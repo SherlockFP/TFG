@@ -84,7 +84,7 @@ import { installCrafting } from './crafting.js';
 // [import:combat]
 
 
-// [import:siege]
+import { installSiege } from './siege.js';
 
 
 // [import:bugfix]
@@ -179,7 +179,7 @@ export class Game extends Emitter {
     // [slot:combat]
 
 
-    // [slot:siege]
+    this.useModule('siege', installSiege);
 
 
     // [slot:bugfix]

@@ -93,7 +93,7 @@ const icon = (type, fallback = '?') => {
 const nameOf = (id) => t(ITEMS[id]?.name || id);
 const fmt = (v) => String(Math.round(v || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 const pct = (p) => (p >= 0.995 ? '100' : p < 0.01 ? '<1' : String(Math.round(p * 100)));
-const CAT_LABEL = { survival: 'survival', combat: 'combat', tools: 'tools', gear: 'gear', arcane: 'arcane' };
+const CAT_LABEL = { survival: 'survival', combat: 'combat', tools: 'tools', gear: 'gear', arcane: 'arcane', tech: 'tech' };
 
 let lastTab = 'craft';
 let lastCat = 'all';
