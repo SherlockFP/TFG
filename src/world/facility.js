@@ -13,6 +13,7 @@ import { INTERIORS, INTERIOR_THEMES, INTERIOR_NAMES, getInterior, isInteriorThem
 import { tintLampLights } from './interiors/common.js';
 import { buildHazards } from './interiors/hazards.js';
 import { buildFacilitySystems, planChestSpots } from './interiors/facsys.js';
+import { planMaps2, buildRooms2, installRoomStyles2 } from './rooms2.js';   // [maps2]
 
 // Interior theme registry (ids: factory, mansion, mineshaft, office, backrooms, serverfarm, sewer, hospital).
 export { INTERIORS, INTERIOR_THEMES, INTERIOR_NAMES, getInterior, isInteriorTheme };
@@ -522,12 +523,14 @@ export function generateLayout(seed, theme = 'factory', size = 1) {
     best.locked = false; best.unlockedByRule = true; unlockedByRule++;
   }
 
-  return {
+  const layoutOut = {
     seed, theme, size, w: W, h: H, cell: CELL, cells, roomOf, heightOf, open, rooms, edgeInfo, doors, fireExits,
     entrance: { room: ent, key: entKey }, distOf, edgeKey, idx, corridorH, plan: R.plan, zoneMask, spines,
     ox: -W * CELL / 2, oz: -H * CELL / 2, y: FACILITY_Y,
     core: coreRoom || null, generator: genRoom || null, outdoorFires, entrySources: sources, unlockedByRule,
   };
+  try { planMaps2(layoutOut); } catch (e) { layoutOut.m2 = null; console.warn('maps2 plan', e); }   // [maps2] retypes a few rooms (own RNG fork, cells / doors untouched)
+  return layoutOut;
 }
 
 // ---------- themes ----------
@@ -611,6 +614,8 @@ for (const th of Object.values(THEMES)) {
   if (!th?.rooms || th.rooms.core) continue;
   th.rooms.core = { floor: 'metal_plate', wall: 'metal_dark', ceil: 'metal_dark', lamp: null, wall_: [], clutter: [], posters: 0 };
 }
+
+installRoomStyles2(THEMES);   // [maps2] story / challenge / liminal room styles for every theme
 
 // Measure prop footprint (cached per id+variant)
 const sizeCache = new Map();
@@ -1224,6 +1229,9 @@ export function buildFacility(layout, { physics, lightPool }) {
   // emergency lighting. Own rng fork; the runtime (state machine, net, HUD) lives in src/game/facilitysys.js.
   let sys = null;
   try { sys = buildFacilitySystems({ ...themeCtx, rng: new RNG((L.seed ^ 0xfac5175) >>> 0), interior: def, doors: doorsOut, hazards, physics, lightPool, colliders }); } catch (e) { console.warn('facility systems', e); }
+  // [maps2] story / liminal rooms + interactable furniture (own RNG fork; failure-isolated)
+  let m2 = null;
+  try { m2 = buildRooms2({ ...themeCtx, rng: new RNG((L.seed ^ 0x3a92c1 ^ 0x51ed) >>> 0), theme, physics, colliders }); } catch (e) { console.warn('maps2 build', e); }
   setPieces.releaseNav();
   // lights
   for (const e of emitters) lightPool.add(e);
@@ -1242,7 +1250,7 @@ export function buildFacility(layout, { physics, lightPool }) {
 
   const mainDoor = doorsOut.find((d) => d.kind === 'entrance');
   const fireDoors = doorsOut.filter((d) => d.kind === 'fireexit');
-  const chestSpots = planChestSpots(L, nav, vaultSpots);
+  const chestSpots = planChestSpots(L, nav, vaultSpots).filter((c) => !L.rooms[c.room]?.m2ch);   // [maps2]
 
   return {
     group, colliders, nav, layout: L, doors: doorsOut, doorByKey, emitters, interactables,
@@ -1250,10 +1258,12 @@ export function buildFacility(layout, { physics, lightPool }) {
     wallSpots: wallSpots.filter((s) => nav.nearestWalkable(...nav.toGrid(s.x, s.z), 2)), ceilingSpots: ceilingSpots.filter(okSpot),
     reactorSpot: reactorRoom?.reactorSpot || null, mainDoor, fireDoors,
     setPieces, zones: setPieces.zones, landmarkSpots, hazards,
-    sys, chestSpots,   // facility systems runtime data + chest spots (dead-end / treasure / vault rooms) for the world module
+    sys, chestSpots, m2,   // [maps2] fac.m2 = story-room notes / light switches / windows (src/game/maps2.js)
+    // facility systems runtime data + chest spots (dead-end / treasure / vault rooms) for the world module
     interior: def.id, interiorName: def.name, atmosphere: def.atmosphere || null,
     dispose(physicsRef) {
       try { sys?.dispose(); } catch (e) { console.warn('facility systems dispose', e); }
+      try { m2?.dispose?.(); } catch (e) { console.warn('maps2 dispose', e); }   // [maps2]
       setPieces.dispose(physicsRef);
       for (const c of colliders) physicsRef.removeCollider(c);
       for (const e of emitters) lightPool.remove(e);

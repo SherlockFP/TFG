@@ -141,7 +141,7 @@ import { installBoardGame } from './boardgame.js';   // [boardgame]
 import { installSecureLoot } from './secureloot.js';   // wave 2: secured containers + breaching tools
 
 
-// [import:maps2]
+import { installMaps2 } from './maps2.js';   // maps2 (story rooms, switches)
 
 
 import { installFood } from './food.js';   // wave 2: food & drinks (buffs, booze, cheers, ship table)
@@ -301,7 +301,7 @@ export class Game extends Emitter {
     this.useModule('secureloot', installSecureLoot);
 
 
-    // [slot:maps2]
+    this.useModule('maps2', installMaps2);
 
 
     this.useModule('food', installFood);
