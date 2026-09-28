@@ -381,3 +381,26 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
 `docs/CRITIQUE.md` honest critique + plan · `CREDITS.md` asset licenses · `README.md` player-facing readme ·
 `docs/REVIEW_WAVE1.md` reviewer report for the wave-1 merge (scores, dead stats, HUD collisions, top-10 fixes; run `tools/harness/wave1_day.js` first, it was written but not executed) ·
 `docs/wave1/*.md` per-module notes · `docs/wave2/*.md` wave-2 modules (anomaly, forge, skeletons).
+
+### 5.14 Session handoff (2026-09-28 night, lead) — READ THIS FIRST
+- Branch `claude/focused-hawking-32j4um` (pushed) holds everything merged; **`main` (live on Render) was NOT updated** —
+  playtest the branch first, then merge to main.
+- Plan/program: `docs/MASTERPLAN.md` (§0-§19: lore, pillars, backlog #1-#24, sector cycle/endless, homeworld, pets, early-game
+  comfort rules). Review: `docs/REVIEW_WAVE1.md`. Per-module notes: `docs/wave1/*.md`, `docs/wave2/*.md`.
+- **Merged modules** (each installed via `this.useModule(name, installX)` slots in `src/game/game.js`): balance/threat/ship door,
+  rpg (roles + passive tree K), crafting, magic (voice/chat/C spells), shop + weapons + Stacked Deck, inventory (I, tiers, bags),
+  facilitysys (living facility, extraction, locked-door fix), lore (The Algorithm, factions, contracts, case files), horde
+  (swarms, hit squads, Doppel + camera, collector, janitor), worldx (landmarks, chests, harvest, lava/ice/jungle), fun
+  (cosmetics/Venom, football, crew tasks, echo mode), P2P batching/delta + NETSTATS, bugfix (body carry), combat (combos,
+  parry, 11 weapons, spells, role skills Y/U), siege + deployables, anomaly (static, mutations, dice, power-ups) + roulette,
+  i18n EN/TR/RU, forge (+1..+9, ascension, shards, creature tiers), menu room (break free, piano, terminal), music,
+  gameplay2 (identify, Spambomb, ship faults, auto roles/aptitudes), cemotes, skeletons + tier looks, durability, mirror
+  dimension, grenades, trade + icons, profile (nickname/avatar), fpbody (stutter fix, grip fit, chat bubbles, FP legs).
+- **Still running / unmerged at handoff** (worktree branches `worktree-agent-*` under `.claude/worktrees/`, merge with
+  `git merge --no-edit <branch>`; docs conflicts = keep both sides): Backrooms workflow (4 builders + QA), boardgame
+  (Administrator), secureloot, maps2, food, homeworld, pets, cycle (sector boss + endless), avatar2 (character redesign).
+  Queued but not started: shipyard (§13), polish/onboarding (§ review top-10), i18n second audit pass.
+- **Biggest risk:** almost everything from wave 2 is only node-tested / host-path tested, NOT hand-played and NOT tested with
+  2 real players. First job next session: `npm run dev`, play 15 min, run `tools/harness/smoke_land.js` + `tools/harness/mp2.mjs`,
+  fix crashes, then merge to `main`.
+- Gotcha learned: never `rm -rf node_modules` inside a worktree whose node_modules is a symlink (it wiped the shared install once).
