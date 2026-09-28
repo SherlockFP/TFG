@@ -1,4 +1,5 @@
 // Item definitions registry. Mods can add entries with registerItem().
+import { localizeFields } from '../core/i18n.js';
 // kind: scrap | big (physics valuable) | fish | drop | tool | weapon | consumable
 // value: [min, max] credits (scrap); price: store price (credits); coin: black market price (Clout)
 // weight in lb (LC-style), hands: 1 | 2
@@ -278,7 +279,7 @@ export const SHIP_UPGRADES = {
 
 export function registerItem(def) {
   if (!def?.id) throw new Error('item needs id');
-  ITEMS[def.id] = { hands: 1, weight: 5, kind: 'scrap', ...def };
+  ITEMS[def.id] = localizeFields({ hands: 1, weight: 5, kind: 'scrap', ...def }, ['name', 'tip', 'desc']);
   return ITEMS[def.id];
 }
 

@@ -6,11 +6,11 @@ import { contractText, RIVAL_REP } from '../../game/contracts.js';
 import { standing, tributeCost } from '../../game/factions.js';
 import { FOCUS_NAME, drawAlgoFace } from '../../game/algorithm.js';
 import { renderCaseCard, renderCaseList, renderLogList, ensureCaseStyle } from './casefile.js';
-import { getLang } from '../../core/i18n.js';
+import { getLang, t } from '../../core/i18n.js';
 import { escapeHtml } from '../../core/util.js';
 
 const tr = () => { try { return getLang() === 'tr'; } catch { return false; } };
-const L = (en, trs) => (tr() ? trs : en);
+const L = (en, trs) => (tr() ? trs : t(en));   // RU: dictionary keyed by the English text
 const STYLE_ID = 'tfg-lore-board-style';
 const CSS = `
 .lb{width:min(1100px,95vw);max-height:90vh;display:flex;flex-direction:column;background:linear-gradient(180deg,rgba(16,6,12,.97),rgba(6,3,6,.97));

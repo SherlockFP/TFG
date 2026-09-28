@@ -25,6 +25,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { SHIP, insideShip } from '../world/ship.js';
 import { createAvatar } from '../models/avatar.js';
 import { suitColor } from '../entities/remote.js';
+import { t, tf, t as _t } from '../core/i18n.js';
 
 const S = SHIP;
 const ROOF_Y = S.h + 0.45;                 // matches ship.js (eh)
@@ -374,7 +375,7 @@ export function installShipFeatures(game) {
   const click = (pos) => game.audio?.at?.('ui_click', pos, 0.7, { refDistance: 1.5, maxDistance: 15 });
   const iaHorn = {
     pos: hornIP, r: 0.3,
-    label: () => (hornCd > 0 ? 'Loud Horn (recharging...)' : 'Sound the LOUD HORN [E]'),
+    label: () => (hornCd > 0 ? t('Loud Horn (recharging...)') : t('Sound the LOUD HORN [E]')),
     action: () => {
       if (hornCd > 0) { game.sfx?.('ui_error', 0.35); return; }
       click(hornIP); request('horn');
@@ -385,23 +386,23 @@ export function installShipFeatures(game) {
     label: () => {
       if (tpCd > 0) return `Teleporter recharging... ${Math.ceil(tpCd)}s`;
       const t = pickTarget();
-      return t ? `Teleport ${game.playerName?.(t) || 'crewmate'} to the ship [E]` : 'Teleporter (no crewmates)';
+      return t ? tf('Teleport {n} to the ship [E]', { n: game.playerName?.(t) || 'crewmate' }) : _t('Teleporter (no crewmates)');
     },
     action: () => {
       if (tpCd > 0) { game.sfx?.('ui_error', 0.35); return; }
       const t = pickTarget();
-      if (!t) { game.ui?.toast?.('No crewmate to teleport.'); game.sfx?.('ui_error', 0.35); return; }
+      if (!t) { game.ui?.toast?.(_t('No crewmate to teleport.')); game.sfx?.('ui_error', 0.35); return; }
       click(tpIP); request('tp', { target: t });
     },
   };
   const iaDisco = {
     pos: ballCenter, r: 0.45, reach: 3.2,
-    label: () => (st.party ? 'Disco ball: stop the party [E]' : 'Disco ball: start the party [E]'),
+    label: () => (st.party ? t('Disco ball: stop the party [E]') : t('Disco ball: start the party [E]')),
     action: () => { click(ballCenter); request('party'); },
   };
   const iaCup = cupPos && doors.length ? {
     pos: cupPos, r: 0.7,
-    label: () => (st.cup ? 'Close cupboard [E]' : 'Open cupboard [E]'),
+    label: () => (st.cup ? t('Close cupboard [E]') : t('Open cupboard [E]')),
     action: () => request('cup'),
   } : null;
 

@@ -9,6 +9,7 @@ import { CREATURES } from './creatures.js';
 import { buyRate } from './progression.js';
 import { insideShip } from '../world/ship.js';
 import { escapeHtml } from '../core/util.js';
+import { t, tf, tfIn, sysMsg } from '../core/i18n.js';
 
 const BANNER = [
   '  _  _______ _____ _    _',
@@ -20,14 +21,14 @@ const BANNER = [
 ];
 
 // ------------------------------------------------------------------ moon helpers (handcrafted + generated sector)
-const interiorName = (id) => FACILITY.INTERIOR_NAMES?.[id] || INTERIOR_NAMES[id] || id;
+const interiorName = (id) => t(FACILITY.INTERIOR_NAMES?.[id] || INTERIOR_NAMES[id] || id);
 const sizeLabel = (s) => (s < 1.3 ? 'S' : s < 1.7 ? 'M' : s < 2.1 ? 'L' : 'XL');
 const riskBar = (m) => { const n = Math.max(1, Math.min(5, Math.round(m.riskScore ?? m.tier ?? 1))); return '[' + '#'.repeat(n) + '-'.repeat(5 - n) + ']'; };
-const weatherName = (run, m) => WEATHER[run.forecast?.[m.id] || 'clear']?.name || 'Clear';
-const costText = (m) => (m.cost ? '▮' + m.cost : 'FREE');
+const weatherName = (run, m) => WEATHER[run.forecast?.[m.id] || 'clear']?.name || t('Clear');
+const costText = (m) => (m.cost ? '▮' + m.cost : t('FREE'));
 // every moon the autopilot can fly to right now (generated moons of older sectors are gone)
 const routable = () => MOON_ORDER.map((id) => MOONS[id]).filter((m) => m && !m.stale);
-const moonKey = (m) => m.name.replace(/^[^-]+-/, '') + ' ' + m.id + ' ' + m.name + ' ' + (m.short || '');
+const moonKey = (m) => m.name.replace(/^[^-]+-/, '') + ' ' + m.id + ' ' + m.name + ' ' + (m.short || '') + ' ' + (m.$name || '');
 function findMoon(q) {
   q = String(q || '').trim();
   const slot = /^#?([1-9])$/.exec(q);
@@ -36,10 +37,10 @@ function findMoon(q) {
 }
 
 function fuzzyFind(list, q, key = (x) => x) {
-  q = q.toLowerCase().replace(/[^a-z0-9çğıöşü]/g, '');
+  q = q.toLowerCase().replace(/[^a-z0-9а-яёçğıöşü]/g, '');
   if (!q) return null;
-  return list.find((x) => key(x).toLowerCase().replace(/[^a-z0-9çğıöşü]/g, '').startsWith(q))
-    || list.find((x) => key(x).toLowerCase().replace(/[^a-z0-9çğıöşü]/g, '').includes(q));
+  return list.find((x) => key(x).toLowerCase().replace(/[^a-z0-9а-яёçğıöşü]/g, '').startsWith(q))
+    || list.find((x) => key(x).toLowerCase().replace(/[^a-z0-9а-яёçğıöşü]/g, '').includes(q));
 }
 
 export class Terminal {
@@ -58,7 +59,7 @@ export class Terminal {
     if (this.el) return;
     const el = document.createElement('div');
     el.className = 'terminal hidden';
-    el.innerHTML = `<div class="term-screen"><div class="term-out"></div><div class="term-line"><span class="term-prompt">&gt;</span><input class="term-in" spellcheck="false" autocomplete="off" maxlength="80"/></div></div><div class="term-hint">[ESC] leave terminal · type HELP</div>`;
+    el.innerHTML = `<div class="term-screen"><div class="term-out"></div><div class="term-line"><span class="term-prompt">&gt;</span><input class="term-in" spellcheck="false" autocomplete="off" maxlength="80"/></div></div><div class="term-hint">${escapeHtml(t('[ESC] leave terminal · type HELP'))}</div>`;
     document.getElementById('ui').appendChild(el);
     this.el = el;
     this.out = el.querySelector('.term-out');
@@ -81,7 +82,7 @@ export class Terminal {
     this.active = true;
     this.game.input.unlock();
     this.el.classList.remove('hidden');
-    if (!this.lines.length) { this.print(BANNER.join('\n'), 'banner'); this.print('Welcome to the Company terminal. Type HELP for a list of commands.'); }
+    if (!this.lines.length) { this.print(BANNER.join('\n'), 'banner'); this.print(t('Welcome to the Company terminal. Type HELP for a list of commands.')); }
     this.render();
     setTimeout(() => this.inp.focus(), 30);
     this.game.sfx('terminal_enter', 0.4);
@@ -117,7 +118,7 @@ export class Terminal {
     this.history.push(cmd); this.histIdx = -1;
     this.print('> ' + cmd, 'echo');
     this.game.sfx('terminal_enter', 0.4);
-    try { this.exec(cmd); } catch (e) { console.error(e); this.print('ERROR: ' + e.message, 'err'); }
+    try { this.exec(cmd); } catch (e) { console.error(e); this.print(t('ERROR') + ': ' + e.message, 'err'); }
   }
 
   exec(cmd) {
@@ -132,52 +133,52 @@ export class Terminal {
       g.net.request('term', { cmd: p });
       return;
     }
-    if (this.pending && (w0 === 'deny' || w0 === 'd' || w0 === 'no' || w0 === 'n')) { this.pending = null; this.print('Cancelled.'); return; }
+    if (this.pending && (w0 === 'deny' || w0 === 'd' || w0 === 'no' || w0 === 'n')) { this.pending = null; this.print(t('Cancelled.')); return; }
     this.pending = null;
     switch (w0) {
       case 'help': case '?':
         this.print([
-          '>MOONS        list moons, weather & routing costs',
-          '>SECTOR       map of the current uncharted sector',
-          '>INFO <moon>  details: biome, interior, risk, modifiers',
-          '>ROUTE <moon> set the autopilot destination (or ROUTE #2)',
-          '>STORE        the Company Store screen (STORE LIST = plain text)',
-          '>BUY <item> [n]',
-          '>BUY VAN      order the Uplink Van (4 seats + cargo bed)',
-          '>SCAN         scrap remaining on this moon',
-          '>QUOTA        profit quota status',
-          '>CREW         crew status',
-          '>BESTIARY     creature entries  (>BESTIARY <name>)',
-          '>SWITCH [name] change the radar target',
-          '>CODES        list secure door / turret / mine codes',
-          '><code>       toggle a secure door or disable a turret/mine (e.g. A3)',
-          '>TRANSMIT <msg>  (Signal Translator)',
-          '>TELEPORT [name] (Teleporter)',
-          '>CLEAR',
+          t('>MOONS        list moons, weather & routing costs'),
+          t('>SECTOR       map of the current uncharted sector'),
+          t('>INFO <moon>  details: biome, interior, risk, modifiers'),
+          t('>ROUTE <moon> set the autopilot destination (or ROUTE #2)'),
+          t('>STORE        the Company Store screen (STORE LIST = plain text)'),
+          t('>BUY <item> [n]'),
+          t('>BUY VAN      order the Uplink Van (4 seats + cargo bed)'),
+          t('>SCAN         scrap remaining on this moon'),
+          t('>QUOTA        profit quota status'),
+          t('>CREW         crew status'),
+          t('>BESTIARY     creature entries  (>BESTIARY <name>)'),
+          t('>SWITCH [name] change the radar target'),
+          t('>CODES        list secure door / turret / mine codes'),
+          t('><code>       toggle a secure door or disable a turret/mine (e.g. A3)'),
+          t('>TRANSMIT <msg>  (Signal Translator)'),
+          t('>TELEPORT [name] (Teleporter)'),
+          t('>CLEAR'),
         ].join('\n'));
         return;
       case 'clear': this.clear(); return;
       case 'moons': case 'moon': {
         const sector = ensureSector(run);
-        const out = ['CURRENT ROUTE: ' + (MOONS[run.moon]?.name || '-'), ''];
-        if (run.dailyEvent) out.push(`TODAY: ${run.dailyEvent.name} — ${run.dailyEvent.desc}`, '');
-        out.push('CHARTED MOONS:');
+        const out = [t('CURRENT ROUTE') + ': ' + (MOONS[run.moon]?.name || '-'), ''];
+        if (run.dailyEvent) out.push(tf('TODAY: {name} — {desc}', { name: t(run.dailyEvent.name), desc: t(run.dailyEvent.desc) }), '');
+        out.push(t('CHARTED MOONS:'));
         for (const id of MOON_ORDER) {
           const m = MOONS[id];
           if (!m || m.generated) continue;
           const w = m.company ? '' : ` (${weatherName(run, m)})`;
-          const rate = m.company ? `  buying at ${Math.round(buyRate(run.daysLeft, run.buyRnd) * 100)}%` : '';
+          const rate = m.company ? '  ' + tf('buying at {r}%', { r: Math.round(buyRate(run.daysLeft, run.buyRnd) * 100) }) : '';
           out.push(`* ${m.name.padEnd(14)} ${m.company ? '' : 'T' + m.tier} ${costText(m)}${w}${rate}`);
         }
         const gen = sectorMoons();
         if (gen.length) {
-          out.push('', `UNCHARTED: ${sector?.name || 'SECTOR'}  (${gen.length} servers)`);
+          out.push('', tf('UNCHARTED: {name}  ({n} servers)', { name: sector?.name || t('SECTOR'), n: gen.length }));
           gen.forEach((m, i) => {
             const cur = m.id === run.moon ? '>' : '*';
-            out.push(`${cur} #${i + 1} ${m.name.padEnd(28)} T${m.tier} ${costText(m).padEnd(6)} (${weatherName(run, m)}) ${m.risk}`);
-            out.push(`       ${biomeName(m.biome)} / ${interiorName(m.interior)} / ${sizeLabel(m.size)}${m.mods.length ? '  +' + m.mods.map((k) => MODIFIERS[k]?.name || k).join(' +') : ''}`);
+            out.push(`${cur} #${i + 1} ${m.name.padEnd(28)} T${m.tier} ${costText(m).padEnd(6)} (${weatherName(run, m)}) ${t(m.risk)}`);
+            out.push(`       ${t(biomeName(m.biome))} / ${interiorName(m.interior)} / ${sizeLabel(m.size)}${m.mods.length ? '  +' + m.mods.map((k) => MODIFIERS[k]?.name || k).join(' +') : ''}`);
           });
-          out.push('', 'Type SECTOR for the map, INFO <moon> for details.');
+          out.push('', t('Type SECTOR for the map, INFO <moon> for details.'));
         }
         this.print(out.join('\n'));
         return;
@@ -189,19 +190,19 @@ export class Terminal {
       case 'info': {
         ensureSector(run);
         const m = arg ? findMoon(arg) : MOONS[run.moon];
-        if (!m) { this.print('Unknown moon. Type MOONS.', 'err'); return; }
+        if (!m) { this.print(t('Unknown moon. Type MOONS.'), 'err'); return; }
         this.print(this.moonInfo(m, run));
         return;
       }
       case 'route': case 'r': {
         ensureSector(run);
         const moon = findMoon(arg);
-        if (!moon) { this.print('Unknown moon. Type MOONS (or SECTOR for uncharted servers).', 'err'); return; }
-        if (run.phase !== 'orbit') { this.print('Routing is only possible while in orbit.', 'err'); return; }
-        if (moon.id === run.moon) { this.print('Already routed to ' + moon.name + '.'); return; }
+        if (!moon) { this.print(t('Unknown moon. Type MOONS (or SECTOR for uncharted servers).'), 'err'); return; }
+        if (run.phase !== 'orbit') { this.print(t('Routing is only possible while in orbit.'), 'err'); return; }
+        if (moon.id === run.moon) { this.print(tf('Already routed to {name}.', { name: moon.name })); return; }
         this.pending = { op: 'route', moon: moon.id };
         const rcost = g.config?.freeTravel ? 0 : moon.cost;
-        this.print(`Route the autopilot to ${moon.name}? ${rcost ? `It will cost ▮${rcost}.` : 'Free travel.'}\n${this.moonInfo(moon, run, true)}\nYour credits: ▮${run.credits}${run.credits < rcost ? '  (NOT ENOUGH)' : ''}\n\nType CONFIRM or DENY.`);
+        this.print(`${tf('Route the autopilot to {name}?', { name: moon.name })} ${rcost ? tf('It will cost ▮{c}.', { c: rcost }) : t('Free travel.')}\n${this.moonInfo(moon, run, true)}\n${tf('Your credits: ▮{c}', { c: run.credits })}${run.credits < rcost ? '  ' + t('(NOT ENOUGH)') : ''}\n\n${t('Type CONFIRM or DENY.')}`);
         return;
       }
       case 'store': case 'shop': {
@@ -212,12 +213,12 @@ export class Terminal {
           return;
         }
         if (g.shop?.textList) { const out = g.shop.textList(); out.splice(out.length - 1, 0, ...(g.cruiser?.storeLines?.() || [])); this.print(out.join('\n')); return; }
-        const out = ['Welcome to the Company store. Deliveries arrive instantly (for a small fee we do not mention).', ''];
+        const out = [t('Welcome to the Company store. Deliveries arrive instantly (for a small fee we do not mention).'), ''];
         for (const id of STORE_ITEMS) { const d = ITEMS[id]; if (d) out.push(`* ${d.name.padEnd(18)} ▮${d.price}`); }
-        out.push('', 'SHIP UPGRADES:');
-        for (const [id, u] of Object.entries(SHIP_UPGRADES)) { if (u.owned) continue; out.push(`* ${u.name.padEnd(18)} ▮${u.price}${run.upgrades?.[id] ? '  [INSTALLED]' : ''}`); }
+        out.push('', t('SHIP UPGRADES:'));
+        for (const [id, u] of Object.entries(SHIP_UPGRADES)) { if (u.owned) continue; out.push(`* ${u.name.padEnd(18)} ▮${u.price}${run.upgrades?.[id] ? '  [' + t('INSTALLED') + ']' : ''}`); }
         out.push(...(g.cruiser?.storeLines?.() || []));
-        out.push('', 'Personal gear, armor and cosmetics: visit Phish Dayı at 0-Algorithm HQ.');
+        out.push('', t('Personal gear, armor and cosmetics: visit Phish Dayı at 0-Algorithm HQ.'));
         this.print(out.join('\n'));
         return;
       }
@@ -226,94 +227,94 @@ export class Terminal {
         const q = (m?.[1] || '').trim();
         const n = Math.max(1, Math.min(10, parseInt(m?.[2] || '1', 10)));
         if (g.cruiser?.terminalBuy?.(q, this)) return;
-        const up = fuzzyFind(Object.entries(SHIP_UPGRADES), q, ([id, u]) => u.name + ' ' + id);
+        const up = fuzzyFind(Object.entries(SHIP_UPGRADES), q, ([id, u]) => u.name + ' ' + (u.$name || '') + ' ' + id);
         // data-driven stock (game/shop.js): every registered item with a price + shop category, at today's deal prices
         const pool = g.shop?.buyables ? g.shop.buyables().map((e) => ({ ...e.def, price: e.price })) : STORE_ITEMS.map((id) => ITEMS[id]);
-        const it = fuzzyFind(pool, q, (d) => d.name + ' ' + d.id);
+        const it = fuzzyFind(pool, q, (d) => d.name + ' ' + (d.$name || '') + ' ' + d.id);
         if (it && (!up || it.name.toLowerCase().startsWith(q))) {
           const cost = it.price * n;
           this.pending = { op: 'buy', item: it.id, n };
-          this.print(`Order ${n}x ${it.name} for ▮${cost}? Credits: ▮${run.credits}\nType CONFIRM or DENY.`);
+          this.print(`${tf('Order {n}x {name} for ▮{cost}? Credits: ▮{c}', { n, name: it.name, cost, c: run.credits })}\n${t('Type CONFIRM or DENY.')}`);
           return;
         }
         if (up) {
           const [id, u] = up;
-          if (run.upgrades?.[id]) { this.print('Already installed.'); return; }
+          if (run.upgrades?.[id]) { this.print(t('Already installed.')); return; }
           this.pending = { op: 'upgrade', id };
-          this.print(`Install ${u.name} for ▮${u.price}? ${u.desc}\nType CONFIRM or DENY.`);
+          this.print(`${tf('Install {name} for ▮{price}? {desc}', { name: u.name, price: u.price, desc: u.desc })}\n${t('Type CONFIRM or DENY.')}`);
           return;
         }
-        this.print('Unknown item. Type STORE.', 'err');
+        this.print(t('Unknown item. Type STORE.'), 'err');
         return;
       }
       case 'scan': {
-        if (run.phase !== 'moon') { this.print('Nothing to scan. Land on a moon first.'); return; }
+        if (run.phase !== 'moon') { this.print(t('Nothing to scan. Land on a moon first.')); return; }
         let n = 0, v = 0;
         for (const it of g.items.all()) {
           if (it.state !== 'world' || !isSellable(it.def) || insideShip(it.obj.position) || it.soulbound) continue;
           n++; v += it.value;
         }
-        this.print(`There are ${n} objects outside the ship, totalling an approximate value of ▮${Math.round(v * (0.8 + Math.random() * 0.2) / 10) * 10}.`);
+        this.print(tf('There are {n} objects outside the ship, totalling an approximate value of ▮{v}.', { n, v: Math.round(v * (0.8 + Math.random() * 0.2) / 10) * 10 }));
         return;
       }
       case 'quota': {
-        this.print(`PROFIT QUOTA: ▮${run.sold} / ▮${run.quota}\nDEADLINE: ${run.daysLeft} day(s)\nCREDITS: ▮${run.credits}\nQUOTAS MET THIS RUN: ${run.quotaIndex}\nCURRENT COMPANY BUYING RATE: ${Math.round(buyRate(run.daysLeft, run.buyRnd) * 100)}%`);
+        this.print(tf('PROFIT QUOTA: ▮{sold} / ▮{quota}', { sold: run.sold, quota: run.quota }) + '\n' + tf('DEADLINE: {d} day(s)', { d: run.daysLeft }) + '\n' + tf('CREDITS: ▮{c}', { c: run.credits }) + '\n' + tf('QUOTAS MET THIS RUN: {n}', { n: run.quotaIndex }) + '\n' + tf('CURRENT COMPANY BUYING RATE: {r}%', { r: Math.round(buyRate(run.daysLeft, run.buyRnd) * 100) }));
         return;
       }
       case 'crew': {
         const out = [];
         const me = g.player;
-        out.push(`* ${g.profile.name} (you)  Lv.${g.profile.level}  ${me.dead ? 'DECEASED' : Math.round(me.hp) + ' HP'}`);
-        for (const r of g.remotes.values()) out.push(`* ${r.name}  Lv.${r.level}  ${r.dead ? 'DECEASED' : (r.hp ?? 100) + ' HP'}${r.indoor ? '  [inside facility]' : ''}`);
+        out.push(`* ${g.profile.name} (${t('you')})  ${t('Lv.')}${g.profile.level}  ${me.dead ? t('DECEASED') : Math.round(me.hp) + ' HP'}`);
+        for (const r of g.remotes.values()) out.push(`* ${r.name}  ${t('Lv.')}${r.level}  ${r.dead ? t('DECEASED') : (r.hp ?? 100) + ' HP'}${r.indoor ? '  [' + t('inside facility') + ']' : ''}`);
         this.print(out.join('\n'));
         return;
       }
       case 'bestiary': case 'b': {
         const seen = Object.entries(g.profile.bestiary).filter(([, b]) => b.seen);
         if (arg) {
-          const e = fuzzyFind(seen.map(([id]) => id), arg, (id) => (CREATURES[id]?.name || id) + ' ' + id);
-          if (!e) { this.print('No entry. You have to see it first.', 'err'); return; }
+          const e = fuzzyFind(seen.map(([id]) => id), arg, (id) => (CREATURES[id]?.name || id) + ' ' + (CREATURES[id]?.$name || '') + ' ' + id);
+          if (!e) { this.print(t('No entry. You have to see it first.'), 'err'); return; }
           const d = CREATURES[e];
-          this.print(`${d.name.toUpperCase()}\n${d.hp ? 'Durability: ' + d.hp + ' (Lv.1)' : 'Durability: UNKNOWN'}    Danger: ${'!'.repeat(Math.min(5, Math.ceil((d.power || 1) + (d.dmg >= 999 ? 2 : 0))))}\nKills: ${g.profile.bestiary[e].kills || 0}\n\n${d.lore}\n\n  - field notes by u/throwaway_janitor`);
+          this.print(`${d.name.toUpperCase()}\n${d.hp ? tf('Durability: {hp} (Lv.1)', { hp: d.hp }) : t('Durability: UNKNOWN')}    ${t('Danger')}: ${'!'.repeat(Math.min(5, Math.ceil((d.power || 1) + (d.dmg >= 999 ? 2 : 0))))}\n${t('Kills')}: ${g.profile.bestiary[e].kills || 0}\n\n${d.lore}\n\n  - ${t('field notes by u/throwaway_janitor')}`);
           return;
         }
-        if (!seen.length) { this.print('No entries yet. Scan creatures (RMB) to learn about them.'); return; }
-        this.print('BESTIARY:\n' + seen.map(([id, b]) => `* ${CREATURES[id]?.name || id}${b.kills ? '  (' + b.kills + ' kills)' : ''}`).join('\n') + '\n\nType BESTIARY <name> for details.');
+        if (!seen.length) { this.print(t('No entries yet. Scan creatures (RMB) to learn about them.')); return; }
+        this.print(t('BESTIARY:') + '\n' + seen.map(([id, b]) => `* ${CREATURES[id]?.name || id}${b.kills ? '  (' + tf('{n} kills', { n: b.kills }) + ')' : ''}`).join('\n') + '\n\n' + t('Type BESTIARY <name> for details.'));
         return;
       }
       case 'switch': {
         const names = [{ id: g.selfId, name: g.profile.name }, ...[...g.remotes.values()].map((r) => ({ id: r.id, name: r.name }))];
-        let t;
-        if (arg) t = fuzzyFind(names, arg, (x) => x.name);
-        else { const i = names.findIndex((x) => x.id === this.radarTarget); t = names[(i + 1) % names.length]; }
-        if (!t) { this.print('No crewmate by that name.', 'err'); return; }
-        this.radarTarget = t.id;
-        this.print('Radar now tracking: ' + t.name);
+        let tg;
+        if (arg) tg = fuzzyFind(names, arg, (x) => x.name);
+        else { const i = names.findIndex((x) => x.id === this.radarTarget); tg = names[(i + 1) % names.length]; }
+        if (!tg) { this.print(t('No crewmate by that name.'), 'err'); return; }
+        this.radarTarget = tg.id;
+        this.print(t('Radar now tracking:') + ' ' + tg.name);
         return;
       }
       case 'codes': {
         const out = [];
-        for (const d of g.world.facility?.doors || []) if (d.code) out.push(`* ${d.code.toUpperCase()}  secure door  ${d.open ? '[OPEN]' : '[CLOSED]'}`);
+        for (const d of g.world.facility?.doors || []) if (d.code) out.push(`* ${d.code.toUpperCase()}  ${t('secure door')}  ${d.open ? '[' + t('OPEN') + ']' : '[' + t('CLOSED') + ']'}`);
         for (const v of g.creatures.views.values()) if (v.code && v.state !== 'dead') out.push(`* ${v.code.toUpperCase()}  ${v.def.name}`);
-        this.print(out.length ? out.join('\n') : 'No coded objects detected.');
+        this.print(out.length ? out.join('\n') : t('No coded objects detected.'));
         return;
       }
       case 'transmit': {
-        if (!run.upgrades?.signal) { this.print('Requires the Signal Translator upgrade.', 'err'); return; }
-        if (!arg) { this.print('Usage: TRANSMIT <message>', 'err'); return; }
+        if (!run.upgrades?.signal) { this.print(t('Requires the Signal Translator upgrade.'), 'err'); return; }
+        if (!arg) { this.print(t('Usage: TRANSMIT <message>'), 'err'); return; }
         g.net.request('term', { cmd: { op: 'transmit', text: cmd.slice(9, 9 + 20) } });
         return;
       }
       case 'teleport': {
-        if (!run.upgrades?.teleporter) { this.print('Requires the Teleporter upgrade.', 'err'); return; }
+        if (!run.upgrades?.teleporter) { this.print(t('Requires the Teleporter upgrade.'), 'err'); return; }
         const names = [...g.remotes.values()].map((r) => ({ id: r.id, name: r.name }));
-        const t = arg ? fuzzyFind(names, arg, (x) => x.name) : names.find((x) => x.id === this.radarTarget);
-        if (!t) { this.print('Teleport whom? (TELEPORT <name> or SWITCH first)', 'err'); return; }
-        if (g.shipFeatures) { g.net.request('shipf', { op: 'tp', target: t.id, term: 1 }); return; }
-        g.net.request('shipf', { op: 'tp', target: t.id });
+        const tg = arg ? fuzzyFind(names, arg, (x) => x.name) : names.find((x) => x.id === this.radarTarget);
+        if (!tg) { this.print(t('Teleport whom? (TELEPORT <name> or SWITCH first)'), 'err'); return; }
+        if (g.shipFeatures) { g.net.request('shipf', { op: 'tp', target: tg.id, term: 1 }); return; }
+        g.net.request('shipf', { op: 'tp', target: tg.id });
         return;
       }
-      case 'kefal': this.print('><((((º>   The Algorithm thanks you for your loyalty.'); return;
+      case 'kefal': this.print(t('><((((º>   The Algorithm thanks you for your loyalty.')); return;
       default: {
         // codes
         if (/^[a-z]\d{1,2}$/.test(w0)) { g.net.request('term', { cmd: { op: 'code', code: w0 } }); return; }
@@ -321,7 +322,7 @@ export class Terminal {
         if (moon) { this.exec('route ' + w0); return; }
         const cr = Object.keys(g.profile.bestiary).find((id) => (CREATURES[id]?.name || '').toLowerCase().startsWith(w0));
         if (cr) { this.exec('bestiary ' + w0); return; }
-        this.print('[There was no action supplied with the word.]', 'err');
+        this.print(t('[There was no action supplied with the word.]'), 'err');
       }
     }
   }
@@ -330,10 +331,10 @@ export class Terminal {
   moonInfo(m, run, brief = false) {
     if (m.company) return `${m.name}\n${m.desc}`;
     const lines = [];
-    if (!brief) lines.push(`${m.name.toUpperCase()}${m.generated ? '  [UNCHARTED]' : ''}`);
-    lines.push(`Tier ${m.tier}  ·  Risk ${riskBar(m)} ${m.risk || ['', 'LOW', 'MODERATE', 'HIGH', 'SEVERE', 'LETHAL'][Math.min(5, m.tier)]}  ·  ${costText(m)}`);
-    lines.push(`Biome: ${biomeName(m.biome)}   Interior: ${interiorName(m.interior)}   Size: ${sizeLabel(m.size || 1)}${(m.mapScale || 1) > 1 ? ' (big map)' : ''}`);
-    lines.push(`Forecast: ${weatherName(run, m)}   Scrap value: x${(m.scrapMul || 1).toFixed(2)}`);
+    if (!brief) lines.push(`${m.name.toUpperCase()}${m.generated ? '  [' + t('UNCHARTED') + ']' : ''}`);
+    lines.push(`${t('Tier')} ${m.tier}  ·  ${t('Risk')} ${riskBar(m)} ${t(m.risk || ['', 'LOW', 'MODERATE', 'HIGH', 'SEVERE', 'LETHAL'][Math.min(5, m.tier)])}  ·  ${costText(m)}`);
+    lines.push(`${t('Biome')}: ${t(biomeName(m.biome))}   ${t('Interior')}: ${interiorName(m.interior)}   ${t('Size')}: ${sizeLabel(m.size || 1)}${(m.mapScale || 1) > 1 ? ' (' + t('big map') + ')' : ''}`);
+    lines.push(`${t('Forecast')}: ${weatherName(run, m)}   ${t('Scrap value')}: x${(m.scrapMul || 1).toFixed(2)}`);
     for (const k of m.mods || []) lines.push(`+ ${MODIFIERS[k]?.name || k}: ${MODIFIERS[k]?.desc || ''}`);
     if (!brief || !m.generated) lines.push(m.desc || '');
     else lines.push(m.desc.split('. ')[0].replace(/\.?$/, '.'));
@@ -344,7 +345,7 @@ export class Terminal {
   printSector(run) {
     const sector = ensureSector(run);
     const moons = sectorMoons();
-    if (!sector || !moons.length) { this.print('No uncharted sector in range.', 'err'); return; }
+    if (!sector || !moons.length) { this.print(t('No uncharted sector in range.'), 'err'); return; }
     const W = 46, H = 9;
     const grid = Array.from({ length: H }, () => Array(W).fill(' '));
     const r = new RNG(hashString('map:' + sector.key));     // same stars every time for this sector
@@ -366,24 +367,24 @@ export class Terminal {
     }
     put(ship.x - 1, ship.y, '[@]');
     pos.forEach((p, i) => put(p.x - 1, p.y, `[${i + 1}]`));
-    const out = [`${sector.name}`.padEnd(W - 10) + `QUOTA #${(run.quotaIndex | 0) + 1}`, '+' + '-'.repeat(W) + '+'];
+    const out = [`${sector.name}`.padEnd(W - 10) + `${t('QUOTA')} #${(run.quotaIndex | 0) + 1}`, '+' + '-'.repeat(W) + '+'];
     for (const row of grid) out.push('|' + row.join('') + '|');
-    out.push('+' + '-'.repeat(W) + '+', '[@] your ship' + (MOONS[run.moon]?.generated ? '   === current route' : ''));
+    out.push('+' + '-'.repeat(W) + '+', '[@] ' + t('your ship') + (MOONS[run.moon]?.generated ? '   === ' + t('current route') : ''));
     pos.forEach((p, i) => {
       const m = p.m;
-      out.push(`[${i + 1}] ${m.name.padEnd(28)} T${m.tier} ${costText(m).padEnd(6)} ${riskBar(m)} ${m.risk}`);
-      out.push(`    ${biomeName(m.biome)} / ${interiorName(m.interior)} / ${sizeLabel(m.size)} / ${weatherName(run, m)}${m.mods.length ? '  +' + m.mods.map((k) => MODIFIERS[k]?.name || k).join(' +') : ''}`);
+      out.push(`[${i + 1}] ${m.name.padEnd(28)} T${m.tier} ${costText(m).padEnd(6)} ${riskBar(m)} ${t(m.risk)}`);
+      out.push(`    ${t(biomeName(m.biome))} / ${interiorName(m.interior)} / ${sizeLabel(m.size)} / ${weatherName(run, m)}${m.mods.length ? '  +' + m.mods.map((k) => MODIFIERS[k]?.name || k).join(' +') : ''}`);
     });
-    out.push('', 'ROUTE #n (or a name) to fly there. Meet the quota and this sector goes dark: a new one is charted.');
+    out.push('', t('ROUTE #n (or a name) to fly there. Meet the quota and this sector goes dark: a new one is charted.'));
     this.print(out.join('\n'));
   }
 
   onRemote(d) {
     if (d.to && d.to !== this.game.selfId) {
-      if (d.all) this.print(d.text, d.cls || '');
+      if (d.all) this.print(d.k ? tf(d.k, d.v || {}) : t(d.text), d.cls || '');
       return;
     }
-    this.print(d.text, d.cls || '');
+    this.print(d.k ? tf(d.k, d.v || {}) : t(d.text), d.cls || '');
     if (d.err) this.game.sfx('terminal_error', 0.5);
   }
 
@@ -391,7 +392,7 @@ export class Terminal {
   hostExecute(cmd, from) {
     const g = this.game;
     const run = g.run;
-    const reply = (text, err) => g.net.sendTo(from, 'term', { to: from, text, err, cls: err ? 'err' : '' });
+    const reply = (text, err, vars) => g.net.sendTo(from, 'term', { to: from, text: tfIn('en', text, vars || {}), k: vars ? text : undefined, v: vars, err, cls: err ? 'err' : '' });
     if (!cmd || typeof cmd !== 'object') return;
     switch (cmd.op) {
       case 'route': {
@@ -401,13 +402,13 @@ export class Terminal {
         if (run.daysLeft <= 0 && !m.company) { reply('Deadline reached: only 0-Algorithm HQ is available.', true); return; }
         // Free travel (host option, on by default): every moon/server is reachable without credits.
         const cost = g.config?.freeTravel ? 0 : m.cost;
-        if (run.credits < cost) { reply(`Insufficient credits: ${m.name} costs ▮${cost}, you have ▮${run.credits}.\nSell scrap at 0-Algorithm HQ (ROUTE HQ) or pick a FREE moon.`, true); return; }
+        if (run.credits < cost) { reply('Insufficient credits: {@m} costs ▮{cost}, you have ▮{c}.\nSell scrap at 0-Algorithm HQ (ROUTE HQ) or pick a FREE moon.', true, { m: m.$name || m.name, cost, c: run.credits }); return; }
         run.credits -= cost;
         run.moon = m.id;
         g.broadcastRun(['moon', 'credits']);
         g.env.setSpace(g.planetColorFor(m.id));
-        g.net.broadcast('sys', { text: `Autopilot routed to ${m.name}. Pull the lever to land.`, kind: 'info' });
-        reply(`Routing autopilot to ${m.name}. Your new balance is ▮${run.credits}.\nPull the lever to land.`);
+        g.net.broadcast('sys', sysMsg('Autopilot routed to {@m}. Pull the lever to land.', { m: m.$name || m.name }, 'info'));
+        reply('Routing autopilot to {@m}. Your new balance is ▮{c}.\nPull the lever to land.', false, { m: m.$name || m.name, c: run.credits });
         return;
       }
       case 'cart': { if (g.shop?.hostCart) g.shop.hostCart(cmd, from, reply); else reply('The store is offline.', true); return; }
@@ -426,7 +427,7 @@ export class Terminal {
           g.items.hostSpawn(cmd.item, pos, { value: 0 });
         }
         g.net.broadcast('fx', { k: 'snd', s: 'dropship', p: [5, 2, -1], v: 0.8 });
-        reply(`Ordered ${n}x ${d.name}. Your new balance is ▮${run.credits}.\nYour order has been delivered to the ship's storage.`);
+        reply("Ordered {n}x {@name}. Your new balance is ▮{c}.\nYour order has been delivered to the ship's storage.", false, { n, name: d.$name || d.name, c: run.credits });
         return;
       }
       case 'upgrade': {
@@ -436,21 +437,21 @@ export class Terminal {
         run.credits -= u.price;
         run.upgrades = { ...run.upgrades, [cmd.id]: true };
         g.broadcastRun(['credits', 'upgrades']);
-        g.net.broadcast('sys', { text: `Ship upgrade installed: ${u.name}`, kind: 'good' });
-        reply(`${u.name} installed.`);
+        g.net.broadcast('sys', sysMsg('Ship upgrade installed: {@name}', { name: u.$name || u.name }, 'good'));
+        reply('{@name} installed.', false, { name: u.$name || u.name });
         return;
       }
       case 'code': {
         const code = String(cmd.code).toLowerCase();
         const door = g.world.facility?.doors.find((dd) => dd.code === code);
-        if (door) { g.hostSetDoor(door.id, !door.open); reply(`Secure door ${code.toUpperCase()} ${!door.open ? 'opened' : 'closed'}.`); return; }
+        if (door) { g.hostSetDoor(door.id, !door.open); reply(!door.open ? 'Secure door {code} opened.' : 'Secure door {code} closed.', false, { code: code.toUpperCase() }); return; }
         const c = [...g.creatures.host.values()].find((cc) => cc.code === code && !cc.dead);
-        if (c) { c.disabledT = 8; reply(`${c.def.name} ${code.toUpperCase()} disabled for 8 seconds.`); return; }
+        if (c) { c.disabledT = 8; reply('{@name} {code} disabled for 8 seconds.', false, { name: c.def.$name || c.def.name, code: code.toUpperCase() }); return; }
         reply('Unknown code.', true);
         return;
       }
       case 'transmit': {
-        g.net.broadcast('sys', { text: '[SIGNAL] ' + String(cmd.text).toUpperCase(), kind: 'signal' });
+        g.net.broadcast('sys', { text: '[' + 'SIGNAL' + '] ' + String(cmd.text).toUpperCase(), kind: 'signal' });
         reply('Transmission sent.');
         return;
       }

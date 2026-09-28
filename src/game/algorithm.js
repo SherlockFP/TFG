@@ -11,7 +11,7 @@
 //        (speechSynthesis, terminal ALGO VOICE ON, off by default), line queue, cinematic-aware.
 import { LINES, FACTIONS, pickLang } from './loredata.js';
 import { isSellable } from './items.js';
-import { getLang } from '../core/i18n.js';
+import { getLang, t, speechLang } from '../core/i18n.js';
 import { saveSettings } from '../core/save.js';
 
 export const FOCI = ['noise', 'light', 'greed', 'split', 'doors', 'coward'];
@@ -223,7 +223,7 @@ export function installAlgorithm(core) {
     if (!st.el) return;
     const f = n.voice && FACTIONS[n.voice];
     st.cur = { ...n, shown: 0, t: 0, dur: 1.2 + n.text.length * 0.034 + 3.2 };
-    st.nameEl.textContent = f ? `${f.name.toUpperCase()} · ${f.leader.toUpperCase()}` : 'THE ALGORITHM';
+    st.nameEl.textContent = f ? `${f.name.toUpperCase()} · ${f.leader.toUpperCase()}` : t('THE ALGORITHM');
     st.el.style.borderColor = f ? f.color : '';
     st.nameEl.style.color = f ? f.color : '';
     st.el.classList.add('on');
@@ -235,10 +235,10 @@ export function installAlgorithm(core) {
     if (!game.settings?.algoVoice || typeof window === 'undefined' || !window.speechSynthesis) return;
     try {
       const u = new SpeechSynthesisUtterance(text.replace(/[▮◈]/g, ''));
-      const lang = tr() ? 'tr' : 'en';
+      const lang = getLang();
       const v = window.speechSynthesis.getVoices().find((x) => x.lang?.toLowerCase().startsWith(lang));
       if (v) u.voice = v;
-      u.lang = lang === 'tr' ? 'tr-TR' : 'en-US';
+      u.lang = speechLang();
       u.pitch = f ? 0.8 : 0.05; u.rate = f ? 1 : 0.9; u.volume = 0.8;
       window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
     } catch { /* optional */ }

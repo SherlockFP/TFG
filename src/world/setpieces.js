@@ -57,6 +57,7 @@
 import * as THREE from 'three';
 import { RNG } from '../core/rng.js';
 import { createProp } from '../models/props.js';
+import { t, tf } from '../core/i18n.js';
 
 // ------------------------------------------------------------------------------------ tuning
 const CATWALK_H = 3.4;           // deck top above the floor
@@ -438,8 +439,8 @@ class SetPieces {
     for (const v of this.vents) {
       v.ip = {
         pos: v.valve, r: 0.42, reach: 2.3,
-        label: () => (v.offUntil > this.clock ? 'Steam valve (closed)' : 'Close the steam valve [E]'),
-        sub: () => (v.offUntil > this.clock ? `Pressure returns in ${Math.ceil(v.offUntil - this.clock)}s` : 'Shuts this vent off for a minute'),
+        label: () => (v.offUntil > this.clock ? t('Steam valve (closed)') : t('Close the steam valve [E]')),
+        sub: () => (v.offUntil > this.clock ? tf('Pressure returns in {n}s', { n: Math.ceil(v.offUntil - this.clock) }) : t('Shuts this vent off for a minute')),
         action: () => { if (v.offUntil <= this.clock) game.net?.request('spValve', { s: this.seed, i: v.i }); },
       };
     }

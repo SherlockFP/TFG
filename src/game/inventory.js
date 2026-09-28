@@ -15,7 +15,7 @@ import { MOONS } from './moons.js';
 import { TIERS, tierIndex } from './tiers.js';
 import * as C from './inventory_core.js';
 import { RNG } from '../core/rng.js';
-import { addTranslations, t } from '../core/i18n.js';
+import { addTranslations, t, tf } from '../core/i18n.js';
 import { insideShip } from '../world/ship.js';
 import { hudDock } from '../ui/dock.js';
 import { iconHTML } from '../ui/icons.js';
@@ -104,9 +104,9 @@ export function installInventory(game) {
         next = C.applyMoves(list, moves);
         why = C.validateState(next, { extraCols: extraCols(), maxHot: hotCap() });
       }
-      if (why === 'does not fit') return fail(forceRepack ? 'Empty the bag first.' : 'Your stuff does not fit in that bag.');
+      if (why === 'does not fit') return fail(forceRepack ? t('Empty the bag first.') : t('Your stuff does not fit in that bag.'));
     }
-    if (why) return fail(why === 'hotbar full' ? 'Hotbar full.' : why === 'wrong slot' ? 'Wrong slot.' : why === 'not baggable' ? 'That does not fit in a bag.' : 'Does not fit there.');
+    if (why) return fail(why === 'hotbar full' ? t('Hotbar full.') : why === 'wrong slot' ? t('Wrong slot.') : why === 'not baggable' ? t('That does not fit in a bag.') : t('Does not fit there.'));
     return { ok: true, moves, slots, ...extra };
   }
   /** Where item `id` currently is, as a target-like location. */
@@ -129,39 +129,39 @@ export function installInventory(game) {
   function planMove(id, target) {
     const list = mine();
     const e = findEntry(id, list);
-    if (!e || !target) return fail('Does not fit there.');
+    if (!e || !target) return fail(t('Does not fit there.'));
     const p = game.player;
     const src = srcOf(e);
     if (target.k === 'world') {
       const rest = list.filter((x) => x.id !== id);
       if (e.inv?.k === 'eq' && e.inv.s === 'bag' && rest.some((x) => x.inv?.k === 'bag')) {
         const r = finalize(rest, [], {}, {}, true);
-        if (!r.ok) return fail('Empty the bag first.');
+        if (!r.ok) return fail(t('Empty the bag first.'));
         return { ok: true, drop: true, moves: r.moves, slots: {} };
       }
       return { ok: true, drop: true, moves: [], slots: {} };
     }
     if (target.k === 'hot') {
-      if (target.i < 0 || target.i >= p.slots.length) return fail('Does not fit there.');
+      if (target.i < 0 || target.i >= p.slots.length) return fail(t('Does not fit there.'));
       const occId = p.slots[target.i];
       if (occId === id) return { ok: true, moves: [], slots: {}, noop: true };
       if (src.k === 'hot') return { ok: true, local: true, moves: [], slots: { [id]: target.i, ...(occId ? { [occId]: src.i } : {}) } };
       const moves = [[id, null]], slots = { [id]: target.i };
       if (occId) {
         const occ = findEntry(occId, list);
-        if (occ && !displaceTo(occ, src, moves, slots)) return fail('Does not fit there.');
+        if (occ && !displaceTo(occ, src, moves, slots)) return fail(t('Does not fit there.'));
         const r = finalize(list, moves, slots);
         if (r.ok || !occ || src.k !== 'bag') return r;
         // occupant does not fit where the item was: any free bag spot
         const next = C.applyMoves(list, [[id, null]]);
         const spot = C.findSpot(next, C.gridOfList(next, extraCols()), C.itemSize(occ.def), occ.id);
-        if (!spot) return fail('Does not fit there.');
+        if (!spot) return fail(t('Does not fit there.'));
         return finalize(list, [[id, null], [occ.id, { k: 'bag', ...spot }]], { [id]: target.i });
       }
       return finalize(list, moves, slots);
     }
     if (target.k === 'eq') {
-      if (!C.fitsSlot(e.def, target.s)) return fail('Wrong slot.');
+      if (!C.fitsSlot(e.def, target.s)) return fail(t('Wrong slot.'));
       const occ = list.find((x) => x.inv?.k === 'eq' && x.inv.s === target.s);
       if (occ?.id === id) return { ok: true, moves: [], slots: {}, noop: true };
       const moves = [[id, { k: 'eq', s: target.s }]], slots = {};
@@ -187,24 +187,24 @@ export function installInventory(game) {
       const after = C.applyMoves(list, [[id, null]]);
       const grid = C.gridOfList(after, extraCols());
       const occ = C.buildOcc(after, grid);
-      if (!occ) return fail('Does not fit there.');
+      if (!occ) return fail(t('Does not fit there.'));
       const hit = [...C.overlapIds(occ, grid, size, target.x, target.y)];
       const moves = [[id, { k: 'bag', x: target.x, y: target.y }]], slots = {};
-      if (hit.length > 1) return fail('Does not fit there.');
+      if (hit.length > 1) return fail(t('Does not fit there.'));
       if (hit.length === 1) {
         const o = findEntry(hit[0], list);
-        if (o && !displaceTo(o, src, moves, slots)) return fail('Does not fit there.');
+        if (o && !displaceTo(o, src, moves, slots)) return fail(t('Does not fit there.'));
         const r = finalize(list, moves, slots, { swap: hit[0] });
         if (r.ok || !o) return r;
         const next = C.applyMoves(list, [[id, { k: 'bag', x: target.x, y: target.y }]]);
         const spot = C.findSpot(next, C.gridOfList(next, extraCols()), C.itemSize(o.def), o.id);
         if (spot) return finalize(list, [[id, { k: 'bag', x: target.x, y: target.y }], [o.id, { k: 'bag', ...spot }]], {}, { swap: hit[0] });
         const free = p.slots.findIndex((s) => !s);
-        return free >= 0 ? finalize(list, [[id, { k: 'bag', x: target.x, y: target.y }], [o.id, null]], { [o.id]: free }, { swap: hit[0] }) : fail('Does not fit there.');
+        return free >= 0 ? finalize(list, [[id, { k: 'bag', x: target.x, y: target.y }], [o.id, null]], { [o.id]: free }, { swap: hit[0] }) : fail(t('Does not fit there.'));
       }
       return finalize(list, moves, slots);
     }
-    return fail('Does not fit there.');
+    return fail(t('Does not fit there.'));
   }
 
   /** Apply a plan: predict locally, then ask the host. Returns true when something was sent / done. */
@@ -274,7 +274,7 @@ export function installInventory(game) {
       if (spot) { const r = planMove(id, { k: 'bag', ...spot }); if (r.ok) return applyPlan(r); }
       const free = p.slots.findIndex((s) => !s);
       if (free >= 0) return doMove(id, { k: 'hot', i: free });
-      api.flash?.('Hotbar full.');
+      api.flash?.(t('Hotbar full.'));
       return false;
     }
     if (C.isEquippable(e.def)) {
@@ -284,13 +284,13 @@ export function installInventory(game) {
     }
     if (e.inv?.k === 'bag') {
       const free = p.slots.findIndex((s) => !s);
-      if (free < 0) { api.flash?.('Hotbar full.'); return false; }
+      if (free < 0) { api.flash?.(t('Hotbar full.')); return false; }
       return doMove(id, { k: 'hot', i: free });
     }
     const why = C.bagRejectReason(e.it);
     if (why) { api.flash?.(why); return false; }
     const spot = C.findSpot(list, gridNow(list), C.itemSize(e.def), id);
-    if (!spot) { api.flash?.('Does not fit there.'); return false; }
+    if (!spot) { api.flash?.(t('Does not fit there.')); return false; }
     return doMove(id, { k: 'bag', ...spot });
   }
 
@@ -333,7 +333,7 @@ export function installInventory(game) {
     st.lastReq = performance.now();
     net()?.request('inv', { op: 'pick', id: it.id, to: iv, bx: extraCols(), hs: hotCap() });
     bump();
-    if (it.nest) game.ui?.toast('Something is angry...', 'bad');
+    if (it.nest) game.ui?.toast(t('Something is angry...'), 'bad');
     return true;
   }
   /** A held item with no hotbar room (crafted / reclaimed / host spawn): into the bag if it fits. */
@@ -394,7 +394,7 @@ export function installInventory(game) {
     if (d.h !== me()) return;
     reconcile();
     game.refreshStats?.();
-    if (d.full && d.why) api.flash?.(d.why === 'hotbar full' ? 'Hotbar full.' : 'Does not fit there.');
+    if (d.full && d.why) api.flash?.(d.why === 'hotbar full' ? t('Hotbar full.') : t('Does not fit there.'));
     game.mods?.emit('tfg:invChanged', game);
   }
   function onHeld(it, d) {
@@ -771,7 +771,7 @@ export function installInventory(game) {
       hk.handled = true;
       api.equip(it.id);
     }));
-    st.offs.push(mods.on('hostStart', (g) => { if (g === game) { const n = hostReclaim(game.selfId, game.profile?.id); if (n) game.ui?.toast(`${n} item(s) back in your inventory.`, 'info'); } }));
+    st.offs.push(mods.on('hostStart', (g) => { if (g === game) { const n = hostReclaim(game.selfId, game.profile?.id); if (n) game.ui?.toast(tf('{n} item(s) back in your inventory.', { n }), 'info'); } }));
     st.offs.push(mods.on('playerJoin', (id, info, g) => { if (g === game && info?.pid) game.later(() => hostReclaim(id, info.pid), 1500); }));
     st.offs.push(mods.on('moonPopulated', (g) => { if (g === game) { try { hostMoonLoot(); } catch (e) { console.warn('[inventory] moon loot', e); } } }));
     st.offs.push(mods.on('phase', (ph, g) => { if (g === game) { bump(); if (ph === 'orbit' || ph === 'landing') clearBeams(); } }));

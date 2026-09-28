@@ -619,14 +619,14 @@ export class ItemTools {
       case 'booster': hk.handled = true; this.armBooster(it); return;
       case 'inhaler': case 'adblock':
         hk.handled = true;
-        if ((it.charges ?? 0) <= 0) this.toast(it.type === 'inhaler' ? 'The inhaler is empty.' : 'The spray can is empty.');
+        if ((it.charges ?? 0) <= 0) this.toast(it.type === 'inhaler' ? t('The inhaler is empty.') : t('The spray can is empty.'));
         return;
       default: break;
     }
     if (d.flash) { hk.handled = true; this.flash(it); return; }
     if (d.glow) {
       hk.handled = true;
-      if ((it.battery ?? 0) <= 0) { this.game.sfx?.('battery_dead', 0.5); this.toast('Battery is dead. Charge it on the ship.'); return; }
+      if ((it.battery ?? 0) <= 0) { this.game.sfx?.('battery_dead', 0.5); this.toast(t('Battery is dead. Charge it on the ship.')); return; }
       this.game.setItemOn?.(it, !it.on);
       this.game.sfx?.('flashlight_click', 0.6);
     }
@@ -639,15 +639,15 @@ export class ItemTools {
     const dir = new THREE.Vector3(-Math.sin(p.yaw), 0, -Math.cos(p.yaw));
     const origin = new THREE.Vector3(p.pos.x, p.pos.y + 1.0, p.pos.z);
     const hit = ph.raycast(origin, dir, 2.4, mask);
-    if (!hit || Math.abs(hit.normal.y) > 0.5) { this.toast('Face a wall to set up the ladder.'); g.sfx?.('ui_error', 0.4); return; }
+    if (!hit || Math.abs(hit.normal.y) > 0.5) { this.toast(t('Face a wall to set up the ladder.')); g.sfx?.('ui_error', 0.4); return; }
     const n = new THREE.Vector3(hit.normal.x, 0, hit.normal.z);
-    if (n.lengthSq() < 1e-4) { this.toast('Face a wall to set up the ladder.'); return; }
+    if (n.lengthSq() < 1e-4) { this.toast(t('Face a wall to set up the ladder.')); return; }
     n.normalize();
     const into = n.clone().negate();
     const wp = new THREE.Vector3(hit.point.x, hit.point.y, hit.point.z);
     const foot = wp.clone().addScaledVector(n, 0.16);
     const down = ph.raycast(new THREE.Vector3(foot.x, origin.y + 0.3, foot.z), DOWN, 3.5, mask);
-    if (!down) { this.toast('No solid floor here.'); return; }
+    if (!down) { this.toast(t('No solid floor here.')); return; }
     const floorY = down.point.y;
     let land = null;
     for (let h = 1.1; h <= LADDER_MAX_LEDGE + 0.5; h += 0.15) {
@@ -665,12 +665,12 @@ export class ItemTools {
       land = tp;
       break;
     }
-    if (!land) { this.toast('No ledge to climb here (needs a wall with a top).'); g.sfx?.('ui_error', 0.4); return; }
+    if (!land) { this.toast(t('No ledge to climb here (needs a wall with a top).')); g.sfx?.('ui_error', 0.4); return; }
     let H = Math.min(LADDER_MAX_H, land.y - floorY + 1.0);
     const ceil = ph.raycast(new THREE.Vector3(foot.x, floorY + 0.3, foot.z), UP, H, mask);
     if (ceil) H = Math.max(land.y - floorY + 0.3, ceil.distance + 0.25);
     const ld = { b: [foot.x, floorY, foot.z], h: +H.toFixed(3), yaw: Math.atan2(n.x, n.z), t: [land.x, land.y, land.z] };
-    if (!sanitizeLadder(ld)) { this.toast('No ledge to climb here (needs a wall with a top).'); return; }
+    if (!sanitizeLadder(ld)) { this.toast(t('No ledge to climb here (needs a wall with a top).')); return; }
     // predict like dropItem: free the slot right away
     const i = p.slots.indexOf(it.id);
     if (i >= 0) p.slots[i] = null;
@@ -747,7 +747,7 @@ export class ItemTools {
     if (!it.on) g.setItemOn?.(it, true);
     g.sfx?.(this.snd('beep_2', 'mine_beep'), 0.6);
     g.dropItem?.(it, true);
-    this.toast('Signal Booster armed. It pings scrap and creatures nearby.', 'good');
+    this.toast(t('Signal Booster armed. It pings scrap and creatures nearby.'), 'good');
   }
   pulseBooster(it) {
     const g = this.game;
@@ -818,7 +818,7 @@ export class ItemTools {
   flash(it) {
     const g = this.game;
     if (g.time < this.flashCd) return;
-    if ((it.charges ?? 0) <= 0) { this.toast('The webcam flash is burnt out.'); g.sfx?.('battery_dead', 0.5); return; }
+    if ((it.charges ?? 0) <= 0) { this.toast(t('The webcam flash is burnt out.')); g.sfx?.('battery_dead', 0.5); return; }
     this.flashCd = g.time + 0.9;
     it.charges -= 1;
     this.net.broadcast('itst', { id: it.id, c: it.charges });
@@ -910,7 +910,7 @@ export class ItemTools {
     if (held?.type !== 'inhaler' || !lmb) return;
     const g = this.game, p = g.player;
     if ((held.charges ?? 0) <= 0) {
-      if (!this.emptyShown) { this.emptyShown = true; this.toast('The inhaler is empty.'); }
+      if (!this.emptyShown) { this.emptyShown = true; this.toast(t('The inhaler is empty.')); }
       return;
     }
     this.drain(held, INHALE_RATE * dt);
@@ -927,7 +927,7 @@ export class ItemTools {
     if (held.charges <= 0) {
       this.net.broadcast('itst', { id: held.id, c: 0 });
       this.dirty = null;
-      this.toast('Hype Inhaler is empty. Tossed it.', 'info');
+      this.toast(t('Hype Inhaler is empty. Tossed it.'), 'info');
       this.net.request('consume', { id: held.id });
     }
   }
@@ -971,7 +971,7 @@ export class ItemTools {
     if (held?.type !== 'adblock' || !lmb) return;
     const g = this.game;
     if ((held.charges ?? 0) <= 0) {
-      if (!this.emptyShown) { this.emptyShown = true; this.toast('The spray can is empty.'); }
+      if (!this.emptyShown) { this.emptyShown = true; this.toast(t('The spray can is empty.')); }
       return;
     }
     this.drain(held, SPRAY_RATE * dt);
@@ -1003,7 +1003,7 @@ export class ItemTools {
         }
       }
     }
-    if (held.charges <= 0) { this.net.broadcast('itst', { id: held.id, c: 0 }); this.dirty = null; this.toast('The spray can is empty.'); }
+    if (held.charges <= 0) { this.net.broadcast('itst', { id: held.id, c: 0 }); this.dirty = null; this.toast(t('The spray can is empty.')); }
   }
 
   // effects of what the local player is carrying (hot, cursed, shake)

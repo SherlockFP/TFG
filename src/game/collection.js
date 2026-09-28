@@ -11,6 +11,7 @@ import { DAILY_EVENTS, wrapMethod } from './dailyEvents.js';
 import { unlockEmote, EMOTES } from './emotes.js';
 import { SUIT_COLORS } from '../models/avatar.js';
 import { INTERIOR_NAMES as REG_INTERIOR_NAMES, INTERIOR_THEMES } from '../world/interiors/index.js';
+import { tf } from '../core/i18n.js';
 
 // ------------------------------------------------------------------ reward suits (colour-only cosmetics)
 // Registered at import so every peer can render them (remote suit colours are looked up in SUIT_COLORS).
@@ -157,7 +158,7 @@ export function installCollection(game) {
     else { if (r.xp) game.progress?.addXp(r.xp, 'Codex'); if (r.coin) game.progress?.addCoins(r.coin, 'Codex'); }
     if (r.emote && unlockEmote(p, r.emote)) save();
     const item = { tier: 'gold', icon: '📖', kicker: 'CODEX MILESTONE', name: m.name, desc: `${m.cat.toUpperCase()} · press J to open the Codex`, reward: rewardLine(r) };
-    if (ach?.banner) ach.banner(item); else game.ui?.toast?.(`CODEX: ${m.name} — ${item.reward}`, 'good');
+    if (ach?.banner) ach.banner(item); else game.ui?.toast?.(tf('CODEX: {name} — {reward}', { name: m.name, reward: item.reward }), 'good');
   };
 
   function evaluate() {
@@ -201,7 +202,7 @@ export function installCollection(game) {
     const known = !!p.codex.interiors[theme];
     const e = p.codex.interiors[theme] || (p.codex.interiors[theme] = { n: 0, at: Date.now() });
     e.n = num(e.n) + 1;
-    if (!known) game.ui?.toast?.(`New Codex entry: interior "${interiorName(theme)}"`, 'info');
+    if (!known) game.ui?.toast?.(tf('New Codex entry: interior "{name}"', { name: interiorName(theme) }), 'info');
     save();
   };
   const recordScrap = (it) => {
@@ -212,7 +213,7 @@ export function installCollection(game) {
     const e = p.codex.scrap[it.type] || (p.codex.scrap[it.type] = { n: 0, best: 0, at: Date.now() });
     e.n = num(e.n) + 1;
     e.best = Math.max(num(e.best), num(it.value));
-    if (!known) game.ui?.toast?.(`New Codex entry: ${it.def.name}`, 'info');
+    if (!known) game.ui?.toast?.(tf('New Codex entry: {name}', { name: it.def.name }), 'info');
     save();
   };
 

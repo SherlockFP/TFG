@@ -332,8 +332,8 @@ export function installWeapons(game, ctx) {
   function startReload(it) {
     const def = it.def;
     if (reload) return;
-    if ((it.ammo ?? 0) >= def.ammo) { toast('Already fully loaded.'); return; }
-    if (!ammoItemFor(def)) { ctx.snd('wv1_empty', null, 0.6); toast('No ammo for this weapon in your slots.', 'bad'); return; }
+    if ((it.ammo ?? 0) >= def.ammo) { toast(t('Already fully loaded.')); return; }
+    if (!ammoItemFor(def)) { ctx.snd('wv1_empty', null, 0.6); toast(t('No ammo for this weapon in your slots.'), 'bad'); return; }
     reload = { it, t: 0, dur: def.reload || 1.2, base: null };
     ctx.bsnd('wv1_reload', g.camera.position, 0.8);
   }
@@ -399,7 +399,7 @@ export function installWeapons(game, ctx) {
     if ((it.ammo ?? 0) <= 0) {
       g.nextSwing = g.time + 0.35;
       ctx.snd('wv1_empty', null, 0.7);
-      toast('Out of ammo. [R] to reload.', 'bad');
+      toast(t('Out of ammo. [R] to reload.'), 'bad');
       return;
     }
     const fwd = eyeFwd();

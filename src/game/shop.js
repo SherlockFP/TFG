@@ -16,7 +16,7 @@ import * as THREE from 'three';
 import { ITEMS, STORE_ITEMS, SHIP_UPGRADES } from './items.js';
 import { TIERS, tierColor } from './tiers.js';
 import { RNG, hashString } from '../core/rng.js';
-import { addTranslations, t } from '../core/i18n.js';
+import { addTranslations, t, tf } from '../core/i18n.js';
 import { CRUISER } from '../entities/cruiser.js';
 import { createWeaponContext, installWeapons } from './weapons.js';
 import { installDeck } from './deck.js';
@@ -268,19 +268,19 @@ export function installShop(game) {
   api.hostCart = (cmd, from, reply) => {
     const run = g.run;
     const fail = (msg) => { reply(msg, true); result(from, false, msg); };
-    if (!run || !Array.isArray(cmd.lines) || !cmd.lines.length || cmd.lines.length > 14) return fail('Nothing to order.');
+    if (!run || !Array.isArray(cmd.lines) || !cmd.lines.length || cmd.lines.length > 14) return fail(t('Nothing to order.'));
     const st = new Map(stockFor(run, lore()).map((e) => [e.id, e]));
     const plan = [];
     let total = 0;
     const taken = new Map();
     for (const raw of cmd.lines) {
       const e = st.get(String(raw?.id));
-      if (!e || e.currency !== 'credits') return fail('Not sold here.');
-      if (e.locked) return fail(e.lockReason || 'Not sold here.');
+      if (!e || e.currency !== 'credits') return fail(t('Not sold here.'));
+      if (e.locked) return fail(e.lockReason || t('Not sold here.'));
       let n = e.ship ? 1 : Math.max(1, Math.min(10, raw.n | 0 || 1));
-      if (e.soldOut) return fail(`${e.name}: SOLD OUT today.`);
+      if (e.soldOut) return fail(tf('{name}: SOLD OUT today.', { name: e.name }));
       if (e.left != null) n = Math.min(n, e.left - (taken.get(e.id) || 0));
-      if (n <= 0) return fail(`${e.name}: SOLD OUT today.`);
+      if (n <= 0) return fail(tf('{name}: SOLD OUT today.', { name: e.name }));
       let unit = e.price, trade = null;
       if (raw.trade && e.def?.upgradeFrom && e.def.upgradePrice > 0) {
         trade = [...g.items.all()].find((it) => it.type === e.def.upgradeFrom && it.holder === from && !it.affix);
@@ -329,10 +329,10 @@ export function installShop(game) {
     const e = run ? stockFor(run, lore()).find((x) => x.id === String(cmd.id)) : null;
     const n = Math.max(1, Math.min(3, cmd.n | 0 || 1));
     const refund = (why) => { reply(why, true); result(from, false, why, { refund: e ? e.price * n : 0 }); };
-    if (!e || e.currency !== 'clout' || e.ship) return refund('Not sold here.');
-    if (e.soldOut) return refund(`${e.name}: SOLD OUT today.`);
-    if (e.left != null && n > e.left) return refund(`${e.name}: only ${e.left} left.`);
-    if (e.locked) return refund(e.lockReason || 'Not sold here.');
+    if (!e || e.currency !== 'clout' || e.ship) return refund(t('Not sold here.'));
+    if (e.soldOut) return refund(tf('{name}: SOLD OUT today.', { name: e.name }));
+    if (e.left != null && n > e.left) return refund(tf('{name}: only {left} left.', { name: e.name, left: e.left }));
+    if (e.locked) return refund(e.lockReason || t('Not sold here.'));
     deliver(e.id, n);
     run.shop = run.shop && run.shop.d === run.day ? run.shop : { d: run.day, sold: {} };
     run.shop = { d: run.shop.d, sold: { ...run.shop.sold, [e.id]: (run.shop.sold[e.id] || 0) + n } };
@@ -403,7 +403,7 @@ export function installShop(game) {
   });
 
   // ---------------------------------------------------------------- terminal commands (soft)
-  try { window.KefalAPI?.registerCommand?.('deals', () => { const c = g.terminal; c.print(api.textList().slice(3, 8).join('\n') || 'No deals today.'); }, 'today\'s Company Store deals'); } catch { /* ignore */ }
+  try { window.KefalAPI?.registerCommand?.('deals', () => { const c = g.terminal; c.print(api.textList().slice(3, 8).join('\n') || t('No deals today.')); }, 'today\'s Company Store deals'); } catch { /* ignore */ }
 
   return Object.assign(api, {
     weapons, deck, ctx,

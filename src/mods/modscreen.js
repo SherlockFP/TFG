@@ -93,7 +93,7 @@ export function buildModsScreen(mm, ui) {
       const code = await f.text();
       if (!confirm(`Import "${f.name}"? Mods run code in your browser. Only import mods you trust.`)) return;
       mm.importMod(f.name, code);
-      ui.toast('Imported. Reload to activate.');
+      ui.toast(t('Imported. Reload to activate.'));
     });
     wrap.appendChild(file);
     wrap.appendChild(el('div', { class: 'menu-row' },

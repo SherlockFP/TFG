@@ -2,13 +2,13 @@
 // Pure helpers (normalizeWord / matchSpellWords) have no DOM dependency so node tests can import them.
 
 // Turkish-aware folding: İ/I/ı -> i, ş -> s, ç -> c, ğ -> g, ö -> o, ü -> u, then strip any remaining accents.
-const FOLD = { 'ı': 'i', 'İ': 'i', 'I': 'i', 'ş': 's', 'Ş': 's', 'ç': 'c', 'Ç': 'c', 'ğ': 'g', 'Ğ': 'g', 'ö': 'o', 'Ö': 'o', 'ü': 'u', 'Ü': 'u', 'â': 'a', 'î': 'i', 'û': 'u' };
+const FOLD = { 'ı': 'i', 'İ': 'i', 'I': 'i', 'ş': 's', 'Ş': 's', 'ç': 'c', 'Ç': 'c', 'ğ': 'g', 'Ğ': 'g', 'ö': 'o', 'Ö': 'o', 'ü': 'u', 'Ü': 'u', 'â': 'a', 'î': 'i', 'û': 'u', 'ё': 'е', 'Ё': 'е' };
 
 /** "İTTT!" -> "it", "Işık" -> "isik", "SUUUS" -> "sus" (letter runs collapse, so shouted elongations still match). */
 export function normalizeWord(w) {
   let s = '';
   for (const ch of String(w || '')) s += FOLD[ch] ?? ch;
-  s = s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/g, '');
+  s = s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9а-я]/g, '');   // latin + cyrillic (ru spell words)
   return s.replace(/(.)\1+/g, '$1');
 }
 
@@ -28,11 +28,11 @@ function lev(a, b) {
   return prev[n];
 }
 
-/** Build a lookup from spell defs: [{ id, words: { en: [...], tr: [...] } }] -> { en: Map(word -> id), tr: Map } */
+/** Build a lookup from spell defs: [{ id, words: { en: [...], tr: [...], ru: [...] } }] -> { en: Map(word -> id), tr: Map, ru: Map } */
 export function buildLexicon(spells) {
-  const lex = { en: new Map(), tr: new Map() };
+  const lex = { en: new Map(), tr: new Map(), ru: new Map() };
   for (const sp of spells) {
-    for (const lang of ['en', 'tr']) for (const w of sp.words[lang] || []) lex[lang].set(normalizeWord(w), sp.id);
+    for (const lang of ['en', 'tr', 'ru']) for (const w of sp.words[lang] || []) lex[lang].set(normalizeWord(w), sp.id);
   }
   return lex;
 }
@@ -50,7 +50,7 @@ function lookup(tok, maps) {
  * Spell ids found in `text`, in spoken order (no duplicates).
  * mode 'chat': the whole message must be ONE spell word (any language).
  * mode 'voice': any spell word anywhere; lang 'en' only listens for English words (the Turkish "it" is far too common
- * in English speech), lang 'tr' accepts Turkish + English words (Turkish recognisers often write the English ones).
+ * in English speech), lang 'tr' accepts Turkish + English words (Turkish recognisers often write the English ones), lang 'ru' Russian + English.
  */
 export function matchSpellWords(text, lex, opts = {}) {
   return findSpellWords(text, lex, opts).map((m) => m.id);
@@ -61,10 +61,10 @@ export function findSpellWords(text, lex, { mode = 'voice', lang = 'en' } = {}) 
   const raw = String(text || '').split(/\s+/).map((w) => w.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '')).filter((w) => normalizeWord(w));
   if (mode === 'chat') {
     if (raw.length !== 1) return [];
-    const id = lookup(normalizeWord(raw[0]), [lex.en, lex.tr]);
+    const id = lookup(normalizeWord(raw[0]), [lex.en, lex.tr, lex.ru]);
     return id ? [{ id, w: raw[0] }] : [];
   }
-  const maps = lang === 'tr' ? [lex.tr, lex.en] : [lex.en];
+  const maps = lang === 'tr' ? [lex.tr, lex.en] : lang === 'ru' ? [lex.ru, lex.en] : [lex.en];
   const out = [];
   for (const w of raw) { const id = lookup(normalizeWord(w), maps); if (id && !out.some((m) => m.id === id)) out.push({ id, w }); }
   return out;

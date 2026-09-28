@@ -1,7 +1,41 @@
-// Minimal i18n: English strings are keys; Turkish translations below.
+// i18n: English strings are keys. Languages: en (source) / tr / ru.
+//   t('Text')            translate a literal English string (falls back to the English key)
+//   tf('Ship: {d} m', v) translate + fill {name} placeholders; {@name} = fill AND translate the value (moon/item names)
+//   L({ en, tr, ru })    local-table pattern for small inline choices
+//   addTranslations(map, lang = 'tr')  register extra strings at runtime (default keeps the old TR-only call working)
+// Bulk dictionaries live in src/i18n/tr*.js and src/i18n/ru*.js (pure data, keyed by the English string).
+import { TR_PARTS } from '../i18n/tr.js';
+import { RU_PARTS } from '../i18n/ru.js';
+
+export const LANGS = [
+  { id: 'en', label: 'English', short: 'EN', speech: 'en-US' },
+  { id: 'tr', label: 'Türkçe', short: 'TR', speech: 'tr-TR' },
+  { id: 'ru', label: 'Русский', short: 'RU', speech: 'ru-RU' },
+];
+const LANG_IDS = LANGS.map((x) => x.id);
 let lang = 'en';
-export function setLang(l) { lang = l === 'tr' ? 'tr' : 'en'; document.documentElement.lang = lang; }
+const langListeners = new Set();
+/** Map a browser locale (navigator.language) to a supported language id. */
+export function detectLang(loc) {
+  const l = String(loc || '').toLowerCase();
+  if (l.startsWith('tr')) return 'tr';
+  if (l.startsWith('ru')) return 'ru';
+  return 'en';
+}
+export function setLang(l) {
+  const next = LANG_IDS.includes(l) ? l : 'en';
+  const changed = next !== lang;
+  lang = next;
+  try { document.documentElement.lang = lang; } catch { /* no DOM (node audit / tests) */ }
+  if (lang === 'ru') { try { document.fonts?.load('20px "TFG Cyr VT"', 'Ж'); document.fonts?.load('16px "Press Start 2P"', 'Ж'); } catch { /* no DOM */ } }
+  if (changed) for (const fn of langListeners) { try { fn(lang); } catch (e) { console.error(e); } }
+}
 export function getLang() { return lang; }
+/** Speech-recognition locale for the current language (voice spells). */
+export function speechLang() { return (LANGS.find((x) => x.id === lang) || LANGS[0]).speech; }
+/** Next language in the EN -> TR -> RU cycle. */
+export function nextLang(cur = lang) { return LANG_IDS[(LANG_IDS.indexOf(cur) + 1) % LANG_IDS.length]; }
+export function onLangChange(fn) { langListeners.add(fn); return () => langListeners.delete(fn); }
 
 const TR = {
   'HOST GAME': 'OYUN KUR',
@@ -461,17 +495,96 @@ const TR = {
   '(claim at HQ)': "(HQ'da al)",
 };
 
-// Other modules can register extra Turkish strings at runtime (same format as TR above).
-export function addTranslations(map) {
-  if (map && typeof map === 'object') for (const [k, v] of Object.entries(map)) if (typeof v === 'string') TR[k] = v;
+// Other modules can register extra strings at runtime (same format as TR above). Default language is TR so the
+// original addTranslations({...}) calls keep working; pass 'ru' for Russian.
+const RU = {};
+const TABLES = { tr: TR, ru: RU };
+export function addTranslations(map, l = 'tr') {
+  const tbl = TABLES[l];
+  if (tbl && map && typeof map === 'object') for (const [k, v] of Object.entries(map)) if (typeof v === 'string') tbl[k] = v;
 }
+for (const part of TR_PARTS) addTranslations(part, 'tr');
+for (const part of RU_PARTS) addTranslations(part, 'ru');
 
+const own = Object.prototype.hasOwnProperty;
+/** Translate a literal English string. Missing entries fall back to the English text. */
 export function t(s) {
-  if (lang === 'tr' && TR[s]) return TR[s];
-  return s;
+  if (lang === 'en') return s;
+  const tbl = TABLES[lang];
+  return tbl && typeof s === 'string' && own.call(tbl, s) ? tbl[s] : s;
+}
+/** Translate for an explicit language (used to build per-recipient text on the host). */
+export function tIn(l, s) {
+  if (l === 'en') return s;
+  const tbl = TABLES[l];
+  return tbl && typeof s === 'string' && own.call(tbl, s) ? tbl[s] : s;
+}
+/** Does a translation for `s` exist in language `l`? (audit / debug) */
+export function hasTranslation(l, s) { return l === 'en' || !!(TABLES[l] && own.call(TABLES[l], s)); }
+
+/** Local-table pattern: L({ en: 'Hello', tr: 'Merhaba', ru: 'Привет' }); missing languages fall back to en. */
+export function L(map) {
+  if (!map) return '';
+  const v = map[lang];
+  return v !== undefined && v !== null ? v : (map.en !== undefined ? map.en : '');
+}
+/** Pick from an [en, tr, ru] array (missing slots fall back to the English one, or via t() for ru when only [en, tr]). */
+export function LA(arr) {
+  if (!Array.isArray(arr)) return arr;
+  if (lang === 'en') return arr[0];
+  if (lang === 'tr') return arr[1] !== undefined ? arr[1] : arr[0];
+  return arr[2] !== undefined ? arr[2] : t(arr[0]);
 }
 
-/** Translate a template key and fill {name} placeholders: tf('Ship: {d} m', { d: 12 }). */
-export function tf(s, vars = {}) {
-  return t(s).replace(/\{(\w+)\}/g, (m, k) => (vars[k] !== undefined && vars[k] !== null ? String(vars[k]) : m));
+const fillVars = (s, vars, l = lang) => s.replace(/\{(@?)(\w+)\}/g, (m, at, k) => {
+  const v = vars[k];
+  if (v === undefined || v === null) return m;
+  return at ? tIn(l, String(v)) : String(v);
+});
+/** Translate a template key and fill {name} placeholders: tf('Ship: {d} m', { d: 12 }). {@name} also translates the value. */
+export function tf(s, vars = {}) { return fillVars(t(s), vars, lang); }
+/** Same as tf but for an explicit language. */
+export function tfIn(l, s, vars = {}) { return fillVars(tIn(l, s), vars, l); }
+
+/**
+ * Host -> clients message payload that every peer localises on its own: net.broadcast('sys', sysMsg('{n} joined', {n}, 'info')).
+ * `text` is the English rendering (old clients / logs); `k` + `v` are re-translated by the receiver via sysText().
+ */
+export function sysMsg(key, vars = {}, kind = 'info') {
+  return { text: tfIn('en', key, vars), k: key, v: vars, kind };
+}
+/** Receiver side of sysMsg(): localised text for a 'sys' payload (falls back to translating the raw text). */
+export function sysText(d) {
+  if (!d) return '';
+  if (d.k) return tf(d.k, d.v || {});
+  return t(String(d.text ?? ''));
+}
+
+// ------------------------------------------------------------------ display-name path
+// Game data (items, creatures, moons, upgrades ...) keeps its English text and stable ids. localizeFields() turns the
+// listed string fields of a definition into getters that go through t() at read time, so every existing `def.name`
+// read site shows the current language without being edited. `def.$name` (etc.) is the untranslated English text
+// (terminal search, network payloads, regex lookups). Assigning to the field still works (sets the English base).
+export function localizeFields(obj, fields = ['name']) {
+  if (!obj || typeof obj !== 'object') return obj;
+  for (const f of fields) {
+    const d = Object.getOwnPropertyDescriptor(obj, f);
+    if (!d || d.get || typeof d.value !== 'string' || !d.configurable) continue;
+    let base = d.value;
+    try {
+      Object.defineProperty(obj, f, { get() { return t(base); }, set(v) { base = v; }, enumerable: true, configurable: true });
+      Object.defineProperty(obj, '$' + f, { get() { return base; }, enumerable: false, configurable: true });
+    } catch { /* frozen definition: stays English */ }
+  }
+  return obj;
+}
+/** localizeFields() on every plain object nested in `root` (tables, arrays of defs), depth-limited. */
+export function localizeDeep(root, fields = ['name'], depth = 4, seen = new Set()) {
+  if (!root || typeof root !== 'object' || depth < 0 || seen.has(root)) return root;
+  seen.add(root);
+  const proto = Object.getPrototypeOf(root);
+  if (!Array.isArray(root) && proto !== Object.prototype && proto !== null) return root;
+  if (!Array.isArray(root)) localizeFields(root, fields);
+  for (const v of Object.values(root)) if (v && typeof v === 'object') localizeDeep(v, fields, depth - 1, seen);
+  return root;
 }

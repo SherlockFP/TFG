@@ -7,6 +7,7 @@ import { setTitleDecor } from './achievements.js';
 import { wrapMethod } from './dailyEvents.js';
 import { unlockEmote } from './emotes.js';
 import { MOONS } from './moons.js';
+import { t, sysMsg } from '../core/i18n.js';
 
 export const CREW_MAX_LEVEL = 50;
 /** Crew XP needed to go from crew level L to L+1. */
@@ -74,7 +75,7 @@ export function installCrew(game) {
     save();
     pushCrew();
     if (after > before) {
-      game.net?.broadcast('sys', { text: `CREW LEVEL UP! ${p.crew.name} is now crew level ${after} (+${Math.min(25, after)}% XP for every member).`, kind: 'good' });
+      game.net?.broadcast('sys', sysMsg('CREW LEVEL UP! {@name} is now crew level {after} (+{n}% XP for every member).', { name: p.crew.$name ?? p.crew.name, after, n: Math.min(25, after) }, 'good'));
       game.net?.broadcast('fx', { k: 'snd', s: 'ui_quota_met', p: [0, 1.5, 0], v: 0.7 });
     }
     void why;
@@ -87,7 +88,7 @@ export function installCrew(game) {
     if (tag !== undefined) { const t = cleanTag(tag); if (t.length < 2) return 'Crew tag: 2-4 letters/digits.'; p.crew.tag = t; }
     save();
     pushCrew();
-    if (game.net && game.isHost) { game.net.broadcast('sys', { text: `The crew is now [${p.crew.tag}] ${p.crew.name}.`, kind: 'info' }); game.hostAnnounce?.(); }
+    if (game.net && game.isHost) { game.net.broadcast('sys', sysMsg('The crew is now [{tag}] {@name}.', { tag: p.crew.tag, name: p.crew.$name ?? p.crew.name }, 'info')); game.hostAnnounce?.(); }
     return '';
   }
 
@@ -153,7 +154,7 @@ export function installCrew(game) {
         const s = game.profile.stats || (game.profile.stats = {});
         const lv = Math.max(1, Math.min(CREW_MAX_LEVEL, c.level | 0));
         if (lv > (s.bestCrewLevel || 0)) { s.bestCrewLevel = lv; save(); }
-        if (lv >= 5 && unlockEmote(game.profile, 'rally')) { save(); game.ui?.toast?.('Emote unlocked: Rally the Crew (hold B)', 'good'); }
+        if (lv >= 5 && unlockEmote(game.profile, 'rally')) { save(); game.ui?.toast?.(t('Emote unlocked: Rally the Crew (hold B)'), 'good'); }
       }
     }));
   }

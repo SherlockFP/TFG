@@ -1,5 +1,6 @@
 // Creature stat table (host AI + UI). Mods can add with registerCreature().
 // hp: null = unkillable. power: spawn budget cost. xp/coin: kill rewards at level 1.
+import { localizeFields } from '../core/i18n.js';
 export const CREATURES = {
   scuttler: { name: 'Spam Bot', hp: 30, dmg: 8, walk: 2.2, run: 5.4, power: 0.5, pack: [2, 4], xp: 18, coin: 3, drop: ['drop_scuttler', 0.25], zone: 'in', radius: 0.5, height: 0.6,
     lore: 'Swarms of cheap spam bots. Crunchy. Easy XP for new janitors.' },
@@ -165,7 +166,7 @@ export function creatureDisplayName(type, variant, affix) {
 }
 
 export function registerCreature(id, def, behavior) {
-  CREATURES[id] = { name: id, hp: 100, dmg: 20, walk: 2, run: 5, power: 1, xp: 50, coin: 10, zone: 'in', radius: 0.5, height: 1.5, ...def, custom: true };
+  CREATURES[id] = localizeFields({ name: id, hp: 100, dmg: 20, walk: 2, run: 5, power: 1, xp: 50, coin: 10, zone: 'in', radius: 0.5, height: 1.5, ...def, custom: true }, ['name', 'lore']);
   if (behavior) CREATURES[id].behavior = behavior;
   return CREATURES[id];
 }

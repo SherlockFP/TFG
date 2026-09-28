@@ -48,3 +48,10 @@ Cheap evaluation (owner request): one scripted smoke over 11 configs (3 handcraf
 | Balance | 5 | nothing hand-tested; new XP curve re-levels existing profiles (regression) | XP migration, creature weights, van damage |
 | Stability | 7 | 0 errors scripted; node gen tests over seeds | new creatures/van/mods never exercised at runtime |
 | Performance | 6 | serverfarm 711 calls, gen0_1 factory 511 | instancing/merging for rack aisles & props |
+
+## Localization round (EN/TR/RU)
+Was: TR covered ~900 strings, everything else (toasts, terminal, host messages, item / creature / moon names, prompts) stayed English,
+no RU. Now: EN/TR/RU with a picker + `navigator.language` default, ~2.3k RU / ~1.8k TR strings, display-name getters, localised host
+messages, Cyrillic font fallback, RU voice spells, audit + codemod tools (docs/wave2/i18n.md). Honest gaps: passive tree / lore-log bodies /
+some minigame strings are still English in TR+RU, wave-2 files were not covered, RU layout (longer text, Cyrillic in the retro fonts)
+was verified by build and a scripted run only — no screenshot review yet.

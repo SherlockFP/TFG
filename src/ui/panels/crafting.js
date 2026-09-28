@@ -7,7 +7,7 @@ import { COMPONENT_IDS, COMPONENT_COLOR } from '../../game/components.js';
 import { BLUEPRINTS, CATS, tierOdds, upgradeInfo, isUpgradable } from '../../game/recipes.js';
 import { analyzeInfo, dismantleYield, dismantleBlock, isStrange } from '../../game/research.js';
 import { iconImg } from '../icons.js';
-import { t } from '../../core/i18n.js';
+import { t, tf } from '../../core/i18n.js';
 
 const STYLE_ID = 'tfg-crafting-style';
 const CSS = `
@@ -407,7 +407,7 @@ export function createCraftingPanel({ game, api, tab, onClose } = {}) {
       sfx('ui_buy', 0.7);
     } else if (d.k === 'dismantled') { stamp = { text: t('DISMANTLED'), sub: d.yields.map(([id, n]) => `${nameOf(id)} ×${n}`).join(', '), color: '#9aa0a4' }; sfx('ui_confirm', 0.6); sel = null; }
     else if (d.k === 'analyzed') {
-      stamp = { text: d.bp ? t('BLUEPRINT!') : t('ANALYZED'), sub: `+${d.xp} XP${d.known ? ' · ' + t('already known: parts recovered') : ''}`, color: '#7fc4ff' };
+      stamp = { text: d.bp ? t('BLUEPRINT!') : t('ANALYZED'), sub: tf('+{xp} XP{n}', { xp: d.xp, n: d.known ? ' · ' + t('already known: parts recovered') : '' }), color: '#7fc4ff' };
       sel = null;
     } else if (d.k === 'upgraded') {
       stamp = d.ok ? { text: t('UPGRADED'), sub: `${TIERS[d.from].name} → ${TIERS[d.to].name}`, color: tierColor(d.to) } : { text: t('FAILED'), sub: t('The weapon survived.'), bad: true };

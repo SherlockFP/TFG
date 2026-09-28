@@ -25,6 +25,7 @@ import {
   shuffle,
   digitFromEvent,
 } from './common.js';
+import { t, t as _t } from '../core/i18n.js';
 
 const W = 192;
 const H = 144;
@@ -238,7 +239,7 @@ export function createFuse(rawOpts = {}) {
     phaseT = 0;
     flicker = 0.7;
     sfx('ui_confirm');
-    mg.setStatus('POWER RESTORED', 'good');
+    mg.setStatus(_t('POWER RESTORED'), 'good');
     mg.finishAfter({ success: true, cancelled: false, timeLeft: Math.round(timeLeft * 10) / 10, mistakes }, 1.9, 0.6);
   }
 
@@ -251,7 +252,7 @@ export function createFuse(rawOpts = {}) {
     mg.shake(10);
     mg.flash('#ff5000', 0.6);
     mg.glitch(0.45);
-    mg.setStatus('OVERLOAD!', 'bad');
+    mg.setStatus(_t('OVERLOAD!'), 'bad');
     for (const l of left) if (l.conn < 0) sparkBurst(parts, LX + 3, l.y, 16, ['#ffffff', '#ffe066', '#ff8020'], 90);
     for (const r of right) if (r.conn < 0) sparkBurst(parts, RX - 3, r.y, 16, ['#ffffff', '#ffe066', '#ff8020'], 90);
     mg.finishAfter({ success: false, cancelled: false, timeLeft: 0, mistakes }, 2.0, 0.6);

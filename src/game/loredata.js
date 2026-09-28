@@ -1,7 +1,13 @@
 // Lore content tables (docs/LORE.md is the bible; this file is the in-game copy). Every player-facing string is an
-// [EN, TR] pair; pick with pickLang(). Data only: no game logic, no imports.
+// [EN, TR] pair; pick with pickLang(). Data only: no game logic. RU comes from src/i18n/ru_lore.js keyed by the EN text.
+import { getLang, t } from '../core/i18n.js';
 
-export const pickLang = (pair, tr) => (Array.isArray(pair) ? (tr && pair[1]) || pair[0] : String(pair ?? ''));
+/** [EN, TR] pair -> current language (RU: dictionary lookup by the English text; second arg kept for old callers). */
+export const pickLang = (pair) => {
+  if (!Array.isArray(pair)) return String(pair ?? '');
+  const l = getLang();
+  return l === 'tr' ? pair[1] || pair[0] : l === 'ru' ? t(pair[0]) : pair[0];
+};
 
 // ------------------------------------------------------------------ factions
 export const FACTIONS = {

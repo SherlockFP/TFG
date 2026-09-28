@@ -31,7 +31,7 @@ import { G, groups } from '../physics/physics.js';
 import { createCruiserModel, VAN } from '../models/cruiser.js';
 import { insideShip } from '../world/ship.js';
 import { itemDef } from '../game/items.js';
-import { t } from '../core/i18n.js';
+import { t, sysMsg } from '../core/i18n.js';
 import { clamp, damp } from '../core/util.js';
 
 export const CRUISER = {
@@ -480,7 +480,7 @@ export function installCruiser(game) {
           try { game.particles?.burst(st.pos.clone().add(_v.set(0, -0.6, 0)), 'dust', null, 2.5); } catch { /* ignore */ }
           const dist = st.pos.distanceTo(game.camera.position);
           game.engine?.shake?.(clamp(0.9 - dist / 40, 0, 0.7));
-          if (isHost()) game.net.broadcast('sys', { text: 'UPLINK VAN delivered next to the ship. Hop in!', kind: 'good' });
+          if (isHost()) game.net.broadcast('sys', sysMsg('UPLINK VAN delivered next to the ship. Hop in!', {}, 'good'));
         }
       } else {
         d.retract += dt;
@@ -772,13 +772,13 @@ export function installCruiser(game) {
         const p = [3.4 + (k % 5) * 0.55, 1.1 + Math.floor(k / 10) * 0.35, -2.4 + (Math.floor(k / 5) % 2) * 0.55];
         net().broadcast('it', { e: 'drop', id, p, q: [0, 0, 0, 1] });
       });
-      if (ids.length) net().broadcast('sys', { text: 'Uplink Van winched aboard. Cargo moved to ship storage:' + ' ' + ids.length, kind: 'good' });
+      if (ids.length) net().broadcast('sys', sysMsg('Uplink Van winched aboard. Cargo moved to ship storage: {length}', { length: ids.length }, 'good'));
       net().broadcast('van', { k: 'despawn', why: 'dock' });
     } else {
       for (const id of ids) net().broadcast('it', { e: 'rm', id });
       r.cruiser = null;
       game.broadcastRun?.(['cruiser']);
-      net().broadcast('sys', { text: 'The Uplink Van was left behind. Signal lost.', kind: 'bad' });
+      net().broadcast('sys', sysMsg('The Uplink Van was left behind. Signal lost.', {}, 'bad'));
       net().broadcast('van', { k: 'despawn', why: 'lost' });
     }
   }
@@ -817,7 +817,7 @@ export function installCruiser(game) {
         if (!st.present || dropping() || i < 0 || i > 3) return;
         const p = posOf(from);
         if (!p || p.distanceTo(st.pos) > 7.5) return;
-        if (st.seats[i] && st.seats[i] !== from) { net().sendTo(from, 'sys', { text: 'That seat is taken.', kind: 'info' }); return; }
+        if (st.seats[i] && st.seats[i] !== from) { net().sendTo(from, 'sys', sysMsg('That seat is taken.', {}, 'info')); return; }
         const seats = st.seats.map((s) => (s === from ? null : s));
         seats[i] = from;
         net().broadcast('van', { k: 'seats', s: seats, x: i === 0 ? snapshot() : undefined });
@@ -842,7 +842,7 @@ export function installCruiser(game) {
           for (const c of st.cargo.values()) if (Math.hypot(c.o.x - x, c.o.z - z) < 0.36) { free = false; break; }
           if (free) { slot = [x, z]; break; }
         }
-        if (!slot) { net().sendTo(from, 'sys', { text: 'The van bed is full.', kind: 'bad' }); return; }
+        if (!slot) { net().sendTo(from, 'sys', sysMsg('The van bed is full.', {}, 'bad')); return; }
         const h = Math.min(0.6, (it.size?.y || 0.3) / 2);
         const lo = new THREE.Vector3(slot[0], VAN.bed.y0 + 0.04 + h, slot[1]);
         const lq = new THREE.Quaternion().setFromAxisAngle(UP, Math.random() * Math.PI * 2);

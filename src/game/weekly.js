@@ -8,6 +8,7 @@
 import { RNG, hashString } from '../core/rng.js';
 import { MOONS, MOON_ORDER } from './moons.js';
 import { dailyEventFor, combineEvents, wrapMethod } from './dailyEvents.js';
+import { tf, sysMsg } from '../core/i18n.js';
 
 const DAY = 86400000;
 const BOARD_SIZE = 10;
@@ -136,7 +137,7 @@ export function installWeekly(game) {
     r.weekly = { key: spec.key, seed: spec.seed, mods: spec.mods, featured: spec.featured, score: 0, quotas: 0, startedAt: Date.now() };
     if (spec.featured && MOONS[spec.featured]) r.moon = spec.featured;
     game.broadcastRun?.(['weekly', 'moon']);
-    game.net?.broadcast('sys', { text: `WEEKLY CHALLENGE ${spec.key} STARTED: ${weeklyMods(spec.mods).map((m) => m.name).join(' · ')}. Featured moon: ${MOONS[spec.featured]?.name || '-'}`, kind: 'good' });
+    game.net?.broadcast('sys', sysMsg('WEEKLY CHALLENGE {key} STARTED: {n}. Featured moon: {n2}', { key: spec.key, n: weeklyMods(spec.mods).map((m) => m.name).join(' · '), n2: MOONS[spec.featured]?.name || '-' }, 'good'));
     game.hostSave?.();
     return '';
   }
@@ -193,7 +194,7 @@ export function installWeekly(game) {
     mergeBoard(p, w.key, [{ rid, score: w.score || 0, quotas: w.quotas || 0, days: r.day || 1, crew: r.crew?.name || '', names: crewNames(), at: w.startedAt || Date.now(), fin: w.fin }]);
     if ((w.score || 0) > prevBest) {
       p.weekly.best[w.key] = w.score || 0;
-      if (prevBest > 0 && (w.score || 0) >= prevBest * 1.05) game.ui?.toast?.(`New weekly personal best: ▮${w.score}`, 'good');
+      if (prevBest > 0 && (w.score || 0) >= prevBest * 1.05) game.ui?.toast?.(tf('New weekly personal best: ▮{score}', { score: w.score }), 'good');
     }
     p.weekly.quotas = Math.max(p.weekly.quotas || 0, w.quotas || 0);
     if (w.fin && !st.finCounted) { st.finCounted = true; p.weekly.runs = (p.weekly.runs || 0) + 1; }
@@ -226,7 +227,7 @@ export function installWeekly(game) {
         game.net.broadcast('wkboard', { key: d.key, entries: list }, false);
       });
       H('wkstart', (d, from) => {
-        if (from !== game.selfId) { game.net.sendTo(from, 'sys', { text: 'Only the host can start the Weekly Challenge.', kind: 'bad' }); return; }
+        if (from !== game.selfId) { game.net.sendTo(from, 'sys', sysMsg('Only the host can start the Weekly Challenge.', {}, 'bad')); return; }
         const why = hostStart();
         if (why) game.net.sendTo(from, 'sys', { text: why, kind: 'bad' });
       });

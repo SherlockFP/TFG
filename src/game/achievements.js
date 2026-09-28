@@ -15,7 +15,7 @@ import { MOONS } from './moons.js';
 import { MARKET, MAX_LEVEL, REBIRTH_LEVEL, prestigeStars, MASTERY, masteryRank } from './progression.js';
 import { SUIT_COLORS, HATS } from '../models/avatar.js';
 import { saveProfile } from '../core/save.js';
-import { getLang } from '../core/i18n.js';
+import { getLang, t } from '../core/i18n.js';
 
 const DAY_MS = 86400000;
 const CHECK_INTERVAL = 2;      // seconds between achievement evaluations
@@ -59,7 +59,7 @@ const TR_UI = {
   'achievement': 'başarım', 'achievements': 'başarım',
 };
 const tr = () => { try { return getLang() === 'tr'; } catch { return false; } };
-const L = (s) => (tr() && TR_UI[s]) || s;
+const L = (s) => (tr() && TR_UI[s]) || (tr() ? s : t(s));   // TR: local table; RU: dictionary (src/i18n/ru_ach.js)
 
 // ------------------------------------------------------------------ definitions
 const st = (p) => p.stats || {};
@@ -334,9 +334,9 @@ function rewardText(r) {
   if (cosmetic) parts.push(cosmeticName(cosmetic));
   return parts.join(' · ');
 }
-const nameOf = (a) => (tr() && a.tr?.[0]) || a.name;
-const descOf = (a) => (tr() && a.tr?.[1]) || a.desc;
-const tierName = (tier) => (tr() ? TIERS[tier]?.tr : TIERS[tier]?.name) || tier;
+const nameOf = (a) => (tr() ? a.tr?.[0] : null) || t(a.name);
+const descOf = (a) => (tr() ? a.tr?.[1] : null) || t(a.desc);
+const tierName = (tier) => (tr() ? TIERS[tier]?.tr : t(TIERS[tier]?.name)) || tier;
 
 // ------------------------------------------------------------------ DOM (own elements + injected CSS)
 const STYLE_ID = 'kefal-achievements-style';

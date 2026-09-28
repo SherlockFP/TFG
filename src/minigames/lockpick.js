@@ -24,6 +24,7 @@ import {
   pxLine,
   TAU,
 } from './common.js';
+import { t, tf, t as _t } from '../core/i18n.js';
 
 const W = 160;
 const H = 120;
@@ -170,7 +171,7 @@ export function createLockpick(rawOpts = {}) {
   const isInside = () => Math.abs(angleDiff(angle, arcC)) <= arcHW + GRACE;
   const tip = (len = 39) => ({ x: CX + Math.sin(angle) * len, y: CY - Math.cos(angle) * len });
 
-  mg.setStatus(`PIN 1/${PINS}`);
+  mg.setStatus(tf('PIN 1/{PINS}', { PINS }));
 
   function attempt() {
     if (phase !== 'play' || broken > 0) return;
@@ -191,7 +192,7 @@ export function createLockpick(rawOpts = {}) {
       dir = -dir;
       arcHW = Math.max(0.09, arcHW * 0.86);
       newArc();
-      mg.setStatus(`PIN ${hits + 1}/${PINS}`, 'good');
+      mg.setStatus(tf('PIN {n}/{PINS}', { n: hits + 1, PINS }), 'good');
     } else {
       picks--;
       broken = 0.55;
@@ -218,7 +219,7 @@ export function createLockpick(rawOpts = {}) {
       }
       floatText(parts, miss < 0.14 ? 'SO CLOSE!' : 'SNAP!', CX, CY - 12, '#ff4040', { life: 0.8 });
       if (picks <= 0) fail();
-      else mg.setStatus(`PICK BROKE - ${picks} LEFT`, 'warn');
+      else mg.setStatus(tf('PICK BROKE - {picks} LEFT', { picks }), 'warn');
     }
   }
 
@@ -226,14 +227,14 @@ export function createLockpick(rawOpts = {}) {
     phase = 'win';
     phaseT = 0;
     sfx('lockpick_success');
-    mg.setStatus('UNLOCKED', 'good');
+    mg.setStatus(_t('UNLOCKED'), 'good');
     mg.finishAfter({ success: true, cancelled: false, picksLeft: picks }, 1.7, 0.5);
   }
 
   function fail() {
     phase = 'fail';
     phaseT = 0;
-    mg.setStatus('OUT OF PICKS', 'bad');
+    mg.setStatus(_t('OUT OF PICKS'), 'bad');
     mg.shake(8);
     mg.finishAfter({ success: false, cancelled: false, picksLeft: 0 }, 1.8, 0.5);
   }

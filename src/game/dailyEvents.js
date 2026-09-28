@@ -12,7 +12,7 @@ import * as THREE from 'three';
 import { MOONS } from './moons.js';
 import { SCRAP_TABLE, ITEMS, isSellable } from './items.js';
 import { insideShip } from '../world/ship.js';
-import { addTranslations } from '../core/i18n.js';
+import { addTranslations, tf, sysMsg } from '../core/i18n.js';
 import { scrapValueMul } from './progression.js';
 
 // w: roll weight (rarer = lower). mood drives the HUD / chat colour: good | bad | mixed.
@@ -316,7 +316,7 @@ function hostPopulateExtras(game) {
     for (let i = 0; i < ev.cache && pool.length; i++) {
       const s = pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
       const t = i % 2 ? 'trophy' : 'goldbar';
-      game.items.hostSpawn(t, new THREE.Vector3(s.x, s.y + 0.55, s.z), { valueMul: vm * 2.2, label: `Cursed ${ITEMS[t]?.name || 'Archive'}` });
+      game.items.hostSpawn(t, new THREE.Vector3(s.x, s.y + 0.55, s.z), { valueMul: vm * 2.2, label: tf('Cursed {n}', { n: ITEMS[t]?.name || 'Archive' }) });
     }
   }
   if (ev.swarm) for (let i = 0; i < ev.swarm; i++) game.hostSpawnCreatureIndoor?.('scuttler');
@@ -345,7 +345,7 @@ function hostMigrate(game) {
     game.net.broadcast('fx', { k: 'snd', s: 'spark', p: [from.x, from.y + 0.3, from.z], v: 0.6 });
     game.net.broadcast('it', { e: 'drop', id: it.id, p: [s.x, s.y + 0.5, s.z], q: [0, 0, 0, 1] });
   }
-  game.net.broadcast('sys', { text: 'SERVER MIGRATION: some content has been moved to another room.', kind: 'info' });
+  game.net.broadcast('sys', sysMsg('SERVER MIGRATION: some content has been moved to another room.', {}, 'info'));
 }
 
 // host: SPONSORED DROP — a valuable falls from the sky near the ship
@@ -360,7 +360,7 @@ function hostSupplyDrop(game) {
   }
   const y = (terrain.heightAt?.(x, z) ?? 0) + 14;
   const type = DROP_TYPES[Math.floor(Math.random() * DROP_TYPES.length)];
-  game.items.hostSpawn(type, new THREE.Vector3(x, y, z), { valueMul: valueMulFor(game, game.run.dailyEvent) * 1.1, label: `Sponsored ${ITEMS[type]?.name || 'Drop'}`, linvel: [0, -4, 0] });
+  game.items.hostSpawn(type, new THREE.Vector3(x, y, z), { valueMul: valueMulFor(game, game.run.dailyEvent) * 1.1, label: tf('Sponsored {n}', { n: ITEMS[type]?.name || 'Drop' }), linvel: [0, -4, 0] });
   game.net.broadcast('fx', { k: 'snd', s: 'ship_thrusters', p: [x, y, z], v: 0.6, r: 12, m: 160 });
-  game.net.broadcast('sys', { text: 'SPONSORED DROP: a package landed near the ship!', kind: 'good' });
+  game.net.broadcast('sys', sysMsg('SPONSORED DROP: a package landed near the ship!', {}, 'good'));
 }

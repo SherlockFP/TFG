@@ -79,7 +79,7 @@ Dev helpers (URL params, see `src/main.js`):
 | Path | Role |
 |---|---|
 | `src/main.js` | App: boot (physics, ext assets, models, mods), CRT menu, host/join, key handling, main loop, audio unlock |
-| `src/core/` | `engine.js` renderer + PSX post (low-res RT, vertex snap via ShaderChunk patch, outlines, dithering, bloom), `input.js`, `rng.js` (seeded RNG — world gen must only use this), `save.js` (settings/profile/run saves + migrations), `i18n.js` (EN keys → TR), `util.js`, `events.js` |
+| `src/core/` | `engine.js` renderer + PSX post (low-res RT, vertex snap via ShaderChunk patch, outlines, dithering, bloom), `input.js`, `rng.js` (seeded RNG — world gen must only use this), `save.js` (settings/profile/run saves + migrations), `i18n.js` (EN keys → TR / RU, `src/i18n/*` dictionaries), `util.js`, `events.js` |
 | `src/physics/physics.js` | Rapier wrapper: static boxes/trimesh, item bodies, kinematic capsules, character controller, raycasts, groups `G` |
 | `src/render/` | `lightpool.js` (constant-count point/spot lights reassigned per frame + halos + beam cones — never change light COUNT or `visible`, that recompiles shaders), `textures.js` (procedural pixel textures) |
 | `src/world/` | `facility.js` (procedural interior: layout → geometry/colliders/props/doors/lights/nav, `mergeStaticMeshes`), `nav.js` (grid A*), `terrain.js` (outdoor moon), `ship.js` (ship always at world origin), `company.js` (HQ), `environment.js` (sky/fog/weather/day-night), `geobuilder.js` (merged quads, `levelTexture` prefers downloaded PSX textures), `extmodels.js` + `propfactory.js` (downloaded GLB props `ext:<id>`) |
@@ -243,6 +243,14 @@ test, 2-tab hand playtest (§6-2), remaining BUGS.md items.
 - **Assets:** 29 Blender props + 74 CC0 models, 26 textures, 25 sounds; theme ambience loops + one-shots (`extassets.js`).
 - Integration wiring: interior names come from `interiors/index.js INTERIOR_NAMES` (HUD brief, codex, terminal, moongen);
   interior carpet/tile floors use the new feel footstep sets; interior ambience prefers the shipped theme loops.
+
+### 5.11 Localization wave (EN / TR / RU) — see docs/wave2/i18n.md
+`core/i18n.js` is multi-language (`t`, `tf` with `{x}` / `{@x}`, `L`, `sysMsg`, `addTranslations(map, lang = 'tr')`, `localizeDeep`);
+bulk dictionaries live in `src/i18n/tr_*.js` / `ru_*.js`; `src/i18n/display.js` localises item / creature / moon / ... names through
+getters (ids untouched, `def.$name` = English). Host -> client text uses `sysMsg` / keyed terminal `reply`. Picker in title + Settings,
+`navigator.language` default, RU voice-spell words, Cyrillic font fallback (`TFG Cyr VT`). Audit: `node tools/i18n_audit.mjs`
+(re-run after merges; target 0 missing TR/RU); codemod: `tools/i18n_wrap.mjs`. Gaps: passive tree texts, some minigame HUD strings,
+long lore bodies (RU), wave-2 files merged later.
 
 ### 5.5 Smoke test (paste in the browser console on `?autohost=local&code=T1&name=Tester`, after ~4 s)
 ```js

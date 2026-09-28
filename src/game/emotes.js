@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { createAvatar } from '../models/avatar.js';
 import { suitColor } from '../entities/remote.js';
 import { G } from '../physics/physics.js';
+import { t } from '../core/i18n.js';
 
 const clamp01 = (t) => Math.min(1, Math.max(0, t));
 function pitchAbout(root, th, h) {
@@ -157,7 +158,7 @@ export class EmoteSystem {
         this.wheelOpen = false;
         this.wheel.classList.add('hidden');
         this.items.forEach((el) => el.classList.remove('sel'));
-        this.nameEl.textContent = 'EMOTES';
+        this.nameEl.textContent = t('EMOTES');
         if (this.hover >= 0 && this.list[this.hover]) this.play(this.list[this.hover]);
       }
     }

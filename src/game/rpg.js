@@ -14,7 +14,7 @@
 // Events: 'tfg:role' (roleId, game) and 'tfg:rpg' (kind, detail, game) on the mod bus.
 import * as THREE from 'three';
 import { clamp } from '../core/util.js';
-import { addTranslations } from '../core/i18n.js';
+import { addTranslations, t, tf } from '../core/i18n.js';
 import { ROLES, ROLE_ORDER, NODE, KEYSTONE_NODES, treeBonus, treeFlags, normId, bonusLines, treeSpent } from './passivetree.js';
 import { createRpgController } from './rpgctl.js';
 import { ensureRpgProfile } from './profile.js';
@@ -88,7 +88,7 @@ export function installRpg(game) {
     const prev = roles.get(from);
     roles.set(from, { role, sv });
     if (first) sendState(from);   // gossip: a peer we had not heard from learns our role too
-    if (prev && prev.role !== role && role) toast(`${game.remotes.get(from)?.name || 'A crewmate'} is now a ${ROLES[role].name}.`, 'info');
+    if (prev && prev.role !== role && role) toast(tf('{n} is now a {name}.', { n: game.remotes.get(from)?.name || 'A crewmate', name: ROLES[role].name }), 'info');
   }
 
   // ------------------------------------------------------------------ change pipeline
@@ -108,7 +108,7 @@ export function installRpg(game) {
     if (kind === 'role') {
       try { mods?.emit('tfg:role', ctl.role(), game); } catch { /* ignore */ }
       const r = ROLES[ctl.role()];
-      if (r) { toast(`Role: ${r.name}. ${r.tag}`, 'good'); try { game.net?.broadcast?.('chat', { text: `${p.name} is now a ${r.name}.`, n: 'TFG' }); } catch { /* offline */ } }
+      if (r) { toast(tf('Role: {name}. {tag}', { name: r.name, tag: r.tag }), 'good'); try { game.net?.broadcast?.('chat', { text: `${p.name} is now a ${r.name}.`, n: 'TFG' }); } catch { /* offline */ } }
     }
   }
 
@@ -168,11 +168,11 @@ export function installRpg(game) {
         const kit = ctl.roleDef()?.kit;
         if (kit) setTimeout(() => { if (!st.disposed && game.run?.phase === 'moon') game.net?.request('rpgkit', {}); }, 1200);
       }
-      if (ph === 'orbit' && !ctl.role() && !st.hint) { st.hint = true; setTimeout(() => toast('No role yet: press K, then ROLE (or terminal: ROLE <name>).', 'info'), 2500); }
+      if (ph === 'orbit' && !ctl.role() && !st.hint) { st.hint = true; setTimeout(() => toast(t('No role yet: press K, then ROLE (or terminal: ROLE <name>).'), 'info'), 2500); }
     }));
     offs.push(mods.on('levelUp', (lv, g) => {
       if (g && g !== game) return;
-      setTimeout(() => { if (!st.disposed && ctl.points() > 0) toast('Passive point available - press K', 'info'); }, 1800);
+      setTimeout(() => { if (!st.disposed && ctl.points() > 0) toast(t('Passive point available - press K'), 'info'); }, 1800);
     }));
     offs.push(mods.on('remoteAvatar', (r, dt) => { try { tagRole(r); } catch { /* cosmetic only */ } }));
     offs.push(mods.on('interactables', (out, g) => {
@@ -180,7 +180,7 @@ export function installRpg(game) {
       const sp = game.ship?.points;
       if (!sp?.bunks || !game.player?.inShip) return;
       const cur = ctl.roleDef();
-      out.push({ pos: sp.bunks, r: 0.9, reach: 2.0, label: game.run?.phase === 'orbit' ? 'Crew roster: choose your role [E]' : 'Crew roster [E]', sub: cur ? `Current role: ${cur.name}` : 'No role yet', action: () => api.openRoles() });
+      out.push({ pos: sp.bunks, r: 0.9, reach: 2.0, label: game.run?.phase === 'orbit' ? t('Crew roster: choose your role [E]') : t('Crew roster [E]'), sub: cur ? tf('Current role: {name}', { name: cur.name }) : t('No role yet'), action: () => api.openRoles() });
     }));
   }
   offs.push(game.on?.('joined', () => sendState()));
@@ -351,9 +351,9 @@ export function installRpg(game) {
         return;
       }
       const rid = resolveRole(arg);
-      if (!rid) { term.print('Unknown role. Type ROLE for the list.', 'err'); return; }
+      if (!rid) { term.print(t('Unknown role. Type ROLE for the list.'), 'err'); return; }
       const pv = R.previewRole(rid);
-      if (!pv.current && pv.clout > 0 && !confirm) { term.print(`Switching to ${ROLES[rid].name} un-links ${pv.orphans.length} passive node(s): they are refunded for ◈${pv.clout}. Type ROLE ${rid.toUpperCase()} CONFIRM to proceed.`); return; }
+      if (!pv.current && pv.clout > 0 && !confirm) { term.print(tf('Switching to {name} un-links {length} passive node(s): they are refunded for ◈{clout}. Type ROLE {n} CONFIRM to proceed.', { name: ROLES[rid].name, length: pv.orphans.length, clout: pv.clout, n: rid.toUpperCase() })); return; }
       const res = R.trySetRole(rid);
       term.print(res.msg, res.ok ? '' : 'err');
     }, 'ROLE [name]  show / pick your crew role (orbit only)');
@@ -370,7 +370,7 @@ export function installRpg(game) {
       const R = g?.rpg;
       if (!R) return;
       const cost = R.respecCost();
-      if (rest[0] !== 'confirm') { term.print(`RESPEC refunds every passive node (${treeSpent(g.profile.rpg)} points) for ◈${cost}. Type RESPEC CONFIRM.`); return; }
+      if (rest[0] !== 'confirm') { term.print(tf('RESPEC refunds every passive node ({treeSpent} points) for ◈{cost}. Type RESPEC CONFIRM.', { treeSpent: treeSpent(g.profile.rpg), cost })); return; }
       const res = R.respecAll();
       term.print(res.msg, res.ok ? '' : 'err');
     }, 'RESPEC [CONFIRM]  refund the whole passive tree (Clout)');
@@ -380,7 +380,7 @@ export function installRpg(game) {
   if (p.rpg.migrated && !p.rpg.migrated.shown) {
     setTimeout(() => {
       if (st.disposed) return;
-      toast(`Your ${p.rpg.migrated.skills} old skill point(s) were refunded. Spend them in the Passive Tree (K).`, 'good');
+      toast(tf('Your {skills} old skill point(s) were refunded. Spend them in the Passive Tree (K).', { skills: p.rpg.migrated.skills }), 'good');
       p.rpg.migrated.shown = true; game.progress.save();
     }, 5000);
   }

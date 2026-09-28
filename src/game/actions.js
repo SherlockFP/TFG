@@ -192,7 +192,7 @@ export const actionMethods = {
           }
         } else if (hit.distance < reach) {
           const toBag = this.inventory?.pickTargetHint?.(it);
-          return { label: `Pick up ${affixDisplayName(def.name, it.affix)} [E]`, sub: [isSellable(def) && it.value ? `▮${it.value}` : '', tierTag(it), ...describeAffix(it.affix, { rarity: true }), toBag ? '→ BAG' : ''].filter(Boolean).join(' · '), color: it.affix ? affixColor(it.affix) : r, action: () => this.pickup(it) };
+          return { label: tf('Pick up {name} [E]', { name: affixDisplayName(def.name, it.affix) }), sub: [isSellable(def) && it.value ? `▮${it.value}` : '', tierTag(it), ...describeAffix(it.affix, { rarity: true }), toBag ? '→ BAG' : ''].filter(Boolean).join(' · '), color: it.affix ? affixColor(it.affix) : r, action: () => this.pickup(it) };
         }
       }
     }
@@ -225,15 +225,15 @@ export const actionMethods = {
 
   doorInteraction(door) {
     const held = this.player.heldItem();
-    if (door.kind === 'blast') return { label: door.open ? 'Secure door (open)' : `Secure door [${(door.code || '').toUpperCase()}] - use the ship terminal`, action: () => {} };
-    if (door.kind === 'vault') return { label: door.locked ? 'Vault (locked) - use the keypad' : 'Vault', action: () => {} };
+    if (door.kind === 'blast') return { label: door.open ? t('Secure door (open)') : tf('Secure door [{n}] - use the ship terminal', { n: (door.code || '').toUpperCase() }), action: () => {} };
+    if (door.kind === 'vault') return { label: door.locked ? t('Vault (locked) - use the keypad') : t('Vault'), action: () => {} };
     if (door.teleport) return null;
     if (door.locked) {
-      if (held?.type === 'key') return { label: 'Unlock door with key [E]', action: () => this.net.request('unlock', { id: door.id, key: held.id }) };
-      if (held?.type === 'lockpick') return { label: 'Pick the lock [E]', action: () => this.startLockpick(door, held) };
-      return { label: 'Locked', sub: 'Needs a key or lockpicker', action: () => this.audio.at('door_locked', door.pos.clone().add(UP), 0.8) };
+      if (held?.type === 'key') return { label: t('Unlock door with key [E]'), action: () => this.net.request('unlock', { id: door.id, key: held.id }) };
+      if (held?.type === 'lockpick') return { label: t('Pick the lock [E]'), action: () => this.startLockpick(door, held) };
+      return { label: t('Locked'), sub: t('Needs a key or lockpicker'), action: () => this.audio.at('door_locked', door.pos.clone().add(UP), 0.8) };
     }
-    return { label: door.open ? 'Close door [E]' : 'Open door [E]', action: () => this.net.request('door', { id: door.id, open: !door.open }) };
+    return { label: door.open ? t('Close door [E]') : t('Open door [E]'), action: () => this.net.request('door', { id: door.id, open: !door.open }) };
   },
 
   interactablesNow() {
@@ -244,47 +244,47 @@ export const actionMethods = {
     const held = p.heldItem();
     const add = (o) => { if (o.pos) out.push(o); };
     if (p.inShip || p.pos.distanceTo(new THREE.Vector3(0, 0, 0)) < 12) {
-      add({ pos: sp.terminal, r: 0.8, label: 'Use terminal [E]', action: () => this.openTerminal() });
+      add({ pos: sp.terminal, r: 0.8, label: t('Use terminal [E]'), action: () => this.openTerminal() });
       add({
-        pos: sp.lever, r: 0.6, label: () => ph === 'orbit' ? (this.run.daysLeft <= 0 && this.run.moon !== 'hq' ? 'Deadline! Route to the Company' : `Land on ${MOONS[this.run.moon]?.name} [E]`) : (ph === 'moon' || ph === 'company') ? 'Start the ship / take off [E]' : 'Ship in flight...',
+        pos: sp.lever, r: 0.6, label: () => ph === 'orbit' ? (this.run.daysLeft <= 0 && this.run.moon !== 'hq' ? t('Deadline! Route to the Company') : tf('Land on {name} [E]', { name: MOONS[this.run.moon]?.name })) : (ph === 'moon' || ph === 'company') ? t('Start the ship / take off [E]') : t('Ship in flight...'),
         action: () => { if (ph === 'orbit' || ph === 'moon' || ph === 'company') { this.sfx('lever_pull', 0.9); this.animLever(); this.net.request('lever'); } },
       });
       add({ pos: sp.doorOpen, r: 0.5, label: () => this.ship.door.label(this.run?.phase), action: () => this.net.request('shipdoor', { open: !this.ship.door.open }) });
-      add({ pos: sp.arcade, r: 0.6, label: 'Play FLAPPY PHISH [E]', action: () => this.startArcade() });
-      if (held?.battery !== undefined && held?.battery !== null && itemDef(held.type).battery) add({ pos: sp.charger, r: 0.6, label: `Charge ${itemDef(held.type).name} [E]`, action: () => { this.net.request('charge', { id: held.id, mul: this.stats.batteryMul }); } });
-      add({ pos: sp.suits, r: 0.7, label: 'Change suit [E]', action: () => this.cycleSuit() });
-      add({ pos: sp.coffee, r: 0.5, label: 'Drink coffee [E]', action: () => { p.stamina = p.maxStamina; this.sfx('heal', 0.4); this.ui.toast('Refreshing. (+stamina)'); } });
+      add({ pos: sp.arcade, r: 0.6, label: t('Play FLAPPY PHISH [E]'), action: () => this.startArcade() });
+      if (held?.battery !== undefined && held?.battery !== null && itemDef(held.type).battery) add({ pos: sp.charger, r: 0.6, label: tf('Charge {name} [E]', { name: itemDef(held.type).name }), action: () => { this.net.request('charge', { id: held.id, mul: this.stats.batteryMul }); } });
+      add({ pos: sp.suits, r: 0.7, label: t('Change suit [E]'), action: () => this.cycleSuit() });
+      add({ pos: sp.coffee, r: 0.5, label: t('Drink coffee [E]'), action: () => { p.stamina = p.maxStamina; this.sfx('heal', 0.4); this.ui.toast(t('Refreshing. (+stamina)')); } });
     }
     const fac = this.world.facility;
     if (fac && p.indoor) {
       for (const ip of fac.interactables) {
-        if (ip.type === 'fuse') add({ pos: ip.pos, r: 0.6, label: () => (this.run?.powerOn ? 'Fuse box: run diagnostics [E]' : 'Fuse box: restore power [E]'), action: () => this.startFuse(ip) });
+        if (ip.type === 'fuse') add({ pos: ip.pos, r: 0.6, label: () => (this.run?.powerOn ? t('Fuse box: run diagnostics [E]') : t('Fuse box: restore power [E]')), action: () => this.startFuse(ip) });
       }
       for (const d of fac.doors) {
-        if (d.kind === 'vault' && d.locked && d.keypadPos) add({ pos: d.keypadPos, r: 0.6, label: 'Crack the vault keypad [E]', action: () => this.startSafe(d) });
-        if (d.teleport) add({ pos: d.pos.clone().add(new THREE.Vector3(0, 1.3, 0)), r: 1.2, reach: 2.4, label: d.kind === 'entrance' ? 'Exit facility [E]' : 'Use fire exit [E]', action: () => this.useExit(d.exitIndex, false) });
-        if (d.kind === 'door' && d.open && d.t > 0.9) add({ pos: d.pos.clone().add(new THREE.Vector3(0, 1.2, 0)), r: 0.8, reach: 2.2, label: 'Close door [E]', action: () => this.net.request('door', { id: d.id, open: false }) });
+        if (d.kind === 'vault' && d.locked && d.keypadPos) add({ pos: d.keypadPos, r: 0.6, label: t('Crack the vault keypad [E]'), action: () => this.startSafe(d) });
+        if (d.teleport) add({ pos: d.pos.clone().add(new THREE.Vector3(0, 1.3, 0)), r: 1.2, reach: 2.4, label: d.kind === 'entrance' ? t('Exit facility [E]') : t('Use fire exit [E]'), action: () => this.useExit(d.exitIndex, false) });
+        if (d.kind === 'door' && d.open && d.t > 0.9) add({ pos: d.pos.clone().add(new THREE.Vector3(0, 1.2, 0)), r: 0.8, reach: 2.2, label: t('Close door [E]'), action: () => this.net.request('door', { id: d.id, open: false }) });
       }
       for (const v of this.creatures.views.values()) {
-        if (v.type === 'mimicdoor' && v.state !== 'dead') add({ pos: v.pos.clone().add(new THREE.Vector3(0, 1.3, 0)), r: 1.1, reach: 2.4, label: 'Use fire exit [E]', action: () => this.net.request('mimicdoor', { cid: v.id }) });
+        if (v.type === 'mimicdoor' && v.state !== 'dead') add({ pos: v.pos.clone().add(new THREE.Vector3(0, 1.3, 0)), r: 1.1, reach: 2.4, label: t('Use fire exit [E]'), action: () => this.net.request('mimicdoor', { cid: v.id }) });
       }
     }
     const outd = this.world.outdoor;
     if (outd && !p.indoor) {
       for (const ip of outd.interactables) {
-        if (ip.type === 'exit') add({ pos: ip.pos, r: 1.2, reach: 2.6, label: ip.index === 0 ? 'Enter facility [E]' : 'Enter fire exit [E]', action: () => this.useExit(ip.index, true) });
-        if (ip.type === 'pond' && p.pos.distanceTo(ip.pos) < ip.r + 3) add({ pos: p.pos.clone().add(new THREE.Vector3(0, 1.2, 0)).addScaledVector(p.forward().setY(0).normalize(), 1.6), r: 1.5, noLos: true, label: held?.type === 'rod' ? 'Cast your line [E]' : 'A pond. (Needs a fishing rod)', action: () => held?.type === 'rod' && this.startFishing() });
+        if (ip.type === 'exit') add({ pos: ip.pos, r: 1.2, reach: 2.6, label: ip.index === 0 ? t('Enter facility [E]') : t('Enter fire exit [E]'), action: () => this.useExit(ip.index, true) });
+        if (ip.type === 'pond' && p.pos.distanceTo(ip.pos) < ip.r + 3) add({ pos: p.pos.clone().add(new THREE.Vector3(0, 1.2, 0)).addScaledVector(p.forward().setY(0).normalize(), 1.6), r: 1.5, noLos: true, label: held?.type === 'rod' ? t('Cast your line [E]') : t('A pond. (Needs a fishing rod)'), action: () => held?.type === 'rod' && this.startFishing() });
       }
     }
     if (outd?.outposts && !p.indoor) outd.outposts.addInteractables(this, add);
     const comp = this.world.company;
     if (comp) {
       for (const ip of comp.interactables) {
-        if (ip.type === 'bell') add({ pos: ip.pos, r: 0.5, label: `Ring the bell - SELL (rate ${Math.round((this.run.buyRate || 0.3) * 100)}%) [E]`, action: () => { this.net.request('bell'); } });
-        if (ip.type === 'market') add({ pos: ip.pos, r: 1.2, reach: 3, label: 'Black Market - Phish Dayı [E]', action: () => this.ui.openMarket(this) });
-        if (ip.type === 'slots') add({ pos: ip.pos, r: 0.6, label: 'GACHA MACHINE - play slots [E]', action: () => this.startSlots() });
-        if (ip.type === 'bounties') add({ pos: ip.pos, r: 0.9, label: 'Bounty board [E]', action: () => this.ui.openBounties(this) });
-        if (ip.type === 'pond' && p.pos.distanceTo(ip.pos) < 5) add({ pos: p.pos.clone().add(new THREE.Vector3(0, 1.2, 0)).addScaledVector(p.forward().setY(0).normalize(), 1.6), r: 1.5, noLos: true, label: held?.type === 'rod' ? 'Cast your line [E]' : 'The sea. (Needs a fishing rod)', action: () => held?.type === 'rod' && this.startFishing(true) });
+        if (ip.type === 'bell') add({ pos: ip.pos, r: 0.5, label: tf('Ring the bell - SELL (rate {n}%) [E]', { n: Math.round((this.run.buyRate || 0.3) * 100) }), action: () => { this.net.request('bell'); } });
+        if (ip.type === 'market') add({ pos: ip.pos, r: 1.2, reach: 3, label: t('Black Market - Phish Dayı [E]'), action: () => this.ui.openMarket(this) });
+        if (ip.type === 'slots') add({ pos: ip.pos, r: 0.6, label: t('GACHA MACHINE - play slots [E]'), action: () => this.startSlots() });
+        if (ip.type === 'bounties') add({ pos: ip.pos, r: 0.9, label: t('Bounty board [E]'), action: () => this.ui.openBounties(this) });
+        if (ip.type === 'pond' && p.pos.distanceTo(ip.pos) < 5) add({ pos: p.pos.clone().add(new THREE.Vector3(0, 1.2, 0)).addScaledVector(p.forward().setY(0).normalize(), 1.6), r: 1.5, noLos: true, label: held?.type === 'rod' ? t('Cast your line [E]') : t('The sea. (Needs a fishing rod)'), action: () => held?.type === 'rod' && this.startFishing(true) });
       }
     }
     this.mods?.emit('interactables', out, this);
@@ -343,8 +343,8 @@ export const actionMethods = {
     if (handsFull || slot < 0) {
       // hotbar full / hands busy: straight into the backpack when it fits (inventory.js, host-validated)
       if (this.inventory?.pickToBag?.(it)) return;
-      if (handsFull) { this.ui.toast('Your hands are full.'); return; }
-      this.ui.toast(this.inventory ? 'Inventory full. [I] to make room.' : 'Inventory full.'); this.sfx('ui_error', 0.4); return;
+      if (handsFull) { this.ui.toast(t('Your hands are full.')); return; }
+      this.ui.toast(this.inventory ? t('Inventory full. [I] to make room.') : t('Inventory full.')); this.sfx('ui_error', 0.4); return;
     }
     // predict (remember where it lay, so a rejected pick puts it back exactly there)
     it.predFrom = { p: it.obj.position.clone(), q: it.obj.quaternion.clone() };
@@ -355,7 +355,7 @@ export const actionMethods = {
     this.sfx('item_pickup', 0.6);
     this.net.request('pick', { id: it.id, slot });
     this.refreshHeldVisuals();
-    if (it.nest) this.ui.toast('Something is angry...', 'bad');
+    if (it.nest) this.ui.toast(t('Something is angry...'), 'bad');
   },
 
   onPickFail(id, d = {}) {
@@ -537,13 +537,13 @@ export const actionMethods = {
       case 'medkit': this.healing = { it, t: 0 }; this.sfx('heal', 0.6); return;
       case 'adrenaline':
         p.speedBoost = 20; p.stamina = p.maxStamina; this.sfx('heal', 0.7);
-        this.net.request('consume', { id: it.id }); this.ui.toast('Adrenaline rush!', 'good'); return;
+        this.net.request('consume', { id: it.id }); this.ui.toast(t('Adrenaline rush!'), 'good'); return;
       case 'stungrenade': this.sfx('stun_pin', 0.8); this.dropItem(it, true, { fuse: 2.2 }); return;
       case 'glowstick': this.sfx('glowstick_crack', 0.8); this.setItemOn(it, true); this.dropItem(it, true); return;
       case 'spraypaint': this.spray(it); return;
       case 'rod': {
         const near = this.findInteraction();
-        if (near && /Cast/.test(near.label)) near.action(); else this.ui.toast('Find a pond or the dock to fish.');
+        if (near && /Cast/.test(near.label)) near.action(); else this.ui.toast(t('Find a pond or the dock to fish.'));
         return;
       }
       default: break;
@@ -568,7 +568,7 @@ export const actionMethods = {
         const p = this.player;
         p.hp = Math.min(p.maxHp, p.hp + (it.def.heal || 50));
         this.net.request('consume', { id: it.id });
-        this.ui.toast('Patched up.', 'good');
+        this.ui.toast(t('Patched up.'), 'good');
         this.net.send('pst', { hp: p.hp });
       }
     }
@@ -584,7 +584,7 @@ export const actionMethods = {
   },
 
   toggleItem(it) {
-    if ((it.battery ?? 1) <= 0) { this.sfx('battery_dead', 0.5); this.ui.toast('Battery is dead. Charge it on the ship.'); return; }
+    if ((it.battery ?? 1) <= 0) { this.sfx('battery_dead', 0.5); this.ui.toast(t('Battery is dead. Charge it on the ship.')); return; }
     this.setItemOn(it, !it.on);
     this.sfx(it.type === 'walkie' ? 'walkie_on' : 'flashlight_click', 0.6);
   },
@@ -647,7 +647,7 @@ export const actionMethods = {
       if (!it || !it.on || it.battery === null || it.battery === undefined) continue;
       const drain = it.type === 'boombox' ? 0.5 : it.type === 'walkie' ? 0.3 : 1;
       it.battery = Math.max(0, it.battery - (drain * dt) / (this.stats.batteryMul || 1));
-      if (it.battery <= 0) { this.setItemOn(it, false); this.sfx('battery_dead', 0.6); this.ui.toast(it.def.name + ' battery died.', 'bad'); }
+      if (it.battery <= 0) { this.setItemOn(it, false); this.sfx('battery_dead', 0.6); this.ui.toast(tf('{name} battery died.', { name: it.def.name }), 'bad'); }
       if ((it.type === 'flashlight' || it.type === 'proflash') && it.on) {
         const L = it.def.light;
         const isHeld = it === held;
@@ -763,7 +763,7 @@ export const actionMethods = {
     const def = it.def;
     const now = this.time;
     if (now < (this.nextSwing || 0)) return;
-    if (def.ammo !== undefined && (it.ammo ?? 0) <= 0) { this.sfx('ui_error', 0.5); this.ui.toast('Out of ammo. [R] to reload with shells.'); return; }
+    if (def.ammo !== undefined && (it.ammo ?? 0) <= 0) { this.sfx('ui_error', 0.5); this.ui.toast(t('Out of ammo. [R] to reload with shells.')); return; }
     if (def.battery && (it.battery ?? 0) <= 0) { this.sfx('battery_dead', 0.5); return; }
     this.nextSwing = now + affixCooldown(it.affix, def.cd);
     const eye = this.camera.position.clone();
@@ -803,7 +803,7 @@ export const actionMethods = {
     const it = p.heldItem();
     if (!it || it.type !== 'shotgun') return;
     const shellsId = p.slots.find((id) => id && this.items.get(id)?.type === 'shells') || this.inventory?.bagItems?.().find((b) => b.type === 'shells')?.id;
-    if (!shellsId) { this.ui.toast('No shells.'); return; }
+    if (!shellsId) { this.ui.toast(t('No shells.')); return; }
     it.ammo = 2;
     this.net.broadcast('itst', { id: it.id, am: 2 });
     this.net.request('consume', { id: shellsId });
@@ -811,7 +811,7 @@ export const actionMethods = {
   },
 
   spray(it) {
-    if ((it.charges ?? 0) <= 0) { this.ui.toast('Spray can is empty.'); return; }
+    if ((it.charges ?? 0) <= 0) { this.ui.toast(t('Spray can is empty.')); return; }
     const eye = this.camera.position.clone();
     const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(this.camera.quaternion);
     const hit = this.physics.raycast(eye, fwd, 3, G.STATIC | G.DOOR);
@@ -878,7 +878,7 @@ export const actionMethods = {
       const shown = it.type === 'body' ? 0 : Math.round(it.value * fuzz);
       total += shown;
       const tg = tierTag(it);
-      labels.push({ pos, name: it.type === 'body' ? `${it.label || 'Body'}` : it.def.name, sub: it.type === 'body' ? 'Recover to reduce fines' : `Value: ▮${shown}${tg ? ' · ' + tg : ''}`, color: it.type === 'body' ? '#ff6b6b' : it.tierColor });
+      labels.push({ pos, name: it.type === 'body' ? `${it.label || 'Body'}` : it.def.name, sub: it.type === 'body' ? t('Recover to reduce fines') : tf('Value: ▮{shown}{n}', { shown, n: tg ? ' · ' + tg : '' }), color: it.type === 'body' ? '#ff6b6b' : it.tierColor });
       labels[labels.length - 1].type = it.type;
       if (it.affix) { const l = labels[labels.length - 1]; l.name = affixDisplayName(it.def.name, it.affix); l.color = affixColor(it.affix); l.sub += ' · ' + describeAffix(it.affix).slice(0, 2).join(', '); }
     }
@@ -893,7 +893,7 @@ export const actionMethods = {
       const known = !!this.profile.bestiary[v.type]?.seen;
       this.progress.see(v.type);
       const name = v.type === 'mimic' ? (v.name || 'Crewmate') : (known ? v.def.name : '???');
-      labels.push({ pos: v.pos.clone().add(new THREE.Vector3(0, v.height + 0.3, 0)), name: v.type === 'mimic' ? name : `${name}${v.def.hazard ? '' : ' Lv.' + v.level}${v.elite ? ' ★ELITE' : ''}`, sub: v.code ? `Code: ${v.code.toUpperCase()}` : (v.def.hazard ? 'Hazard' : 'Entity'), color: v.type === 'mimic' ? '#b8ffcc' : '#ff5a5a' });
+      labels.push({ pos: v.pos.clone().add(new THREE.Vector3(0, v.height + 0.3, 0)), name: v.type === 'mimic' ? name : `${name}${v.def.hazard ? '' : ' Lv.' + v.level}${v.elite ? ' ★ELITE' : ''}`, sub: v.code ? `Code: ${v.code.toUpperCase()}` : (v.def.hazard ? t('Hazard') : t('Entity')), color: v.type === 'mimic' ? '#b8ffcc' : '#ff5a5a' });
     }
     // exits / ship
     if (this.world.outdoor && !this.player.indoor) {
@@ -938,7 +938,7 @@ export const actionMethods = {
     if (p.hp - dmg <= 0 && this.hasPerk('secondwind') && !this.secondWindUsed && dmg < 999) {
       this.secondWindUsed = true;
       p.hp = 1;
-      this.ui.toast('SECOND WIND!', 'good');
+      this.ui.toast(t('SECOND WIND!'), 'good');
       this.engine.flash(0xffffff, 0.6);
       return;
     }
@@ -993,7 +993,7 @@ export const actionMethods = {
       'Ping (P) threats so your crew knows.', 'Dead crewmates can still watch and ping. Stay on comms.', 'Bodies can be carried back to cut the fine.',
       'Close doors behind you. Some things cannot open them.', 'Do not stare at what blinks. Do not look away either.', 'Leave before midnight. The ship will not wait.'];
     this.ui.hud?.setDead(true, 'You ' + this.deathText(cause).replace('their', 'your'), DEATH_TIPS[Math.floor(Math.random() * DEATH_TIPS.length)]);
-    this.ui.systemMessage(`You ${this.deathText(cause).replace('their', 'your')}`, 'bad');
+    this.ui.systemMessage(tf('You {replace}', { replace: this.deathText(cause).replace('their', 'your') }), 'bad');
     this.spectateIdx = 0;
     this.deadT = 0;
     if (p.latched) { p.latched = null; }
@@ -1015,7 +1015,7 @@ export const actionMethods = {
       cam.position.copy(c).add(off);
       cam.lookAt(c);
       this.spectating = null;
-      this.ui.hud?.setSpectate(alive.length ? null : 'Waiting for the crew...');
+      this.ui.hud?.setSpectate(alive.length ? null : t('Waiting for the crew...'));
       return;
     }
     const r = alive[this.spectateIdx % alive.length];
@@ -1027,13 +1027,13 @@ export const actionMethods = {
     cam.position.copy(hit ? head.clone().add(want.sub(head).setLength(Math.max(0.3, hit.distance - 0.2))) : want);
     cam.lookAt(head);
     this.env.indoor = r.indoor;
-    this.ui.hud?.setSpectate(`Spectating ${r.name}  [LMB] next`);
+    this.ui.hud?.setSpectate(tf('Spectating {name}  [LMB] next', { name: r.name }));
   },
 
   onLatch(d) {
     if (d.pid === this.selfId) {
       this.player.latched = d.on ? d.cid : null;
-      if (d.on) { this.ui.toast('Something is on your head! Hit it!', 'bad'); this.engine.shake(0.6); }
+      if (d.on) { this.ui.toast(t('Something is on your head! Hit it!'), 'bad'); this.engine.shake(0.6); }
     } else {
       const r = this.remotes.get(d.pid);
       if (r) r.latched = d.on;
@@ -1123,7 +1123,7 @@ export const actionMethods = {
     if (sea) {
       this.hqFish = this.hqFish || { day: -1, n: 0 };
       if (this.hqFish.day !== this.run?.day) this.hqFish = { day: this.run?.day, n: 0 };
-      if (this.hqFish.n >= 6) { this.ui.toast('The fish are not biting here anymore today. Try a moon pond.'); return; }
+      if (this.hqFish.n >= 6) { this.ui.toast(t('The fish are not biting here anymore today. Try a moon pond.')); return; }
       this.hqFish.n++;
     }
     const luck = (this.profile.skills.lck || 0) * 0.01;
@@ -1140,15 +1140,15 @@ export const actionMethods = {
         const slot = findFreeSlot(this.player);
         this.net.request('fish', { type: fish.id, slot });
         this.progress.fish(fish.id);
-        this.ui.toast(`Caught: ${def.name}!`, 'good');
+        this.ui.toast(tf('Caught: {name}!', { name: def.name }), 'good');
       }
     });
   },
   startSafe(door) {
     const danger = this.hostDangerGuess();
     this.openMinigame('safe', { difficulty: clamp(0.25 + danger * 0.12, 0, 0.95) }, (res) => {
-      if (res.success) { this.net.request('vault', { id: door.id }); this.ui.toast('Vault unlocked!', 'good'); }
-      else if (!res.cancelled) { this.net.request('alarm', { p: door.pos.toArray() }); this.ui.toast('ALARM TRIGGERED!', 'bad'); }
+      if (res.success) { this.net.request('vault', { id: door.id }); this.ui.toast(t('Vault unlocked!'), 'good'); }
+      else if (!res.cancelled) { this.net.request('alarm', { p: door.pos.toArray() }); this.ui.toast(t('ALARM TRIGGERED!'), 'bad'); }
     });
   },
   startFuse(ip) {
@@ -1198,3 +1198,4 @@ export const actionMethods = {
 function hashId(s) { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h; }
 
 import { suitColor as suitColorFor } from '../entities/remote.js';
+import { t, tf } from '../core/i18n.js';

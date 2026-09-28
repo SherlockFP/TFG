@@ -9,7 +9,7 @@ import { MOONS } from './moons.js';
 import { tierOfItem, tierIndex } from './tiers.js';
 import { RNG, hashString } from '../core/rng.js';
 import { clamp, escapeHtml } from '../core/util.js';
-import { getLang } from '../core/i18n.js';
+import { getLang, t, sysMsg } from '../core/i18n.js';
 import { hudDock } from '../ui/dock.js';
 
 const tr = () => { try { return getLang() === 'tr'; } catch { return false; } };
@@ -171,7 +171,7 @@ export function installContracts(core) {
     run.contract = null;
     core.factions.hostAdd(c.faction, ABANDON_REP, 'abandon');
     logResult(c, 'abandoned');
-    game.net.broadcast('sys', { text: `${game.playerName(from)} abandoned the ${FACTIONS[c.faction].name} contract (${ABANDON_REP} rep).`, kind: 'warn' });
+    game.net.broadcast('sys', sysMsg('{name} abandoned the {@name2} contract ({ABANDON_REP} rep).', { name: game.playerName(from), name2: FACTIONS[c.faction].$name ?? FACTIONS[c.faction].name, ABANDON_REP }, 'warn'));
     core.emit('tfg:contract', { id: c.id, state: 'abandoned', faction: c.faction });
     return { text: `Contract abandoned. ${FACTIONS[c.faction].name} ${ABANDON_REP} rep.` };
   }
@@ -229,7 +229,7 @@ export function installContracts(core) {
     c.state = 'complete';
     c.progress = c.n;
     const tx = contractText(c, false);
-    game.net.broadcast('sys', { text: `CONTRACT COMPLETE: ${tx.title} — payout at the end of the day.`, kind: 'good' });
+    game.net.broadcast('sys', sysMsg('CONTRACT COMPLETE: {title} — payout at the end of the day.', { title: tx.title }, 'good'));
     core.broadcast('contract', { state: 'complete', f: c.faction, title: c.title });
     core.algo?.hostSayFaction(c.faction, 'done');
     game.later?.(() => core.algo?.hostSay('contract_done', { faction: c.faction }, { gap: 2 }), 5000);
@@ -268,7 +268,7 @@ export function installContracts(core) {
     game.broadcastRun?.(['credits']);
     game.net.broadcast('xp', { xp, coin: 10 + 5 * q, reason: 'Secret objective' });
     core.broadcast('secret', { id: s.id, credits, xp });
-    game.net.broadcast('sys', { text: `SECRET OBJECTIVE COMPLETE: ${SECRETS[s.id].name[0]} — ▮${credits}, ${xp} XP`, kind: 'good' });
+    game.net.broadcast('sys', sysMsg('SECRET OBJECTIVE COMPLETE: {n} — ▮{credits}, {xp} XP', { n: SECRETS[s.id].name[0], credits, xp }, 'good'));
     core.algo?.hostSay('secret', {}, { gap: 3 });
     day.secret = { id: s.id };
     core.emit('tfg:contract', { id: 'secret:' + s.id, state: 'secret' });
@@ -329,23 +329,23 @@ export function installContracts(core) {
     const run = game.run || {};
     ensure(run);
     const T = tr();
-    const out = [T ? 'SÖZLEŞME PANOSU' : 'CONTRACT BOARD', ''];
+    const out = [t('CONTRACT BOARD'), ''];
     const c = run.contract;
     if (c) {
       const tx = contractText(c, T);
-      out.push(`${T ? 'AKTİF' : 'ACTIVE'}: [${FACTIONS[c.faction].short}] ${tx.title} — ${stateName(c.state, T)} ${c.progress || 0}/${c.n}`, `  ${tx.brief}`, '');
+      out.push(`${t('ACTIVE')}: [${FACTIONS[c.faction].short}] ${tx.title} — ${stateName(c.state, T)} ${c.progress || 0}/${c.n}`, `  ${tx.brief}`, '');
     }
     const offers = run.contracts?.offers || [];
-    if (!offers.length) out.push(T ? 'Teklif yok. Yörüngeye dönünce yenileri gelir.' : 'No offers. New ones arrive in orbit.');
+    if (!offers.length) out.push(t('No offers. New ones arrive in orbit.'));
     offers.forEach((o, i) => {
       const tx = contractText(o, T), f = FACTIONS[o.faction];
       out.push(`${o.taken ? 'x' : i + 1}. [${f.short}] ${tx.title}${o.chain !== null && o.chain !== undefined ? `  ★ ${pickLang(CHAINS[o.faction].name, T)} ${o.chain + 1}/5` : ''}  (${tx.type})`);
       out.push(`   ${tx.brief}`);
       if (tx.goal !== tx.brief) out.push(`   > ${tx.goal}`);
-      out.push(`   ▮${o.reward.credits} · +${o.reward.rep} ${f.short} / ${RIVAL_REP} ${FACTIONS[o.rival].short} · ${o.reward.xp} XP${o.taken ? (T ? '  [ALINDI]' : '  [TAKEN]') : ''}`);
+      out.push(`   ▮${o.reward.credits} · +${o.reward.rep} ${f.short} / ${RIVAL_REP} ${FACTIONS[o.rival].short} · ${o.reward.xp} XP${o.taken ? (t('  [TAKEN]')) : ''}`);
     });
-    out.push('', T ? '>ACCEPT <n>  sözleşmeyi al · >ABANDON  bırak (-5 itibar) · >BOARD  panoyu aç' : '>ACCEPT <n>  take a contract · >ABANDON  drop it (-5 rep) · >BOARD  open the board');
-    out.push(T ? '??? Her gün bir GİZLİ GÖREV var. Sadece tamamlanınca görünür.' : '??? Every day hides a SECRET OBJECTIVE. It is revealed only when completed.');
+    out.push('', t('>ACCEPT <n>  take a contract · >ABANDON  drop it (-5 rep) · >BOARD  open the board'));
+    out.push(t('??? Every day hides a SECRET OBJECTIVE. It is revealed only when completed.'));
     return out.join('\n');
   }
   function stateName(s, T) {
@@ -356,14 +356,14 @@ export function installContracts(core) {
     const c = run?.contract;
     const T = tr();
     if (phase === 'orbit') {
-      if (c) add(`${T ? 'Sözleşme' : 'Contract'}: ${contractText(c, T).title} — ${T ? 'başlamak için in' : 'land to start'}`, 'sub');
-      else if (run?.contracts?.offers?.some((o) => !o.taken)) add(T ? 'Sözleşme panosu: terminal CONTRACTS ya da gemideki pano' : 'Contract board: terminal CONTRACTS or the board in the ship', 'hint');
+      if (c) add(`${t('Contract')}: ${contractText(c, T).title} — ${t('land to start')}`, 'sub');
+      else if (run?.contracts?.offers?.some((o) => !o.taken)) add(t('Contract board: terminal CONTRACTS or the board in the ship'), 'hint');
     } else if (phase === 'moon' && c) {
       const tx = contractText(c, T);
-      if (c.state === 'complete') add(`${FACTIONS[c.faction].short}: ${tx.title} ✔ ${T ? '(gün sonunda ödenir)' : '(paid at day end)'}`, 'sub', true);
+      if (c.state === 'complete') add(`${FACTIONS[c.faction].short}: ${tx.title} ✔ ${t('(paid at day end)')}`, 'sub', true);
       else add(`${FACTIONS[c.faction].short}: ${tx.goal} ${c.progress || 0}/${c.n}`, 'sub', false, c.n ? Math.min(1, (c.progress || 0) / c.n) : 0);
     }
-    if (phase === 'moon') add(T ? '??? Gizli görev' : '??? Secret objective', 'hint');
+    if (phase === 'moon') add(t('??? Secret objective'), 'hint');
   }
   function updateDock(dt) {
     st.dockT -= dt;
@@ -383,9 +383,9 @@ export function installContracts(core) {
       const pct = c.n ? Math.round(Math.min(1, (c.progress || 0) / c.n) * 100) : 0;
       html += `<div class="lore-dock" style="--fc:${f.color}"><div class="ld-k">${f.glyph} ${escapeHtml(f.short)} · ${escapeHtml(tx.type)}${c.chain !== null && c.chain !== undefined ? ' ★' : ''}</div>`
         + `<div class="ld-t">${escapeHtml(tx.title)}</div><div class="ld-b"><span style="width:${pct}%"></span></div>`
-        + `<div class="ld-p">${c.state === 'complete' ? (T ? 'TAMAM ✔' : 'COMPLETE ✔') : c.state === 'active' ? (T ? 'inişte başlar' : 'starts on landing') : `${c.progress || 0} / ${c.n}`}</div></div>`;
+        + `<div class="ld-p">${c.state === 'complete' ? (t('COMPLETE ✔')) : c.state === 'active' ? (t('starts on landing')) : `${c.progress || 0} / ${c.n}`}</div></div>`;
     }
-    for (const id of wars) html += `<div class="lore-dock war" style="--fc:#ff2a2a"><div class="ld-k">⚔ ${T ? 'SAVAŞ' : 'WAR'}: ${escapeHtml(FACTIONS[id].short)}</div></div>`;
+    for (const id of wars) html += `<div class="lore-dock war" style="--fc:#ff2a2a"><div class="ld-k">⚔ ${t('WAR')}: ${escapeHtml(FACTIONS[id].short)}</div></div>`;
     if (html !== st.dockHtml) { st.dock.innerHTML = html; st.dockHtml = html; }
   }
 

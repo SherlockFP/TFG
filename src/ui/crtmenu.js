@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 import { levelMaterial } from '../world/geobuilder.js';
 import { createAnyProp } from '../world/propfactory.js';
-import { t } from '../core/i18n.js';
+import { t, tf } from '../core/i18n.js';
 import { rankOf, xpForLevel } from '../game/progression.js';
 import { listRuns } from '../core/save.js';
 
@@ -76,7 +76,7 @@ function makeCRT({ w = 0.8, h = 0.6, depth = 0.6, canvasW = 256, canvasH = 192, 
   return { group: g, canvas, ctx, tex, mat, screen, w, h };
 }
 
-const FONT = (px) => `${px}px "TFG Credit", VT323, monospace`;   // "TFG Credit": narrow ▮ credit glyph (style.css)
+const FONT = (px) => `${px}px "TFG Credit", VT323, "TFG Cyr VT", monospace`;   // "TFG Credit": narrow ▮ credit glyph (style.css)
 const MENU_FONT = (px) => `bold ${px}px "Arial Narrow", "Roboto Condensed", Impact, sans-serif`;
 
 export class CRTMenu {
@@ -250,9 +250,9 @@ export class CRTMenu {
     }
     this.noise(ctx, W, H, 0.12);
     ctx.fillStyle = '#e8e8e8'; ctx.font = FONT(18); ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-    ctx.fillText('CAM 04 - SUBLEVEL B', 8, 6);
+    ctx.fillText(t('CAM 04 - SUBLEVEL B'), 8, 6);
     const d = new Date(); ctx.fillText(`${d.toLocaleDateString()} ${d.toLocaleTimeString()}`, 8, H - 24);
-    if (Math.floor(time * 2) % 2) { ctx.fillStyle = '#ff2a2a'; ctx.beginPath(); ctx.arc(W - 40, 16, 5, 0, Math.PI * 2); ctx.fill(); ctx.fillText('REC', W - 32, 6); }
+    if (Math.floor(time * 2) % 2) { ctx.fillStyle = '#ff2a2a'; ctx.beginPath(); ctx.arc(W - 40, 16, 5, 0, Math.PI * 2); ctx.fill(); ctx.fillText(t('REC'), W - 32, 6); }
   }
   drawStatic(c, time, dim) {
     const { ctx, canvas } = c; const W = canvas.width, H = canvas.height;
@@ -274,7 +274,7 @@ export class CRTMenu {
       ctx.fillStyle = i === 0 ? `rgba(255,60,60,${k})` : `rgba(90,255,130,${k})`;
       ctx.fillRect(cx + Math.cos(ba) * br - 3, cy + Math.sin(ba) * br - 3, 6, 6);
     }
-    ctx.fillStyle = '#49ff7a'; ctx.font = FONT(18); ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.fillText('MOTION TRACKER', 6, 4);
+    ctx.fillStyle = '#49ff7a'; ctx.font = FONT(18); ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.fillText(t('MOTION TRACKER'), 6, 4);
   }
   drawCard(c, time) {
     const { ctx, canvas } = c; const W = canvas.width, H = canvas.height;
@@ -282,13 +282,13 @@ export class CRTMenu {
     ctx.fillStyle = '#100a05'; ctx.fillRect(0, 0, W, H);
     ctx.textAlign = 'left'; ctx.textBaseline = 'top';
     ctx.fillStyle = '#ff9a4a'; ctx.font = FONT(30); ctx.fillText(p.name.slice(0, 16), 12, 10);
-    ctx.fillStyle = '#ffd9b8'; ctx.font = FONT(22); ctx.fillText(`Lv.${p.level}  ${rankOf(p.level)}${p.title ? ' · ' + p.title : ''}`, 12, 46);
+    ctx.fillStyle = '#ffd9b8'; ctx.font = FONT(22); ctx.fillText(`${t('Lv.')}${p.level}  ${t(rankOf(p.level))}${p.title ? ' · ' + p.title : ''}`, 12, 46);
     ctx.fillStyle = '#3a2412'; ctx.fillRect(12, 78, W - 24, 10);
     ctx.fillStyle = '#ff9a4a'; ctx.fillRect(12, 78, (W - 24) * Math.min(1, p.xp / xpForLevel(p.level)), 10);
-    ctx.fillStyle = '#ffd23f'; ctx.font = FONT(24); ctx.fillText(`◈ ${p.coins} clout`, 12, 100);
+    ctx.fillStyle = '#ffd23f'; ctx.font = FONT(24); ctx.fillText(tf('◈ {coins} clout', { coins: p.coins }), 12, 100);
     ctx.fillStyle = '#c9a98a'; ctx.font = FONT(19);
-    ctx.fillText(`kills ${p.stats.kills} · quotas ${p.stats.quotasMet} · deaths ${p.stats.deaths}`, 12, 134);
-    ctx.fillText(`[CHARACTER] to customize`, 12, 158);
+    ctx.fillText(tf('kills {kills} · quotas {quotas} · deaths {deaths}', { kills: p.stats.kills, quotas: p.stats.quotasMet, deaths: p.stats.deaths }), 12, 134);
+    ctx.fillText(t('[CHARACTER] to customize'), 12, 158);
   }
   drawLog(c, time) {
     const { ctx, canvas } = c; const W = canvas.width, H = canvas.height;

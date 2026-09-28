@@ -2,11 +2,11 @@
 // reading overlay. Self-contained DOM + injected CSS. Used by game/casefile.js, game/lore.js and panels/contracts.js.
 import { drawAlgoFace } from '../../game/algorithm.js';
 import { FACTIONS, LINES, LORE_LOGS, CHAPTERS, pickLang } from '../../game/loredata.js';
-import { getLang } from '../../core/i18n.js';
+import { getLang, t } from '../../core/i18n.js';
 import { escapeHtml } from '../../core/util.js';
 
 const tr = () => { try { return getLang() === 'tr'; } catch { return false; } };
-const L = (en, trs) => (tr() ? trs : en);
+const L = (en, trs) => (tr() ? trs : t(en));   // RU: dictionary keyed by the English text
 const STYLE_ID = 'tfg-lore-case-style';
 const CSS = `
 .lcase-cine{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(20,6,12,.55),rgba(0,0,0,.88));
