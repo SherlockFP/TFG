@@ -85,3 +85,7 @@ was verified by build and a scripted run only — no screenshot review yet.
 Playable Acoustic / Electric Guitar, Keytar and Drum Pad (LMB = play mode, real notes, chords, 4-song follow-along, jam session chip, noise on moons).
 Honest gaps: never played by hand in a browser (avatar strap poses, arm animation, panel layout, latency all unverified); 2 real players untested; bass / violin /
 harmonica / bongos / kazoo / theremin, rhythm-game guide, busker hat and creature dancing were cut for budget. See `docs/wave2/music.md`.
+## Wave 2 - MIRROR DIMENSION (module `mirror`, node-tested only)
+Portal mirror on ~25% of outdoor maps (sector 1+), a flipped / ASCII / dark dimension with Vampire-Survivors waves, XP crystals, 8 temporary upgrades, Reflection Meter chests + power-ups, a 3:00 countdown with overtime,
+cracked-reflection respawns and a SHATTERED wipe (`docs/wave2/mirror.md`). Honest gaps: never run in a browser (the dimension shader is a separate program with a safe fallback, but its look, the portal placement / colliders, model proportions,
+card layout, dash feel and every 2-player path are unverified); some creature behaviours read `aiPlayers()` directly and might still notice players in the other dimension; world-projected DOM labels are not mirrored; numbers are design values.

@@ -1,6 +1,7 @@
 // Renderer + PSX pipeline: low-res render target, vertex snapping (global shader chunk patch),
 // depth-based outlines, Bayer dithering + color quantization, screen effects.
 import * as THREE from 'three';
+import { MIRROR_FS_DECL, MIRROR_FS_UV, MIRROR_FS_GRADE } from '../render/mirrorfx.js';   // [mirror] dimension post look (docs/wave2/mirror.md)
 
 let psxPatched = false;
 export function patchPSX(jitterLevel = 1) {
@@ -28,7 +29,8 @@ varying vec2 vUv;
 void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }
 `;
 
-const POST_FS = `
+// [mirror] postFS(true) is the dimension variant (own program: a shader problem there can never break the normal game); postFS(false) is the untouched base
+const postFS = (MIR) => `
 precision highp float;
 uniform sampler2D tColor;
 uniform sampler2D tDepth;
@@ -57,6 +59,7 @@ uniform float uScanA;    // scan wave strength
 uniform vec3 uScanCol;
 uniform vec2 uProj;      // tan(fov/2) * aspect, tan(fov/2)
 varying vec2 vUv;
+${MIR ? MIRROR_FS_DECL : ''}   // [mirror]
 
 float bayer4(vec2 p) {
   ivec2 ip = ivec2(mod(p, 4.0));
@@ -77,6 +80,7 @@ vec3 toSRGB(vec3 c) {
 }
 void main() {
   vec2 uv = vUv;
+${MIR ? MIRROR_FS_UV : ''}   // [mirror]
   if (uWarp > 0.0) {
     uv += vec2(sin(uv.y * 9.0 + uTime * 2.1), cos(uv.x * 7.0 + uTime * 1.6)) * 0.006 * uWarp;
   }
@@ -125,6 +129,7 @@ void main() {
   col = toSRGB(col) * uGamma;
   float l = dot(col, vec3(0.299, 0.587, 0.114));
   col = mix(vec3(l), col, uSat * (1.0 - 0.55 * uLowHp));
+${MIR ? MIRROR_FS_GRADE : ''}   // [mirror]
 
   // scan wave: a bright shell sweeping over every surface, concentric scanlines inside it
   if (uScanA > 0.0) {
@@ -182,6 +187,7 @@ void main() {
   gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
 }
 `;
+const POST_FS = postFS(false), POST_FS_MIRROR = postFS(true);   // [mirror]
 
 export class Engine {
   constructor(container, settings) {
@@ -220,10 +226,13 @@ export class Engine {
         uHurtDir: { value: new THREE.Vector3(0, 1, 0) }, uLowHp: { value: 0 }, uBeat: { value: 0 },
         uScan: { value: new THREE.Vector4(0, 0, 0, 0) }, uScanA: { value: 0 }, uScanCol: { value: new THREE.Color(0.35, 0.72, 1.0) },
         uProj: { value: new THREE.Vector2(1, 1) },
+        uMir: { value: new THREE.Vector4(0, 0, 0, 5) },   // [mirror]
       },
       depthTest: false, depthWrite: false,
     });
+    this.postMatMirror = new THREE.ShaderMaterial({ vertexShader: POST_VS, fragmentShader: POST_FS_MIRROR, uniforms: this.postMat.uniforms, depthTest: false, depthWrite: false });   // [mirror] shares the uniforms
     const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), this.postMat);
+    this.postQuad = quad;   // [mirror]
     quad.frustumCulled = false;
     this.postScene.add(quad);
 
@@ -320,6 +329,8 @@ export class Engine {
     u.uHurtDir.value.set(fx.hurtDir.x, fx.hurtDir.y, Math.min(0.9, fx.hurtDirA));
     u.uLowHp.value = fx.lowHp * (this.settings.reduceMotion ? 0.5 : 1);
     u.uBeat.value = fx.beat;
+    this.mirrorHook?.(u, dt);   // [mirror] set by render/mirrorfx.js installMirrorFx
+    this.postQuad.material = u.uMir.value.x > 0.001 && !this.mirrorBroken ? this.postMatMirror : this.postMat;   // [mirror]
 
     this.renderer.setRenderTarget(this.rt);
     this.renderer.render(this.scene, this.camera);

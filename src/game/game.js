@@ -122,7 +122,7 @@ import { installMusic } from './music.js';
 // [import:durability]
 
 
-// [import:mirror]
+import { installMirror } from './mirror.js';   // [mirror] dimension (docs/wave2/mirror.md)
 
 
 // [import:avatar2]
@@ -254,7 +254,7 @@ export class Game extends Emitter {
     // [slot:durability]
 
 
-    // [slot:mirror]
+    this.useModule('mirror', installMirror);
 
 
     // [slot:avatar2]

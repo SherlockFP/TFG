@@ -253,6 +253,11 @@ The headless feature script `tools/harness/wave2_combat.js` exists but was not r
 STATIC exposure per player (hot rooms / hot items / breach; Buzzing 25, Glitching 50, Corrupted 75, DELETED 100), Decon Shower in the ship, Antivirus Shot, Faraday Suit, Signal Counter,
 10 mutations, 6 temporary power-ups (holographic pickups), Loot Box Shrine (d20) + throwable Cursed Die, left-dock buff bar. Net types `an` / `anfx` / `anst`. Shared edits: game.js slot lines, magic.js (Mute hook).
 Verified: node test (`tools/harness/anomaly_core.test.mjs`), build, smoke_land. NOT hand-played; `tools/harness/wave2_anomaly.js` was written but not executed (budget freeze).
+### 5.13 Wave 2 - MIRROR DIMENSION (module `mirror`, docs/wave2/mirror.md; node-tested + builds, NOT run in a browser)
+~25% of outdoor maps from sector 1 carry a portal mirror (E to step in / out). Inside: host-owned membership, flipped screen + mirrored A/D / mouse X, dark ASCII post look (own shader program, safe fallback), wraith / flame fiend /
+mirror copy / zombie fodder waves (cap 50), XP crystals + 3-card level-ups (8 temporary upgrades), Reflection Meter -> chests + power-ups. Owner rules: 3:00 countdown then OVERTIME (+1 level / 20 s), a death = sit out one round
+(respawn while a crewmate inside lives), everyone inside dead = SHATTERED (real death), day end = lost in the reflection. Hooks: game.js slots + 6 `[mirror]` lines in engine.js; the rest are instance wraps. `tools/harness/mirror.test.mjs` PASS.
+
 ### 5.11 Wave 2 - HQ FORGE (module `forge`, see docs/wave2/forge.md)
 THE MONETIZER (+1..+9, overclocks), Ascension Altar (tier up, workbench capped at Rare), Shard Exchange, 6 shard items + Backup Drive, weapon glow (+3/+5/+7/+9), creature tiers
 (Uncommon..Mythic: HP/dmg/XP mul on top of balance.scale, aura/nameplate, shard drops). Pure rules `src/game/enhance.js` + `node tools/harness/forge_rules.test.mjs`. Hooks in shared files are
