@@ -96,6 +96,9 @@ import { installWorldX } from './worldx.js';
 // [import:forge]
 
 
+// [import:music]
+
+
 export class Game extends Emitter {
   constructor({ engine, audio, settings, profile, ui, input, mods }) {
     super();
@@ -195,6 +198,9 @@ export class Game extends Emitter {
 
 
     // [slot:forge]
+
+
+    // [slot:music]
 
   }
 
