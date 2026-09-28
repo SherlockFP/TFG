@@ -177,6 +177,7 @@ export class EmoteSystem {
     const av = this.ensureAvatar();
     if (this.avatarSuit !== g.profile.suit) { av.setSuitColor(suitColor(g.profile.suit)); this.avatarSuit = g.profile.suit; }
     if (this.avatarHat !== g.profile.hat) { av.setHat(g.profile.hat); this.avatarHat = g.profile.hat; }
+    av.setLook?.(g.profile);   // wardrobe outfit / accessories
     av.root.visible = true;
     av.root.position.copy(p.pos);
     av.root.rotation.set(0, p.yaw + Math.PI, 0);

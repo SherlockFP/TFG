@@ -10,11 +10,16 @@
 //     -Z points forward from the body). Extra parts: neck, hips, hatSlot.
 //   extra methods: getHat(), setEyeColor(css).
 // createViewModel(): anim.leftHand (bool) additionally shows the left arm (e.g. flashlight).
+//
+// WARDROBE (wave 1, src/models/cosmetics.js): setLook({ suit, hat, face, back }) applies an outfit ("suit" ids in
+// OUTFITS: venom, hazmat, clown ...) or a plain colour suit, a hat, a face accessory and a back accessory. Undefined
+// fields keep their current value. Outfits are appearance only. viewModel.setLook / setOutfit dress the first-person arms.
 import * as THREE from 'three';
 import {
   G, xf, merged, lam, lamI, basI, bas, tex, newTex, noiseFill, mk, pv, Tinter,
   clamp, lerp, smooth, damp, rng, TAU, PI,
 } from './modelkit.js';
+import { OUTFIT_BY_ID, OUTFITS, HATS_EXTRA, buildHatExtra, createLookController, outfitLook } from './cosmetics.js';
 
 export const SUIT_COLORS = [
   { id: 'orange', name: 'Orange', color: '#d9642b' },
@@ -33,6 +38,9 @@ export const SUIT_COLORS = [
   { id: 'gold', name: 'Gold', color: '#c9a227' },   // achievement-only: TFG Legend reward (achievements.js), not sold
 ];
 
+// wardrobe outfits share the suit id space (profile.suit): the entry gives them a swatch colour for old code paths
+for (const o of OUTFITS) if (!SUIT_COLORS.some((x) => x.id === o.id)) SUIT_COLORS.push({ id: o.id, name: o.name, color: o.color, outfit: true, tier: o.tier });
+
 export const HATS = [
   { id: 'none', name: 'None' },
   { id: 'cap', name: 'Cap' },
@@ -49,6 +57,7 @@ export const HATS = [
   { id: 'halo', name: 'Halo' },
   { id: 'horns', name: 'Horns' },
   { id: 'antenna', name: 'Antenna' },
+  ...HATS_EXTRA.map((h) => ({ id: h.id, name: h.name })),
 ];
 
 // ------------------------------------------------------------------ shared looks
@@ -73,8 +82,92 @@ const metalMat = () => lam(C.metal);
 const ASPECT = 1.5;
 function ell(ctx, x, y, rx, ry) { ctx.beginPath(); ctx.ellipse(x, y, Math.max(0.3, rx / ASPECT), Math.max(0.3, ry), 0, 0, TAU); }
 
+// Venom symbiote face: white angular eye patches + a wide toothy grin on a black visor
+function drawVenomFace(ctx, s) {
+  const W = 64, H = 64;
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#10122a'); g.addColorStop(0.45, '#04050c'); g.addColorStop(1, '#000000');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = 'rgba(150,170,255,0.10)';
+  ctx.beginPath(); ctx.moveTo(6, 3); ctx.lineTo(22, 3); ctx.lineTo(12, 18); ctx.lineTo(5, 18); ctx.fill();
+  const expr = s.expr, m = s.mouth;
+  ctx.save();
+  ctx.fillStyle = '#f6f8ff'; ctx.strokeStyle = '#f6f8ff'; ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 4;
+  const P = (side, dx, y) => [32 + side * dx, y];
+  for (const side of [-1, 1]) {
+    if (expr === 'dead') {
+      ctx.lineWidth = 2.4;
+      ctx.beginPath(); ctx.moveTo(...P(side, 8, 17)); ctx.lineTo(...P(side, 24, 34)); ctx.moveTo(...P(side, 24, 17)); ctx.lineTo(...P(side, 8, 34)); ctx.stroke();
+      continue;
+    }
+    if (s.blink) { ctx.fillRect(Math.min(P(side, 6, 0)[0], P(side, 24, 0)[0]), 27, 18, 2); continue; }
+    const k = expr === 'scared' ? 1.14 : 1, sq = expr === 'happy' ? 0.62 : 1, cy = 27;
+    const Y = (y) => cy + (y - cy) * sq * k;
+    ctx.beginPath();
+    let pt = P(side, 5, Y(26)); ctx.moveTo(pt[0], pt[1]);
+    pt = P(side, 15, Y(19)); ctx.lineTo(pt[0], pt[1]);
+    pt = P(side, 26, Y(14)); ctx.lineTo(pt[0], pt[1]);
+    pt = P(side, 22 + (k - 1) * 4, Y(28)); ctx.lineTo(pt[0], pt[1]);
+    pt = P(side, 9, Y(36)); ctx.lineTo(pt[0], pt[1]);
+    ctx.closePath(); ctx.fill();
+  }
+  // the grin
+  ctx.shadowBlur = 2;
+  const t = (x) => (x - 32) / 27, top = (x) => 42 + 5 * (1 - t(x) * t(x)) + (expr === 'angry' ? -1 : 0);
+  const gap = (x) => (2.6 + 9 * m) * Math.sqrt(Math.max(0, 1 - t(x) * t(x)));
+  ctx.lineWidth = 1.1;
+  ctx.beginPath(); for (let x = 5; x <= 59; x += 2) { const y = top(x); if (x === 5) ctx.moveTo(x, y); else ctx.lineTo(x, y); } ctx.stroke();
+  ctx.beginPath(); for (let x = 5; x <= 59; x += 2) { const y = top(x) + gap(x); if (x === 5) ctx.moveTo(x, y); else ctx.lineTo(x, y); } ctx.stroke();
+  const tl = 3.6 + m * 2.5;
+  for (let x = 8; x <= 56; x += 5.4) { const y = top(x), l = tl * (1 - 0.35 * Math.abs(t(x))); ctx.beginPath(); ctx.moveTo(x - 2.5, y); ctx.lineTo(x + 2.5, y); ctx.lineTo(x, y + l); ctx.fill(); }
+  for (let x = 10.7; x <= 54; x += 5.4) { const y = top(x) + gap(x), l = (tl - 0.4) * (1 - 0.35 * Math.abs(t(x))); ctx.beginPath(); ctx.moveTo(x - 2.5, y); ctx.lineTo(x + 2.5, y); ctx.lineTo(x, y - l); ctx.fill(); }
+  if (m > 0.4) { ctx.shadowBlur = 0; ctx.fillStyle = '#c23a5a'; const y = top(32) + gap(32); ctx.beginPath(); ctx.moveTo(28, y - 2); ctx.lineTo(36, y - 2); ctx.lineTo(35, y + 4 + m * 6); ctx.lineTo(29, y + 4 + m * 6); ctx.fill(); }
+  ctx.restore();
+}
+
+// LED face accessory: the visor becomes a pixel display (5x6 eyes on a 3 px pitch, bar mouth)
+const LED_EYE = {
+  normal: ['.###.', '#####', '#####', '#####', '#####', '.###.'],
+  blink: ['.....', '.....', '.....', '#####', '.....', '.....'],
+  happy: ['.....', '.###.', '#...#', '.....', '.....', '.....'],
+  dead: ['#...#', '.#.#.', '..#..', '.#.#.', '#...#', '.....'],
+  scared: ['.###.', '#...#', '#...#', '#...#', '.###.', '.....'],
+  angry: ['#....', '##...', '#####', '.###.', '.###.', '.....'],
+};
+function drawLedFace(ctx, s) {
+  const W = 64, H = 64;
+  ctx.fillStyle = '#03070a'; ctx.fillRect(0, 0, W, H);
+  const on = '#42ff8f', off = 'rgba(66,255,143,0.07)';
+  const cell = (gx, gy, lit) => { ctx.fillStyle = lit ? on : off; ctx.fillRect(3 + gx * 3, 6 + gy * 3, 2, 2); };
+  for (let gy = 0; gy < 17; gy++) for (let gx = 0; gx < 20; gx++) cell(gx, gy, false);
+  ctx.shadowColor = on; ctx.shadowBlur = 3;
+  const key = s.expr === 'dead' ? 'dead' : s.blink ? 'blink' : LED_EYE[s.expr] ? s.expr : 'normal';
+  for (const [side, x0] of [[-1, 3], [1, 12]]) {
+    const bm = LED_EYE[key];
+    for (let r = 0; r < 6; r++) for (let c = 0; c < 5; c++) {
+      const cc = key === 'angry' && side > 0 ? 4 - c : c;
+      if (bm[r][cc] === '#') cell(x0 + c, 2 + r, true);
+    }
+  }
+  const m = s.mouth;
+  if (s.expr === 'happy' || (m < 0.06 && s.expr !== 'dead' && s.expr !== 'angry')) {
+    if (s.expr === 'happy') { for (const [x, y] of [[4, 11], [5, 12], [6, 13], [7, 13], [8, 13], [9, 13], [10, 13], [11, 13], [12, 13], [13, 12], [14, 11]]) cell(x, y, true); }
+    else for (let x = 6; x <= 13; x++) cell(x, 12, true);
+  } else if (m < 0.06) { for (let x = 6; x <= 13; x++) cell(x, 12, true); }
+  else {
+    const rows = 1 + Math.round(m * 3);
+    for (let x = 6; x <= 13; x++) { cell(x, 11, true); cell(x, 11 + rows, true); }
+    for (let r = 1; r < rows; r++) { cell(6, 11 + r, true); cell(13, 11 + r, true); }
+  }
+  ctx.shadowBlur = 0;
+}
+
 function drawFace(ctx, s) {
   const W = 64, H = 64;
+  if (s.style !== 'mimic') {
+    if (s.led) { drawLedFace(ctx, s); return; }
+    if (s.style === 'venom') { drawVenomFace(ctx, s); return; }
+  }
   // visor background + reflection
   const g = ctx.createLinearGradient(0, 0, 0, H);
   g.addColorStop(0, s.visor);
@@ -242,7 +335,7 @@ function buildHat(id) {
       add('b', bas('#ff3030'), () => [xf(G.ico(0.025, 0), [0.08, 0.19, -0.03])]);
       break;
     default:
-      break;
+      return buildHatExtra(id);
   }
   return g;
 }
@@ -254,21 +347,21 @@ const VISOR_PHI = PI * 0.6;
 const HAND_Q = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(
   new THREE.Vector3(-1, 0, 0), new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 1, 0)));
 
-function buildLeg(parent, side, suitMat) {
+function buildLeg(parent, side, suitMat, bootMat = darkMat()) {
   const hip = pv(parent, [side * 0.11, 0, 0]);
   mk(hip, G.segY(THIGH, 0.095, 0.082, 5), suitMat);
   const knee = pv(hip, [0, -THIGH, 0]);
   mk(knee, merged('av_shin', () => [xf(G.segY(SHIN, 0.082, 0.07, 5)), xf(G.box(0.12, 0.08, 0.05), [0, -0.03, 0.06])]), suitMat);
   const ankle = pv(knee, [0, -SHIN, 0]);
-  mk(ankle, merged('av_boot', () => [xf(G.box(0.14, 0.11, 0.25), [0, -0.035, 0.035]), xf(G.box(0.13, 0.06, 0.13), [0, 0.02, 0])]), darkMat());
+  mk(ankle, merged('av_boot', () => [xf(G.box(0.14, 0.11, 0.25), [0, -0.035, 0.035]), xf(G.box(0.13, 0.06, 0.13), [0, 0.02, 0])]), bootMat);
   return { hip, knee, ankle };
 }
-function buildArm(parent, side, suitMat) {
+function buildArm(parent, side, suitMat, gloveMat = darkMat()) {
   const sh = pv(parent, [side * 0.3, 0.44, 0]);
   mk(sh, merged('av_uarm', () => [xf(G.segY(UARM, 0.078, 0.066, 5)), xf(G.sph(0.098, 5, 3), [0, -0.02, 0])]), suitMat);
   const el = pv(sh, [0, -UARM, 0]);
   mk(el, G.segY(FARM, 0.068, 0.058, 5), suitMat);
-  mk(el, merged('av_glove', () => [xf(G.box(0.1, 0.13, 0.09), [0, -FARM - 0.05, 0.005]), xf(G.cyl(0.072, 0.072, 0.045, 5, true), [0, -FARM + 0.01, 0]), xf(G.box(0.035, 0.07, 0.05), [0.045, -FARM - 0.03, 0.04], [0, 0, 0.3])]), darkMat());
+  mk(el, merged('av_glove', () => [xf(G.box(0.1, 0.13, 0.09), [0, -FARM - 0.05, 0.005]), xf(G.cyl(0.072, 0.072, 0.045, 5, true), [0, -FARM + 0.01, 0]), xf(G.box(0.035, 0.07, 0.05), [0.045, -FARM - 0.03, 0.04], [0, 0, 0.3])]), gloveMat);
   const hand = new THREE.Object3D();
   hand.name = side > 0 ? 'handL' : 'handR';
   hand.position.set(0, -FARM - 0.08, 0.01);
@@ -284,13 +377,15 @@ function buildArm(parent, side, suitMat) {
 export function createAvatar({ suitColor = '#d9642b', hat = 'none', visorColor, faceStyle = 'normal', eyeColor } = {}) {
   const root = new THREE.Group();
   root.name = 'avatar';
-  const suitMat = lamI(suitColor, { map: suitTex() });
+  const baseMap = suitTex();
+  const suitMat = lamI(suitColor, { map: baseMap });
+  const gloveMat = lamI(C.dark), bootMat = lamI(C.dark), beltMatI = lamI(C.belt);   // per instance: outfits recolour them
   const rnd = rng((Math.random() * 1e9) | 0);
 
   const rig = pv(root, null, null, 'rig');
   const body = pv(rig, [0, HIP_Y, 0], null, 'hips');
   mk(body, merged('av_pelvis', () => [xf(G.box(0.36, 0.2, 0.27), [0, 0.02, 0]), xf(G.box(0.2, 0.12, 0.05), [0, -0.02, 0.13])]), suitMat);
-  const legL = buildLeg(body, 1, suitMat), legR = buildLeg(body, -1, suitMat);
+  const legL = buildLeg(body, 1, suitMat, bootMat), legR = buildLeg(body, -1, suitMat, bootMat);
 
   const spine = pv(body, [0, 0.07, 0], null, 'torso');
   mk(spine, merged('av_torso', () => [
@@ -298,33 +393,34 @@ export function createAvatar({ suitColor = '#d9642b', hat = 'none', visorColor, 
     xf(G.cyl(0.19, 0.25, 0.07, 8), [0, 0.535, 0], [0, PI / 8, 0], [1, 1, 0.66]),
     xf(G.box(0.11, 0.1, 0.03), [0.1, 0.32, 0.165]),
   ]), suitMat);
-  mk(spine, merged('av_belt', () => [
+  const beltMesh = mk(spine, merged('av_belt', () => [
     xf(G.cyl(0.236, 0.236, 0.07, 8, true), [0, 0.03, 0], [0, PI / 8, 0], [1, 1, 0.7]),
     xf(G.box(0.09, 0.09, 0.06), [0.15, 0.0, 0.16]), xf(G.box(0.09, 0.09, 0.06), [-0.15, 0.0, 0.16]),
     xf(G.box(0.05, 0.4, 0.02), [0.11, 0.3, 0.166]), xf(G.box(0.05, 0.4, 0.02), [-0.11, 0.3, 0.166]),
     xf(G.box(0.05, 0.025, 0.34), [0.11, 0.52, 0]), xf(G.box(0.05, 0.025, 0.34), [-0.11, 0.52, 0]),
-  ]), beltMat());
-  mk(spine, merged('av_regulator', () => [xf(G.box(0.1, 0.07, 0.05), [0, 0.2, 0.175]), xf(G.cyl(0.15, 0.16, 0.07, 8, true), [0, 0.55, 0])]), metalMat());
+  ]), beltMatI);
+  const regulatorMesh = mk(spine, merged('av_regulator', () => [xf(G.box(0.1, 0.07, 0.05), [0, 0.2, 0.175]), xf(G.cyl(0.15, 0.16, 0.07, 8, true), [0, 0.55, 0])]), metalMat());
 
   const backpack = pv(spine, [0, 0.28, -0.2], null, 'backpack');
-  mk(backpack, merged('av_frame', () => [xf(G.box(0.34, 0.46, 0.05)), xf(G.box(0.3, 0.05, 0.14), [0, -0.21, -0.06])]), darkMat());
-  mk(backpack, merged('av_tank', () => [
+  const backpackGear = pv(backpack, null, null, 'backpackGear');   // stock frame + tank (wardrobe outfits may hide it)
+  mk(backpackGear, merged('av_frame', () => [xf(G.box(0.34, 0.46, 0.05)), xf(G.box(0.3, 0.05, 0.14), [0, -0.21, -0.06])]), darkMat());
+  mk(backpackGear, merged('av_tank', () => [
     xf(G.cyl(0.105, 0.105, 0.4, 7, true), [0, 0, -0.105]),
     xf(G.sph(0.105, 7, 2, 0, TAU, 0, PI / 2), [0, 0.2, -0.105]),
     xf(G.sph(0.105, 7, 2, 0, TAU, 0, PI / 2), [0, -0.2, -0.105], [PI, 0, 0]),
   ]), tankMat());
-  mk(backpack, merged('av_valve', () => [xf(G.cyl(0.03, 0.03, 0.07, 6), [0, 0.32, -0.105]), xf(G.box(0.09, 0.02, 0.02), [0, 0.35, -0.105])]), metalMat());
+  mk(backpackGear, merged('av_valve', () => [xf(G.cyl(0.03, 0.03, 0.07, 6), [0, 0.32, -0.105]), xf(G.box(0.09, 0.02, 0.02), [0, 0.35, -0.105])]), metalMat());
 
-  const armL = buildArm(spine, 1, suitMat), armR = buildArm(spine, -1, suitMat);
+  const armL = buildArm(spine, 1, suitMat, gloveMat), armR = buildArm(spine, -1, suitMat, gloveMat);
 
   const neck = pv(spine, [0, 0.5, 0], null, 'neck');
   const head = pv(neck, null, null, 'head');
-  mk(head, G.sph(0.165, 9, 7), suitMat, [0, 0.135, 0]);
-  mk(head, merged('av_helmetbits', () => [
+  const headMesh = mk(head, G.sph(0.165, 9, 7), suitMat, [0, 0.135, 0]);
+  const helmetBitsMesh = mk(head, merged('av_helmetbits', () => [
     xf(G.box(0.03, 0.08, 0.08), [0.163, 0.13, 0]), xf(G.box(0.03, 0.08, 0.08), [-0.163, 0.13, 0]),
     xf(G.box(0.05, 0.05, 0.08), [0.15, 0.24, 0.05]),
   ]), metalMat());
-  mk(head, G.box(0.035, 0.035, 0.01), bas('#fff1b8'), [0.15, 0.24, 0.092]);
+  const helmetLightMesh = mk(head, G.box(0.035, 0.035, 0.01), bas('#fff1b8'), [0.15, 0.24, 0.092]);
 
   // visor face (per-instance canvas)
   const faceT = newTex(64, 64);
@@ -332,7 +428,7 @@ export function createAvatar({ suitColor = '#d9642b', hat = 'none', visorColor, 
   const visorMat = faceT ? basI('#ffffff', { map: faceT.tex }) : basI(visorBase);
   const face = mk(head, G.sph(0.172, 8, 4, PI / 2 - VISOR_PHI / 2, VISOR_PHI, PI * 0.28, PI * 0.4), visorMat, [0, 0.135, 0]);
   face.name = 'visor';
-  const fs = { mouth: 0, expr: 'normal', blink: false, pupil: [0, 0], eye: eyeColor || C.eye, visor: visorBase, style: faceStyle, twitch: 0 };
+  const fs = { mouth: 0, expr: 'normal', blink: false, pupil: [0, 0], eye: eyeColor || C.eye, visor: visorBase, style: faceStyle, twitch: 0, led: false };
   let drawnMouth = -1, faceDirty = true, extraExpr = null;
   const redraw = () => {
     faceDirty = false; drawnMouth = fs.mouth;
@@ -347,14 +443,38 @@ export function createAvatar({ suitColor = '#d9642b', hat = 'none', visorColor, 
   const hatSlot = pv(head, [0, 0.295, 0], null, 'hatSlot');
   let hatObj = null, hatId = 'none';
   const tinter = new Tinter(root);
+  let look = null;                       // wardrobe controller (outfit / face / back attachments), created below
   function setHat(id) {
     if (hatObj) hatSlot.remove(hatObj);
     hatId = HATS.some((h) => h.id === id) ? id : 'none';
     hatObj = buildHat(hatId);
     hatSlot.add(hatObj);
+    look?.onHat(hatId);
     tinter.refresh();
   }
   setHat(hat);
+  look = createLookController({
+    root, body, spine, neck, head, hatSlot, legL, legR, armL, armR, backpack, backpackGear, suitMat, gloveMat, bootMat, beltMat: beltMatI, baseMap,
+    gear: { belt: beltMesh, regulator: regulatorMesh, helmetbits: helmetBitsMesh, helmetLight: helmetLightMesh, headMesh, face },
+    fs, redraw, tinterRefresh: () => tinter.refresh(), getHat: () => hatId,
+  });
+  let curSuit = null, curFace = 'none', curBack = 'none';
+  /** Wardrobe: { suit (outfit id or colour-suit id), hat, face, back } — undefined fields stay as they are. */
+  function setLook(l) {
+    if (!l) return;
+    let changed = false;
+    if (l.suit !== undefined && l.suit !== curSuit) {
+      curSuit = l.suit; changed = true;
+      const def = OUTFIT_BY_ID[l.suit];
+      if (def) look.setOutfit(def.id);
+      else { look.setOutfit('none'); const c = SUIT_COLORS.find((x) => x.id === l.suit)?.color; if (c) suitMat.color.set(c); }
+    }
+    if (l.hat !== undefined && (l.hat || 'none') !== hatId) { setHat(l.hat || 'none'); changed = true; }
+    if (l.face !== undefined && (l.face || 'none') !== curFace) { curFace = l.face || 'none'; look.setFace(curFace); changed = true; }
+    if (l.back !== undefined && (l.back || 'none') !== curBack) { curBack = l.back || 'none'; look.setBack(curBack); changed = true; }
+    // the ship mirror keeps the local avatar on its own render layer: new attachments must join it
+    if (changed && root.layers.mask !== 1) { const m = root.layers.mask; root.traverse((o) => { o.layers.mask = m; }); }
+  }
 
   // ---- animation state
   const W = { crouch: 0, sprint: 0, air: 0, carry: 0, hold: 0, climb: 0, sit: 0, dance: 0, wave: 0, point: 0 };
@@ -523,6 +643,7 @@ export function createAvatar({ suitColor = '#d9642b', hat = 'none', visorColor, 
       if (t2 !== fs.twitch) { fs.twitch = t2; faceDirty = true; }
     }
     if (faceDirty) redraw();
+    look?.update(dt, time, a, mouthSm);
   }
 
   function setMouth(v) {
@@ -546,16 +667,19 @@ export function createAvatar({ suitColor = '#d9642b', hat = 'none', visorColor, 
     update,
     setMouth,
     setExpression,
-    setSuitColor(hex) { suitMat.color.set(hex); },
+    setSuitColor(hex) { if (!OUTFIT_BY_ID[curSuit]) suitMat.color.set(hex); },   // an outfit owns the colour
     setHat,
     getHat: () => hatId,
+    setLook,
+    getLook: () => ({ suit: curSuit, hat: hatId, face: curFace, back: curBack }),
     setEyeColor(hex) { fs.eye = hex; redraw(); },
     setHitFlash(v) { tinter.setFlash(v); },
     setVisible(b) { root.visible = !!b; },
     dispose() {
       if (hatObj) hatSlot.remove(hatObj);
+      look.dispose();
       tinter.dispose();
-      suitMat.dispose();
+      suitMat.dispose(); gloveMat.dispose(); bootMat.dispose(); beltMatI.dispose();
       visorMat.dispose();
       if (faceT) faceT.tex.dispose();
     },
@@ -684,7 +808,9 @@ function makeTrail() {
 export function createViewModel({ suitColor = '#d9642b' } = {}) {
   const root = new THREE.Group();
   root.name = 'viewmodel';
-  const sleeveMat = lamI(suitColor, { map: suitTex() });
+  const baseMap = suitTex();
+  const sleeveMat = lamI(suitColor, { map: baseMap });
+  const vmGloveMat = lamI(C.dark);
   const sway = pv(root, null, null, 'sway');
 
   const mkArm = (side) => { // side +1 = right (screen right, +X), -1 = left
@@ -700,13 +826,14 @@ export function createViewModel({ suitColor = '#d9642b' } = {}) {
       xf(G.box(0.095, 0.075, 0.12), [0, 0, -0.31]),
       xf(G.box(0.04, 0.035, 0.08), [-side * 0.055, 0.01, -0.3], [0, side * 0.4, 0]),
       xf(G.box(0.085, 0.04, 0.05), [0, -0.035, -0.37], [0.5, 0, 0]),
-    ]), darkMat());
+    ]), vmGloveMat);
     const hand = new THREE.Object3D();
     hand.name = side > 0 ? 'handR' : 'handL';
     hand.position.set(0, 0.0, -0.34);
     el.add(hand);
     return { side, base, sh, el, hand, show: side > 0 ? 1 : 0, cur: { x: 0.2, y: 0.1, z: 0, el: 0.18, px: 0.24, py: -0.34, pz: 0.06, roll: 0, wr: 0 } };
   };
+  let vmOutfit = false;
   const R = mkArm(1), L = mkArm(-1);
   L.base.visible = false;
   const trail = makeTrail();
@@ -887,8 +1014,22 @@ export function createViewModel({ suitColor = '#d9642b' } = {}) {
     impact(kind = 'flesh', strength = 1) { impactKind = kind; impactAmt = clamp(strength, 0.3, 1.6); impactT = 1; },
     /** Manual recoil (e.g. mods): uses WEAPON_RECOIL[type]. */
     kick(type = 'generic') { recoil = WEAPON_RECOIL[type] || WEAPON_RECOIL.generic; recoilT = 1; },
-    setSuitColor(hex) { sleeveMat.color.set(hex); },
+    setSuitColor(hex) { if (!vmOutfit) sleeveMat.color.set(hex); },
+    /** wardrobe: dress the first-person sleeves / gloves like the outfit (colour + fabric only) */
+    setLook(l) {
+      if (!l || l.suit === undefined) return;
+      const def = OUTFIT_BY_ID[l.suit];
+      vmOutfit = !!def;
+      if (def) {
+        const b = outfitLook(def.id);
+        sleeveMat.map = b.map || baseMap; sleeveMat.color.set(b.tint || def.color);
+        sleeveMat.emissive.set(b.emissive || '#000000'); vmGloveMat.color.set(b.glove || C.dark);
+      } else {
+        sleeveMat.map = baseMap; sleeveMat.emissive.set('#000000'); vmGloveMat.color.set(C.dark);
+        const c = SUIT_COLORS.find((x) => x.id === l.suit)?.color; if (c) sleeveMat.color.set(c);
+      }
+    },
     setVisible(b) { root.visible = !!b; if (!b) trail.clear(); },
-    dispose() { sleeveMat.dispose(); trail.dispose(); },
+    dispose() { sleeveMat.dispose(); vmGloveMat.dispose(); trail.dispose(); },
   };
 }

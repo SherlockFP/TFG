@@ -64,7 +64,7 @@ import { setDocksVisible } from '../ui/dock.js';   // shared crafting components
 
 // [import:worldx]
 
-// [import:fun]
+import { installFun } from './fun.js';
 
 
 export class Game extends Emitter {
@@ -137,7 +137,7 @@ export class Game extends Emitter {
 
     // [slot:worldx]
 
-    // [slot:fun]
+    this.useModule('fun', installFun);
 
   }
 
@@ -196,7 +196,7 @@ export class Game extends Emitter {
 
   helloData() {
     const p = this.profile;
-    return { name: p.name, level: p.level, suit: p.suit, hat: p.hat, pid: p.id, title: titleOf(p), mods: this.mods?.enabledIds() || [] };
+    return { name: p.name, level: p.level, suit: p.suit, hat: p.hat, face: p.face || 'none', back: p.back || 'none', pid: p.id, title: titleOf(p), mods: this.mods?.enabledIds() || [] };   // face/back: wardrobe accessories (old clients ignore them)
   }
 
   installNetHandlers() {

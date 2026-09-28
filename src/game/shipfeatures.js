@@ -732,6 +732,7 @@ export function installShipFeatures(game) {
     if (prof.suit !== avSuit) { avSuit = prof.suit; a.setSuitColor(suitColor(avSuit)); }
     const hat = prof.hat || 'none';
     if (hat !== avHat) { avHat = hat; a.setHat(hat); setLayerDeep(a.root, MIRROR_LAYER); }
+    a.setLook?.(prof);   // wardrobe outfit / face / back (keeps the mirror layer for new parts)
     a.root.visible = true;
     a.root.position.copy(p.pos);
     a.root.rotation.y = p.yaw + Math.PI;               // avatar faces +Z, camera yaw 0 faces -Z

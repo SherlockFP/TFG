@@ -146,6 +146,7 @@ export class CharPreview {
   sync() {
     const p = this.profile;
     if (!p) return;
+    this.avatar?.setLook?.(p);   // wardrobe outfit / face / back (suit id may be an outfit)
     const suit = (SUIT_COLORS.find((s) => s.id === p.suit) || SUIT_COLORS[0]).color;
     const title = baseTitleOf(p);
     const o = this.opts;
