@@ -545,7 +545,7 @@ export function installInventory(game) {
       const line = document.createElement('div');
       line.className = 'tinv-feed-line' + (tiered ? ' tier-' + tier : '');
       line.style.setProperty('--tc', tiered ? TIERS[tier].color : '#cfc6b8');
-      const name = affixDisplayName(t(it.def.name), it.affix);
+      const name = affixDisplayName(t(it.def.name), it.affix, it);
       const val = isSellable(it.def) && it.value ? ` ▮${it.value}` : '';
       line.innerHTML = `${iconHTML(it.type, 'ico')}<span><b>${escapeHtml(name)}</b>${tiered ? `<i>${escapeHtml(t(TIERS[tier].name))}</i>` : ''}<i>${escapeHtml(val)}${toBag ? ' · ' + escapeHtml(t(it.inv?.k === 'eq' ? 'Equipped' : 'Stashed in bag')) : ''}</i></span>`;
       st.feedEl.appendChild(line);
@@ -714,13 +714,15 @@ export function installInventory(game) {
     saveFields(it) {
       const out = {};
       if (it?.tier) out.tr = it.tier;
+      if (it?.plus) out.pl = it.plus;   // [forge] +N and overclocks survive saves
+      if (it?.oc?.length) out.oc = [...it.oc];
       const holder = it?.holder && !String(it.holder).startsWith('c:') ? it.holder : null;
       const pid = holder ? pidOf(holder) : it?.reclaim?.pid;
       if (pid) out.rc = { pid, iv: holder ? (it.inv ? { ...it.inv } : null) : (it.reclaim?.iv || null) };
       return out;
     },
     /** host.js hostInit restore hook: fields to pass through into the 'sp' event */
-    loadFields(s) { return { tr: s?.tr, rc: s?.rc }; },
+    loadFields(s) { return { tr: s?.tr, rc: s?.rc, pl: s?.pl, oc: s?.oc }; },   // [forge] pl / oc
     flash: (msg) => panel.flash(msg),
     debug: () => ({ beams: st.beams.size, ver: st.ver, luck: st.luck }),
     dispose() {

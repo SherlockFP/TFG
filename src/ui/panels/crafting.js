@@ -300,7 +300,7 @@ export function createCraftingPanel({ game, api, tab, onClose } = {}) {
       const a = mk('div', 'crp-dd'); a.append(Object.assign(mk('span', 'crp-tier', TIERS[cur].name.toUpperCase()), {}), mk('span', 'crp-arrow', '→'), mk('span', 'crp-tier', TIERS[u.to].name.toUpperCase()));
       a.firstChild.style.setProperty('--tc', tierColor(cur)); a.lastChild.style.setProperty('--tc', tierColor(u.to));
       dt.appendChild(a);
-    } else dt.appendChild(mk('div', 'crp-dd', t('Already at the top tier.')));
+    } else dt.appendChild(mk('div', 'crp-dd', t(cur !== 'mythic' && TIER_ORDER.indexOf(cur) >= 2 ? 'Workbench upgrades stop at Rare. Use the Ascension Altar at HQ.' : 'Already at the top tier.')));   // [forge]
     dh.append(big, dt);
     det.appendChild(dh);
     if (stamp) { const sp = mk('div', 'crp-stamp' + (stamp.bad ? ' bad' : ''), stamp.text); if (stamp.color) sp.style.setProperty('--tc', stamp.color); if (stamp.sub) sp.appendChild(mk('small', '', stamp.sub)); det.appendChild(sp); }

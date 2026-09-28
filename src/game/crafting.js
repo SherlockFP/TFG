@@ -19,6 +19,7 @@ import { COMPONENT_MODEL_IDS, createComponentModel, createWorkbench, WORKBENCH_S
 import { SHIP } from '../world/ship.js';
 import { G } from '../physics/physics.js';
 import { createCraftingPanel } from '../ui/panels/crafting.js';
+import { SHARD_IDS } from './enhance.js';   // [forge]
 
 // ---------------------------------------------------------------------------------------------- placement
 const BENCH = { x: 4.05, z: SHIP.z0 + WORKBENCH_SIZE.d / 2 + 0.03 };   // -z wall of the ship, right of the arcade
@@ -64,6 +65,8 @@ export function rollChestLoot(tier, rng, opts = {}) {
     } else if (cat === 'component') {
       const arcane = idx >= 3 && rng.next() < 0.35;
       type = pickWeighted(rng, arcane ? KIND_TABLES.arcane : (THEME_TABLES[theme] || THEME_TABLES.factory));
+      // [forge] forge shards: ~1 in 3 chest components is a shard of the chest's tier or up to two below (never Source Code)
+      if (rng.next() < 0.28 + idx * 0.04) type = SHARD_IDS[Math.max(0, Math.min(4, idx - Math.floor(rng.next() * 3)))];
     } else if (cat === 'tool') {
       type = pickWeighted(rng, CHEST_TOOLS.filter(([id]) => ITEMS[id]));
     } else if (cat === 'weapon') {
@@ -307,7 +310,7 @@ export function installCrafting(game) {
     if (!it || !isUpgradable(it.def)) return reply(from, { k: 'err', msg: 'Pick a weapon to upgrade.' });
     const from_ = tierOfItem(it, it.def);
     const u = upgradeInfo(from_, clamp(Number(d.luck) || 0, 0, 1.2));
-    if (!u) return reply(from, { k: 'err', msg: 'Already at the top tier.' });
+    if (!u) return reply(from, { k: 'err', msg: tierIndex(from_) >= 2 && from_ !== 'mythic' ? 'Workbench upgrades stop at Rare. Use the Ascension Altar at HQ.' : 'Already at the top tier.' });   // [forge] cap
     if (u.bp && !(Array.isArray(d.bps) && d.bps.includes(u.bp))) return reply(from, { k: 'err', msg: 'Blueprint required: ' + BLUEPRINTS[u.bp].name });
     const src = sourcesFor(from).filter((x) => x !== it);
     for (const [id, n] of u.in) if (countIn(src, id) < n) return reply(from, { k: 'err', msg: 'Missing ingredients.' });
@@ -321,7 +324,7 @@ export function installCrafting(game) {
       // replace the weapon by an identical one one tier higher (affixes, charges and soulbinding are kept)
       const pos = benchSpot(0, 1);
       game.net.broadcast('it', { e: 'rm', id: it.id });
-      newId = game.items.hostSpawn(it.type, pos, { tier: u.to, af: it.affix || undefined, value: it.value, baseValue: it.baseValue, soulbound: it.soulbound || undefined, battery: it.battery ?? undefined, charges: it.charges ?? undefined });
+      newId = game.items.hostSpawn(it.type, pos, { tier: u.to, af: it.affix || undefined, value: it.value, baseValue: it.baseValue, soulbound: it.soulbound || undefined, battery: it.battery ?? undefined, charges: it.charges ?? undefined, plus: it.plus || undefined, oc: it.oc?.length ? [...it.oc] : undefined });   // [forge] keep +N / overclocks
       setTier(newId, u.to);
       stats.upgraded++;
     }

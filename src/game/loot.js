@@ -9,6 +9,7 @@
 // (an RNG instance from core/rng.js or any () => [0,1) function), so it is deterministic per seed.
 import * as THREE from 'three';
 import { RARITY } from './items.js';
+import { forgeName } from './enhance.js';   // [forge]
 
 export const RARITY_ORDER = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
 export const AFFIX_RARITIES = ['uncommon', 'rare', 'epic', 'legendary'];
@@ -166,12 +167,13 @@ export function normalizeAffix(af) {
 }
 
 /** "Sharp Machete of the Deep" */
-export function affixDisplayName(baseName, affix) {
-  if (!affix) return baseName;
+export function affixDisplayName(baseName, affix, it = null) {
   let s = baseName;
-  if (affix.prefix) s = affix.prefix + ' ' + s;
-  if (affix.suffix) s = s + ' ' + affix.suffix;
-  return s;
+  if (affix) {
+    if (affix.prefix) s = affix.prefix + ' ' + s;
+    if (affix.suffix) s = s + ' ' + affix.suffix;
+  }
+  return it && (it.plus || it.oc?.length) ? forgeName(s, it.plus || 0, it.oc) : s;   // [forge] "+7 Katana ⚡"
 }
 
 /** Compact name for tight UI (inventory slots): "Sharp Machete" or "Machete of Haste". */

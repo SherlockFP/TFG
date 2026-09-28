@@ -88,6 +88,7 @@ export class WorldItem {
     this.affix = normalizeAffix(data.af);   // weapon rarity + affixes (null = plain item)
     this.collected = !!data.col;
     this.tier = TIERS[data.tr] ? data.tr : null;   // rolled / granted item tier (tiers.js); null = derived (tierOfItem)
+    this.plus = Math.max(0, Math.min(9, data.pl | 0)); this.oc = Array.isArray(data.oc) ? data.oc.filter((x) => typeof x === 'string').slice(0, 2) : [];   // [forge] +0..+9 enhancement and overclock ids (game/forge.js)
     this.inv = this.holder ? normalizeInv(data.iv) : null;   // null = hotbar / world; { k:'bag', x, y } | { k:'eq', s }
     this.reclaim = data.rc && typeof data.rc === 'object' && typeof data.rc.pid === 'string' ? { pid: data.rc.pid.slice(0, 64), iv: normalizeInv(data.rc.iv) } : null;
     this.bag = normalizeBag(data.bg);       // legacy belt bag contents (dumped by the host, see inventory.js)
@@ -291,7 +292,7 @@ export class ItemManager {
       b: opts.battery ?? def.battery ?? undefined, c: opts.charges ?? def.charges ?? undefined, am: def.ammo ?? undefined,
       h: opts.holder || null, lb: opts.label || undefined, sb: opts.soulbound || undefined, lv: opts.linvel || undefined,
       af: opts.af || undefined, col: opts.col ? 1 : undefined, bg: opts.bag?.length ? opts.bag : undefined,
-      tr: tier || undefined,
+      tr: tier || undefined, pl: opts.plus || undefined, oc: opts.oc?.length ? opts.oc : undefined,   // [forge]
     };
     // spawn straight into the holder's bag / equipment (crafting, reclaim): opts.inv = 'bag' | 'eq' | { k, x, y } | { k:'eq', s }
     if (opts.holder && opts.inv) { const iv = this.game.inventory?.hostPlaceFor?.(opts.holder, def, opts.inv); if (iv) data.iv = iv; }
@@ -538,6 +539,7 @@ export class ItemManager {
         af: it.affix || undefined, col: it.collected ? 1 : undefined,
         bg: it.bag.length ? it.bag.map((e) => ({ ...e })) : undefined, ld: it.ladder || undefined,
         tr: it.tier || undefined, iv: it.holder && it.inv ? { ...it.inv } : undefined, rc: it.reclaim || undefined,
+        pl: it.plus || undefined, oc: it.oc?.length ? [...it.oc] : undefined,   // [forge]
       });
     }
     return out;

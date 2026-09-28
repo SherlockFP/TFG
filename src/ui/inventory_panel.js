@@ -9,6 +9,7 @@ import { affixDisplayName, describeAffix, affixCooldown } from '../game/loot.js'
 import { iconHTML } from './icons.js';
 import { escapeHtml } from '../core/util.js';
 import { t } from '../core/i18n.js';
+import { plusMul, plusBonus, OVERCLOCKS } from '../game/enhance.js';   // [forge]
 
 const CELL = 50, GAP = 3, PAD = 6;
 const EQ_ITEM = { armor: [72, 92], trinket1: [50, 50], trinket2: [50, 50], bag: [64, 64] };   // item box inside each paper-doll slot
@@ -29,8 +30,9 @@ export function itemTooltipHTML(it, def = it?.def, { grid = null, hint = '' } = 
   if (!def) return '';
   const tier = it ? it.rarity() : (def.tier || 'common');
   const T = TIERS[tier] || TIERS.common;
-  const mul = T.statMul;
-  const name = affixDisplayName(t(def.name), it?.affix);
+  const pm = it?.plus ? plusMul(it.plus) : 1;   // [forge] +N enhancement
+  const mul = T.statMul * pm;
+  const name = affixDisplayName(t(def.name), it?.affix, it);
   const rows = [];
   const row = (k, v, cls = '') => rows.push(`<span class="k">${escapeHtml(t(k))}</span><span class="v ${cls}">${v}</span>`);
   if (isSellable(def) && (it?.value || def.value)) row('Value', it ? `▮${it.value}` : `▮${def.value[0]}-${def.value[1]}`);
@@ -67,7 +69,9 @@ export function itemTooltipHTML(it, def = it?.def, { grid = null, hint = '' } = 
   if (def.battery && it) row('Battery', `${Math.round(((it.battery ?? def.battery) / def.battery) * 100)}%`);
   if (def.charges && it) row('Charges', `${it.charges ?? def.charges}`);
   if (def.ammo !== undefined && it) row('Ammo', `${it.ammo ?? 0}/${def.ammo}`);
-  const aff = it?.affix ? describeAffix(it.affix).map((s) => `<div>${escapeHtml(s)}</div>`).join('') : '';
+  if (it?.plus) row('Forge', `+${it.plus} (+${Math.round(plusBonus(it.plus) * 100)}%)`, 'up');   // [forge]
+  const ocHtml = (it?.oc || []).map((id) => OVERCLOCKS[id] ? `<div style="color:${OVERCLOCKS[id].color}">${OVERCLOCKS[id].icon} ${escapeHtml(t(OVERCLOCKS[id].name))}: ${escapeHtml(t(OVERCLOCKS[id].desc))}</div>` : '').join('');
+  const aff = (it?.affix ? describeAffix(it.affix).map((s) => `<div>${escapeHtml(s)}</div>`).join('') : '') + ocHtml;
   const flags = [];
   const flag = (s, col) => flags.push(`<span style="color:${col}">${escapeHtml(t(s))}</span>`);
   if (def.hands === 2) flag('Two-handed', '#ffd9b8');

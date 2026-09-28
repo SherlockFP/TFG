@@ -12,6 +12,7 @@ import { MINIGAMES } from '../minigames/index.js';
 import { applyAffixes, applyAffixEffects, affixCooldown, affixDisplayName, affixColor, describeAffix } from './loot.js';
 import { TIERS } from './tiers.js';
 import { t } from '../core/i18n.js';
+import { plusMul } from './enhance.js';   // [forge]
 
 /** Weapon damage multiplier of an item's tier (tiers.js statMul; plain / store weapons are Common = 1). */
 // Relative to the definition's own tier: def.dmg is the damage at def.tier/def.rarity, a better roll scales it up.
@@ -20,7 +21,7 @@ const tierDmg = (it) => {
   if (!it || it.def?.kind !== 'weapon') return 1;
   const own = TIERS[it.rarity?.()]?.statMul || 1;
   const base = TIERS[it.def.tier]?.statMul || TIERS[it.def.rarity]?.statMul || 1;
-  return own / base;
+  return own / base * (it.plus ? plusMul(it.plus) : 1);   // [forge] +N enhancement rides the same multiplier (no second wrapper)
 };
 /** "Rare" suffix for labels of tiered items (plain scrap without a rolled tier shows nothing extra). */
 const tierTag = (it) => (it?.tier && it.tier !== 'common' && !it.affix ? TIERS[it.tier]?.name || '' : '');
@@ -199,7 +200,7 @@ export const actionMethods = {
           }
         } else if (hit.distance < reach) {
           const toBag = this.inventory?.pickTargetHint?.(it);
-          return { label: `Pick up ${affixDisplayName(def.name, it.affix)} [E]`, sub: [isSellable(def) && it.value ? `▮${it.value}` : '', tierTag(it), ...describeAffix(it.affix, { rarity: true }), toBag ? '→ BAG' : ''].filter(Boolean).join(' · '), color: it.affix ? affixColor(it.affix) : r, action: () => this.pickup(it) };
+          return { label: `Pick up ${affixDisplayName(def.name, it.affix, it)} [E]`, sub: [isSellable(def) && it.value ? `▮${it.value}` : '', tierTag(it), ...describeAffix(it.affix, { rarity: true }), toBag ? '→ BAG' : ''].filter(Boolean).join(' · '), color: it.affix ? affixColor(it.affix) : r, action: () => this.pickup(it) };
         }
       }
     }
@@ -896,7 +897,8 @@ export const actionMethods = {
       const tg = tierTag(it);
       labels.push({ pos, name: it.type === 'body' ? `${it.label || 'Body'}` : it.def.name, sub: it.type === 'body' ? 'Recover to reduce fines' : `Value: ▮${shown}${tg ? ' · ' + tg : ''}`, color: it.type === 'body' ? '#ff6b6b' : it.tierColor });
       labels[labels.length - 1].type = it.type;
-      if (it.affix) { const l = labels[labels.length - 1]; l.name = affixDisplayName(it.def.name, it.affix); l.color = affixColor(it.affix); l.sub += ' · ' + describeAffix(it.affix).slice(0, 2).join(', '); }
+      if (it.affix) { const l = labels[labels.length - 1]; l.name = affixDisplayName(it.def.name, it.affix, it); l.color = affixColor(it.affix); l.sub += ' · ' + describeAffix(it.affix).slice(0, 2).join(', '); }
+      else if (it.plus || it.oc?.length) labels[labels.length - 1].name = affixDisplayName(it.def.name, null, it);   // [forge]
     }
     for (const v of this.creatures.views.values()) {
       if (v.state === 'dead' || v.type === 'web' || v.type === 'mimicdoor') continue;
@@ -909,7 +911,8 @@ export const actionMethods = {
       const known = !!this.profile.bestiary[v.type]?.seen;
       this.progress.see(v.type);
       const name = v.type === 'mimic' ? (v.name || 'Crewmate') : (known ? v.def.name : '???');
-      labels.push({ pos: v.pos.clone().add(new THREE.Vector3(0, v.height + 0.3, 0)), name: v.type === 'mimic' ? name : `${name}${v.def.hazard ? '' : ' Lv.' + v.level}${v.elite ? ' ★ELITE' : ''}`, sub: v.code ? `Code: ${v.code.toUpperCase()}` : (v.def.hazard ? 'Hazard' : 'Entity'), color: v.type === 'mimic' ? '#b8ffcc' : '#ff5a5a' });
+      const ft = v.tier && known ? TIERS[v.tier] : null;   // [forge] creature tier colour + name
+      labels.push({ pos: v.pos.clone().add(new THREE.Vector3(0, v.height + 0.3, 0)), name: v.type === 'mimic' ? name : `${ft ? ft.name + ' ' : ''}${name}${v.def.hazard ? '' : ' Lv.' + v.level}${v.elite ? ' ★ELITE' : ''}`, sub: v.code ? `Code: ${v.code.toUpperCase()}` : (v.def.hazard ? 'Hazard' : 'Entity'), color: v.type === 'mimic' ? '#b8ffcc' : ft ? ft.color : '#ff5a5a' });
     }
     // exits / ship
     if (this.world.outdoor && !this.player.indoor) {
