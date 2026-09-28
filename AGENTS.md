@@ -264,6 +264,7 @@ getters (ids untouched, `def.$name` = English). Host -> client text uses `sysMsg
 `navigator.language` default, RU voice-spell words, Cyrillic font fallback (`TFG Cyr VT`). Audit: `node tools/i18n_audit.mjs`
 (re-run after merges; target 0 missing TR/RU); codemod: `tools/i18n_wrap.mjs`. Gaps: passive tree texts, some minigame HUD strings,
 long lore bodies (RU), wave-2 files merged later.
++ The Algorithm's Revolver (Russian-roulette power-ups, `src/game/roulette.js`, net `rr` / `rrfx`, docs/wave2/anomaly.md): tables replace ~half the shrine spawns (quota >= 1) + a ship bonus table; node test `tools/harness/roulette.test.mjs` PASS, `wave2_roulette.js` run once (solo path PASS); 2+ player pass/forced flow only covered by the node test.
 
 ### 5.5 Smoke test (paste in the browser console on `?autohost=local&code=T1&name=Tester`, after ~4 s)
 ```js

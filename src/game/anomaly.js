@@ -14,6 +14,7 @@ import { MUTATIONS, installMutations, rollMutation, mutDuration } from './mutati
 import { POWERUPS, installPowerups } from './powerups.js';
 import { installStatic, STAGES } from './static.js';
 import { installDice } from './dice.js';
+import { installRoulette } from './roulette.js';
 import { createBuffBar } from '../ui/buffbar.js';
 import { ANOMALY_ITEM_MODELS, createAura } from '../models/anomaly.js';
 
@@ -47,7 +48,7 @@ export function installAnomaly(game) {
     game, mods, peers,
     screen: { noise: 0, warp: 0, stage: 0 },
     hud: { setStatic: noop, setBuffs: noop },
-    static: null, powerups: null, mutations: null, dice: null,
+    static: null, powerups: null, mutations: null, dice: null, roulette: null,
     markDirty() { dirty = true; },
     refreshStats() { game.refreshStats?.(); },
     toast(text, kind = 'info') { game.ui?.toast?.(text, kind); },
@@ -125,6 +126,7 @@ export function installAnomaly(game) {
   ctx.mutations = installMutations(ctx);
   ctx.powerups = installPowerups(ctx);
   ctx.dice = installDice(ctx);
+  ctx.roulette = installRoulette(ctx);   // The Algorithm's Revolver (src/game/roulette.js): tables replace ~half the shrine spawns
   if (mods?.itemModels) for (const [id, fn] of Object.entries(ANOMALY_ITEM_MODELS)) if (!mods.itemModels.has(id)) mods.itemModels.set(id, () => fn());
 
   // ------------------------------------------------------------------ stats (every peer computes its own)
@@ -208,7 +210,7 @@ export function installAnomaly(game) {
     // expiry
     for (const r of [...B.values()]) if (now >= r.until) buffs.remove(r.id, 'expired');
     // sub-systems (each adds to ctx.screen)
-    for (const [name, sys] of [['static', ctx.static], ['mutations', ctx.mutations], ['powerups', ctx.powerups], ['dice', ctx.dice]]) {
+    for (const [name, sys] of [['static', ctx.static], ['mutations', ctx.mutations], ['powerups', ctx.powerups], ['dice', ctx.dice], ['roulette', ctx.roulette]]) {
       try { sys.update(dt); } catch (e) { if ((errCount[name] = (errCount[name] || 0) + 1) <= 3) console.warn('[anomaly] ' + name + ' update', e); }
     }
     // engine noise / warp with ownership (other systems write these too)
@@ -243,7 +245,7 @@ export function installAnomaly(game) {
     addExposure: (n) => ctx.static.addExposure(n), setExposure: (v) => ctx.static.setExposure(v),
     grant: (id, dur) => ctx.grantBuff(id, dur ?? DEFS[id]?.dur ?? 60),
     has: (id) => B.has(id), clear: () => buffs.clear('api'), muted: () => ctx.mutations.muted(),
-    buffs, static: ctx.static, mutations: ctx.mutations, powerups: ctx.powerups, dice: ctx.dice, peers, DEFS,
+    buffs, static: ctx.static, mutations: ctx.mutations, powerups: ctx.powerups, dice: ctx.dice, roulette: ctx.roulette, peers, DEFS,
     force: { roll: (n) => ctx.dice.forceNat(n), face: (f) => ctx.dice.forceFace(f) },
     debug: () => ({ exposure: ctx.static.exposure, stage: ctx.static.stage, rate: ctx.static.rate, buffs: [...B.keys()], zones: ctx.static.zones().length, shrine: !!ctx.dice.shrine, pickups: ctx.powerups.pickups().length }),
     dispose() {
@@ -251,7 +253,7 @@ export function installAnomaly(game) {
       disposed = true;
       for (const o of offs) { try { o?.(); } catch { /* ignore */ } }
       for (const r of game.remotes?.values?.() || []) { const a = auras.get(r); if (a) a.dispose(); }
-      for (const s of [ctx.dice, ctx.powerups, ctx.mutations, ctx.static]) { try { s?.dispose?.(); } catch (e) { console.warn('[anomaly] dispose', e); } }
+      for (const s of [ctx.roulette, ctx.dice, ctx.powerups, ctx.mutations, ctx.static]) { try { s?.dispose?.(); } catch (e) { console.warn('[anomaly] dispose', e); } }
       mixFx('noise', 'noise', 0); mixFx('warp', 'warp', 0);
       overlay?.remove(); overlay = null;
       ctx.hud.dispose?.();
