@@ -258,6 +258,12 @@ THE MONETIZER (+1..+9, overclocks), Ascension Altar (tier up, workbench capped a
 (Uncommon..Mythic: HP/dmg/XP mul on top of balance.scale, aura/nameplate, shard drops). Pure rules `src/game/enhance.js` + `node tools/harness/forge_rules.test.mjs`. Hooks in shared files are
 marked `[forge]`. Only node test + build + one smoke were run; `tools/harness/wave2_forge.js` is written but NOT run yet.
 
+### 5.13 Wave 2 - FPBODY (`game.fpbody`, docs/wave2/fpbody.md; node-verified only, NOT looked at in a browser)
+Chat / spell / emote speech bubbles over crewmates, first-person body (own avatar on render layer 2, no head/arms, walk/run/crouch/jump), held-item grip fitting from each model's bounding box + two-hand arm IK + view model drawn over the world (depth range),
+and the walking-stutter fixes. **Root cause of "hitching while walking": LocalPlayer's constant `vel.y = -1` stick-to-ground push made the Rapier controller stall ~3 frames every ~0.7 s (7 % of frames) on flat floors; fixed (desired.y = 0 while grounded).**
+Also: the tool grip offset in `refreshHeldVisuals` had the wrong sign (weapons ended up behind the camera). Shared-file edits marked `[fpbody]` (avatar.js IK, actions.js hooks, localplayer.js, game.js slot).
+`tools/harness/fpbody.js` (browser script) was written but NOT run (lead cancelled the headless runs); node harnesses `fpbody_{offline,body_offline,smoke,walk_offline,stall_offline,terrain_offline}.mjs` did run.
+
 ### 5.5 Smoke test (paste in the browser console on `?autohost=local&code=T1&name=Tester`, after ~4 s)
 ```js
 const g = kefal.game, errs = []; addEventListener('error', e => errs.push(e.message));

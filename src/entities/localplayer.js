@@ -192,7 +192,8 @@ export class LocalPlayer {
     if (!this.frozen || this.dead) {
       this.yaw -= dx; this.pitch = clamp(this.pitch - dy, -1.5, 1.5);
     }
-    this.lookDelta = { x: dx, y: dy };
+    if (!this.lookDelta) this.lookDelta = { x: 0, y: 0 };   // [fpbody] reused, no per-frame allocation
+    this.lookDelta.x = dx; this.lookDelta.y = dy;
     if (!this.dead && this.game.cruiser?.seated && this.game.cruiser.seatedUpdate(this, dt, input)) return;
     if (this.dead) { this.noise = 0; this.game.engine.setLowHealth?.(0); this.stopBreathing(); return; }
 
@@ -293,7 +294,11 @@ export class LocalPlayer {
     if (!this.grounded) this.minVelY = Math.min(this.minVelY, this.vel.y);
 
     // move with controller
-    const desired = { x: this.vel.x * dt, y: this.vel.y * dt, z: this.vel.z * dt };
+    const desired = this._desired || (this._desired = { x: 0, y: 0, z: 0 });   // [fpbody] reused
+    // [fpbody] ROOT CAUSE of the "hitch while walking": the constant -1 m/s 'stick to ground' push (vel.y = -1 while grounded) made the Rapier
+    // character controller cancel its horizontal movement for ~3 frames every ~0.7 s on flat floors (measured: 7% of frames at < 3 m/s,
+    // tools/harness/fpbody_stall_offline.mjs). Snap-to-ground (0.4 m) already keeps us glued to the floor, so grounded frames ask for no vertical move.
+    desired.x = this.vel.x * dt; desired.y = (!this.fpLegacy && this.grounded && this.vel.y <= 0 ? 0 : this.vel.y * dt); desired.z = this.vel.z * dt;
     this.ctrl.computeColliderMovement(this.col, desired, undefined, groups(G.PLAYER, G.STATIC | G.DOOR));
     const mv = this.ctrl.computedMovement();
     const wasGrounded = this.grounded;
@@ -352,7 +357,7 @@ export class LocalPlayer {
       const stride = this.sprinting ? 2.3 : this.crouch ? 1.4 : 1.9;
       this.stride = stride;
       if (this.stepDist > stride) {
-        this.stepDist = 0; this.footIdx++;
+        this.stepDist = this.fpLegacy ? 0 : Math.min(this.stepDist - stride, stride * 0.5); this.footIdx++;   // [fpbody] keep the overshoot: the bob phase used to stall a few % every footfall
         const quiet = this.game.hasPerk('lightfoot') ? 0.5 : 1;
         const vol = (this.crouch ? 0.12 : this.sprinting ? 0.55 : 0.32) * quiet;
         this.game.footstep(this.pos, vol, true);
@@ -382,7 +387,7 @@ export class LocalPlayer {
     }
     this.stepOff = damp(this.stepOff, 0, 13, dt);
     // head bob, locked to the footfalls (lowest point when a foot lands)
-    this.bobAmt = damp(this.bobAmt, this.grounded && hs > 0.5 ? Math.min(1, hs / 5) : 0, 8, dt);
+    this.bobAmt = damp(this.bobAmt, (this.grounded || (!this.fpLegacy && this.airT < 0.1)) && hs > 0.5 ? Math.min(1, hs / 5) : 0, 8, dt);   // [fpbody] a one-frame ground-contact flicker no longer drops the bob
     this.bobPhase = (this.footIdx + clamp(this.stepDist / (this.stride || 1.9), 0, 1)) * Math.PI;
     this.bobT = this.bobPhase;   // legacy name
     const bob = (g.settings.headBob ? this.bobAmt : 0) * rm * (this.sprinting ? 1.25 : 1);

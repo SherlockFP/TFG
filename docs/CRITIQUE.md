@@ -75,3 +75,7 @@ overclock effects (shock / burn / vamp) untested with 2 real players; economy: s
 Melee combos / heavy / block-parry, 6 melee + 5 tech weapons (rocket jump, grenades, grav tool), 5 spells, Blood Magic and 12 role skills were added
 (`docs/wave2/combat.md`). **Feel is unverified**: arcs / guard poses / hit timing were tuned by numbers only, `tools/harness/wave2_combat.js` has not been run and
 nothing was hand-played. RMB is now block-hold / scan-tap while a melee weapon is held - check that this feels right before shipping.
+## Wave 2 - FPBODY (first-person feel)
+Found and fixed by numbers (node, real LocalPlayer + Rapier): the walking "hitch" was a controller stall (7 % of frames at 0 m/s on flat floors) caused by the constant downward stick-to-ground push, and held tools were placed with the grip offset sign wrong
+(shovel / rod / sledge behind the camera, 25 of 101 item models inside the forearm). Chat bubbles, first-person legs, two-hand arm IK and the view-model-over-world depth pass are written but **never seen in a real renderer** (headless run cancelled):
+check bubble size / font, leg look when crouching, elbow direction of the IK arms, outlines on the view model, and that the ship mirror does not show the first-person body. PSX vertex snap still shimmers while walking (setting `vertexJitter`).

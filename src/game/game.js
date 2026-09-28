@@ -112,7 +112,7 @@ import { installForge } from './forge.js';
 // [import:cemotes]
 
 
-// [import:fpbody]
+import { installFpBody } from './fpbody.js';   // [fpbody]
 
 
 export class Game extends Emitter {
@@ -232,7 +232,7 @@ export class Game extends Emitter {
     // [slot:cemotes]
 
 
-    // [slot:fpbody]
+    this.useModule('fpbody', installFpBody);
 
   }
 
