@@ -867,11 +867,11 @@ export class UI {
 
   screen_howto() {
     const txt = `
-<b>THE JOB</b><br>You work for TFG. Fly to moons, loot the abandoned facilities, bring scrap back to the ship and sell it at <b>0-Algorithm HQ</b> to meet the <b>profit quota</b> every 3 days. Miss it and you're fired.<br><br>
+<b>THE JOB</b><br>You are a contract content janitor for <b>The Algorithm</b>. Fly to the server moons, loot the abandoned facilities, bring the lost content back to the ship and sell it at <b>0-Algorithm HQ</b> to meet the <b>Engagement Quota</b> every 3 days. Miss it and you get deplatformed.<br><br>
 <b>THE SHIP</b><br>Use the <b>terminal</b> (MOONS, ROUTE, STORE, BUY, SCAN, BESTIARY, codes). Pull the <b>lever</b> to land or take off. The ship leaves at <b>midnight</b> — with or without you.<br><br>
-<b>CONTROLS</b><br>WASD move · Shift sprint · Ctrl crouch · Space jump · E interact / pick up · LMB use / attack / grab big loot · RMB scan · MMB / P ping · G drop · Q throw · F flashlight · 1-4 slots · R reload · V push-to-talk · Z/X emotes · Enter chat · Tab character · Esc menu<br><br>
+<b>CONTROLS</b><br>WASD move · Shift sprint · Ctrl crouch · Space jump · E interact / pick up · LMB use / attack / grab big loot · RMB scan · MMB / P ping · G drop · Q throw · F flashlight · 1-4 slots · R reload · V push-to-talk · Z/X emotes · Enter chat · I inventory · K passive tree · hold C spell wheel (or say / type the spell word) · J service record · hold B emote wheel · Tab character · Esc menu<br><br>
 <b>SURVIVAL</b><br>Every creature has a rule. <i>Scan</i> them and read the BESTIARY. Sound matters: sprinting, horns and <b>your voice</b> attract things. Some exits are not what they seem.<br><br>
-<b>PROGRESSION</b><br>You earn XP and <b>Clout</b> for securing scrap, kills, bounties, fishing and minigames. Level up to gain skill points (TAB). Buy soulbound weapons, armor, perks and cosmetics from <b>Phish Dayı</b>'s Black Market at HQ. Higher tier moons and later quotas are more dangerous — and more profitable.<br><br>
+<b>PROGRESSION</b><br>You earn XP and <b>Clout</b> for securing scrap, kills, bounties, fishing and minigames. Level up to gain skill points and spend them in the passive tree (K). Buy soulbound weapons, armor, perks and cosmetics from <b>Phish Dayı</b>'s Black Market at HQ. Higher tier moons and later quotas are more dangerous — and more profitable.<br><br>
 <b>MINIGAMES</b><br>Crack vault keypads, rewire fuse boxes, pick locks, fish at ponds and the HQ dock, play FLAPPY PHISH on the ship's arcade, and gamble your coins at the GACHA MACHINE.<br><br>
 <b>MULTIPLAYER</b><br>Host a lobby (public or private with password) and friends can find it in the lobby browser or join with the 6-letter code. Everything is peer-to-peer; the host runs the world.`;
     const f = this.frame(t('HOW TO PLAY'), el('div', { class: 'howto', html: txt }), el('div', { class: 'menu-row' }, this.backButton(() => this.showMenu('title'))));

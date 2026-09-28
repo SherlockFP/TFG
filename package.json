@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "KEFAL COMPANY - co-op PSX horror scavenging game (Three.js, P2P multiplayer)",
+  "description": "TFG (TOTALLY FUCKED GAME) - co-op PSX horror scavenging game (Three.js, P2P multiplayer)",
   "scripts": {
     "dev": "vite --host",
     "dev:https": "vite --host --mode https",

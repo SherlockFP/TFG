@@ -329,7 +329,7 @@ const TR = {
   'Clickbait Mine: click. Do not step off. Ask a friend for help.': 'Tık Tuzağı Mayını: tık. Üstünden inme. Bir arkadaştan yardım iste.',
   'Deep rooms hold the best loot. The deeper you go, the more it pays.': 'En iyi ganimet derin odalarda. Ne kadar derine inersen o kadar kazanırsın.',
   'A walkie-talkie lets you talk across the whole map.': 'Telsizle haritanın her yerine konuşabilirsin.',
-  'Level up to earn skill points. Press TAB to spend them.': 'Seviye atlayınca yetenek puanı kazanırsın. Harcamak için TAB.',
+  'Level up to earn skill points. Press K to spend them in the passive tree.': 'Seviye atlayınca yetenek puanı kazanırsın. Pasif ağaçta harcamak için K.',
   'Daily events change the rules: check the terminal before you land.': 'Günlük olaylar kuralları değiştirir: inmeden önce terminale bak.',
   'Fragile scrap loses value when it hits the floor. Carry it gently.': 'Kırılgan hurda yere düşünce değer kaybeder. Nazik taşı.',
   'Firewall Turrets can be disabled from the terminal with their code.': 'Güvenlik Duvarı Taretleri terminalden kodlarıyla kapatılabilir.',
