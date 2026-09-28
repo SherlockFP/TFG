@@ -111,3 +111,7 @@ validated nickname, pixel / 3D-snapshot avatar with frames, shown in the lobby b
 - Built and node-tested (state machine, host flow with mock game, planner) but never seen in a browser: check the window at 1280x720, drag & drop, the tooltip comparison block, the popup keys N / M and the glyph icon drawings by eye.
 - Clout is trusted client-side (debit handshake); fine for co-op friends, not for strangers. No trade history / log panel, no trading over the terminal, no NPC / hub trading yet (hub planet idea in MASTERPLAN #13).
 - Icons: audit numbers (items without a model) still to be read from `ICONAUDIT`; glyph fallbacks are stop-gaps, the real fix is a model per item.
+## Wave 2 - FPBODY (first-person feel)
+Found and fixed by numbers (node, real LocalPlayer + Rapier): the walking "hitch" was a controller stall (7 % of frames at 0 m/s on flat floors) caused by the constant downward stick-to-ground push, and held tools were placed with the grip offset sign wrong
+(shovel / rod / sledge behind the camera, 25 of 101 item models inside the forearm). Chat bubbles, first-person legs, two-hand arm IK and the view-model-over-world depth pass are written but **never seen in a real renderer** (headless run cancelled):
+check bubble size / font, leg look when crouching, elbow direction of the IK arms, outlines on the view model, and that the ship mirror does not show the first-person body. PSX vertex snap still shimmers while walking (setting `vertexJitter`).

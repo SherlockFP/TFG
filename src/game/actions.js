@@ -477,7 +477,8 @@ export const actionMethods = {
       it.obj.visible = active && !p.dead;
       const def = it.def;
       const g = it.obj.userData.gripOffset || new THREE.Vector3();
-      if ((def.hands === 2 && !def.ranged && def.kind !== 'weapon') || def.kind === 'big' || it.type === 'body') {
+      if (this.fpbody?.placeHeld(it, def)) { /* [fpbody] fitted to the palm from the model's own bounding box (game/fpbody_grip.js) */ }
+      else if ((def.hands === 2 && !def.ranged && def.kind !== 'weapon') || def.kind === 'big' || it.type === 'body') {
         it.obj.position.set(0, -0.28, -0.75);
         it.obj.quaternion.identity();
       } else {
@@ -515,7 +516,7 @@ export const actionMethods = {
       if ((it.def.hands === 2 && it.def.kind !== 'weapon') || it.type === 'body') { it.obj.quaternion.identity(); it.obj.position.set(0, 0, 0.35); }
       else {
         if (it.def.kind === 'weapon' && !it.def.ranged) it.obj.quaternion.setFromEuler(new THREE.Euler(0.9, 0, 0)); else it.obj.quaternion.identity();
-        it.obj.position.copy(g).applyQuaternion(it.obj.quaternion).multiplyScalar(-1);
+        if (!this.fpbody?.placeRemoteHeld(it, hand)) it.obj.position.copy(g).applyQuaternion(it.obj.quaternion).multiplyScalar(-1);   // [fpbody] placeRemoteHeld: grip offset sign fixed, scrap in front of the glove
       }
       it.obj.visible = false;
     }
@@ -1209,6 +1210,7 @@ export const actionMethods = {
       holding: !def ? 'none' : def.hands === 2 || def.kind === 'big' || held.type === 'body' ? 'twohand' : 'onehand',
       lookDelta: p.lookDelta || { x: 0, y: 0 }, time: this.time,
       item: held ? held.type : null, weapon: def?.kind === 'weapon', ranged: !!def?.ranged, player: p, reduceMotion: !!this.settings.reduceMotion,
+      grip: this.fpbody?.gripOf(held) || null,   // [fpbody] arm IK targets for two-handed items
     });
   },
 };

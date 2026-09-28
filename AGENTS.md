@@ -300,6 +300,12 @@ DELETED USERS family (Bone Walker: collapses + rebuilds once unless the skull is
 username tags, spawn weights (mansion / hospital / backrooms / mineshaft + night outdoors), plus a GENERIC per-tier armour / colour layer (`src/render/tierlooks.js`, hooked in `creature_tiers.js`) that dresses every
 creature Uncommon..Mythic (scrap -> iron -> runes -> gold + cape -> glitch shader + crown + halo). Node test `tools/harness/skeletons.test.mjs`, build, ONE headless run + one screenshot (host rules + 26 tiered views verified). Not hand-played; tags / poses unseen.
 
+### 5.13 Wave 2 - FPBODY (`game.fpbody`, docs/wave2/fpbody.md; node-verified only, NOT looked at in a browser)
+Chat / spell / emote speech bubbles over crewmates, first-person body (own avatar on render layer 2, no head/arms, walk/run/crouch/jump), held-item grip fitting from each model's bounding box + two-hand arm IK + view model drawn over the world (depth range),
+and the walking-stutter fixes. **Root cause of "hitching while walking": LocalPlayer's constant `vel.y = -1` stick-to-ground push made the Rapier controller stall ~3 frames every ~0.7 s (7 % of frames) on flat floors; fixed (desired.y = 0 while grounded).**
+Also: the tool grip offset in `refreshHeldVisuals` had the wrong sign (weapons ended up behind the camera). Shared-file edits marked `[fpbody]` (avatar.js IK, actions.js hooks, localplayer.js, game.js slot).
+`tools/harness/fpbody.js` (browser script) was written but NOT run (lead cancelled the headless runs); node harnesses `fpbody_{offline,body_offline,smoke,walk_offline,stall_offline,terrain_offline}.mjs` did run.
+
 ### 5.5 Smoke test (paste in the browser console on `?autohost=local&code=T1&name=Tester`, after ~4 s)
 ```js
 const g = kefal.game, errs = []; addEventListener('error', e => errs.push(e.message));

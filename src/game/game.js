@@ -116,7 +116,7 @@ import { installSkeletons } from './skeletons.js';
 import { installCreatureEmotes } from './cemotes.js';
 
 
-// [import:fpbody]
+import { installFpBody } from './fpbody.js';   // [fpbody]
 
 
 import { installGrenades } from './grenades.js';
@@ -274,7 +274,7 @@ export class Game extends Emitter {
     this.useModule('cemotes', installCreatureEmotes);
 
 
-    // [slot:fpbody]
+    this.useModule('fpbody', installFpBody);
 
 
     this.useModule('grenades', installGrenades);

@@ -697,8 +697,8 @@ export function createAvatar({ suitColor = '#d9642b', hat = 'none', visorColor, 
 // motion trail, ranged weapons kick back (WEAPON_RECOIL). impact(kind) adds a hit recoil ('flesh'|'metal'|'wall').
 const _qa = new THREE.Quaternion(), _qb = new THREE.Quaternion(), _qc = new THREE.Quaternion(), _eu = new THREE.Euler();
 const _X = new THREE.Vector3(1, 0, 0), _Z = new THREE.Vector3(0, 0, 1);
-const _v1 = new THREE.Vector3(), _v2 = new THREE.Vector3();
-const VM_REST = {
+const _v1 = new THREE.Vector3(), _v2 = new THREE.Vector3(), IKO = {};   // [fpbody] IKO: IK scratch
+export const VM_REST = {
   //            base pos (x mirrored per side)   sh rot x, y (mirrored), z (mirrored), elbow
   onehand: { p: [0.24, -0.34, 0.06], r: [0.2, 0.1, 0.0], el: 0.18 },
   twohand: { p: [0.25, -0.33, 0.04], r: [0.22, 0.3, -0.25], el: 0.3 },
@@ -710,6 +710,53 @@ const VM_REST = {
 // w = end of wind-up, s = end of the strike (both as fractions of the swing timeline; the hit
 // resolves ~0.14 s after the click, which is where every wind-up ends).
 const P_KEYS = ['x', 'y', 'z', 'e', 'px', 'py', 'pz', 'roll', 'wr'];
+// [fpbody] first-person arm IK. The rig: shoulder (base) -> upper arm 0.3 along -Z -> elbow (rotates about X, + raises the forearm)
+// -> forearm 0.34 to the hand pivot. vmArmIK puts the hand pivot on a camera-space target (item grip fitting, see
+// game/fpbody_grip.js); vmArmFK is the forward kinematics of the same rig (used by the offline checks).
+const VM_L1 = 0.3, VM_L2 = 0.34;
+export const VM_ARM = { L1: VM_L1, L2: VM_L2, cuff: 0.2525, rFore: 0.078, rUpper: 0.088 };
+const _iT = new THREE.Vector3(), _iU = new THREE.Vector3(), _iH = new THREE.Vector3(), _iYp = new THREE.Vector3();
+const _iB1 = new THREE.Vector3(), _iA1 = new THREE.Vector3(1, 0, 0), _iA2 = new THREE.Vector3(), _iA3 = new THREE.Vector3();
+const _iMa = new THREE.Matrix4(), _iMb = new THREE.Matrix4(), _iEul = new THREE.Euler(), _iQa = new THREE.Quaternion(), _iQb = new THREE.Quaternion();
+export function vmArmIK(bx, by, bz, tx, ty, tz, side = 1, out = {}) {
+  let ox = bx, oy = by, oz = bz;
+  _iT.set(tx - bx, ty - by, tz - bz);
+  let d = _iT.length();
+  if (d > 0.625) {   // out of reach: slide the (off-screen) shoulder towards the target
+    const k = Math.min(d - 0.625, 0.25) / d;
+    ox += _iT.x * k; oy += _iT.y * k; oz += _iT.z * k;
+    _iT.set(tx - ox, ty - oy, tz - oz); d = _iT.length();
+  }
+  _iT.multiplyScalar(1 / Math.max(d, 1e-6));                       // b3 = shoulder -> target
+  d = clamp(d, 0.08, 0.635);                                       // still too far: the hand stops short
+  const th = Math.acos(clamp((d * d - VM_L1 * VM_L1 - VM_L2 * VM_L2) / (2 * VM_L1 * VM_L2), -1, 1));
+  _iH.set(0, VM_L2 * Math.sin(th), -(VM_L1 + VM_L2 * Math.cos(th))).normalize();   // hand direction in the shoulder frame
+  // local frame (x axis, +Y side of the bend plane, hand direction) -> camera frame (side vector, "up", target direction)
+  _iA2.set(0, 1, 0).addScaledVector(_iH, -_iH.y).normalize();
+  _iA3.copy(_iH);
+  const detA = -_iA2.z * _iA3.y + _iA2.y * _iA3.z;   // (x cross yp) . h
+  _iU.set(-0.35 * side, 1, 0).addScaledVector(_iT, -(-0.35 * side * _iT.x + _iT.y));   // elbow goes down / slightly outward
+  if (_iU.lengthSq() < 1e-6) _iU.set(0, 0, 1);
+  _iU.normalize();
+  _iB1.copy(_iU).cross(_iT).multiplyScalar(detA >= 0 ? 1 : -1);
+  _iMa.makeBasis(_iA1, _iA2, _iA3);
+  _iMb.makeBasis(_iB1, _iU, _iT);
+  _iMb.multiply(_iMa.transpose());                                  // R maps the local frame onto the camera frame
+  _iEul.setFromRotationMatrix(_iMb, 'XYZ');
+  out.x = _iEul.x; out.y = _iEul.y; out.z = _iEul.z; out.e = th;
+  out.px = ox; out.py = oy; out.pz = oz; out.reach = d;
+  return out;
+}
+export function vmArmFK(px, py, pz, x, y, z, e, out = {}) {
+  _iQa.setFromEuler(_iEul.set(x, y, z, 'XYZ'));
+  _iQb.setFromAxisAngle(_X, e).premultiply(_iQa);
+  out.elbow = (out.elbow || new THREE.Vector3()).set(0, 0, -VM_L1).applyQuaternion(_iQa).add(_iH.set(px, py, pz));
+  out.hand = (out.hand || new THREE.Vector3()).set(0, 0, -VM_L2).applyQuaternion(_iQb).add(out.elbow);
+  out.wrist = (out.wrist || new THREE.Vector3()).set(0, 0, -VM_ARM.cuff).applyQuaternion(_iQb).add(out.elbow);
+  out.base = (out.base || new THREE.Vector3()).set(px, py, pz);
+  return out;
+}
+
 export const WEAPON_ARCS = {
   // empty hands: a short jab
   fist: { w: 0.26, s: 0.5, trail: 0, W: { x: 0.25, e: 0.95, pz: 0.12, py: 0.02, px: 0.03 }, S: { x: 0.18, y: 0.28, e: -0.25, pz: -0.3, px: -0.1, py: 0.03 } },
@@ -903,7 +950,13 @@ export function createViewModel({ suitColor = '#d9642b' } = {}) {
     const rm = a.reduceMotion ? 0.35 : 1;
     // rest pose (blend one-hand ↔ two-hand)
     let px = lerp(one.p[0], two.p[0], tw) * sd, py = lerp(one.p[1], two.p[1], tw), pz = lerp(one.p[2], two.p[2], tw);
-    const rx = lerp(one.r[0], two.r[0], tw), ry = lerp(one.r[1], two.r[1], tw) * sd, rz = lerp(one.r[2], two.r[2], tw) * sd, re = lerp(one.el, two.el, tw);
+    let rx = lerp(one.r[0], two.r[0], tw), ry = lerp(one.r[1], two.r[1], tw) * sd, rz = lerp(one.r[2], two.r[2], tw) * sd, re = lerp(one.el, two.el, tw);
+    // [fpbody] item-fit IK: a.grip.R / a.grip.L = hand pivot target in camera space (from game/fpbody_grip.js) replaces this arm's rest pose
+    const gk = a.grip ? (isRight ? a.grip.R : a.grip.L) : null;
+    if (gk && (isRight ? holding !== 'none' : holding === 'twohand' || a.leftHand)) {
+      vmArmIK(px, py, pz, gk.x, gk.y, gk.z, sd, IKO);
+      px = IKO.px; py = IKO.py; pz = IKO.pz; rx = IKO.x; ry = IKO.y; rz = IKO.z; re = IKO.e;
+    }
     let x = rx, y = ry, z = rz, e = re, roll = 0, wr = 0;
     // walk bob synced to the footfalls (bobPhase: multiples of PI = a foot lands)
     const m = clamp(a.moveBob || 0, 0, 1) * rm;
