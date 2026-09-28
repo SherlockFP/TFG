@@ -697,7 +697,7 @@ export class UI {
           section(t('Retro filter')), row(t('Vertex jitter') + ` (${t('reload')})`, jit), check(t('Dithering'), 'dither'), check(t('Outlines'), 'outlines'),
           section(t('Performance')), check(t('Show FPS'), 'showFps'));
       } else if (tab === 'Audio') {
-        body.append(section(t('Volume')), slider(t('Master volume'), 'masterVolume', 0, 1, 0.05, pct), slider(t('Effects volume'), 'sfxVolume', 0, 1, 0.05, pct), slider(t('Music volume'), 'musicVolume', 0, 1, 0.05, pct), slider(t('Voice volume'), 'voiceVolume', 0, 1.5, 0.05, pct),
+        body.append(section(t('Volume')), slider(t('Master volume'), 'masterVolume', 0, 1, 0.05, pct), slider(t('Effects volume'), 'sfxVolume', 0, 1, 0.05, pct), slider(t('Music volume'), 'musicVolume', 0, 1, 0.05, pct), slider(t('Voice volume'), 'voiceVolume', 0, 1.5, 0.05, pct), slider(t('Instrument volume'), 'instrumentVolume', 0, 1.5, 0.05, pct),
           check(t('Menu sounds'), 'uiSounds', null, true));
         const audio = this.app.audio;
         body.append(section(t('Output')));

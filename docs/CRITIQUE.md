@@ -81,3 +81,7 @@ no RU. Now: EN/TR/RU with a picker + `navigator.language` default, ~2.3k RU / ~1
 messages, Cyrillic font fallback, RU voice spells, audit + codemod tools (docs/wave2/i18n.md). Honest gaps: passive tree / lore-log bodies /
 some minigame strings are still English in TR+RU, wave-2 files were not covered, RU layout (longer text, Cyrillic in the retro fonts)
 was verified by build and a scripted run only — no screenshot review yet.
+## Wave 2 - music (module `music`, node-tested only)
+Playable Acoustic / Electric Guitar, Keytar and Drum Pad (LMB = play mode, real notes, chords, 4-song follow-along, jam session chip, noise on moons).
+Honest gaps: never played by hand in a browser (avatar strap poses, arm animation, panel layout, latency all unverified); 2 real players untested; bass / violin /
+harmonica / bongos / kazoo / theremin, rhythm-game guide, busker hat and creature dancing were cut for budget. See `docs/wave2/music.md`.
