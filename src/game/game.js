@@ -67,6 +67,18 @@ import { setDocksVisible } from '../ui/dock.js';   // shared crafting components
 // [import:fun]
 
 
+// [import:brlevels]
+
+
+// [import:backrooms]
+
+
+// [import:brcreatures]
+
+
+// [import:liminal]
+
+
 export class Game extends Emitter {
   constructor({ engine, audio, settings, profile, ui, input, mods }) {
     super();
@@ -138,6 +150,18 @@ export class Game extends Emitter {
     // [slot:worldx]
 
     // [slot:fun]
+
+
+    // [slot:brlevels]
+
+
+    // [slot:backrooms]
+
+
+    // [slot:brcreatures]
+
+
+    // [slot:liminal]
 
   }
 
