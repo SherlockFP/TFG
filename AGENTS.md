@@ -282,6 +282,8 @@ E on a crewmate (<= 4 m) / N / `/trade <name>` / terminal `TRADE` -> 10 s popup 
 Host-authoritative atomic swap (`trade_core.js` pure rules + state machine, `trade_host.js`), net types `trreq/tracc/troff/trlock/trok/trcx/trca` + host `trs/trm/trc`; Clout debited by the giver's client, paid via the reward path (`Trade:` reason is exempt from the multiplier).
 Icons: `ui/icons.js` never leaves a blank icon (generated glyph fallbacks in `ui/iconatlas.js`, soft-cache retry, id-matching bug fixed), terminal `ICONAUDIT` / `game.trade.iconAudit()`. Verified: node test `tools/harness/trade.test.mjs` (86 checks), node --check, build, i18n audit for the trade files.
 NOT verified: any browser run (window layout, drag & drop, popup, glyph look, real 2-player P2P); `tools/harness/wave2_trade.js` is written but NOT run.
+### 5.13 Wave 2 - THE ADMINISTRATOR + THE BOARD (module `boardgame`, docs/wave2/boardgame.md)
+Rare (~4 % per landing, once a day, quota >= 1) tall grey-suit entity; stare at its face for 2 s and you + crew within 10 m are sent to a dice-and-cards board (24-tile ring, 12 turns, LOOT / TRAP / CARD / DUEL / SHORTCUT / EXIT). Fail = most valuable item + 90 % HP. Pure rules `src/game/board_rules.js` + `node tools/harness/board.test.mjs` (PASS). NOT browser-tested (headless run cancelled); hooks marked `[boardgame]` in game.js.
 ### 5.11 Localization wave (EN / TR / RU) — see docs/wave2/i18n.md
 `core/i18n.js` is multi-language (`t`, `tf` with `{x}` / `{@x}`, `L`, `sysMsg`, `addTranslations(map, lang = 'tr')`, `localizeDeep`);
 bulk dictionaries live in `src/i18n/tr_*.js` / `ru_*.js`; `src/i18n/display.js` localises item / creature / moon / ... names through

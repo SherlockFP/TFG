@@ -135,7 +135,7 @@ import { installMirror } from './mirror.js';   // [mirror] dimension (docs/wave2
 import { installTrade } from './trade.js';
 
 
-// [import:boardgame]
+import { installBoardGame } from './boardgame.js';   // [boardgame]
 
 
 import { installSecureLoot } from './secureloot.js';   // wave 2: secured containers + breaching tools
@@ -294,7 +294,7 @@ export class Game extends Emitter {
     this.useModule('trade', installTrade);
 
 
-    // [slot:boardgame]
+    this.useModule('boardgame', installBoardGame);   // [boardgame]
 
 
     this.useModule('secureloot', installSecureLoot);
