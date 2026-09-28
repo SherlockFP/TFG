@@ -253,6 +253,11 @@ THE MONETIZER (+1..+9, overclocks), Ascension Altar (tier up, workbench capped a
 (Uncommon..Mythic: HP/dmg/XP mul on top of balance.scale, aura/nameplate, shard drops). Pure rules `src/game/enhance.js` + `node tools/harness/forge_rules.test.mjs`. Hooks in shared files are
 marked `[forge]`. Only node test + build + one smoke were run; `tools/harness/wave2_forge.js` is written but NOT run yet.
 
+### 5.13 Wave 2 - SKELETONS + tier looks for every creature (module `skeletons`, docs/wave2/skeletons.md)
+DELETED USERS family (Bone Walker: collapses + rebuilds once unless the skull is smashed, Bone Archer: visible wind-up + projectiles, Bone Knight: frontal shield, Bone Swarm: skull hands) with glitchy
+username tags, spawn weights (mansion / hospital / backrooms / mineshaft + night outdoors), plus a GENERIC per-tier armour / colour layer (`src/render/tierlooks.js`, hooked in `creature_tiers.js`) that dresses every
+creature Uncommon..Mythic (scrap -> iron -> runes -> gold + cape -> glitch shader + crown + halo). Node test `tools/harness/skeletons.test.mjs`, build, ONE headless run + one screenshot (host rules + 26 tiered views verified). Not hand-played; tags / poses unseen.
+
 ### 5.5 Smoke test (paste in the browser console on `?autohost=local&code=T1&name=Tester`, after ~4 s)
 ```js
 const g = kefal.game, errs = []; addEventListener('error', e => errs.push(e.message));
@@ -326,4 +331,4 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
 `docs/THEME.md` TFG naming bible · `docs/BUGS.md` verified bug list · `docs/AUDIO_AUDIT.md` deferred audio issues ·
 `docs/CRITIQUE.md` honest critique + plan · `CREDITS.md` asset licenses · `README.md` player-facing readme ·
 `docs/REVIEW_WAVE1.md` reviewer report for the wave-1 merge (scores, dead stats, HUD collisions, top-10 fixes; run `tools/harness/wave1_day.js` first, it was written but not executed) ·
-`docs/wave1/*.md` per-module notes.
+`docs/wave1/*.md` per-module notes · `docs/wave2/*.md` wave-2 modules (anomaly, forge, skeletons).

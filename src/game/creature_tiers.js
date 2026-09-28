@@ -11,6 +11,7 @@ import { CREATURES, rollAffix } from './creatures.js';
 import { MOONS } from './moons.js';
 import { scrapTableFor } from './items.js';
 import * as F from './enhance.js';
+import { attachTierLook, tierLooksUpdate, clearTierLooks } from '../render/tierlooks.js';   // [skeletons] generic armour / colour per tier (all creatures)
 
 const RING_GEO = new THREE.RingGeometry(0.72, 1.0, 28).rotateX(-Math.PI / 2);
 const _v = new THREE.Vector3();
@@ -184,6 +185,7 @@ export function installCreatureTiers(game, forge) {
       if (!v.tier || v.tier === 'common' || fxMap.has(v.id) || v.state === 'dead') continue;
       if (!TIERS[v.tier]) continue;
       fxMap.set(v.id, makeFx(v));
+      try { attachTierLook(v); } catch (e) { console.warn('[tierlooks]', v.type, e); }   // [skeletons]
     }
     const cam = game.camera?.position;
     for (const [id, fx] of fxMap) {
@@ -212,6 +214,7 @@ export function installCreatureTiers(game, forge) {
       }
     }
     if (hpT <= 0) hpT = 0.25;
+    try { tierLooksUpdate(dt, game); } catch (e) { console.warn('[tierlooks]', e); }   // [skeletons] shader clock, cape sway, halo, embers
   }
 
   return {
@@ -223,6 +226,7 @@ export function installCreatureTiers(game, forge) {
       for (const off of offs) { try { off(); } catch { /* ignore */ } }
       for (const r of restores.reverse()) { try { r(); } catch { /* ignore */ } }
       for (const [id, fx] of [...fxMap]) killFx(id, fx);
+      clearTierLooks();   // [skeletons]
       void RNG;
     },
   };

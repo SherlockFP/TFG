@@ -106,7 +106,7 @@ import { installForge } from './forge.js';
 // [import:shipyard]
 
 
-// [import:skeletons]
+import { installSkeletons } from './skeletons.js';
 
 
 export class Game extends Emitter {
@@ -220,7 +220,7 @@ export class Game extends Emitter {
     // [slot:shipyard]
 
 
-    // [slot:skeletons]
+    this.useModule('skeletons', installSkeletons);
 
   }
 
