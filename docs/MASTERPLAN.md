@@ -299,3 +299,62 @@ Uygulama sırası önerisi (maliyet/etki): 1 → 3 → 4 → 2 → 5 → 9 → 6
 | 21 | **Tech item'lar + craft** | Kurulabilir teknoloji (deployable): Auto-Turret MK1-3 (mermi/batarya), Tesla Coil, Barikat (tahta/metal), Spike Strip, Proximity Mine, Floodlight Tower (karanlık yaratıkları iter), Repair Drone, Scout Drone (kamera görüntüsü), Shield Dome, Motion Sensor (HUD'da yaratık pingi), Portable Generator (turret'leri besler, yakıt), Battery Bank, Relay kablosu. Hepsi craft tarifleriyle (circuit/sensor/battery/cable/scrapmetal/fuel), blueprint'ler research ile açılır, tier'ı güç/dayanıklılığı belirler. Yerleştirme: elde kit → hayalet önizleme, geçerli/geçersiz renk, döndürme, host onaylı. Modeller: procedural (modelkit) + uygun CC0 GLB'ler | tfg-builder (Sonnet) |
 | 22 | **SIEGE (tower defense)** | Yaratıklar tesisten **dışarı taşar ve gemiye saldırır**; ekip gemi etrafına savunma kurar. **Tetikleyiciler:** (a) extraction alarmı sonrası (tesis çekirdeği alındıysa), (b) Threat ≥ HUNTED iken gece 18:00 sonrası küçük şansla, (c) kota son günü "Breach Night" günlük olayı, (d) Moderation Bureau "Hold the Line" kontratı. **Akış:** 60 sn hazırlık sireni → 3-5 dalga (Spambot sürüsü + yavaş tank + hızlı koşucu + her 3. dalgada mini-boss), girişlerden ve harita kenarlarından gemiye yol bulur. **Gemi Hull Integrity** (0-100): düşerse yaratıklar gemideki hurdadan çalar/kırar (oyun bitmez, kayıp olur). **Ödül:** dalga başına component + kredi, tüm dalgalar = "SIEGE HELD" bonusu + XP + Clout; hiç hasar almadan = nadir blueprint. **Denge:** dalga gücü sektör × oyuncu sayısı × Threat ile ölçeklenir; gün başına en fazla 1 siege; ilk siege en erken kota 2'de; hazırlık süresi hep verilir; savunmasız ekip için gemi kapısı kapatılabilir ve kapı dayanıklılığı var | tfg-builder (Sonnet) |
 | 23 | **Anomali sistemi: STATIC (radyasyon) + mutasyonlar + zar + geçici power-up'lar** | **STATIC maruziyeti** (0-100, oyuncu başına): sıcak bölgeler (sunucu çekirdeği, reaktör, containment breach, lav), "hot" itemler (GPU, CORE, Legacy Core), anomali ayları. Aşamalar: *Clean* → *Buzzing* (25, hafif ekran paraziti, +%10 hız) → *Glitching* (50, her 60 sn mutasyon zarı, max HP −15) → *Corrupted* (75, hasar üstü DoT + halüsinasyon ama +%25 hasar) → *DELETED* (100, çöküş). Temizleme: gemide **Decon duşu**, **Antivirus Shot** (craft), Almond Water, gemide bekleme; koruma: **Faraday Suit** (zırh slotu). Tespit: **Signal Counter** (Geiger gibi tıklayan alet). **Mutasyonlar** (geçici, kalkışa kadar): iyi — Overclocked Legs, Night Vision, Thick Skin, Magnet Hands, Echolocation; kötü — Lag, Mute (sesle büyü yok), Glass Bones, Beacon (parlarsın), Jitter. **Zar:** nadir **Loot Box Shrine** (Algorithm'ın kumar sunağı): kredi/hurda/can/STATIC adayıp dev bir d20 atılır → 1 lanet/mimic, 2-7 debuff, 8-14 geçici buff, 15-19 büyük buff/nadir item, 20 mythic. Fırlatılabilir fizikli **Cursed Die** itemi (düştüğü yüz etkiyi belirler). **Geçici power-up'lar** (dünyada holografik ikonlar, elite drop, zar): Double XP Weekend, Premium Trial (hız), Ad-Free (yaratıklar görmez 20 sn), Overclock (hızlı saldırı), Cloud Save (bir ölümü engeller), Viral (hasar sıçrar). Denge: süreli, sınırlı stack, her güç bir risk taşır; sol HUD dock'ta buff/debuff zamanlayıcıları | tfg-builder (Sonnet) |
+| 24 | **HQ FORGE: +1…+9 güçlendirme, tier yükseltme, yaratık tier'ları** | Aşağıdaki §12'ye bak | tfg-builder (Sonnet) |
+
+## 12. HQ Forge ve yaratık tier sistemi (detaylı tasarım)
+
+**Yer:** Şirket haritası (0-Algorithm HQ, `src/world/company.js`). Satış tezgâhının yanında dev bir makine:
+**"THE MONETIZER"**. Pack-a-Punch gibi: silahı yuvasına koyarsın, makine sallanır, ışıklar yanar,
+The Algorithm yorum yapar, silah parlayarak geri çıkar. Yanında **Ascension Altar** (tier yükseltme) ve
+**Shard Exchange** (malzeme takası).
+
+### 12.1 Güçlendirme (+1 … +9)
+| Seviye | Başarı | Başarısızlıkta | Maliyet (▮ + malzeme) | Bonus (silah: hasar / zırh: DR) | Görsel |
+|---|---|---|---|---|---|
+| +1 | %100 | — | 20 + 2 Scrap Shard | +%6 | isim "+1" |
+| +2 | %100 | — | 35 + 3 Scrap Shard | +%12 | |
+| +3 | %95 | seviye aynı | 55 + 2 Circuit Core | +%18 | hafif parıltı (tier rengi) |
+| +4 | %85 | seviye aynı | 80 + 3 Circuit Core | +%24 | |
+| +5 | %70 | seviye aynı | 120 + 2 Data Crystal | +%31 + **Overclock özelliği** açılır | tier renginde aura + kıvılcım |
+| +6 | %55 | −1 seviye | 170 + 3 Data Crystal | +%38 | |
+| +7 | %40 | −1 seviye | 240 + 2 Ecto Core | +%46 | animasyonlu "glitch camo" |
+| +8 | %30 | −1 seviye | 330 + 2 Algorithm Fragment | +%55 | |
+| +9 | %20 | −1 seviye | 450 + 1 Source Code | +%65 + **ikinci Overclock** | tam Pack-a-Punch kamuflajı, iz, ses |
+- **Backup Drive** (koruma itemi): başarısızlıkta seviye düşmesini engeller (nadir drop / Dark Web).
+- **Overclock özellikleri** (+5 ve +9'da biri seçilir/rastgele, katalizöre göre): *Shock* (zincir), *Burn* (DoT),
+  *Freeze* (yavaşlatma), *Void* (zırh deler), *Vamp* (can çalma), *Viral* (öldürülen patlar). Katalizör itemi
+  verilirse seçilir, yoksa rastgele.
+- Seviye ve özellik item örneğinde tutulur (`it.plus`, `it.oc[]`), kaydedilir, ağ ile senkron, isim "+7 Katana ⚡".
+- Zırh/trinket'ler de güçlendirilebilir (DR / bonus × seviye), çantalar hariç.
+
+### 12.2 Tier yükseltme (Ascension)
+Common→Uncommon→Rare→Epic→Legendary→Mythic. Maliyet: hedef tier'ın **shard'ı** + kredi + aynı türden
+"kurban" item (opsiyonel, şansı artırır). Başarı: Uncommon %90, Rare %75, Epic %55, Legendary %35, Mythic %15;
+başarısızlık tier düşürmez, sadece malzeme gider. Workbench'teki eski tier-up en fazla **Rare**'e kadar izinli;
+Epic+ sadece HQ Altar'da.
+
+### 12.3 Malzemeler (shard'lar)
+| Shard | Tier | Nereden |
+|---|---|---|
+| Scrap Shard | common | her yaratık, hurda sökme |
+| Circuit Core | uncommon | uncommon+ yaratık, elektronik sökme, chest |
+| Data Crystal | rare | rare+ yaratık, sunucu çekirdekleri, chest |
+| Ecto Core | epic | epic+ yaratık, backrooms, mimic |
+| Algorithm Fragment | legendary | legendary yaratık, boss, raid/extraction |
+| Source Code | mythic | mythic yaratık, world boss, SIEGE flawless |
+Shard Exchange: 5 alt shard → 1 üst shard (legendary'ye kadar; Source Code takasla alınamaz).
+
+### 12.4 Yaratık tier'ları
+Her yaratık doğarken bir tier alır (sektör + Threat + ay tehlikesiyle ağırlıklı, `rollTier`):
+| Tier | HP / hasar | Görünüm | Drop |
+|---|---|---|---|
+| Common | ×1 | normal | %40 Scrap Shard |
+| Uncommon | ×1.25 | yeşil isim/iz | + %30 Circuit Core |
+| Rare | ×1.6 | mavi aura | + %30 Data Crystal, item drop tier ≥ uncommon |
+| Epic | ×2.1 | mor aura + 1 affix | + %25 Ecto Core, item ≥ rare |
+| Legendary | ×2.8 | turuncu aura + 2 affix, can barı | + %30 Algorithm Fragment, item ≥ epic |
+| Mythic | ×4 | kırmızı glitch aura + 3 affix, isim anonsu | + %25 Source Code, item ≥ legendary |
+- Erken oyun güvenliği: kota 0-1'de en fazla Uncommon, kota 2-3'te en fazla Rare; Mythic sadece sektör 6+ veya Threat FUCKED.
+- Mevcut elite affix sistemi tier'ın üstüne oturur (tier affix sayısını belirler); boss'lar sabit Legendary/Mythic.
+- Drop'un item tier'ı: `rollTier(rng, { minTier: tier−1 })`.
+- Scan'de ve isim etiketinde tier rengi; öldürme XP'si tier çarpanıyla.
