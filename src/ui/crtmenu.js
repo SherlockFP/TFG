@@ -6,12 +6,13 @@ import { levelMaterial } from '../world/geobuilder.js';
 import { createAnyProp } from '../world/propfactory.js';
 import { t } from '../core/i18n.js';
 import { rankOf, xpForLevel } from '../game/progression.js';
-import { listRuns } from '../core/save.js';
+import { listRuns, saveProfile } from '../core/save.js';
+import { MenuRoom } from './menuroom.js';
 
-const CRT_VS = `
+export const CRT_VS = `
 varying vec2 vUv;
 void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
-const CRT_FS = `
+export const CRT_FS = `
 uniform sampler2D map;
 uniform float time;
 uniform float power;     // 0..1 brightness / on
@@ -38,7 +39,7 @@ void main(){
   gl_FragColor = vec4(c, 1.0);
 }`;
 
-function makeCRT({ w = 0.8, h = 0.6, depth = 0.6, canvasW = 256, canvasH = 192, body = 0x2a2724, tint = [1, 1, 1] }) {
+export function makeCRT({ w = 0.8, h = 0.6, depth = 0.6, canvasW = 256, canvasH = 192, body = 0x2a2724, tint = [1, 1, 1] }) {
   const g = new THREE.Group();
   const bodyMat = new THREE.MeshLambertMaterial({ color: body });
   const bw = w + 0.16, bh = h + 0.16;
@@ -97,8 +98,11 @@ export class CRTMenu {
     this.focus = 0;           // 0 = wide shot, 1 = zoomed to the main CRT
     this._camA = new THREE.Vector3(); this._camB = new THREE.Vector3(); this._camC = new THREE.Vector3(); this._camD = new THREE.Vector3();
     this.screens = [];
+    this.room = null;
     this.buildRoom();
     this.buildScreens();
+    // the interactive "Content Review Cell" (break free of the chair, walk around, piano, terminal...): src/ui/menuroom.js
+    try { this.room = new MenuRoom(this, { makeCRT, CRT_VS, CRT_FS, levelMaterial, createAnyProp, saveProfile }); } catch (e) { console.warn('[menu] cell disabled', e); this.room = null; this.buildBasicWalls(); }
     this.setItems();
     this.bindInput();
     engine.setRenderHeightOverride?.(540);
@@ -111,10 +115,6 @@ export class CRTMenu {
     floor.material = floor.material.clone(); floor.material.map = floor.material.map?.clone() || null;
     if (floor.material.map) { floor.material.map.repeat.set(5, 5); floor.material.map.needsUpdate = true; }
     floor.rotation.x = -Math.PI / 2; s.add(floor);
-    const wallMat = levelMaterial('concrete_stained');
-    const back = new THREE.Mesh(new THREE.PlaneGeometry(14, 5), wallMat); back.position.set(0, 2.5, -3.2); s.add(back);
-    const left = new THREE.Mesh(new THREE.PlaneGeometry(10, 5), wallMat); left.position.set(-4.5, 2.5, 0); left.rotation.y = Math.PI / 2; s.add(left);
-    const right = new THREE.Mesh(new THREE.PlaneGeometry(10, 5), wallMat); right.position.set(4.5, 2.5, 0); right.rotation.y = -Math.PI / 2; s.add(right);
     const ceil = new THREE.Mesh(new THREE.PlaneGeometry(14, 10), levelMaterial('metal_dark')); ceil.position.set(0, 4, 0); ceil.rotation.x = Math.PI / 2; s.add(ceil);
     // metal shelving rack behind the monitors
     const rackMat = new THREE.MeshLambertMaterial({ color: 0x2c2f31 });
@@ -122,15 +122,8 @@ export class CRTMenu {
     for (const x of [-2.9, -0.4, 2.2, 3.6]) bar(x, 1.6, -1.2, 0.07, 3.2, 0.07);
     for (const y of [0.55, 1.5, 2.45]) { bar(0.35, y, -1.2, 6.6, 0.05, 0.9); }
     // table in front with junk
-    bar(0.9, 0.78, 0.2, 2.6, 0.06, 1.1);
-    for (const [x, z] of [[-0.3, -0.25], [2.1, -0.25], [-0.3, 0.65], [2.1, 0.65]]) bar(x, 0.39, z, 0.06, 0.78, 0.06);
-    // props for silhouettes
-    const put = (id, x, y, z, r = 0) => { try { const o = createAnyProp(id, { seed: 7 }); o.position.set(x, y, z); o.rotation.y = r; s.add(o); return o; } catch { return null; } };
-    put('server_rack_prop', 3.9, 0, -2.3, -0.3);
-    put('filing_cabinet', -3.8, 0, -2.2, 0.4);
-    put('office_chair', 1.3, 0, 1.4, 2.6);
-    put('barrel', -3.6, 0, 1.2, 0);
-    put('cardboard_boxes', 3.4, 0, 1.0, 0.8);
+    bar(0.15, 0.78, 0.2, 4.1, 0.06, 1.1);
+    for (const [x, z] of [[-1.8, -0.25], [2.1, -0.25], [-1.8, 0.65], [2.1, 0.65]]) bar(x, 0.39, z, 0.06, 0.78, 0.06);
     // hanging cables
     const cableMat = new THREE.MeshLambertMaterial({ color: 0x0c0c0c });
     for (let i = 0; i < 9; i++) {
@@ -158,6 +151,15 @@ export class CRTMenu {
     const dg = new THREE.BufferGeometry(); dg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
     this.dust = new THREE.Points(dg, new THREE.PointsMaterial({ color: 0xffd0c0, size: 0.012, transparent: true, opacity: 0.5, depthWrite: false }));
     s.add(this.dust);
+  }
+
+  // plain walls (the cell builds its own, with windows and a door; this is only the fallback if that fails)
+  buildBasicWalls() {
+    const s = this.scene;
+    const wallMat = levelMaterial('concrete_stained');
+    const back = new THREE.Mesh(new THREE.PlaneGeometry(14, 5), wallMat); back.position.set(0, 2.5, -3.2); s.add(back);
+    const left = new THREE.Mesh(new THREE.PlaneGeometry(10, 5), wallMat); left.position.set(-4.5, 2.5, 0); left.rotation.y = Math.PI / 2; s.add(left);
+    const right = new THREE.Mesh(new THREE.PlaneGeometry(10, 5), wallMat); right.position.set(4.5, 2.5, 0); right.rotation.y = -Math.PI / 2; s.add(right);
   }
 
   // ------------------------------------------------------------------ monitors
@@ -281,7 +283,7 @@ export class CRTMenu {
     const p = this.app.profile;
     ctx.fillStyle = '#100a05'; ctx.fillRect(0, 0, W, H);
     ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-    ctx.fillStyle = '#ff9a4a'; ctx.font = FONT(30); ctx.fillText(p.name.slice(0, 16), 12, 10);
+    ctx.fillStyle = '#ff9a4a'; ctx.font = FONT(30); ctx.fillText(p.name.slice(0, 16) + (this.room?.isVerified() ? ' ✓' : ''), 12, 10);
     ctx.fillStyle = '#ffd9b8'; ctx.font = FONT(22); ctx.fillText(`Lv.${p.level}  ${rankOf(p.level)}${p.title ? ' · ' + p.title : ''}`, 12, 46);
     ctx.fillStyle = '#3a2412'; ctx.fillRect(12, 78, W - 24, 10);
     ctx.fillStyle = '#ff9a4a'; ctx.fillRect(12, 78, (W - 24) * Math.min(1, p.xp / xpForLevel(p.level)), 10);
@@ -289,6 +291,8 @@ export class CRTMenu {
     ctx.fillStyle = '#c9a98a'; ctx.font = FONT(19);
     ctx.fillText(`kills ${p.stats.kills} · quotas ${p.stats.quotasMet} · deaths ${p.stats.deaths}`, 12, 134);
     ctx.fillText(`[CHARACTER] to customize`, 12, 158);
+    const badges = this.room?.badges();
+    if (badges) { ctx.fillStyle = '#ffd23f'; ctx.fillText(badges.slice(0, 26), 12, 174); }
   }
   drawLog(c, time) {
     const { ctx, canvas } = c; const W = canvas.width, H = canvas.height;
@@ -340,16 +344,16 @@ export class CRTMenu {
     this.ray = new THREE.Raycaster();
     this.ndc = new THREE.Vector2();
     this.onMove = (e) => {
-      if (this.mode !== 'title') return;
+      if (this.mode !== 'title' || (this.room && !this.room.menuActive())) return;
       const r = canvas.getBoundingClientRect();
       this.ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
       const i = this.pick();
       if (i !== this.hover) { this.hover = i; if (i >= 0 && i !== this.sel) { this.sel = i; this.app.audio?.ui('ui_hover', 0.3); } }
       canvas.style.cursor = i >= 0 ? 'pointer' : 'default';
     };
-    this.onClick = (e) => { if (this.mode !== 'title') return; this.onMove(e); if (this.hover >= 0) this.activate(this.hover); };
+    this.onClick = (e) => { if (this.mode !== 'title' || (this.room && !this.room.menuActive())) return; this.onMove(e); if (this.hover >= 0) this.activate(this.hover); };
     this.onKey = (e) => {
-      if (this.app.game || this.mode !== 'title' || document.activeElement?.tagName === 'INPUT') return;
+      if (this.app.game || this.mode !== 'title' || document.activeElement?.tagName === 'INPUT' || (this.room && !this.room.menuActive())) return;
       if (e.code === 'ArrowUp' || e.code === 'KeyW') { this.sel = (this.sel - 1 + this.items.length) % this.items.length; this.app.audio?.ui('ui_hover', 0.3); e.preventDefault(); }
       if (e.code === 'ArrowDown' || e.code === 'KeyS') { this.sel = (this.sel + 1) % this.items.length; this.app.audio?.ui('ui_hover', 0.3); e.preventDefault(); }
       if (e.code === 'Enter' || e.code === 'Space') { this.activate(this.sel); e.preventDefault(); }
@@ -368,7 +372,8 @@ export class CRTMenu {
   }
   // gamepad (polled by ui.js): D-pad / stick moves, A / Start confirms
   padInput(act) {
-    if (this.mode !== 'title' || !this.items.length) return;
+    if (this.mode === 'title' && this.room && (act === 'left' || act === 'right')) { this.room.struggleKey(act === 'left' ? -1 : 1); return; }   // alternate left/right to file the appeal
+    if (this.mode !== 'title' || !this.items.length || (this.room && !this.room.menuActive())) return;
     if (act === 'up' || act === 'down') {
       this.sel = (this.sel + (act === 'up' ? -1 : 1) + this.items.length) % this.items.length;
       this.app.audio?.ui('ui_hover', 0.3);
@@ -407,6 +412,7 @@ export class CRTMenu {
     cam.position.lerpVectors(wide, close, ef);
     const look = this._camC.set(-0.15 + Math.sin(t * 0.17) * 0.04, 1.5, -0.9).lerp(this._camD.set(-0.25, 1.45, 0.1), ef);
     cam.lookAt(look);
+    this.room?.frame(dt, cam);   // seated micro-movement / struggle / free-roam camera (src/ui/menuroom.js)
     // bulb swings, red light flickers
     this.bulb.rotation.z = Math.sin(t * 0.9) * 0.12;
     this.bulb.position.x = 0.4 + Math.sin(t * 0.9) * 0.12;
@@ -426,6 +432,7 @@ export class CRTMenu {
   }
 
   dispose() {
+    this.room?.dispose();
     const canvas = this.engine.canvas;
     canvas.removeEventListener('pointermove', this.onMove);
     canvas.removeEventListener('click', this.onClick);
