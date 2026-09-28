@@ -6,8 +6,11 @@
 // (useItem / interactables / update / fx / registerHandlers / sessionEnd), so the Game only has to call
 // items.dispose() on destroy.
 import * as THREE from 'three';
-import { ITEMS, RARITY, itemDef, rarityOfValue, isSellable } from '../game/items.js';
-import { normalizeAffix, affixValueBonus } from '../game/loot.js';
+import { ITEMS, itemDef, isSellable } from '../game/items.js';
+import { normalizeAffix, affixValueBonus, makeAffix } from '../game/loot.js';
+import { TIERS, TIER_ORDER, rollTier, tierOfItem, tierIndex } from '../game/tiers.js';
+import { normalizeInv, rollsTier, TIER_VALUE_NORM } from '../game/inventory_core.js';
+import { RNG } from '../core/rng.js';
 import { createItemModel, createLadderModel } from '../models/items.js';
 import { insideShip } from '../world/ship.js';
 import { G } from '../physics/physics.js';
@@ -18,7 +21,7 @@ const tmpV2 = new THREE.Vector3();
 const UP = new THREE.Vector3(0, 1, 0);
 const DOWN = new THREE.Vector3(0, -1, 0);
 
-// ---- belt bag ----
+// ---- legacy belt bag (pre-wave-1 saves stored up to 4 scrap entries inside the bag item; the host dumps them) ----
 export const BAG_MAX = 4;
 export const BAG_WEIGHT_MUL = 0.6;
 // ---- extension ladder ----
@@ -34,9 +37,10 @@ const FX_STEAM = { count: 3, color: [0xdddddd, 0xffffff, 0xbbbbbb], speed: 0.35,
 const FX_SPRAY = { count: 7, color: [0xe8f4ff, 0xc0ffd8, 0xffffff], speed: 4.5, up: 0.2, life: 0.45, size: 0.06, gravity: 1, drag: 2.2 };
 const FX_HYPE = { count: 4, color: [0xff7ad0, 0xffc0f0, 0xffffff], speed: 0.6, up: 0.4, life: 0.6, size: 0.05, gravity: -0.5, drag: 2.5 };
 
+const INSTANCE_TIER_KINDS = new Set(['weapon', 'armor', 'trinket', 'bag', 'tool', 'consumable', 'component']);
 const finite3 = (a) => Array.isArray(a) && a.length === 3 && a.every((v) => Number.isFinite(Number(v))) ? a.map(Number) : null;
 
-/** Sanitize belt-bag contents (network / saves). */
+/** Sanitize legacy belt-bag contents (network / old saves). */
 export function normalizeBag(bg) {
   if (!Array.isArray(bg)) return [];
   const out = [];
@@ -62,16 +66,6 @@ export function sanitizeLadder(ld) {
   return { b, h, yaw, t: tp };
 }
 
-/** Why an item cannot go into a belt bag (null = it can). */
-export function bagRejectReason(it) {
-  if (!it || it.state !== 'world' || it.carrier || it.ladder) return 'Out of reach.';
-  const d = it.def;
-  if (d.hot) return 'It is way too hot to stash.';
-  if (d.cursed) return 'The letter refuses to be put away.';
-  if (!['scrap', 'drop', 'fish'].includes(d.kind) || d.hands !== 1 || it.type === 'body' || d.special || it.affix || it.soulbound) return 'That does not fit in the bag.';
-  if ((d.weight || 0) > 15) return 'Too heavy for the belt bag.';
-  return null;
-}
 
 export class WorldItem {
   constructor(mgr, data) {
@@ -93,7 +87,10 @@ export class WorldItem {
     this.flags = data.f || 0;
     this.affix = normalizeAffix(data.af);   // weapon rarity + affixes (null = plain item)
     this.collected = !!data.col;
-    this.bag = normalizeBag(data.bg);       // belt bag contents
+    this.tier = TIERS[data.tr] ? data.tr : null;   // rolled / granted item tier (tiers.js); null = derived (tierOfItem)
+    this.inv = this.holder ? normalizeInv(data.iv) : null;   // null = hotbar / world; { k:'bag', x, y } | { k:'eq', s }
+    this.reclaim = data.rc && typeof data.rc === 'object' && typeof data.rc.pid === 'string' ? { pid: data.rc.pid.slice(0, 64), iv: normalizeInv(data.rc.iv) } : null;
+    this.bag = normalizeBag(data.bg);       // legacy belt bag contents (dumped by the host, see inventory.js)
     this.ladder = null;                     // deployed ladder descriptor (see deployLadder)
     if (this.type === 'beltbag') this.updateBagLabel();
     this.obj = this.makeVisual();
@@ -182,7 +179,7 @@ export class WorldItem {
     if (holder && this.ladder) this.foldLadder();
     this.holder = holder;
     this.state = holder ? 'held' : 'world';
-    if (holder) this.removeBody();
+    if (holder) this.removeBody(); else this.inv = null;
   }
 
   /** Stand the Extension Ladder up against a wall (all peers, from the host's 'ladder' event / welcome). */
@@ -221,7 +218,14 @@ export class WorldItem {
   }
 
   worldPos(out = new THREE.Vector3()) { return this.obj.getWorldPosition(out); }
-  rarity() { return rarityOfValue(this.value); }
+  /** Display tier: rolled it.tier > weapon affix rarity > def tier > (scrap only) value-based rarity (tiers.js tierOfItem).
+   *  Weapons, gear and tools never fall back to their value / class rarity: a plain store Kevlar Suit is Common. */
+  rarity() {
+    if (this.tier) return this.tier;
+    if (INSTANCE_TIER_KINDS.has(this.def.kind)) return this.affix?.rarity || this.def.tier || 'common';
+    return tierOfItem(this, this.def);
+  }
+  get tierColor() { return (TIERS[this.rarity()] || TIERS.common).color; }
   dispose() {
     this.removeBody();
     this.obj.removeFromParent();
@@ -238,6 +242,7 @@ export class ItemManager {
     this.items = new Map();
     this.nextId = 1;
     this.snapTimer = 0;
+    this.tierRng = null; this.tierSeed = null;
     this.tools = null;
     try { if (game.mods?.on) this.tools = new ItemTools(game, this); } catch (e) { console.warn('item tools', e); }
   }
@@ -246,13 +251,37 @@ export class ItemManager {
   dispose() { this.tools?.dispose(); this.tools = null; }
 
   // ---------- host API ----------
+  /** Seeded tier RNG, restarted every landing (run.seed) so a day's rolls are reproducible for the host. */
+  hostTierRng() {
+    const seed = this.game.run?.seed ?? 1;
+    if (!this.tierRng || this.tierSeed !== seed) { this.tierRng = new RNG(((seed ^ 0x71e5) >>> 0) || 1); this.tierSeed = seed; }
+    return this.tierRng;
+  }
+  /**
+   * Resolve the tier of a new item (host). opts.tier forces one (chests, shops, crafting); weapons take their affix
+   * rarity (a forced uncommon+ tier on a plain weapon rolls a matching affix); scrap / drops / big valuables roll with
+   * the host loot luck; store gear stays Common unless spawned as loot (opts.valueMul) or opts.rollTier.
+   */
+  hostResolveTier(def, opts) {
+    if (opts.tier && TIERS[opts.tier]) return opts.tier;
+    if (opts.af?.rarity && TIERS[opts.af.rarity]) return opts.af.rarity;
+    if (def.kind === 'weapon') return null;
+    if (!rollsTier(def, opts)) return null;
+    const luck = opts.luck ?? this.game.inventory?.hostLootLuck?.() ?? 0;
+    return rollTier(this.hostTierRng(), { luck, minTier: opts.minTier, maxTier: opts.maxTier });
+  }
   hostSpawn(type, pos, opts = {}) {
     const def = itemDef(type);
+    const tier = this.hostResolveTier(def, opts);
+    if (tier && def.kind === 'weapon' && !def.noAffix && !opts.af && tierIndex(tier) > 0) {
+      opts = { ...opts, af: makeAffix(tierIndex(tier) >= tierIndex('legendary') ? 'legendary' : tier, this.hostTierRng()) };
+    }
     let v = opts.value;
     if (v === undefined && def.value) {
       const [a, b] = def.value;
       v = Math.round((a + Math.random() * (b - a)) * (opts.valueMul ?? 1));
       if (opts.af) v = Math.round(v * affixValueBonus(opts.af));
+      else if (tier && def.kind !== 'weapon' && !def.tier) v = Math.max(1, Math.round(v * TIERS[tier].valueMul * TIER_VALUE_NORM));
     }
     const id = 'i' + (this.nextId++).toString(36) + Math.floor(Math.random() * 36).toString(36);
     const yaw = opts.yaw ?? Math.random() * Math.PI * 2;
@@ -262,7 +291,10 @@ export class ItemManager {
       b: opts.battery ?? def.battery ?? undefined, c: opts.charges ?? def.charges ?? undefined, am: def.ammo ?? undefined,
       h: opts.holder || null, lb: opts.label || undefined, sb: opts.soulbound || undefined, lv: opts.linvel || undefined,
       af: opts.af || undefined, col: opts.col ? 1 : undefined, bg: opts.bag?.length ? opts.bag : undefined,
+      tr: tier || undefined,
     };
+    // spawn straight into the holder's bag / equipment (crafting, reclaim): opts.inv = 'bag' | 'eq' | { k, x, y } | { k:'eq', s }
+    if (opts.holder && opts.inv) { const iv = this.game.inventory?.hostPlaceFor?.(opts.holder, def, opts.inv); if (iv) data.iv = iv; }
     this.game.net.broadcast('it', { e: 'sp', ...data });
     return id;
   }
@@ -272,7 +304,7 @@ export class ItemManager {
     const ps = this.game.particles;
     if (!ps) return;
     const p = it.obj.getWorldPosition(tmpV2);
-    const col = it.affix ? (RARITY[it.affix.rarity]?.color || '#ffffff') : it.def.value ? RARITY[it.rarity()].color : '#cfc6b8';
+    const col = it.def.value || it.tier || it.affix ? it.tierColor : '#cfc6b8';
     const big = it.def.kind === 'big' || (it.def.hands === 2);
     ps.burst(p, { count: big ? 14 : 8, color: [col, 0xffffff, col], speed: 1.4, up: 1.6, life: 0.55, size: 0.05, gravity: -1.5, drag: 3 });
     if (big) ps.burst(p, FX_DUST, null, 0.6);
@@ -288,6 +320,7 @@ export class ItemManager {
   // move a (held) item into the world at d.p / d.q (drop + ladder events)
   placeInWorld(it, d) {
     const prevHolder = it.holder;
+    it.dropHolder = prevHolder; it.dropInv = it.inv;   // inventory.js: a leaver's bag/equipment can be reclaimed on rejoin
     it.setHeld(null);
     it.owner = null;
     this.game.onItemDropped(it, prevHolder);
@@ -302,6 +335,7 @@ export class ItemManager {
 
   // ---------- event application (all peers) ----------
   onEvent(d) {
+    this.game.inventory?.onItemEvent?.(d);   // inventory caches (weight) follow every item change
     switch (d.e) {
       case 'sp': {
         if (this.items.has(d.id)) return;
@@ -314,7 +348,19 @@ export class ItemManager {
         const it = this.items.get(d.id); if (!it) return;
         it.owner = null;
         it.setHeld(d.h);
+        it.inv = normalizeInv(d.iv);
         this.game.onItemHeld(it, d.h, d.sl);
+        this.game.inventory?.onHeld?.(it, d);
+        break;
+      }
+      case 'inv': {   // host-confirmed inventory moves for one holder: { h, mv: [[id, inv|null]...], sl?: {id: slot}, full? }
+        const mv = Array.isArray(d.mv) ? d.mv : [];
+        for (const m of mv) {
+          const it = Array.isArray(m) && this.items.get(m[0]);
+          if (!it || it.holder !== d.h) continue;
+          it.inv = normalizeInv(m[1]);
+        }
+        this.game.inventory?.onInvEvent?.(d);
         break;
       }
       case 'drop': {
@@ -491,6 +537,7 @@ export class ItemManager {
         on: it.on || undefined, lb: it.label || undefined, sb: it.soulbound || undefined, sl: it.slot ?? undefined,
         af: it.affix || undefined, col: it.collected ? 1 : undefined,
         bg: it.bag.length ? it.bag.map((e) => ({ ...e })) : undefined, ld: it.ladder || undefined,
+        tr: it.tier || undefined, iv: it.holder && it.inv ? { ...it.inv } : undefined, rc: it.reclaim || undefined,
       });
     }
     return out;
@@ -570,7 +617,6 @@ export class ItemTools {
     switch (it.type) {
       case 'ladder': hk.handled = true; this.deployLadder(it); return;
       case 'booster': hk.handled = true; this.armBooster(it); return;
-      case 'beltbag': hk.handled = true; this.useBag(it); return;
       case 'inhaler': case 'adblock':
         hk.handled = true;
         if ((it.charges ?? 0) <= 0) this.toast(it.type === 'inhaler' ? 'The inhaler is empty.' : 'The spray can is empty.');
@@ -721,7 +767,7 @@ export class ItemTools {
     scrap.sort((a, b) => a[0] - b[0]);
     for (const [, o] of scrap.slice(0, 10)) {
       const v = Math.max(5, Math.round(o.value / 5) * 5);
-      hud.floatText(o.obj.position.clone().add(new THREE.Vector3(0, 0.45, 0)), `▮${v}`, o.affix ? (RARITY[o.affix.rarity]?.color || '#fff') : RARITY[o.rarity()].color);
+      hud.floatText(o.obj.position.clone().add(new THREE.Vector3(0, 0.45, 0)), `▮${v}`, o.tierColor);
     }
     let n = 0;
     for (const v of g.creatures?.views?.values() || []) {
@@ -753,27 +799,19 @@ export class ItemTools {
     }
   }
 
-  // ------------------------------------------------------------------ Belt Bag
-  useBag(bag) {
-    const g = this.game;
-    const { eye, fwd } = this.eyeFwd();
-    const hit = g.physics.raycast(eye, fwd, 3.2, G.STATIC | G.DOOR | G.ITEM | G.BIG, g.player.col);
-    const tgt = hit?.info?.kind === 'item' ? this.mgr.get(hit.info.itemId) : null;
-    if (tgt && tgt !== bag) {
-      const why = bagRejectReason(tgt);
-      if (why) { this.toast(why); g.sfx?.('ui_error', 0.4); return; }
-      if (bag.bag.length >= BAG_MAX) { this.toast('The belt bag is full.'); g.sfx?.('ui_error', 0.4); return; }
-      this.net.request('itool', { op: 'bagput', id: bag.id, it: tgt.id });
-      return;
-    }
-    if (bag.bag.length) {
-      const wall = g.physics.raycast(eye, fwd, 1.0, G.STATIC | G.DOOR);
-      const dist = wall ? Math.max(0.1, wall.distance - 0.35) : 0.8;
-      const p = eye.clone().addScaledVector(fwd, dist).add(new THREE.Vector3(0, -0.2, 0));
-      this.net.request('itool', { op: 'bagdump', id: bag.id, p: p.toArray() });
-      return;
-    }
-    this.toast('Aim at small scrap and press LMB to stash it.');
+  // ------------------------------------------------------------------ legacy Belt Bag contents
+  /** Host: spill the scrap entries an old-save Belt Bag still carries (the bag itself is now a wearable grid bag). */
+  hostDumpLegacyBag(bag, pos) {
+    const g = this.game, items = this.mgr;
+    if (!g.isHost || !bag?.bag?.length) return;
+    const p = pos ? pos.clone() : (bag.holder ? (bag.holder === g.selfId ? g.player.pos : g.remotes.get(bag.holder)?.pos)?.clone()?.add(new THREE.Vector3(0, 1, 0)) : bag.obj.position.clone()) || new THREE.Vector3(0, 1, 0);
+    const list = bag.bag;
+    bag.bag = [];
+    list.forEach((e, i) => {
+      const off = new THREE.Vector3(((i % 2) - 0.5) * 0.22, 0.2 + i * 0.1, (Math.floor(i / 2) - 0.5) * 0.22);
+      items.hostSpawn(e.ty, p.clone().add(off), { value: e.v, baseValue: e.bv, battery: e.b, charges: e.c, col: e.col, linvel: [off.x * 2, 0.5, off.z * 2] });
+    });
+    g.net.broadcast('it', { e: 'bag', id: bag.id, bg: [] });
   }
 
   // ------------------------------------------------------------------ Webcam flash
@@ -861,7 +899,7 @@ export class ItemTools {
     if (!held || this.hinted.has(type)) return;
     const d = held.def;
     let tip = null;
-    if (TOOL_HINT_TYPES.has(type)) tip = d.tip;
+    if (TOOL_HINT_TYPES.has(type) || ((d.kind === 'bag' || d.kind === 'armor' || d.kind === 'trinket') && d.tip)) tip = d.tip;
     else for (const k of Object.keys(SPECIAL_HINTS)) if (d[k]) { tip = SPECIAL_HINTS[k]; break; }
     if (!tip) return;
     this.hinted.add(type);
@@ -1100,30 +1138,6 @@ export class ItemTools {
       if (pp && Math.hypot(pp.x - ld.b[0], pp.z - ld.b[2]) > 4) return;
       it.lastHolder = from;
       g.net.broadcast('it', { e: 'ladder', id: it.id, ld });
-    } else if (d.op === 'bagput') {
-      const bag = items.get(d.id), tgt = items.get(d.it);
-      if (!bag || bag.type !== 'beltbag' || bag.holder !== from || !tgt || tgt === bag) return;
-      if (bagRejectReason(tgt) || bag.bag.length >= BAG_MAX) return;
-      if (tgt.owner && tgt.owner !== from) return;
-      if (pp && pp.distanceTo(tgt.obj.position) > 4.5) return;
-      const entry = { ty: tgt.type, v: tgt.value, bv: tgt.baseValue, b: tgt.battery ?? undefined, c: tgt.charges ?? undefined, col: tgt.collected ? 1 : undefined };
-      const fx = tgt.obj.position.toArray().map((v) => +v.toFixed(2));
-      const bg = [...bag.bag, entry];
-      bag.bag = normalizeBag(bg);          // update now so a second request in the same tick sees it
-      g.net.broadcast('it', { e: 'rm', id: tgt.id });
-      g.net.broadcast('it', { e: 'bag', id: bag.id, bg, fx });
-    } else if (d.op === 'bagdump') {
-      const bag = items.get(d.id);
-      if (!bag || bag.type !== 'beltbag' || bag.holder !== from || !bag.bag.length) return;
-      let p = finite3(d.p) ? new THREE.Vector3().fromArray(finite3(d.p)) : null;
-      if (!p || (pp && p.distanceTo(pp) > 3)) p = (pp || new THREE.Vector3()).clone().add(new THREE.Vector3(0, 1, 0));
-      const list = bag.bag;
-      bag.bag = [];
-      list.forEach((e, i) => {
-        const off = new THREE.Vector3(((i % 2) - 0.5) * 0.22, i * 0.1, (Math.floor(i / 2) - 0.5) * 0.22);
-        items.hostSpawn(e.ty, p.clone().add(off), { value: e.v, baseValue: e.bv, battery: e.b, charges: e.c, col: e.col, linvel: [off.x * 2, 0.5, off.z * 2] });
-      });
-      g.net.broadcast('it', { e: 'bag', id: bag.id, bg: [] });
     }
   }
 

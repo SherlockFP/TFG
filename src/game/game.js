@@ -44,7 +44,7 @@ import { installCruiser } from '../entities/cruiser.js';
 import './components.js';
 import { setDocksVisible } from '../ui/dock.js';   // shared crafting components (registered at import)
 // ---- WAVE 1 module imports: one line per module, keep the blank separator lines (avoids merge conflicts) ----
-// [import:inventory]
+import { installInventory } from './inventory.js';
 
 // [import:facilitysys]
 
@@ -117,7 +117,7 @@ export class Game extends Emitter {
     try { this.cruiser = installCruiser(this); } catch (e) { console.warn('cruiser', e); this.cruiser = null; }
     // ---- WAVE 1 modules (docs/MASTERPLAN.md): this.useModule(name, installFn) stores game[name], disposes on destroy ----
     this.wave1 = [];
-    // [slot:inventory]
+    this.useModule('inventory', installInventory);
 
     // [slot:facilitysys]
 
