@@ -248,6 +248,7 @@ test, 2-tab hand playtest (§6-2), remaining BUGS.md items.
 STATIC exposure per player (hot rooms / hot items / breach; Buzzing 25, Glitching 50, Corrupted 75, DELETED 100), Decon Shower in the ship, Antivirus Shot, Faraday Suit, Signal Counter,
 10 mutations, 6 temporary power-ups (holographic pickups), Loot Box Shrine (d20) + throwable Cursed Die, left-dock buff bar. Net types `an` / `anfx` / `anst`. Shared edits: game.js slot lines, magic.js (Mute hook).
 Verified: node test (`tools/harness/anomaly_core.test.mjs`), build, smoke_land. NOT hand-played; `tools/harness/wave2_anomaly.js` was written but not executed (budget freeze).
++ The Algorithm's Revolver (Russian-roulette power-ups, `src/game/roulette.js`, net `rr` / `rrfx`, docs/wave2/anomaly.md): tables replace ~half the shrine spawns (quota >= 1) + a ship bonus table; node test `tools/harness/roulette.test.mjs` PASS, `wave2_roulette.js` run once (solo path PASS); 2+ player pass/forced flow only covered by the node test.
 
 ### 5.5 Smoke test (paste in the browser console on `?autohost=local&code=T1&name=Tester`, after ~4 s)
 ```js

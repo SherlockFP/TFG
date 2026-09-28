@@ -129,7 +129,7 @@ export function installDice(ctx) {
     D.fac = fac || null;
     if (!fac || !run || (run.phase !== 'moon' && run.phase !== 'landing')) return;
     const plan = planShrine(fac.scrapSpots, run.seed);
-    if (plan) createShrineAt(plan);
+    if (plan && !ctx.roulette?.claims?.(plan, run.seed)) createShrineAt(plan);   // roulette.js takes ~half of the spawns from quota 1 on
   }
   function createShrineAt(plan) {
     const model = createShrine();
