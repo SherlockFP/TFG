@@ -38,7 +38,7 @@ export function buildLexicon(spells) {
 }
 
 // real words one letter away from a spell word that must never cast it ("firewall" is a creature players shout about)
-const NEAR_MISS = new Set(['firewal', 'blank', 'bling', 'blinds', 'field', 'shiel', 'lemon', 'human', 'women', 'kalan', 'kaplan']);
+const NEAR_MISS = new Set(['firewal', 'blank', 'bling', 'blinds', 'field', 'shiel', 'lemon', 'human', 'women', 'kalan', 'kaplan', 'front', 'meter', 'totes', 'decay']);   // wave 2: front / meter / totes / decay sit one letter from frost / meteor / totem / decoy
 function lookup(tok, maps) {
   for (const m of maps) { const id = m.get(tok); if (id) return id; }
   if (tok.length < 5 || NEAR_MISS.has(tok)) return null;   // short words (it, sus, cek) must be exact

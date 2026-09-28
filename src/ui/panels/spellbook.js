@@ -15,6 +15,8 @@ const GLYPHS = {
   fire: ['.....#......', '.....##.....', '....###.....', '....####.#..', '...#####.##.', '..##########', '.###.#######', '.###..######', '.####..####.', '..###...###.', '...#######..', '....#####...'],
 };
 const glyphCache = new Map();
+/** wave 2: extra spell glyphs (12 rows of 12 chars, '#' = filled) */
+export function registerGlyph(id, rows) { GLYPHS[id] = rows; glyphCache.delete(id); }
 export function spellGlyph(id, cls = '') {
   const rows = GLYPHS[id];
   if (!rows) return '';
@@ -138,13 +140,14 @@ export class ManaDock {
     const key = m.ORDER.filter((id) => m.knows(id)).join(',');
     if (key !== this.knownKey) this.rebuildSlots();
     const max = m.maxMana;
+    this.$.bar.style.display = m.bloodMagic ? 'none' : '';   // Blood Magic keystone: no mana bar
     this.$.fill.style.width = (100 * Math.max(0, m.mana) / Math.max(1, max)).toFixed(1) + '%';
     this.$.num.textContent = Math.floor(m.mana);
     this.$.sh.style.width = m.shieldHp > 0 ? Math.min(100, m.shieldHp / Math.max(1, m.shieldMax) * 100).toFixed(0) + '%' : '0%';
     for (const [id, s] of this.slotEls) {
       const f = m.cooldownFrac(id);
       s.cd.style.setProperty('--cd', (f * 100).toFixed(1) + '%');
-      s.el.classList.toggle('nomana', m.mana < m.costOf(id));
+      s.el.classList.toggle('nomana', m.bloodMagic ? false : m.mana < m.costOf(id));
       const ready = f <= 0;
       if (ready && !s.ready) { s.el.classList.remove('ready-flash'); void s.el.offsetWidth; s.el.classList.add('ready-flash'); }
       s.ready = ready;
@@ -248,7 +251,7 @@ export class SpellWheel {
     this.center.innerHTML = `<div class="mg-t">${known ? t(sp.name).toUpperCase() : '???'}</div>`
       + `<div class="mg-say">"${sp.say.en}" · "${sp.say.tr}"</div>`
       + `<div class="mg-d">${t(sp.desc)}</div>`
-      + `<div class="mg-s">${known ? `${m.costOf(id)} ${t('mana')} · ${m.cooldownOf(id).toFixed(0)}s${cd > 0 ? ' · ' + t('ready in') + ' ' + cd.toFixed(1) + 's' : ''}` : t('Learn it from a skillbook') + ` (${t(sp.tierName)})`}</div>`;
+      + `<div class="mg-s">${known ? `${m.bloodMagic ? m.hpCost(id) + ' HP' : m.costOf(id) + ' ' + t('mana')} · ${m.cooldownOf(id).toFixed(0)}s${cd > 0 ? ' · ' + t('ready in') + ' ' + cd.toFixed(1) + 's' : ''}` : t('Learn it from a skillbook') + ` (${t(sp.tierName)})`}</div>`;
   }
   selected() { return this.hover >= 0 ? this.m.ORDER[this.hover] : null; }
   dispose() { this.el.remove(); }

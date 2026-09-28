@@ -81,7 +81,7 @@ import { installCrafting } from './crafting.js';
 // [import:liminal]
 
 
-// [import:combat]
+import { installCombat } from './combat.js';   // wave 2: melee combos / parry, new weapons, spells, role skills
 
 
 // [import:siege]
@@ -176,7 +176,7 @@ export class Game extends Emitter {
     // [slot:liminal]
 
 
-    // [slot:combat]
+    this.useModule('combat', installCombat);
 
 
     // [slot:siege]
