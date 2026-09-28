@@ -135,7 +135,7 @@ import { installCreatureEmotes } from './cemotes.js';
 // [import:boardgame]
 
 
-// [import:secureloot]
+import { installSecureLoot } from './secureloot.js';   // wave 2: secured containers + breaching tools
 
 
 export class Game extends Emitter {
@@ -277,7 +277,7 @@ export class Game extends Emitter {
     // [slot:boardgame]
 
 
-    // [slot:secureloot]
+    this.useModule('secureloot', installSecureLoot);
 
   }
 
