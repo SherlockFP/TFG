@@ -90,6 +90,9 @@ import { installLore } from './lore.js';
 // [import:bugfix]
 
 
+// [import:anomaly]
+
+
 export class Game extends Emitter {
   constructor({ engine, audio, settings, profile, ui, input, mods }) {
     super();
@@ -183,6 +186,9 @@ export class Game extends Emitter {
 
 
     // [slot:bugfix]
+
+
+    // [slot:anomaly]
 
   }
 
