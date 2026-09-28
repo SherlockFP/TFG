@@ -72,7 +72,7 @@ import { installWorldX } from './worldx.js';
 import { installFun } from './fun.js';
 
 
-// [import:brlevels]
+import { installBackroomsLevels } from './brlevels.js';
 
 
 // [import:backrooms]
@@ -232,7 +232,7 @@ export class Game extends Emitter {
     this.useModule('fun', installFun);
 
 
-    // [slot:brlevels]
+    this.useModule('brlevels', installBackroomsLevels);
 
 
     // [slot:backrooms]
