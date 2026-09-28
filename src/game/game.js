@@ -132,6 +132,7 @@ import { installMirror } from './mirror.js';   // [mirror] dimension (docs/wave2
 
 
 // [import:trade]
+import { installTrade } from './trade.js';
 
 
 // [import:boardgame]
@@ -289,6 +290,7 @@ export class Game extends Emitter {
 
 
     // [slot:trade]
+    this.useModule('trade', installTrade);
 
 
     // [slot:boardgame]

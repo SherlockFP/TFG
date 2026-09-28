@@ -275,6 +275,11 @@ mirror copy / zombie fodder waves (cap 50), XP crystals + 3-card level-ups (8 te
 THE MONETIZER (+1..+9, overclocks), Ascension Altar (tier up, workbench capped at Rare), Shard Exchange, 6 shard items + Backup Drive, weapon glow (+3/+5/+7/+9), creature tiers
 (Uncommon..Mythic: HP/dmg/XP mul on top of balance.scale, aura/nameplate, shard drops). Pure rules `src/game/enhance.js` + `node tools/harness/forge_rules.test.mjs`. Hooks in shared files are
 marked `[forge]`. Only node test + build + one smoke were run; `tools/harness/wave2_forge.js` is written but NOT run yet.
+### 5.13 Wave 2 - PLAYER TRADING + icons for every item (module `trade`, docs/wave2/trade.md)
+E on a crewmate (<= 4 m) / N / `/trade <name>` / terminal `TRADE` -> 10 s popup (N accept, M decline) -> CRT trade window (your inventory with generated icons, 9-slot offers + Clout, LOCK -> ACCEPT -> 3 s countdown, any change resets the locks, tooltips + comparison, TRADE COMPLETE).
+Host-authoritative atomic swap (`trade_core.js` pure rules + state machine, `trade_host.js`), net types `trreq/tracc/troff/trlock/trok/trcx/trca` + host `trs/trm/trc`; Clout debited by the giver's client, paid via the reward path (`Trade:` reason is exempt from the multiplier).
+Icons: `ui/icons.js` never leaves a blank icon (generated glyph fallbacks in `ui/iconatlas.js`, soft-cache retry, id-matching bug fixed), terminal `ICONAUDIT` / `game.trade.iconAudit()`. Verified: node test `tools/harness/trade.test.mjs` (86 checks), node --check, build, i18n audit for the trade files.
+NOT verified: any browser run (window layout, drag & drop, popup, glyph look, real 2-player P2P); `tools/harness/wave2_trade.js` is written but NOT run.
 ### 5.11 Localization wave (EN / TR / RU) — see docs/wave2/i18n.md
 `core/i18n.js` is multi-language (`t`, `tf` with `{x}` / `{@x}`, `L`, `sysMsg`, `addTranslations(map, lang = 'tr')`, `localizeDeep`);
 bulk dictionaries live in `src/i18n/tr_*.js` / `ru_*.js`; `src/i18n/display.js` localises item / creature / moon / ... names through

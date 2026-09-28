@@ -1352,6 +1352,9 @@ function unknownItem(k) {
   return { kind: 'unknown', center: true };
 }
 
+/** [trade] does models/items.js itself build this id? (module-registered models live in window.__kefalMods.itemModels) */
+export const hasItemModel = (id) => !!ITEMS[id];
+
 export const ITEM_MODEL_IDS = Object.freeze([
   // scrap
   'bolt', 'axle', 'bell', 'register', 'goldbar', 'duck', 'robot', 'lamp', 'canned', 'figurine', 'mug', 'teeth',

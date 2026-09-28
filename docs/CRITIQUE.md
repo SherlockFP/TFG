@@ -106,3 +106,8 @@ untested; rare drop rates (void chest 80 %, boss always, world 28 % per day) and
 The owner could not find a way to rename himself (a bare, unvalidated text box hid inside CHARACTER) and lobbies were anonymous. Now: PROFILE on the CRT menu,
 validated nickname, pixel / 3D-snapshot avatar with frames, shown in the lobby browser, TAB, chat, summary and above name tags. Honest gaps: never opened in a browser
 (layout, snapshot camera framing, pointer drawing, 2-player `pf` sync unverified), no avatars in the case-file panel, no gamepad drawing, slur list is deliberately small.
+
+## Wave 2 - player trading (module `trade`)
+- Built and node-tested (state machine, host flow with mock game, planner) but never seen in a browser: check the window at 1280x720, drag & drop, the tooltip comparison block, the popup keys N / M and the glyph icon drawings by eye.
+- Clout is trusted client-side (debit handshake); fine for co-op friends, not for strangers. No trade history / log panel, no trading over the terminal, no NPC / hub trading yet (hub planet idea in MASTERPLAN #13).
+- Icons: audit numbers (items without a model) still to be read from `ICONAUDIT`; glyph fallbacks are stop-gaps, the real fix is a model per item.
