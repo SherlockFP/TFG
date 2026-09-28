@@ -228,6 +228,11 @@ test, 2-tab hand playtest (§6-2), remaining BUGS.md items.
 - `facility.js generateLayout(seed, theme, size)`: unknown theme -> factory, size clamped 0.5..2.6 (MAX_FACILITY_SIZE), per-theme layout rules (plan rooms|wings|open, door/blast odds, loops, hub landmark room, room shapes), island repair (every cell reachable). Verified in node: 100 seeds x 8 themes x sizes 0.8-2.6, 0 failures.
 - Open: no true multi-level floors (2D nav grid). Breaker-room lamp bulbs still look lit while dark. Hazard feel/balance not yet playtested in the browser.
 
+### 5.9b Wave 2 - combat module (`src/game/combat*.js`, `spells_ext.js`, `role_skills.js`; details `docs/wave2/combat.md`; NOT hand-played)
+Melee combos + charged heavy + block / parry for every melee weapon (RMB hold = block, RMB tap = scan while a melee weapon is held), backstab, 6 new melee weapons, rocket /
+grenade launcher (rocket jump), SMG, rifle, Grav-Tool, spells ZAP / FROST / METEOR / DECOY / TOTEM, Blood Magic keystone in `magic.js`, role skills on **Y / U**. Net types `cb*`.
+The headless feature script `tools/harness/wave2_combat.js` exists but was not run.
+
 ### 5.10 Round 3 - content wave (11 builders, integrated; NOT yet browser-verified)
 - **Endless moons** `src/game/moongen.js`: every quota opens a new SECTOR of 3-5 generated moons (pure fn of run.runId + quotaIndex,
   registered into MOONS at `applyRunState` via `ensureSector`), 10 biomes (4 new in `world/outdoor_biomes.js`), map scale up to 1.5x,

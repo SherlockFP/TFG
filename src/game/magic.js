@@ -39,7 +39,16 @@ export const SPELL_ORDER = ['push', 'lumen', 'heal', 'pull', 'hush', 'blink', 's
 for (const sp of Object.values(SPELLS)) sp.tierName = sp.tier ? TIERS[sp.tier]?.name || sp.tier : 'Known';
 
 export const BASE_MANA = 100, BASE_REGEN = 2.5;   // mana / s
-const LEX = buildLexicon(Object.values(SPELLS));
+let LEX = buildLexicon(Object.values(SPELLS));
+/** Wave 2 (combat.js / spells_ext.js): add spells to the table. Data only - behaviour hooks come through game.magic.ext. */
+export function registerSpellData(list) {
+  for (const sp of list) {
+    if (SPELLS[sp.id]) continue;
+    SPELLS[sp.id] = { ...sp, tierName: sp.tier ? TIERS[sp.tier]?.name || sp.tier : 'Known' };
+    SPELL_ORDER.push(sp.id);
+  }
+  LEX = buildLexicon(Object.values(SPELLS));
+}
 const DEFAULT_KNOWN = ['push'];
 
 // ------------------------------------------------------------------ skillbooks (registered at import: chests / shops spawn by id)
@@ -183,6 +192,7 @@ export function installMagic(game) {
     offs: [], disposed: false, wheelOpen: false, voiceHeld: false, voiceWarned: false, castIn: new Map(),
     warpT: 0, warpSet: 0, burnAcc: 0,
   };
+  const EXT = new Map();   // wave 2 spell hooks: id -> { prep(fx, ctx) -> string|falsy, fx(d, local), host(d, from, eye, dir, pw) -> false|object, cost() }
   const scene = game.scene, audio = game.audio;
   const on = (ev, fn) => { const off = game.mods?.on?.(ev, fn); if (off) S.offs.push(off); };
   registerBookModels(game.mods);
@@ -195,7 +205,8 @@ export function installMagic(game) {
   const profile = () => game.profile;
   const knows = (id) => DEFAULT_KNOWN.includes(id) || (Array.isArray(profile()?.spells) && profile().spells.includes(id));
   const cooldownOf = (id) => (SPELLS[id]?.cd || 0) * (1 - clamp(bonus('cooldown'), 0, 0.5));
-  const costOf = (id) => SPELLS[id]?.mana || 0;
+  const bloodMagic = () => { try { return !!game.rpg?.has?.('bloodmagic'); } catch { return false; } };   // keystone: spells cost Health, no mana
+  const costOf = (id) => EXT.get(id)?.cost?.() ?? (SPELLS[id]?.mana || 0);
   const cooldownLeft = (id) => Math.max(0, (S.cds.get(id) || 0) - game.time);
   const cooldownFrac = (id) => { const l = cooldownLeft(id); return l > 0 ? clamp(l / Math.max(0.01, cooldownOf(id)), 0, 1) : 0; };
   const sayWord = (id) => (getLang() === 'tr' ? SPELLS[id].say.tr : SPELLS[id].say.en);
@@ -279,7 +290,8 @@ export function installMagic(game) {
     const cdl = cooldownLeft(id);
     if (cdl > 0) { if (source !== 'voice') sfx('spell_fizzle', 0.3); dock?.note(`${t(sp.name)}: ${cdl.toFixed(1)}s`); return { ok: false, reason: 'cooldown', left: cdl }; }
     const cost = costOf(id);
-    if (S.mana < cost) { dock?.lowMana(); return fizzle('Not enough mana.', 'mana'); }
+    const blood = bloodMagic(), hpCost = blood ? Math.ceil(cost * 0.5) : 0;
+    if (blood ? p.hp <= hpCost + 2 : S.mana < cost) { dock?.lowMana(); return fizzle(blood ? 'Too weak to pay the blood price.' : 'Not enough mana.', 'mana'); }
     const { eye, dir } = eyeDir();
     const pw = power();
     const fx = { k: 'spell', s: id, c: game.selfId, p: arr3(eye), d: [+dir.x.toFixed(3), +dir.y.toFixed(3), +dir.z.toFixed(3)], pw: +pw.toFixed(2), src: source[0], w: String(opts.word || sayWord(id)).slice(0, 16) };
@@ -310,8 +322,11 @@ export function installMagic(game) {
       fx.dur = sp.dur;
     } else if (id === 'fire') {
       fx.f = Math.random().toString(36).slice(2, 9);
+    } else if (EXT.has(id)) {
+      const r = EXT.get(id).prep?.(fx, { eye, dir, pw, p, source });
+      if (r) return fizzle(typeof r === 'string' ? r : null, 'blocked');
     }
-    S.mana -= cost;
+    if (blood) { p.hp -= hpCost; game.net?.send?.('pst', { hp: Math.round(p.hp) }); game.engine.hurt?.(0.3); } else S.mana -= cost;
     S.cds.set(id, game.time + cooldownOf(id));
     game.swingAnim = Math.max(game.swingAnim || 0, 0.7);   // arm gesture (also replicated to the avatar)
     applyFx(fx, true);
@@ -448,7 +463,7 @@ export function installMagic(game) {
       case 'fireboom': fireboom(d); break;
       case 'burn': if (typeof d.cid === 'string') S.burnFx.set(d.cid, game.time + clamp(Number(d.t) || 3, 0, 8)); break;
       case 'slam': if (p) { burst(p, 'slam', null, 1); sfxAt('spell_slam', p, 1, 4); shakeBy(p, 0.25, 12); } break;
-      default: break;
+      default: EXT.get(d.s)?.fx?.(d, local); break;
     }
     // everyone else sees the incantation over the caster's head
     if (!local && sp && d.c && d.c !== game.selfId) {
@@ -685,6 +700,7 @@ export function installMagic(game) {
     if (d.s === 'push' && dir) hostPush(from, eye, dir, pw);
     else if (d.s === 'hush') S.hHush.set(from, game.time + sp.dur);
     else if (d.s === 'fire' && dir && d.f) S.hProj.push({ fid: String(d.f).slice(0, 12), pos: eye.clone().addScaledVector(dir, 0.6), vel: dir.clone().multiplyScalar(24), t: 0, from, pw });
+    else if (EXT.has(d.s)) { const r = EXT.get(d.s).host?.(d, from, eye, dir, pw); if (r === false) return; if (r && typeof r === 'object') Object.assign(d, r); }
     const out = { ...d, k: 'spell', c: from, p: arr3(eye) };
     delete out.a;
     game.net.broadcast('fx', out);
@@ -1022,6 +1038,11 @@ export function installMagic(game) {
   const api = {
     SPELLS, ORDER: SPELL_ORDER, SKILLBOOK_IDS, game,
     worldBooks: true,
+    /** wave 2 hooks (spells_ext.js): EXT.set(id, { prep, fx, host, cost }); kit = the VFX helpers of this module */
+    ext: EXT,
+    kit: { ringFx, coneFx, beamFx, burst, shakeBy, sfx, sfxAt, addMesh, killMesh, anim, warp },
+    get bloodMagic() { return bloodMagic(); },
+    hpCost: (id) => Math.ceil(costOf(id) * 0.5),
     get mana() { return S.mana; }, set mana(v) { S.mana = clamp(Number(v) || 0, 0, maxMana()); },
     get maxMana() { return maxMana(); },
     get shieldHp() { return S.shieldHp; }, get shieldMax() { return S.shieldMax; }, get hushT() { return S.hushT; },

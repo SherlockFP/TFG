@@ -71,3 +71,7 @@ hallucinations are audio only; Decon booth placement in the ship unchecked visua
 Added: +1..+9 enhancement with a juicy machine sequence, overclocks, tier ascension, shards from every creature tier, creature tiers with auras.
 Risks: everything visual (machine sequence, camo shader, nameplates) is unverified in a real browser; creature tier damage x4 (Mythic) may spike; forge stations placed blind next to the sell counter;
 overclock effects (shock / burn / vamp) untested with 2 real players; economy: shard drop rates and credit costs are design numbers, not playtested.
+## Wave 2 - combat module (added blind, budget-capped session)
+Melee combos / heavy / block-parry, 6 melee + 5 tech weapons (rocket jump, grenades, grav tool), 5 spells, Blood Magic and 12 role skills were added
+(`docs/wave2/combat.md`). **Feel is unverified**: arcs / guard poses / hit timing were tuned by numbers only, `tools/harness/wave2_combat.js` has not been run and
+nothing was hand-played. RMB is now block-hold / scan-tap while a melee weapon is held - check that this feels right before shipping.
