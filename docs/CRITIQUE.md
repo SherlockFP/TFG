@@ -63,3 +63,7 @@ Evidence: smoke_land 0 errors on 3 moons, vite build OK, node checks (tree 1913,
 | Stability | 7.5 | wrappers audited (no double multipliers, no id clashes) | old-save migration test |
 | Performance | 6 | unmeasured; one 7 MB main chunk | code-split, dc in facility |
 | Multiplayer | 4 | client-trusted values, no 2-peer test of wave 1 | mp2 run + hardening |
+
+## Wave 2 - ANOMALY (STATIC / mutations / dice / power-ups)
+Built per MASTERPLAN #23 (docs/wave2/anomaly.md). Honest gaps: nothing hand-played, feature script written but never run (budget freeze), only node-model numbers for exposure pacing;
+hallucinations are audio only; Decon booth placement in the ship unchecked visually; 2-player paths untested. Risk to watch: three writers of `engine.fx.noise/warp` (creatures, stun, anomaly).

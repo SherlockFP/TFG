@@ -91,7 +91,7 @@ import { installFun } from './fun.js';
 import { installBugfix } from './bugfix.js';
 
 
-// [import:anomaly]
+import { installAnomaly } from './anomaly.js';
 
 
 // [import:forge]
@@ -202,7 +202,7 @@ export class Game extends Emitter {
     this.useModule('bugfix', installBugfix);
 
 
-    // [slot:anomaly]
+    this.useModule('anomaly', installAnomaly);
 
 
     // [slot:forge]

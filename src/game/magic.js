@@ -275,6 +275,7 @@ export function installMagic(game) {
     if (!knows(id)) return fizzle("You don't know that spell yet. Find its skillbook.", 'not-known');
     const p = game.player;
     if (!game.net || !game.run || !p || p.dead || S.disposed) return { ok: false, reason: 'unavailable' };
+    if (source === 'voice' && game.anomaly?.muted?.()) return fizzle('Muted: voice spells are disabled for now.', 'muted');   // ANOMALY: Mute mutation
     const cdl = cooldownLeft(id);
     if (cdl > 0) { if (source !== 'voice') sfx('spell_fizzle', 0.3); dock?.note(`${t(sp.name)}: ${cdl.toFixed(1)}s`); return { ok: false, reason: 'cooldown', left: cdl }; }
     const cost = costOf(id);
