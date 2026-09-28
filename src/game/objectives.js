@@ -94,6 +94,7 @@ export class Objectives {
       default: break;
     }
     if (run.phase !== 'moon') this.enteredToday = false;
+    try { g.mods?.emit('objectives', add, g, run.phase); } catch (e) { console.warn('objectives hook', e); }   // wave-1 modules add lines here
     for (const b of (g.profile.bounties || []).slice(0, 3)) add(`${b.done ? '✔ ' : ''}${bountyText(b)} ${b.done ? t('(claim at HQ)') : `${Math.min(b.progress, b.n)}/${b.n}`}`, 'bounty', b.done, b.n ? Math.min(1, b.progress / b.n) : 0);
     return out;
   }

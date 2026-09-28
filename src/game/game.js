@@ -41,6 +41,31 @@ import { installLootFx } from './loot.js';
 import { installShipFeatures } from './shipfeatures.js';
 import { installMeta } from './prestige.js';
 import { installCruiser } from '../entities/cruiser.js';
+import './components.js';
+import { setDocksVisible } from '../ui/dock.js';   // shared crafting components (registered at import)
+// ---- WAVE 1 module imports: one line per module, keep the blank separator lines (avoids merge conflicts) ----
+// [import:inventory]
+
+// [import:facilitysys]
+
+// [import:balance]
+
+// [import:magic]
+
+// [import:rpg]
+
+// [import:shop]
+
+// [import:crafting]
+
+// [import:lore]
+
+// [import:horde]
+
+// [import:worldx]
+
+// [import:fun]
+
 
 export class Game extends Emitter {
   constructor({ engine, audio, settings, profile, ui, input, mods }) {
@@ -90,6 +115,30 @@ export class Game extends Emitter {
     try { this.meta = installMeta(this); } catch (e) { console.warn('meta layer', e); this.meta = null; }   // codex, daily events, weekly challenge, rebirth, crew, Service Record (J)
     try { this.shipFeatures = installShipFeatures(this); } catch (e) { console.warn('ship features', e); this.shipFeatures = null; }
     try { this.cruiser = installCruiser(this); } catch (e) { console.warn('cruiser', e); this.cruiser = null; }
+    // ---- WAVE 1 modules (docs/MASTERPLAN.md): this.useModule(name, installFn) stores game[name], disposes on destroy ----
+    this.wave1 = [];
+    // [slot:inventory]
+
+    // [slot:facilitysys]
+
+    // [slot:balance]
+
+    // [slot:magic]
+
+    // [slot:rpg]
+
+    // [slot:shop]
+
+    // [slot:crafting]
+
+    // [slot:lore]
+
+    // [slot:horde]
+
+    // [slot:worldx]
+
+    // [slot:fun]
+
   }
 
   get stats() {
@@ -728,6 +777,7 @@ export class Game extends Emitter {
     this.ui.hud?.update(dt, this);
     this.pings?.update(dt);
     this.objectives.update(dt);
+    setDocksVisible(!this.ui.hud?.el.classList.contains('hidden'));
   }
 
   // Falls that should never be deaths: the Company harbour (no sea collider) and the void under the ship in
@@ -908,8 +958,16 @@ export class Game extends Emitter {
     setTimeout(() => { this.engine.fadeTarget = 0; }, 6500);
   }
 
+  /** Install a self-contained feature module: fn(game) -> api with optional dispose(). Errors never break the game. */
+  useModule(name, fn) {
+    try { this[name] = fn(this) || null; if (this[name]) this.wave1.push(name); }
+    catch (e) { console.warn('module ' + name, e); this[name] = null; }
+    return this[name];
+  }
+
   destroy() {
     clearTimeout(this.joinTimeout); clearTimeout(this._pwErrTimer);
+    for (const n of (this.wave1 || []).reverse()) { try { this[n]?.dispose?.(); } catch (e) { console.warn('dispose', n, e); } this[n] = null; }
     this.achievements?.dispose();
     this.meta?.dispose(); this.meta = null;
     this.director?.dispose(); this.director = null;
