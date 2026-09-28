@@ -148,6 +148,7 @@ import { installCreatureEmotes } from './cemotes.js';
 
 
 // [import:pets]
+import { installPets } from './pets.js';
 
 
 export class Game extends Emitter {
@@ -302,6 +303,7 @@ export class Game extends Emitter {
 
 
     // [slot:pets]
+    this.useModule('pets', installPets);
 
   }
 
