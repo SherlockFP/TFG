@@ -78,10 +78,18 @@ export class LocalTransport extends BaseTransport {
       if (m.t === 'bin') this.onBinary?.(m.d, m.from, m.meta);
     };
     this.ch.postMessage({ t: 'hello', from: this.selfId });
+    let prevBeat = performance.now();
     this.hb = setInterval(() => {
       this.ch?.postMessage({ t: 'hb', from: this.selfId });
       const now = performance.now();
-      for (const id of [...this.peers]) if (now - (this.last.get(id) || 0) > 5000) { this.peers.delete(id); this.onPeerLeave?.(id); }
+      // This tab was blocked (a moon loading / world gen) or throttled (hidden tab): the heartbeats that arrived meanwhile are still
+      // queued behind this timer task, so `last` is stale through no fault of the peer. Give everybody a fresh window instead of
+      // evicting the host ("The host has left. Session ended.").
+      const stalled = now - prevBeat > 2500;
+      prevBeat = now;
+      if (stalled) { for (const id of this.peers) this.last.set(id, now); return; }
+      // 15 s: the peer's OWN tab can be busy for many seconds while it builds a moon (a real leave sends 'bye' immediately)
+      for (const id of [...this.peers]) if (now - (this.last.get(id) || 0) > 15000) { this.peers.delete(id); this.onPeerLeave?.(id); }
     }, 1000);
     this._unload = () => this.leave();
     window.addEventListener('beforeunload', this._unload);

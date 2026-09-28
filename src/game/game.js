@@ -88,6 +88,7 @@ import { installCrafting } from './crafting.js';
 
 
 // [import:bugfix]
+import { installBugfix } from './bugfix.js';
 
 
 export class Game extends Emitter {
@@ -183,6 +184,7 @@ export class Game extends Emitter {
 
 
     // [slot:bugfix]
+    this.useModule('bugfix', installBugfix);
 
   }
 

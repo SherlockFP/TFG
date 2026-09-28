@@ -155,6 +155,8 @@ export const hostMethods = {
       // (the host's own prediction already marked it held by the host)
       if (!it || it.carrier || (it.state !== 'world' && it.holder !== from)) { fail(); return; }
       if (it.owner && it.owner !== from) { fail(); return; }
+      // one body per carrier (a second pick is refused; the client answers with a toast before it ever asks)
+      if (it.type === 'body' && [...this.items.all()].some((o) => o !== it && o.type === 'body' && o.holder === from)) { fail(); return; }
       // distance check against the last position the client REPORTED (the damped avatar lags behind after teleports)
       const rr = from === this.selfId ? null : this.remotes.get(from);
       const p = from === this.selfId ? this.player.pos : (rr && rr.lastUpdate ? rr.target : null);
@@ -177,7 +179,7 @@ export const hostMethods = {
     });
     H('grab', (d, from) => {
       const it = this.items.get(d.id);
-      if (!it || it.state !== 'world' || (it.owner && it.owner !== from) || it.carrier) return;
+      if (!it || it.state !== 'world' || (it.owner && it.owner !== from) || it.carrier || it.type === 'body') return;   // bodies are carried in the hands, never beamed (they would be left behind at every door)
       const p = it.obj.position, q = it.obj.quaternion;
       this.net.broadcast('it', { e: 'own', id: it.id, o: from, p: [p.x, p.y, p.z], q: [q.x, q.y, q.z, q.w] });
       it.lastHolder = from;
@@ -390,7 +392,9 @@ export const hostMethods = {
     let fines = 0;
     if (!moon.company) {
       for (const dd of deaths) {
-        const bodyInShip = shipItems.some((it) => it.type === 'body' && it.label === dd.name);
+        // a body still in the carrier's hands counts as delivered when the carrier is aboard
+        const bodyInShip = shipItems.some((it) => it.type === 'body' && it.label === dd.name)
+          || [...this.items.all()].some((it) => it.type === 'body' && it.label === dd.name && it.holder && aboard.some((p) => p.id === it.holder));
         fines += Math.round(run.credits * (bodyInShip ? 0.05 : 0.15));
       }
       fines = Math.min(fines, run.credits);

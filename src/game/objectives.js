@@ -80,7 +80,11 @@ export class Objectives {
             }
           }
         }
-        for (const it of g.items.all()) if (it.type === 'body' && it.state === 'world' && !insideShip(it.obj.position)) { add(tf("Recover {name}'s body (smaller fine)", { name: it.label || t('a crewmate') }), 'sub'); break; }
+        for (const it of g.items.all()) {
+          if (it.type !== 'body') continue;
+          if (it.holder === g.selfId) { if (!insideShip(p.pos)) { add(tf("Carry {name}'s body to the ship (smaller fine)", { name: it.label || t('a crewmate') }), 'sub'); break; } }
+          else if (it.state === 'world' && !insideShip(it.obj.position)) { add(tf("Recover {name}'s body (smaller fine)", { name: it.label || t('a crewmate') }), 'sub'); break; }
+        }
         break;
       }
       case 'takeoff': add(t('Taking off...'), 'hint'); break;
