@@ -50,7 +50,7 @@ import { setDocksVisible } from '../ui/dock.js';   // shared crafting components
 
 // [import:balance]
 
-// [import:magic]
+import { installMagic } from './magic.js';
 
 // [import:rpg]
 
@@ -123,7 +123,7 @@ export class Game extends Emitter {
 
     // [slot:balance]
 
-    // [slot:magic]
+    this.useModule('magic', installMagic);
 
     // [slot:rpg]
 
