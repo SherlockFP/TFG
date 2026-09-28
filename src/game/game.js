@@ -52,7 +52,7 @@ import { setDocksVisible } from '../ui/dock.js';   // shared crafting components
 
 // [import:magic]
 
-// [import:rpg]
+import { installRpg } from './rpg.js';
 
 // [import:shop]
 
@@ -125,7 +125,7 @@ export class Game extends Emitter {
 
     // [slot:magic]
 
-    // [slot:rpg]
+    this.useModule('rpg', installRpg);
 
     // [slot:shop]
 

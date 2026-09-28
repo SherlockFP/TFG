@@ -1,14 +1,41 @@
 // Personal progression runtime: XP / levels / skill points / mastery / rebirth / coins / bounties / bestiary / stats.
 import { saveProfile } from '../core/save.js';
 import {
-  xpForLevel, MAX_LEVEL, REBIRTH_LEVEL, rankOf, dailyBounties, SKILL_CAP, MASTERY, masteryBlock, masteryRank,
+  xpForLevel, MAX_LEVEL, REBIRTH_LEVEL, rankOf, dailyBounties, SKILL_CAP, SKILLS, MASTERY, masteryBlock, masteryRank,
   applyRebirth, canRebirth, metaMultipliers, prestigeStars, migrateXpCurve,
 } from './progression.js';
+import { ROLES, NODE, TREE_VERSION, nodeCost, pruneState } from './passivetree.js';
 import { CREATURES } from './creatures.js';
 
 // Rewards that are already "final" numbers: never multiplied by stars / mastery / events / crew.
 const FLAT_REASONS = /^(Achievement|Daily login|Codex|Weekly|Rebirth|Bounty)/i;
 const CREW_XP_CAP = 25;       // crew level N gives +N% XP, capped
+
+/**
+ * Passive-tree state of a profile (profile.rpg, see passivetree.js). Idempotent. On the FIRST call for an old save the
+ * six legacy base skills are refunded into skill points (r.migrated remembers the amount so the game can announce it) -
+ * the tree now sells the same effects. Unknown / disconnected nodes (tree edits between versions) are refunded too.
+ */
+export function ensureRpgProfile(p) {
+  if (!p) return p;
+  const r = p.rpg && typeof p.rpg === 'object' && !Array.isArray(p.rpg) ? p.rpg : (p.rpg = {});
+  if (!p.skills || typeof p.skills !== 'object' || Array.isArray(p.skills)) p.skills = {};
+  if (typeof p.skillPoints !== 'number' || !isFinite(p.skillPoints)) p.skillPoints = 0;
+  if (!r.v) {
+    let refund = 0;
+    for (const k of Object.keys(p.skills)) { refund += Math.max(0, Math.floor(Number(p.skills[k]) || 0)); p.skills[k] = 0; }
+    for (const k of Object.keys(SKILLS)) if (p.skills[k] === undefined) p.skills[k] = 0;
+    p.skillPoints += refund;
+    r.v = TREE_VERSION;
+    if (refund > 0) r.migrated = { skills: refund, at: Date.now(), shown: false };
+  }
+  if (!ROLES[r.role]) r.role = null;
+  if (!Array.isArray(r.nodes)) r.nodes = [];
+  if (!r.kit || typeof r.kit !== 'object' || Array.isArray(r.kit)) r.kit = {};
+  const removed = pruneState(r);
+  for (const id of removed) p.skillPoints += NODE[id] ? nodeCost(NODE[id]) : 1;
+  return p;
+}
 
 /** Normalise the fields the meta layer adds to a profile (idempotent; old saves get defaults). */
 export function ensureMetaProfile(p) {
@@ -27,6 +54,7 @@ export function ensureMetaProfile(p) {
   // safety net only: migrateXpCurve already scaled banked XP below the requirement, so nothing re-levels on load
   while (p.level < MAX_LEVEL && p.xp >= xpForLevel(p.level)) { p.xp -= xpForLevel(p.level); p.level += 1; p.skillPoints += 1; }
   if (p.level >= MAX_LEVEL) p.xp = Math.min(p.xp, xpForLevel(MAX_LEVEL));
+  ensureRpgProfile(p);
   return p;
 }
 
@@ -105,6 +133,8 @@ export class Progress {
   }
   allocate(skill) {
     const p = this.p;
+    // legacy base skills were replaced by the passive tree (K): refuse instead of silently re-spending into a dead system
+    if (p.rpg?.v) { this.game.ui?.toast?.('Skills moved to the Passive Tree - press K.', 'info'); return false; }
     if (p.skillPoints <= 0 || (p.skills[skill] || 0) >= SKILL_CAP) return false;
     p.skills[skill] = (p.skills[skill] || 0) + 1;
     p.skillPoints -= 1;

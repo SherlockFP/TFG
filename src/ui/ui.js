@@ -16,6 +16,7 @@ import { CREATURES } from '../game/creatures.js';
 import { GAME_VERSION } from '../net/lobby.js';
 import { renderAchievementsPanel } from '../game/achievements.js';
 import { createServiceRecord } from './panels/record.js';
+import { decorateSkills } from './panels/passivetree.js';
 import { getCharPreview, peekCharPreview, CharPreview } from './charpreview.js';
 
 const LOGO = `<div class="logo"><div class="logo-main">TFG</div><div class="logo-long">TOTALLY FUCKED GAME</div><div class="logo-fish">(( ◉ ))</div><div class="logo-sub">"Engagement is love."</div></div>`;
@@ -603,6 +604,7 @@ export class UI {
         plus.dataset.nav = 'sk:' + id;
         skills.appendChild(el('div', { class: 'skill-row', title: sk.desc }, el('span', { class: 'sk-name' }, `${sk.short}`), el('span', { class: 'sk-bar' }, el('span', { style: { width: (v / SKILL_CAP * 100) + '%' } })), el('span', { class: 'sk-v' }, String(v)), plus, el('span', { class: 'sk-desc' }, sk.desc)));
       }
+      decorateSkills(skills, p, this);   // [rpg] legacy skill rows -> role + PASSIVE TREE [K] buttons (ui/panels/passivetree.js)
       const statsBox = el('div', { class: 'statbox' },
         el('div', {}, `HP ${st.maxHp} · Stamina ${st.maxStamina} · Armor ${Math.round(st.armor * 100)}%`),
         el('div', {}, `Melee ×${st.meleeMul.toFixed(2)} · Crit ${Math.round(st.crit * 100)}% · Speed ×${st.speedMul.toFixed(2)}`),
