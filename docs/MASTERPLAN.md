@@ -183,10 +183,10 @@ FİKİR → LLM (kısıtlar + mevcut içerik listesi) → SPEC JSON (map/creatur
 - Oyun içi karşılığı: **The Algorithm** = runtime Director; offline karşılığı = içerik üretim hattı.
 
 ## 6. Model kullanım politikası (geliştirme)
-- **Opus 5.5** (`.claude/agents/tfg-architect.md`): mimari, ağ-hassas host mantığı, AI davranışları,
-  envanter/state makineleri, lore/director.
-- **Sonnet 5.5** (`.claude/agents/tfg-builder.md`, `tfg-qa.md`): içerik, silah/kozmetik/shop, paneller,
-  denge geçişleri, QA/playtest.
+- **Varsayılan: Sonnet 5.5** (sahibin isteği: "sonnetler daha fazla olsun"). İçerik, özellik, panel, denge,
+  bug fix, QA/playtest, doğrulama ve fix turları Sonnet ile yapılır (`.claude/agents/tfg-builder.md`, `tfg-qa.md`).
+- **Opus 5.5** sadece gerçekten zor işler için (`.claude/agents/tfg-architect.md`): ağ-hassas host mimarisi,
+  büyük state makineleri, birden fazla sistemi kesen tasarım kararları. Hedef oran: ajanların ≥%70'i Sonnet.
 - Paralel ajanlar ayrı git worktree'lerinde çalışır; `game.js` içindeki `// [slot:x]` / `// [import:x]` satırları
   sayesinde merge çakışması olmaz. Headless test: `flock /tmp/tfg-browser.lock node tools/harness/headless.mjs`.
 
