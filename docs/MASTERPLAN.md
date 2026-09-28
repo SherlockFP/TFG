@@ -390,3 +390,37 @@ büyük gemi = daha çok SIEGE hedef yüzeyi. Böylece "her şeyi al" değil "ek
 **Teknik:** `ship.js` çekirdek + `shipyard.js` modül yerleşimi; tüm modüllerin eşyaları (workbench, kiosk, ayna,
 lore panosu, decon, fault istasyonları) **anchor registry** (`game.ship.anchors`) üzerinden yerleşir, sabit koordinat
 yok; modül kurulumu host-authoritative, run save'e yazılır, late join senkron.
+
+## 14. SECTOR CYCLE — 3 gün + BOSS (ana döngü, tasarım)
+
+```
+GÜN 1 → GÜN 2 → GÜN 3 (HQ'da sat, kotayı doldur)
+   → "SECTOR GATE OPEN" → BOSS GÜNÜ: Sector Core'a iniş (zaman baskısı yok, ama Threat hızlı artar)
+       → 2-3 kanat: elite yaratıklar + kilitli kapılar (anahtarlar mini-boss'lardan) + 1 kısa bulmaca
+       → BOSS ARENASI (temaya uygun) → boss yenildi → BOSS SANDIĞI + extraction
+   → yeni sektör: daha zor aylar, daha iyi loot, yeni kota
+```
+- **Kota dolmazsa:** eski sistem (fired / run reset) aynen kalır.
+- **Boss kaybedilirse (herkes ölür / çekilirsiniz):** hurda kaybı yok (sattınız), bir **grace day** kazanılır (1 günlük
+  ekstra toplama, kota yok), sonra tekrar boss. 2. kayıp → sektör yine ilerler ama boss sandığı yok, fraksiyon
+  itibarı düşer, "SHAMEFUL EXIT" CASE kaydı. Böylece asla kilitlenme olmaz.
+- **Sector Core haritası:** o sektördeki ayların baskın iç mekân temasıyla üretilir (seeded), boss arenası temaya özel:
+| Tema | Boss | Mekanik fikri |
+|---|---|---|
+| factory | **The Foreman** (var) | slam telegraph, konveyör tuzakları |
+| serverfarm | **The Load Balancer** | hasarı en düşük canlı oyuncuya "dağıtır"; sunucu raflarını kapatınca zayıflar |
+| office | **Middle Manager** | "toplantı" çağırır — herkes bir noktada toplanmazsa ceza; kağıt kalkanları |
+| backrooms | **The Lobby Manager** | arena seviye değiştirir (Level 0 → Poolrooms → Level !), ışıkları kapatır |
+| hospital | **The Head Surgeon** | oyuncuyu "ameliyat masasına" çeker; arkadaş kurtarmalı |
+| sewer | **Comment Section Hydra** | kesilen her kafa 2 "reply" doğurur; kökü yakmak gerekir |
+| mansion | **The Host** | NPC gibi davranır, güven kazanınca saldırır; aynalar arası ışınlanır |
+| mineshaft | **The Excavator** | doğrudan savaş yok: maden sistemini (vinç/ray/patlayıcı) kullanarak devir |
+| (her 5. sektör) | **Legacy Bot** (var) | world boss |
+- **Boss sandığı:** garanti Legendary+ item, shard'lar (Algorithm Fragment / Source Code), gemi parçası (§13), boss
+  trophy (Trophy Hall), ilk öldürmede kozmetik. Loot kalitesi sektörle artar.
+- **Ölçek:** boss HP = taban × (1 + 0.35 × sektör) × oyuncu sayısı çarpanı (1 / 1.6 / 2.1 / 2.5); mekanikler 3. sektörden
+  sonra ikinci faz kazanır.
+- **UI:** kota ekranı "SECTOR GATE OPEN" sinematiği, terminal `CORE` komutu (boss bilgisi, önerilen seviye), boss can
+  barı + faz göstergesi, zafer sonrası "SECTOR CLEARED" + CASE kaydı.
+- **Teknik:** host phase akışına `core` fazı (landing → core → takeoff), `moongen` sektör başına `coreMoon`, bosses.js
+  kayıt API'siyle yeni boss'lar (her biri kendi dosyası), facility generator'a `layout.plan = 'core'` (kanatlar + arena).
