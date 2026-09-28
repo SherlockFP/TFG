@@ -141,7 +141,7 @@ import { installCreatureEmotes } from './cemotes.js';
 // [import:maps2]
 
 
-// [import:food]
+import { installFood } from './food.js';   // wave 2: food & drinks (buffs, booze, cheers, ship table)
 
 
 export class Game extends Emitter {
@@ -289,7 +289,7 @@ export class Game extends Emitter {
     // [slot:maps2]
 
 
-    // [slot:food]
+    this.useModule('food', installFood);
 
   }
 

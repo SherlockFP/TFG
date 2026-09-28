@@ -87,3 +87,6 @@ Honest gaps: never played by hand in a browser (avatar strap poses, arm animatio
 harmonica / bongos / kazoo / theremin, rhythm-game guide, busker hat and creature dancing were cut for budget. See `docs/wave2/music.md`.
 ## Wave 2 - creature emotes (module cemotes, docs/wave2/cemotes.md)
 Creatures emote (idle / victory + chat line + victim camera) and react to player emotes (dance-along pacifies swarm/partygoer types 4-8 s, taunts enrage predators, mimics copy, shy types flee). Risks: taunt-enrage and the dance-along freeze are balance levers tuned by numbers only; bubble legibility in dark interiors and the killer-focus camera feel are unverified; the freeze (host AI skipped via stunT) also pauses a creature's detection for its emote length.
+
+## Food & drinks (wave 2, module `food`)
+Added optional buffs + social fun (cheers, cake, table, booze). Unverified in a browser: first-person eat arcs, blur overlay, table / machine placement. Booze courage only touches STATIC; no chat bubbles exist to slur yet.
