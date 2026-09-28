@@ -123,7 +123,7 @@ import { installCreatureEmotes } from './cemotes.js';
 import { installDurability } from './durability.js';   // [durability]
 
 
-// [import:mirror]
+import { installMirror } from './mirror.js';   // [mirror] dimension (docs/wave2/mirror.md)
 
 
 // [import:avatar2]
@@ -280,7 +280,7 @@ export class Game extends Emitter {
     this.useModule('durability', installDurability);   // [durability]
 
 
-    // [slot:mirror]
+    this.useModule('mirror', installMirror);
 
 
     // [slot:avatar2]

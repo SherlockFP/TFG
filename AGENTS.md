@@ -255,6 +255,11 @@ STATIC exposure per player (hot rooms / hot items / breach; Buzzing 25, Glitchin
 Verified: node test (`tools/harness/anomaly_core.test.mjs`), build, smoke_land. NOT hand-played; `tools/harness/wave2_anomaly.js` was written but not executed (budget freeze).
 ### 5.13 Wave 2 - CREATURE EMOTES (module `cemotes`, docs/wave2/cemotes.md)
 Every creature emotes (body language layer + internet-style bubble), gloats after killing a player (chat line + victim camera on the killer) and reacts to player emotes by personality (dance-along = safe passage, taunt = enrage, mimic copies, shy flees, bosses laugh). Net type `ce` (HOST_ONLY). Only game.js slot lines are shared. Verified: `node tools/harness/cemotes.test.mjs` (data + fake-game simulation), build, one headless run (`wave2_cemotes.js`); NOT hand-played.
+### 5.13 Wave 2 - MIRROR DIMENSION (module `mirror`, docs/wave2/mirror.md; node-tested + builds, NOT run in a browser)
+~25% of outdoor maps from sector 1 carry a portal mirror (E to step in / out). Inside: host-owned membership, flipped screen + mirrored A/D / mouse X, dark ASCII post look (own shader program, safe fallback), wraith / flame fiend /
+mirror copy / zombie fodder waves (cap 50), XP crystals + 3-card level-ups (8 temporary upgrades), Reflection Meter -> chests + power-ups. Owner rules: 3:00 countdown then OVERTIME (+1 level / 20 s), a death = sit out one round
+(respawn while a crewmate inside lives), everyone inside dead = SHATTERED (real death), day end = lost in the reflection. Hooks: game.js slots + 6 `[mirror]` lines in engine.js; the rest are instance wraps. `tools/harness/mirror.test.mjs` PASS.
+
 ### 5.11 Wave 2 - HQ FORGE (module `forge`, see docs/wave2/forge.md)
 THE MONETIZER (+1..+9, overclocks), Ascension Altar (tier up, workbench capped at Rare), Shard Exchange, 6 shard items + Backup Drive, weapon glow (+3/+5/+7/+9), creature tiers
 (Uncommon..Mythic: HP/dmg/XP mul on top of balance.scale, aura/nameplate, shard drops). Pure rules `src/game/enhance.js` + `node tools/harness/forge_rules.test.mjs`. Hooks in shared files are

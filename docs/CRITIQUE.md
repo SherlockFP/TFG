@@ -94,3 +94,7 @@ Creatures emote (idle / victory + chat line + victim camera) and react to player
 ## Wave 2 - SKELETONS + tier looks
 Added: 4 skeleton creatures (collapse/rebuild/smash, wind-up archer, shield knight, skull-hand swarm) with deleted-user tags, and a generic client tier look layer (colour + armour per tier for all creatures).
 Risks: collapse / rise / guard / stagger poses and the username tag glitch were never looked at; Common skeletons read dark in fog; Mythic shader cost on many creatures unmeasured (SwiftShader 1.7 s/frame for the whole 30-creature scene); the Knight block is 85 % damage reduction and a Walker effectively has two lives, so early-sector time-to-kill is untested; zombot (instanced) cannot show gear.
+## Wave 2 - MIRROR DIMENSION (module `mirror`, node-tested only)
+Portal mirror on ~25% of outdoor maps (sector 1+), a flipped / ASCII / dark dimension with Vampire-Survivors waves, XP crystals, 8 temporary upgrades, Reflection Meter chests + power-ups, a 3:00 countdown with overtime,
+cracked-reflection respawns and a SHATTERED wipe (`docs/wave2/mirror.md`). Honest gaps: never run in a browser (the dimension shader is a separate program with a safe fallback, but its look, the portal placement / colliders, model proportions,
+card layout, dash feel and every 2-player path are unverified); some creature behaviours read `aiPlayers()` directly and might still notice players in the other dimension; world-projected DOM labels are not mirrored; numbers are design values.
