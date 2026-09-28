@@ -130,6 +130,7 @@ import { installGameplay2 } from './gameplay2.js';
 
 
 // [import:trade]
+import { installTrade } from './trade.js';
 
 
 export class Game extends Emitter {
@@ -266,6 +267,7 @@ export class Game extends Emitter {
 
 
     // [slot:trade]
+    this.useModule('trade', installTrade);
 
   }
 

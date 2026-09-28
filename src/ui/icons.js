@@ -10,8 +10,9 @@
 //       typeFromName(name) -> item id for a display name (scan labels / sale lists only carry names)
 //  2) Pixel-art UI glyphs (12x12 inline SVG, currentColor): glyph(name, cls)
 import * as THREE from 'three';
-import { createItemModel } from '../models/items.js';
+import { createItemModel, hasItemModel } from '../models/items.js';   // [trade] hasItemModel
 import { ITEMS } from '../game/items.js';
+import { fallbackIconURL } from './iconatlas.js';   // [trade] generated glyph icons: no item is ever blank
 
 // ------------------------------------------------------------------ tuning
 export const ICON_SIZE = 64;          // output PNG size (CSS upscales it with pixelated filtering)
@@ -40,7 +41,12 @@ const queue = [];
 const queued = new Set();
 let R = null;              // lazily created renderer bundle
 let scheduled = false;
-let failed = false;        // WebGL unavailable -> icons disabled
+let failed = false;        // WebGL unavailable -> glyph icons only  [trade]
+// [trade] cached glyph fallbacks (no model / render failed / no WebGL). A real model can replace them later (mod registered
+// late, GLB finished loading): iconURL() retries a few times, and iconState() tells the audit which icons are real.
+const soft = new Map();    // type -> { why: 'nomodel'|'render'|'gl', tries, at }
+const hasModel = (type) => !!window.__kefalMods?.itemModels?.has?.(type) || hasItemModel(type);
+const glyphFor = (type) => fallbackIconURL(type, ITEMS[type] || null, undefined);
 
 const _box = new THREE.Box3();
 const _v = new THREE.Vector3();
@@ -100,6 +106,7 @@ function renderIcon(type) {
   try { obj = modelFor(type); } catch (e) { console.warn('icon model', type, e); }
   if (!obj) return '';
   const { wrap, cam, renderer } = r;
+  wrap.clear();   // [trade] a model that threw halfway must not leak into the next icon
   wrap.position.set(0, 0, 0);
   wrap.rotation.set(0, 0, 0);
   wrap.add(obj);
@@ -161,27 +168,56 @@ function renderIcon(type) {
 
 function notify(type, url) {
   const list = document.querySelectorAll('img[data-icon]');
+  const enc = encodeURIComponent(type);   // [trade] iconHTML() used to strip odd characters from the id: such items never got their icon
   for (const img of list) {
-    if (img.dataset.icon !== type) continue;
+    if (img.dataset.icon !== type && img.dataset.icon !== enc) continue;
     img.src = url;
     img.classList.add('ok');
   }
 }
 
+// [trade] one queued type -> model render, or a glyph when there is no model / the render failed / WebGL is gone. Never leaves ''.
+function renderQueued(type) {
+  queued.delete(type);
+  if (cache.has(type)) return;
+  let url = '', why = '';
+  if (failed) why = 'gl';
+  else if (!hasModel(type)) why = 'nomodel';
+  else {
+    try { url = renderIcon(type); } catch (e) { console.warn('icon render', type, e); url = ''; }
+    if (!url) why = failed ? 'gl' : 'render';
+  }
+  if (url) soft.delete(type);
+  else { url = glyphFor(type); soft.set(type, { why, tries: (soft.get(type)?.tries || 0) + 1, at: performance.now() }); }
+  cache.set(type, url);
+  if (url) notify(type, url);
+}
+
 function pump() {
   scheduled = false;
   const t0 = performance.now();
-  while (queue.length && performance.now() - t0 < SLICE_MS) {
-    const type = queue.shift();
-    queued.delete(type);
-    if (cache.has(type)) continue;
-    let url = '';
-    try { url = renderIcon(type); } catch (e) { console.warn('icon render', type, e); url = ''; }
-    cache.set(type, url);
-    if (url) notify(type, url);
-  }
+  while (queue.length && performance.now() - t0 < SLICE_MS) renderQueued(queue.shift());
   if (queue.length) schedule();
 }
+
+/** [trade] Render queued icons right now for up to `ms` (a window that is about to show many icons calls this after building). */
+export function flushIcons(ms = 30) {
+  const t0 = performance.now();
+  let n = 0;
+  while (queue.length && performance.now() - t0 < ms) { renderQueued(queue.shift()); n++; }
+  if (queue.length) schedule();
+  return n;
+}
+export const iconsPending = () => queue.length;
+/** [trade] 'model' (real render) | 'glyph' (generated fallback) | 'blank' | 'pending' (queued) | 'none' (never requested) */
+export function iconState(type) {
+  const u = cache.get(type);
+  if (u === undefined) return queued.has(type) ? 'pending' : 'none';
+  if (!u) return 'blank';
+  return soft.has(type) ? 'glyph' : 'model';
+}
+/** [trade] where an item's 3D model comes from: 'mod' (registered in itemModels) | 'builtin' (models/items.js) | null (none) */
+export function iconModelSource(type) { return window.__kefalMods?.itemModels?.has?.(type) ? 'mod' : hasItemModel(type) ? 'builtin' : null; }
 
 function schedule() {
   if (scheduled || failed) return;
@@ -191,7 +227,8 @@ function schedule() {
 }
 
 function enqueue(type, front = false) {
-  if (!type || cache.has(type) || queued.has(type) || failed) return;
+  if (!type || cache.has(type) || queued.has(type)) return;
+  if (failed) { cache.set(type, glyphFor(type)); soft.set(type, { why: 'gl', tries: 9, at: 0 }); return; }   // [trade]
   queued.add(type);
   if (front) queue.unshift(type); else queue.push(type);
   schedule();
@@ -201,9 +238,14 @@ function enqueue(type, front = false) {
 export function iconURL(type) {
   if (!type) return '';
   const u = cache.get(type);
-  if (u !== undefined) return u;
+  if (u !== undefined) {
+    // [trade] a glyph stands in until a real model shows up (registered late / GLB loaded): try the render again, a few times
+    const s = soft.get(type);
+    if (s && !failed && s.tries < 3 && hasModel(type) && (s.why === 'nomodel' || performance.now() - s.at > 4000)) { cache.delete(type); enqueue(type, true); }
+    return u;
+  }
   enqueue(type, true);
-  return '';
+  return cache.get(type) || '';   // [trade] set synchronously when WebGL is unavailable
 }
 
 /** <img> element for an item type (fills in when the icon is ready). */
@@ -222,7 +264,7 @@ export function iconImg(type, cls = 'ico') {
 /** Same as iconImg() but as an HTML string. */
 export function iconHTML(type, cls = 'ico') {
   const u = iconURL(type);
-  const safe = String(type || '').replace(/[^a-zA-Z0-9_:\-]/g, '');
+  const safe = encodeURIComponent(String(type || ''));   // [trade] was: stripped odd characters (icon never matched its <img>)
   return `<img class="${cls}${u ? ' ok' : ''}" data-icon="${safe}" src="${u || BLANK}" alt="" draggable="false">`;
 }
 

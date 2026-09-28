@@ -85,3 +85,8 @@ was verified by build and a scripted run only — no screenshot review yet.
 Playable Acoustic / Electric Guitar, Keytar and Drum Pad (LMB = play mode, real notes, chords, 4-song follow-along, jam session chip, noise on moons).
 Honest gaps: never played by hand in a browser (avatar strap poses, arm animation, panel layout, latency all unverified); 2 real players untested; bass / violin /
 harmonica / bongos / kazoo / theremin, rhythm-game guide, busker hat and creature dancing were cut for budget. See `docs/wave2/music.md`.
+
+## Wave 2 - player trading (module `trade`)
+- Built and node-tested (state machine, host flow with mock game, planner) but never seen in a browser: check the window at 1280x720, drag & drop, the tooltip comparison block, the popup keys N / M and the glyph icon drawings by eye.
+- Clout is trusted client-side (debit handshake); fine for co-op friends, not for strangers. No trade history / log panel, no trading over the terminal, no NPC / hub trading yet (hub planet idea in MASTERPLAN #13).
+- Icons: audit numbers (items without a model) still to be read from `ICONAUDIT`; glyph fallbacks are stop-gaps, the real fix is a model per item.

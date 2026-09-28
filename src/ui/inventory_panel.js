@@ -69,6 +69,7 @@ export function itemTooltipHTML(it, def = it?.def, { grid = null, hint = '' } = 
   if (def.battery && it) row('Battery', `${Math.round(((it.battery ?? def.battery) / def.battery) * 100)}%`);
   if (def.charges && it) row('Charges', `${it.charges ?? def.charges}`);
   if (def.ammo !== undefined && it) row('Ammo', `${it.ammo ?? 0}/${def.ammo}`);
+  if (it && typeof it.dur === 'number') { const mx = it.durMax || def.durability || def.dur || 1, f = Math.max(0, Math.min(1, it.dur / mx)); row('Durability', `${Math.round(f * 100)}%`, f < 0.25 ? 'down' : ''); }   // [trade] durability module: it.dur
   if (it?.plus) row('Forge', `+${it.plus} (+${Math.round(plusBonus(it.plus) * 100)}%)`, 'up');   // [forge]
   const ocHtml = (it?.oc || []).map((id) => OVERCLOCKS[id] ? `<div style="color:${OVERCLOCKS[id].color}">${OVERCLOCKS[id].icon} ${escapeHtml(t(OVERCLOCKS[id].name))}: ${escapeHtml(t(OVERCLOCKS[id].desc))}</div>` : '').join('');
   const aff = (it?.affix ? describeAffix(it.affix).map((s) => `<div>${escapeHtml(s)}</div>`).join('') : '') + ocHtml;

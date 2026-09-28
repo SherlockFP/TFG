@@ -6,5 +6,6 @@ import local from './tr_local.js';
 import wrap1 from './tr_wrap1.js';
 import manual from './tr_manual.js';
 import data2 from './tr_data2.js';
+import trade from './tr_trade.js';   // [trade]
 
-export const TR_PARTS = [core, names, local, wrap1, manual, data2];
+export const TR_PARTS = [core, names, local, wrap1, manual, data2, trade];
