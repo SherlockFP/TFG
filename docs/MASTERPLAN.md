@@ -187,6 +187,8 @@ FİKİR → LLM (kısıtlar + mevcut içerik listesi) → SPEC JSON (map/creatur
   bug fix, QA/playtest, doğrulama ve fix turları Sonnet ile yapılır (`.claude/agents/tfg-builder.md`, `tfg-qa.md`).
 - **Opus 5.5** sadece gerçekten zor işler için (`.claude/agents/tfg-architect.md`): ağ-hassas host mimarisi,
   büyük state makineleri, birden fazla sistemi kesen tasarım kararları. Hedef oran: ajanların ≥%70'i Sonnet.
+- **Test bütçesi (sahibin isteği):** ajan başına en fazla 1 smoke + 1 özellik çalıştırması ve 1-2 ekran görüntüsü;
+  uzun playtest döngüsü yok. Oyun hissi = sahibin kendi playtest'i. **Hedef: oyunu daha eğlenceli yapmak.**
 - Paralel ajanlar ayrı git worktree'lerinde çalışır; `game.js` içindeki `// [slot:x]` / `// [import:x]` satırları
   sayesinde merge çakışması olmaz. Headless test: `flock /tmp/tfg-browser.lock node tools/harness/headless.mjs`.
 
