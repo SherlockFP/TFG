@@ -243,6 +243,7 @@ export function equipBonuses(list) {
   const b = { armor: 0, speed: 0, luck: 0, crit: 0, stamina: 0, regenPct: 0, scan: 0, battery: 0 };
   for (const e of list) {
     if (e.inv?.k !== 'eq') continue;
+    if (e.it?.dur != null && e.it.dur <= 0 && e.def?.kind === 'armor') continue;   // [durability] broken armour gives nothing
     const g = e.def?.gear;
     const mul = tierStat(e.tier || entryTier(e.it, e.def)) * plusMul(e.it?.plus || 0);   // [forge] +N enhancement scales gear stats
     if (g) for (const k of Object.keys(b)) if (g[k]) b[k] += k === 'speed' ? g[k] : g[k] * mul;

@@ -89,6 +89,7 @@ export class WorldItem {
     this.collected = !!data.col;
     this.tier = TIERS[data.tr] ? data.tr : null;   // rolled / granted item tier (tiers.js); null = derived (tierOfItem)
     this.plus = Math.max(0, Math.min(9, data.pl | 0)); this.oc = Array.isArray(data.oc) ? data.oc.filter((x) => typeof x === 'string').slice(0, 2) : [];   // [forge] +0..+9 enhancement and overclock ids (game/forge.js)
+    this.dur = data.du == null ? null : Math.max(0, Number(data.du) || 0); this.dr = Math.max(0, Math.min(20, data.dr | 0));   // [durability] current durability (null = untouched = full) + full-repair count (game/durability.js)
     this.inv = this.holder ? normalizeInv(data.iv) : null;   // null = hotbar / world; { k:'bag', x, y } | { k:'eq', s }
     this.reclaim = data.rc && typeof data.rc === 'object' && typeof data.rc.pid === 'string' ? { pid: data.rc.pid.slice(0, 64), iv: normalizeInv(data.rc.iv) } : null;
     this.bag = normalizeBag(data.bg);       // legacy belt bag contents (dumped by the host, see inventory.js)
@@ -293,6 +294,7 @@ export class ItemManager {
       h: opts.holder || null, lb: opts.label || undefined, sb: opts.soulbound || undefined, lv: opts.linvel || undefined,
       af: opts.af || undefined, col: opts.col ? 1 : undefined, bg: opts.bag?.length ? opts.bag : undefined,
       tr: tier || undefined, pl: opts.plus || undefined, oc: opts.oc?.length ? opts.oc : undefined,   // [forge]
+      du: opts.dur ?? undefined, dr: opts.dr || undefined,   // [durability]
     };
     // spawn straight into the holder's bag / equipment (crafting, reclaim): opts.inv = 'bag' | 'eq' | { k, x, y } | { k:'eq', s }
     if (opts.holder && opts.inv) { const iv = this.game.inventory?.hostPlaceFor?.(opts.holder, def, opts.inv); if (iv) data.iv = iv; }
@@ -540,6 +542,7 @@ export class ItemManager {
         bg: it.bag.length ? it.bag.map((e) => ({ ...e })) : undefined, ld: it.ladder || undefined,
         tr: it.tier || undefined, iv: it.holder && it.inv ? { ...it.inv } : undefined, rc: it.reclaim || undefined,
         pl: it.plus || undefined, oc: it.oc?.length ? [...it.oc] : undefined,   // [forge]
+        du: it.dur ?? undefined, dr: it.dr || undefined,   // [durability]
       });
     }
     return out;

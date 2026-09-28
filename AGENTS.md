@@ -268,6 +268,12 @@ getters (ids untouched, `def.$name` = English). Host -> client text uses `sysMsg
 long lore bodies (RU), wave-2 files merged later.
 + The Algorithm's Revolver (Russian-roulette power-ups, `src/game/roulette.js`, net `rr` / `rrfx`, docs/wave2/anomaly.md): tables replace ~half the shrine spawns (quota >= 1) + a ship bonus table; node test `tools/harness/roulette.test.mjs` PASS, `wave2_roulette.js` run once (solo path PASS); 2+ player pass/forced flow only covered by the node test.
 
+### 5.13 Wave 2 - ITEM DURABILITY (module `durability`, docs/wave2/durability.md)
+Weapons (per swing / hit / shot) and worn armour (per damage taken) wear out: Common / Uncommon items shatter (one scrap shard left), Rare+ or forged items become BROKEN (cannot attack, x0.3 sell value) until repaired
+(workbench REPAIR tab, Repair Kit +40 %, HQ mechanic bench; every full repair ages the max by 5 %, floor 60 %). Bar under hotbar / grid icons, tooltip row, BROKEN overlay. Pure rules `src/game/durability_core.js`
++ `node tools/harness/durability.test.mjs`; browser proof `tools/harness/wave2_durability.js` (35/35, host path only). Item fields `it.dur` / `it.dr` (`du` / `dr` on `sp`, serialize, saveFields). Net types `duw` `dukit` `durep` `dus` `dubrk` `dures`.
+Hooks in shared files are marked `[durability]`. NOT verified: client prediction / `duw` flush with a real second player, HQ mechanic bench placement + panel by eye.
+
 ### 5.5 Smoke test (paste in the browser console on `?autohost=local&code=T1&name=Tester`, after ~4 s)
 ```js
 const g = kefal.game, errs = []; addEventListener('error', e => errs.push(e.message));

@@ -10,6 +10,7 @@ import { iconHTML } from './icons.js';
 import { escapeHtml } from '../core/util.js';
 import { t, tf } from '../core/i18n.js';
 import { plusMul, plusBonus, OVERCLOCKS } from '../game/enhance.js';   // [forge]
+import { durBarHTML, durClass, durRow, durFlag } from './durability_style.js';   // [durability]
 
 const CELL = 50, GAP = 3, PAD = 6;
 const EQ_ITEM = { armor: [72, 92], trinket1: [50, 50], trinket2: [50, 50], bag: [64, 64] };   // item box inside each paper-doll slot
@@ -70,6 +71,7 @@ export function itemTooltipHTML(it, def = it?.def, { grid = null, hint = '' } = 
   if (def.charges && it) row('Charges', `${it.charges ?? def.charges}`);
   if (def.ammo !== undefined && it) row('Ammo', `${it.ammo ?? 0}/${def.ammo}`);
   if (it?.plus) row('Forge', `+${it.plus} (+${Math.round(plusBonus(it.plus) * 100)}%)`, 'up');   // [forge]
+  const dRow = durRow(it, def); if (dRow) row(...dRow);   // [durability] Durability 87/120
   const ocHtml = (it?.oc || []).map((id) => OVERCLOCKS[id] ? `<div style="color:${OVERCLOCKS[id].color}">${OVERCLOCKS[id].icon} ${escapeHtml(t(OVERCLOCKS[id].name))}: ${escapeHtml(t(OVERCLOCKS[id].desc))}</div>` : '').join('');
   const aff = (it?.affix ? describeAffix(it.affix).map((s) => `<div>${escapeHtml(s)}</div>`).join('') : '') + ocHtml;
   const flags = [];
@@ -81,6 +83,7 @@ export function itemTooltipHTML(it, def = it?.def, { grid = null, hint = '' } = 
   if (def.component || def.kind === 'component') flag('Component', '#7dff7d');
   if (def.keyItem || def.id === 'key') flag('Key item', '#ffd23f');
   if (it?.soulbound) flag('Soulbound', '#b35cff');
+  const dFlag = durFlag(it, def); if (dFlag) flag(...dFlag);   // [durability]
   const desc = def.tip ? `<div class="tt-desc">${escapeHtml(t(def.tip))}</div>` : '';
   return `<div class="tt-head">${iconHTML(def.id, 'ico')}<div><div class="tt-name">${escapeHtml(name)}</div>
     <div class="tt-kind"><b>${escapeHtml(t(T.name))}</b> · ${escapeHtml(t(KIND_NAME[def.kind] || def.kind || ''))}</div></div></div>
@@ -206,7 +209,7 @@ export class InventoryPanel {
     const g = this.game, p = g.player;
     const list = this.api.entries();
     const grid = this.api.grid();
-    return list.map((e) => `${e.id}:${e.inv ? e.inv.k + (e.inv.s || '') + e.inv.x + ',' + e.inv.y : 'h'}:${e.tier}:${e.value}:${e.it.charges ?? ''}:${Math.round(e.it.battery ?? -1)}:${e.it.ammo ?? ''}`).join('|')
+    return list.map((e) => `${e.id}:${e.inv ? e.inv.k + (e.inv.s || '') + e.inv.x + ',' + e.inv.y : 'h'}:${e.tier}:${e.value}:${e.it.charges ?? ''}:${Math.round(e.it.battery ?? -1)}:${e.it.ammo ?? ''}:${e.it.dur ?? ''}`).join('|')
       + `#${p.slots.join(',')}#${p.slot}#${grid.cols}x${grid.rows}#${Math.round(p.carryWeight?.() || 0)}`;
   }
 
@@ -221,7 +224,7 @@ export class InventoryPanel {
     const ch = def.ammo !== undefined ? `<div class="iv-c">${it.ammo ?? 0}/${def.ammo}</div>` : def.charges ? `<div class="iv-c">${it.charges ?? 0}</div>` : '';
     const style = `width:${w}px;height:${h}px;${tiered ? `--tc:${TIERS[tier].color};` : ''}`;
     const img = iconHTML(it.type, 'ico').replace('<img ', `<img style="width:${ico}px;height:${ico}px" `);
-    return `<div class="ivi ${tiered ? 't-' + tier : 'plain'}" data-id="${escapeHtml(e.id)}" style="${style}">${tiered ? '<div class="iv-pip"></div>' : ''}${img}${val}${ch}${bat}</div>`;
+    return `<div class="ivi ${tiered ? 't-' + tier : 'plain'}${durClass(it)}" data-id="${escapeHtml(e.id)}" style="${style}">${tiered ? '<div class="iv-pip"></div>' : ''}${img}${val}${ch}${bat}${durBarHTML(it)}</div>`;   // [durability] bar + BROKEN overlay
   }
 
   render() {

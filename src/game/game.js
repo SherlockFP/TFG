@@ -120,7 +120,7 @@ import { installCreatureEmotes } from './cemotes.js';
 // [import:grenades]
 
 
-// [import:durability]
+import { installDurability } from './durability.js';   // [durability]
 
 
 // [import:mirror]
@@ -274,7 +274,7 @@ export class Game extends Emitter {
     // [slot:grenades]
 
 
-    // [slot:durability]
+    this.useModule('durability', installDurability);   // [durability]
 
 
     // [slot:mirror]

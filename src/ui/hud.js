@@ -7,6 +7,7 @@ import { el, escapeHtml, fmtClock, clamp } from '../core/util.js';
 import { itemDef } from '../game/items.js';
 import { affixShortName } from '../game/loot.js';
 import { forgeName } from '../game/enhance.js';   // [forge]
+import { durBarHTML, durClass } from './durability_style.js';   // [durability]
 import { TIERS } from '../game/tiers.js';
 import { ensureInventoryStyles } from './inventory_style.js';
 import { xpForLevel, rankOf } from '../game/progression.js';
@@ -233,7 +234,7 @@ export class HUD {
       const bar = it && d.battery ? `<div class="inv-bat"><div style="width:${clamp((Number(it.battery) / d.battery) * 100 || 0, 0, 100)}%"></div></div>` : '';
       const extra = it && d.ammo !== undefined ? `<div class="inv-ammo">${Number(it.ammo) || 0}/${Number(d.ammo) || 0}</div>` : it && it.charges !== undefined && it.charges !== null && d.charges ? `<div class="inv-ammo">${Number(it.charges) || 0}</div>` : '';
       const tcls = tier && tier !== 'common' ? ` tier tier-${tier}` : '';
-      return `<div class="inv-slot ${i === active ? 'active' : ''} ${it ? 'full' : ''}${tcls}"${tcls ? ` style="--tc:${col}"` : ''}><div class="inv-num">${i + 1}</div>${it ? iconHTML(it.type, 'inv-ico') + `<div class="inv-name" style="color:${col}">${escapeHtml(nm)}</div>` : ''}${bar}${extra}${it?.on ? '<div class="inv-on">●</div>' : ''}</div>`;
+      return `<div class="inv-slot ${i === active ? 'active' : ''} ${it ? 'full' : ''}${tcls}${durClass(it)}"${tcls ? ` style="--tc:${col}"` : ''}><div class="inv-num">${i + 1}</div>${it ? iconHTML(it.type, 'inv-ico') + `<div class="inv-name" style="color:${col}">${escapeHtml(nm)}</div>` : ''}${bar}${durBarHTML(it)}${extra}${it?.on ? '<div class="inv-on">●</div>' : ''}</div>`;
     }).join('');
     this.$.inv.innerHTML = (this.bagTag || '') + html;
   }

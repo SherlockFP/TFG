@@ -71,6 +71,10 @@ hallucinations are audio only; Decon booth placement in the ship unchecked visua
 Added: +1..+9 enhancement with a juicy machine sequence, overclocks, tier ascension, shards from every creature tier, creature tiers with auras.
 Risks: everything visual (machine sequence, camo shader, nameplates) is unverified in a real browser; creature tier damage x4 (Mythic) may spike; forge stations placed blind next to the sell counter;
 overclock effects (shock / burn / vamp) untested with 2 real players; economy: shard drop rates and credit costs are design numbers, not playtested.
+## Wave 2 - ITEM DURABILITY (owner request: items should break like Minecraft)
+Added: durability for weapons + worn armour (tier x class x forge-plus table), shatter vs BROKEN by tier, 25 / 10 % warnings, workbench REPAIR tab, Repair Kit, HQ mechanic, ageing (-5 % max per full repair).
+Risks: numbers are design guesses (pipe 120 hits, katana 600, guns 250-500 shots) and untuned by play; attack detection is a `swingAnim` edge (a spell cast counts as a whiff); only the host path ran in a browser
+(client prediction / batched `duw` flush untested with 2 players); the HQ mechanic bench is placed blind (x -14.4, z -36.9); broken armour is silently 0 stats (no HUD hint besides the bar / tooltip).
 ## Wave 2 - combat module (added blind, budget-capped session)
 Melee combos / heavy / block-parry, 6 melee + 5 tech weapons (rocket jump, grenades, grav tool), 5 spells, Blood Magic and 12 role skills were added
 (`docs/wave2/combat.md`). **Feel is unverified**: arcs / guard poses / hit timing were tuned by numbers only, `tools/harness/wave2_combat.js` has not been run and
