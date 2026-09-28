@@ -102,6 +102,7 @@ import { installMusic } from './music.js';
 
 
 // [import:gameplay2]
+import { installGameplay2 } from './gameplay2.js';
 
 
 // [import:shipyard]
@@ -234,6 +235,7 @@ export class Game extends Emitter {
 
 
     // [slot:gameplay2]
+    this.useModule('gameplay2', installGameplay2);
 
 
     // [slot:shipyard]

@@ -1,7 +1,7 @@
 // ROLES panel: six big cards (icon, description, bonuses, starting kit). Opened from the passive tree (ROLE button),
 // the ship's crew-roster locker [E] and the terminal (ROLE). Works with a game (in-game rules: orbit only) or a bare
 // profile (main menu). Self-contained DOM + injected CSS in the amber CRT look.
-import { ROLES, ROLE_ORDER, bonusLines } from '../../game/passivetree.js';
+import { ROLES, bonusLines } from '../../game/passivetree.js';
 import { itemDef } from '../../game/items.js';
 import { iconCanvas } from './treeicons.js';
 import { getLang, addTranslations, t } from '../../core/i18n.js';
@@ -25,7 +25,7 @@ const CSS = `
 .rl-title{font-family:var(--font2,monospace);font-size:20px;color:var(--amber,#ff8a3d);letter-spacing:3px;text-shadow:0 0 12px rgba(255,138,61,.45)}
 .rl-sub{opacity:.75;font-size:19px}
 .rl-warn{margin:8px 0 0;padding:4px 10px;border-left:3px solid #ff6b5a;background:rgba(255,80,60,.08);color:#ffb0a4;font-size:19px}
-.rl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0;overflow:auto;min-height:0;padding:2px}
+.rl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0;overflow:auto;min-height:0;padding:2px}
 .rl-card{position:relative;display:flex;flex-direction:column;gap:6px;padding:12px 14px 12px;border:1px solid rgba(255,138,61,.25);background:linear-gradient(160deg,rgba(0,0,0,.35),rgba(0,0,0,.6));cursor:pointer;transition:transform .12s,box-shadow .15s,border-color .15s;overflow:hidden}
 .rl-card::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 90% at 0% 0%,var(--rc) 0%,transparent 55%);opacity:.13}
 .rl-card:hover{transform:translateY(-2px);border-color:var(--rc);box-shadow:0 0 22px color-mix(in srgb,var(--rc) 40%,transparent)}
@@ -37,6 +37,7 @@ const CSS = `
 .rl-desc{font-size:18px;opacity:.78;line-height:1.05;min-height:38px}
 .rl-stats{font-size:19px;line-height:1.05}
 .rl-good{color:#8dff8d}.rl-bad{color:#ff6b5a}
+.rl-apt{font-size:18px;line-height:1.05;color:#ffe08a;opacity:.95}
 .rl-kit{font-size:17px;opacity:.85;border-top:1px dashed rgba(255,138,61,.25);padding-top:5px;margin-top:2px}
 .rl-kit b{color:#ffe08a;font-weight:normal}
 .rl-btn{font-family:var(--font,monospace);font-size:21px;color:var(--rc);background:rgba(0,0,0,.35);border:1px solid var(--rc);padding:2px 12px;cursor:pointer;align-self:flex-start;margin-top:2px}
@@ -81,7 +82,7 @@ export function createRolesPanel({ game = null, ctl, profile = game?.profile, on
     root.appendChild(head);
     if (!gate.ok) root.appendChild(mk('div', 'rl-warn', gate.msg));
     const grid = mk('div', 'rl-grid');
-    for (const id of ROLE_ORDER) {
+    for (const id of Object.keys(ROLES)) {
       const r = ROLES[id];
       const card = mk('div', 'rl-card' + (cur === id ? ' cur' : ''));
       card.style.setProperty('--rc', r.color);
@@ -96,6 +97,8 @@ export function createRolesPanel({ game = null, ctl, profile = game?.profile, on
       const stats = mk('div', 'rl-stats');
       for (const l of bonusLines(r.bonus)) stats.appendChild(mk('div', l.good ? 'rl-good' : 'rl-bad', l.text));
       card.appendChild(stats);
+      const apt = tr() && r.aptitudeTr ? r.aptitudeTr : r.aptitude;   // wave-2 aptitude line ("what you are good at")
+      if (apt) card.appendChild(mk('div', 'rl-apt', L('GOOD AT') + ': ' + apt));
       const kit = mk('div', 'rl-kit');
       kit.append(document.createTextNode(L('STARTING KIT') + ': '), Object.assign(mk('b'), { textContent: itemDef(r.kit).name }), document.createTextNode(' (' + L('once per day, in your hands on landing') + ')'));
       card.appendChild(kit);

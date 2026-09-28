@@ -347,7 +347,7 @@ export function installRpg(game) {
       if (!arg) {
         const cur = R.role();
         const out = [`ROLES (yours: ${cur ? ROLES[cur].name.toUpperCase() : 'NONE'}):`];
-        for (const id of ROLE_ORDER) { const r = ROLES[id]; out.push(`${id === cur ? '*' : ' '} ${r.name.toUpperCase().padEnd(12)} ${r.tag}`, `    ${bonusLines(r.bonus).map((l) => l.text).join(', ')} | kit: ${itemDef(r.kit).name}`); }
+        for (const id of Object.keys(ROLES)) { const r = ROLES[id]; out.push(`${id === cur ? '*' : ' '} ${r.name.toUpperCase().padEnd(12)} ${r.tag}`, `    ${bonusLines(r.bonus).map((l) => l.text).join(', ')} | kit: ${itemDef(r.kit).name}`); }
         out.push('', 'ROLE <name> to switch (ship in orbit only). Full tree: press K.');
         term.print(out.join('\n'));
         return;
