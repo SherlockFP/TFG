@@ -9,6 +9,8 @@ import { levelTexture } from './geobuilder.js';
 import { G } from '../physics/physics.js';
 import { buildOutposts } from './outposts.js';
 import { buildBiomeDecor } from './outdoor_biomes.js';
+import { planLandmarks, buildLandmarks } from './landmarks.js';
+import './biomes_wave1.js';   // registers the lava / ice / jungle biomes (BIOMES + decor builders)
 import * as FACILITY from './facility.js';
 import { setInteriorProbe } from '../game/moongen.js';
 
@@ -57,7 +59,21 @@ export function planMoon(seed, moon) {
       if (far({ x: 0, z: 0 }, 30) && far(entrance, 28) && fires.every((f) => far(f, 18)) && ponds.every((o) => far(o, 30))) { ponds.push(p); break; }
     }
   }
-  return { entrance, entranceYaw: Math.atan2(-entrance.x, -entrance.z), fires, ponds, biome, scale: sc };
+  // frozen lakes (ice biome, own RNG stream so the other layout rolls never shift): flat, walkable, slippery
+  const lakes = [];
+  if (biome.frozen) {
+    const LR = new RNG((seed ^ 0x1ce1a4e) >>> 0);
+    const nLakes = biome.frozen.lakes + (sc > 1.2 ? 1 : 0);
+    for (let i = 0; i < nLakes; i++) {
+      for (let t = 0; t < 40; t++) {
+        const a = LR.float(0, Math.PI * 2), d = LR.float(45, 115) * sc;
+        const l = { x: Math.cos(a) * d, z: Math.sin(a) * d, r: LR.float(11, 19) };
+        const far = (q, m) => Math.hypot(l.x - q.x, l.z - q.z) > m + l.r;
+        if (far({ x: 0, z: 0 }, 32) && far(entrance, 26) && fires.every((f) => far(f, 14)) && ponds.every((o) => far(o, 12)) && lakes.every((o) => Math.hypot(l.x - o.x, l.z - o.z) > l.r + o.r + 10)) { lakes.push(l); break; }
+      }
+    }
+  }
+  return { entrance, entranceYaw: Math.atan2(-entrance.x, -entrance.z), fires, ponds, lakes, biome, scale: sc };
 }
 
 export class Terrain {
@@ -74,13 +90,79 @@ export class Terrain {
     this.step = S / RES_;
     this.playHalf = 130 * this.scale;       // walkable area half-extent inside the border mountains (creature wander clamp)
     this.flood = this.biome.flood ?? null;  // world-y of the water sheet on flooded biomes
+    this.lakes = plan.lakes || [];          // frozen lakes (ice biome)
+    // lava biome: lava sits in carved river channels below world-y lava.y (see carveLava); rivers never cross the
+    // ship <-> facility path or the lines from the ship to the fire exits, and unreachable land is left empty
+    this.lava = this.biome.lava ? { y: this.biome.lava.y, mul: Math.max(0.6, Math.min(1.8, +moon?.lavaMul || 1)) } : null;
+    if (this.lava) {
+      this.noiseL = new Noise2D(seed ^ 0x51a4a); this.noiseG = new Noise2D(seed ^ 0x6a7e1);
+      this.lines = [plan.entrance, ...plan.fires].map((q) => ({ x: q.x, z: q.z }));
+    }
     this.heights = new Float32Array((RES_ + 1) * (RES_ + 1));
     this.pathPts = this.makePath();
     for (let j = 0; j <= RES_; j++) for (let i = 0; i <= RES_; i++) {
       const x = -this.half + i * this.step, z = -this.half + j * this.step;
       this.heights[j * (RES_ + 1) + i] = this.rawHeight(x, z);
     }
+    if (this.lava) this.computeReach();
   }
+
+  // ---- lava helpers -------------------------------------------------------------------------------------
+  /** metres of lava above the ground at (x, z) (<= 0 = dry) */
+  lavaDepthAt(x, z) { return this.lava ? this.lava.y - this.heightAt(x, z) : -99; }
+  distToLines(x, z) {
+    let best = this.distToPath(x, z);
+    for (const q of this.lines) {
+      const t = Math.max(0, Math.min(1, (x * q.x + z * q.z) / (q.x * q.x + q.z * q.z || 1)));
+      best = Math.min(best, Math.hypot(x - q.x * t, z - q.z * t));
+    }
+    return best;
+  }
+  carveLava(x, z, h) {
+    const Ly = this.lava.y;
+    h = Math.max(h, Ly + 1.0);   // dry land by default
+    const n = this.noiseL.fbm(x * 0.011, z * 0.011, 2);
+    const gate = smooth01((this.noiseG.noise(x * 0.02 + 5, z * 0.02 - 9) + 0.5) / 0.55);   // rivers break up into streams / pools
+    const mask = smooth01((this.distToLines(x, z) - 11) / 9);
+    const rv = (1 - smooth01((Math.abs(n) - 0.07 * this.lava.mul) / 0.09)) * gate * mask;
+    return h + (Ly - 1.3 - h) * rv;
+  }
+  computeReach() {
+    const RES_ = this.res, W = RES_ + 1, H = this.heights, Ly = this.lava.y + 0.15;
+    const reach = new Uint8Array(W * W);
+    const ci = Math.round(this.half / this.step);
+    const start = ci * W + ci;
+    const stack = [start];
+    reach[start] = 1;
+    const lim = this.step * 1.1;
+    while (stack.length) {
+      const k = stack.pop(), i = k % W, j = (k / W) | 0;
+      for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++) {
+        if (!di && !dj) continue;
+        const ni = i + di, nj = j + dj;
+        if (ni < 0 || nj < 0 || ni >= W || nj >= W) continue;
+        const nk = nj * W + ni;
+        if (reach[nk] || H[nk] < Ly || Math.abs(H[nk] - H[k]) > lim) continue;
+        reach[nk] = 1; stack.push(nk);
+      }
+    }
+    this.reach = reach;
+  }
+  /** placement test used by avoid(): true on lava, next to lava, or on land the ship cannot reach (lava biome only) */
+  blocked(x, z, m = 0) {
+    if (!this.lava) return false;
+    const W = this.res + 1;
+    const cell = (px, pz) => {
+      const i = Math.max(0, Math.min(W - 1, Math.round((px + this.half) / this.step))), j = Math.max(0, Math.min(W - 1, Math.round((pz + this.half) / this.step)));
+      return j * W + i;
+    };
+    if (!this.reach[cell(x, z)]) return true;
+    const r = m + 2.5;
+    for (let k = 0; k < 6; k++) { const a = (k / 6) * Math.PI * 2; if (!this.reach[cell(x + Math.cos(a) * r, z + Math.sin(a) * r)]) return true; }
+    return false;
+  }
+  /** on a frozen lake (ice biome) */
+  onIce(x, z) { for (const l of this.lakes) if ((x - l.x) ** 2 + (z - l.z) ** 2 < (l.r * 0.96) ** 2) return true; return false; }
 
   // footstep surface for game.footstep (biome.step, wading splashes in flood water)
   footSurface(pos) {
@@ -130,6 +212,7 @@ export class Terrain {
     // border mountains
     const r = Math.max(Math.abs(x), Math.abs(z));
     h += smooth01((r - 120 * sc) / 38) * 45 + smooth01((r - 150 * sc) / 10) * 30;
+    if (this.lava) h = this.carveLava(x, z, h);
     // flatten zones
     const flat = (cx, cz, rad, fall, target) => {
       const d = Math.hypot(x - cx, z - cz);
@@ -156,6 +239,10 @@ export class Terrain {
         const bowl = p.y - 1.8 * (1 - smooth01(d / p.r));
         h = bowl * (1 - t) + h * t;
       }
+    }
+    for (const l of this.lakes) {
+      l.y = l.y ?? n.fbm(l.x * 0.012, l.z * 0.012, 4) * b.height * 0.4;
+      flat(l.x, l.z, l.r * 0.85, l.r * 0.55, l.y);
     }
     flat(0, 0, 13, 16, SHIP_FLAT_Y);
     return h;
@@ -192,10 +279,13 @@ export class Terrain {
       const onPath = !steep && this.distToPath(cx, cz) < 3.2 && Math.hypot(cx, cz) > 12;
       const bk = steep ? buckets.rock : onPath ? buckets.path : buckets.ground;
       const shade = 0.78 + this.noise2.noise(cx * 0.15, cz * 0.15) * 0.18 + (nrm.y - 0.8) * 0.3;
+      // lava biome: scorched, glowing ground next to the rivers
+      const hot = this.lava ? smooth01((this.lava.y + 1.9 - (a.y + bb.y + c.y) / 3) / 1.9) : 0;
       for (const p of [a, bb, c]) {
         bk.p.push(p.x, p.y, p.z); bk.n.push(nrm.x, nrm.y, nrm.z);
         bk.uv.push(p.x * 0.25, p.z * 0.25);
-        bk.c.push(shade * bk.t[0], shade * bk.t[1], shade * bk.t[2]);
+        if (hot > 0) bk.c.push(shade * bk.t[0] + (1.0 - shade * bk.t[0]) * hot * 0.85, shade * bk.t[1] + (0.42 - shade * bk.t[1]) * hot * 0.85, shade * bk.t[2] + (0.08 - shade * bk.t[2]) * hot * 0.85);
+        else bk.c.push(shade * bk.t[0], shade * bk.t[1], shade * bk.t[2]);
       }
     };
     for (let j = 0; j < RES_; j++) for (let i = 0; i < RES_; i++) {
@@ -269,6 +359,7 @@ function instanceProps(id, placements, group, tint = null, ownMats = null) {
         pos.set(p.x, p.y, p.z);
         m4.compose(pos, q, s).multiply(mesh.matrixWorld);
         inst.setMatrixAt(k, m4);
+        (p.inst = p.inst || []).push({ mesh: inst, k });
       });
       inst.instanceMatrix.needsUpdate = true;
       inst.computeBoundingSphere();
@@ -294,9 +385,10 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
   const sc = terrain.scale || 1, sc2 = sc * sc;
   const ownMats = [];   // tinted material clones owned by this moon
 
-  const addBox = (x, y, z, sx, sy, sz, rotY = 0) => {
-    const c = physics.addStaticBox(x, y, z, sx / 2, sy / 2, sz / 2, rotY, G.STATIC, { kind: 'prop' });
+  const addBox = (x, y, z, sx, sy, sz, rotY = 0, data = null) => {
+    const c = physics.addStaticBox(x, y, z, sx / 2, sy / 2, sz / 2, rotY, G.STATIC, data || { kind: 'prop' });
     colliders.push(c);
+    return c;
   };
   const placeProp = (id, x, z, rotY = 0, opts = {}) => {
     let obj;
@@ -361,7 +453,13 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
   }
 
   // trees / rocks scatter (instanced)
-  const avoid = (x, z, m = 0) => {
+  let landmarkSites = [];
+  const siteBlocks = (st, x, z, m) => {
+    if (st.plats) { for (const p of st.plats.concat(st.ledges)) if (Math.hypot(x - p.x, z - p.z) < Math.max(p.sx, p.sz) / 2 + 3 + m) return true; return false; }
+    return Math.hypot(x - st.x, z - st.z) < st.radius + m;
+  };
+  const avoidBase = (x, z, m = 0) => {
+    if (terrain.blocked(x, z, m)) return true;
     if (Math.hypot(x, z) < 26 + m) return true;
     if (Math.hypot(x - e.x, z - e.z) < 20 + m) return true;
     for (const f of plan.fires) if (Math.hypot(x - f.x, z - f.z) < 9 + m) return true;
@@ -369,6 +467,9 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
     if (terrain.distToPath(x, z) < 5 + m) return true;
     return false;
   };
+  // wave 1 landmarks (towers, ruins, parkour, billboards) reserve their footprint before trees / rocks / outposts are placed
+  try { landmarkSites = planLandmarks({ seed, moon, plan, terrain, avoid: avoidBase }); } catch (err) { console.warn('landmark plan', err); landmarkSites = []; }
+  const avoid = (x, z, m = 0) => avoidBase(x, z, m) || landmarkSites.some((st) => siteBlocks(st, x, z, m));
   const treeId = b.trees;
   const trees = [];
   if (treeId) {
@@ -383,6 +484,7 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
     }
     instanceProps(treeId, trees, group, b.treeTint ?? null, ownMats);
   }
+  const treeIsRock = !!treeId && treeId.includes('rock');
   const rocks = [];
   for (let k = 0; k < Math.round(90 * sc2); k++) {
     const x = rng.float(-140, 140) * sc, z = rng.float(-140, 140) * sc;
@@ -403,17 +505,21 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
     instanceProps('grass_clump', bushes.slice(0, nGrass), group, b.treeTint && b.flood != null ? b.treeTint : null, ownMats);
     instanceProps('bush', bushes.slice(nGrass), group);
   }
-  // colliders for trees/rocks (trunks)
-  for (const list of [trees, rocks]) {
-    for (const p of list) {
+  // colliders for trees/rocks (trunks); harvestable ones (src/game/harvest.js) are tagged with their id
+  const harvest = { trees: [], rocks: [] };
+  [[trees, treeIsRock ? 'rock' : 'tree'], [rocks, 'rock']].forEach(([list, kind]) => {
+    list.forEach((p, i) => {
+      const id = (kind === 'tree' ? 't' : treeIsRock && list === trees ? 'q' : 'r') + i;
+      p.id = id; p.kind = kind; p.cols = [];
       for (const c of p.colliders || []) {
         const sx = c.s[0] * p.scale, sy = c.s[1] * p.scale, sz = c.s[2] * p.scale;
         const lx = c.c[0] * p.scale, lz = c.c[2] * p.scale;
         const cs = Math.cos(p.rot), sn = Math.sin(p.rot);
-        addBox(p.x + lx * cs + lz * sn, p.y + c.c[1] * p.scale, p.z - lx * sn + lz * cs, sx, sy, sz, p.rot);
+        p.cols.push(addBox(p.x + lx * cs + lz * sn, p.y + c.c[1] * p.scale, p.z - lx * sn + lz * cs, sx, sy, sz, p.rot, { kind, hid: id }));
       }
-    }
-  }
+      (kind === 'tree' ? harvest.trees : harvest.rocks).push(p);
+    });
+  });
 
   // biome set dressing (neon grid + monoliths, flooded racks, burnt husks + fires, crystal fields): own RNG
   // stream, instanced/merged geometry, added straight to the group so the outposts see it as obstacles
@@ -462,6 +568,10 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
     placeProp('lamp_post', p.x + 3.5, p.z + 1, rng.float(0, 6.28));
   }
 
+  // wave 1 landmarks: geometry + colliders + chest / scrap spots (own RNG streams: the layout above is unchanged)
+  let landmarks = null;
+  try { landmarks = buildLandmarks({ seed, moon, plan, terrain, group, addBox, emitters, avoid: avoidBase, sites: landmarkSites }); } catch (err) { console.warn('landmarks', err); landmarks = null; }
+
   for (const em of emitters) lightPool.add(em);
   for (const s of outdoorScrapSpots) s.y = terrain.heightAt(s.x, s.z);
 
@@ -470,12 +580,14 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
     entranceObj: entObj,
     outposts,
     decor,
+    landmarks, harvest, avoid, ownMats,
     // per-frame visuals of the biome decor (glitch cubes, pulsing grid, fires, blinking racks); cheap when idle
-    update(dt, game) { decor?.update(dt, game); },
+    update(dt, game) { decor?.update(dt, game); landmarks?.update(dt, game); },
     dispose(physicsRef) {
       for (const c of colliders) physicsRef.removeCollider(c);
       for (const em of emitters) lightPool.remove(em);
       outposts?.dispose(physicsRef);
+      landmarks?.dispose();
       decor?.dispose();
       group.traverse((o) => { if (o.geometry && o.isMesh && !o.isInstancedMesh) o.geometry.dispose(); });
       for (const m of ownMats) m.dispose();

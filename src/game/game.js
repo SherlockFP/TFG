@@ -62,7 +62,7 @@ import { setDocksVisible } from '../ui/dock.js';   // shared crafting components
 
 // [import:horde]
 
-// [import:worldx]
+import { installWorldX } from './worldx.js';
 
 // [import:fun]
 
@@ -135,7 +135,7 @@ export class Game extends Emitter {
 
     // [slot:horde]
 
-    // [slot:worldx]
+    this.useModule('worldx', installWorldX);
 
     // [slot:fun]
 
