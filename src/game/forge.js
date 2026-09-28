@@ -174,7 +174,7 @@ export function installForge(game) {
   Object.assign(api, {
     count, myItems, open, close: closePanel, isOpen: () => !!panel, stations, stationPos,
     enhanceInfo: F.enhanceInfo, ascendInfo: F.ascendInfo,
-    requestEnhance: (id, o = {}) => req('fgenh', { id, backup: o.backup ? 1 : 0 }),
+    requestEnhance: (id, o = {}) => req('fgenh', { id, backup: o.backup ? 1 : 0, fl: Math.round((Number(game.rpg?.bonus?.('forgeLuck')) || 0) * 1000) / 1000 }),   // Engineer aptitude
     requestAscend: (id, sac = null) => req('fgasc', { id, sac: sac || undefined }),
     requestExchange: (o) => req('fgexc', o),
     force: (...v) => rng.force(...v),
@@ -211,7 +211,8 @@ export function installForge(game) {
     const drives = d.backup && info.failDrops ? take(from, F.BACKUP_ID, 1) : null;
     payCredits(info.credits);
     remove(mats);
-    const roll = rng.next('enhance');
+    const luck = Math.max(0, Math.min(0.15, Number(d.fl) || 0));   // role aptitude (Engineer +10%), co-op trust, capped
+    const roll = Math.max(0, rng.next('enhance') - luck);
     const res = F.resolveEnhance(cur, roll, { backup: !!drives });
     if (res.backupUsed && drives) remove(drives);
     it.plus = res.to;
