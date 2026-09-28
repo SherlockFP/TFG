@@ -23,6 +23,7 @@ import { MOONS } from '../../src/game/moons.js';
 import { generateSector, MODIFIERS } from '../../src/game/moongen.js';
 import { DAILY_EVENTS } from '../../src/game/dailyEvents.js';
 import { CREATURES, spawnTable, creatureLevelStats } from '../../src/game/creatures.js';
+import { scaleFor } from '../../src/game/balance_core.js';   // wave-1 balance: sector creature scale + threat (default ON, --no-balance = the old flat numbers)
 import {
   nextQuota, scrapValueMul, scrapCountBonus, indoorPowerMul, outdoorPowerMul, creatureBaseLevel,
   xpForLevel, xpToReach, REBIRTH_LEVEL, MAX_LEVEL, BALANCE,
@@ -33,6 +34,8 @@ const argv = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] 
 const RUNS = +argv('--runs', 600);
 const SEED = +argv('--seed', 1234567);
 const CSV = args.includes('--csv');
+const BALANCE_ON = !args.includes('--no-balance');
+const AVG_THREAT = +argv('--avg-threat', 40);   // mean Threat over a landing for a crew that holds loot and stays a while (see docs/wave1/balance.md)
 Object.assign(BALANCE, JSON.parse(argv('--bal', '{}')));   // try knob changes without editing: --bal '{"levelPerQuota":0.5}'
 
 // ---------------------------------------------------------------- deterministic rng
@@ -119,9 +122,10 @@ function mixFactor(m, zone) {
 /** Creature threat of one landing (power units x level toughness). */
 function dayThreat(m, q, ev, weather) {
   const lv = creatureBaseLevel(m.tier, q) + 0.5;              // host rolls base -1..+2
-  const tough = Math.sqrt((1 + 0.18 * (lv - 1)) * (1 + 0.1 * (lv - 1)));
+  const bs = BALANCE_ON ? scaleFor(q, AVG_THREAT) : null;     // wave-1: sector scale (weak early creatures) + the Threat meter's spawn multiplier
+  const tough = Math.sqrt((1 + 0.18 * (lv - 1)) * (1 + 0.1 * (lv - 1))) * (bs ? Math.sqrt(bs.hp * bs.dmg) : 1);
   const ramp = 0.8;                                           // 35 % at 8:00 -> 100 % at 14:00, day average
-  const pressure = 1.2;                                       // haul-pressure stages, average over the day
+  const pressure = bs ? bs.spawn : 1.2;                       // haul pressure used to be a flat x1.2 here; it is now the Threat meter (greed term)
   const indoor = m.power * indoorPowerMul(q) * (ev.dangerMul || 1) * ramp * pressure;
   const outdoorShare = weather === 'eclipsed' ? 0.8 : 0.3;    // outdoors only matters after 17:00 unless eclipsed
   const outdoor = (m.outdoorPower || 2) * outdoorPowerMul(q) * (ev.dangerMul || 1) * outdoorShare;

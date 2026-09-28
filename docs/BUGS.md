@@ -1387,6 +1387,7 @@ this.jetting = !!jet;
 Alternatively, change the periodic sync at actions.js:585 to `if (it && (it.on || it.type =
 
 ## [minor] (creatures) Lurker never gets angry from being stared at: anger only increases on the single tick before it switches to 'flee'
+**FIXED (wave 1 balance)** - verified in src/entities/creatures.js lurker: anger accumulates in EVERY state while watched (also while fleeing, 3x for the Obsessed variant), the angry transition uses d < 18, anger is reset when the angry state times out and after each attack.
 - src/entities/creatures.js:709
 - fix: Accumulate anger whenever the lurker is watched, before branching on state: if (watched) c.data.anger += dt*1.6; else decay. Check the anger>6 && d<12 transition to 'angry' in the flee branch as well (or right after the accumulation), not only in the sneak branch.
 - verified fix: In the lurker behavior (src/entities/creatures.js), accumulate anger after the 'angry'/'attack' early-returns and before the flee/sneak split, and reset anger when the angry state times out:
@@ -1451,6 +1452,7 @@ Charge power only on success, at both call sites:
 Optional hardening: in entities/creatures.js:795, a falling leech should not latch onto a player who already has one (`p.latched`); it should go to 'walk' instead, so leeches that do end up stacked cannot all latch onto the same person.
 
 ## [minor] (creatures) 'Aggro onto attacker' does nothing for chaser-based creatures (scuttler, spider, crawler, skeleton, robot): being shot from outside their FOV does not trigger a chase
+**FIXED (wave 1 balance)** - verified: CreatureManager.damage() sets the one-shot marker c.data.hitBy / hitAt (real players only, never 'explosion' / 'stun'), and chaser() + crawler consume it through takeAggro() in idle / walk (a stun delays it instead of dropping it); spiders keep c.data.alarm.
 - src/entities/creatures.js:406
 - fix: In damage(), when `by` is a player id (this.game.aiPlayerById(by)) and the creature is not a hazard, set c.target = by, c.lostT = 0, and for chaser-style states (idle/walk) call c.setState('run'). Alternatively, in the chaser idle/walk branch, start the run when c.target resolves to a live player. Do not set c.target to 'explosion' or 'stun'.
 - verified fix: Use a one-shot aggro flag. Do not force a state inside damage().
@@ -1504,6 +1506,7 @@ Also make the crawler's disengage clear its state the way chaser does:
 
 
 ## [minor] (creatures) Host re-runs A* every frame for creatures that hear a noise or whose target is unreachable
+**FIXED (wave 1 balance)** - goTo(): a failed search keeps path = null and backs off (repath 1.5-2.5 s) instead of retrying on the next timer; goToLazy() (noise chasing: chaser, hound, Moderator patrol) keeps the current path while the goal moved < 2 m and also waits after a failed search; moveToward() only re-paths on the repath timer or when the target drifted > 2.5 m.
 - src/entities/creatures.js:581
 - fix: In the hear branch, only re-path if !c.dest or c.dest.distanceTo(n.pos) > 2 (or when c.repath <= 0). In goTo, on failure keep c.path = [] and set c.repath = 1 + Math.random(), and in moveToward only retry when c.repath <= 0 instead of checking `!c.path`.
 - verified fix: Add a flat-distance helper and use it in the new guards:
@@ -1747,6 +1750,7 @@ This keeps the original `?? meta` fallback for the peer id. Optionally, also har
 3) Creature carry: in src/game/game.js onWelcome, move the loop `for (const c of d.creatures || []) this.creatures.onEvent(c);` above the items loop (line 189). Alternatively, after both loops, re-run `this.onItemHeld(it, it.holder, null)` for every item whose holder starts with 'c:'.
 
 ## [minor] (network) A creature's looping sounds for its current state never start when its view is created, e.g. no jester winding music for late joiners
+**FIXED (wave 1 balance)** - CreatureView.startLoops() now starts the '*' loops AND the loops tied to the state the view is created in (late joiner's rumbling Worm / winding Pop-up).
 - src/entities/creatures.js:100
 - fix: After the model is built, start the loops for the initial state: e.g. set `this.state = null` and call `this.setState(d.st || 'idle')` (skipping the one-shot STATE_SOUNDS for that first call), or start the LOOPS entries whose state equals d.st.
 - verified fix: Make loop handling depend on the state and on volume, then start the loops for the initial state from the constructor.

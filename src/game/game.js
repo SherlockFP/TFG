@@ -48,7 +48,8 @@ import { setDocksVisible } from '../ui/dock.js';   // shared crafting components
 
 // [import:facilitysys]
 
-// [import:balance]
+import { installBalance } from './balance.js';
+import { doorwayBusy } from '../world/doorsafe.js';
 
 // [import:magic]
 
@@ -121,7 +122,7 @@ export class Game extends Emitter {
 
     // [slot:facilitysys]
 
-    // [slot:balance]
+    this.useModule('balance', installBalance);
 
     // [slot:magic]
 
@@ -492,6 +493,8 @@ export class Game extends Emitter {
         this.physics.removeCollider(d.collider);
         const i = fac.colliders.indexOf(d.collider); if (i >= 0) fac.colliders.splice(i, 1);
         d.collider = null;
+      } else if (!d.collider && d.colArgs && !d.open && d.t < 0.45 && doorwayBusy(this.physics, d.colArgs)) {
+        d.t = 0.45;   // safety sensor: never close a door onto somebody standing in it (a collider made inside a capsule = stuck in the wall)
       } else if (d.t < 0.3 && !d.collider && d.colArgs) {
         d.collider = this.physics.addStaticBox(d.colArgs[0], d.colArgs[1], d.colArgs[2], d.colArgs[3] / 2, d.colArgs[4] / 2, d.colArgs[5] / 2, 0, G.DOOR, { kind: 'door', door: d });
         fac.colliders.push(d.collider);

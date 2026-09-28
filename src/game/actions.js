@@ -235,7 +235,7 @@ export const actionMethods = {
         pos: sp.lever, r: 0.6, label: () => ph === 'orbit' ? (this.run.daysLeft <= 0 && this.run.moon !== 'hq' ? 'Deadline! Route to the Company' : `Land on ${MOONS[this.run.moon]?.name} [E]`) : (ph === 'moon' || ph === 'company') ? 'Start the ship / take off [E]' : 'Ship in flight...',
         action: () => { if (ph === 'orbit' || ph === 'moon' || ph === 'company') { this.sfx('lever_pull', 0.9); this.animLever(); this.net.request('lever'); } },
       });
-      add({ pos: sp.doorOpen, r: 0.5, label: () => (this.ship.door.open ? 'Close ship door [E]' : 'Open ship door [E]'), action: () => this.net.request('shipdoor', { open: !this.ship.door.open }) });
+      add({ pos: sp.doorOpen, r: 0.5, label: () => this.ship.door.label(this.run?.phase), action: () => this.net.request('shipdoor', { open: !this.ship.door.open }) });
       add({ pos: sp.arcade, r: 0.6, label: 'Play FLAPPY PHISH [E]', action: () => this.startArcade() });
       if (held?.battery !== undefined && held?.battery !== null && itemDef(held.type).battery) add({ pos: sp.charger, r: 0.6, label: `Charge ${itemDef(held.type).name} [E]`, action: () => { this.net.request('charge', { id: held.id, mul: this.stats.batteryMul }); } });
       add({ pos: sp.suits, r: 0.7, label: 'Change suit [E]', action: () => this.cycleSuit() });

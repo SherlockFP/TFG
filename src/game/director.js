@@ -544,8 +544,11 @@ export function installDirector(game) {
   // ---- pressure ----
   function hostTryPressure(run, hd) {
     if (H.t < H.nextPressureT || !hd || H.bossEngaged) return false;
+    // Threat (game.balance): the more the crew is hunted, the sooner calm stretches turn into a pressure spawn. Relief,
+    // the calm requirement itself and the per-day budget curve below are untouched, so the director still paces the fear.
+    const pace = clamp(game.balance?.scale?.().pace || 1, 0.8, 2);
     let target = null;
-    for (const st of H.players.values()) if (st.eligible && st.indoor && !st.boss && st.calmT >= PRESSURE_CALM) { target = st; break; }
+    for (const st of H.players.values()) if (st.eligible && st.indoor && !st.boss && st.calmT >= Math.max(45, PRESSURE_CALM / Math.max(1, pace))) { target = st; break; }
     if (!target) return false;
     if (typeof game.indoorBudget !== 'function' || typeof game.hostSpawnCreatureIndoor !== 'function' || !game.creatures?.host) return false;
     const budget = game.indoorBudget();
@@ -570,7 +573,7 @@ export function installDirector(game) {
     const pick = H.rng.weighted(entries);
     hd.powerUsed = used + CREATURES[pick.id].power;
     if (!game.hostSpawnCreatureIndoor(pick.id)) { hd.powerUsed = used; H.nextPressureT = H.t + 10; return false; }   // no fair spot (early-game safety / players near): refund, retry soon
-    H.nextPressureT = H.t + PRESSURE_GAP * H.rng.float(0.85, 1.3);
+    H.nextPressureT = H.t + PRESSURE_GAP * H.rng.float(0.85, 1.3) / pace;
     target.calmT = 35;
     markEvent();
     emit('pressure', null, { type: pick.id });
