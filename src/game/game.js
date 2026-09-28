@@ -58,7 +58,7 @@ import { installRpg } from './rpg.js';
 
 // [import:shop]
 
-// [import:crafting]
+import { installCrafting } from './crafting.js';
 
 // [import:lore]
 
@@ -144,7 +144,7 @@ export class Game extends Emitter {
 
     // [slot:shop]
 
-    // [slot:crafting]
+    this.useModule('crafting', installCrafting);
 
     // [slot:lore]
 
