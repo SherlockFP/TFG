@@ -1,0 +1,347 @@
+[
+ {
+  "id": "amb_backrooms_hum",
+  "path": "assets/ext/sounds/tfg-custom/amb_backrooms_hum.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "backrooms",
+   "fluorescent",
+   "hum",
+   "loop",
+   "tfg"
+  ]
+ },
+ {
+  "id": "amb_office_hvac",
+  "path": "assets/ext/sounds/tfg-custom/amb_office_hvac.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "office",
+   "hvac",
+   "loop",
+   "tfg"
+  ]
+ },
+ {
+  "id": "amb_server_room",
+  "path": "assets/ext/sounds/tfg-custom/amb_server_room.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 28.0,
+  "tags": [
+   "ambience",
+   "serverfarm",
+   "fans",
+   "loop",
+   "tfg"
+  ]
+ },
+ {
+  "id": "amb_sewer_tunnel",
+  "path": "assets/ext/sounds/tfg-custom/amb_sewer_tunnel.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 32.0,
+  "tags": [
+   "ambience",
+   "sewer",
+   "drips",
+   "loop",
+   "tfg"
+  ]
+ },
+ {
+  "id": "amb_hospital_ward",
+  "path": "assets/ext/sounds/tfg-custom/amb_hospital_ward.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 28.0,
+  "tags": [
+   "ambience",
+   "hospital",
+   "heart_monitor",
+   "loop",
+   "tfg"
+  ]
+ },
+ {
+  "id": "sfx_heart_beep",
+  "path": "assets/ext/sounds/tfg-custom/sfx_heart_beep.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 0.97,
+  "tags": [
+   "hospital",
+   "beep",
+   "heart_monitor",
+   "tfg"
+  ]
+ },
+ {
+  "id": "sfx_flatline",
+  "path": "assets/ext/sounds/tfg-custom/sfx_flatline.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 4.26,
+  "tags": [
+   "hospital",
+   "flatline",
+   "heart_monitor",
+   "stinger",
+   "tfg"
+  ]
+ },
+ {
+  "id": "sfx_phone_ring",
+  "path": "assets/ext/sounds/tfg-custom/sfx_phone_ring.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 5.92,
+  "tags": [
+   "office",
+   "phone",
+   "ring",
+   "bell",
+   "tfg"
+  ]
+ },
+ {
+  "id": "sfx_dialup_modem",
+  "path": "assets/ext/sounds/tfg-custom/sfx_dialup_modem.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 7.68,
+  "tags": [
+   "internet",
+   "modem",
+   "dialup",
+   "stinger",
+   "retro",
+   "tfg"
+  ]
+ },
+ {
+  "id": "sfx_hdd_click",
+  "path": "assets/ext/sounds/tfg-custom/sfx_hdd_click.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 2.4,
+  "tags": [
+   "serverfarm",
+   "hdd",
+   "click",
+   "computer",
+   "tfg"
+  ]
+ },
+ {
+  "id": "sfx_drip_1",
+  "path": "assets/ext/sounds/tfg-custom/sfx_drip_1.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 1.2,
+  "tags": [
+   "sewer",
+   "water",
+   "drip",
+   "tfg"
+  ]
+ },
+ {
+  "id": "sfx_drip_2",
+  "path": "assets/ext/sounds/tfg-custom/sfx_drip_2.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 1.2,
+  "tags": [
+   "sewer",
+   "water",
+   "drip",
+   "tfg"
+  ]
+ },
+ {
+  "id": "sfx_drip_3",
+  "path": "assets/ext/sounds/tfg-custom/sfx_drip_3.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 1.2,
+  "tags": [
+   "sewer",
+   "water",
+   "drip",
+   "tfg"
+  ]
+ },
+ {
+  "id": "sfx_drip_4",
+  "path": "assets/ext/sounds/tfg-custom/sfx_drip_4.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 1.2,
+  "tags": [
+   "sewer",
+   "water",
+   "drip",
+   "tfg"
+  ]
+ },
+ {
+  "id": "sfx_pipe_groan_1",
+  "path": "assets/ext/sounds/tfg-custom/sfx_pipe_groan_1.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 6.1,
+  "tags": [
+   "sewer",
+   "pipe",
+   "metal",
+   "groan",
+   "tfg"
+  ]
+ },
+ {
+  "id": "sfx_pipe_groan_2",
+  "path": "assets/ext/sounds/tfg-custom/sfx_pipe_groan_2.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 6.1,
+  "tags": [
+   "sewer",
+   "pipe",
+   "metal",
+   "groan",
+   "tfg"
+  ]
+ },
+ {
+  "id": "sfx_crt_on",
+  "path": "assets/ext/sounds/tfg-custom/sfx_crt_on.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 1.8,
+  "tags": [
+   "crt",
+   "tv",
+   "monitor",
+   "power",
+   "tfg"
+  ]
+ },
+ {
+  "id": "sfx_crt_off",
+  "path": "assets/ext/sounds/tfg-custom/sfx_crt_off.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 0.7,
+  "tags": [
+   "crt",
+   "tv",
+   "monitor",
+   "power",
+   "tfg"
+  ]
+ },
+ {
+  "id": "sfx_fluoro_flicker",
+  "path": "assets/ext/sounds/tfg-custom/sfx_fluoro_flicker.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 1.3,
+  "tags": [
+   "backrooms",
+   "office",
+   "light",
+   "flicker",
+   "electric",
+   "tfg"
+  ]
+ },
+ {
+  "id": "sfx_elevator_ding",
+  "path": "assets/ext/sounds/tfg-custom/sfx_elevator_ding.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 2.4,
+  "tags": [
+   "office",
+   "elevator",
+   "bell",
+   "tfg"
+  ]
+ },
+ {
+  "id": "sfx_printer_jam",
+  "path": "assets/ext/sounds/tfg-custom/sfx_printer_jam.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 2.6,
+  "tags": [
+   "office",
+   "printer",
+   "machine",
+   "tfg"
+  ]
+ },
+ {
+  "id": "sfx_typing",
+  "path": "assets/ext/sounds/tfg-custom/sfx_typing.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 3.0,
+  "tags": [
+   "office",
+   "keyboard",
+   "typing",
+   "tfg"
+  ]
+ },
+ {
+  "id": "sfx_bios_beep",
+  "path": "assets/ext/sounds/tfg-custom/sfx_bios_beep.ogg",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "duration": 2.0,
+  "tags": [
+   "serverfarm",
+   "computer",
+   "beep",
+   "error",
+   "tfg"
+  ]
+ },
+ {
+  "id": "amb_sewer_water_1",
+  "path": "assets/ext/sounds/quendel-water/amb_sewer_water_1.ogg",
+  "pack": "Free Water Stream Sounds",
+  "license": "CC-BY 4.0",
+  "credit": "Free Water Stream Sounds by Gregor Quendel (CC-BY 4.0)",
+  "duration": 33.5,
+  "tags": [
+   "ambience",
+   "sewer",
+   "water",
+   "loop"
+  ]
+ },
+ {
+  "id": "amb_sewer_water_2",
+  "path": "assets/ext/sounds/quendel-water/amb_sewer_water_2.ogg",
+  "pack": "Free Water Stream Sounds",
+  "license": "CC-BY 4.0",
+  "credit": "Free Water Stream Sounds by Gregor Quendel (CC-BY 4.0)",
+  "duration": 20.5,
+  "tags": [
+   "ambience",
+   "sewer",
+   "water",
+   "loop"
+  ]
+ }
+]

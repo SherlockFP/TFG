@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KEFAL COMPANY — model viewer</title>
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #07080b; color: #d8d4c8; font: 12px/1.35 monospace; }
+    #view { position: fixed; inset: 0; }
+    #view canvas { width: 100%; height: 100%; display: block; }
+    body.psx #view canvas { image-rendering: pixelated; }
+    #panel { position: fixed; top: 8px; left: 8px; width: 300px; max-height: calc(100% - 16px); overflow-y: auto; background: rgba(12, 13, 17, 0.9); border: 1px solid #3a3226; padding: 8px 10px; box-sizing: border-box; z-index: 5; }
+    #panel h2 { margin: 10px 0 4px; font-size: 12px; color: #e8903c; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #3a3226; }
+    #panel h2:first-child { margin-top: 0; }
+    .row { display: flex; flex-wrap: wrap; gap: 3px; margin: 3px 0; align-items: center; }
+    button { background: #1d1f26; color: #d8d4c8; border: 1px solid #454a55; padding: 2px 6px; font: inherit; cursor: pointer; }
+    button:hover { border-color: #e8903c; }
+    button.on { background: #e8903c; color: #120d06; border-color: #e8903c; }
+    label { display: inline-flex; gap: 4px; align-items: center; }
+    input[type=range] { width: 150px; }
+    select { background: #1d1f26; color: #d8d4c8; border: 1px solid #454a55; font: inherit; }
+    .lbl { position: fixed; transform: translate(-50%, -100%); pointer-events: auto; cursor: pointer; white-space: nowrap; padding: 1px 4px; background: rgba(0, 0, 0, 0.55); border: 1px solid #333; color: #cfc6b0; font-size: 11px; z-index: 2; }
+    .lbl.sel { border-color: #e8903c; color: #ffb060; }
+    .lbl small { color: #7d7868; }
+    #vmTitle { position: fixed; right: 8px; bottom: 250px; color: #7d7868; z-index: 3; }
+    #info { color: #7d7868; }
+  </style>
+</head>
+<body>
+  <div id="view"></div>
+  <div id="panel"></div>
+  <div id="vmTitle">first-person view model ↓</div>
+  <script type="module" src="./models.js"></script>
+</body>
+</html>

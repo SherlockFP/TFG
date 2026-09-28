@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TFG</title>
+  <meta name="description" content="Co-op PSX horror scavenging. Meet the quota. Engagement is love." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23120a04'/><path d='M4 16c6-8 16-8 22 0-6 8-16 8-22 0z' fill='%23ff7b2e'/><path d='M24 16l6-5v10z' fill='%23ff7b2e'/><circle cx='10' cy='15' r='1.6' fill='%23120a04'/></svg>" />
+  <style>
+    html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+    #loading { position: fixed; inset: 0; background: #050302; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; color: #ff9a4a; font-family: monospace; }
+    #loading.hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div id="game"></div>
+  <div id="ui"></div>
+  <div id="fps"></div>
+  <div id="loading"><div class="load-text">LOADING TFG OS...</div></div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

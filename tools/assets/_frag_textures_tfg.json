@@ -1,0 +1,430 @@
+[
+ {
+  "id": "tfg_office_ceiling",
+  "path": "assets/ext/textures/tfg-custom/tfg_office_ceiling.png",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "size": [
+   128,
+   128
+  ],
+  "tags": [
+   "ceiling",
+   "office",
+   "tiles",
+   "tfg"
+  ]
+ },
+ {
+  "id": "tfg_office_carpet",
+  "path": "assets/ext/textures/tfg-custom/tfg_office_carpet.png",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "size": [
+   128,
+   128
+  ],
+  "tags": [
+   "floor",
+   "office",
+   "carpet",
+   "tfg"
+  ]
+ },
+ {
+  "id": "tfg_office_wall",
+  "path": "assets/ext/textures/tfg-custom/tfg_office_wall.png",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "size": [
+   64,
+   64
+  ],
+  "tags": [
+   "wall",
+   "office",
+   "painted",
+   "tfg"
+  ]
+ },
+ {
+  "id": "tfg_cubicle_fabric",
+  "path": "assets/ext/textures/tfg-custom/tfg_cubicle_fabric.png",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "size": [
+   64,
+   64
+  ],
+  "tags": [
+   "fabric",
+   "office",
+   "cubicle",
+   "tfg"
+  ]
+ },
+ {
+  "id": "tfg_server_floor",
+  "path": "assets/ext/textures/tfg-custom/tfg_server_floor.png",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "size": [
+   128,
+   128
+  ],
+  "tags": [
+   "floor",
+   "serverfarm",
+   "raised_floor",
+   "metal",
+   "tfg"
+  ]
+ },
+ {
+  "id": "tfg_server_wall",
+  "path": "assets/ext/textures/tfg-custom/tfg_server_wall.png",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "size": [
+   128,
+   128
+  ],
+  "tags": [
+   "wall",
+   "serverfarm",
+   "metal",
+   "panel",
+   "tfg"
+  ]
+ },
+ {
+  "id": "tfg_sewer_brick",
+  "path": "assets/ext/textures/tfg-custom/tfg_sewer_brick.png",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "size": [
+   128,
+   128
+  ],
+  "tags": [
+   "wall",
+   "sewer",
+   "brick",
+   "wet",
+   "tfg"
+  ]
+ },
+ {
+  "id": "tfg_sewer_stone",
+  "path": "assets/ext/textures/tfg-custom/tfg_sewer_stone.png",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "size": [
+   128,
+   128
+  ],
+  "tags": [
+   "wall",
+   "ceiling",
+   "sewer",
+   "stone",
+   "tfg"
+  ]
+ },
+ {
+  "id": "tfg_sewer_floor",
+  "path": "assets/ext/textures/tfg-custom/tfg_sewer_floor.png",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "size": [
+   128,
+   128
+  ],
+  "tags": [
+   "floor",
+   "sewer",
+   "concrete",
+   "wet",
+   "tfg"
+  ]
+ },
+ {
+  "id": "tfg_hospital_floor",
+  "path": "assets/ext/textures/tfg-custom/tfg_hospital_floor.png",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "size": [
+   128,
+   128
+  ],
+  "tags": [
+   "floor",
+   "hospital",
+   "vinyl",
+   "tiles",
+   "tfg"
+  ]
+ },
+ {
+  "id": "tfg_hospital_wall",
+  "path": "assets/ext/textures/tfg-custom/tfg_hospital_wall.png",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "size": [
+   64,
+   64
+  ],
+  "tags": [
+   "wall",
+   "hospital",
+   "painted",
+   "tfg"
+  ]
+ },
+ {
+  "id": "tfg_hospital_tiles",
+  "path": "assets/ext/textures/tfg-custom/tfg_hospital_tiles.png",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "size": [
+   128,
+   128
+  ],
+  "tags": [
+   "wall",
+   "hospital",
+   "tiles",
+   "tfg"
+  ]
+ },
+ {
+  "id": "tfg_hospital_ceiling",
+  "path": "assets/ext/textures/tfg-custom/tfg_hospital_ceiling.png",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "size": [
+   128,
+   128
+  ],
+  "tags": [
+   "ceiling",
+   "hospital",
+   "tiles",
+   "tfg"
+  ]
+ },
+ {
+  "id": "tfg_backrooms_wallpaper",
+  "path": "assets/ext/textures/tfg-custom/tfg_backrooms_wallpaper.png",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "size": [
+   128,
+   128
+  ],
+  "tags": [
+   "wall",
+   "backrooms",
+   "wallpaper",
+   "yellow",
+   "tfg"
+  ]
+ },
+ {
+  "id": "tfg_backrooms_carpet",
+  "path": "assets/ext/textures/tfg-custom/tfg_backrooms_carpet.png",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "size": [
+   128,
+   128
+  ],
+  "tags": [
+   "floor",
+   "backrooms",
+   "carpet",
+   "wet",
+   "tfg"
+  ]
+ },
+ {
+  "id": "gbr_backrooms_carpet",
+  "path": "assets/ext/textures/gibbongl-backrooms/gbr_backrooms_carpet.png",
+  "pack": "Low-res Backrooms and Poolrooms textures",
+  "license": "CC0",
+  "size": [
+   64,
+   64
+  ],
+  "tags": [
+   "floor",
+   "backrooms",
+   "carpet",
+   "yellow"
+  ]
+ },
+ {
+  "id": "gbr_backrooms_wall",
+  "path": "assets/ext/textures/gibbongl-backrooms/gbr_backrooms_wall.png",
+  "pack": "Low-res Backrooms and Poolrooms textures",
+  "license": "CC0",
+  "size": [
+   64,
+   64
+  ],
+  "tags": [
+   "wall",
+   "backrooms",
+   "wallpaper",
+   "yellow"
+  ]
+ },
+ {
+  "id": "gbr_backrooms_wall_base",
+  "path": "assets/ext/textures/gibbongl-backrooms/gbr_backrooms_wall_base.png",
+  "pack": "Low-res Backrooms and Poolrooms textures",
+  "license": "CC0",
+  "size": [
+   64,
+   64
+  ],
+  "tags": [
+   "wall",
+   "backrooms",
+   "wallpaper",
+   "baseboard"
+  ]
+ },
+ {
+  "id": "gbr_backrooms_ceiling",
+  "path": "assets/ext/textures/gibbongl-backrooms/gbr_backrooms_ceiling.png",
+  "pack": "Low-res Backrooms and Poolrooms textures",
+  "license": "CC0",
+  "size": [
+   64,
+   64
+  ],
+  "tags": [
+   "ceiling",
+   "backrooms",
+   "tiles"
+  ]
+ },
+ {
+  "id": "gbr_poolrooms_tile",
+  "path": "assets/ext/textures/gibbongl-backrooms/gbr_poolrooms_tile.png",
+  "pack": "Low-res Backrooms and Poolrooms textures",
+  "license": "CC0",
+  "size": [
+   64,
+   64
+  ],
+  "tags": [
+   "floor",
+   "wall",
+   "poolrooms",
+   "tiles",
+   "white"
+  ]
+ },
+ {
+  "id": "gbr_poolrooms_tile_color",
+  "path": "assets/ext/textures/gibbongl-backrooms/gbr_poolrooms_tile_color.png",
+  "pack": "Low-res Backrooms and Poolrooms textures",
+  "license": "CC0",
+  "size": [
+   64,
+   64
+  ],
+  "tags": [
+   "floor",
+   "wall",
+   "poolrooms",
+   "tiles"
+  ]
+ },
+ {
+  "id": "gbr_backrooms_light",
+  "path": "assets/ext/textures/gibbongl-backrooms/gbr_backrooms_light.png",
+  "pack": "Low-res Backrooms and Poolrooms textures",
+  "license": "CC0",
+  "size": [
+   32,
+   32
+  ],
+  "tags": [
+   "light",
+   "backrooms",
+   "emissive",
+   "ceiling"
+  ]
+ },
+ {
+  "id": "gbr_poolrooms_light",
+  "path": "assets/ext/textures/gibbongl-backrooms/gbr_poolrooms_light.png",
+  "pack": "Low-res Backrooms and Poolrooms textures",
+  "license": "CC0",
+  "size": [
+   32,
+   32
+  ],
+  "tags": [
+   "light",
+   "poolrooms",
+   "emissive",
+   "ceiling"
+  ]
+ },
+ {
+  "id": "nb_backrooms_wallpaper",
+  "path": "assets/ext/textures/naivegoblin-backrooms/nb_backrooms_wallpaper.png",
+  "pack": "Backrooms Asset Pack",
+  "license": "CC-BY 4.0",
+  "credit": "Backrooms Asset Pack by NaiveGoblin (CC-BY 4.0)",
+  "size": [
+   128,
+   128
+  ],
+  "tags": [
+   "wall",
+   "backrooms",
+   "wallpaper",
+   "yellow"
+  ]
+ },
+ {
+  "id": "nb_backrooms_carpet",
+  "path": "assets/ext/textures/naivegoblin-backrooms/nb_backrooms_carpet.png",
+  "pack": "Backrooms Asset Pack",
+  "license": "CC-BY 4.0",
+  "credit": "Backrooms Asset Pack by NaiveGoblin (CC-BY 4.0)",
+  "size": [
+   128,
+   128
+  ],
+  "tags": [
+   "floor",
+   "backrooms",
+   "carpet",
+   "yellow"
+  ]
+ },
+ {
+  "id": "nb_office_ceiling",
+  "path": "assets/ext/textures/naivegoblin-backrooms/nb_office_ceiling.png",
+  "pack": "Backrooms Asset Pack",
+  "license": "CC-BY 4.0",
+  "credit": "Backrooms Asset Pack by NaiveGoblin (CC-BY 4.0)",
+  "size": [
+   128,
+   128
+  ],
+  "tags": [
+   "ceiling",
+   "backrooms",
+   "office",
+   "tiles",
+   "light"
+  ]
+ }
+]

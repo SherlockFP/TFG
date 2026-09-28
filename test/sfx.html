@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KEFAL COMPANY — SFX audition</title>
+<style>
+  :root {
+    --bg: #0d0f0c; --panel: #161a14; --line: #2a3226; --text: #c9d4bf; --dim: #7d8a73;
+    --accent: #e0a526; --loop: #4fb3a6; --hot: #d9573b;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 13px/1.4 ui-monospace, Consolas, monospace; }
+  header { position: sticky; top: 0; z-index: 2; background: #0d0f0cee; border-bottom: 1px solid var(--line);
+    padding: 10px 16px; display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+  h1 { margin: 0; font-size: 15px; letter-spacing: 2px; color: var(--accent); }
+  header label { display: flex; gap: 6px; align-items: center; color: var(--dim); }
+  input[type=search] { background: var(--panel); border: 1px solid var(--line); color: var(--text); padding: 5px 8px; width: 180px; font: inherit; }
+  button { font: inherit; cursor: pointer; }
+  .tool { background: var(--panel); color: var(--text); border: 1px solid var(--line); padding: 5px 10px; }
+  .tool:hover { border-color: var(--accent); }
+  #status { color: var(--dim); min-width: 220px; }
+  #wave { display: block; width: 100%; height: 70px; background: var(--panel); border-bottom: 1px solid var(--line); }
+  main { padding: 8px 16px 40px; }
+  section h2 { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--dim); margin: 18px 0 8px;
+    border-bottom: 1px dashed var(--line); padding-bottom: 4px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px; }
+  .snd { display: flex; align-items: stretch; background: var(--panel); border: 1px solid var(--line); }
+  .snd .play { flex: 1; text-align: left; background: none; border: 0; color: var(--text); padding: 6px 8px; }
+  .snd .play:hover { background: #20271c; }
+  .snd .meta { display: block; color: var(--dim); font-size: 11px; }
+  .snd .loopbtn { width: 46px; border: 0; border-left: 1px solid var(--line); background: none; color: var(--loop); font-size: 11px; }
+  .snd .loopbtn.on { background: var(--loop); color: var(--bg); }
+  .snd.playing { border-color: var(--accent); }
+  .snd.err { border-color: var(--hot); }
+  .tag { color: var(--loop); }
+</style>
+</head>
+<body>
+<header>
+  <h1>KEFAL SFX</h1>
+  <button class="tool" id="renderAll">Render all</button>
+  <button class="tool" id="stopAll" title="Esc">Stop all</button>
+  <label>vol <input type="range" id="master" min="0" max="1" step="0.01" value="0.8"></label>
+  <label><input type="checkbox" id="useVol" checked> apply suggested vol</label>
+  <input type="search" id="filter" placeholder="filter…">
+  <span id="status">click a sound to render + play</span>
+</header>
+<canvas id="wave"></canvas>
+<main id="list"></main>
+<script type="module" src="./sfx.js"></script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KEFAL COMPANY — minigame test bench</title>
+    <style>
+      :root {
+        --g: #39ff6a;
+        --a: #ffb000;
+        --bg: #030805;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; }
+      body {
+        background: var(--bg);
+        color: var(--g);
+        font-family: 'VT323', monospace;
+        font-size: 20px;
+        overflow: hidden;
+      }
+      /* fake 3D world behind the overlay */
+      #world {
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(ellipse at 50% 60%, rgba(40, 70, 60, 0.35), rgba(0, 0, 0, 0) 60%),
+          repeating-linear-gradient(90deg, #0b1310 0 38px, #0e1a15 38px 40px),
+          linear-gradient(#050807, #0c1511);
+        animation: sway 7s ease-in-out infinite alternate;
+      }
+      #world::after {
+        content: 'THE PLAYER IS STILL IN THE WORLD. SOMETHING IS BEHIND YOU.';
+        position: absolute;
+        left: 50%;
+        bottom: 12px;
+        transform: translateX(-50%);
+        color: rgba(255, 60, 60, 0.35);
+        letter-spacing: 2px;
+        white-space: nowrap;
+      }
+      @keyframes sway {
+        from { filter: brightness(0.8); background-position: 0 0, 0 0, 0 0; }
+        to { filter: brightness(1.05); background-position: 0 0, 60px 0, 0 0; }
+      }
+      #panel {
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        width: 380px;
+        max-height: calc(100vh - 24px);
+        overflow: auto;
+        padding: 12px 14px;
+        border: 2px solid #1b4d2a;
+        border-radius: 10px;
+        background: rgba(2, 8, 5, 0.92);
+        box-shadow: 0 0 30px rgba(57, 255, 106, 0.12);
+        z-index: 10;
+      }
+      h1 {
+        font-family: 'Press Start 2P', monospace;
+        font-size: 12px;
+        color: var(--a);
+        margin: 0 0 10px;
+        line-height: 1.5;
+      }
+      .row { display: flex; align-items: center; gap: 8px; margin: 6px 0; flex-wrap: wrap; }
+      label { color: #9fdcb0; }
+      button {
+        font: inherit;
+        color: var(--g);
+        background: #07160c;
+        border: 1px solid #1f6a35;
+        border-radius: 4px;
+        padding: 3px 10px;
+        cursor: pointer;
+      }
+      button:hover { background: #0c2a16; color: #fff; }
+      .games button { min-width: 108px; }
+      input, select {
+        font: inherit;
+        color: var(--g);
+        background: #020604;
+        border: 1px solid #1f6a35;
+        border-radius: 3px;
+        padding: 1px 4px;
+      }
+      input[type='number'] { width: 90px; }
+      input[type='range'] { width: 150px; accent-color: var(--g); }
+      #log {
+        margin-top: 8px;
+        height: 200px;
+        overflow: auto;
+        font-size: 17px;
+        line-height: 1.1;
+        border-top: 1px dashed #1f6a35;
+        padding-top: 6px;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+      #log .res { color: #fff; }
+      #log .sfx { color: #5a8a6a; }
+      #attract {
+        width: 256px;
+        height: 192px;
+        image-rendering: pixelated;
+        border: 2px solid #1b4d2a;
+        border-radius: 6px;
+        display: block;
+        margin-top: 4px;
+      }
+      #ui-layer { position: fixed; inset: 0; pointer-events: none; z-index: 100; }
+      #ui-layer > * { pointer-events: auto; }
+      small { color: #5a8a6a; }
+    </style>
+  </head>
+  <body>
+    <div id="world"></div>
+    <div id="panel">
+      <h1>KEFAL CO. // MINIGAME TEST BENCH</h1>
+      <div class="row games" id="games"></div>
+      <div class="row">
+        <label for="diff">difficulty</label>
+        <input id="diff" type="range" min="0" max="1" step="0.05" value="0.3" />
+        <span id="diffv">0.30</span>
+      </div>
+      <div class="row">
+        <label for="seed">seed</label>
+        <input id="seed" type="number" value="1337" />
+        <label><input id="randseed" type="checkbox" checked /> random each run</label>
+      </div>
+      <div class="row">
+        <label for="fish">fish</label>
+        <select id="fish"></select>
+      </div>
+      <div class="row">
+        <label for="balance">slots balance</label>
+        <input id="balance" type="number" value="500" />
+        <label for="hi">arcade hi</label>
+        <input id="hi" type="number" value="0" />
+      </div>
+      <div class="row">
+        <label><input id="sound" type="checkbox" checked /> beeps</label>
+        <label><input id="logsfx" type="checkbox" /> log sfx</label>
+        <button id="clear">clear log</button>
+      </div>
+      <div class="row">
+        <div>
+          <small>arcade attract (128x96, 10 fps):</small>
+          <canvas id="attract" width="128" height="96"></canvas>
+        </div>
+      </div>
+      <div id="log"></div>
+    </div>
+    <div id="ui-layer"></div>
+    <script type="module" src="./minigames.js"></script>
+  </body>
+</html>

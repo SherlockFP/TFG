@@ -1,0 +1,23 @@
+# Render Blueprint — TFG as a free static site.
+# Multiplayer is serverless P2P (Trystero over Nostr relays), so no game server is needed:
+# Render only serves the built files. Friends open the URL, one hosts, the others join with the code.
+services:
+  - type: web
+    name: tfg
+    runtime: static
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    pullRequestPreviewsEnabled: false
+    envVars:
+      - key: NODE_VERSION
+        value: 22.12.0
+    headers:
+      # short cache for everything: /assets/ also holds the (unhashed) asset packs + manifest.json,
+      # so a long "immutable" rule there would serve stale content after a redeploy
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=600
+      # voice chat needs the microphone on this origin
+      - path: /*
+        name: Permissions-Policy
+        value: microphone=(self)

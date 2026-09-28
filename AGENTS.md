@@ -1,0 +1,311 @@
+# AGENTS.md — handoff guide for the next AI / developer
+
+> Read this first. It explains what **TFG — TOTALLY FUCKED GAME** is, how the code is organised, how to run
+> and test it, what state everything is in, and what to do next. Keep it updated when you finish work.
+> The owner (the user) writes in **Turkish**; answer in Turkish. UI text is English with Turkish translations.
+
+## 0. START HERE (new AI / developer taking over)
+**Project folder:** `D:\KefalCompany` (Windows). Dev server: `npm run dev` → http://localhost:5173.
+
+Reading order (≈15 min):
+1. **This file** top to bottom — especially §5.2 (work that was in progress at handoff) and §6 (what to do next).
+2. `docs/CRITIQUE.md` — honest list of what feels bad and what is planned (update it after every round).
+3. `docs/THEME.md` — TFG naming bible (display names; ids stay "kefal").
+4. `docs/BUGS.md` — verified bug list (fixed ones are listed in §5.4 here; the rest are open).
+5. Skim `src/game/game.js` (orchestrator), `src/game/host.js` (host rules), `src/game/actions.js` (player actions).
+6. Only when doing audio: `docs/AUDIO_AUDIT.md`. Only when doing mods: `docs/LC_MODS.md` + `src/mods/modapi.js`.
+
+First 30 minutes checklist:
+- [ ] `npm install && npm run dev`, open `http://localhost:5173/?autohost=local&code=T1&name=Tester`
+- [ ] Syntax check: `for f in $(find src public/mods -name "*.js"); do node --check $f || echo FAIL $f; done`
+- [ ] Run the smoke test in §5.5 (must print `errs: []`) — if `setpieces.js` crashes see §5.2
+- [ ] `git init && git add -A && git commit -m "handoff snapshot"` (there is no git history yet!)
+- [ ] Tell the owner (in Turkish) what you will do next, then work in small fast rounds (§2)
+
+### Türkçe özet (sahibi için)
+Proje klasörü `D:\KefalCompany`. Yeni AI önce bu dosyayı (AGENTS.md), sonra `docs/CRITIQUE.md`, `docs/THEME.md`,
+`docs/BUGS.md` dosyalarını okumalı. Yapılanlar §5.1'de, devralındığı an yarım kalan işler §5.2'de, eksikler ve
+bilinen sorunlar §5.3'te, sıradaki işler öncelik sırasıyla §6'da. Yeni AI'a şunu demen yeterli:
+"D:\KefalCompany projesindeki AGENTS.md dosyasını oku ve §6'daki yol haritasından devam et."
+
+## 1. What the game is
+Browser co-op PSX-style horror scavenging game: **Lethal Company + R.E.P.O.** core loop with an **MMO-style
+progression layer** (levels, skill points, personal currency "Clout" ◈, black market, bounties, achievements),
+**minigames**, **mods**, **proximity voice chat** (push-to-talk **V**) with mouth animation, and **serverless P2P
+multiplayer** (Trystero/WebRTC, lobby browser, join by 6-letter code).
+
+Theme: **internet content / "dead internet"** (the user dropped the original fish/"Kefal" theme). You scavenge lost
+content from abandoned server moons and sell it to **The Algorithm** to meet the **Engagement Quota**. Creatures are
+internet horrors (Lurker, Web Crawler, NPC, Deepfake, Troll, Pop-up, AI Slop, The Worm…). Fish art is reused through
+"phishing" puns (Phish Dayı the black-market merchant, FLAPPY PHISH arcade, PHISHING minigame).
+**Full naming bible: `docs/THEME.md`.** Internal ids (item/creature/moon/prop/sound ids, `kefal.*` localStorage
+keys, `window.KefalAPI`, the folder name) intentionally still say "kefal" — do NOT rename ids (saves + mods break).
+
+## 2. Owner preferences (important)
+- Wants **speed**: small, fast iterations; don't run long multi-agent rounds unless asked; estimate and ship.
+- Wants the game to feel **premium and fun, not "low budget"**: goals, replayability, juice, good UI.
+- Name is **TFG / TOTALLY FUCKED GAME**; use "TFG" everywhere.
+- Main menu = **Call of Duty: Black Ops 1 style** CRT-monitor room (done: `src/ui/crtmenu.js`).
+- R.E.P.O.-like extras: push-to-talk on **V** (default), emotes + animations (done: `src/game/emotes.js`), expressive faces.
+- Audio issues were reported ("no sound in headphones"); the owner said **gameplay first, audio later**.
+  Deferred audio findings: `docs/AUDIO_AUDIT.md` (21 confirmed issues, e.g. output-device loss, BT hands-free).
+- Keep an honest running critique: `docs/CRITIQUE.md` (update it each round).
+
+## 3. Run / build / test
+```bash
+npm install
+npm run dev          # http://localhost:5173  (HMR is OFF by default; reload manually. KEFAL_HMR=1 to enable)
+npm run dev:https    # self-signed HTTPS (needed for microphone when friends join over LAN)
+npm run build        # static build in dist/ (can be uploaded to itch.io as HTML5)
+```
+Dev helpers (URL params, see `src/main.js`):
+- `?autohost=local&code=ABC123&name=Hasan` → auto-host (network `local` = BroadcastChannel between tabs on one PC;
+  `nostr`/`mqtt`/`torrent` = real internet P2P). `?name=` uses a throwaway in-memory profile (not saved).
+- `?autojoin=ABC123&net=local&name=Can` → auto-join.
+- Console: `kefal` = the App, `kefal.game` = Game, `kefal.tick(n, dt, render)` advances the simulation manually
+  (background/hidden browser tabs pause requestAnimationFrame — use tick or the 20 Hz hidden-tab fallback loop).
+  `window.THREE` is exposed. Example: `kefal.game.net.request('lever')` lands the ship (landing takes ~9 s real time).
+- Syntax check everything: `for f in $(find src -name "*.js"); do node --check $f; done`
+- No test framework; verification = node --check + browser playtests (screenshots) + small scripted checks via `kefal`.
+
+## 4. Architecture (≈36k lines, plain ES modules, Vite, three.js 0.186, Rapier, Trystero 0.25)
+| Path | Role |
+|---|---|
+| `src/main.js` | App: boot (physics, ext assets, models, mods), CRT menu, host/join, key handling, main loop, audio unlock |
+| `src/core/` | `engine.js` renderer + PSX post (low-res RT, vertex snap via ShaderChunk patch, outlines, dithering, bloom), `input.js`, `rng.js` (seeded RNG — world gen must only use this), `save.js` (settings/profile/run saves + migrations), `i18n.js` (EN keys → TR), `util.js`, `events.js` |
+| `src/physics/physics.js` | Rapier wrapper: static boxes/trimesh, item bodies, kinematic capsules, character controller, raycasts, groups `G` |
+| `src/render/` | `lightpool.js` (constant-count point/spot lights reassigned per frame + halos + beam cones — never change light COUNT or `visible`, that recompiles shaders), `textures.js` (procedural pixel textures) |
+| `src/world/` | `facility.js` (procedural interior: layout → geometry/colliders/props/doors/lights/nav, `mergeStaticMeshes`), `nav.js` (grid A*), `terrain.js` (outdoor moon), `ship.js` (ship always at world origin), `company.js` (HQ), `environment.js` (sky/fog/weather/day-night), `geobuilder.js` (merged quads, `levelTexture` prefers downloaded PSX textures), `extmodels.js` + `propfactory.js` (downloaded GLB props `ext:<id>`) |
+| `src/entities/` | `localplayer.js` (FPS controller, stamina, weight, fall damage), `remote.js` (avatars, interpolation, emotes, mouth), `items.js` (world items, physics ownership transfer for the REPO grab beam, fragile value), `creatures.js` (host AI `BEHAVIORS` + client `CreatureView`s, hazards) |
+| `src/game/` | `game.js` orchestrator (net handlers, map load/unload, loop), `host.js` (host-only run logic mixed into Game: phases, quota, economy, spawning, request handlers, `later()` timers), `actions.js` (local player actions: interact, inventory, combat, scan, minigames, damage/death/spectate), `terminal.js` (ship terminal commands), data tables `items.js` / `creatures.js` / `moons.js` / `progression.js`, `profile.js` (XP/levels/coins/bounties), `screens.js` (ship CRT screens), `emotes.js`, `objectives.js` (HUD objective tracker), `extcontent.js` (items/creatures from downloaded models), plus new feature modules (see §6) |
+| `src/net/` | `transport.js` (Trystero or BroadcastChannel), `lobby.js` (serverless lobby discovery), `session.js` (request/broadcast envelope), `voice.js` (proximity voice, walkie, clip capture for "skinwalker" mimicry) |
+| `src/ui/` | `ui.js` (menus/panels), `hud.js` (visor HUD), `crtmenu.js` (Black Ops CRT main menu), `style.css`, `icons.js` (item thumbnails, used by the inventory) |
+| `src/models/` | procedural models: `avatar.js` (player + first-person arms, face canvas with mouth), `creatures.js`, `items.js`, `props.js`, `modelkit.js` |
+| `src/audio/` | `audio.js` (WebAudio manager), `sfxlib.js`/`dsp.js` (191 procedural sounds), `extassets.js` (downloaded OGG sounds + texture overrides) |
+| `src/minigames/` | DOM/canvas minigames: arcade, fishing, safe, fuse, lockpick, slots (common API `create*(opts) → {el, update, destroy}`) |
+| `src/render/particles.js` | pooled PSX particles (blood/sparks/goo/dust/death) — `game.particles.burst()` |
+| `tools/apply_hooks.py` | applies agent integration hooks from workflow journals (see §5.6) |
+| `src/mods/modapi.js` + `src/mods/modscreen.js` + `public/mods/*.js` | mod system (`KefalAPI` / `ViralAPI` v2): 24 **TFG FEATURES** = built-in LC mod ports (on by default, per-feature switches, host-authoritative `config.features`, terminal `FEATURES`) + 10 optional cheat/joke mods. See `docs/LC_MODS.md` |
+| `public/assets/ext/` | downloaded CC0/free packs (1159 textures, 452 sounds, 284 GLBs) + `manifest.json`; licenses in `CREDITS.md` |
+
+**Networking model:** host is authoritative for world state (items, creatures, doors, economy, time); each peer owns
+its own player (movement, HP). Clients call `game.net.request(action, data)` → host handler (`net.handle`); host
+broadcasts events (`it`, `cev`, `door`, `phase`, `gs`, `xp`, `sys`, `fx`, `hurt`, …). World generation is deterministic
+from the run seed on every peer. `applyRunState` mutates `game.run` in place (host code may hold references).
+
+## 5. Status at handoff (2026-09-28, ~20:00)
+
+### 5.1 DONE — works and was checked in the browser
+**Core loop (Lethal Company):** ship in orbit → terminal (MOONS/ROUTE/STORE/BUY/SCAN…) → lever lands (~9 s) →
+procedural facility (3 interior themes: factory, mansion, **mineshaft**) + outdoor moon + HQ ("0-Algorithm HQ") →
+scrap pickup/carry/weight/drop, REPO-style grab beam for big items (physics ownership transfer), fragile value loss →
+sell on the HQ counter + bell (buy rate by days left, `run.favor` multiplier) → quota / 3-day deadline / fines for
+deaths (less if the body is carried back) / all-dead loses scrap / fired = run reset, personal progression kept.
+Death → spectate → revive in orbit. Midnight auto-takeoff, left-behind players die.
+
+**Progression (MMO layer):** XP/levels/ranks (Lurker … Internet Legend), skill points (TAB), Clout ◈ currency,
+black market (Phish Dayı), soulbound gear, bounties, **achievements + titles on name tags + daily login streak**
+(`achievements.js`), **affixed weapon loot** with rarity/prefix/suffix (`loot.js`), **boss The Foreman** (`bosses.js`,
+indoor, slam telegraph, stun guard, loot drop, HP bar; HP 1100).
+
+**World variety:** set pieces (catwalks, steam vents, flooded rooms, dark corridors, blood trails — `setpieces.js`),
+mineshaft interior on 88-Chatroom (`mineshaft.js`), outdoor outposts with lockable supply crates (`outposts.js`),
+weather, day/night, 7 moons, 17 creatures + hazards (turrets, mines, fake exit), mimics (door mimic, voice
+"skinwalker" mimic using recorded voice clips, crewmate mimic).
+
+**Horror pacing:** horror director (`director.js`: tension/relief, shadow figures, blackouts, heartbeat on chase,
+boss-aware), creature AI with sound-based hunting.
+
+**Social / REPO extras:** proximity voice chat (HRTF, push-to-talk **V** default, walkie radio, mic consent panel),
+mouth animation, 16 emotes (hold **B** wheel, Z/X quick emotes, third-person emote camera), pings (P / MMB),
+ship features (`shipfeatures.js`: loud horn, floodlight, disco ball, teleporter, **mirror**, cupboard), chat.
+
+**Multiplayer:** Trystero P2P (Nostr/MQTT/torrent) + BroadcastChannel local mode, serverless lobby browser,
+6-letter join codes, host-authoritative world, deterministic seeded world gen. Verified: 2 tabs locally + a real
+Nostr session (voice path with a synthetic stream).
+
+**UI:**
+- Black Ops 1 style **CRT room main menu** (`crtmenu.js`).
+- Visor HUD with objectives tracker (`objectives.js`) and inventory **item icons** (`icons.js` → `hud.setInventory`).
+- End-of-day **PERFORMANCE REPORT**: count-up rows, S–F grade stamp, crew badges (`ui.showDaySummary`).
+- **QUOTA MET** confetti cinematic (host event `quotamet`) and **DEPLATFORMED** terminal/glitch cinematic (`ui.showFired`).
+- Death overlay with the cause ("You blinked.") and a tip.
+- Terminal, market, settings (audio output device picker, test sound, meter), TR/EN i18n.
+
+**Feel / visuals:** PSX pipeline (low-res, vertex snap, dithering, outlines), bloom, light halos + beam cones,
+**hit particles** (`render/particles.js`: blood/sparks/goo/dust/death), **hitstop** (`game.hitstopT`),
+**knockback** (host `hit` handler), camera shake, hit flash.
+
+**Mods:** `KefalAPI` v2. 24 LC mod ports are built in as TFG FEATURES (on by default, switch per feature; host decides crew features, terminal `FEATURES`), incl. 11 new ones: Late Join, Push Company, Needy Cats, Sell Bodies, Spectate Enemies, Control Company Lite, Helmet Cameras, Employee Assignments, Story Logs, General Improvements, Weather Tweaks. 10 optional cheat/joke mods. The 3 mod bugs from BUGS.md (roulette payout, reserved-slots welcome, content-mod enforcement) are fixed. List: `docs/LC_MODS.md`.
+
+**Theme:** fully re-themed to TFG / internet content (display names only — ids unchanged, see `docs/THEME.md`).
+
+**Bug hunt:** 87 verified findings in `docs/BUGS.md`; ~35 critical/major fixed (list in §5.4).
+
+### 5.2 IN PROGRESS at handoff time (check these first!)
+- Three background "fix" agents (Claude Code workflow subagents) were **still editing** these files when this was
+  written: `src/world/setpieces.js` (label `fix:setpieces`), `src/world/outposts.js` (`fix:outposts`),
+  `src/world/mineshaft.js` (`fix:mineshaft`). If the session ended mid-edit a file may be broken.
+  - Last smoke test caught setpieces.js **mid-edit**: `TypeError … reading 'color'` in `SetPieces.updateSparks`
+    (`s.glowMat` undefined, around line 555). If it still happens, fix it (spark objects need `glowMat`/`lit`/`dim`
+    set where they are built, or guard `s.glowMat?.color`).
+  - Their integration hooks (if any) are in the workflow journals; apply with
+    `PYTHONIOENCODING=utf-8 python tools/apply_hooks.py wf_c18bf06d-d15 fix:setpieces` and
+    `… wf_c2bb065f-00c fix:outposts` / `fix:mineshaft` (safe to re-run; already-present code is skipped).
+    If the journals are gone, just review the three files by hand and run the smoke test below.
+- Already applied from finished agents: every `build:*` hook, `fix:achievements`, `fix:director`, `fix:ship`,
+  `fix:pings`. `fix:loot` needed no hooks (it edited bosses.js/loot.js directly).
+
+### 5.3 MISSING / KNOWN PROBLEMS (honest list)
+**Not verified by hand (only "no console errors" scripted tests):** Foreman fight feel/balance, crate lockpicking,
+achievements panel UI, set-piece balance (steam damage, flooding), outposts on every biome, emote sync between
+2 real players, all new modules with **2+ real players over the internet** (only local host tested).
+**Bugs still open:** `docs/BUGS.md` remaining items — generator room can attach to the vault (facility.js `attach`),
+minor findings, mod issues (lethal-casino roulette payout timing, reserved-slots vs host config, content-mod
+enforcement). Boss review leftovers: leash re-engage stall when hit while walking home; loot drops could clip
+through walls (DROP_TRIES added, not verified); shared `_v` passed to delayed audio.
+**Audio:** owner reported "no sound in headphones" — deferred on request. 21 confirmed issues in
+`docs/AUDIO_AUDIT.md` (device loss, BT hands-free profile, meter after destination…). Real microphones untested.
+**UI:** host/join/settings/character submenus still look like web forms (should match the CRT room); no 3D
+character preview; no loading tips; `▮` credit glyph renders as a wide block in the pixel font; scan labels,
+store and sale list don't use item icons yet.
+**Feel:** no LC-style 3D scan wave; first-person weapon poses/swing arcs weak; no particles on item break/pickup;
+footstep/impact variety thin.
+**Replayability:** no daily moon events (risk/reward modifiers), no collection log, favor multiplier not shown in UI.
+**Re-theme leftovers:** some models still fish-flavoured (merchant head, fish hat), arcade sprite/"TFG JUMP" text,
+poster/sign textures in `src/render/textures.js`, slot machine symbols.
+**Balance:** day length 720 s, quota growth, creature power budget, early instant deaths near the entrance,
+affix sell bonus (CAP.valuePct 1 → up to ~6× value on legendary).
+**Infra:** the project is **not a git repository** — run `git init` + first commit before big changes.
+`npm run build` was not re-verified after the latest modules. No automated tests.
+
+### 5.4 Bugs fixed this session (for reference)
+Host timers surviving leave (`later()` + `destroyed`), host slot overwriting saves (`loadRun` at START), double
+sell, all-dead at HQ soft-lock, scrap re-collected every day (`it.collected` persisted), mid-day quit save-scum
+(only save in orbit/company), stale run ref (in-place run state), left-behind double death + their held scrap
+teleporting into the ship, held items not saved, quotaMul compounding, fired run persisted immediately, charger for
+host items, stale prevVel false impacts, grab-beam quick tap / double start, medkit exploit, leech latch cleanup +
+black spectator view, turret cone/'off' state, yoinker freeze on unreachable scrap, HUD injection via network
+numbers, chat click pointer-lock, pointer re-capture after leaving, DECEASED overlay leaking, fuse-box XP farm, HQ
+fishing farm (6/day), LightPool `visible` toggling (shader recompiles), nav crossing walls beside doors, unlocked
+doors staying blocked in nav, lamp post inside the ship, host-dropped items invisible, ghost players from rejected
+peers, leaver items dropped at ship centre, host tab hidden freezing the world, buyRnd sync, boss double-stun
+cancel, affix normalisation overwritten, death/level-up banners overlapping, generator/vault attach
+seal (attach rejects entrance/vault/generator rooms), setpieces spark `glowMat` guard.
+
+### 5.7 Second handoff round (2026-09-28, ~21:30) — §6-1 + §6-3 start
+Stabilised: all `src` + `public/mods` files pass `node --check` (0 fail), `npm run build` succeeds
+(chunk warnings only), git initialised (`78e1dd3 handoff snapshot`, `.gitignore` for node_modules/dist).
+setpieces.js crash point guarded with `s.glowMat?.color`; spark builder already sets `glowMat`, so the
+mid-edit crash from §5.2 should be gone — needs the browser smoke test (§5.5) to confirm.
+`src/world/mineshaft.js` was still being edited by a background agent at snapshot time (unstaged diff).
+Generator/vault attach bug fixed per `docs/BUGS.md` verified fix (`1edbfb9`). Still open: browser smoke
+test, 2-tab hand playtest (§6-2), remaining BUGS.md items.
+
+### 5.8 Round 3 stability pass (bug fixer)
+- Run sync is generic: `broadcastRun()` without keys diff-syncs every top-level `run` field once per second (host.js),
+  so new fields added to `game.run` reach clients automatically. `run.dailyEvent` rides the landing phase message.
+- Session (net/session.js): host-only message types are ignored from non-hosts; the host relays client broadcasts
+  (`net.relayTypes`) to peers without a direct link; host broadcasts `pleft` for ghost cleanup.
+- Early-game fairness: 90 s / 25 m walking-distance no-spawn zone around facility doors (`hostEarlySafeFilter`,
+  `NavGrid.distanceField`). `hostSpawnCreatureIndoor` returns true/false; power is only charged on success.
+- Per-day resets in hostLever: pressureStage, moonT, fuseDone. Blackout daily event = real `hostSetPower(false)`.
+- Pickfail restores the host transform; grenades tick in every phase; item music/glow torn down (`updateItemFx`);
+  late-join item state; jetpack LMB/battery; harbour/orbit void safety net; local player sub-steps long frames.
+- BUGS.md entries fixed this round are marked `**FIXED (round 3)**`. Still open: creature-AI minors in
+  entities/creatures.js (lurker anger, aggro on chasers, A* throttling, initial loop sounds), ui.js key-rebind leak
+  and lobby HTML entities, TURN server option, the 3 [mods] items.
+
+### 5.9 Round 3 - interior themes + hazards (dungeons agent)
+- `src/world/interiors/`: registry `index.js` (INTERIOR_THEMES, INTERIORS[id], getInterior, INTERIOR_NAMES, interiorFootstep/Ambience/Atmosphere) + one file per theme: `office.js` (Corporate Intranet, wing plan, cubicles, elevator hub), `backrooms.js` (Level 0, 'open' plan, poolrooms), `serverfarm.js` (Cloud Storage, rack aisles + cable trays, core chamber), `sewer.js` (Comment Sewer, water channels, cistern), `hospital.js` (Telehealth Clinic, wards, morgue, operating theatre). `hazards.js`: laser grids (alarm = host noise), breaker rooms, cave-ins, vent shortcuts, toxic sludge (net: spHz / spHzB / spHzState via setpieces.js).
+- `facility.js generateLayout(seed, theme, size)`: unknown theme -> factory, size clamped 0.5..2.6 (MAX_FACILITY_SIZE), per-theme layout rules (plan rooms|wings|open, door/blast odds, loops, hub landmark room, room shapes), island repair (every cell reachable). Verified in node: 100 seeds x 8 themes x sizes 0.8-2.6, 0 failures.
+- Open: no true multi-level floors (2D nav grid). Breaker-room lamp bulbs still look lit while dark. Hazard feel/balance not yet playtested in the browser.
+
+### 5.10 Round 3 - content wave (11 builders, integrated; NOT yet browser-verified)
+- **Endless moons** `src/game/moongen.js`: every quota opens a new SECTOR of 3-5 generated moons (pure fn of run.runId + quotaIndex,
+  registered into MOONS at `applyRunState` via `ensureSector`), 10 biomes (4 new in `world/outdoor_biomes.js`), map scale up to 1.5x,
+  13 modifiers, 3 new outposts, terminal SECTOR/MAP/INFO, fuzzy ROUTE. Interiors picked from all 8 registered themes.
+- **Interiors** see §5.9. **Loot:** `items.js scrapTableFor/bigTableFor(theme)` used by host populate + random scrap; 25 new scrap,
+  2 big valuables, 5 store tools (ladder, signal booster, hype inhaler, belt bag, adblock spray); affix sell bonus capped at 2x.
+- **Creatures:** 7 new (Moderator, Customer Support + Ticket Swarm, Editor, Tamagotchi, Parasocial, Clickbait, Reply Guy), Legacy Bot
+  world boss, variants + elite affixes; host uses `spawnTable(moon, zone, run)` + `canSpawnMore` caps.
+- **Uplink Van** `entities/cruiser.js` (BUY VAN, 4 seats, cargo bed). **Meta** `game/prestige.js` installMeta: codex, 20 daily
+  events, weekly challenge, rebirth, mastery, crews, Service Record panel (J). **Mods:** 24 LC ports built in as TFG FEATURES.
+- **Feel:** per-weapon arcs/trails, surface footsteps (carpet/tile/water/gravel), ScanFx 3D scan wave, camera juice, Reduce motion.
+- **UI:** every menu CRT-styled, gamepad nav, CRT dialogs, loading screen + landing briefing card, compass, event chips, report queue.
+- **Assets:** 29 Blender props + 74 CC0 models, 26 textures, 25 sounds; theme ambience loops + one-shots (`extassets.js`).
+- Integration wiring: interior names come from `interiors/index.js INTERIOR_NAMES` (HUD brief, codex, terminal, moongen);
+  interior carpet/tile floors use the new feel footstep sets; interior ambience prefers the shipped theme loops.
+
+### 5.5 Smoke test (paste in the browser console on `?autohost=local&code=T1&name=Tester`, after ~4 s)
+```js
+const g = kefal.game, errs = []; addEventListener('error', e => errs.push(e.message));
+const res = [];
+for (const m of ['hamsi', 'levrek', 'palamut']) {       // factory, mineshaft, mansion
+  g.run.daysLeft = 3; g.run.moon = m; g.player.inShip = true; g.hostLever(g.selfId); g.hostFinishLanding();
+  for (let i = 0; i < 20; i++) { kefal.tick(10, 1/30, false); await new Promise(r => setTimeout(r, 10)); }
+  const s = g.world.facility.scrapSpots[2]; g.player.teleport(new THREE.Vector3(s.x, s.y + 0.2, s.z)); kefal.tick(30, 1/30, true);
+  res.push({ m, theme: g.world.facility?.layout?.theme, creatures: g.creatures.host.size, calls: kefal.engine.sceneStats?.calls });
+  g.player.teleport(new THREE.Vector3(0, 1, 0)); g.player.inShip = true; g.hostBeginTakeoff('lever'); g.hostFinishTakeoff(); kefal.tick(5, 1/30, false);
+}
+({ res, errs })
+```
+Useful debug calls: `g.bosses.hostSpawnForeman(pos)`, `g.creatures.hostSpawn('hound', pos)`,
+`g.items.hostSpawn('shovel', pos, { holder: g.selfId })`, `g.ui.showDaySummary({...}, g)`,
+`g.ui.showQuotaMet({bonus, surplus, prev, quota, quotaIndex}, g)`, `g.ui.showFired({quotaIndex, sold, quota, days}, g)`,
+`g.particles.burst(pos, 'blood')`.
+
+### 5.6 Feature modules — integration state
+| Module | State | Notes |
+|---|---|---|
+| `src/game/pings.js` | ✅ wired (fix version) | MMB / P pings |
+| `src/game/director.js` | ✅ wired (fix version) | horror director, boss-aware |
+| `src/game/shipfeatures.js` | ✅ wired (fix version + terminal/disco-mod hooks) | horn, floodlight, disco, teleporter, mirror, cupboard |
+| `src/game/loot.js` + `bosses.js` | ✅ wired (fix version) | affix weapons + The Foreman |
+| `src/game/achievements.js` | ✅ wired (fix version) | achievements, titles, daily login |
+| `src/world/setpieces.js` | ⚠️ wired, **fix agent was mid-edit** (§5.2) | catwalks, steam, flooding, dark corridors |
+| `src/world/mineshaft.js` | ⚠️ wired, fix agent running | mineshaft interior (88-Chatroom) |
+| `src/world/outposts.js` | ⚠️ wired, fix agent running | outdoor outposts + crates |
+| `src/render/particles.js` | ✅ new, wired | hit/death particles |
+| `src/ui/icons.js` | ✅ wired in inventory | item thumbnails + pixel glyphs |
+| `src/entities/cruiser.js` + `src/models/cruiser.js` | ✅ new (hooks: game/localplayer/actions/terminal/i18n) | UPLINK VAN: buyable 4-seat van (terminal BUY VAN, ▮350), Rapier ray-cast vehicle, driver-authoritative 20 Hz stream (`vanst`), host owns seats/cargo (`van` req/msg), cargo bed, ramming, flip-push, dock at takeoff (<38 m) or lost; saved in `run.cruiser`; physics.js gained additive `addPreStep` / `createVehicleBody` / `createVehicleController` |
+
+How hooks work: the agents returned integration hooks (file / anchor / mode / code) in workflow journals under
+`C:\Users\Sher\.claude\projects\D--KefalCompany\459d8598-…\subagents\workflows\wf_*/journal.jsonl`
+(labels `build:*`, `fix:*`); `tools/apply_hooks.py` applies them. If you add a module by hand, follow the pattern:
+install in the Game constructor (or after `installNetHandlers`), `update(dt)` in `Game.update`, `dispose()` in `destroy()`.
+
+## 6. Roadmap (next steps, in priority order)
+1. **Stabilise:** browser smoke test of the round-3 content (§5.8-5.10): land on gen0_0..2 and every interior theme, van,
+   new creatures, Service Record (J), MODS screen, scan wave. Fix console errors first. Then finish/verify §5.2.
+2. **Hand playtest** the new content with 2 tabs (`?autohost=local` + `?autojoin=CODE&net=local`): boss fight,
+   crates, set pieces, achievements panel, report/cinematics in real flow. Fix what feels bad, fast.
+3. Close the remaining `docs/BUGS.md` items (start with the generator/vault attach bug).
+4. **UI:** restyle host/join/settings/character submenus to the CRT look, 3D character preview, loading tips, icons in
+   scan labels/store/sale list, fix the `▮` glyph (custom narrow glyph or different symbol per THEME.md).
+5. **Feel:** LC-style 3D scan wave (expanding ring shader + labels popping), better weapon poses/swing arcs,
+   particles on item break/pickup, more impact/footstep variety.
+6. **Replayability:** daily moon events (risk/reward modifiers shown on the terminal), collection log,
+   favor/streak multiplier visible in HUD, weekly challenge seed.
+7. **Audio pass** with `docs/AUDIO_AUDIT.md` (only when the owner says so; they deferred it).
+8. **Re-theme leftovers** (models/textures/arcade/slots) — keep ids unchanged.
+9. **Balance:** day length, quota growth, creature budget, spawn fairness near the entrance, affix value cap.
+
+## 7. Gotchas
+- Never change the number of lights in the scene at runtime (constant pools). Don't toggle `light.visible`.
+- World generation must be deterministic: only `RNG` from `src/core/rng.js`, never `Math.random`, for anything peers must agree on.
+- `hostSave()` is skipped mid-day by design (quitting mid-day loses that day, like Lethal Company).
+- Host timers must use `this.later(fn, ms)` so they die with the game.
+- `net.broadcast(type, d)` also delivers to the sender; `net.send` does not.
+- The Vite dev server has HMR off (agents editing files used to reload the page); reload manually.
+- Pointer lock does not work in automated browser panes — drive the game through `kefal.game` / `kefal.tick`.
+- Windows console + Python: set `PYTHONIOENCODING=utf-8` when printing game strings (▮ ◈ characters).
+- Mods: `window.KefalAPI` (alias target of the old name) — hooks emitted with `mods?.emit(...)` (grep for the list:
+  boot, configure, netReady, hostStart, registerHandlers, phase, mapLoaded, moonPopulated, update, stats,
+  interactables, daySummary, fx, message, localDeath, levelUp, exit, sessionEnd, playerJoin, useItem, itemState,
+  localHurt, chat, remoteAvatar).
+
+## 8. Docs index
+`docs/PLAN.md` original design · `docs/RESEARCH.md` LC/REPO research · `docs/LC_MODS.md` mod ports ·
+`docs/THEME.md` TFG naming bible · `docs/BUGS.md` verified bug list · `docs/AUDIO_AUDIT.md` deferred audio issues ·
+`docs/CRITIQUE.md` honest critique + plan · `CREDITS.md` asset licenses · `README.md` player-facing readme.

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KEFAL props viewer</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #101014; color: #d8d4c8; font: 12px/1.35 monospace; overflow: hidden; }
+  #c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  #c.psx { image-rendering: pixelated; }
+  #ui { position: fixed; top: 8px; left: 8px; width: 260px; max-height: calc(100% - 16px); display: flex; flex-direction: column; gap: 6px;
+        background: rgba(12, 12, 16, 0.86); border: 1px solid #3a3a44; padding: 8px; box-sizing: border-box; }
+  #ui h1 { font-size: 13px; margin: 0; color: #e0b040; letter-spacing: 1px; }
+  #list { overflow: auto; flex: 1; min-height: 80px; border-top: 1px solid #3a3a44; padding-top: 4px; }
+  #list div { cursor: pointer; padding: 1px 4px; white-space: nowrap; display: flex; justify-content: space-between; }
+  #list div span { color: #888; }
+  #list div:hover { background: #2a2a34; }
+  #list div.sel { background: #6a2020; }
+  label { display: inline-block; margin-right: 8px; user-select: none; }
+  #stats, #info { position: fixed; right: 8px; background: rgba(12, 12, 16, 0.86); padding: 6px 8px; border: 1px solid #3a3a44; white-space: pre-wrap; }
+  #stats { top: 8px; }
+  #info { bottom: 8px; max-width: 460px; max-height: 45%; overflow: auto; }
+  select, input { background: #1c1c22; color: #ddd; border: 1px solid #444; font: inherit; }
+  select, #filter { width: 100%; box-sizing: border-box; }
+  .legend { color: #999; }
+  .legend b { font-weight: normal; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="ui">
+  <h1>KEFAL COMPANY // models</h1>
+  <select id="mode">
+    <option value="props">Props</option>
+    <option value="items">Items</option>
+    <option value="textures">Textures</option>
+  </select>
+  <input id="filter" type="text" placeholder="filter ids...">
+  <div>
+    <label><input type="checkbox" id="optCol" checked> colliders</label>
+    <label><input type="checkbox" id="optAnc" checked> anchors</label>
+    <label><input type="checkbox" id="optLabels" checked> labels</label>
+    <label><input type="checkbox" id="optLights"> lights</label>
+    <label><input type="checkbox" id="optNight"> night</label>
+    <label><input type="checkbox" id="optPsx"> PSX res</label>
+    <label><input type="checkbox" id="optWire"> wire</label>
+    <label><input type="checkbox" id="optAnim"> animate</label>
+  </div>
+  <div>seed <input id="seed" type="number" value="1" style="width:64px">
+       variant <input id="variant" type="number" value="-1" min="-1" style="width:44px"></div>
+  <div class="legend"><b style="color:#f44">red</b>=colliders <b style="color:#48f">blue</b>=leaf colliders
+    axes=anchors <b style="color:#ff0">yellow</b>=lights <b style="color:#0ff">cyan</b>=tool tip</div>
+  <div id="list"></div>
+</div>
+<div id="stats"></div>
+<div id="info">click an id to focus - double-click a model to focus it</div>
+<script type="module" src="./props.js"></script>
+</body>
+</html>

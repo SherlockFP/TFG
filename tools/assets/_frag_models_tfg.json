@@ -1,0 +1,633 @@
+[
+ {
+  "id": "tfg_crt_monitor",
+  "path": "assets/ext/models/tfg-custom/tfg_crt_monitor.glb",
+  "category": "machinery",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 72,
+  "size": [
+   0.42,
+   0.435,
+   0.462
+  ],
+  "animations": [],
+  "tags": [
+   "office",
+   "computer",
+   "crt",
+   "monitor",
+   "emissive",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_crt_stack",
+  "path": "assets/ext/models/tfg-custom/tfg_crt_stack.glb",
+  "category": "machinery",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 480,
+  "size": [
+   1.3,
+   1.443,
+   1.128
+  ],
+  "animations": [],
+  "tags": [
+   "office",
+   "crt",
+   "landmark",
+   "emissive",
+   "internet",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_cubicle_wall",
+  "path": "assets/ext/models/tfg-custom/tfg_cubicle_wall.glb",
+  "category": "furniture",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 72,
+  "size": [
+   1.69,
+   1.458,
+   0.42
+  ],
+  "animations": [],
+  "tags": [
+   "office",
+   "cubicle",
+   "partition",
+   "wall",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_cubicle_desk",
+  "path": "assets/ext/models/tfg-custom/tfg_cubicle_desk.glb",
+  "category": "furniture",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 284,
+  "size": [
+   1.75,
+   1.428,
+   0.86
+  ],
+  "animations": [],
+  "tags": [
+   "office",
+   "cubicle",
+   "desk",
+   "computer",
+   "emissive",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_copier",
+  "path": "assets/ext/models/tfg-custom/tfg_copier.glb",
+  "category": "machinery",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 168,
+  "size": [
+   1.25,
+   1.044,
+   0.714
+  ],
+  "animations": [],
+  "tags": [
+   "office",
+   "copier",
+   "printer",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_filing_boxes",
+  "path": "assets/ext/models/tfg-custom/tfg_filing_boxes.glb",
+  "category": "prop",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 96,
+  "size": [
+   0.86,
+   0.9,
+   0.392
+  ],
+  "animations": [],
+  "tags": [
+   "office",
+   "boxes",
+   "cardboard",
+   "clutter",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_keyboard",
+  "path": "assets/ext/models/tfg-custom/tfg_keyboard.glb",
+  "category": "scrap",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 12,
+  "size": [
+   0.44,
+   0.03,
+   0.15
+  ],
+  "animations": [],
+  "tags": [
+   "office",
+   "keyboard",
+   "computer",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_router",
+  "path": "assets/ext/models/tfg-custom/tfg_router.glb",
+  "category": "scrap",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 120,
+  "size": [
+   0.22,
+   0.2,
+   0.162
+  ],
+  "animations": [],
+  "tags": [
+   "office",
+   "router",
+   "wifi",
+   "internet",
+   "emissive",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_server_rack",
+  "path": "assets/ext/models/tfg-custom/tfg_server_rack.glb",
+  "category": "machinery",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 108,
+  "size": [
+   0.62,
+   2.0,
+   1.035
+  ],
+  "animations": [],
+  "tags": [
+   "serverfarm",
+   "server",
+   "rack",
+   "emissive",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_server_rack_open",
+  "path": "assets/ext/models/tfg-custom/tfg_server_rack_open.glb",
+  "category": "machinery",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 192,
+  "size": [
+   0.826,
+   2.0,
+   1.584
+  ],
+  "animations": [],
+  "tags": [
+   "serverfarm",
+   "server",
+   "rack",
+   "emissive",
+   "damaged",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_crac_unit",
+  "path": "assets/ext/models/tfg-custom/tfg_crac_unit.glb",
+  "category": "machinery",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 120,
+  "size": [
+   1.6,
+   1.94,
+   0.801
+  ],
+  "animations": [],
+  "tags": [
+   "serverfarm",
+   "cooling",
+   "hvac",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_ups_cabinet",
+  "path": "assets/ext/models/tfg-custom/tfg_ups_cabinet.glb",
+  "category": "machinery",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 48,
+  "size": [
+   0.6,
+   1.2,
+   0.81
+  ],
+  "animations": [],
+  "tags": [
+   "serverfarm",
+   "ups",
+   "battery",
+   "emissive",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_server_blade",
+  "path": "assets/ext/models/tfg-custom/tfg_server_blade.glb",
+  "category": "scrap",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 36,
+  "size": [
+   0.44,
+   0.045,
+   0.595
+  ],
+  "animations": [],
+  "tags": [
+   "serverfarm",
+   "server",
+   "blade",
+   "emissive",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_troffer_light",
+  "path": "assets/ext/models/tfg-custom/tfg_troffer_light.glb",
+  "category": "light",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 24,
+  "size": [
+   1.2,
+   0.089,
+   0.6
+  ],
+  "animations": [],
+  "tags": [
+   "backrooms",
+   "office",
+   "ceiling",
+   "light",
+   "emissive",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_stack_chair",
+  "path": "assets/ext/models/tfg-custom/tfg_stack_chair.glb",
+  "category": "furniture",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 144,
+  "size": [
+   0.44,
+   0.905,
+   0.463
+  ],
+  "animations": [],
+  "tags": [
+   "backrooms",
+   "office",
+   "chair",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_almond_water",
+  "path": "assets/ext/models/tfg-custom/tfg_almond_water.glb",
+  "category": "scrap",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 92,
+  "size": [
+   0.08,
+   0.24,
+   0.084
+  ],
+  "animations": [],
+  "tags": [
+   "backrooms",
+   "bottle",
+   "drink",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_backrooms_pillar",
+  "path": "assets/ext/models/tfg-custom/tfg_backrooms_pillar.glb",
+  "category": "structure",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 24,
+  "size": [
+   0.64,
+   3.4,
+   0.64
+  ],
+  "animations": [],
+  "tags": [
+   "backrooms",
+   "pillar",
+   "column",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_sewer_pipe",
+  "path": "assets/ext/models/tfg-custom/tfg_sewer_pipe.glb",
+  "category": "structure",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 272,
+  "size": [
+   2.2,
+   1.28,
+   0.71
+  ],
+  "animations": [],
+  "tags": [
+   "sewer",
+   "pipe",
+   "wall",
+   "slime",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_sewer_valve",
+  "path": "assets/ext/models/tfg-custom/tfg_sewer_valve.glb",
+  "category": "machinery",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 396,
+  "size": [
+   0.499,
+   2.4,
+   0.613
+  ],
+  "animations": [],
+  "tags": [
+   "sewer",
+   "pipe",
+   "valve",
+   "wall",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_sewer_outflow",
+  "path": "assets/ext/models/tfg-custom/tfg_sewer_outflow.glb",
+  "category": "structure",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 204,
+  "size": [
+   1.2,
+   1.5,
+   1.17
+  ],
+  "animations": [],
+  "tags": [
+   "sewer",
+   "pipe",
+   "outflow",
+   "wall",
+   "slime",
+   "emissive",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_sewer_grate",
+  "path": "assets/ext/models/tfg-custom/tfg_sewer_grate.glb",
+  "category": "structure",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 24,
+  "size": [
+   1.0,
+   0.038,
+   1.0
+  ],
+  "animations": [],
+  "tags": [
+   "sewer",
+   "grate",
+   "floor",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_sewer_ladder",
+  "path": "assets/ext/models/tfg-custom/tfg_sewer_ladder.glb",
+  "category": "structure",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 252,
+  "size": [
+   0.49,
+   2.8,
+   0.205
+  ],
+  "animations": [],
+  "tags": [
+   "sewer",
+   "ladder",
+   "wall",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_hospital_bed",
+  "path": "assets/ext/models/tfg-custom/tfg_hospital_bed.glb",
+  "category": "furniture",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 384,
+  "size": [
+   0.99,
+   1.03,
+   2.05
+  ],
+  "animations": [],
+  "tags": [
+   "hospital",
+   "bed",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_gurney",
+  "path": "assets/ext/models/tfg-custom/tfg_gurney.glb",
+  "category": "furniture",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 340,
+  "size": [
+   0.63,
+   1.16,
+   1.95
+  ],
+  "animations": [],
+  "tags": [
+   "hospital",
+   "gurney",
+   "body",
+   "horror",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_iv_stand",
+  "path": "assets/ext/models/tfg-custom/tfg_iv_stand.glb",
+  "category": "prop",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 228,
+  "size": [
+   0.561,
+   1.966,
+   0.533
+  ],
+  "animations": [],
+  "tags": [
+   "hospital",
+   "iv",
+   "drip",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_wheelchair",
+  "path": "assets/ext/models/tfg-custom/tfg_wheelchair.glb",
+  "category": "furniture",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 340,
+  "size": [
+   0.601,
+   0.99,
+   0.77
+  ],
+  "animations": [],
+  "tags": [
+   "hospital",
+   "wheelchair",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_med_cabinet",
+  "path": "assets/ext/models/tfg-custom/tfg_med_cabinet.glb",
+  "category": "furniture",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 256,
+  "size": [
+   0.9,
+   2.06,
+   0.455
+  ],
+  "animations": [],
+  "tags": [
+   "hospital",
+   "cabinet",
+   "medicine",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_heart_monitor",
+  "path": "assets/ext/models/tfg-custom/tfg_heart_monitor.glb",
+  "category": "machinery",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 252,
+  "size": [
+   0.523,
+   1.366,
+   0.497
+  ],
+  "animations": [],
+  "tags": [
+   "hospital",
+   "monitor",
+   "ecg",
+   "emissive",
+   "tfg",
+   "psx"
+  ]
+ },
+ {
+  "id": "tfg_privacy_curtain",
+  "path": "assets/ext/models/tfg-custom/tfg_privacy_curtain.glb",
+  "category": "furniture",
+  "pack": "TFG Custom (made for this game)",
+  "license": "CC0",
+  "tris": 284,
+  "size": [
+   2.26,
+   1.933,
+   0.13
+  ],
+  "animations": [],
+  "tags": [
+   "hospital",
+   "curtain",
+   "divider",
+   "tfg",
+   "psx"
+  ]
+ }
+]

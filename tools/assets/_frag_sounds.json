@@ -1,0 +1,5590 @@
+[
+ {
+  "id": "step_concrete_1",
+  "path": "assets/ext/sounds/liminal-horror/step_concrete_1.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.36,
+  "tags": [
+   "footstep",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_concrete_2",
+  "path": "assets/ext/sounds/liminal-horror/step_concrete_2.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.35,
+  "tags": [
+   "footstep",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_concrete_3",
+  "path": "assets/ext/sounds/liminal-horror/step_concrete_3.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.35,
+  "tags": [
+   "footstep",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_concrete_4",
+  "path": "assets/ext/sounds/liminal-horror/step_concrete_4.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.35,
+  "tags": [
+   "footstep",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_concrete_5",
+  "path": "assets/ext/sounds/liminal-horror/step_concrete_5.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.35,
+  "tags": [
+   "footstep",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_concrete_6",
+  "path": "assets/ext/sounds/liminal-horror/step_concrete_6.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.37,
+  "tags": [
+   "footstep",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_concrete_7",
+  "path": "assets/ext/sounds/liminal-horror/step_concrete_7.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.36,
+  "tags": [
+   "footstep",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_concrete_8",
+  "path": "assets/ext/sounds/liminal-horror/step_concrete_8.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.38,
+  "tags": [
+   "footstep",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_concrete_9",
+  "path": "assets/ext/sounds/liminal-horror/step_concrete_9.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.38,
+  "tags": [
+   "footstep",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_concrete_10",
+  "path": "assets/ext/sounds/liminal-horror/step_concrete_10.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.38,
+  "tags": [
+   "footstep",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_concrete_11",
+  "path": "assets/ext/sounds/liminal-horror/step_concrete_11.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.36,
+  "tags": [
+   "footstep",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_concrete_12",
+  "path": "assets/ext/sounds/liminal-horror/step_concrete_12.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.37,
+  "tags": [
+   "footstep",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_concrete_13",
+  "path": "assets/ext/sounds/liminal-horror/step_concrete_13.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.1,
+  "tags": [
+   "footstep",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_concrete_14",
+  "path": "assets/ext/sounds/liminal-horror/step_concrete_14.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.29,
+  "tags": [
+   "footstep",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_concrete_15",
+  "path": "assets/ext/sounds/liminal-horror/step_concrete_15.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.09,
+  "tags": [
+   "footstep",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_concrete_16",
+  "path": "assets/ext/sounds/liminal-horror/step_concrete_16.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.29,
+  "tags": [
+   "footstep",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_metal_1",
+  "path": "assets/ext/sounds/liminal-horror/step_metal_1.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.36,
+  "tags": [
+   "footstep",
+   "metal"
+  ]
+ },
+ {
+  "id": "step_metal_2",
+  "path": "assets/ext/sounds/liminal-horror/step_metal_2.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.34,
+  "tags": [
+   "footstep",
+   "metal"
+  ]
+ },
+ {
+  "id": "step_metal_3",
+  "path": "assets/ext/sounds/liminal-horror/step_metal_3.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.35,
+  "tags": [
+   "footstep",
+   "metal"
+  ]
+ },
+ {
+  "id": "step_metal_4",
+  "path": "assets/ext/sounds/liminal-horror/step_metal_4.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.35,
+  "tags": [
+   "footstep",
+   "metal"
+  ]
+ },
+ {
+  "id": "step_metal_5",
+  "path": "assets/ext/sounds/liminal-horror/step_metal_5.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.42,
+  "tags": [
+   "footstep",
+   "metal"
+  ]
+ },
+ {
+  "id": "step_metal_6",
+  "path": "assets/ext/sounds/liminal-horror/step_metal_6.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.42,
+  "tags": [
+   "footstep",
+   "metal"
+  ]
+ },
+ {
+  "id": "step_metal_7",
+  "path": "assets/ext/sounds/liminal-horror/step_metal_7.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.46,
+  "tags": [
+   "footstep",
+   "metal"
+  ]
+ },
+ {
+  "id": "step_metal_8",
+  "path": "assets/ext/sounds/liminal-horror/step_metal_8.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.46,
+  "tags": [
+   "footstep",
+   "metal"
+  ]
+ },
+ {
+  "id": "step_metal_9",
+  "path": "assets/ext/sounds/liminal-horror/step_metal_9.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.38,
+  "tags": [
+   "footstep",
+   "metal"
+  ]
+ },
+ {
+  "id": "step_metal_10",
+  "path": "assets/ext/sounds/liminal-horror/step_metal_10.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.36,
+  "tags": [
+   "footstep",
+   "metal"
+  ]
+ },
+ {
+  "id": "step_metal_11",
+  "path": "assets/ext/sounds/liminal-horror/step_metal_11.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.37,
+  "tags": [
+   "footstep",
+   "metal"
+  ]
+ },
+ {
+  "id": "step_metal_12",
+  "path": "assets/ext/sounds/liminal-horror/step_metal_12.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.4,
+  "tags": [
+   "footstep",
+   "metal"
+  ]
+ },
+ {
+  "id": "step_metal_13",
+  "path": "assets/ext/sounds/liminal-horror/step_metal_13.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.55,
+  "tags": [
+   "footstep",
+   "metal"
+  ]
+ },
+ {
+  "id": "step_metal_14",
+  "path": "assets/ext/sounds/liminal-horror/step_metal_14.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.51,
+  "tags": [
+   "footstep",
+   "metal"
+  ]
+ },
+ {
+  "id": "step_metal_15",
+  "path": "assets/ext/sounds/liminal-horror/step_metal_15.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.29,
+  "tags": [
+   "footstep",
+   "metal"
+  ]
+ },
+ {
+  "id": "step_metal_16",
+  "path": "assets/ext/sounds/liminal-horror/step_metal_16.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.27,
+  "tags": [
+   "footstep",
+   "metal"
+  ]
+ },
+ {
+  "id": "step_carpet_1",
+  "path": "assets/ext/sounds/liminal-horror/step_carpet_1.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.15,
+  "tags": [
+   "footstep",
+   "carpet"
+  ]
+ },
+ {
+  "id": "step_carpet_2",
+  "path": "assets/ext/sounds/liminal-horror/step_carpet_2.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.29,
+  "tags": [
+   "footstep",
+   "carpet"
+  ]
+ },
+ {
+  "id": "step_carpet_3",
+  "path": "assets/ext/sounds/liminal-horror/step_carpet_3.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.28,
+  "tags": [
+   "footstep",
+   "carpet"
+  ]
+ },
+ {
+  "id": "step_carpet_4",
+  "path": "assets/ext/sounds/liminal-horror/step_carpet_4.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.11,
+  "tags": [
+   "footstep",
+   "carpet"
+  ]
+ },
+ {
+  "id": "step_carpet_5",
+  "path": "assets/ext/sounds/liminal-horror/step_carpet_5.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.34,
+  "tags": [
+   "footstep",
+   "carpet"
+  ]
+ },
+ {
+  "id": "step_carpet_6",
+  "path": "assets/ext/sounds/liminal-horror/step_carpet_6.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.32,
+  "tags": [
+   "footstep",
+   "carpet"
+  ]
+ },
+ {
+  "id": "step_carpet_7",
+  "path": "assets/ext/sounds/liminal-horror/step_carpet_7.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.32,
+  "tags": [
+   "footstep",
+   "carpet"
+  ]
+ },
+ {
+  "id": "step_carpet_8",
+  "path": "assets/ext/sounds/liminal-horror/step_carpet_8.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.32,
+  "tags": [
+   "footstep",
+   "carpet"
+  ]
+ },
+ {
+  "id": "step_carpet_9",
+  "path": "assets/ext/sounds/liminal-horror/step_carpet_9.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.32,
+  "tags": [
+   "footstep",
+   "carpet"
+  ]
+ },
+ {
+  "id": "step_carpet_10",
+  "path": "assets/ext/sounds/liminal-horror/step_carpet_10.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.33,
+  "tags": [
+   "footstep",
+   "carpet"
+  ]
+ },
+ {
+  "id": "step_carpet_11",
+  "path": "assets/ext/sounds/liminal-horror/step_carpet_11.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.34,
+  "tags": [
+   "footstep",
+   "carpet"
+  ]
+ },
+ {
+  "id": "step_carpet_12",
+  "path": "assets/ext/sounds/liminal-horror/step_carpet_12.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.34,
+  "tags": [
+   "footstep",
+   "carpet"
+  ]
+ },
+ {
+  "id": "step_carpet_13",
+  "path": "assets/ext/sounds/liminal-horror/step_carpet_13.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.35,
+  "tags": [
+   "footstep",
+   "carpet"
+  ]
+ },
+ {
+  "id": "step_carpet_14",
+  "path": "assets/ext/sounds/liminal-horror/step_carpet_14.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.28,
+  "tags": [
+   "footstep",
+   "carpet"
+  ]
+ },
+ {
+  "id": "step_carpet_15",
+  "path": "assets/ext/sounds/liminal-horror/step_carpet_15.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.3,
+  "tags": [
+   "footstep",
+   "carpet"
+  ]
+ },
+ {
+  "id": "step_carpet_16",
+  "path": "assets/ext/sounds/liminal-horror/step_carpet_16.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.31,
+  "tags": [
+   "footstep",
+   "carpet"
+  ]
+ },
+ {
+  "id": "step_leaves_1",
+  "path": "assets/ext/sounds/liminal-horror/step_leaves_1.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.43,
+  "tags": [
+   "footstep",
+   "leaves",
+   "grass",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_leaves_2",
+  "path": "assets/ext/sounds/liminal-horror/step_leaves_2.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.45,
+  "tags": [
+   "footstep",
+   "leaves",
+   "grass",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_leaves_3",
+  "path": "assets/ext/sounds/liminal-horror/step_leaves_3.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.49,
+  "tags": [
+   "footstep",
+   "leaves",
+   "grass",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_leaves_4",
+  "path": "assets/ext/sounds/liminal-horror/step_leaves_4.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.51,
+  "tags": [
+   "footstep",
+   "leaves",
+   "grass",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_leaves_5",
+  "path": "assets/ext/sounds/liminal-horror/step_leaves_5.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.67,
+  "tags": [
+   "footstep",
+   "leaves",
+   "grass",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_leaves_6",
+  "path": "assets/ext/sounds/liminal-horror/step_leaves_6.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.7,
+  "tags": [
+   "footstep",
+   "leaves",
+   "grass",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_leaves_7",
+  "path": "assets/ext/sounds/liminal-horror/step_leaves_7.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.7,
+  "tags": [
+   "footstep",
+   "leaves",
+   "grass",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_leaves_8",
+  "path": "assets/ext/sounds/liminal-horror/step_leaves_8.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.7,
+  "tags": [
+   "footstep",
+   "leaves",
+   "grass",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_leaves_9",
+  "path": "assets/ext/sounds/liminal-horror/step_leaves_9.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.31,
+  "tags": [
+   "footstep",
+   "leaves",
+   "grass",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_leaves_10",
+  "path": "assets/ext/sounds/liminal-horror/step_leaves_10.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.32,
+  "tags": [
+   "footstep",
+   "leaves",
+   "grass",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_leaves_11",
+  "path": "assets/ext/sounds/liminal-horror/step_leaves_11.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.27,
+  "tags": [
+   "footstep",
+   "leaves",
+   "grass",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_leaves_12",
+  "path": "assets/ext/sounds/liminal-horror/step_leaves_12.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.34,
+  "tags": [
+   "footstep",
+   "leaves",
+   "grass",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_leaves_13",
+  "path": "assets/ext/sounds/liminal-horror/step_leaves_13.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.49,
+  "tags": [
+   "footstep",
+   "leaves",
+   "grass",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_leaves_14",
+  "path": "assets/ext/sounds/liminal-horror/step_leaves_14.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.55,
+  "tags": [
+   "footstep",
+   "leaves",
+   "grass",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_leaves_15",
+  "path": "assets/ext/sounds/liminal-horror/step_leaves_15.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.56,
+  "tags": [
+   "footstep",
+   "leaves",
+   "grass",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_leaves_16",
+  "path": "assets/ext/sounds/liminal-horror/step_leaves_16.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.62,
+  "tags": [
+   "footstep",
+   "leaves",
+   "grass",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_snow_1",
+  "path": "assets/ext/sounds/liminal-horror/step_snow_1.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.37,
+  "tags": [
+   "footstep",
+   "snow",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_snow_2",
+  "path": "assets/ext/sounds/liminal-horror/step_snow_2.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.36,
+  "tags": [
+   "footstep",
+   "snow",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_snow_3",
+  "path": "assets/ext/sounds/liminal-horror/step_snow_3.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.36,
+  "tags": [
+   "footstep",
+   "snow",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_snow_4",
+  "path": "assets/ext/sounds/liminal-horror/step_snow_4.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.36,
+  "tags": [
+   "footstep",
+   "snow",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_snow_5",
+  "path": "assets/ext/sounds/liminal-horror/step_snow_5.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.38,
+  "tags": [
+   "footstep",
+   "snow",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_snow_6",
+  "path": "assets/ext/sounds/liminal-horror/step_snow_6.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.36,
+  "tags": [
+   "footstep",
+   "snow",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_snow_7",
+  "path": "assets/ext/sounds/liminal-horror/step_snow_7.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.37,
+  "tags": [
+   "footstep",
+   "snow",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_snow_8",
+  "path": "assets/ext/sounds/liminal-horror/step_snow_8.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.38,
+  "tags": [
+   "footstep",
+   "snow",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_snow_9",
+  "path": "assets/ext/sounds/liminal-horror/step_snow_9.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.09,
+  "tags": [
+   "footstep",
+   "snow",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_snow_10",
+  "path": "assets/ext/sounds/liminal-horror/step_snow_10.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.38,
+  "tags": [
+   "footstep",
+   "snow",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_snow_11",
+  "path": "assets/ext/sounds/liminal-horror/step_snow_11.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.11,
+  "tags": [
+   "footstep",
+   "snow",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_snow_12",
+  "path": "assets/ext/sounds/liminal-horror/step_snow_12.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.41,
+  "tags": [
+   "footstep",
+   "snow",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_snow_13",
+  "path": "assets/ext/sounds/liminal-horror/step_snow_13.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.35,
+  "tags": [
+   "footstep",
+   "snow",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_snow_14",
+  "path": "assets/ext/sounds/liminal-horror/step_snow_14.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.35,
+  "tags": [
+   "footstep",
+   "snow",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_snow_15",
+  "path": "assets/ext/sounds/liminal-horror/step_snow_15.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.35,
+  "tags": [
+   "footstep",
+   "snow",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_snow_16",
+  "path": "assets/ext/sounds/liminal-horror/step_snow_16.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.36,
+  "tags": [
+   "footstep",
+   "snow",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_gravel_1",
+  "path": "assets/ext/sounds/liminal-horror/step_gravel_1.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.5,
+  "tags": [
+   "footstep",
+   "gravel",
+   "dirt",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_gravel_2",
+  "path": "assets/ext/sounds/liminal-horror/step_gravel_2.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.7,
+  "tags": [
+   "footstep",
+   "gravel",
+   "dirt",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_gravel_3",
+  "path": "assets/ext/sounds/liminal-horror/step_gravel_3.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.63,
+  "tags": [
+   "footstep",
+   "gravel",
+   "dirt",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_gravel_4",
+  "path": "assets/ext/sounds/liminal-horror/step_gravel_4.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.7,
+  "tags": [
+   "footstep",
+   "gravel",
+   "dirt",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_gravel_5",
+  "path": "assets/ext/sounds/liminal-horror/step_gravel_5.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.36,
+  "tags": [
+   "footstep",
+   "gravel",
+   "dirt",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_gravel_6",
+  "path": "assets/ext/sounds/liminal-horror/step_gravel_6.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.34,
+  "tags": [
+   "footstep",
+   "gravel",
+   "dirt",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_gravel_7",
+  "path": "assets/ext/sounds/liminal-horror/step_gravel_7.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.44,
+  "tags": [
+   "footstep",
+   "gravel",
+   "dirt",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_gravel_8",
+  "path": "assets/ext/sounds/liminal-horror/step_gravel_8.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.35,
+  "tags": [
+   "footstep",
+   "gravel",
+   "dirt",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_gravel_9",
+  "path": "assets/ext/sounds/liminal-horror/step_gravel_9.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.41,
+  "tags": [
+   "footstep",
+   "gravel",
+   "dirt",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_gravel_10",
+  "path": "assets/ext/sounds/liminal-horror/step_gravel_10.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.23,
+  "tags": [
+   "footstep",
+   "gravel",
+   "dirt",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_gravel_11",
+  "path": "assets/ext/sounds/liminal-horror/step_gravel_11.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.25,
+  "tags": [
+   "footstep",
+   "gravel",
+   "dirt",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_gravel_12",
+  "path": "assets/ext/sounds/liminal-horror/step_gravel_12.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.45,
+  "tags": [
+   "footstep",
+   "gravel",
+   "dirt",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_1",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_1.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.6,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_2",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_2.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.5,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_3",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_3.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.15,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_4",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_4.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.49,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_5",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_5.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.25,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_6",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_6.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.19,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_7",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_7.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.34,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_8",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_8.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.67,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_9",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_9.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.2,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_10",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_10.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.16,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_11",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_11.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.5,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_12",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_12.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.31,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_13",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_13.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.69,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_14",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_14.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.18,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_15",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_15.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.7,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_16",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_16.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.21,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_17",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_17.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.46,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_18",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_18.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.44,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_19",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_19.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.34,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_20",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_20.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.36,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_21",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_21.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.23,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_22",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_22.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.7,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_23",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_23.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.69,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_mud_24",
+  "path": "assets/ext/sounds/liminal-horror/step_mud_24.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.66,
+  "tags": [
+   "footstep",
+   "mud",
+   "outdoor"
+  ]
+ },
+ {
+  "id": "step_stairs_1",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_1.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.09,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_2",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_2.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.13,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_3",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_3.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.7,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_4",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_4.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.29,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_5",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_5.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.16,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_6",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_6.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.28,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_7",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_7.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.14,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_8",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_8.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.47,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_9",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_9.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.13,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_10",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_10.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.1,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_11",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_11.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.3,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_12",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_12.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.43,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_13",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_13.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.63,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_14",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_14.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.25,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_15",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_15.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.2,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_16",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_16.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.27,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_17",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_17.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.09,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_18",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_18.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.5,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_19",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_19.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.29,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_20",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_20.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.3,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_21",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_21.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.19,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_22",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_22.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.27,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_23",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_23.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.14,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_stairs_24",
+  "path": "assets/ext/sounds/liminal-horror/step_stairs_24.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.27,
+  "tags": [
+   "footstep",
+   "stairs",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_1",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_1.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.36,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_2",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_2.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.11,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_3",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_3.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.28,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_4",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_4.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.3,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_5",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_5.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.26,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_6",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_6.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.17,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_7",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_7.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.29,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_8",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_8.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.7,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_9",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_9.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.54,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_10",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_10.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.27,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_11",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_11.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.37,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_12",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_12.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.23,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_13",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_13.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.64,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_14",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_14.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.1,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_15",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_15.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.36,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_16",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_16.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.19,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_17",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_17.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.7,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_18",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_18.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.42,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_19",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_19.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.22,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_20",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_20.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.29,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_21",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_21.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.31,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_22",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_22.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.37,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_23",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_23.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.27,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_wood_24",
+  "path": "assets/ext/sounds/liminal-horror/step_wood_24.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.14,
+  "tags": [
+   "footstep",
+   "wood"
+  ]
+ },
+ {
+  "id": "step_heavy_1",
+  "path": "assets/ext/sounds/phlegmlee-horror/step_heavy_1.ogg",
+  "pack": "Horror Sound Pack",
+  "license": "CC0",
+  "duration": 0.3,
+  "tags": [
+   "footstep",
+   "heavy",
+   "monster",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_heavy_2",
+  "path": "assets/ext/sounds/phlegmlee-horror/step_heavy_2.ogg",
+  "pack": "Horror Sound Pack",
+  "license": "CC0",
+  "duration": 0.33,
+  "tags": [
+   "footstep",
+   "heavy",
+   "monster",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_heavy_3",
+  "path": "assets/ext/sounds/phlegmlee-horror/step_heavy_3.ogg",
+  "pack": "Horror Sound Pack",
+  "license": "CC0",
+  "duration": 0.32,
+  "tags": [
+   "footstep",
+   "heavy",
+   "monster",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_heavy_4",
+  "path": "assets/ext/sounds/phlegmlee-horror/step_heavy_4.ogg",
+  "pack": "Horror Sound Pack",
+  "license": "CC0",
+  "duration": 0.32,
+  "tags": [
+   "footstep",
+   "heavy",
+   "monster",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_heavy_5",
+  "path": "assets/ext/sounds/phlegmlee-horror/step_heavy_5.ogg",
+  "pack": "Horror Sound Pack",
+  "license": "CC0",
+  "duration": 0.3,
+  "tags": [
+   "footstep",
+   "heavy",
+   "monster",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_heavy_6",
+  "path": "assets/ext/sounds/phlegmlee-horror/step_heavy_6.ogg",
+  "pack": "Horror Sound Pack",
+  "license": "CC0",
+  "duration": 0.29,
+  "tags": [
+   "footstep",
+   "heavy",
+   "monster",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_heavy_7",
+  "path": "assets/ext/sounds/phlegmlee-horror/step_heavy_7.ogg",
+  "pack": "Horror Sound Pack",
+  "license": "CC0",
+  "duration": 0.32,
+  "tags": [
+   "footstep",
+   "heavy",
+   "monster",
+   "concrete"
+  ]
+ },
+ {
+  "id": "step_heavy_8",
+  "path": "assets/ext/sounds/phlegmlee-horror/step_heavy_8.ogg",
+  "pack": "Horror Sound Pack",
+  "license": "CC0",
+  "duration": 0.29,
+  "tags": [
+   "footstep",
+   "heavy",
+   "monster",
+   "concrete"
+  ]
+ },
+ {
+  "id": "run_heavy_loop",
+  "path": "assets/ext/sounds/phlegmlee-horror/run_heavy_loop.ogg",
+  "pack": "Horror Sound Pack",
+  "license": "CC0",
+  "duration": 1.96,
+  "tags": [
+   "footstep",
+   "running",
+   "loop"
+  ]
+ },
+ {
+  "id": "step_retro_1",
+  "path": "assets/ext/sounds/kronbits-sfx/step_retro_1.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.11,
+  "tags": [
+   "footstep",
+   "retro"
+  ]
+ },
+ {
+  "id": "step_retro_2",
+  "path": "assets/ext/sounds/kronbits-sfx/step_retro_2.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.22,
+  "tags": [
+   "footstep",
+   "retro"
+  ]
+ },
+ {
+  "id": "step_retro_3",
+  "path": "assets/ext/sounds/kronbits-sfx/step_retro_3.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.44,
+  "tags": [
+   "footstep",
+   "retro"
+  ]
+ },
+ {
+  "id": "step_retro_4",
+  "path": "assets/ext/sounds/kronbits-sfx/step_retro_4.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.14,
+  "tags": [
+   "footstep",
+   "retro"
+  ]
+ },
+ {
+  "id": "step_retro_5",
+  "path": "assets/ext/sounds/kronbits-sfx/step_retro_5.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.76,
+  "tags": [
+   "footstep",
+   "retro"
+  ]
+ },
+ {
+  "id": "step_retro_6",
+  "path": "assets/ext/sounds/kronbits-sfx/step_retro_6.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.19,
+  "tags": [
+   "footstep",
+   "retro"
+  ]
+ },
+ {
+  "id": "door_creak_1",
+  "path": "assets/ext/sounds/liminal-horror/door_creak_1.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 1.62,
+  "tags": [
+   "door",
+   "creak",
+   "wood"
+  ]
+ },
+ {
+  "id": "door_creak_2",
+  "path": "assets/ext/sounds/liminal-horror/door_creak_2.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 1.95,
+  "tags": [
+   "door",
+   "creak",
+   "wood"
+  ]
+ },
+ {
+  "id": "door_creak_3",
+  "path": "assets/ext/sounds/liminal-horror/door_creak_3.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 3.48,
+  "tags": [
+   "door",
+   "creak",
+   "wood"
+  ]
+ },
+ {
+  "id": "door_creak_4",
+  "path": "assets/ext/sounds/liminal-horror/door_creak_4.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 1.55,
+  "tags": [
+   "door",
+   "creak",
+   "wood"
+  ]
+ },
+ {
+  "id": "door_creak_5",
+  "path": "assets/ext/sounds/liminal-horror/door_creak_5.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.6,
+  "tags": [
+   "door",
+   "creak",
+   "wood"
+  ]
+ },
+ {
+  "id": "door_creak_6",
+  "path": "assets/ext/sounds/liminal-horror/door_creak_6.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.95,
+  "tags": [
+   "door",
+   "creak",
+   "wood"
+  ]
+ },
+ {
+  "id": "door_creak_7",
+  "path": "assets/ext/sounds/liminal-horror/door_creak_7.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.98,
+  "tags": [
+   "door",
+   "creak",
+   "wood"
+  ]
+ },
+ {
+  "id": "door_creak_8",
+  "path": "assets/ext/sounds/liminal-horror/door_creak_8.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 4.22,
+  "tags": [
+   "door",
+   "creak",
+   "wood"
+  ]
+ },
+ {
+  "id": "door_creak_9",
+  "path": "assets/ext/sounds/liminal-horror/door_creak_9.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 4.92,
+  "tags": [
+   "door",
+   "creak",
+   "wood"
+  ]
+ },
+ {
+  "id": "door_creak_10",
+  "path": "assets/ext/sounds/liminal-horror/door_creak_10.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 4.86,
+  "tags": [
+   "door",
+   "creak",
+   "wood"
+  ]
+ },
+ {
+  "id": "door_creak_11",
+  "path": "assets/ext/sounds/liminal-horror/door_creak_11.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.68,
+  "tags": [
+   "door",
+   "creak",
+   "wood"
+  ]
+ },
+ {
+  "id": "door_creak_12",
+  "path": "assets/ext/sounds/liminal-horror/door_creak_12.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.97,
+  "tags": [
+   "door",
+   "creak",
+   "wood"
+  ]
+ },
+ {
+  "id": "mon_growl_1",
+  "path": "assets/ext/sounds/liminal-horror/mon_growl_1.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 1.95,
+  "tags": [
+   "monster",
+   "growl",
+   "creature"
+  ]
+ },
+ {
+  "id": "mon_growl_2",
+  "path": "assets/ext/sounds/liminal-horror/mon_growl_2.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 2.01,
+  "tags": [
+   "monster",
+   "growl",
+   "creature"
+  ]
+ },
+ {
+  "id": "mon_growl_3",
+  "path": "assets/ext/sounds/liminal-horror/mon_growl_3.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 4.62,
+  "tags": [
+   "monster",
+   "growl",
+   "creature"
+  ]
+ },
+ {
+  "id": "mon_growl_4",
+  "path": "assets/ext/sounds/liminal-horror/mon_growl_4.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 0.93,
+  "tags": [
+   "monster",
+   "growl",
+   "creature"
+  ]
+ },
+ {
+  "id": "mon_growl_5",
+  "path": "assets/ext/sounds/liminal-horror/mon_growl_5.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 2.81,
+  "tags": [
+   "monster",
+   "growl",
+   "creature"
+  ]
+ },
+ {
+  "id": "mon_growl_6",
+  "path": "assets/ext/sounds/liminal-horror/mon_growl_6.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 1.0,
+  "tags": [
+   "monster",
+   "growl",
+   "creature"
+  ]
+ },
+ {
+  "id": "mon_growl_7",
+  "path": "assets/ext/sounds/liminal-horror/mon_growl_7.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 2.07,
+  "tags": [
+   "monster",
+   "growl",
+   "creature"
+  ]
+ },
+ {
+  "id": "mon_growl_8",
+  "path": "assets/ext/sounds/liminal-horror/mon_growl_8.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 4.7,
+  "tags": [
+   "monster",
+   "growl",
+   "creature"
+  ]
+ },
+ {
+  "id": "mon_growl_9",
+  "path": "assets/ext/sounds/liminal-horror/mon_growl_9.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 4.86,
+  "tags": [
+   "monster",
+   "growl",
+   "creature"
+  ]
+ },
+ {
+  "id": "mon_growl_10",
+  "path": "assets/ext/sounds/liminal-horror/mon_growl_10.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 4.82,
+  "tags": [
+   "monster",
+   "growl",
+   "creature"
+  ]
+ },
+ {
+  "id": "mon_growl_11",
+  "path": "assets/ext/sounds/liminal-horror/mon_growl_11.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 1.87,
+  "tags": [
+   "monster",
+   "growl",
+   "creature"
+  ]
+ },
+ {
+  "id": "mon_growl_12",
+  "path": "assets/ext/sounds/liminal-horror/mon_growl_12.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 2.06,
+  "tags": [
+   "monster",
+   "growl",
+   "creature"
+  ]
+ },
+ {
+  "id": "mon_deep_growl",
+  "path": "assets/ext/sounds/phlegmlee-horror/mon_deep_growl.ogg",
+  "pack": "Horror Sound Pack",
+  "license": "CC0",
+  "duration": 3.56,
+  "tags": [
+   "monster",
+   "growl",
+   "giant",
+   "creature"
+  ]
+ },
+ {
+  "id": "mon_roar_1",
+  "path": "assets/ext/sounds/kronbits-sfx/mon_roar_1.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 1.24,
+  "tags": [
+   "monster",
+   "roar",
+   "retro",
+   "creature"
+  ]
+ },
+ {
+  "id": "mon_roar_2",
+  "path": "assets/ext/sounds/kronbits-sfx/mon_roar_2.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 1.86,
+  "tags": [
+   "monster",
+   "roar",
+   "retro",
+   "creature"
+  ]
+ },
+ {
+  "id": "mon_roar_3",
+  "path": "assets/ext/sounds/kronbits-sfx/mon_roar_3.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.64,
+  "tags": [
+   "monster",
+   "roar",
+   "retro",
+   "creature"
+  ]
+ },
+ {
+  "id": "mon_roar_4",
+  "path": "assets/ext/sounds/kronbits-sfx/mon_roar_4.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 2.65,
+  "tags": [
+   "monster",
+   "roar",
+   "retro",
+   "creature"
+  ]
+ },
+ {
+  "id": "mon_scream",
+  "path": "assets/ext/sounds/kronbits-sfx/mon_scream.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 1.71,
+  "tags": [
+   "monster",
+   "scream",
+   "screamer"
+  ]
+ },
+ {
+  "id": "animal_birds",
+  "path": "assets/ext/sounds/kronbits-sfx/animal_birds.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 2.05,
+  "tags": [
+   "animal",
+   "outdoor",
+   "creature"
+  ]
+ },
+ {
+  "id": "animal_crow",
+  "path": "assets/ext/sounds/kronbits-sfx/animal_crow.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 2.23,
+  "tags": [
+   "animal",
+   "outdoor",
+   "creature"
+  ]
+ },
+ {
+  "id": "animal_fly",
+  "path": "assets/ext/sounds/kronbits-sfx/animal_fly.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 4.39,
+  "tags": [
+   "animal",
+   "outdoor",
+   "creature"
+  ]
+ },
+ {
+  "id": "animal_owl",
+  "path": "assets/ext/sounds/kronbits-sfx/animal_owl.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 1.36,
+  "tags": [
+   "animal",
+   "outdoor",
+   "creature"
+  ]
+ },
+ {
+  "id": "animal_wolf",
+  "path": "assets/ext/sounds/kronbits-sfx/animal_wolf.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 2.02,
+  "tags": [
+   "animal",
+   "outdoor",
+   "creature"
+  ]
+ },
+ {
+  "id": "voice_zombie_anger",
+  "path": "assets/ext/sounds/goofy-monsters/voice_zombie_anger.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 1.63,
+  "tags": [
+   "monster",
+   "voice",
+   "zombie",
+   "anger",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_zombie_attack",
+  "path": "assets/ext/sounds/goofy-monsters/voice_zombie_attack.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.65,
+  "tags": [
+   "monster",
+   "voice",
+   "zombie",
+   "attack",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_zombie_hurt",
+  "path": "assets/ext/sounds/goofy-monsters/voice_zombie_hurt.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.48,
+  "tags": [
+   "monster",
+   "voice",
+   "zombie",
+   "hurt",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_zombie_die",
+  "path": "assets/ext/sounds/goofy-monsters/voice_zombie_die.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.77,
+  "tags": [
+   "monster",
+   "voice",
+   "zombie",
+   "die",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_zombie_grunt",
+  "path": "assets/ext/sounds/goofy-monsters/voice_zombie_grunt.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.42,
+  "tags": [
+   "monster",
+   "voice",
+   "zombie",
+   "grunt",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_zombie_eating",
+  "path": "assets/ext/sounds/goofy-monsters/voice_zombie_eating.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 4.2,
+  "tags": [
+   "monster",
+   "voice",
+   "zombie",
+   "eating",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_zombie_laughing",
+  "path": "assets/ext/sounds/goofy-monsters/voice_zombie_laughing.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 1.69,
+  "tags": [
+   "monster",
+   "voice",
+   "zombie",
+   "laughing",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_zombie_scared",
+  "path": "assets/ext/sounds/goofy-monsters/voice_zombie_scared.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 1.75,
+  "tags": [
+   "monster",
+   "voice",
+   "zombie",
+   "scared",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_slime_anger",
+  "path": "assets/ext/sounds/goofy-monsters/voice_slime_anger.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 1.8,
+  "tags": [
+   "monster",
+   "voice",
+   "slime",
+   "anger",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_slime_attack",
+  "path": "assets/ext/sounds/goofy-monsters/voice_slime_attack.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.39,
+  "tags": [
+   "monster",
+   "voice",
+   "slime",
+   "attack",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_slime_hurt",
+  "path": "assets/ext/sounds/goofy-monsters/voice_slime_hurt.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.31,
+  "tags": [
+   "monster",
+   "voice",
+   "slime",
+   "hurt",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_slime_die",
+  "path": "assets/ext/sounds/goofy-monsters/voice_slime_die.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.25,
+  "tags": [
+   "monster",
+   "voice",
+   "slime",
+   "die",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_slime_grunt",
+  "path": "assets/ext/sounds/goofy-monsters/voice_slime_grunt.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.31,
+  "tags": [
+   "monster",
+   "voice",
+   "slime",
+   "grunt",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_slime_eating",
+  "path": "assets/ext/sounds/goofy-monsters/voice_slime_eating.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.64,
+  "tags": [
+   "monster",
+   "voice",
+   "slime",
+   "eating",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_slime_laughing",
+  "path": "assets/ext/sounds/goofy-monsters/voice_slime_laughing.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 2.09,
+  "tags": [
+   "monster",
+   "voice",
+   "slime",
+   "laughing",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_slime_scared",
+  "path": "assets/ext/sounds/goofy-monsters/voice_slime_scared.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 1.51,
+  "tags": [
+   "monster",
+   "voice",
+   "slime",
+   "scared",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_rat_anger",
+  "path": "assets/ext/sounds/goofy-monsters/voice_rat_anger.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 1.65,
+  "tags": [
+   "monster",
+   "voice",
+   "rat",
+   "anger",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_rat_attack",
+  "path": "assets/ext/sounds/goofy-monsters/voice_rat_attack.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.43,
+  "tags": [
+   "monster",
+   "voice",
+   "rat",
+   "attack",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_rat_hurt",
+  "path": "assets/ext/sounds/goofy-monsters/voice_rat_hurt.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.41,
+  "tags": [
+   "monster",
+   "voice",
+   "rat",
+   "hurt",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_rat_die",
+  "path": "assets/ext/sounds/goofy-monsters/voice_rat_die.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 1.78,
+  "tags": [
+   "monster",
+   "voice",
+   "rat",
+   "die",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_rat_grunt",
+  "path": "assets/ext/sounds/goofy-monsters/voice_rat_grunt.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.27,
+  "tags": [
+   "monster",
+   "voice",
+   "rat",
+   "grunt",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_rat_eating",
+  "path": "assets/ext/sounds/goofy-monsters/voice_rat_eating.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 1.7,
+  "tags": [
+   "monster",
+   "voice",
+   "rat",
+   "eating",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_rat_laughing",
+  "path": "assets/ext/sounds/goofy-monsters/voice_rat_laughing.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.97,
+  "tags": [
+   "monster",
+   "voice",
+   "rat",
+   "laughing",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_rat_scared",
+  "path": "assets/ext/sounds/goofy-monsters/voice_rat_scared.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 1.13,
+  "tags": [
+   "monster",
+   "voice",
+   "rat",
+   "scared",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_bat_anger",
+  "path": "assets/ext/sounds/goofy-monsters/voice_bat_anger.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 1.42,
+  "tags": [
+   "monster",
+   "voice",
+   "bat",
+   "anger",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_bat_attack",
+  "path": "assets/ext/sounds/goofy-monsters/voice_bat_attack.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.64,
+  "tags": [
+   "monster",
+   "voice",
+   "bat",
+   "attack",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_bat_hurt",
+  "path": "assets/ext/sounds/goofy-monsters/voice_bat_hurt.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.5,
+  "tags": [
+   "monster",
+   "voice",
+   "bat",
+   "hurt",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_bat_die",
+  "path": "assets/ext/sounds/goofy-monsters/voice_bat_die.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 1.4,
+  "tags": [
+   "monster",
+   "voice",
+   "bat",
+   "die",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_bat_grunt",
+  "path": "assets/ext/sounds/goofy-monsters/voice_bat_grunt.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.25,
+  "tags": [
+   "monster",
+   "voice",
+   "bat",
+   "grunt",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_bat_eating",
+  "path": "assets/ext/sounds/goofy-monsters/voice_bat_eating.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 3.23,
+  "tags": [
+   "monster",
+   "voice",
+   "bat",
+   "eating",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_bat_laughing",
+  "path": "assets/ext/sounds/goofy-monsters/voice_bat_laughing.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 1.22,
+  "tags": [
+   "monster",
+   "voice",
+   "bat",
+   "laughing",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_bat_scared",
+  "path": "assets/ext/sounds/goofy-monsters/voice_bat_scared.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 2.06,
+  "tags": [
+   "monster",
+   "voice",
+   "bat",
+   "scared",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_skeleton_anger",
+  "path": "assets/ext/sounds/goofy-monsters/voice_skeleton_anger.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 1.71,
+  "tags": [
+   "monster",
+   "voice",
+   "skeleton",
+   "anger",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_skeleton_attack",
+  "path": "assets/ext/sounds/goofy-monsters/voice_skeleton_attack.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.79,
+  "tags": [
+   "monster",
+   "voice",
+   "skeleton",
+   "attack",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_skeleton_hurt",
+  "path": "assets/ext/sounds/goofy-monsters/voice_skeleton_hurt.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.83,
+  "tags": [
+   "monster",
+   "voice",
+   "skeleton",
+   "hurt",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_skeleton_die",
+  "path": "assets/ext/sounds/goofy-monsters/voice_skeleton_die.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.96,
+  "tags": [
+   "monster",
+   "voice",
+   "skeleton",
+   "die",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_skeleton_grunt",
+  "path": "assets/ext/sounds/goofy-monsters/voice_skeleton_grunt.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.38,
+  "tags": [
+   "monster",
+   "voice",
+   "skeleton",
+   "grunt",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_skeleton_eating",
+  "path": "assets/ext/sounds/goofy-monsters/voice_skeleton_eating.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 2.04,
+  "tags": [
+   "monster",
+   "voice",
+   "skeleton",
+   "eating",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_skeleton_laughing",
+  "path": "assets/ext/sounds/goofy-monsters/voice_skeleton_laughing.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 1.77,
+  "tags": [
+   "monster",
+   "voice",
+   "skeleton",
+   "laughing",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_skeleton_scared",
+  "path": "assets/ext/sounds/goofy-monsters/voice_skeleton_scared.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 1.75,
+  "tags": [
+   "monster",
+   "voice",
+   "skeleton",
+   "scared",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_dragon_anger",
+  "path": "assets/ext/sounds/goofy-monsters/voice_dragon_anger.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 1.97,
+  "tags": [
+   "monster",
+   "voice",
+   "dragon",
+   "anger",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_dragon_attack_1",
+  "path": "assets/ext/sounds/goofy-monsters/voice_dragon_attack_1.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 3.51,
+  "tags": [
+   "monster",
+   "voice",
+   "dragon",
+   "attack",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_dragon_attack_2",
+  "path": "assets/ext/sounds/goofy-monsters/voice_dragon_attack_2.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.58,
+  "tags": [
+   "monster",
+   "voice",
+   "dragon",
+   "attack",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_dragon_hurt",
+  "path": "assets/ext/sounds/goofy-monsters/voice_dragon_hurt.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.61,
+  "tags": [
+   "monster",
+   "voice",
+   "dragon",
+   "hurt",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_dragon_die",
+  "path": "assets/ext/sounds/goofy-monsters/voice_dragon_die.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 3.06,
+  "tags": [
+   "monster",
+   "voice",
+   "dragon",
+   "die",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_dragon_grunt",
+  "path": "assets/ext/sounds/goofy-monsters/voice_dragon_grunt.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.55,
+  "tags": [
+   "monster",
+   "voice",
+   "dragon",
+   "grunt",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_dragon_eating",
+  "path": "assets/ext/sounds/goofy-monsters/voice_dragon_eating.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 5.0,
+  "tags": [
+   "monster",
+   "voice",
+   "dragon",
+   "eating",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_dragon_laughing",
+  "path": "assets/ext/sounds/goofy-monsters/voice_dragon_laughing.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 1.63,
+  "tags": [
+   "monster",
+   "voice",
+   "dragon",
+   "laughing",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_dragon_scared",
+  "path": "assets/ext/sounds/goofy-monsters/voice_dragon_scared.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.79,
+  "tags": [
+   "monster",
+   "voice",
+   "dragon",
+   "scared",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_clown_anger",
+  "path": "assets/ext/sounds/goofy-monsters/voice_clown_anger.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 1.79,
+  "tags": [
+   "monster",
+   "voice",
+   "clown",
+   "anger",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_clown_attack",
+  "path": "assets/ext/sounds/goofy-monsters/voice_clown_attack.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 1.42,
+  "tags": [
+   "monster",
+   "voice",
+   "clown",
+   "attack",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_clown_hurt",
+  "path": "assets/ext/sounds/goofy-monsters/voice_clown_hurt.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.59,
+  "tags": [
+   "monster",
+   "voice",
+   "clown",
+   "hurt",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_clown_die",
+  "path": "assets/ext/sounds/goofy-monsters/voice_clown_die.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 2.91,
+  "tags": [
+   "monster",
+   "voice",
+   "clown",
+   "die",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_clown_grunt",
+  "path": "assets/ext/sounds/goofy-monsters/voice_clown_grunt.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 0.56,
+  "tags": [
+   "monster",
+   "voice",
+   "clown",
+   "grunt",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_clown_eating",
+  "path": "assets/ext/sounds/goofy-monsters/voice_clown_eating.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 3.45,
+  "tags": [
+   "monster",
+   "voice",
+   "clown",
+   "eating",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_clown_laughing",
+  "path": "assets/ext/sounds/goofy-monsters/voice_clown_laughing.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 3.16,
+  "tags": [
+   "monster",
+   "voice",
+   "clown",
+   "laughing",
+   "goofy"
+  ]
+ },
+ {
+  "id": "voice_clown_scared",
+  "path": "assets/ext/sounds/goofy-monsters/voice_clown_scared.ogg",
+  "pack": "Goofy Sounds for Scary Monsters",
+  "license": "CC0",
+  "duration": 2.88,
+  "tags": [
+   "monster",
+   "voice",
+   "clown",
+   "scared",
+   "goofy"
+  ]
+ },
+ {
+  "id": "sting_drum",
+  "path": "assets/ext/sounds/obsydianx-horror/sting_drum.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 3.2,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting_drum_glitch",
+  "path": "assets/ext/sounds/obsydianx-horror/sting_drum_glitch.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 0.78,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting_impact",
+  "path": "assets/ext/sounds/obsydianx-horror/sting_impact.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 4.0,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting_impact_glitch",
+  "path": "assets/ext/sounds/obsydianx-horror/sting_impact_glitch.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 1.64,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting_piano",
+  "path": "assets/ext/sounds/obsydianx-horror/sting_piano.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 2.11,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting_piano_ringmod",
+  "path": "assets/ext/sounds/obsydianx-horror/sting_piano_ringmod.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 1.69,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting_synth",
+  "path": "assets/ext/sounds/obsydianx-horror/sting_synth.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 3.6,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting_synth_glitch",
+  "path": "assets/ext/sounds/obsydianx-horror/sting_synth_glitch.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 0.93,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting_violin",
+  "path": "assets/ext/sounds/obsydianx-horror/sting_violin.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 3.1,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting_violin_glitch",
+  "path": "assets/ext/sounds/obsydianx-horror/sting_violin_glitch.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 0.66,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting2_drum_2",
+  "path": "assets/ext/sounds/obsydianx-horror/sting2_drum_2.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 3.13,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting2_drum_3",
+  "path": "assets/ext/sounds/obsydianx-horror/sting2_drum_3.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 3.18,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting2_drum_4",
+  "path": "assets/ext/sounds/obsydianx-horror/sting2_drum_4.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 3.41,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting2_drum_5",
+  "path": "assets/ext/sounds/obsydianx-horror/sting2_drum_5.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 3.56,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting2_impact_2",
+  "path": "assets/ext/sounds/obsydianx-horror/sting2_impact_2.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 4.0,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting2_impact_3",
+  "path": "assets/ext/sounds/obsydianx-horror/sting2_impact_3.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 4.0,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting2_impact_4",
+  "path": "assets/ext/sounds/obsydianx-horror/sting2_impact_4.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 4.0,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting2_impact_5",
+  "path": "assets/ext/sounds/obsydianx-horror/sting2_impact_5.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 4.0,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting2_synth_2",
+  "path": "assets/ext/sounds/obsydianx-horror/sting2_synth_2.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 3.78,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting2_synth_3",
+  "path": "assets/ext/sounds/obsydianx-horror/sting2_synth_3.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 3.53,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting2_synth_4",
+  "path": "assets/ext/sounds/obsydianx-horror/sting2_synth_4.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 3.45,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting2_synth_5",
+  "path": "assets/ext/sounds/obsydianx-horror/sting2_synth_5.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 3.43,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting2_violin_2",
+  "path": "assets/ext/sounds/obsydianx-horror/sting2_violin_2.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 3.1,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting2_violin_3",
+  "path": "assets/ext/sounds/obsydianx-horror/sting2_violin_3.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 3.1,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting2_violin_4",
+  "path": "assets/ext/sounds/obsydianx-horror/sting2_violin_4.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 3.1,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "sting2_violin_5",
+  "path": "assets/ext/sounds/obsydianx-horror/sting2_violin_5.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 3.1,
+  "tags": [
+   "stinger",
+   "horror"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "jumpscare_1",
+  "path": "assets/ext/sounds/phlegmlee-horror/jumpscare_1.ogg",
+  "pack": "Horror Sound Pack",
+  "license": "CC0",
+  "duration": 8.0,
+  "tags": [
+   "stinger",
+   "jumpscare",
+   "horror"
+  ]
+ },
+ {
+  "id": "jumpscare_2",
+  "path": "assets/ext/sounds/phlegmlee-horror/jumpscare_2.ogg",
+  "pack": "Horror Sound Pack",
+  "license": "CC0",
+  "duration": 8.0,
+  "tags": [
+   "stinger",
+   "jumpscare",
+   "horror"
+  ]
+ },
+ {
+  "id": "jumpscare_3",
+  "path": "assets/ext/sounds/phlegmlee-horror/jumpscare_3.ogg",
+  "pack": "Horror Sound Pack",
+  "license": "CC0",
+  "duration": 8.0,
+  "tags": [
+   "stinger",
+   "jumpscare",
+   "horror"
+  ]
+ },
+ {
+  "id": "jumpscare_4",
+  "path": "assets/ext/sounds/phlegmlee-horror/jumpscare_4.ogg",
+  "pack": "Horror Sound Pack",
+  "license": "CC0",
+  "duration": 6.33,
+  "tags": [
+   "stinger",
+   "jumpscare",
+   "horror"
+  ]
+ },
+ {
+  "id": "eerie",
+  "path": "assets/ext/sounds/phlegmlee-horror/eerie.ogg",
+  "pack": "Horror Sound Pack",
+  "license": "CC0",
+  "duration": 6.31,
+  "tags": [
+   "stinger",
+   "eerie",
+   "horror"
+  ]
+ },
+ {
+  "id": "power_down_whoosh",
+  "path": "assets/ext/sounds/phlegmlee-horror/power_down_whoosh.ogg",
+  "pack": "Horror Sound Pack",
+  "license": "CC0",
+  "duration": 15.05,
+  "tags": [
+   "stinger",
+   "power",
+   "horror"
+  ]
+ },
+ {
+  "id": "amb_facility_armory",
+  "path": "assets/ext/sounds/nihilex-facility/amb_facility_armory.ogg",
+  "pack": "Underground Facility Ambient Pack (Free Audio Asset Collection)",
+  "license": "CC0",
+  "duration": 60.0,
+  "tags": [
+   "ambience",
+   "facility",
+   "interior",
+   "loop"
+  ]
+ },
+ {
+  "id": "amb_facility_cell",
+  "path": "assets/ext/sounds/nihilex-facility/amb_facility_cell.ogg",
+  "pack": "Underground Facility Ambient Pack (Free Audio Asset Collection)",
+  "license": "CC0",
+  "duration": 60.0,
+  "tags": [
+   "ambience",
+   "facility",
+   "interior",
+   "loop"
+  ]
+ },
+ {
+  "id": "amb_facility_hallway",
+  "path": "assets/ext/sounds/nihilex-facility/amb_facility_hallway.ogg",
+  "pack": "Underground Facility Ambient Pack (Free Audio Asset Collection)",
+  "license": "CC0",
+  "duration": 60.0,
+  "tags": [
+   "ambience",
+   "facility",
+   "interior",
+   "loop"
+  ]
+ },
+ {
+  "id": "amb_facility_janitor",
+  "path": "assets/ext/sounds/nihilex-facility/amb_facility_janitor.ogg",
+  "pack": "Underground Facility Ambient Pack (Free Audio Asset Collection)",
+  "license": "CC0",
+  "duration": 60.0,
+  "tags": [
+   "ambience",
+   "facility",
+   "interior",
+   "loop"
+  ]
+ },
+ {
+  "id": "amb_facility_lockers",
+  "path": "assets/ext/sounds/nihilex-facility/amb_facility_lockers.ogg",
+  "pack": "Underground Facility Ambient Pack (Free Audio Asset Collection)",
+  "license": "CC0",
+  "duration": 60.0,
+  "tags": [
+   "ambience",
+   "facility",
+   "interior",
+   "loop"
+  ]
+ },
+ {
+  "id": "amb_facility_office",
+  "path": "assets/ext/sounds/nihilex-facility/amb_facility_office.ogg",
+  "pack": "Underground Facility Ambient Pack (Free Audio Asset Collection)",
+  "license": "CC0",
+  "duration": 60.0,
+  "tags": [
+   "ambience",
+   "facility",
+   "interior",
+   "loop"
+  ]
+ },
+ {
+  "id": "amb_facility_research",
+  "path": "assets/ext/sounds/nihilex-facility/amb_facility_research.ogg",
+  "pack": "Underground Facility Ambient Pack (Free Audio Asset Collection)",
+  "license": "CC0",
+  "duration": 60.0,
+  "tags": [
+   "ambience",
+   "facility",
+   "interior",
+   "loop"
+  ]
+ },
+ {
+  "id": "amb_drone_1",
+  "path": "assets/ext/sounds/obsydianx-horror/amb_drone_1.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "drone",
+   "horror",
+   "loop"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "amb_drone_2",
+  "path": "assets/ext/sounds/obsydianx-horror/amb_drone_2.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "drone",
+   "horror",
+   "loop"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "amb_drone_3",
+  "path": "assets/ext/sounds/obsydianx-horror/amb_drone_3.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "drone",
+   "horror",
+   "loop"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "amb_drone_4",
+  "path": "assets/ext/sounds/obsydianx-horror/amb_drone_4.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "drone",
+   "horror",
+   "loop"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "amb_drone_5",
+  "path": "assets/ext/sounds/obsydianx-horror/amb_drone_5.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "drone",
+   "horror",
+   "loop"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "amb_drone_6",
+  "path": "assets/ext/sounds/obsydianx-horror/amb_drone_6.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "drone",
+   "horror",
+   "loop"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "amb_drone_7",
+  "path": "assets/ext/sounds/obsydianx-horror/amb_drone_7.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "drone",
+   "horror",
+   "loop"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "amb_drone_8",
+  "path": "assets/ext/sounds/obsydianx-horror/amb_drone_8.ogg",
+  "pack": "Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)",
+  "license": "CC-BY 4.0",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "drone",
+   "horror",
+   "loop"
+  ],
+  "credit": "Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)"
+ },
+ {
+  "id": "amb_wind_1",
+  "path": "assets/ext/sounds/liminal-horror/amb_wind_1.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 20.0,
+  "tags": [
+   "ambience",
+   "wind",
+   "outdoor",
+   "loop"
+  ]
+ },
+ {
+  "id": "amb_wind_2",
+  "path": "assets/ext/sounds/liminal-horror/amb_wind_2.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 6.57,
+  "tags": [
+   "ambience",
+   "wind",
+   "outdoor",
+   "loop"
+  ]
+ },
+ {
+  "id": "amb_wind_3",
+  "path": "assets/ext/sounds/liminal-horror/amb_wind_3.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 20.0,
+  "tags": [
+   "ambience",
+   "wind",
+   "outdoor",
+   "loop"
+  ]
+ },
+ {
+  "id": "amb_wind_4",
+  "path": "assets/ext/sounds/liminal-horror/amb_wind_4.ogg",
+  "pack": "FREE HORROR SFX - Scary Sound Effects (vol 1+2)",
+  "license": "CC0 (author asks not to resell/redistribute the pack itself)",
+  "duration": 20.0,
+  "tags": [
+   "ambience",
+   "wind",
+   "outdoor",
+   "loop"
+  ]
+ },
+ {
+  "id": "amb_rain_porch_1",
+  "path": "assets/ext/sounds/cluckfox-rain/amb_rain_porch_1.ogg",
+  "pack": "Rain and Thunder",
+  "license": "CC0",
+  "duration": 40.0,
+  "tags": [
+   "ambience",
+   "rain",
+   "thunder",
+   "weather",
+   "outdoor",
+   "loop"
+  ]
+ },
+ {
+  "id": "amb_rain_porch_2",
+  "path": "assets/ext/sounds/cluckfox-rain/amb_rain_porch_2.ogg",
+  "pack": "Rain and Thunder",
+  "license": "CC0",
+  "duration": 40.0,
+  "tags": [
+   "ambience",
+   "rain",
+   "thunder",
+   "weather",
+   "outdoor",
+   "loop"
+  ]
+ },
+ {
+  "id": "amb_rain_porch_3",
+  "path": "assets/ext/sounds/cluckfox-rain/amb_rain_porch_3.ogg",
+  "pack": "Rain and Thunder",
+  "license": "CC0",
+  "duration": 37.01,
+  "tags": [
+   "ambience",
+   "rain",
+   "thunder",
+   "weather",
+   "outdoor",
+   "loop"
+  ]
+ },
+ {
+  "id": "amb_rain_indoor_1",
+  "path": "assets/ext/sounds/cluckfox-rain/amb_rain_indoor_1.ogg",
+  "pack": "Rain and Thunder",
+  "license": "CC0",
+  "duration": 30.01,
+  "tags": [
+   "ambience",
+   "rain",
+   "thunder",
+   "weather",
+   "outdoor",
+   "loop"
+  ]
+ },
+ {
+  "id": "amb_rain_indoor_2",
+  "path": "assets/ext/sounds/cluckfox-rain/amb_rain_indoor_2.ogg",
+  "pack": "Rain and Thunder",
+  "license": "CC0",
+  "duration": 18.5,
+  "tags": [
+   "ambience",
+   "rain",
+   "thunder",
+   "weather",
+   "outdoor",
+   "loop"
+  ]
+ },
+ {
+  "id": "music_dark_ambient",
+  "path": "assets/ext/sounds/phlegmlee-horror/music_dark_ambient.ogg",
+  "pack": "Horror Sound Pack",
+  "license": "CC0",
+  "duration": 60.0,
+  "tags": [
+   "music",
+   "horror",
+   "loop"
+  ]
+ },
+ {
+  "id": "music_dark_pluck",
+  "path": "assets/ext/sounds/phlegmlee-horror/music_dark_pluck.ogg",
+  "pack": "Horror Sound Pack",
+  "license": "CC0",
+  "duration": 60.0,
+  "tags": [
+   "music",
+   "horror",
+   "loop"
+  ]
+ },
+ {
+  "id": "music_eerie_long",
+  "path": "assets/ext/sounds/phlegmlee-horror/music_eerie_long.ogg",
+  "pack": "Horror Sound Pack",
+  "license": "CC0",
+  "duration": 60.0,
+  "tags": [
+   "music",
+   "horror",
+   "loop"
+  ]
+ },
+ {
+  "id": "music_eerie",
+  "path": "assets/ext/sounds/phlegmlee-horror/music_eerie.ogg",
+  "pack": "Horror Sound Pack",
+  "license": "CC0",
+  "duration": 60.0,
+  "tags": [
+   "music",
+   "horror",
+   "loop"
+  ]
+ },
+ {
+  "id": "music_less_dark",
+  "path": "assets/ext/sounds/phlegmlee-horror/music_less_dark.ogg",
+  "pack": "Horror Sound Pack",
+  "license": "CC0",
+  "duration": 60.0,
+  "tags": [
+   "music",
+   "horror",
+   "loop"
+  ]
+ },
+ {
+  "id": "amb_retro_1",
+  "path": "assets/ext/sounds/kronbits-sfx/amb_retro_1.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "retro",
+   "loop"
+  ]
+ },
+ {
+  "id": "amb_retro_2",
+  "path": "assets/ext/sounds/kronbits-sfx/amb_retro_2.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "retro",
+   "loop"
+  ]
+ },
+ {
+  "id": "amb_retro_3",
+  "path": "assets/ext/sounds/kronbits-sfx/amb_retro_3.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "retro",
+   "loop"
+  ]
+ },
+ {
+  "id": "amb_retro_4",
+  "path": "assets/ext/sounds/kronbits-sfx/amb_retro_4.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 25.71,
+  "tags": [
+   "ambience",
+   "retro",
+   "loop"
+  ]
+ },
+ {
+  "id": "amb_retro_5",
+  "path": "assets/ext/sounds/kronbits-sfx/amb_retro_5.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "retro",
+   "loop"
+  ]
+ },
+ {
+  "id": "scifi_alien_ship",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_alien_ship.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_big_dock",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_big_dock.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_big_fan",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_big_fan.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_ship_hum",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_ship_hum.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_converter",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_converter.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_drone",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_drone.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_engine",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_engine.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_generator",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_generator.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_grain_drone",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_grain_drone.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_machina",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_machina.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_maelstrom",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_maelstrom.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_offworld_traffic",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_offworld_traffic.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_planetarium",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_planetarium.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_rotator",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_rotator.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_rotor",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_rotor.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_alarm",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_alarm.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_shimmer_drone",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_shimmer_drone.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_sirens",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_sirens.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_alarm_soft",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_alarm_soft.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_spark_drone",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_spark_drone.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_engine_splutter",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_engine_splutter.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_strange_planet",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_strange_planet.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_sub_rumble",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_sub_rumble.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_system_alert",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_system_alert.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_alarm_low",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_alarm_low.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "scifi_wake_up",
+  "path": "assets/ext/sounds/loadless-scifi/scifi_wake_up.ogg",
+  "pack": "Sci-fi SFX (Part 1)",
+  "license": "Free incl. commercial use with credit to \"Paul Timings\" + link",
+  "duration": 30.0,
+  "tags": [
+   "ambience",
+   "scifi",
+   "machinery",
+   "loop"
+  ],
+  "credit": "Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1"
+ },
+ {
+  "id": "impact_generic",
+  "path": "assets/ext/sounds/kronbits-sfx/impact_generic.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 1.12,
+  "tags": [
+   "impact",
+   "hit"
+  ]
+ },
+ {
+  "id": "impact_lofi",
+  "path": "assets/ext/sounds/kronbits-sfx/impact_lofi.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.84,
+  "tags": [
+   "impact",
+   "hit"
+  ]
+ },
+ {
+  "id": "impact_metal_1",
+  "path": "assets/ext/sounds/kronbits-sfx/impact_metal_1.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.93,
+  "tags": [
+   "impact",
+   "hit"
+  ]
+ },
+ {
+  "id": "impact_metal_2",
+  "path": "assets/ext/sounds/kronbits-sfx/impact_metal_2.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.84,
+  "tags": [
+   "impact",
+   "hit"
+  ]
+ },
+ {
+  "id": "impact_punch",
+  "path": "assets/ext/sounds/kronbits-sfx/impact_punch.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.29,
+  "tags": [
+   "impact",
+   "hit"
+  ]
+ },
+ {
+  "id": "impact_punch_hurt",
+  "path": "assets/ext/sounds/kronbits-sfx/impact_punch_hurt.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.33,
+  "tags": [
+   "impact",
+   "hit"
+  ]
+ },
+ {
+  "id": "impact_water",
+  "path": "assets/ext/sounds/kronbits-sfx/impact_water.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 2.48,
+  "tags": [
+   "impact",
+   "hit"
+  ]
+ },
+ {
+  "id": "electric_1",
+  "path": "assets/ext/sounds/kronbits-sfx/electric_1.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 3.62,
+  "tags": [
+   "electric",
+   "zap",
+   "machinery"
+  ]
+ },
+ {
+  "id": "electric_2",
+  "path": "assets/ext/sounds/kronbits-sfx/electric_2.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 2.69,
+  "tags": [
+   "electric",
+   "zap",
+   "machinery"
+  ]
+ },
+ {
+  "id": "electric_3",
+  "path": "assets/ext/sounds/kronbits-sfx/electric_3.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 4.0,
+  "tags": [
+   "electric",
+   "zap",
+   "machinery"
+  ]
+ },
+ {
+  "id": "electric_4",
+  "path": "assets/ext/sounds/kronbits-sfx/electric_4.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 3.61,
+  "tags": [
+   "electric",
+   "zap",
+   "machinery"
+  ]
+ },
+ {
+  "id": "electric_5",
+  "path": "assets/ext/sounds/kronbits-sfx/electric_5.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 4.0,
+  "tags": [
+   "electric",
+   "zap",
+   "machinery"
+  ]
+ },
+ {
+  "id": "electric_6",
+  "path": "assets/ext/sounds/kronbits-sfx/electric_6.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.53,
+  "tags": [
+   "electric",
+   "zap",
+   "machinery"
+  ]
+ },
+ {
+  "id": "electric_7",
+  "path": "assets/ext/sounds/kronbits-sfx/electric_7.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.77,
+  "tags": [
+   "electric",
+   "zap",
+   "machinery"
+  ]
+ },
+ {
+  "id": "electric_8",
+  "path": "assets/ext/sounds/kronbits-sfx/electric_8.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.66,
+  "tags": [
+   "electric",
+   "zap",
+   "machinery"
+  ]
+ },
+ {
+  "id": "electric_9",
+  "path": "assets/ext/sounds/kronbits-sfx/electric_9.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.76,
+  "tags": [
+   "electric",
+   "zap",
+   "machinery"
+  ]
+ },
+ {
+  "id": "beep_1",
+  "path": "assets/ext/sounds/kronbits-sfx/beep_1.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 1.57,
+  "tags": [
+   "ui",
+   "alarm",
+   "beep",
+   "terminal"
+  ]
+ },
+ {
+  "id": "beep_2",
+  "path": "assets/ext/sounds/kronbits-sfx/beep_2.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 5.0,
+  "tags": [
+   "ui",
+   "alarm",
+   "beep",
+   "terminal"
+  ]
+ },
+ {
+  "id": "beep_3",
+  "path": "assets/ext/sounds/kronbits-sfx/beep_3.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.62,
+  "tags": [
+   "ui",
+   "alarm",
+   "beep",
+   "terminal"
+  ]
+ },
+ {
+  "id": "beep_4",
+  "path": "assets/ext/sounds/kronbits-sfx/beep_4.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.65,
+  "tags": [
+   "ui",
+   "alarm",
+   "beep",
+   "terminal"
+  ]
+ },
+ {
+  "id": "beep_5",
+  "path": "assets/ext/sounds/kronbits-sfx/beep_5.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.73,
+  "tags": [
+   "ui",
+   "alarm",
+   "beep",
+   "terminal"
+  ]
+ },
+ {
+  "id": "beep_6",
+  "path": "assets/ext/sounds/kronbits-sfx/beep_6.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.08,
+  "tags": [
+   "ui",
+   "alarm",
+   "beep",
+   "terminal"
+  ]
+ },
+ {
+  "id": "beep_7",
+  "path": "assets/ext/sounds/kronbits-sfx/beep_7.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.1,
+  "tags": [
+   "ui",
+   "alarm",
+   "beep",
+   "terminal"
+  ]
+ },
+ {
+  "id": "beep_8",
+  "path": "assets/ext/sounds/kronbits-sfx/beep_8.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.99,
+  "tags": [
+   "ui",
+   "alarm",
+   "beep",
+   "terminal"
+  ]
+ },
+ {
+  "id": "beep_9",
+  "path": "assets/ext/sounds/kronbits-sfx/beep_9.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.62,
+  "tags": [
+   "ui",
+   "alarm",
+   "beep",
+   "terminal"
+  ]
+ },
+ {
+  "id": "beep_10",
+  "path": "assets/ext/sounds/kronbits-sfx/beep_10.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.71,
+  "tags": [
+   "ui",
+   "alarm",
+   "beep",
+   "terminal"
+  ]
+ },
+ {
+  "id": "explosion_1",
+  "path": "assets/ext/sounds/kronbits-sfx/explosion_1.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 4.49,
+  "tags": [
+   "explosion",
+   "impact"
+  ]
+ },
+ {
+  "id": "explosion_2",
+  "path": "assets/ext/sounds/kronbits-sfx/explosion_2.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.93,
+  "tags": [
+   "explosion",
+   "impact"
+  ]
+ },
+ {
+  "id": "explosion_3",
+  "path": "assets/ext/sounds/kronbits-sfx/explosion_3.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.91,
+  "tags": [
+   "explosion",
+   "impact"
+  ]
+ },
+ {
+  "id": "explosion_4",
+  "path": "assets/ext/sounds/kronbits-sfx/explosion_4.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 2.96,
+  "tags": [
+   "explosion",
+   "impact"
+  ]
+ },
+ {
+  "id": "pickup_1",
+  "path": "assets/ext/sounds/kronbits-sfx/pickup_1.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.74,
+  "tags": [
+   "pickup",
+   "item",
+   "ui"
+  ]
+ },
+ {
+  "id": "pickup_2",
+  "path": "assets/ext/sounds/kronbits-sfx/pickup_2.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.34,
+  "tags": [
+   "pickup",
+   "item",
+   "ui"
+  ]
+ },
+ {
+  "id": "pickup_3",
+  "path": "assets/ext/sounds/kronbits-sfx/pickup_3.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.28,
+  "tags": [
+   "pickup",
+   "item",
+   "ui"
+  ]
+ },
+ {
+  "id": "pickup_4",
+  "path": "assets/ext/sounds/kronbits-sfx/pickup_4.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.48,
+  "tags": [
+   "pickup",
+   "item",
+   "ui"
+  ]
+ },
+ {
+  "id": "pickup_5",
+  "path": "assets/ext/sounds/kronbits-sfx/pickup_5.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.44,
+  "tags": [
+   "pickup",
+   "item",
+   "ui"
+  ]
+ },
+ {
+  "id": "swoosh_1",
+  "path": "assets/ext/sounds/kronbits-sfx/swoosh_1.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.56,
+  "tags": [
+   "swoosh",
+   "swing",
+   "melee"
+  ]
+ },
+ {
+  "id": "swoosh_2",
+  "path": "assets/ext/sounds/kronbits-sfx/swoosh_2.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.35,
+  "tags": [
+   "swoosh",
+   "swing",
+   "melee"
+  ]
+ },
+ {
+  "id": "swoosh_3",
+  "path": "assets/ext/sounds/kronbits-sfx/swoosh_3.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.84,
+  "tags": [
+   "swoosh",
+   "swing",
+   "melee"
+  ]
+ },
+ {
+  "id": "gun_shot",
+  "path": "assets/ext/sounds/kronbits-sfx/gun_shot.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.55,
+  "tags": [
+   "weapon",
+   "gun",
+   "shotgun"
+  ]
+ },
+ {
+  "id": "gun_reload",
+  "path": "assets/ext/sounds/kronbits-sfx/gun_reload.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.46,
+  "tags": [
+   "weapon",
+   "reload"
+  ]
+ },
+ {
+  "id": "taser",
+  "path": "assets/ext/sounds/kronbits-sfx/taser.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.99,
+  "tags": [
+   "weapon",
+   "taser",
+   "electric"
+  ]
+ },
+ {
+  "id": "water_1",
+  "path": "assets/ext/sounds/kronbits-sfx/water_1.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 4.0,
+  "tags": [
+   "water",
+   "splash",
+   "drip"
+  ]
+ },
+ {
+  "id": "water_2",
+  "path": "assets/ext/sounds/kronbits-sfx/water_2.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 4.0,
+  "tags": [
+   "water",
+   "splash",
+   "drip"
+  ]
+ },
+ {
+  "id": "water_3",
+  "path": "assets/ext/sounds/kronbits-sfx/water_3.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.27,
+  "tags": [
+   "water",
+   "splash",
+   "drip"
+  ]
+ },
+ {
+  "id": "radio_static_1",
+  "path": "assets/ext/sounds/kronbits-sfx/radio_static_1.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 5.15,
+  "tags": [
+   "radio",
+   "static",
+   "walkie",
+   "interference"
+  ]
+ },
+ {
+  "id": "radio_static_2",
+  "path": "assets/ext/sounds/kronbits-sfx/radio_static_2.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 8.0,
+  "tags": [
+   "radio",
+   "static",
+   "walkie",
+   "interference"
+  ]
+ },
+ {
+  "id": "hitech_1",
+  "path": "assets/ext/sounds/kronbits-sfx/hitech_1.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 3.77,
+  "tags": [
+   "scifi",
+   "terminal",
+   "ui"
+  ]
+ },
+ {
+  "id": "hitech_2",
+  "path": "assets/ext/sounds/kronbits-sfx/hitech_2.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 2.36,
+  "tags": [
+   "scifi",
+   "terminal",
+   "ui"
+  ]
+ },
+ {
+  "id": "hitech_3",
+  "path": "assets/ext/sounds/kronbits-sfx/hitech_3.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 4.0,
+  "tags": [
+   "scifi",
+   "terminal",
+   "ui"
+  ]
+ },
+ {
+  "id": "siren",
+  "path": "assets/ext/sounds/kronbits-sfx/siren.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 4.0,
+  "tags": [
+   "alarm",
+   "siren"
+  ]
+ },
+ {
+  "id": "motor",
+  "path": "assets/ext/sounds/kronbits-sfx/motor.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 5.59,
+  "tags": [
+   "machinery",
+   "motor",
+   "engine"
+  ]
+ },
+ {
+  "id": "power_off",
+  "path": "assets/ext/sounds/kronbits-sfx/power_off.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 4.0,
+  "tags": [
+   "power",
+   "turn_off",
+   "machinery"
+  ]
+ },
+ {
+  "id": "computer",
+  "path": "assets/ext/sounds/kronbits-sfx/computer.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 3.46,
+  "tags": [
+   "terminal",
+   "computer",
+   "ui"
+  ]
+ },
+ {
+  "id": "transmission",
+  "path": "assets/ext/sounds/kronbits-sfx/transmission.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 1.33,
+  "tags": [
+   "radio",
+   "scifi"
+  ]
+ },
+ {
+  "id": "neg_1",
+  "path": "assets/ext/sounds/kronbits-sfx/neg_1.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 2.63,
+  "tags": [
+   "ui",
+   "fail",
+   "negative"
+  ]
+ },
+ {
+  "id": "neg_2",
+  "path": "assets/ext/sounds/kronbits-sfx/neg_2.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 3.45,
+  "tags": [
+   "ui",
+   "fail",
+   "negative"
+  ]
+ },
+ {
+  "id": "neg_3",
+  "path": "assets/ext/sounds/kronbits-sfx/neg_3.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 1.51,
+  "tags": [
+   "ui",
+   "fail",
+   "negative"
+  ]
+ },
+ {
+  "id": "neg_4",
+  "path": "assets/ext/sounds/kronbits-sfx/neg_4.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 1.9,
+  "tags": [
+   "ui",
+   "fail",
+   "negative"
+  ]
+ },
+ {
+  "id": "neg_5",
+  "path": "assets/ext/sounds/kronbits-sfx/neg_5.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.67,
+  "tags": [
+   "ui",
+   "fail",
+   "negative"
+  ]
+ },
+ {
+  "id": "vo_deactivated",
+  "path": "assets/ext/sounds/kronbits-sfx/vo_deactivated.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.86,
+  "tags": [
+   "voice",
+   "announcer",
+   "ui"
+  ]
+ },
+ {
+  "id": "vo_game_over",
+  "path": "assets/ext/sounds/kronbits-sfx/vo_game_over.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.59,
+  "tags": [
+   "voice",
+   "announcer",
+   "ui"
+  ]
+ },
+ {
+  "id": "vo_level_completed",
+  "path": "assets/ext/sounds/kronbits-sfx/vo_level_completed.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 1.0,
+  "tags": [
+   "voice",
+   "announcer",
+   "ui"
+  ]
+ },
+ {
+  "id": "vo_malfunction",
+  "path": "assets/ext/sounds/kronbits-sfx/vo_malfunction.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.89,
+  "tags": [
+   "voice",
+   "announcer",
+   "ui"
+  ]
+ },
+ {
+  "id": "vo_mission_completed",
+  "path": "assets/ext/sounds/kronbits-sfx/vo_mission_completed.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 1.08,
+  "tags": [
+   "voice",
+   "announcer",
+   "ui"
+  ]
+ },
+ {
+  "id": "vo_nightmare_mode",
+  "path": "assets/ext/sounds/kronbits-sfx/vo_nightmare_mode.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.76,
+  "tags": [
+   "voice",
+   "announcer",
+   "ui"
+  ]
+ },
+ {
+  "id": "vo_time_out",
+  "path": "assets/ext/sounds/kronbits-sfx/vo_time_out.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 0.57,
+  "tags": [
+   "voice",
+   "announcer",
+   "ui"
+  ]
+ },
+ {
+  "id": "jingle_success_1",
+  "path": "assets/ext/sounds/kronbits-sfx/jingle_success_1.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 1.17,
+  "tags": [
+   "music",
+   "jingle",
+   "success",
+   "ui"
+  ]
+ },
+ {
+  "id": "jingle_success_2",
+  "path": "assets/ext/sounds/kronbits-sfx/jingle_success_2.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 1.16,
+  "tags": [
+   "music",
+   "jingle",
+   "success",
+   "ui"
+  ]
+ },
+ {
+  "id": "jingle_success_3",
+  "path": "assets/ext/sounds/kronbits-sfx/jingle_success_3.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 1.85,
+  "tags": [
+   "music",
+   "jingle",
+   "success",
+   "ui"
+  ]
+ },
+ {
+  "id": "jingle_fail_1",
+  "path": "assets/ext/sounds/kronbits-sfx/jingle_fail_1.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 2.73,
+  "tags": [
+   "music",
+   "jingle",
+   "fail",
+   "ui"
+  ]
+ },
+ {
+  "id": "jingle_fail_2",
+  "path": "assets/ext/sounds/kronbits-sfx/jingle_fail_2.ogg",
+  "pack": "200 Free SFX",
+  "license": "CC0",
+  "duration": 2.24,
+  "tags": [
+   "music",
+   "jingle",
+   "fail",
+   "ui"
+  ]
+ },
+ {
+  "id": "ui_confirm_1",
+  "path": "assets/ext/sounds/obsydianx-ui/ui_confirm_1.ogg",
+  "pack": "Interface SFX Pack 1",
+  "license": "CC0",
+  "duration": 1.47,
+  "tags": [
+   "ui",
+   "confirm"
+  ]
+ },
+ {
+  "id": "ui_confirm_2",
+  "path": "assets/ext/sounds/obsydianx-ui/ui_confirm_2.ogg",
+  "pack": "Interface SFX Pack 1",
+  "license": "CC0",
+  "duration": 1.48,
+  "tags": [
+   "ui",
+   "confirm"
+  ]
+ },
+ {
+  "id": "ui_confirm_3",
+  "path": "assets/ext/sounds/obsydianx-ui/ui_confirm_3.ogg",
+  "pack": "Interface SFX Pack 1",
+  "license": "CC0",
+  "duration": 1.45,
+  "tags": [
+   "ui",
+   "confirm"
+  ]
+ },
+ {
+  "id": "ui_confirm_4",
+  "path": "assets/ext/sounds/obsydianx-ui/ui_confirm_4.ogg",
+  "pack": "Interface SFX Pack 1",
+  "license": "CC0",
+  "duration": 1.42,
+  "tags": [
+   "ui",
+   "confirm"
+  ]
+ },
+ {
+  "id": "ui_confirm_b_1",
+  "path": "assets/ext/sounds/obsydianx-ui/ui_confirm_b_1.ogg",
+  "pack": "Interface SFX Pack 1",
+  "license": "CC0",
+  "duration": 0.91,
+  "tags": [
+   "ui",
+   "confirm"
+  ]
+ },
+ {
+  "id": "ui_confirm_b_2",
+  "path": "assets/ext/sounds/obsydianx-ui/ui_confirm_b_2.ogg",
+  "pack": "Interface SFX Pack 1",
+  "license": "CC0",
+  "duration": 0.92,
+  "tags": [
+   "ui",
+   "confirm"
+  ]
+ },
+ {
+  "id": "ui_confirm_b_3",
+  "path": "assets/ext/sounds/obsydianx-ui/ui_confirm_b_3.ogg",
+  "pack": "Interface SFX Pack 1",
+  "license": "CC0",
+  "duration": 1.28,
+  "tags": [
+   "ui",
+   "confirm"
+  ]
+ },
+ {
+  "id": "ui_back_1",
+  "path": "assets/ext/sounds/obsydianx-ui/ui_back_1.ogg",
+  "pack": "Interface SFX Pack 1",
+  "license": "CC0",
+  "duration": 1.28,
+  "tags": [
+   "ui",
+   "back",
+   "cancel"
+  ]
+ },
+ {
+  "id": "ui_back_2",
+  "path": "assets/ext/sounds/obsydianx-ui/ui_back_2.ogg",
+  "pack": "Interface SFX Pack 1",
+  "license": "CC0",
+  "duration": 1.31,
+  "tags": [
+   "ui",
+   "back",
+   "cancel"
+  ]
+ },
+ {
+  "id": "ui_back_3",
+  "path": "assets/ext/sounds/obsydianx-ui/ui_back_3.ogg",
+  "pack": "Interface SFX Pack 1",
+  "license": "CC0",
+  "duration": 1.22,
+  "tags": [
+   "ui",
+   "back",
+   "cancel"
+  ]
+ },
+ {
+  "id": "ui_error_1",
+  "path": "assets/ext/sounds/obsydianx-ui/ui_error_1.ogg",
+  "pack": "Interface SFX Pack 1",
+  "license": "CC0",
+  "duration": 1.46,
+  "tags": [
+   "ui",
+   "error"
+  ]
+ },
+ {
+  "id": "ui_error_2",
+  "path": "assets/ext/sounds/obsydianx-ui/ui_error_2.ogg",
+  "pack": "Interface SFX Pack 1",
+  "license": "CC0",
+  "duration": 1.5,
+  "tags": [
+   "ui",
+   "error"
+  ]
+ },
+ {
+  "id": "ui_error_3",
+  "path": "assets/ext/sounds/obsydianx-ui/ui_error_3.ogg",
+  "pack": "Interface SFX Pack 1",
+  "license": "CC0",
+  "duration": 1.28,
+  "tags": [
+   "ui",
+   "error"
+  ]
+ },
+ {
+  "id": "ui_cursor_1",
+  "path": "assets/ext/sounds/obsydianx-ui/ui_cursor_1.ogg",
+  "pack": "Interface SFX Pack 1",
+  "license": "CC0",
+  "duration": 0.97,
+  "tags": [
+   "ui",
+   "cursor",
+   "hover"
+  ]
+ },
+ {
+  "id": "ui_cursor_2",
+  "path": "assets/ext/sounds/obsydianx-ui/ui_cursor_2.ogg",
+  "pack": "Interface SFX Pack 1",
+  "license": "CC0",
+  "duration": 0.29,
+  "tags": [
+   "ui",
+   "cursor",
+   "hover"
+  ]
+ },
+ {
+  "id": "ui_cursor_3",
+  "path": "assets/ext/sounds/obsydianx-ui/ui_cursor_3.ogg",
+  "pack": "Interface SFX Pack 1",
+  "license": "CC0",
+  "duration": 0.5,
+  "tags": [
+   "ui",
+   "cursor",
+   "hover"
+  ]
+ },
+ {
+  "id": "ui_cursor_4",
+  "path": "assets/ext/sounds/obsydianx-ui/ui_cursor_4.ogg",
+  "pack": "Interface SFX Pack 1",
+  "license": "CC0",
+  "duration": 0.2,
+  "tags": [
+   "ui",
+   "cursor",
+   "hover"
+  ]
+ },
+ {
+  "id": "ui_cursor_5",
+  "path": "assets/ext/sounds/obsydianx-ui/ui_cursor_5.ogg",
+  "pack": "Interface SFX Pack 1",
+  "license": "CC0",
+  "duration": 0.23,
+  "tags": [
+   "ui",
+   "cursor",
+   "hover"
+  ]
+ }
+]
