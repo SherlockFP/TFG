@@ -58,7 +58,7 @@ import { setDocksVisible } from '../ui/dock.js';   // shared crafting components
 
 // [import:crafting]
 
-// [import:lore]
+import { installLore } from './lore.js';
 
 // [import:horde]
 
@@ -131,7 +131,7 @@ export class Game extends Emitter {
 
     // [slot:crafting]
 
-    // [slot:lore]
+    this.useModule('lore', installLore);
 
     // [slot:horde]
 
