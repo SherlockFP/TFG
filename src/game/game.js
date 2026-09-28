@@ -84,7 +84,7 @@ import { installFun } from './fun.js';
 import { installCombat } from './combat.js';   // wave 2: melee combos / parry, new weapons, spells, role skills
 
 
-// [import:siege]
+import { installSiege } from './siege.js';
 
 
 // [import:bugfix]
@@ -201,7 +201,7 @@ export class Game extends Emitter {
     this.useModule('combat', installCombat);
 
 
-    // [slot:siege]
+    this.useModule('siege', installSiege);
 
 
     // [slot:bugfix]
