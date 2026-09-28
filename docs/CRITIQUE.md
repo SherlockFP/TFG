@@ -98,3 +98,7 @@ Risks: collapse / rise / guard / stagger poses and the username tag glitch were 
 Portal mirror on ~25% of outdoor maps (sector 1+), a flipped / ASCII / dark dimension with Vampire-Survivors waves, XP crystals, 8 temporary upgrades, Reflection Meter chests + power-ups, a 3:00 countdown with overtime,
 cracked-reflection respawns and a SHATTERED wipe (`docs/wave2/mirror.md`). Honest gaps: never run in a browser (the dimension shader is a separate program with a safe fallback, but its look, the portal placement / colliders, model proportions,
 card layout, dash feel and every 2-player path are unverified); some creature behaviours read `aiPlayers()` directly and might still notice players in the other dimension; world-projected DOM labels are not mirrored; numbers are design values.
+## Wave 2 - grenades (hold-to-throw + bombs)
+Every grenade now throws the same way (hold LMB, dotted arc, cook, bounce / roll, beeps) and there are 4 new common bombs + 5 rare drop-only ones (`docs/wave2/grenades.md`).
+Risks: the aim preview and cook bar were never run with a real mouse (headless has no held button); visuals (smoke puffs, blackout dome, glitch slices, vortex) are unseen; 2-player sync is
+untested; rare drop rates (void chest 80 %, boss always, world 28 % per day) and damage numbers (sticky 100, glitch 140) are design numbers; blackout also dims your own screen (vignette) while inside.

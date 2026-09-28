@@ -117,7 +117,7 @@ import { installCreatureEmotes } from './cemotes.js';
 // [import:fpbody]
 
 
-// [import:grenades]
+import { installGrenades } from './grenades.js';
 
 
 import { installDurability } from './durability.js';   // [durability]
@@ -274,7 +274,7 @@ export class Game extends Emitter {
     // [slot:fpbody]
 
 
-    // [slot:grenades]
+    this.useModule('grenades', installGrenades);
 
 
     this.useModule('durability', installDurability);   // [durability]
