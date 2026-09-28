@@ -41,8 +41,9 @@ import { installLootFx } from './loot.js';
 import { installShipFeatures } from './shipfeatures.js';
 import { installMeta } from './prestige.js';
 import { installCruiser } from '../entities/cruiser.js';
-import './components.js';
-import { setDocksVisible } from '../ui/dock.js';   // shared crafting components (registered at import)
+import './components.js';   // shared crafting components (registered at import)
+import { setDocksVisible } from '../ui/dock.js';
+import { installNetStats } from '../net/netstats.js';   // NETSTATS network diagnostics
 // ---- WAVE 1 module imports: one line per module, keep the blank separator lines (avoids merge conflicts) ----
 // [import:inventory]
 
@@ -127,6 +128,7 @@ export class Game extends Emitter {
     try { this.meta = installMeta(this); } catch (e) { console.warn('meta layer', e); this.meta = null; }   // codex, daily events, weekly challenge, rebirth, crew, Service Record (J)
     try { this.shipFeatures = installShipFeatures(this); } catch (e) { console.warn('ship features', e); this.shipFeatures = null; }
     try { this.cruiser = installCruiser(this); } catch (e) { console.warn('cruiser', e); this.cruiser = null; }
+    this.netstats = installNetStats(this);   // terminal NETSTATS / chat /net
     // ---- WAVE 1 modules (docs/MASTERPLAN.md): this.useModule(name, installFn) stores game[name], disposes on destroy ----
     this.wave1 = [];
     // [slot:inventory]
@@ -874,14 +876,17 @@ export class Game extends Emitter {
       };
       const hn = this.heldNestIds(); if (hn) st.hn = hn;
       this.lastPs = st;
-      this.net.send('ps', st);
+      // idle players (nothing changed) only send a 4 Hz heartbeat instead of 15 Hz
+      const key = JSON.stringify(st);
+      this.psIdleT = (this.psIdleT || 0) + 1 / 15;
+      if (key !== this._psKey || this.psIdleT >= 0.25) { this._psKey = key; this.psIdleT = 0; this.net.send('ps', st); }
     }
     // physics items I own
     this.itemSnapT = (this.itemSnapT || 0) - dt;
     if (this.itemSnapT <= 0) {
       this.itemSnapT = 1 / 12;
       const list = this.items.collectSnapshot(this.selfId);
-      if (list.length) this.net.send('is', list);
+      if (list.length) this.net.sendRows('is', list, { eps: 0.004 });
     }
   }
 
@@ -991,6 +996,7 @@ export class Game extends Emitter {
 
   destroy() {
     clearTimeout(this.joinTimeout); clearTimeout(this._pwErrTimer);
+    this.netstats?.dispose(); this.netstats = null;
     for (const n of (this.wave1 || []).reverse()) { try { this[n]?.dispose?.(); } catch (e) { console.warn('dispose', n, e); } this[n] = null; }
     this.achievements?.dispose();
     this.meta?.dispose(); this.meta = null;

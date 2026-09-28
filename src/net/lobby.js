@@ -2,7 +2,7 @@
 // joins a shared discovery room; hosts announce their lobby info periodically.
 import { makeTransport } from './transport.js';
 
-export const GAME_VERSION = '0.9.0';
+export const GAME_VERSION = '0.10.0';   // 0.10: batched packets ('_b') + delta rows - older clients are rejected cleanly
 const DISCOVERY_ROOM = 'kefal-lobbies-v1';
 
 export class LobbyDirectory {

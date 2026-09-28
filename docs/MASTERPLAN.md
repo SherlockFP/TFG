@@ -267,3 +267,20 @@ alışveriş arabası / forklift / ofis sandalyesi fizik komedisi.
    (e) Ctrl+Z itemleri, sonra F2 tesis kimlikleri (Hotel Shift vb.).
 4. İçerik paketleri **veri odaklı şablonla** (tek dosya = 1 yaratık/item + model + TR çeviri) → ucuz, çakışmasız.
 5. Test: ajan başına 1 smoke + 1 özellik scripti, ≤2 ekran görüntüsü; oyun hissi testi = sahibin playtest'i.
+
+## 11. Wave 2 backlog (sahibin 2026-09-28 gece istekleri)
+
+| # | İstek | Tasarım notu | Sahip / model |
+|---|---|---|---|
+| 1 | **P2P optimizasyonu** | ✅ Paket birleştirme (`_b`), delta satırlar (`sendRows` — creature `cs`, item `is`), boştaki oyuncu 4 Hz heartbeat, NETSTATS komutu, GAME_VERSION 0.10.0. Sırada: uzak oyuncu/yaratık interpolasyonunu zaman damgalı buffer'a çevirmek (akıcılık), ilgi alanı (uzak yaratıkları seyrek gönder) | lead |
+| 2 | **Host migration (CoD lobi gibi)** | Host çıkınca herkese "HOST LEFT — DEVAM ET / ÇIK". Devam edenler arasında en küçük peer id'li oyuncu yeni host olur (mesajlaşmadan herkes aynı sonuca varır). Yeni host kendi kopyasındaki run + gemideki eşyalardan runData kurar, gemiyi yörüngeye alır ("Signal lost — autopilot"), oyun kaldığı yerden devam eder. Mid-day tam devralma sonraki adım | lead / tfg-architect |
+| 3 | **Karakter takılması + akıcı hareket** | localplayer sub-step / kamera interpolasyonu / collider dikiş yerlerinde takılma / GC & shader derleme spike'ları ölçülüp düzeltilecek | lead (merge sonrası) |
+| 4 | **Viewmodel** | Elde tutulan eşyaların elin içine girmesi, iç içe geçme, görünmeme: eşya başına tutuş offset'i + bounding-box tabanlı otomatik yerleştirme + ayrı viewmodel katmanı (depth clear) | lead (merge sonrası) |
+| 5 | **UI "AI gibi" görünüyor** | Ortak tasarım dili: tek font hiyerarşisi, daha az kutu/çerçeve, daha az emoji, tutarlı boşluklar, gerçek ikonlar; tüm panellerde aynı başlık/alt bilgi | tfg-builder |
+| 6 | **Ekstra oyunlar** | Gemide/HQ'da oynanabilir: **satranç, dama**, karnaval oyunları (halka atma, balon patlatma, çekiç vurma, düşen ördek atış), kart oyunu, zar. Çok oyunculu (P2P senkron) | tfg-builder |
+| 7 | **Peluş oyuncaklar, kuklalar, değişik yaratıklar/itemler** | itch.io'daki CC0 paketlerinden model + beğenilen oyunlardan (REPO vb.) ilham alan **yeniden yorumlanmış** yaratıklar (birebir kopya değil): kukla ustası, peluş sürüsü, müzik kutusu kuklası… | tfg-builder |
+| 8 | **Üçgen / liminal haritalar** | İmkânsız geometri (içi dışından büyük odalar, sonsuz merdiven, üçgen/eğik koridorlar, portal kapılar), liminal alanlar (boş AVM, oyun parkı, gece otoparkı, havuz, okul koridoru) | tfg-builder |
+| 9 | **Haritada daha fazla etkileşim / bağlılık** | Her odada dokunulabilir şey: çekmeceler, bilgisayarlar, radyolar, asansör düğmeleri, graffiti, kırılabilir camlar; günlük ödül/koleksiyon hedefleri; "bir şey daha" hissi | tfg-builder |
+| 10 | **Oyun içinden baskın / invasion** | Gemi terminalinde **SIGNAL HIJACK**: açık lobilerin sinyalini yakala → **yaratık olarak** o lobiye sız (kısa süreli, sınırlı can, tek canavar gövdesi). Başarı = çalınan değer/Clout; savunan ekip öldürürse ödül alır. Dengeler: günde 1 baskın, yeni oyunculara (level < 5) baskın yok, host "Invasions: off" diyebilir, invader'ın gücü hedef ekibin sektörüne göre ölçeklenir | tfg-architect |
+| 11 | **Tuzak kurma** | Ayı kapanı, tripwire alarm, yay tahtası, sahte loot yemi, elektrikli zemin; hem yaratıklara hem invader'lara karşı; craft ile | tfg-builder |
+| 12 | **Denge** | Her yeni sistem Threat/lootLuck/sektör çarpanlarına bağlanır; invasion ve tuzaklar için ayrı denge tablosu `docs/wave1/balance.md` içinde | lead |

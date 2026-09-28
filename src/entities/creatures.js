@@ -812,8 +812,9 @@ export class CreatureManager {
     this.snapTimer -= dt;
     if (this.snapTimer <= 0 && this.host.size) {
       this.snapTimer = 1 / 12;
-      this.game.net.send('cs', this.snapshot());
-      this.applySnapshot(this.snapshot());
+      const snap = this.snapshot();
+      this.game.net.sendRows('cs', snap, { eps: 0.02 });   // delta rows + 1.5 s keyframes (net/session.js)
+      this.applySnapshot(snap);
     }
   }
 }

@@ -29,7 +29,11 @@ export class Session extends Emitter {
     this.handlers = new Map();    // host request handlers: action -> fn(data, from)
     this.msgHandlers = new Map(); // message type -> fn(data, from)
     this.connected = false;
-    this.stats = { sent: 0, recv: 0, bytesOut: 0, relayed: 0 };
+    this.stats = { sent: 0, recv: 0, bytesOut: 0, bytesIn: 0, relayed: 0, packetsOut: 0, packetsIn: 0, byType: {} };
+    this.measureBytes = false;    // NETSTATS turns this on (JSON length per packet costs a little CPU)
+    this._outq = [];              // outgoing messages of this task: [{ m, to }], flushed as one packet per peer
+    this._flushPending = false;
+    this._rows = new Map();       // sendRows(): type -> Map(id -> last sent row)
     this.relayTypes = new Set(RELAY_TYPES);
     this.peerLinks = new Map();   // host: peerId -> Set of peer ids that client reports a direct link to
   }
@@ -40,7 +44,7 @@ export class Session extends Emitter {
     clearTimeout(this._linksT);
     this._linksT = setTimeout(() => {
       if (!this.transport || this.isHost || !this.hostId) return;
-      this.transport.send({ t: 'req', d: { a: '_links', ids: [...this.transport.peers] } }, this.hostId);
+      this._out({ t: 'req', d: { a: '_links', ids: [...this.transport.peers] } }, this.hostId);
     }, 400);
   }
 
@@ -54,7 +58,7 @@ export class Session extends Emitter {
       const missing = (ql && !ql.has(from)) || (fromLinks && !fromLinks.has(q));
       if (!missing) continue;
       this.stats.relayed++;
-      this.transport.send({ t: 'relay', d: { from, m: { t, d } } }, q);
+      this._out({ t: 'relay', d: { from, m: { t, d } } }, q);
     }
   }
 
@@ -90,10 +94,19 @@ export class Session extends Emitter {
   }
 
   // message dispatch
-  receive(m, from) {
+  receive(m, from, inner = false) {
     if (!m || typeof m !== 'object') return;
-    this.stats.recv++;
+    if (!inner) {
+      this.stats.packetsIn++;
+      if (this.measureBytes) { try { this.stats.bytesIn += JSON.stringify(m).length; } catch { /* ignore */ } }
+    }
     const { t, d } = m;
+    if (t === '_b') {                                              // batched packet: every message of one sender task
+      if (inner || !Array.isArray(d)) return;
+      for (const x of d) this.receive(x, from, true);
+      return;
+    }
+    this.stats.recv++;
     if (t === 'hello') {
       if (!d || typeof d !== 'object') return;
       if (d.ver !== GAME_VERSION) { if (this.isHost) this.transport.send({ t: 'reject', d: { reason: 'Version mismatch (host ' + GAME_VERSION + ')' } }, from); return; }
@@ -150,21 +163,78 @@ export class Session extends Emitter {
       if (fn) { try { fn(d, this.selfId); } catch (e) { console.error('req local', a, e); } }
       return;
     }
-    if (this.hostId) this.transport.send({ t: 'req', d }, this.hostId);
+    if (this.hostId) this._out({ t: 'req', d }, this.hostId);
   }
 
   // host -> everyone (including local handler when includeSelf)
   broadcast(t, d, includeSelf = true) {
-    this.stats.sent++;
-    this.transport.send({ t, d });
+    this._out({ t, d });
     if (includeSelf) this.receiveLocal(t, d);
   }
   sendTo(peerId, t, d) {
     if (peerId === this.selfId) { this.receiveLocal(t, d); return; }
-    this.transport.send({ t, d }, peerId);
+    this._out({ t, d }, peerId);
   }
   // peer -> all others (no self)
-  send(t, d) { this.stats.sent++; this.transport.send({ t, d }); }
+  send(t, d) { this._out({ t, d }); }
+
+  // Delta-compressed row snapshots (creature / item state tables: rows are arrays whose [0] is a stable id).
+  // Only rows that changed since the last send go out; every `keyframe` seconds all rows are re-sent so late
+  // joiners and lost packets heal. Receivers must apply rows individually (a missing row means "unchanged").
+  // eps: numeric columns whose change is below it count as unchanged (positions/yaw jitter).
+  sendRows(t, rows, { keyframe = 1.5, eps = 0.015, to } = {}) {
+    let st = this._rows.get(t);
+    if (!st) this._rows.set(t, st = { last: new Map(), keyT: 0 });
+    const now = performance.now() / 1000;
+    const full = now - st.keyT >= keyframe;
+    if (full) st.keyT = now;
+    const out = full ? rows : [];
+    const seen = new Set();
+    for (const r of rows) {
+      const id = r[0];
+      seen.add(id);
+      const prev = st.last.get(id);
+      if (!full && !rowChanged(prev, r, eps)) continue;
+      st.last.set(id, r);
+      if (!full) out.push(r);
+    }
+    if (full) for (const r of rows) st.last.set(r[0], r);
+    for (const id of st.last.keys()) if (!seen.has(id)) st.last.delete(id);
+    if (!out.length) return 0;
+    if (to) this.sendTo(to, t, out); else this.send(t, out);
+    return out.length;
+  }
+
+  // queue one message; everything queued during the current task leaves as ONE packet per peer (microtask
+  // flush), so a frame that emits 8 messages costs 1 WebRTC send instead of 8. Per-peer order is preserved.
+  _out(m, to) {
+    this.stats.sent++;
+    const bt = this.stats.byType;
+    bt[m.t] = (bt[m.t] || 0) + 1;
+    this._outq.push({ m, to: to || null });
+    if (!this._flushPending) { this._flushPending = true; queueMicrotask(() => this.flush()); }
+  }
+  flush() {
+    this._flushPending = false;
+    const q = this._outq;
+    if (!q.length || !this.transport) { q.length = 0; return; }
+    this._outq = [];
+    const pack = (list) => (list.length === 1 ? list[0] : { t: '_b', d: list });
+    const put = (m, to) => {
+      this.stats.packetsOut++;
+      if (this.measureBytes) { try { this.stats.bytesOut += JSON.stringify(m).length * (to ? 1 : Math.max(1, this.transport.peers.size)); } catch { /* ignore */ } }
+      this.transport.send(m, to || undefined);
+    };
+    if (q.every((e) => !e.to)) { put(pack(q.map((e) => e.m))); return; }
+    // mixed targets: build each peer's ordered list (broadcasts go to everyone, directed ones to their peer)
+    const per = new Map();
+    const peers = [...this.transport.peers];
+    for (const e of q) {
+      const targets = e.to ? [e.to] : peers;
+      for (const p of targets) { let a = per.get(p); if (!a) per.set(p, a = []); a.push(e.m); }
+    }
+    for (const [p, list] of per) put(pack(list), p);
+  }
   receiveLocal(t, d) {
     const h = this.msgHandlers.get(t);
     if (h) { try { h(d, this.selfId); } catch (e) { console.error('local', t, e); } }
@@ -176,5 +246,17 @@ export class Session extends Emitter {
   removeStream(s) { this.transport.removeStream(s); }
   peerIds() { return [...this.transport.peers]; }
   playerCount() { return this.players.size; }
-  leave() { clearTimeout(this._linksT); this.transport.leave(); this.clear(); }
+  leave() { clearTimeout(this._linksT); try { this.flush(); } catch { /* ignore */ } this.transport.leave(); this.clear(); }
+}
+
+function rowChanged(a, b, eps) {
+  if (!a || a.length !== b.length) return true;
+  for (let i = 1; i < b.length; i++) {
+    const x = a[i], y = b[i];
+    if (x === y) continue;
+    if (typeof x === 'number' && typeof y === 'number') { if (Math.abs(x - y) > eps) return true; continue; }
+    if (x && y && typeof x === 'object') { try { if (JSON.stringify(x) === JSON.stringify(y)) continue; } catch { /* fallthrough */ } }
+    return true;
+  }
+  return false;
 }
