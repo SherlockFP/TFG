@@ -26,6 +26,8 @@ await cli.waitForFunction(() => kefal.game?.net?.connected, null, { timeout: 600
 if (!(await cli.evaluate(() => !!kefal.game))) { console.log(JSON.stringify(logs, null, 1)); await b.close(); process.exit(1); }
 // both tabs are hidden-ish in headless; drive the sim manually on both
 const tick = (p, n) => p.evaluate((n) => { for (let i = 0; i < n; i++) kefal.tick(1, 1 / 30, false); }, n);
+const hs = await host.evaluate(() => ({ g: !!kefal.game, txt: document.body.innerText.slice(0, 300) }));
+if (!hs.g) { console.log(JSON.stringify({ hostGone: hs, logs }, null, 1)); await b.close(); process.exit(1); }
 await host.evaluate(() => { const g = kefal.game; g.net.measureBytes = true; g.run.daysLeft = 3; g.run.moon = 'hamsi'; g.player.inShip = true; g.hostLever(g.selfId); g.hostFinishLanding(); });
 await cli.evaluate(() => { kefal.game.net.measureBytes = true; });
 for (let i = 0; i < 12; i++) { await tick(host, 10); await tick(cli, 10); await host.waitForTimeout(30); }
