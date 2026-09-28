@@ -150,7 +150,7 @@ import { installDurability } from './durability.js';   // [durability]
 // [import:pets]
 
 
-// [import:cycle]
+import { installCycle } from './cycle.js';   // [cycle] inert: rules only, see docs/wave2/cycle.md
 
 
 export class Game extends Emitter {
@@ -307,7 +307,7 @@ export class Game extends Emitter {
     // [slot:pets]
 
 
-    // [slot:cycle]
+    this.useModule('cycle', installCycle);   // [cycle]
 
   }
 
