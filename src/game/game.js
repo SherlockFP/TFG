@@ -90,7 +90,7 @@ import { installLore } from './lore.js';
 // [import:bugfix]
 
 
-// [import:anomaly]
+import { installAnomaly } from './anomaly.js';
 
 
 export class Game extends Emitter {
@@ -188,7 +188,7 @@ export class Game extends Emitter {
     // [slot:bugfix]
 
 
-    // [slot:anomaly]
+    this.useModule('anomaly', installAnomaly);
 
   }
 

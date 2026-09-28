@@ -244,6 +244,11 @@ test, 2-tab hand playtest (§6-2), remaining BUGS.md items.
 - Integration wiring: interior names come from `interiors/index.js INTERIOR_NAMES` (HUD brief, codex, terminal, moongen);
   interior carpet/tile floors use the new feel footstep sets; interior ambience prefers the shipped theme loops.
 
+### 5.12 Wave 2 - ANOMALY system (`game.anomaly`, docs/wave2/anomaly.md)
+STATIC exposure per player (hot rooms / hot items / breach; Buzzing 25, Glitching 50, Corrupted 75, DELETED 100), Decon Shower in the ship, Antivirus Shot, Faraday Suit, Signal Counter,
+10 mutations, 6 temporary power-ups (holographic pickups), Loot Box Shrine (d20) + throwable Cursed Die, left-dock buff bar. Net types `an` / `anfx` / `anst`. Shared edits: game.js slot lines, magic.js (Mute hook).
+Verified: node test (`tools/harness/anomaly_core.test.mjs`), build, smoke_land. NOT hand-played; `tools/harness/wave2_anomaly.js` was written but not executed (budget freeze).
+
 ### 5.5 Smoke test (paste in the browser console on `?autohost=local&code=T1&name=Tester`, after ~4 s)
 ```js
 const g = kefal.game, errs = []; addEventListener('error', e => errs.push(e.message));
