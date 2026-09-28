@@ -60,7 +60,7 @@ import { installShop } from './shop.js';
 
 import { installCrafting } from './crafting.js';
 
-// [import:lore]
+import { installLore } from './lore.js';
 
 // [import:horde]
 
@@ -155,7 +155,7 @@ export class Game extends Emitter {
 
     this.useModule('crafting', installCrafting);
 
-    // [slot:lore]
+    this.useModule('lore', installLore);
 
     // [slot:horde]
 
