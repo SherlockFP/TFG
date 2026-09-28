@@ -106,6 +106,9 @@ import { installForge } from './forge.js';
 // [import:shipyard]
 
 
+// [import:skeletons]
+
+
 export class Game extends Emitter {
   constructor({ engine, audio, settings, profile, ui, input, mods }) {
     super();
@@ -215,6 +218,9 @@ export class Game extends Emitter {
 
 
     // [slot:shipyard]
+
+
+    // [slot:skeletons]
 
   }
 
