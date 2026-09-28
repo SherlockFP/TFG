@@ -525,3 +525,19 @@ Sahip: modeller "çok AI duruyor", hafif yuvarlak, Among Us'ımsı ama **çakma 
 - Cezalı sistemler kademeli açılır: Spambomb / rulet / Administrator kota 1+, SIEGE kota 2+, ayna portalı sektör 1+,
   ev gezegeni baskını ≥3 bina. Yeni bir sistem eklerken **bu tabloya uy**: önce ödül, sonra risk.
 - Hedef: ilk 30-45 dakikada oyuncu en az 3 "vay be" loot anı, 1 yeni sistem keşfi ve 0 haksız ölüm yaşasın.
+
+### 14.2 SONSUZ MOD ("THE DEEP FEED") — 3 sektör döngüsünden sonra
+- **Açılış:** 3 Sector Core boss'u yenildikten sonra The Algorithm "PATCH 1.0 — ENDLESS CONTENT" ilan eder; run sonsuz
+  moda geçer (istenirse klasik döngüye devam seçeneği).
+- **Ritim değişir:** sabit 3 gün + kota yerine **Derinlik (Depth)** sistemi: her gün bir derinlik katı; kota yerine sürekli
+  eriyen **Engagement Meter** (satışla dolar, her gün erir; sıfırlanırsa kovulursun) → "bir gün daha" gerilimi korunur ama
+  takvim baskısı olmaz.
+- **Her 3 derinlikte bir PATCH NOTES:** The Algorithm oyuna yeni bir **mutator** ekler (ör. "Gravity -20%", "Creatures
+  learn doors", "Loot is shy", "Double shrines") + loot çarpanı artar; mutatorlar birikir ama en eski olanlar bazen
+  "rollback" olur (çeşitlilik, sıkıcılık yok).
+- **Boss'lar artık takvimli değil:** Derinlikte rastgele **S-rank Glitch Gate** / Red Gate / Apex encounter olarak çıkar;
+  her 10 derinlikte "SEASON FINALE" (özel boss + büyük sandık).
+- **Ölçek:** güç = derinlik ile yumuşak artan (log eğrisi), loot tier şansı ve değer çarpanı da artar → oyuncu hep
+  güçlendiğini hisseder; Threat/erken konfor kuralları geçerli değil ama "relief günleri" (her 5 derinlikte sakin gün) var.
+- **Çıkış ve ödül:** istediğin zaman **CASH OUT** → derinliğe göre kalıcı ödül (Clout, unvan, prestij yıldızı, özel kozmetik)
+  + liderlik tablosu (haftalık/crew). Ölüp kovulursan yarısı.
