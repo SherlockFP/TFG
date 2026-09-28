@@ -96,6 +96,7 @@ const TR = {
   'Already fully loaded.': 'Zaten dolu.', 'Reloading...': 'Dolduruluyor...', 'Prying...': 'Zorlanıyor...',
   'Pry the door open with the Crowbar [E]': 'Kapıyı levyeyle zorla [E]', 'Hold [E]: slow and loud.': '[E] basılı tut: yavaş ve gürültülü.',
   'Pry the crate open with the Crowbar [E]': 'Kasayı levyeyle zorla [E]',
+  'The door gives way with a crack.': 'Kapı çatırdayarak açıldı.',
 };
 addTranslations(TR);
 

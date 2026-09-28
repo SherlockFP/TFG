@@ -48,3 +48,18 @@ Cheap evaluation (owner request): one scripted smoke over 11 configs (3 handcraf
 | Balance | 5 | nothing hand-tested; new XP curve re-levels existing profiles (regression) | XP migration, creature weights, van damage |
 | Stability | 7 | 0 errors scripted; node gen tests over seeds | new creatures/van/mods never exercised at runtime |
 | Performance | 6 | serverfarm 711 calls, gen0_1 factory 511 | instancing/merging for rack aisles & props |
+
+## Wave 1 review snapshot (2026-09-28, reviewer pass on claude/focused-hawking-32j4um; full report: docs/REVIEW_WAVE1.md)
+Evidence: smoke_land 0 errors on 3 moons, vite build OK, node checks (tree 1913, inventory core, 4800 facility layouts) pass. The browser
+"day in the life" script (tools/harness/wave1_day.js) is written but was NOT run (budget cut); nothing was tested with 2 peers.
+
+| Area | Score | Evidence | Next gap |
+|---|---|---|---|
+| Fun / loop | 7 | contract -> facility chain -> threat/greed -> extract -> case file | never hand-played; early game much tamer |
+| Onboarding | 4 | ~10 systems, no tutorial, how-to lacked I/K/C/J/B (fixed), unbounded objectives | staged unlocks, objective cap |
+| Theme | 7 | Algorithm lore 9, mechanic names 5 (PUSH/HEAL/Mana, COMPANY STORE) | net-speak rename |
+| UI | 6.5 | consistent tokens, vector icons; toast stack vs right dock, cine banner vs Algorithm subtitle | HUD collision pass |
+| Balance | 5.5 | sims thoughtful; 5 simultaneous early nerfs; dead stats (Blood Magic, lootLuck, reviveSpeed, interactSpeed, rangedDmg) | wire/hide stats, difficulty selector |
+| Stability | 7.5 | wrappers audited (no double multipliers, no id clashes) | old-save migration test |
+| Performance | 6 | unmeasured; one 7 MB main chunk | code-split, dc in facility |
+| Multiplayer | 4 | client-trusted values, no 2-peer test of wave 1 | mp2 run + hardening |

@@ -32,7 +32,7 @@ export const TIPS = [
   'Clickbait Mine: click. Do not step off. Ask a friend for help.',
   'Deep rooms hold the best loot. The deeper you go, the more it pays.',
   'A walkie-talkie lets you talk across the whole map.',
-  'Level up to earn skill points. Press TAB to spend them.',
+  'Level up to earn skill points. Press K to spend them in the passive tree.',
   'Daily events change the rules: check the terminal before you land.',
   'Fragile scrap loses value when it hits the floor. Carry it gently.',
   'Firewall Turrets can be disabled from the terminal with their code.',

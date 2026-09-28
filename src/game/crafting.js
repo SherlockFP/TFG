@@ -99,6 +99,28 @@ const TR = {
   'Shotgun Shells': 'Pompalı Fişeği', Rounds: 'Mermi', Nails: 'Çivi', Bolts: 'Ok', 'Access Card Copy': 'Erişim Kartı Kopyası', 'Pro Flashlight': 'Pro Fener', 'Signal Booster': 'Sinyal Güçlendirici',
   'Adblock Spray': 'Reklam Engelleyici Sprey', 'Belt Bag': 'Kemer Çantası', 'Field Pack': 'Saha Çantası', 'Hauler Frame': 'Taşıyıcı Çerçeve', 'Skillbook Binding': 'Beceri Kitabı Ciltleme',
   'Masterwork Upgrades': 'Şaheser Yükseltmeler', 'Hauler Frame ': 'Taşıyıcı Çerçeve',
+  // workbench panel + toasts (added in the wave-1 review: these were English-only)
+  Crafted: 'Üretildi', Recharged: 'Şarj edildi', 'No battery items to recharge.': 'Şarj edilecek pilli eşya yok.',
+  'New recipe available at the workbench.': 'Atölye masasında yeni bir tarif var.',
+  'Gas mask on. You breathe filtered air.': 'Gaz maskesi takıldı. Filtrelenmiş hava soluyorsun.', 'Gas mask off.': 'Gaz maskesi çıkarıldı.',
+  'Patched up (trauma kit).': 'Yaraların sarıldı (travma kiti).', 'Trap set.': 'Tuzak kuruldu.',
+  LUCK: 'ŞANS', 'Ingredients: items you hold + items lying on the bench.': 'Malzemeler: elindeki eşyalar + tezgâhtaki eşyalar.',
+  'Blueprint required': 'Şema gerekli', 'Nothing here yet.': 'Burada henüz bir şey yok.', 'Select a recipe.': 'Bir tarif seç.',
+  INGREDIENTS: 'MALZEMELER', 'Credits (ship funds)': 'Kredi (gemi fonu)', Blueprint: 'Şema', KNOWN: 'BİLİNİYOR', UNKNOWN: 'BİLİNMİYOR',
+  'Unlocked by analyzing': 'Analizle açılır', 'TIER CHANCE': 'SEVİYE ŞANSI', 'MISSING PARTS': 'EKSİK PARÇALAR',
+  'This item has no tier.': 'Bu eşyanın seviyesi yok.', 'WORKING...': 'ÇALIŞIYOR...',
+  'Pick a weapon you carry or leave on the bench.': 'Taşıdığın ya da tezgâha bıraktığın bir silah seç.',
+  'No weapon in reach. Hold one or put it on the bench.': 'Erişimde silah yok. Birini tut ya da tezgâha koy.',
+  'Select a weapon.': 'Bir silah seç.', 'Already at the top tier.': 'Zaten en üst seviyede.', COST: 'MALİYET', 'SUCCESS CHANCE': 'BAŞARI ŞANSI',
+  'On failure the weapon is kept; parts are lost and half the credits.': 'Başarısız olursa silah kalır; parçalar ve kredilerin yarısı gider.',
+  'on bench': 'tezgâhta', 'Nothing suitable in reach. Hold items or put them on the bench.': 'Erişimde uygun bir şey yok. Eşya tut ya da tezgâha koy.',
+  'Select an item.': 'Bir eşya seç.', 'Turn scrap into components instead of selling it.': 'Hurdayı satmak yerine parçalara çevir.',
+  'Sells for': 'Satış değeri', 'SELL / DISMANTLE / KEEP - your call.': 'SAT / SÖK / SAKLA - karar senin.', YIELDS: 'VERİR',
+  'Strange items and creature drops: learn from them instead of selling them.': 'Garip eşyalar ve yaratık parçaları: satmak yerine onlardan öğren.',
+  STRANGE: 'GARİP', 'creature sample': 'yaratık örneği', 'WHAT YOU MIGHT LEARN': 'ÖĞRENEBİLECEKLERİN',
+  'Analyze strange items and big creature drops at the workbench to permanently unlock advanced recipes.': 'Garip eşyaları ve büyük yaratık parçalarını atölye masasında analiz ederek gelişmiş tarifleri kalıcı olarak aç.',
+  'already known: parts recovered': 'zaten biliniyor: parçalar geri kazanıldı', UPGRADED: 'YÜKSELTİLDİ', FAILED: 'BAŞARISIZ', 'The weapon survived.': 'Silah sağ kurtuldu.', ERROR: 'HATA',
+  'Not yet discovered.': 'Henüz keşfedilmedi.', Source: 'Kaynak', CRAFTED: 'ÜRETİLDİ', DISMANTLED: 'SÖKÜLDÜ', 'BLUEPRINT!': 'ŞEMA!', ANALYZED: 'ANALİZ EDİLDİ',
 };
 const trItems = () => addTranslations(TR);
 

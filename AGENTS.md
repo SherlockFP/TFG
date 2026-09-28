@@ -315,4 +315,6 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
 ## 8. Docs index
 `docs/PLAN.md` original design · `docs/RESEARCH.md` LC/REPO research · `docs/LC_MODS.md` mod ports ·
 `docs/THEME.md` TFG naming bible · `docs/BUGS.md` verified bug list · `docs/AUDIO_AUDIT.md` deferred audio issues ·
-`docs/CRITIQUE.md` honest critique + plan · `CREDITS.md` asset licenses · `README.md` player-facing readme.
+`docs/CRITIQUE.md` honest critique + plan · `CREDITS.md` asset licenses · `README.md` player-facing readme ·
+`docs/REVIEW_WAVE1.md` reviewer report for the wave-1 merge (scores, dead stats, HUD collisions, top-10 fixes; run `tools/harness/wave1_day.js` first, it was written but not executed) ·
+`docs/wave1/*.md` per-module notes.
