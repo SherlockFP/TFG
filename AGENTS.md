@@ -244,6 +244,11 @@ test, 2-tab hand playtest (§6-2), remaining BUGS.md items.
 - Integration wiring: interior names come from `interiors/index.js INTERIOR_NAMES` (HUD brief, codex, terminal, moongen);
   interior carpet/tile floors use the new feel footstep sets; interior ambience prefers the shipped theme loops.
 
+### 5.11 Wave 2 - HQ FORGE (module `forge`, see docs/wave2/forge.md)
+THE MONETIZER (+1..+9, overclocks), Ascension Altar (tier up, workbench capped at Rare), Shard Exchange, 6 shard items + Backup Drive, weapon glow (+3/+5/+7/+9), creature tiers
+(Uncommon..Mythic: HP/dmg/XP mul on top of balance.scale, aura/nameplate, shard drops). Pure rules `src/game/enhance.js` + `node tools/harness/forge_rules.test.mjs`. Hooks in shared files are
+marked `[forge]`. Only node test + build + one smoke were run; `tools/harness/wave2_forge.js` is written but NOT run yet.
+
 ### 5.5 Smoke test (paste in the browser console on `?autohost=local&code=T1&name=Tester`, after ~4 s)
 ```js
 const g = kefal.game, errs = []; addEventListener('error', e => errs.push(e.message));

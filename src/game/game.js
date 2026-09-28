@@ -93,7 +93,7 @@ import { installWorldX } from './worldx.js';
 // [import:anomaly]
 
 
-// [import:forge]
+import { installForge } from './forge.js';
 
 
 export class Game extends Emitter {
@@ -194,7 +194,7 @@ export class Game extends Emitter {
     // [slot:anomaly]
 
 
-    // [slot:forge]
+    this.useModule('forge', installForge);
 
   }
 

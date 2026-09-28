@@ -3,6 +3,7 @@
 // (prediction + the I panel) and node tests. Everything works on plain entries:
 //   entry = { id, def, inv, tier?, it? }   inv = null (hotbar) | { k: 'bag', x, y } | { k: 'eq', s: EQUIP_SLOTS[i] }
 import { TIERS, tierDef, tierIndex, tierOfItem } from './tiers.js';
+import { plusMul } from './enhance.js';   // [forge]
 
 /** No bag equipped: a few pockets. */
 export const POCKETS = Object.freeze({ id: null, cols: 4, rows: 2, weightMul: 1, speed: 0 });
@@ -243,7 +244,7 @@ export function equipBonuses(list) {
   for (const e of list) {
     if (e.inv?.k !== 'eq') continue;
     const g = e.def?.gear;
-    const mul = tierStat(e.tier || entryTier(e.it, e.def));
+    const mul = tierStat(e.tier || entryTier(e.it, e.def)) * plusMul(e.it?.plus || 0);   // [forge] +N enhancement scales gear stats
     if (g) for (const k of Object.keys(b)) if (g[k]) b[k] += k === 'speed' ? g[k] : g[k] * mul;
     if (e.def?.kind === 'bag') b.speed += bagInfo(e.def).speed || 0;
   }

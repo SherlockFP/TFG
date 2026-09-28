@@ -7,6 +7,7 @@
 // Crafted items that only this module needs (craft_* ids) are registered here at import time.
 import { ITEMS, registerItem, itemDef } from './items.js';
 import { TIERS, TIER_ORDER, tierIndex } from './tiers.js';
+import { WORKBENCH_MAX_TIER } from './enhance.js';   // [forge]
 import './components.js';
 
 // ------------------------------------------------------------------------------------------------ crafted items
@@ -104,7 +105,7 @@ export const UPGRADE = {
 /** Upgrade requirements for taking an item from `fromTier` to the next tier (null at the top). */
 export function upgradeInfo(fromTier, luck = 0) {
   const i = tierIndex(fromTier);
-  if (i >= TIER_ORDER.length - 1) return null;
+  if (i >= tierIndex(WORKBENCH_MAX_TIER)) return null;   // [forge] workbench tier-up stops at Rare; Epic+ = HQ Ascension Altar
   const to = TIER_ORDER[i + 1];
   const u = UPGRADE[to];
   return { from: fromTier, to, in: u.in, credits: u.credits, bp: u.bp || null, chance: Math.min(0.98, u.chance + Math.max(0, luck) * 0.12) };

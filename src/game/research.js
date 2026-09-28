@@ -118,7 +118,18 @@ export function dismantleBlock(it) {
 }
 
 /** Deterministic yield [[componentId, n], ...] for an item type. value = instance value (falls back to the def average). */
-export function dismantleYield(itemId, { value, theme } = {}) {
+export function dismantleYield(itemId, opts = {}) {
+  // [forge] every dismantle also yields forge shards: Scrap Shards always, a Circuit Core from electronics / valuable items
+  const list = dismantleParts(itemId, opts);
+  const def = itemDef(itemId);
+  const v = Number.isFinite(opts.value) && opts.value > 0 ? opts.value : avgValue(def);
+  const fam = FAMILY_OF[itemId];
+  const parts = list.reduce((a, [, n]) => a + n, 0);
+  list.push(['shard_scrap', 1 + (parts >= 3 ? 1 : 0)]);
+  if (fam === 'electronic' || v >= 110) list.push(['shard_circuit', 1]);
+  return list;
+}
+function dismantleParts(itemId, { value, theme } = {}) {
   if (DISMANTLE_TABLE[itemId]) return DISMANTLE_TABLE[itemId].map((e) => e.slice());
   const def = itemDef(itemId);
   const fam = FAMILY_OF[itemId] || (def.kind === 'drop' ? 'drop' : def.kind === 'big' ? 'electronic' : def.kind === 'weapon' || def.kind === 'tool' ? 'metal' : 'metal');

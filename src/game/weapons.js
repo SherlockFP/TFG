@@ -13,6 +13,7 @@
 import * as THREE from 'three';
 import { ITEMS, registerItem, SCRAP_TABLE } from './items.js';
 import { TIERS } from './tiers.js';
+import { plusMul } from './enhance.js';   // [forge]
 import { WEAPON_ARCS, WEAPON_RECOIL } from '../models/avatar.js';
 import { WEAPON_MODELS, createCardMesh, CARD_COLORS } from '../models/weapons_wave1.js';
 import { G } from '../physics/physics.js';
@@ -104,9 +105,10 @@ addTranslations(TR);
 export function relMul(it) {
   const def = it?.def;
   const tier = it?.tier;
-  if (!def || !tier || !TIERS[tier]) return 1;
+  const plus = it?.plus ? plusMul(it.plus) : 1;   // [forge] +N enhancement (ranged host damage + Stacked Deck use relMul)
+  if (!def || !tier || !TIERS[tier]) return plus;
   const base = TIERS[def.tier] || TIERS[def.rarity] || TIERS.common;
-  return TIERS[tier].statMul / base.statMul;
+  return (TIERS[tier].statMul / base.statMul) * plus;
 }
 
 // ================================================================================================== procedural sounds

@@ -10,6 +10,7 @@ import { insideShip } from '../world/ship.js';
 import { applyNameTagTitle } from '../game/achievements.js';
 import { ITEMS } from '../game/items.js';
 import { t, addTranslations } from '../core/i18n.js';
+import { creatureTierMul, creatureTierXp } from '../game/enhance.js';   // [forge] creature tiers
 
 addTranslations({ 'CROUCH BESIDE IT TO ROCK IT': 'SALLAMAK İÇİN YANINDA ÇÖMEL' });
 
@@ -123,6 +124,7 @@ export class CreatureView {
     // behaviour variant + affix: shown through the display name (scan labels), tint, scale and a floor ring
     this.variant = variantOf(this.type, d.vr);
     this.affix = d.af && AFFIXES[d.af] ? d.af : null;
+    this.tier = d.tr || null; this.fgAff = Array.isArray(d.fa) ? d.fa : null;   // [forge] tier + extra affixes (drawn by game/creature_tiers.js)
     if (this.variant || this.affix) this.def = { ...this.def, name: creatureDisplayName(this.type, d.vr, this.affix) };
     this.private = PRIVATE_TO_EXTRA.has(this.type);
     this.level = d.lv || 1; this.elite = !!d.el;
@@ -410,6 +412,9 @@ class HostCreature {
     // sector / threat scale (game.balance): HP is baked at spawn for EVERY creature type, mod creatures included
     const bs = mgr.game.balance?.scale(this.def.boss ? 'boss' : this.def.hazard ? 'hazard' : 'creature');
     if (bs && st.maxHp) st.maxHp = Math.max(1, Math.round(st.maxHp * bs.hp));
+    // [forge] creature tier (game/creature_tiers.js): HP + XP multipliers ON TOP of the sector scale (bosses keep their hand-tuned stats)
+    this.tier = opts.tier || null; this.fgAff = Array.isArray(opts.fa) ? opts.fa : null;
+    if (this.tier && !this.def.boss) { if (st.maxHp) st.maxHp = Math.max(1, Math.round(st.maxHp * creatureTierMul(this.tier))); st.xp = Math.round(st.xp * creatureTierXp(this.tier)); }
     this.maxHp = st.maxHp; this.hp = st.maxHp;
     this.age = 0;           // s since spawn: no attacks during the first second (vent spawns, swarms)
     this.lastHurtT = -99;
@@ -539,6 +544,7 @@ export class CreatureManager {
       if (list) { let r = Math.random() * 100; for (const e of list) { r -= e.w; if (r < 0) { v = e.id; break; } } }
       opts = { ...opts, variant: v };
     }
+    if (this.game.forge) opts = this.game.forge.creatureOpts(type, opts);   // [forge] tier + extra affixes
     if (opts.affix === undefined) opts = { ...opts, affix: rollAffix(type, opts.level || 1, !!opts.elite) };
     const c = new HostCreature(this, id, type, pos, opts);
     c.fakeLv = opts.fakeLv; c.fakeTitle = opts.fakeTitle || '';   // disguise tag data, re-sent to late joiners by serializeFor
@@ -546,7 +552,7 @@ export class CreatureManager {
     this.game.net.broadcast('cev', {
       e: 'sp', id, ty: type, p: [pos.x, pos.y, pos.z], yaw: c.yaw, st: c.state, lv: c.level, el: c.elite,
       mh: c.maxHp, hp: c.hp, code: c.code, seed: c.seed, nm: c.name, suit: c.suit, up: c.up, fakeLv: opts.fakeLv, ft: opts.fakeTitle || undefined,
-      vr: c.variant || undefined, af: c.affix || undefined,
+      vr: c.variant || undefined, af: c.affix || undefined, tr: c.tier || undefined, fa: c.fgAff || undefined,   // [forge]
     });
     return c;
   }
@@ -557,7 +563,7 @@ export class CreatureManager {
   serializeFor() {
     const out = [];
     for (const c of this.host.values()) {
-      out.push({ e: 'sp', id: c.id, ty: c.type, p: [c.pos.x, c.pos.y, c.pos.z], yaw: c.yaw, st: c.state, lv: c.level, el: c.elite, mh: c.maxHp, hp: c.hp, code: c.code, seed: c.seed, nm: c.name, suit: c.suit, up: c.up, fakeLv: c.fakeLv, ft: c.fakeTitle || undefined, vr: c.variant || undefined, af: c.affix || undefined });
+      out.push({ e: 'sp', id: c.id, ty: c.type, p: [c.pos.x, c.pos.y, c.pos.z], yaw: c.yaw, st: c.state, lv: c.level, el: c.elite, mh: c.maxHp, hp: c.hp, code: c.code, seed: c.seed, nm: c.name, suit: c.suit, up: c.up, fakeLv: c.fakeLv, ft: c.fakeTitle || undefined, vr: c.variant || undefined, af: c.affix || undefined, tr: c.tier || undefined, fa: c.fgAff || undefined });   // [forge]
     }
     return out;
   }
@@ -620,7 +626,7 @@ export class CreatureManager {
       // drop an item
       const d = c.def.drop;
       if (d && Math.random() < d[1] * (c.elite ? 2 : 1)) {
-        this.game.items.hostSpawn(d[0], c.pos.clone().add(new THREE.Vector3(0, 0.6, 0)), { valueMul: 1 + (c.level - 1) * 0.08 });
+        this.game.items.hostSpawn(d[0], c.pos.clone().add(new THREE.Vector3(0, 0.6, 0)), { valueMul: 1 + (c.level - 1) * 0.08, ...this.game.forge?.dropOpts?.(c) });   // [forge] item tier floor (Rare+ creatures)
       }
       if (c.type === 'mimic' && Math.random() < 0.6) this.game.hostSpawnRandomScrap(c.pos.clone().add(new THREE.Vector3(0, 0.6, 0)));
       try { ON_DEATH[c.type]?.(c, by, this); } catch (e) { console.error('death', c.type, e); }
