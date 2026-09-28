@@ -358,3 +358,35 @@ Her yaratık doğarken bir tier alır (sektör + Threat + ay tehlikesiyle ağır
 - Mevcut elite affix sistemi tier'ın üstüne oturur (tier affix sayısını belirler); boss'lar sabit Legendary/Mythic.
 - Drop'un item tier'ı: `rollTier(rng, { minTier: tier−1 })`.
 - Scan'de ve isim etiketinde tier rengi; öldürme XP'si tier çarpanıyla.
+
+## 13. SHIPYARD — küçük başlayan, büyüyen, özelleştirilen gemi (tasarım)
+
+**Başlangıç:** "Starter Pod" — sadece çekirdek kabin: terminal, kalkış kolu, şarj istasyonu, küçük depo (6 hurda yeri).
+Diğer her şey **modül** olarak sonradan eklenir; ilk günlerde gemi dar ve kalabalık hisseder (bilinçli).
+
+**Modüller** (geminin dış hardpoint'lerine takılır; her birinin kapısı çekirdeğe açılır; Mk I → Mk III):
+| Modül | Ne verir | Mk III'te |
+|---|---|---|
+| Cargo Bay | +12 hurda yeri, büyük eşya rampası | otomatik değer tarayıcı |
+| Workshop | workbench + Forge-lite (tier ≤ Rare) buraya taşınır | craft süresi −%30 |
+| Med Bay | ölü arkadaşı gemide diriltme istasyonu, Decon duşu | dirilme maliyeti −%50 |
+| Turret Hardpoint | çatıya kalıcı savunma tareti (SIEGE) | çift namlu |
+| Garage | Uplink Van dock + araç tamiri | ikinci araç yeri |
+| Bunk Room | ölüm sonrası yeniden doğma noktası, gün sonu "dinlenme" buff'ı | +1 günlük buff |
+| Lab | research/analyze hızı, blueprint şansı | strange item analizi 2× |
+| Trophy Hall | yaratık kafaları, artifact'ler, CASE fotoğrafları (sadece kozmetik + küçük XP) | ziyaretçi bonusu |
+| Music Room / Lounge | aletler, jukebox, jam bonusu ×1.5 | sahne ışıkları |
+
+**Nasıl alınır:** (1) terminal **SHIPYARD** — kredi ile satın al; (2) **Gemi parçaları** dünyada nadir düşer
+(Hull Plate, Bulkhead, Engine Coil, Hardpoint Bracket — chest, extraction ödülü, boss, SIEGE); gemideki
+**Frame Console**'a yeterli parça koyunca modül ücretsiz kurulur; (3) fraksiyon ödülleri (Archive → Lab, Bureau → Turret).
+
+**Özelleştirme:** gövde boyası (renk + desen), iç duvar/zemin teması, isim plakası (gemi adı), decal'lar, mobilya
+yerleştirme modu (deployable ghost preview mantığıyla: hayalet önizleme, döndür, yerleştir, geri al).
+
+**Denge:** her modül gemiyi **ağırlaştırır** → rota yakıt maliyeti +%5/modül ve iniş gürültüsü (Threat başlangıcı +2);
+büyük gemi = daha çok SIEGE hedef yüzeyi. Böylece "her şeyi al" değil "ekibe uygun gemiyi kur" kararı çıkar.
+
+**Teknik:** `ship.js` çekirdek + `shipyard.js` modül yerleşimi; tüm modüllerin eşyaları (workbench, kiosk, ayna,
+lore panosu, decon, fault istasyonları) **anchor registry** (`game.ship.anchors`) üzerinden yerleşir, sabit koordinat
+yok; modül kurulumu host-authoritative, run save'e yazılır, late join senkron.
