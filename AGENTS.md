@@ -268,6 +268,8 @@ getters (ids untouched, `def.$name` = English). Host -> client text uses `sysMsg
 long lore bodies (RU), wave-2 files merged later.
 + The Algorithm's Revolver (Russian-roulette power-ups, `src/game/roulette.js`, net `rr` / `rrfx`, docs/wave2/anomaly.md): tables replace ~half the shrine spawns (quota >= 1) + a ship bonus table; node test `tools/harness/roulette.test.mjs` PASS, `wave2_roulette.js` run once (solo path PASS); 2+ player pass/forced flow only covered by the node test.
 
++ Homeworld tycoon (module `homeworld`, docs/wave2/homeworld.md): moon HOME (terminal `ROUTE HOME`), build mode ([E] console / [H]), per-game-day economy, power/cooling limits, away-raid sim + HUD; node test `tools/harness/homeworld.test.mjs` PASS (26), build OK, NOT browser-tested; shared-file hooks marked `[hw]` in game.js / host.js.
+
 ### 5.5 Smoke test (paste in the browser console on `?autohost=local&code=T1&name=Tester`, after ~4 s)
 ```js
 const g = kefal.game, errs = []; addEventListener('error', e => errs.push(e.message));
