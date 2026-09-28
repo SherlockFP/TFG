@@ -89,7 +89,7 @@ const CABLE_LIT = 0xfff2b0;
 const DX = [1, 0, -1, 0], DZ = [0, 1, 0, -1];
 const INWARD = [[-1, 0], [0, -1], [1, 0], [0, 1]];                 // edge d of a cell -> back into the cell
 const WALL_ROT = [-Math.PI / 2, Math.PI, Math.PI / 2, 0];          // prop front (+Z) faces into the cell
-const SKIP_ROOMS = new Set(['entrance', 'vault', 'generator']);
+const SKIP_ROOMS = new Set(['entrance', 'vault', 'generator', 'core']);
 const NO_FLOOD = new Set(['flooded_cave', 'poolrooms', 'overflow', 'sludge_pit', 'cistern']);   // rooms with their own water
 const FLOOD_W = { bathroom: 4, boiler: 3, kitchen: 3, nest: 2, storage: 2, lab: 2, lockers: 2, collapsed_shaft: 2 };
 // creature types the steam may stun (simple state machines that recover from 'stunned' -> 'idle')

@@ -6,7 +6,7 @@ import * as THREE from 'three';
 export const DX = [1, 0, -1, 0], DZ = [0, 1, 0, -1];
 export const INWARD = [[-1, 0], [0, -1], [1, 0], [0, 1]];          // edge d -> back into the cell
 export const WALL_ROT = [-Math.PI / 2, Math.PI, Math.PI / 2, 0];   // prop front (+Z) faces into the cell
-export const SPECIAL_ROOMS = new Set(['entrance', 'vault', 'generator']);
+export const SPECIAL_ROOMS = new Set(['entrance', 'vault', 'generator', 'core']);
 
 /** Geometry helper bundle bound to one layout. */
 export function layoutKit(L) {

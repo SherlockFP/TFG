@@ -46,7 +46,7 @@ import { setDocksVisible } from '../ui/dock.js';   // shared crafting components
 // ---- WAVE 1 module imports: one line per module, keep the blank separator lines (avoids merge conflicts) ----
 // [import:inventory]
 
-// [import:facilitysys]
+import { installFacilitySystems } from './facilitysys.js';
 
 // [import:balance]
 
@@ -119,7 +119,7 @@ export class Game extends Emitter {
     this.wave1 = [];
     // [slot:inventory]
 
-    // [slot:facilitysys]
+    this.useModule('facilitysys', installFacilitySystems);
 
     // [slot:balance]
 

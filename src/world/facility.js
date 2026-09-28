@@ -12,6 +12,7 @@ import { buildSetPieces, planDarkCorridors } from './setpieces.js';
 import { INTERIORS, INTERIOR_THEMES, INTERIOR_NAMES, getInterior, isInteriorTheme } from './interiors/index.js';
 import { tintLampLights } from './interiors/common.js';
 import { buildHazards } from './interiors/hazards.js';
+import { buildFacilitySystems, planChestSpots } from './interiors/facsys.js';
 
 // Interior theme registry (ids: factory, mansion, mineshaft, office, backrooms, serverfarm, sewer, hospital).
 export { INTERIORS, INTERIOR_THEMES, INTERIOR_NAMES, getInterior, isInteriorTheme };
@@ -330,7 +331,7 @@ export function generateLayout(seed, theme = 'factory', size = 1) {
         if (!inb(ox, oz)) continue;
         const c = cells[idx(ox, oz)];
         if (!c) continue;
-        { const ro = roomOf[idx(ox, oz)]; if (ro >= 0 && ['entrance', 'vault', 'generator'].includes(rooms[ro].type)) continue; }
+        { const ro = roomOf[idx(ox, oz)]; if (ro >= 0 && ['entrance', 'vault', 'generator', 'core'].includes(rooms[ro].type)) continue; }
         if (distOf[idx(ox, oz)] < 4) continue;
         cand.push({ x, z, ox, oz, ix, iz, dir, dist: distOf[idx(ox, oz)] });
       }
@@ -349,6 +350,8 @@ export function generateLayout(seed, theme = 'factory', size = 1) {
   for (let i = 0; i < vaultCount; i++) attach('vault', 2, 2);
   const genRoom = attach('generator', 2, 2) || rng.pick(rooms.filter((r) => r.type === 'small'));
   if (genRoom && genRoom.type !== 'generator') genRoom.type = 'generator';
+  // containment chamber (facility systems: the CORE sits here behind a powered containment door)
+  const coreRoom = attach('core', 3, 3) || attach('core', 2, 2);
 
   // assign room types
   const types = R.types;
@@ -367,11 +370,33 @@ export function generateLayout(seed, theme = 'factory', size = 1) {
       if (theme === 'mineshaft') h = mineshaftRoomHeight(r.type, rng);
     } else h = R.roomHeight ? R.roomHeight(r.type, rng) : 4.4;
     if (r.type === 'vault' || r.type === 'generator') h = 4;
+    if (r.type === 'core') h = 5.2;
     r.height = Math.round(h * 10) / 10;
     for (let zz = r.z; zz < r.z + r.h; zz++) for (let xx = r.x; xx < r.x + r.w; xx++) heightOf[idx(xx, zz)] = r.height;
   }
   const corridorH = R.corridorH || CORRIDOR_H;
   for (let i = 0; i < W * H; i++) if (cells[i] === 2) heightOf[i] = corridorH;
+
+  // ---- room links (open boundary edges) + sealed treasure rooms ----
+  // A treasure room is a dead end (exactly one way in) deep in the facility; its only door is locked on purpose.
+  // Keys spawn in reachable rooms (facility systems) and the lockpicker opens it too.
+  for (const r of rooms) {
+    r.linkKeys = [];
+    for (let zz = r.z; zz < r.z + r.h; zz++) for (let xx = r.x; xx < r.x + r.w; xx++) for (let d = 0; d < 4; d++) {
+      const nx = xx + [1, 0, -1, 0][d], nz = zz + [0, 1, 0, -1][d];
+      if (nx >= r.x && nx < r.x + r.w && nz >= r.z && nz < r.z + r.h) continue;
+      const k = edgeKey(xx, zz, d);
+      if (inb(nx, nz) && cells[idx(nx, nz)] && open.has(k)) r.linkKeys.push(k);
+    }
+    r.links = r.linkKeys.length;
+  }
+  const treasureEdges = new Set();
+  {
+    const cand = rooms.filter((r) => r.links === 1 && !r.hub && !['entrance', 'vault', 'generator', 'core'].includes(r.type) && r.w * r.h <= 16 && distOf[idx(r.cx, r.cz)] >= 5);
+    rng.shuffle(cand);
+    const nTreasure = size >= 1.6 ? 2 : 1;
+    for (const r of cand.slice(0, nTreasure)) { r.treasure = true; treasureEdges.add(r.linkKeys[0]); }
+  }
 
   // ---- edges: doors/arches ----
   const edgeInfo = new Map();
@@ -389,10 +414,14 @@ export function generateLayout(seed, theme = 'factory', size = 1) {
     if (ra === rb && ra >= 0) continue;           // inside same room
     if (cells[a] === 2 && cells[b] === 2) continue; // corridor-corridor
     const roomA = ra >= 0 ? rooms[ra] : null, roomB = rb >= 0 ? rooms[rb] : null;
-    const special = [roomA, roomB].find((r) => r && (r.type === 'vault'));
+    const special = [roomA, roomB].find((r) => r && (r.type === 'vault' || r.type === 'core'));
     let info;
-    if (special) {
+    if (special?.type === 'core') {
+      info = { type: 'contain', width: 3.0, doorH: Math.round(Math.min(3.1, Math.min(heightOf[a], heightOf[b]) - 0.15) * 100) / 100 };
+    } else if (special) {
       info = { type: 'vault', width: 2.6, doorH: 2.8 };
+    } else if (treasureEdges.has(key)) {
+      info = { type: 'door', width: 1.35, doorH: 2.35, locked: true, treasure: true };
     } else {
       const roll = rng.next();
       if (roll < R.blastP && Math.min(heightOf[a], heightOf[b]) >= 3.3) info = { type: 'blast', width: 3.3, doorH: 3.2, code: codeFor(blastCount++) };
@@ -411,36 +440,93 @@ export function generateLayout(seed, theme = 'factory', size = 1) {
 
   // fire exits: far rooms, closed wall facing outward
   const fireExits = [];
-  const farRooms = rooms.filter((r) => !['entrance', 'vault', 'generator'].includes(r.type))
+  const farRooms = rooms.filter((r) => !['entrance', 'vault', 'generator', 'core'].includes(r.type) && !r.treasure)
     .map((r) => ({ r, d: distOf[idx(r.cx, r.cz)] })).sort((a, b) => b.d - a.d);
   const nFire = size >= 2 ? 3 : size >= 1.2 ? 2 : 1;
+  const wallOut = (xx, zz) => {
+    const out = [];
+    for (let d = 0; d < 4; d++) {
+      const nx2 = xx + [1, 0, -1, 0][d], nz2 = zz + [0, 1, 0, -1][d];
+      if (inb(nx2, nz2) && cells[idx(nx2, nz2)]) continue;
+      const k = edgeKey(xx, zz, d);
+      if (edgeInfo.has(k)) continue;
+      out.push({ x: xx, z: zz, d, k });
+    }
+    return out;
+  };
+  const addFireExit = (c, room) => {
+    const ex = c.d === 0 ? c.x + 1 : c.d === 2 ? c.x : c.x + 0.5;
+    const ez = c.d === 1 ? c.z + 1 : c.d === 3 ? c.z : c.z + 0.5;
+    const info = { type: 'fireexit', width: 1.35, doorH: 2.35, key: c.k, dir: c.d & 1, cx: ex, cz: ez, a: idx(c.x, c.z), b: -1, inward: c.d };
+    edgeInfo.set(c.k, info);
+    fireExits.push({ room, cellX: c.x, cellZ: c.z, d: c.d, info });
+  };
   for (const { r } of farRooms) {
     if (fireExits.length >= nFire) break;
     if (fireExits.some((f) => Math.abs(f.room.cx - r.cx) + Math.abs(f.room.cz - r.cz) < W / 3)) continue;
     // candidate wall edges of r whose neighbor is empty
     const cand = [];
-    for (let zz = r.z; zz < r.z + r.h; zz++) for (let xx = r.x; xx < r.x + r.w; xx++) {
+    for (let zz = r.z; zz < r.z + r.h; zz++) for (let xx = r.x; xx < r.x + r.w; xx++) cand.push(...wallOut(xx, zz));
+    if (!cand.length) continue;
+    addFireExit(rng.pick(cand), r);
+  }
+  // every facility has a second way in/out: when no far room had an outside wall, use the deepest corridor
+  if (!fireExits.length) {
+    const cc = [];
+    for (let i = 0; i < W * H; i++) if (cells[i] === 2 && distOf[i] >= 3) cc.push(i);
+    cc.sort((p, q) => distOf[q] - distOf[p] || p - q);
+    for (const i of cc) {
+      const w = wallOut(i % W, (i / W) | 0);
+      if (!w.length) continue;
+      addFireExit(w[0], { cx: i % W, cz: (i / W) | 0, corridor: true });
+      break;
+    }
+  }
+
+  // ---- the locked-door rule (owner bug: "a locked door on the only way, I get stuck") ----
+  // With every locked door treated as a wall, every floor cell outside the intentionally sealed rooms (vaults, the
+  // containment chamber, treasure rooms) must be reachable from the main entrance or a fire exit that has an outdoor
+  // twin. Locked doors on the frontier of the reachable region are unlocked (lowest edge key first) until it holds.
+  const outdoorFires = size >= 1.2 ? 2 : 1;   // terrain.js planMoon places this many outdoor fire exits
+  const sealedRoomId = (ri) => ri >= 0 && (rooms[ri].type === 'vault' || rooms[ri].type === 'core' || !!rooms[ri].treasure);
+  const blocks = (inf) => !!inf && (inf.type === 'vault' || inf.type === 'contain' || (inf.type === 'door' && inf.locked));
+  const sources = [idx(ent.cx, ent.cz), ...fireExits.slice(0, outdoorFires).map((f) => idx(f.cellX, f.cellZ))];
+  const reachLocked = () => {
+    const seen = new Uint8Array(W * H);
+    let qh = 0, qt = 0;
+    for (const s of sources) if (!seen[s]) { seen[s] = 1; reachQ[qt++] = s; }
+    while (qh < qt) {
+      const i = reachQ[qh++], x = i % W, z = (i / W) | 0;
       for (let d = 0; d < 4; d++) {
-        const nx2 = xx + [1, 0, -1, 0][d], nz2 = zz + [0, 1, 0, -1][d];
-        if (inb(nx2, nz2) && cells[idx(nx2, nz2)]) continue;
-        const k = edgeKey(xx, zz, d);
-        if (edgeInfo.has(k)) continue;
-        cand.push({ x: xx, z: zz, d, k });
+        const nx = x + [1, 0, -1, 0][d], nz = z + [0, 1, 0, -1][d];
+        if (!inb(nx, nz)) continue;
+        const j = idx(nx, nz), k = edgeKey(x, z, d);
+        if (!cells[j] || seen[j] || !open.has(k) || blocks(edgeInfo.get(k))) continue;
+        seen[j] = 1; reachQ[qt++] = j;
       }
     }
-    if (!cand.length) continue;
-    const c = rng.pick(cand);
-    const ex = c.d === 0 ? c.x + 1 : c.d === 2 ? c.x : c.x + 0.5;
-    const ez = c.d === 1 ? c.z + 1 : c.d === 3 ? c.z : c.z + 0.5;
-    const info = { type: 'fireexit', width: 1.35, doorH: 2.35, key: c.k, dir: c.d & 1, cx: ex, cz: ez, a: idx(c.x, c.z), b: -1, inward: c.d };
-    edgeInfo.set(c.k, info);
-    fireExits.push({ room: r, cellX: c.x, cellZ: c.z, d: c.d, info });
+    return seen;
+  };
+  let unlockedByRule = 0;
+  for (let guard = 0; guard < 400; guard++) {
+    const seen = reachLocked();
+    let missing = false;
+    for (let i = 0; i < W * H && !missing; i++) if (cells[i] && !seen[i] && !sealedRoomId(roomOf[i])) missing = true;
+    if (!missing) break;
+    let best = null;
+    for (const inf of doors) {
+      if (inf.type !== 'door' || !inf.locked || inf.treasure || seen[inf.a] === seen[inf.b]) continue;
+      if (!best || inf.key < best.key) best = inf;
+    }
+    if (!best) break;
+    best.locked = false; best.unlockedByRule = true; unlockedByRule++;
   }
 
   return {
     seed, theme, size, w: W, h: H, cell: CELL, cells, roomOf, heightOf, open, rooms, edgeInfo, doors, fireExits,
     entrance: { room: ent, key: entKey }, distOf, edgeKey, idx, corridorH, plan: R.plan, zoneMask, spines,
     ox: -W * CELL / 2, oz: -H * CELL / 2, y: FACILITY_Y,
+    core: coreRoom || null, generator: genRoom || null, outdoorFires, entrySources: sources, unlockedByRule,
   };
 }
 
@@ -520,6 +606,11 @@ for (const [theme, rooms] of Object.entries(EXT_ADD)) {
 
 // round-2 asset kit (tfg_* custom Blender props, Kenney furniture, PSX boxes) for every theme incl. the new interiors
 applyExtThemeProps(THEMES);
+// containment chamber (facility systems): bare, cold, lit by the core itself (interiors/facsys.js dresses it)
+for (const th of Object.values(THEMES)) {
+  if (!th?.rooms || th.rooms.core) continue;
+  th.rooms.core = { floor: 'metal_plate', wall: 'metal_dark', ceil: 'metal_dark', lamp: null, wall_: [], clutter: [], posters: 0 };
+}
 
 // Measure prop footprint (cached per id+variant)
 const sizeCache = new Map();
@@ -735,7 +826,7 @@ export function buildFacility(layout, { physics, lightPool }) {
     const rcx = (x0 + x1) / 2, rcz = (z0 + z1) / 2;
     // Deep rooms get a readable landmark so navigation is not just an endless sequence of boxes.
     // Keep it visual-only: the gameplay collision belongs to the room itself, not the landmark.
-    if (r.type !== 'entrance' && !r.hub && L.distOf[L.idx(r.cx, r.cz)] >= 5 && r.w * r.h >= 8 && rng.chance(0.38)) {
+    if (r.type !== 'entrance' && r.type !== 'core' && !r.hub && L.distOf[L.idx(r.cx, r.cz)] >= 5 && r.w * r.h >= 8 && rng.chance(0.38)) {
       const marks = def.landmarks || ['server_rack_prop', 'generator', 'shelf_metal'];
       const landmark = marks[rng.int(0, marks.length - 1)];
       const obj = placeProp(landmark, rcx, Y, rcz, rng.int(0, 3) * Math.PI / 2, { visualOnly: true });
@@ -801,7 +892,7 @@ export function buildFacility(layout, { physics, lightPool }) {
       }
     }
     // free wall spots (used by the host for mimic doors etc.)
-    if (!['entrance', 'vault', 'generator'].includes(r.type)) {
+    if (!['entrance', 'vault', 'generator', 'core'].includes(r.type)) {
       for (let k = wallCount + 2; k < wallSlots.length && k < wallCount + 4; k++) {
         const s = wallSlots[k];
         const nx = s.x + [1, 0, -1, 0][s.d], nz = s.z + [0, 1, 0, -1][s.d];
@@ -898,15 +989,15 @@ export function buildFacility(layout, { physics, lightPool }) {
       const s = wallSlots[(wallCount + k) % wallSlots.length];
       decals.push({ s, tex: def.posters ? rng.pick(def.posters) : L.theme === 'mansion' ? rng.pick(['poster_missing', 'poster_fish', 'graffiti']) : rng.pick(['poster_work', 'poster_safety', 'poster_like', 'poster_fish', 'poster_missing', 'sign_danger', 'graffiti', 'blood_splat']), y: 1.6, size: 1.1 });
     }
-    // scrap spots in room
-    const spots = Math.max(2, Math.round(r.w * r.h * 0.9));
+    // scrap spots in room (none in the containment chamber: the CORE is its only prize)
+    const spots = r.type === 'core' ? 0 : Math.max(2, Math.round(r.w * r.h * 0.9));
     for (let k = 0; k < spots; k++) {
       const px = rng.float(x0 + 0.8, x1 - 0.8), pz = rng.float(z0 + 0.8, z1 - 0.8);
-      scrapSpots.push({ x: px, y: Y, z: pz, room: r.id, type: r.type, dist: L.distOf[L.idx(r.cx, r.cz)] || 0 });
+      scrapSpots.push({ x: px, y: Y, z: pz, room: r.id, type: r.type, dist: L.distOf[L.idx(r.cx, r.cz)] || 0, sealed: r.type === 'vault' || !!r.treasure });
     }
-    if (r.w * r.h >= 6 && !['vault', 'entrance', 'bathroom'].includes(r.type)) bigSpots.push({ x: rcx + rng.float(-1, 1), y: Y, z: rcz + rng.float(-1, 1), room: r.id, dist: L.distOf[L.idx(r.cx, r.cz)] || 0 });
+    if (r.w * r.h >= 6 && !['vault', 'entrance', 'bathroom', 'core'].includes(r.type)) bigSpots.push({ x: rcx + rng.float(-1, 1), y: Y, z: rcz + rng.float(-1, 1), room: r.id, dist: L.distOf[L.idx(r.cx, r.cz)] || 0 });
     // vents
-    if (r.type !== 'entrance' && r.type !== 'vault' && wallSlots.length > 2 && rng.chance(0.55)) {
+    if (r.type !== 'entrance' && r.type !== 'vault' && r.type !== 'core' && wallSlots.length > 2 && rng.chance(0.55)) {
       const s = wallSlots[wallSlots.length - 1];
       const [ecx, ecz] = edgeCenter(s.x, s.z, s.d);
       const inward = [[-1, 0], [0, -1], [1, 0], [0, 1]][s.d];
@@ -1003,7 +1094,7 @@ export function buildFacility(layout, { physics, lightPool }) {
     const rotY = info.dir === 0 ? Math.PI / 2 : 0; // door plane faces +z (rot 0) or +x
     let propId = null;
     if (info.type === 'door') propId = L.theme === 'mansion' ? 'door_mansion' : (def.doorProp || 'door_single');
-    else if (info.type === 'blast') propId = 'blast_door';
+    else if (info.type === 'blast' || info.type === 'contain') propId = 'blast_door';
     else if (info.type === 'vault') propId = 'vault_door';
     else if (info.type === 'entrance') propId = L.theme === 'mansion' ? 'door_mansion' : 'blast_door';
     else if (info.type === 'fireexit') propId = 'door_single';
@@ -1032,6 +1123,18 @@ export function buildFacility(layout, { physics, lightPool }) {
       anchors: obj.userData.anchors || {},
       width: info.width, height: info.doorH,
     };
+    if (info.type === 'contain') {
+      // Containment door: behaves like a vault door for the host rules (no manual open/close, no key, creatures
+      // ignore it, nav-blocked while shut) but the facility-systems module owns its animation and collider.
+      // The collider is a plain static 'prop' box so the look-at ray never shows the vault/door prompts.
+      door.kind = 'vault';
+      door.contain = true;
+      door.locked = true;
+      const alongX = info.dir === 1;
+      door.solidArgs = [px, Y + info.doorH / 2, pz, alongX ? info.width : 0.5, info.doorH, alongX ? 0.5 : info.width];
+      door.solid = addBox(...door.solidArgs, G.STATIC, { kind: 'prop', id: 'contain_door' });
+    }
+    if (info.treasure) door.treasure = true;
     if (info.type === 'door' || info.type === 'blast' || info.type === 'vault') {
       const alongX = info.dir === 1;
       const thick = info.type === 'blast' ? 0.5 : 0.25;
@@ -1066,7 +1169,9 @@ export function buildFacility(layout, { physics, lightPool }) {
     }
     if (info.type === 'entrance' || info.type === 'fireexit') {
       door.teleport = true;
-      door.exitIndex = info.type === 'entrance' ? 0 : 1 + L.fireExits.findIndex((f) => f.info === info);
+      // the outdoor map has L.outdoorFires fire exits: a third indoor fire exit leads out through the first one
+      // (before, it pointed at a missing outdoor exit and did nothing)
+      door.exitIndex = info.type === 'entrance' ? 0 : 1 + (Math.max(0, L.fireExits.findIndex((f) => f.info === info)) % Math.max(1, L.outdoorFires || 1));
       // standing spot inside, in front of the door
       const wallSide = info.type === 'entrance' ? 1 : info.inward;
       const inward = [[-1, 0], [0, -1], [1, 0], [0, 1]][wallSide];
@@ -1115,6 +1220,10 @@ export function buildFacility(layout, { physics, lightPool }) {
   // gameplay set pieces shared by every theme: laser grids, breaker rooms, cave-ins, vent shortcuts, sludge
   const hazards = buildHazards({ ...themeCtx, rng: new RNG((L.seed ^ 0x4a2a7d) >>> 0), interior: def });
   setPieces.hazards = hazards;
+  // facility systems (interiors/facsys.js): generator console, puzzle panels, notes, consoles, containment chamber,
+  // emergency lighting. Own rng fork; the runtime (state machine, net, HUD) lives in src/game/facilitysys.js.
+  let sys = null;
+  try { sys = buildFacilitySystems({ ...themeCtx, rng: new RNG((L.seed ^ 0xfac5175) >>> 0), interior: def, doors: doorsOut, hazards, physics, lightPool, colliders }); } catch (e) { console.warn('facility systems', e); }
   setPieces.releaseNav();
   // lights
   for (const e of emitters) lightPool.add(e);
@@ -1133,6 +1242,7 @@ export function buildFacility(layout, { physics, lightPool }) {
 
   const mainDoor = doorsOut.find((d) => d.kind === 'entrance');
   const fireDoors = doorsOut.filter((d) => d.kind === 'fireexit');
+  const chestSpots = planChestSpots(L, nav, vaultSpots);
 
   return {
     group, colliders, nav, layout: L, doors: doorsOut, doorByKey, emitters, interactables,
@@ -1140,8 +1250,10 @@ export function buildFacility(layout, { physics, lightPool }) {
     wallSpots: wallSpots.filter((s) => nav.nearestWalkable(...nav.toGrid(s.x, s.z), 2)), ceilingSpots: ceilingSpots.filter(okSpot),
     reactorSpot: reactorRoom?.reactorSpot || null, mainDoor, fireDoors,
     setPieces, zones: setPieces.zones, landmarkSpots, hazards,
+    sys, chestSpots,   // facility systems runtime data + chest spots (dead-end / treasure / vault rooms) for the world module
     interior: def.id, interiorName: def.name, atmosphere: def.atmosphere || null,
     dispose(physicsRef) {
+      try { sys?.dispose(); } catch (e) { console.warn('facility systems dispose', e); }
       setPieces.dispose(physicsRef);
       for (const c of colliders) physicsRef.removeCollider(c);
       for (const e of emitters) lightPool.remove(e);
