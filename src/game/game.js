@@ -118,6 +118,9 @@ import { installForge } from './forge.js';
 // [import:grenades]
 
 
+// [import:durability]
+
+
 export class Game extends Emitter {
   constructor({ engine, audio, settings, profile, ui, input, mods }) {
     super();
@@ -239,6 +242,9 @@ export class Game extends Emitter {
 
 
     // [slot:grenades]
+
+
+    // [slot:durability]
 
   }
 
