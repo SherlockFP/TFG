@@ -16,7 +16,7 @@ import { isoWeek, weeklySpec, weeklyMods, ensureWeeklyProfile } from '../../game
 import { crewLevelOf, ensureCrewProfile, publicCrew } from '../../game/crew.js';
 import { EMOTES, LOCKED_EMOTES, isEmoteUnlocked } from '../../game/emotes.js';
 import { iconImg } from '../icons.js';
-import { getLang, addTranslations } from '../../core/i18n.js';
+import { getLang, addTranslations, t, t as _t } from '../../core/i18n.js';
 import { saveProfile } from '../../core/save.js';
 
 const TR = {
@@ -29,7 +29,7 @@ const TR = {
 };
 addTranslations({ 'SERVICE RECORD [J]': 'HİZMET KAYDI [J]', 'Codex · Mastery · Rebirth · Weekly · Crew': 'Kodeks · Ustalık · Yeniden Doğuş · Haftalık · Ekip' });
 const tr = () => { try { return getLang() === 'tr'; } catch { return false; } };
-const L = (s) => (tr() && TR[s]) || s;
+const L = (s) => (tr() ? TR[s] : null) || t(s);
 
 const CREATURE_ICONS = {
   scuttler: '🪳', yoinker: '🦝', crawler: '🕷️', lurker: '👁️', mannequin: '🧍', sludge: '🟢', jester: '🎁', spider: '🕸️', leech: '🩸',
@@ -228,7 +228,7 @@ export function createServiceRecord({ game = null, profile = game?.profile, tab,
     } else if (lastSub === 'events') {
       for (const ev of DAILY_EVENTS) {
         const n = p.codex.events[ev.id] || 0;
-        const nm = (tr() && ev.tr?.[0]) || ev.name, ds = (tr() && ev.tr?.[1]) || ev.desc;
+        const nm = (tr() ? ev.tr?.[0] : null) || t(ev.name), ds = (tr() ? ev.tr?.[1] : null) || t(ev.desc);
         const c = card(n > 0, n > 0 ? '📅' : '❔', n > 0 ? nm : '???', n > 0 ? `x${n}` : '', n > 0 ? [['rec-d', ds], ['rec-note', eventEffects(ev).join(' · ')]] : [['rec-d', 'Not yet experienced']]);
         if (n > 0) c.style.borderLeft = `3px solid ${MOOD_COLOR[ev.mood] || '#ffd23f'}`;
         grid.appendChild(c);
@@ -265,8 +265,8 @@ export function createServiceRecord({ game = null, profile = game?.profile, tab,
         const block = masteryBlock(p, id);
         const node = mk('div', 'rec-node');
         const info = mk('div', 'rec-cb');
-        const nm = mk('div', 'rec-n', `${m.icon} ${(tr() && m.tr) || m.name}`);
-        info.append(nm, mk('div', 'rec-pips', '■'.repeat(r) + '□'.repeat(m.max - r)), mk('div', 'rec-d', (tr() && m.trDesc) || m.desc));
+        const nm = mk('div', 'rec-n', `${m.icon} ${(tr() ? m.tr : null) || _t(m.name)}`);
+        info.append(nm, mk('div', 'rec-pips', '■'.repeat(r) + '□'.repeat(m.max - r)), mk('div', 'rec-d', (tr() ? m.trDesc : null) || _t(m.desc)));
         const plus = btn(block ? (block === 'MAX' ? 'MAX' : '+') : '+', () => {
           let ok = false;
           if (game?.progress) ok = game.progress.allocateMastery(id);

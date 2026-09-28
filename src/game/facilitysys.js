@@ -885,11 +885,11 @@ export function installFacilitySystems(game) {
   try {
     window.KefalAPI?.registerCommand?.('facility', (rest, term, g) => {
       const f = g.run?.fac;
-      if (!f || g.run?.phase !== 'moon') { term.print('FACILITY: no facility telemetry (land on a moon first).'); return; }
+      if (!f || g.run?.phase !== 'moon') { term.print(t('FACILITY: no facility telemetry (land on a moon first).')); return; }
       if (rest[0] === 'override') {
-        if (!(f.lock > 0)) { term.print('No lockdown in progress.'); return; }
+        if (!(f.lock > 0)) { term.print(t('No lockdown in progress.')); return; }
         g.net.request('facAct', { a: 'override' });
-        term.print('Lockdown override requested (▮25).');
+        term.print(t('Lockdown override requested (▮25).'));
         return;
       }
       const L = (k, v) => `${k.padEnd(12)}${String(v).toUpperCase()}`;

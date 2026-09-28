@@ -26,6 +26,7 @@ import {
   fxRand,
   hsl,
 } from './common.js';
+import { t, tf, t as _t } from '../core/i18n.js';
 
 const W = 160;
 const H = 120;
@@ -462,14 +463,14 @@ export function createArcade(rawOpts = {}) {
     sparkBurst(parts, fish.x, fish.y, 16, ['#ffffff', '#ff5a3a', '#ffd23f'], 60);
     for (let i = 0; i < 8; i++) bubble(fish.x + fxRand(-4, 4), fish.y + fxRand(-3, 3), fxRand() < 0.5 ? 3 : 2);
     endRun();
-    mg.setStatus(`SCORE ${score}`, 'bad');
+    mg.setStatus(tf('SCORE {score}', { score }), 'bad');
   }
 
   function press() {
     if (mode === 'ready') {
       mode = 'play';
       modeT = 0;
-      mg.setStatus('SCORE 0');
+      mg.setStatus(_t('SCORE 0'));
       flap();
     } else if (mode === 'play') {
       flap();
@@ -556,7 +557,7 @@ export function createArcade(rawOpts = {}) {
           scorePop = 0.14;
           sfx('arcade_score');
           sparkBurst(parts, p.x + PW / 2, p.c, 8, ['#ffffff', '#ffd23f', '#39ff6a'], 40);
-          mg.setStatus(`SCORE ${score}`);
+          mg.setStatus(tf('SCORE {score}', { score }));
           if (score % 10 === 0) {
             floatText(parts, 'SPEED UP!', W / 2, 40, '#ffb000', { life: 1.1 });
             mg.flash('#39ff6a', 0.18);

@@ -26,6 +26,7 @@ import { G } from '../physics/physics.js';
 import { loadModState, saveModState } from '../core/save.js';
 import { Emitter } from '../core/events.js';
 import { buildModsScreen } from './modscreen.js';
+import { t, tf } from '../core/i18n.js';
 
 // events that are never gated for built-in features: 'boot'/'netReady' install patches (the patched
 // code checks featureOn itself), 'sessionEnd' must always clean up
@@ -286,7 +287,7 @@ export class ModManager extends Emitter {
       // a save made with a moon that is not installed any more would crash the landing
       if (game.run && !MOONS[game.run.moon]) {
         game.run.moon = MOONS.hamsi ? 'hamsi' : MOON_ORDER.find((m) => MOONS[m] && !MOONS[m].company) || game.run.moon;
-        game.ui?.toast('Your save was routed to a moon that is not installed. Autopilot reset.', 'bad');
+        game.ui?.toast(t('Your save was routed to a moon that is not installed. Autopilot reset.'), 'bad');
       }
     });
     this.on('message', (d, from) => {
@@ -296,7 +297,7 @@ export class ModManager extends Emitter {
       for (const [k, v] of Object.entries(d.f)) if (this.defs.get(k)?.builtin) f[k] = !!v;
       g.config.features = f;
       this.applyContentGates();
-      if (d.changed) g.ui?.toast(`Host ${d.on ? 'enabled' : 'disabled'} ${this.defs.get(d.changed)?.name || d.changed}.`, 'info');
+      if (d.changed) g.ui?.toast(tf('Host {n} {n2}.', { n: d.on ? 'enabled' : 'disabled', n2: this.defs.get(d.changed)?.name || d.changed }), 'info');
     });
     // terminal: FEATURES [name on|off]
     this.commands.set('features', { fn: (rest, term, game) => this.featuresCommand(rest, term, game), help: 'TFG feature switches (host: FEATURES <name> ON/OFF)', owner: null });
@@ -314,16 +315,16 @@ export class ModManager extends Emitter {
     const want = rest[rest.length - 1];
     const q = rest.slice(0, want === 'on' || want === 'off' ? -1 : rest.length).join(' ').replace(/[^a-z0-9]/g, '');
     const def = list.find((d) => d.id.replace(/[^a-z0-9]/g, '').startsWith(q) || d.name.toLowerCase().replace(/[^a-z0-9]/g, '').startsWith(q));
-    if (!def) { term.print('Unknown feature. Type FEATURES for the list.', 'err'); return; }
+    if (!def) { term.print(t('Unknown feature. Type FEATURES for the list.'), 'err'); return; }
     if (want !== 'on' && want !== 'off') { term.print(`${def.name}: ${this.featureOn(def.id) ? 'ON' : 'OFF'}\n${def.description || ''}`); return; }
     const on = want === 'on';
-    if (def.scope === 'local') { this.setEnabled(def.id, on); term.print(`${def.name} ${on ? 'enabled' : 'disabled'} for you${on && !this.active.has(def.id) ? ' (reload needed)' : ''}.`); return; }
-    if (!game?.isHost) { term.print('Only the host can switch crew features.', 'err'); return; }
+    if (def.scope === 'local') { this.setEnabled(def.id, on); term.print(tf('{name} {n} for you{n2}.', { name: def.name, n: on ? 'enabled' : 'disabled', n2: on && !this.active.has(def.id) ? ' (reload needed)' : '' })); return; }
+    if (!game?.isHost) { term.print(t('Only the host can switch crew features.'), 'err'); return; }
     this.setEnabled(def.id, on);
     game.config.features = { ...(game.config.features || {}), [def.id]: on };
     this.applyContentGates();
     game.net.broadcast('modmsg', { k: 'tfg-features', f: game.config.features, changed: def.id, on });
-    term.print(`${def.name} is now ${on ? 'ON' : 'OFF'} for the crew. Some effects apply from the next landing.`);
+    term.print(tf('{name} is now {n} for the crew. Some effects apply from the next landing.', { name: def.name, n: on ? 'ON' : 'OFF' }));
   }
 
   // Host: may this peer join? Sends 'reject' (before any world data) and returns false when not.
@@ -347,7 +348,7 @@ export class ModManager extends Emitter {
   missingMoon(game, moonId) {
     const msg = `This lobby is on moon "${moonId}", which is not installed here. Enable the same mods as the host.`;
     console.warn('[mods]', msg);
-    if (game.isHost) game.ui?.toast('Unknown moon "' + moonId + '" - the autopilot will abort the landing.', 'bad');
+    if (game.isHost) game.ui?.toast(tf('Unknown moon "{moonId}" - the autopilot will abort the landing.', { moonId }), 'bad');
     else game.emit('fatal', msg);
     return true;
   }
@@ -399,11 +400,11 @@ export class ModManager extends Emitter {
     if (!c || (c.owner && !this.featureOn(c.owner))) {
       if (w0 === 'help' && this.commands.size) {
         const live = [...this.commands.entries()].filter(([, v]) => !v.owner || this.featureOn(v.owner));
-        setTimeout(() => terminal.print('FEATURE & MOD COMMANDS:\n' + live.map(([k, v]) => `>${k.toUpperCase()}  ${v.help || ''}`).join('\n')), 0);
+        setTimeout(() => terminal.print(tf('FEATURE & MOD COMMANDS:\n{n}', { n: live.map(([k, v]) => `>${k.toUpperCase()}  ${v.help || ''}`).join('\n') })), 0);
       }
       return false;
     }
-    try { c.fn(rest, terminal, this.game); } catch (e) { terminal.print('Mod error: ' + e.message, 'err'); }
+    try { c.fn(rest, terminal, this.game); } catch (e) { terminal.print(tf('Mod error: {message}', { message: e.message }), 'err'); }
     return true;
   }
 }

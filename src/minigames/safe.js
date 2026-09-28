@@ -25,6 +25,7 @@ import {
   digitFromEvent,
   TAU,
 } from './common.js';
+import { t, tf, t as _t } from '../core/i18n.js';
 
 const W = 192;
 const H = 144;
@@ -213,7 +214,7 @@ export function createSafe(rawOpts = {}) {
     phaseT = 0;
   }
 
-  mg.setStatus('ROUND 1/3');
+  mg.setStatus(_t('ROUND 1/3'));
 
   function lightKey(i, color, amount = 1) {
     keyLight[i] = amount;
@@ -259,14 +260,14 @@ export function createSafe(rawOpts = {}) {
     if (roundsDone >= ROUNDS) {
       granted();
     } else {
-      mg.setStatus(`ROUND ${roundsDone + 1}/3`, 'good');
+      mg.setStatus(tf('ROUND {n}/3', { n: roundsDone + 1 }), 'good');
     }
   }
 
   function granted() {
     setPhase('granted');
-    mg.setStatus('ACCESS GRANTED', 'good');
-    mg.setHelp('[SPACE] continue');
+    mg.setStatus(_t('ACCESS GRANTED'), 'good');
+    mg.setHelp(_t('[SPACE] continue'));
     mg.finishAfter({ success: true, cancelled: false, rounds: ROUNDS }, 2.6, 0.9);
   }
 
@@ -279,8 +280,8 @@ export function createSafe(rawOpts = {}) {
     mg.shake(7);
     mg.flash('#ff0000', 0.5);
     mg.glitch(0.3);
-    mg.setStatus(reason === 'timeout' ? 'TIME OUT - ALARM!' : 'ACCESS DENIED', 'bad');
-    mg.setHelp('[SPACE] continue');
+    mg.setStatus(reason === 'timeout' ? _t('TIME OUT - ALARM!') : _t('ACCESS DENIED'), 'bad');
+    mg.setHelp(_t('[SPACE] continue'));
     mg.finishAfter({ success: false, cancelled: false, rounds: roundsDone, reason }, 2.4, 0.7);
   }
 
@@ -332,7 +333,7 @@ export function createSafe(rawOpts = {}) {
       if (phaseT > (round === 0 ? 1.0 : 0.6)) {
         setPhase('show');
         shown = -1;
-        mg.setStatus(`ROUND ${round + 1}/3 - WATCH`, 'warn');
+        mg.setStatus(tf('ROUND {n}/3 - WATCH', { n: round + 1 }), 'warn');
       }
     } else if (phase === 'show') {
       const step = ON + GAP;
@@ -351,7 +352,7 @@ export function createSafe(rawOpts = {}) {
         timeMax = lens[round] * lerp(1.25, 0.75, D) + 2;
         timeLeft = timeMax;
         lastTick = Math.ceil(timeLeft);
-        mg.setStatus(`ROUND ${round + 1}/3 - ENTER CODE`);
+        mg.setStatus(tf('ROUND {n}/3 - ENTER CODE', { n: round + 1 }));
       }
     } else if (phase === 'input') {
       timeLeft -= dt;

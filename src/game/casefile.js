@@ -7,7 +7,7 @@ import { LINES, FACTIONS, pickLang } from './loredata.js';
 import { MOONS } from './moons.js';
 import { interiorName } from './collection.js';
 import { hashString } from '../core/rng.js';
-import { getLang } from '../core/i18n.js';
+import { getLang, t } from '../core/i18n.js';
 import { renderCaseCard } from '../ui/panels/casefile.js';
 
 export const CASE_CAP = 50;
@@ -108,10 +108,10 @@ export function installCaseFiles(core) {
   function listText() {
     const T = tr();
     const list = ensureCaseProfile(game.profile);
-    if (!list.length) return T ? 'Arşivde dava yok. Bir gün hayatta kal (ya da kalma).' : 'No case files yet. Survive a day (or do not).';
-    const out = [T ? 'DAVA ARŞİVİ (son 10) — CASE <n> ile aç' : 'CASE ARCHIVE (latest 10) — open with CASE <n>', ''];
+    if (!list.length) return t('No case files yet. Survive a day (or do not).');
+    const out = [t('CASE ARCHIVE (latest 10) — open with CASE <n>'), ''];
     for (const c of list.slice(0, 10)) {
-      out.push(`#${c.n}  ${T ? 'GÜN' : 'DAY'} ${c.day}  ${String(c.moon || '').slice(0, 18).padEnd(18)} ▮${String(c.value).padEnd(5)} ${c.returned}/${c.entered} ${T ? 'döndü' : 'returned'}${c.deaths.length ? `  ✖${c.deaths.length}` : ''}${c.allDead ? '  [WIPE]' : ''}`);
+      out.push(`#${c.n}  ${t('DAY')} ${c.day}  ${String(c.moon || '').slice(0, 18).padEnd(18)} ▮${String(c.value).padEnd(5)} ${c.returned}/${c.entered} ${t('returned')}${c.deaths.length ? `  ✖${c.deaths.length}` : ''}${c.allDead ? '  [WIPE]' : ''}`);
     }
     return out.join('\n');
   }
@@ -119,8 +119,8 @@ export function installCaseFiles(core) {
     const T = tr();
     const list = ensureCaseProfile(game.profile);
     const c = n ? list.find((x) => String(x.n) === String(n).replace('#', '')) : list[0];
-    if (!c) return T ? 'Dava bulunamadı. CASES yaz.' : 'Case not found. Type CASES.';
-    const L = (en, trs) => (T ? trs : en);
+    if (!c) return t('Case not found. Type CASES.');
+    const L = (en, trs) => (T ? trs : t(en));
     const out = [`CASE #${c.n} — ${c.moon} — ${L('DAY', 'GÜN')} ${c.day}${c.interior ? ' — ' + c.interior : ''}`, ''];
     out.push(`${L('Entered', 'Giren')} ${c.entered}, ${L('Returned', 'Dönen')} ${c.returned}, ${L('Value extracted', 'Çıkarılan değer')} ▮${c.value}, ${L('Kills', 'Öldürme')} ${c.kills}`);
     if (c.artifacts?.length) out.push(`${L('Artifacts', 'Eserler')}: ${c.artifacts.map((a) => `${a.name} (▮${a.value})`).join(', ')}`);

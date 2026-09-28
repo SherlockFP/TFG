@@ -7,7 +7,7 @@
 //                   analyze(itemId), craft(recipeId), have(type), status(recipe), gasProof(), luck(), blueprints(), dispose() }
 import * as THREE from 'three';
 import { RNG } from '../core/rng.js';
-import { addTranslations, t } from '../core/i18n.js';
+import { addTranslations, t, tf } from '../core/i18n.js';
 import { ITEMS, itemDef, scrapTableFor } from './items.js';
 import { MOONS } from './moons.js';
 import { CREATURES } from './creatures.js';
@@ -818,7 +818,7 @@ export function installCrafting(game) {
       const q = rest.join(' ').toLowerCase().trim();
       const list = api.recipes();
       const r = q && (list.find((x) => x.id === q || x.name.toLowerCase() === q) || list.find((x) => x.name.toLowerCase().includes(q)));
-      if (!q || !r) { term.print(q ? 'No such recipe. Type CRAFT.' : list.map((x) => x.name.toUpperCase()).join('\n') + '\n\nRECIPES <name> shows details.'); return; }
+      if (!q || !r) { term.print(q ? t('No such recipe. Type CRAFT.') : tf('{n}\n\nRECIPES <name> shows details.', { n: list.map((x) => x.name.toUpperCase()).join('\n') })); return; }
       const st = status(r);
       const odds = tierOdds(r.tier, luck()).map((o) => `${o.tier} ${Math.round(o.p * 100)}%`).join(' / ');
       term.print([`${r.name.toUpperCase()} -> ${ITEMS[r.out]?.name || r.out} x${r.n}`, r.desc, '',

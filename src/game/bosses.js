@@ -21,7 +21,7 @@ import { MOONS } from './moons.js';
 import { RNG } from '../core/rng.js';
 import { angleDiff } from '../core/util.js';
 import { rollWeaponAffixes } from './loot.js';
-import { t, addTranslations } from '../core/i18n.js';
+import { t, addTranslations, sysMsg } from '../core/i18n.js';
 
 addTranslations({
   'BOSS DEFEATED': 'BOSS YENİLDİ',
@@ -347,7 +347,7 @@ function foremanThink(c, dt, M) {
     d.summonT = 4; d.roarLen = 1.8;
     c.setState('roar');
     M.noise(c.pos, 4);
-    M.game.net.broadcast('sys', { text: "The Foreman's furnace ROARS - it is enraged!", kind: 'bad' });
+    M.game.net.broadcast('sys', sysMsg('The Foreman\'s furnace ROARS - it is enraged!', {}, 'bad'));
     return;
   }
   if (d.enraged && d.engaged && d.summonT > 0) d.summonT -= dt;
@@ -792,7 +792,7 @@ export function legacyBehavior(c, dt, M) {
     if (near || c.hp < c.maxHp || c.target || (run.time || 0) >= 18 * 60 || run.weather === 'eclipsed') {
       c.setState('boot');
       M.noise(c.pos, 4);
-      g.net.broadcast('sys', { text: 'Something old just powered on out there. A spotlight is sweeping the moon...', kind: 'bad' });
+      g.net.broadcast('sys', sysMsg('Something old just powered on out there. A spotlight is sweeping the moon...', {}, 'bad'));
     }
     return;
   }
@@ -1143,7 +1143,7 @@ export function installBosses(game) {
     if (!c) return null;
     boss = c;
     track(c);
-    game.net.broadcast('sys', { text: 'Seismic sensors: something heavy is pacing deep inside the facility...', kind: 'info' });
+    game.net.broadcast('sys', sysMsg('Seismic sensors: something heavy is pacing deep inside the facility...', {}, 'info'));
     return c;
   }
 
@@ -1194,7 +1194,7 @@ export function installBosses(game) {
     if (!c) return null;
     legacy = c;
     track(c);
-    game.net.broadcast('sys', { text: 'Long-range scan: a decommissioned war machine is parked on this moon. Do not wake it before you have to.', kind: 'info' });
+    game.net.broadcast('sys', sysMsg('Long-range scan: a decommissioned war machine is parked on this moon. Do not wake it before you have to.', {}, 'info'));
     return c;
   }
 
@@ -1225,7 +1225,7 @@ export function installBosses(game) {
     });
     scheduleLootCheck(ids, c);
     const who = topDamage(c);
-    game.net.broadcast('sys', { text: `THE FOREMAN has been decommissioned!${who} His stash spills across the floor.`, kind: 'good' });
+    game.net.broadcast('sys', sysMsg('THE FOREMAN has been decommissioned!{who} His stash spills across the floor.', { who }, 'good'));
     game.net.broadcast('fx', { k: 'bdead', n: 'The Foreman has been decommissioned', p: [+c.pos.x.toFixed(2), +c.pos.y.toFixed(2), +c.pos.z.toFixed(2)] });
   }
 
@@ -1275,7 +1275,7 @@ export function installBosses(game) {
       ids.push(game.items.hostSpawn(dr.type, pos, { valueMul, af: dr.af || undefined, linvel: [Math.cos(a) * 3, 4, Math.sin(a) * 3] }));
     });
     scheduleLootCheck(ids, c);
-    game.net.broadcast('sys', { text: `THE LEGACY BOT has been deprecated!${topDamage(c)} Its core and cargo are scattered around the wreck.`, kind: 'good' });
+    game.net.broadcast('sys', sysMsg('THE LEGACY BOT has been deprecated!{topDamage} Its core and cargo are scattered around the wreck.', { topDamage: topDamage(c) }, 'good'));
     game.net.broadcast('fx', { k: 'bdead', n: 'The Legacy Bot has been deprecated', p: [+c.pos.x.toFixed(2), +c.pos.y.toFixed(2), +c.pos.z.toFixed(2)] });
   }
 

@@ -9,7 +9,7 @@ import { G } from '../physics/physics.js';
 import { ITEMS, registerItem } from './items.js';
 import { TIERS } from './tiers.js';
 import { RNG } from '../core/rng.js';
-import { addTranslations, getLang, t } from '../core/i18n.js';
+import { addTranslations, getLang, speechLang, t } from '../core/i18n.js';
 import { saveSettings } from '../core/save.js';
 import { buildLexicon, findSpellWords, isTurkishWord, speechSupported, VoiceListener } from './magic_voice.js';
 import { ManaDock, SpellWheel } from '../ui/panels/spellbook.js';
@@ -18,21 +18,21 @@ import { createSkillbookModel } from '../models/skillbook.js';
 // ------------------------------------------------------------------ spell table
 // words: what the voice / chat matcher listens for (normalised: diacritics + letter runs are folded, see magic_voice.js)
 export const SPELLS = {
-  push: { id: 'push', name: 'Push', say: { en: 'PUSH', tr: 'İT' }, words: { en: ['push', 'pushed'], tr: ['it', 'itt', 'pus'] },
+  push: { id: 'push', name: 'Push', say: { en: 'PUSH', tr: 'İT', ru: 'ТОЛКАЙ' }, words: { en: ['push', 'pushed'], tr: ['it', 'itt', 'pus'], ru: ['толкай', 'толчок', 'толкни', 'толкнуть'] },
     mana: 15, cd: 4, tier: null, color: 0x9fd4ff, desc: 'Cone of force: knocks creatures back, flings loose items, shoves crewmates.' },
-  lumen: { id: 'lumen', name: 'Lumen', say: { en: 'LUMEN', tr: 'IŞIK' }, words: { en: ['lumen', 'lumin', 'lumens'], tr: ['ışık', 'isik', 'lümen'] },
+  lumen: { id: 'lumen', name: 'Lumen', say: { en: 'LUMEN', tr: 'IŞIK', ru: 'СВЕТ' }, words: { en: ['lumen', 'lumin', 'lumens'], tr: ['ışık', 'isik', 'lümen'], ru: ['свет', 'люмен', 'светись'] },
     mana: 20, cd: 15, tier: 'uncommon', color: 0xfff2c0, dur: 45, desc: 'A floating orb of light follows you for 45 s. Works in a blackout.' },
-  heal: { id: 'heal', name: 'Heal', say: { en: 'HEAL', tr: 'ŞİFA' }, words: { en: ['heal', 'heals'], tr: ['şifa', 'sifa', 'hil'] },
+  heal: { id: 'heal', name: 'Heal', say: { en: 'HEAL', tr: 'ŞİFA', ru: 'ЛЕЧИ' }, words: { en: ['heal', 'heals'], tr: ['şifa', 'sifa', 'hil'], ru: ['лечи', 'лечить', 'исцели', 'хил'] },
     mana: 35, cd: 25, tier: 'uncommon', color: 0x7dff9a, desc: 'Heals you and every crewmate within 8 m.' },
-  pull: { id: 'pull', name: 'Pull', say: { en: 'PULL', tr: 'ÇEK' }, words: { en: ['pull', 'pulled'], tr: ['çek', 'cek', 'pul'] },
+  pull: { id: 'pull', name: 'Pull', say: { en: 'PULL', tr: 'ÇEK', ru: 'ТЯНИ' }, words: { en: ['pull', 'pulled'], tr: ['çek', 'cek', 'pul'], ru: ['тяни', 'тянуть', 'притяни'] },
     mana: 12, cd: 3, tier: 'rare', color: 0xc79bff, desc: 'Yanks the loose item you look at into your arms (up to 18 m).' },
-  hush: { id: 'hush', name: 'Hush', say: { en: 'HUSH', tr: 'SUS' }, words: { en: ['hush', 'shush'], tr: ['sus'] },
+  hush: { id: 'hush', name: 'Hush', say: { en: 'HUSH', tr: 'SUS', ru: 'ТИХО' }, words: { en: ['hush', 'shush'], tr: ['sus'], ru: ['тихо', 'тише', 'молчи'] },
     mana: 25, cd: 22, tier: 'rare', color: 0x9a7dff, dur: 8, desc: 'Silence bubble: for 8 s creatures cannot hear you (steps, voice, noise).' },
-  blink: { id: 'blink', name: 'Blink', say: { en: 'BLINK', tr: 'SIÇRA' }, words: { en: ['blink', 'blinks'], tr: ['sıçra', 'sicra', 'sichra'] },
+  blink: { id: 'blink', name: 'Blink', say: { en: 'BLINK', tr: 'SIÇRA', ru: 'ПРЫЖОК' }, words: { en: ['blink', 'blinks'], tr: ['sıçra', 'sicra', 'sichra'], ru: ['прыжок', 'прыгай', 'блинк'] },
     mana: 20, cd: 6, tier: 'epic', color: 0x5ae0ff, desc: 'Teleport up to 7 m forward. Never through walls.' },
-  shield: { id: 'shield', name: 'Shield', say: { en: 'SHIELD', tr: 'KALKAN' }, words: { en: ['shield', 'shields'], tr: ['kalkan', 'şild'] },
+  shield: { id: 'shield', name: 'Shield', say: { en: 'SHIELD', tr: 'KALKAN', ru: 'ЩИТ' }, words: { en: ['shield', 'shields'], tr: ['kalkan', 'şild'], ru: ['щит', 'защита', 'шилд'] },
     mana: 30, cd: 30, tier: 'epic', color: 0x66b3ff, dur: 10, desc: 'Absorbs up to 45 damage for 10 s (not instant kills).' },
-  fire: { id: 'fire', name: 'Fireball', say: { en: 'FIRE', tr: 'ATEŞ' }, words: { en: ['fire', 'fireball'], tr: ['ateş', 'ates'] },
+  fire: { id: 'fire', name: 'Fireball', say: { en: 'FIRE', tr: 'ATEŞ', ru: 'ОГОНЬ' }, words: { en: ['fire', 'fireball'], tr: ['ateş', 'ates'], ru: ['огонь', 'огня', 'файрбол', 'фаербол'] },
     mana: 40, cd: 10, tier: 'legendary', color: 0xff7a2a, desc: 'A fireball that bursts on impact and sets creatures on fire.' },
 };
 export const SPELL_ORDER = ['push', 'lumen', 'heal', 'pull', 'hush', 'blink', 'shield', 'fire'];
@@ -209,7 +209,7 @@ export function installMagic(game) {
   const costOf = (id) => EXT.get(id)?.cost?.() ?? (SPELLS[id]?.mana || 0);
   const cooldownLeft = (id) => Math.max(0, (S.cds.get(id) || 0) - game.time);
   const cooldownFrac = (id) => { const l = cooldownLeft(id); return l > 0 ? clamp(l / Math.max(0.01, cooldownOf(id)), 0, 1) : 0; };
-  const sayWord = (id) => (getLang() === 'tr' ? SPELLS[id].say.tr : SPELLS[id].say.en);
+  const sayWord = (id) => SPELLS[id].say[getLang()] || SPELLS[id].say.en;
 
   // ---- audio
   function ensureSound(name) {
@@ -283,7 +283,7 @@ export function installMagic(game) {
     const source = opts.source || 'key';
     const sp = SPELLS[id];
     if (!sp) return { ok: false, reason: 'unknown' };
-    if (!knows(id)) return fizzle("You don't know that spell yet. Find its skillbook.", 'not-known');
+    if (!knows(id)) return fizzle(t('You don\'t know that spell yet. Find its skillbook.'), 'not-known');
     const p = game.player;
     if (!game.net || !game.run || !p || p.dead || S.disposed) return { ok: false, reason: 'unavailable' };
     if (source === 'voice' && game.anomaly?.muted?.()) return fizzle('Muted: voice spells are disabled for now.', 'muted');   // ANOMALY: Mute mutation
@@ -291,20 +291,20 @@ export function installMagic(game) {
     if (cdl > 0) { if (source !== 'voice') sfx('spell_fizzle', 0.3); dock?.note(`${t(sp.name)}: ${cdl.toFixed(1)}s`); return { ok: false, reason: 'cooldown', left: cdl }; }
     const cost = costOf(id);
     const blood = bloodMagic(), hpCost = blood ? Math.ceil(cost * 0.5) : 0;
-    if (blood ? p.hp <= hpCost + 2 : S.mana < cost) { dock?.lowMana(); return fizzle(blood ? 'Too weak to pay the blood price.' : 'Not enough mana.', 'mana'); }
+    if (blood ? p.hp <= hpCost + 2 : S.mana < cost) { dock?.lowMana(); return fizzle(blood ? t('Too weak to pay the blood price.') : t('Not enough mana.'), 'mana'); }
     const { eye, dir } = eyeDir();
     const pw = power();
     const fx = { k: 'spell', s: id, c: game.selfId, p: arr3(eye), d: [+dir.x.toFixed(3), +dir.y.toFixed(3), +dir.z.toFixed(3)], pw: +pw.toFixed(2), src: source[0], w: String(opts.word || sayWord(id)).slice(0, 16) };
     // spell-specific preparation (may fizzle before any mana is spent)
     if (id === 'blink') {
       const to = blinkTarget(p, dir);
-      if (!to) return fizzle('No room to blink.', 'blocked');
+      if (!to) return fizzle(t('No room to blink.'), 'blocked');
       fx.q = arr3(to); fx.p = arr3(p.pos);
       p.teleport(to);
       game.psTimer = 0;
     } else if (id === 'pull') {
       const it = pullTarget(eye, dir);
-      if (!it) return fizzle('Nothing to pull there.', 'no-target');
+      if (!it) return fizzle(t('Nothing to pull there.'), 'no-target');
       fx.it = it.id;
       const fwdH = new THREE.Vector3(dir.x, 0, dir.z).normalize();
       fx.to = arr3(p.pos.clone().addScaledVector(fwdH, 1.3).add(new THREE.Vector3(0, 1.0, 0)));
@@ -314,7 +314,7 @@ export function installMagic(game) {
     } else if (id === 'shield') {
       fx.dur = sp.dur;
       S.shieldMax = S.shieldHp = Math.round(45 * pw); S.shieldT = sp.dur;
-      toast('Shield up.', 'good');
+      toast(t('Shield up.'), 'good');
     } else if (id === 'hush') {
       fx.dur = sp.dur; S.hushT = sp.dur;
       toast('Silence...', 'info');
@@ -882,7 +882,7 @@ export function installMagic(game) {
   function useBook(it) {
     const id = it.def.spell;
     if (!SPELLS[id]) return;
-    if (knows(id)) { toast('You already know this spell. Sell the book or give it to a crewmate.', 'info'); sfx('spell_fizzle', 0.4); return; }
+    if (knows(id)) { toast(t('You already know this spell. Sell the book or give it to a crewmate.'), 'info'); sfx('spell_fizzle', 0.4); return; }
     learn(id);
     if (it.holder === game.selfId && game.items.get(it.id) === it) game.net.request('consume', { id: it.id });
     else { try { game.inventory?.consume?.(it.type); } catch (e) { console.warn('magic consume', e); } }
@@ -899,7 +899,7 @@ export function installMagic(game) {
   }
   function onSpeech(text, final = true, idx = 0) {
     if (S.disposed) return [];
-    const found = findSpellWords(text, LEX, { mode: 'voice', lang: getLang() === 'tr' ? 'tr' : 'en' });
+    const found = findSpellWords(text, LEX, { mode: 'voice', lang: getLang() });
     dock?.showHeard(text, found.map((m) => m.w));
     let done = S.castIn.get(idx);
     if (!done) { done = new Set(); S.castIn.set(idx, done); if (S.castIn.size > 40) S.castIn.delete(S.castIn.keys().next().value); }
@@ -914,14 +914,14 @@ export function installMagic(game) {
   }
   const listener = new VoiceListener({
     onText: (text, final, idx) => onSpeech(text, final, idx),
-    onError: (code) => { if (code === 'not-allowed' || code === 'service-not-allowed') toast('Voice spells need your microphone: turn it on in Settings > Voice.', 'bad'); else if (code === 'network') game.ui?.toast?.('Voice spells: speech service unreachable (network).', 'bad'); },
+    onError: (code) => { if (code === 'not-allowed' || code === 'service-not-allowed') toast(t('Voice spells need your microphone: turn it on in Settings > Voice.'), 'bad'); else if (code === 'network') game.ui?.toast?.(t('Voice spells: speech service unreachable (network).'), 'bad'); },
   });
   function updateVoice() {
     const want = !!(game.input?.isDown?.('ptt') && !game.player.dead && voiceEnabled());
     if (want && !S.voiceHeld) {
-      if (!speechSupported()) { if (!S.voiceWarned) { S.voiceWarned = true; toast('Voice spells are not supported in this browser (use Chrome / Edge). Type the spell word in chat or hold C.', 'info'); } }
-      else if (!micOk()) { if (!S.voiceWarned) { S.voiceWarned = true; toast('Voice spells need your microphone: turn it on in Settings > Voice.', 'info'); } }
-      else listener.start(getLang() === 'tr' ? 'tr-TR' : 'en-US');
+      if (!speechSupported()) { if (!S.voiceWarned) { S.voiceWarned = true; toast(t('Voice spells are not supported in this browser (use Chrome / Edge). Type the spell word in chat or hold C.'), 'info'); } }
+      else if (!micOk()) { if (!S.voiceWarned) { S.voiceWarned = true; toast(t('Voice spells need your microphone: turn it on in Settings > Voice.'), 'info'); } }
+      else listener.start(speechLang());
     } else if (!want && S.voiceHeld) listener.stop();
     S.voiceHeld = want;
   }
@@ -1016,7 +1016,7 @@ export function installMagic(game) {
     S.shieldHp -= a; d.dmg -= a;
     sfx('spell_shieldhit', 0.9); game.engine.flash(SPELLS.shield.color, 0.25);
     burst(game.player.eyePos(), 'shield', null, 0.8);
-    if (S.shieldHp <= 0) { S.shieldHp = 0; S.shieldT = 0; toast('Your shield broke!', 'bad'); game.net?.broadcast?.('fx', { k: 'spell', s: 'shieldoff', c: game.selfId }); }
+    if (S.shieldHp <= 0) { S.shieldHp = 0; S.shieldT = 0; toast(t('Your shield broke!'), 'bad'); game.net?.broadcast?.('fx', { k: 'spell', s: 'shieldoff', c: game.selfId }); }
   });
   on('localDeath', () => { S.shieldHp = 0; S.shieldT = 0; closeWheel(false); });
   on('moonPopulated', (g) => { try { hostWorldBook(g); } catch (e) { console.warn('magic books', e); } });

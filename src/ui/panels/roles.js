@@ -4,7 +4,7 @@
 import { ROLES, ROLE_ORDER, bonusLines } from '../../game/passivetree.js';
 import { itemDef } from '../../game/items.js';
 import { iconCanvas } from './treeicons.js';
-import { getLang, addTranslations } from '../../core/i18n.js';
+import { getLang, addTranslations, t } from '../../core/i18n.js';
 
 const TR = {
   'CHOOSE YOUR ROLE': 'ROLÜNÜ SEÇ', 'CURRENT ROLE': 'MEVCUT ROL', SELECT: 'SEÇ', Close: 'Kapat', 'STARTING KIT': 'BAŞLANGIÇ EKİPMANI',
@@ -14,7 +14,7 @@ const TR = {
 };
 addTranslations(TR);
 const tr = () => { try { return getLang() === 'tr'; } catch { return false; } };
-const L = (s) => (tr() && TR[s]) || s;
+const L = (s) => (tr() ? TR[s] : null) || t(s);
 
 const STYLE_ID = 'tfg-roles-style';
 const CSS = `

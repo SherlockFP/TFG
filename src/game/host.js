@@ -55,7 +55,7 @@ export const hostMethods = {
     this.registerHandlers();
     this.spawnInShip();
     this.updateAmbience();
-    this.ui.toast('You are the host. Lobby code: ' + this.net.code);
+    this.ui.toast(tf('You are the host. Lobby code: {code}', { code: this.net.code }));
     this.hostAnnounce();
     this.tutorialHint('orbit');
     this.mods?.emit('hostStart', this);
@@ -118,7 +118,7 @@ export const hostMethods = {
       run: this.run, config: this.config, players,
       items: this.items.serialize(), creatures: this.creatures.serializeFor(), doors, shipDoor: this.ship.door.open,
     });
-    this.net.broadcast('sys', { text: `${info.name} joined the crew.`, kind: 'info' }, false);
+    this.net.broadcast('sys', sysMsg('{name} joined the crew.', { name: info.name }, 'info'), false);
     this.hostAnnounce();
     this.mods?.emit('playerJoin', id, info, this);
   },
@@ -167,7 +167,7 @@ export const hostMethods = {
         it.pulled = true;
         this.hostSetPower(false);
         this.hostData.powerBoost = (this.hostData.powerBoost || 0) + 3;
-        this.net.broadcast('sys', { text: 'Something has been disconnected... the facility goes dark.', kind: 'bad' });
+        this.net.broadcast('sys', sysMsg('Something has been disconnected... the facility goes dark.', {}, 'bad'));
       }
     });
     H('drop', (d, from) => {
@@ -226,13 +226,13 @@ export const hostMethods = {
       this.hostData.fuseDone = this.hostData.fuseDone || new Set();
       const repeat = this.hostData.fuseDone.has(fk) && this.run.powerOn;
       this.hostData.fuseDone.add(fk);
-      if (repeat) { this.net.sendTo(from, 'sys', { text: 'Diagnostics: all systems nominal.', kind: 'info' }); return; }
+      if (repeat) { this.net.sendTo(from, 'sys', sysMsg('Diagnostics: all systems nominal.', {}, 'info')); return; }
       if (!this.run.powerOn) {
         this.hostSetPower(true);
-        this.net.broadcast('sys', { text: `${this.playerName(from)} restored the power.`, kind: 'good' });
+        this.net.broadcast('sys', sysMsg('{name} restored the power.', { name: this.playerName(from) }, 'good'));
       } else {
         for (const door of this.world.facility?.doors || []) if (door.kind === 'blast' && !door.open) this.hostSetDoor(door.id, true);
-        this.net.broadcast('sys', { text: 'Security override: all secure doors opened.', kind: 'info' });
+        this.net.broadcast('sys', sysMsg('Security override: all secure doors opened.', {}, 'info'));
       }
       this.net.broadcast('xp', { to: from, xp: 70, coin: 10, reason: 'Fuse box repaired', bounty: { type: 'minigame', target: 'fuse' } });
     });
@@ -243,7 +243,7 @@ export const hostMethods = {
       // hostSpawn with holder: we also need the slot -> handled by client picking the first free slot on 'sp'
     });
     H('shipdoor', (d, from) => {
-      if (['landing', 'takeoff', 'orbit', 'fired'].includes(this.run.phase)) { this.net.sendTo(from, 'sys', { text: 'The door is sealed during flight.', kind: 'bad' }); return; }
+      if (['landing', 'takeoff', 'orbit', 'fired'].includes(this.run.phase)) { this.net.sendTo(from, 'sys', sysMsg('The door is sealed during flight.', {}, 'bad')); return; }
       // state-set request, not a toggle: two players pressing at once end in the last request, and a request for the state the door
       // is already in (double press, stale label) is dropped instead of replaying the hydraulics for everybody
       if (this.ship.door.open === !!d.open) return;
@@ -310,7 +310,7 @@ export const hostMethods = {
     if (!inShip) return;
     if (run.phase === 'orbit') {
       if (run.daysLeft <= 0 && run.moon !== 'hq') {
-        this.net.sendTo(from, 'sys', { text: 'DEADLINE! Route to 0-Algorithm HQ and sell your scrap.', kind: 'bad' });
+        this.net.sendTo(from, 'sys', sysMsg('DEADLINE! Route to 0-Algorithm HQ and sell your scrap.', {}, 'bad'));
         return;
       }
       run.seed = Math.floor(Math.random() * 1e9);
@@ -333,7 +333,7 @@ export const hostMethods = {
 
   hostFinishLanding() {
     if (this.run.phase !== 'landing') return;
-    if (!MOONS[this.run.moon]) { this.run.moon = 'hamsi'; this.broadcastRun(['moon']); this.net.broadcast('sys', { text: 'Autopilot error: that moon is not installed on this ship. Landing aborted - rerouted to 56K-Dialup.', kind: 'bad' }); this.hostSetPhase('orbit'); return; }
+    if (!MOONS[this.run.moon]) { this.run.moon = 'hamsi'; this.broadcastRun(['moon']); this.net.broadcast('sys', sysMsg('Autopilot error: that moon is not installed on this ship. Landing aborted - rerouted to 56K-Dialup.', {}, 'bad')); this.hostSetPhase('orbit'); return; }
     const moon = MOONS[this.run.moon];
     if (moon.company) {
       this.hostSetPhase('company');
@@ -342,7 +342,7 @@ export const hostMethods = {
     } else {
       this.hostSetPhase('moon');
       const ev = this.run.dailyEvent;
-      this.net.broadcast('sys', { text: `DAILY EVENT: ${ev?.name || 'NORMAL FEED'} — ${ev?.desc || ''}`, kind: ev?.dangerMul > 1.15 ? 'warn' : 'info' });
+      this.net.broadcast('sys', sysMsg('DAILY EVENT: {@n} — {@n2}', { n: ev?.name || 'NORMAL FEED', n2: ev?.desc || '' }, ev?.dangerMul > 1.15 ? 'warn' : 'info'));
       this.hostData.pressureStage = 0;
       this.hostData.moonT = 0;
       this.hostPopulateMoon();
@@ -430,7 +430,7 @@ export const hostMethods = {
     // quota evaluation after leaving the company on deadline day
     if (moon.company && run.daysLeft <= 0) this.hostEvaluateQuota();
     else if (run.daysLeft <= 0) {
-      this.net.broadcast('sys', { text: 'Deadline reached. Route to 0-Algorithm HQ and sell!', kind: 'bad' });
+      this.net.broadcast('sys', sysMsg('Deadline reached. Route to 0-Algorithm HQ and sell!', {}, 'bad'));
       run.moon = 'hq';
       this.broadcastRun(['moon']);
     }
@@ -449,7 +449,7 @@ export const hostMethods = {
       run.sold = 0;
       run.daysLeft = 3;
       this.broadcastRun(['credits', 'quotaIndex', 'quota', 'sold', 'daysLeft']);
-      this.net.broadcast('sys', { text: `QUOTA MET! Overtime bonus ▮${bonus}. New quota: ▮${run.quota}`, kind: 'good' });
+      this.net.broadcast('sys', sysMsg('QUOTA MET! Overtime bonus ▮{bonus}. New quota: ▮{quota}', { bonus, quota: run.quota }, 'good'));
       this.net.broadcast('quotamet', { bonus, surplus, prev, quota: run.quota, quotaIndex: run.quotaIndex });
       this.net.broadcast('fx', { k: 'snd', s: 'ui_quota_met', p: [0, 1.5, 0], v: 1 });
       this.net.broadcast('xp', { xp: 150 + run.quotaIndex * 80, coin: 30 + run.quotaIndex * 15, reason: 'Quota met', quota: true });
@@ -738,7 +738,7 @@ export const hostMethods = {
       void moon;
       if (run.time >= 23 * 60 && !hd.alarmPlayed) {
         hd.alarmPlayed = true;
-        this.net.broadcast('sys', { text: 'WARNING: The autopilot will leave at midnight!', kind: 'bad' });
+        this.net.broadcast('sys', sysMsg('WARNING: The autopilot will leave at midnight!', {}, 'bad'));
         this.net.broadcast('fx', { k: 'snd', s: 'ship_alarm', p: [0, 2, 0], v: 1, r: 30, m: 400 });
       }
       if (run.time >= 24 * 60 - 1) { run.time = 24 * 60; hd.alarmPlayed = false; this.hostBeginTakeoff('midnight'); }
@@ -776,7 +776,7 @@ export const hostMethods = {
       const ps = this.aiPlayers();
       if (ps.length && ps.every((p) => p.dead)) {
         hd.allDeadT += dt;
-        if (hd.allDeadT > 4) { hd.allDeadT = 0; this.net.broadcast('sys', { text: 'All crew lost. The autopilot is returning to orbit.', kind: 'bad' }); this.hostBeginTakeoff('alldead'); }
+        if (hd.allDeadT > 4) { hd.allDeadT = 0; this.net.broadcast('sys', sysMsg('All crew lost. The autopilot is returning to orbit.', {}, 'bad')); this.hostBeginTakeoff('alldead'); }
       } else hd.allDeadT = 0;
       this.creatures.hostUpdate(dt);
     } else if (run.phase === 'company') {
@@ -976,7 +976,7 @@ export const hostMethods = {
       if (Math.abs(p.x - zone.pos.x) < half.x + 0.3 && Math.abs(p.z - zone.pos.z) < half.z + 0.6 && p.y > zone.pos.y - 1 && p.y < zone.pos.y + 2.5) inZone.push(it);
     }
     this.net.broadcast('fx', { k: 'snd', s: 'company_bell', p: [zone.pos.x, zone.pos.y, zone.pos.z], v: 1 });
-    if (!inZone.length) { this.net.sendTo(from, 'sys', { text: 'Place scrap on the counter first, then ring the bell.', kind: 'info' }); return; }
+    if (!inZone.length) { this.net.sendTo(from, 'sys', sysMsg('Place scrap on the counter first, then ring the bell.', {}, 'info')); return; }
     if (this.hostData.selling) return;
     this.hostData.selling = true;
     for (const it of inZone) it.selling = true;
@@ -1002,3 +1002,4 @@ export const hostMethods = {
 
 // local import to avoid a cycle with remote.js at module-eval time
 import { suitColor as suitColorOf } from '../entities/remote.js';
+import { tf, sysMsg } from '../core/i18n.js';

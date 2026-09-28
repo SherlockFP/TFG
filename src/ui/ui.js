@@ -4,7 +4,7 @@
 // gamepad navigable (arrows / D-pad move focus, Enter / A confirm, Esc / B back, LB / RB switch tabs).
 // Full-screen reports (day summary, quota met, deplatformed) play one at a time; toasts wait while one is up.
 import { el, escapeHtml, clamp } from '../core/util.js';
-import { t, setLang, getLang } from '../core/i18n.js';
+import { t, setLang, getLang, LANGS, tf } from '../core/i18n.js';
 import { HUD, randomTip } from './hud.js';
 import { iconHTML, typeFromName } from './icons.js';
 import { listRuns, loadRun, deleteRun, saveSettings, saveProfile, DEFAULT_KEYS } from '../core/save.js';
@@ -39,15 +39,15 @@ export class UI {
     this.root.appendChild(this.menuEl);
     this.overlay = el('div', { class: 'overlay hidden' });
     this.root.appendChild(this.overlay);
-    this.chatEl = el('div', { class: 'chat hidden' }, el('div', { class: 'chat-log' }), el('input', { class: 'chat-in hidden', maxlength: 200, placeholder: 'Say something... (Enter)' }));
+    this.chatEl = el('div', { class: 'chat hidden' }, el('div', { class: 'chat-log' }), el('input', { class: 'chat-in hidden', maxlength: 200, placeholder: t('Say something... (Enter)') }));
     this.root.appendChild(this.chatEl);
     this.chatLog = this.chatEl.querySelector('.chat-log');
     this.chatIn = this.chatEl.querySelector('.chat-in');
     this.mgLayer = el('div', { class: 'mg-layer hidden' });
     this.root.appendChild(this.mgLayer);
-    this.clickHint = el('div', { class: 'click-hint hidden' }, 'Click to resume');
+    this.clickHint = el('div', { class: 'click-hint hidden' }, t('Click to resume'));
     this.root.appendChild(this.clickHint);
-    this.soundHint = el('div', { class: 'sound-hint hidden' }, '🔇 Sound is off - click anywhere to enable it');
+    this.soundHint = el('div', { class: 'sound-hint hidden' }, t('🔇 Sound is off - click anywhere to enable it'));
     this.root.appendChild(this.soundHint);
     this.panelOpen = null;
     this.marketOpen = false;
@@ -98,8 +98,8 @@ export class UI {
     b.dataset.back = '1';
     return b;
   }
-  toast(text, kind) { this.hud.toast(text, kind); }
-  systemMessage(text, kind = 'info') { this.chatMessage(null, text, false, kind); this.hud.toast(text, kind === 'signal' ? 'info' : kind); }
+  toast(text, kind) { this.hud.toast(t(text), kind); }   // t(): safety net for static strings that were not wrapped at the call site
+  systemMessage(text, kind = 'info') { text = t(text); this.chatMessage(null, text, false, kind); this.hud.toast(text, kind === 'signal' ? 'info' : kind); }
   chatMessage(name, text, self, kind) {
     this.chatEl.classList.remove('hidden');
     const line = el('div', { class: 'chat-line ' + (kind || '') + (self ? ' self' : '') }, name ? el('span', { class: 'cn' }, name + ': ') : null, text);
@@ -408,10 +408,15 @@ export class UI {
   screen_title() {
     // the menu itself lives on the big CRT in the 3D room (src/ui/crtmenu.js); DOM only adds a few corners
     const box = el('div', { class: 'title-screen crt' });
-    box.appendChild(el('div', { class: 'version' }, 'TFG v' + GAME_VERSION + ' · three.js · WebRTC P2P'));
+    box.appendChild(el('div', { class: 'version' }, 'TFG v' + GAME_VERSION + t(' · three.js · WebRTC P2P')));
     box.appendChild(el('div', { class: 'crt-hint' }, t('Click an option on the screen · arrows + Enter')));
-    const langBtn = this.button(getLang() === 'tr' ? 'EN' : 'TR', () => { this.app.settings.lang = getLang() === 'tr' ? 'en' : 'tr'; setLang(this.app.settings.lang); saveSettings(this.app.settings); this.app.menu?.setItems?.(); this.showMenu('title'); }, 'lang');
-    box.appendChild(langBtn);
+    const langBox = el('div', { class: 'lang-picker' });
+    for (const L_ of LANGS) {
+      const b = this.button(L_.short, () => { this.app.settings.lang = L_.id; setLang(L_.id); saveSettings(this.app.settings); this.app.menu?.setItems?.(); this.showMenu('title'); }, 'lang' + (L_.id === getLang() ? ' active' : ''));
+      b.title = L_.label;
+      langBox.appendChild(b);
+    }
+    box.appendChild(langBox);
     this.menuEl.appendChild(box);
   }
 
@@ -515,7 +520,7 @@ export class UI {
         const blocked = full || l.incompatible;
         const row_ = el('div', { class: 'lobby-row' + (l.incompatible ? ' bad' : '') + (full ? ' full' : ''), tabindex: blocked ? -1 : 0, 'data-code': l.code },
           el('div', { class: 'l-name' }, (l.locked ? '🔒 ' : '') + (l.name || '?')),
-          el('div', { class: 'l-host' }, (l.host || '?') + ` · Lv.${l.level || 1}` + (l.stars ? ` ★${l.stars | 0}` : '') + (l.crew ? ` · [${String(l.crewTag || '').slice(0, 4)}] ${String(l.crew).slice(0, 24)} (C${l.crewLv | 0})` : '')),
+          el('div', { class: 'l-host' }, (l.host || '?') + tf(' · Lv.{n}', { n: l.level || 1 }) + (l.stars ? ` ★${l.stars | 0}` : '') + (l.crew ? ` · [${String(l.crewTag || '').slice(0, 4)}] ${String(l.crew).slice(0, 24)} (C${l.crewLv | 0})` : '')),
           el('div', { class: 'l-pl' }, el('span', { class: 'l-bar' }, el('i', { style: { width: clamp((l.players / Math.max(1, l.max)) * 100, 0, 100) + '%' } })), ` ${l.players}/${l.max}`),
           el('div', { class: 'l-ph' }, `${String(l.phase || '').toUpperCase()} ${l.moon || ''}`),
           el('div', { class: 'l-q' }, `${t('Day')} ${l.day || 1} · ▮${l.quota || 0}`),
@@ -558,13 +563,13 @@ export class UI {
       const st = derivedStats(p);
       const focusKey = document.activeElement?.dataset?.nav;
       wrap.innerHTML = '';
-      wrap.appendChild(this.panelHead(t('CHARACTER'), `Lv.${p.level} · ${rankOf(p.level)}`));
+      wrap.appendChild(this.panelHead(t('CHARACTER'), tf('Lv.{level} · {rank}', { level: p.level, rank: t(rankOf(p.level)) })));
       const nameIn = el('input', { value: p.name, maxlength: 18 });
       nameIn.addEventListener('change', () => { p.name = nameIn.value.trim().slice(0, 18) || p.name; saveProfile(p); this.app.game?.net?.send('pinfo', this.app.game.helloData()); });
       const suits = el('div', { class: 'swatches' });
       for (const s of SUIT_COLORS) {
         const owned = p.cosmetics.suits.includes(s.id);
-        const sw = el('div', { class: 'swatch' + (p.suit === s.id ? ' sel' : '') + (owned ? '' : ' locked'), title: s.name + (owned ? '' : ' (Black Market)'), style: { background: s.color }, tabindex: owned ? 0 : -1, 'data-nav': 'suit:' + s.id });
+        const sw = el('div', { class: 'swatch' + (p.suit === s.id ? ' sel' : '') + (owned ? '' : ' locked'), title: s.name + (owned ? '' : t(' (Black Market)')), style: { background: s.color }, tabindex: owned ? 0 : -1, 'data-nav': 'suit:' + s.id });
         sw.addEventListener('click', () => { if (!owned) return; p.suit = s.id; saveProfile(p); this.app.game?.viewModel?.setSuitColor?.(s.color); this.app.game?.net?.send('pinfo', this.app.game.helloData()); this.sfx(); render(); });
         suits.appendChild(sw);
       }
@@ -593,9 +598,9 @@ export class UI {
         row(t('Name'), nameIn),
         el('div', { class: 'label' }, t('Suit')), suits,
         el('div', { class: 'label' }, t('Hat')), hats,
-        el('div', { class: 'label' }, `Lv.${p.level} · ${rankOf(p.level)} · ${p.xp}/${xpForLevel(p.level)} XP`),
+        el('div', { class: 'label' }, tf('Lv.{level} · {rankOf} · {xp}/{xpForLevel} XP', { level: p.level, rankOf: rankOf(p.level), xp: p.xp, xpForLevel: xpForLevel(p.level) })),
         el('div', { class: 'xpbar' }, el('div', { style: { width: (p.xp / xpForLevel(p.level) * 100) + '%' } })),
-        el('div', { class: 'label clout' }, `◈ ${p.coins} Clout`),
+        el('div', { class: 'label clout' }, tf('◈ {coins} Clout', { coins: p.coins })),
       );
       // skills
       const skills = el('div', { class: 'skills' }, el('div', { class: 'label' }, `${t('Skills')} · ${t('Skill points')}: ${p.skillPoints}`));
@@ -607,9 +612,9 @@ export class UI {
       }
       decorateSkills(skills, p, this);   // [rpg] legacy skill rows -> role + PASSIVE TREE [K] buttons (ui/panels/passivetree.js)
       const statsBox = el('div', { class: 'statbox' },
-        el('div', {}, `HP ${st.maxHp} · Stamina ${st.maxStamina} · Armor ${Math.round(st.armor * 100)}%`),
-        el('div', {}, `Melee ×${st.meleeMul.toFixed(2)} · Crit ${Math.round(st.crit * 100)}% · Speed ×${st.speedMul.toFixed(2)}`),
-        el('div', {}, `Scan ${st.scanRange} m · Battery ×${st.batteryMul.toFixed(1)} · Carry relief ${st.carryRelief} lb`),
+        el('div', {}, tf('HP {maxHp} · Stamina {maxStamina} · Armor {n}%', { maxHp: st.maxHp, maxStamina: st.maxStamina, n: Math.round(st.armor * 100) })),
+        el('div', {}, tf('Melee ×{n} · Crit {n2}% · Speed ×{n3}', { n: st.meleeMul.toFixed(2), n2: Math.round(st.crit * 100), n3: st.speedMul.toFixed(2) })),
+        el('div', {}, tf('Scan {scanRange} m · Battery ×{n} · Carry relief {carryRelief} lb', { scanRange: st.scanRange, n: st.batteryMul.toFixed(1), carryRelief: st.carryRelief })),
       );
       // loadout
       const lo = p.loadout;
@@ -626,7 +631,7 @@ export class UI {
       const wIcon = lo.weapon && ITEMS[lo.weapon] ? el('span', { class: 'lo-ico', html: iconHTML(lo.weapon, 'lo-img') }) : null;
       loBox.append(row(t('Weapon'), el('div', { class: 'lo-w' }, wIcon, selector('weapon', weapons, (id) => ITEMS[id].name))), row(t('Head'), selector('head', heads, (id) => armorDef(id).name)), row(t('Body'), selector('body', bodies, (id) => armorDef(id).name)), row(t('Perk'), selector('perk', perks, (id) => armorDef(id).name)));
       const s = p.stats;
-      const statsList = el('div', { class: 'dim' }, `Kills ${s.kills} · Deaths ${s.deaths} · Quotas ${s.quotasMet} · Days ${s.days} · Fish ${s.fish} · Arcade best ${s.bestArcade} · Bestiary ${Object.values(p.bestiary).filter((b) => b.seen).length}/${Object.keys(CREATURES).length}`);
+      const statsList = el('div', { class: 'dim' }, tf('Kills {kills} · Deaths {deaths} · Quotas {quotasMet} · Days {days} · Fish {fish} · Arcade best {bestArcade} · Bestiary {length}/{length2}', { kills: s.kills, deaths: s.deaths, quotasMet: s.quotasMet, days: s.days, fish: s.fish, bestArcade: s.bestArcade, length: Object.values(p.bestiary).filter((b) => b.seen).length, length2: Object.keys(CREATURES).length }));
       const right = el('div', { class: 'col' }, skills, statsBox, loBox, statsList);
       const body = el('div', { class: 'cp-body' }, el('div', { class: 'cols' }, left, right));
       const achBox = el('div', { class: 'ach-host' });
@@ -700,7 +705,7 @@ export class UI {
         const out = el('select', { 'data-nav': 'set:out' }, el('option', { value: '' }, t('System default')));
         if (audio.canChooseOutput()) {
           navigator.mediaDevices?.enumerateDevices?.().then((ds) => {
-            for (const d of ds) if (d.kind === 'audiooutput' && d.deviceId && d.deviceId !== 'default') out.appendChild(el('option', { value: d.deviceId, selected: s.outputDevice === d.deviceId }, d.label || 'Output ' + (out.options.length)));
+            for (const d of ds) if (d.kind === 'audiooutput' && d.deviceId && d.deviceId !== 'default') out.appendChild(el('option', { value: d.deviceId, selected: s.outputDevice === d.deviceId }, d.label || tf('Output {length}', { length: out.options.length })));
           }).catch(() => {});
           out.addEventListener('change', async () => { s.outputDevice = out.value; saveSettings(s); const ok = await audio.setOutputDevice(out.value); this.toast(ok ? t('Output device changed.') : t('Could not switch output device.')); audio.testSound(); });
           body.append(row(t('Output device'), out));
@@ -720,7 +725,7 @@ export class UI {
         const mode = el('select', { 'data-nav': 'set:vmode' }, el('option', { value: 'open', selected: s.voiceMode === 'open' }, t('Open mic')), el('option', { value: 'ptt', selected: s.voiceMode === 'ptt' }, t('Push to talk') + ` [${prettyKey(s.keys.ptt)}]`));
         mode.addEventListener('change', () => { s.voiceMode = mode.value; apply(); });
         const dev = el('select', { 'data-nav': 'set:mic' }, el('option', { value: '' }, t('Default')));
-        navigator.mediaDevices?.enumerateDevices?.().then((ds) => { for (const d of ds) if (d.kind === 'audioinput' && d.deviceId) dev.appendChild(el('option', { value: d.deviceId, selected: s.micDevice === d.deviceId }, d.label || 'Microphone')); }).catch(() => {});
+        navigator.mediaDevices?.enumerateDevices?.().then((ds) => { for (const d of ds) if (d.kind === 'audioinput' && d.deviceId) dev.appendChild(el('option', { value: d.deviceId, selected: s.micDevice === d.deviceId }, d.label || t('Microphone'))); }).catch(() => {});
         dev.addEventListener('change', () => { s.micDevice = dev.value; apply(); this.toast(t('Microphone changes apply to the next session.')); });
         const meter = el('div', { class: 'meter' }, el('div'));
         const g0 = this.app.game;
@@ -752,7 +757,7 @@ export class UI {
         body.append(el('div', { class: 'dim note' }, t('Click a key, then press the new key (Esc cancels). A key that is already used swaps with the other action.')));
         body.append(el('div', { class: 'dim note' }, t('Also: 1-4 / wheel = slots · LMB use / grab · RMB scan · MMB ping · R reload · Esc menu · Gamepad: D-pad / A / B / LB-RB in menus')));
       } else if (tab === 'Gameplay') {
-        const lang = el('select', { 'data-nav': 'set:lang' }, el('option', { value: 'en', selected: getLang() === 'en' }, 'English'), el('option', { value: 'tr', selected: getLang() === 'tr' }, 'Türkçe'));
+        const lang = el('select', { 'data-nav': 'set:lang' }, ...LANGS.map((L_) => el('option', { value: L_.id, selected: getLang() === L_.id }, L_.label)));
         lang.addEventListener('change', () => {
           s.lang = lang.value; setLang(s.lang); saveSettings(s);
           this.app.menu?.setItems?.();
@@ -866,14 +871,15 @@ export class UI {
   }
 
   screen_howto() {
-    const txt = `
-<b>THE JOB</b><br>You are a contract content janitor for <b>The Algorithm</b>. Fly to the server moons, loot the abandoned facilities, bring the lost content back to the ship and sell it at <b>0-Algorithm HQ</b> to meet the <b>Engagement Quota</b> every 3 days. Miss it and you get deplatformed.<br><br>
-<b>THE SHIP</b><br>Use the <b>terminal</b> (MOONS, ROUTE, STORE, BUY, SCAN, BESTIARY, codes). Pull the <b>lever</b> to land or take off. The ship leaves at <b>midnight</b> — with or without you.<br><br>
-<b>CONTROLS</b><br>WASD move · Shift sprint · Ctrl crouch · Space jump · E interact / pick up · LMB use / attack / grab big loot · RMB scan · MMB / P ping · G drop · Q throw · F flashlight · 1-4 slots · R reload · V push-to-talk · Z/X emotes · Enter chat · I inventory · K passive tree · hold C spell wheel (or say / type the spell word) · J service record · hold B emote wheel · Tab character · Esc menu<br><br>
-<b>SURVIVAL</b><br>Every creature has a rule. <i>Scan</i> them and read the BESTIARY. Sound matters: sprinting, horns and <b>your voice</b> attract things. Some exits are not what they seem.<br><br>
-<b>PROGRESSION</b><br>You earn XP and <b>Clout</b> for securing scrap, kills, bounties, fishing and minigames. Level up to gain skill points and spend them in the passive tree (K). Buy soulbound weapons, armor, perks and cosmetics from <b>Phish Dayı</b>'s Black Market at HQ. Higher tier moons and later quotas are more dangerous — and more profitable.<br><br>
-<b>MINIGAMES</b><br>Crack vault keypads, rewire fuse boxes, pick locks, fish at ponds and the HQ dock, play FLAPPY PHISH on the ship's arcade, and gamble your coins at the GACHA MACHINE.<br><br>
-<b>MULTIPLAYER</b><br>Host a lobby (public or private with password) and friends can find it in the lobby browser or join with the 6-letter code. Everything is peer-to-peer; the host runs the world.`;
+    const txt = [
+      `<b>THE JOB</b><br>You are a contract content janitor for <b>The Algorithm</b>. Fly to the server moons, loot the abandoned facilities, bring the lost content back to the ship and sell it at <b>0-Algorithm HQ</b> to meet the <b>Engagement Quota</b> every 3 days. Miss it and you get deplatformed.`,
+      `<b>THE SHIP</b><br>Use the <b>terminal</b> (MOONS, ROUTE, STORE, BUY, SCAN, BESTIARY, codes). Pull the <b>lever</b> to land or take off. The ship leaves at <b>midnight</b> — with or without you.`,
+      `<b>CONTROLS</b><br>WASD move · Shift sprint · Ctrl crouch · Space jump · E interact / pick up · LMB use / attack / grab big loot · RMB scan · MMB / P ping · G drop · Q throw · F flashlight · 1-4 slots · R reload · V push-to-talk · Z/X emotes · Enter chat · I inventory · K passive tree · hold C spell wheel (or say / type the spell word) · J service record · hold B emote wheel · Tab character · Esc menu`,
+      `<b>SURVIVAL</b><br>Every creature has a rule. <i>Scan</i> them and read the BESTIARY. Sound matters: sprinting, horns and <b>your voice</b> attract things. Some exits are not what they seem.`,
+      `<b>PROGRESSION</b><br>You earn XP and <b>Clout</b> for securing scrap, kills, bounties, fishing and minigames. Level up to gain skill points and spend them in the passive tree (K). Buy soulbound weapons, armor, perks and cosmetics from <b>Phish Dayı</b>'s Black Market at HQ. Higher tier moons and later quotas are more dangerous — and more profitable.`,
+      `<b>MINIGAMES</b><br>Crack vault keypads, rewire fuse boxes, pick locks, fish at ponds and the HQ dock, play FLAPPY PHISH on the ship's arcade, and gamble your coins at the GACHA MACHINE.`,
+      `<b>MULTIPLAYER</b><br>Host a lobby (public or private with password) and friends can find it in the lobby browser or join with the 6-letter code. Everything is peer-to-peer; the host runs the world.`,
+    ].map((p) => t(p)).join('<br><br>');
     const f = this.frame(t('HOW TO PLAY'), el('div', { class: 'howto', html: txt }), el('div', { class: 'menu-row' }, this.backButton(() => this.showMenu('title'))));
     this.focusFirst(f, '[data-back]');
   }
@@ -912,15 +918,15 @@ export class UI {
       saveSettings(s);
       this.closePanel();
       if (consent === 'yes') game.enableMic();
-      else this.toast('Voice chat: listening only. You can change this in Settings > Voice.');
+      else this.toast(t('Voice chat: listening only. You can change this in Settings > Voice.'));
     };
     const box = this.panel('voice');
-    box.append(this.panelHead('🎙 VOICE CHAT'), el('div', { class: 'cp-body' },
-      el('div', { class: 'howto', html: `Talk to your crew with <b>proximity voice chat</b> - nearby crewmates hear you in 3D, walls muffle you, your avatar's mouth moves.<br><br><span class="dim">Using <b>Bluetooth headphones</b>? Turning the mic on can switch them to low-quality "hands-free" mode and some systems go silent. If you lose sound, pick the headset in Settings > Audio > Output device, use a separate mic, or choose "listen only".</span>` }),
+    box.append(this.panelHead(t('🎙 VOICE CHAT')), el('div', { class: 'cp-body' },
+      el('div', { class: 'howto', html: t(`Talk to your crew with <b>proximity voice chat</b> - nearby crewmates hear you in 3D, walls muffle you, your avatar's mouth moves.<br><br><span class="dim">Using <b>Bluetooth headphones</b>? Turning the mic on can switch them to low-quality "hands-free" mode and some systems go silent. If you lose sound, pick the headset in Settings > Audio > Output device, use a separate mic, or choose "listen only".</span>`) }),
       el('div', { class: 'menu-list' },
-        this.button('Enable mic (open mic)', () => choose('yes', 'open'), 'big'),
-        this.button('Enable mic (push-to-talk: V)', () => choose('yes', 'ptt')),
-        this.button('Listen only (no mic)', () => choose('no')),
+        this.button(t('Enable mic (open mic)'), () => choose('yes', 'open'), 'big'),
+        this.button(t('Enable mic (push-to-talk: V)'), () => choose('yes', 'ptt')),
+        this.button(t('Listen only (no mic)'), () => choose('no')),
       )), this.panelFoot());
     this.openPanel(box);
   }
@@ -948,11 +954,11 @@ export class UI {
     const g = this.app.game;
     if (!g) return;
     const party = el('div', { class: 'party' });
-    const line = (name, lvl, hp, dead, you) => el('div', { class: 'party-row' + (dead ? ' dead' : '') + (you ? ' you' : '') }, el('span', {}, (you ? '▶ ' : '') + name), el('span', {}, 'Lv.' + lvl), el('span', {}, dead ? 'DECEASED' : Math.round(hp) + ' HP'));
+    const line = (name, lvl, hp, dead, you) => el('div', { class: 'party-row' + (dead ? ' dead' : '') + (you ? ' you' : '') }, el('span', {}, (you ? '▶ ' : '') + name), el('span', {}, 'Lv.' + lvl), el('span', {}, dead ? t('DECEASED') : Math.round(hp) + ' HP'));
     party.appendChild(line(g.profile.name, g.profile.level, g.player.hp, g.player.dead, true));
     for (const r of g.remotes.values()) party.appendChild(line(r.name, r.level, r.hp ?? 100, r.dead));
     const run = g.run || {};
-    const info = el('div', { class: 'dim' }, `Quota ▮${run.sold}/${run.quota} · ${run.daysLeft} days left · Credits ▮${run.credits} · Moon: ${MOONS[run.moon]?.name}`);
+    const info = el('div', { class: 'dim' }, tf('Quota ▮{sold}/{quota} · {daysLeft} days left · Credits ▮{credits} · Moon: {name}', { sold: run.sold, quota: run.quota, daysLeft: run.daysLeft, credits: run.credits, name: MOONS[run.moon]?.name }));
     const char = this.characterPanel(true);
     char.insertBefore(el('div', { class: 'crew-box' }, el('div', { class: 'label' }, t('CREW')), party, info), char.children[1]);
     this.openPanel(char);
@@ -964,9 +970,9 @@ export class UI {
     const wrap = this.panel('wide market');
     const render = () => {
       wrap.innerHTML = '';
-      wrap.appendChild(this.panelHead(`${t('Black Market')} — Phish Dayı`, `◈ ${p.coins} · Lv.${p.level}`));
+      wrap.appendChild(this.panelHead(`${t('Black Market')} — Phish Dayı`, tf('◈ {coins} · Lv.{level}', { coins: p.coins, level: p.level })));
       const body = el('div', { class: 'cp-body' });
-      body.appendChild(el('div', { class: 'dim' }, `"Ooo, hoş geldin evlat! Good stuff, fair prices... mostly." · You have ◈ ${p.coins} · Lv.${p.level}`));
+      body.appendChild(el('div', { class: 'dim' }, tf('"Ooo, hoş geldin evlat! Good stuff, fair prices... mostly." · You have ◈ {coins} · Lv.{level}', { coins: p.coins, level: p.level })));
       body.appendChild(el('div', { class: 'tabs' }, ...['Weapons', 'Armor', 'Perks', 'Cosmetics'].map((n) => this.button(t(n), () => { tab = n; this.marketTab = n; render(); }, tab === n ? 'tab sel' : 'tab'))));
       const grid = el('div', { class: 'shop-grid' });
       const card = (name, rarity, desc, price, minLevel, owned, equipped, onBuy, onEquip, iconType) => {
@@ -974,7 +980,7 @@ export class UI {
         const locked = p.level < (minLevel || 1);
         return el('div', { class: 'shop-card' + (locked ? ' lvl-locked' : ''), style: { borderColor: r.color } },
           el('div', { class: 'sc-top' }, iconType ? el('div', { class: 'sc-ico', html: iconHTML(iconType, 'sc-img') }) : null,
-            el('div', {}, el('div', { class: 'sc-name', style: { color: r.color } }, name), el('div', { class: 'sc-rar' }, r.name + (minLevel > 1 ? ` · Lv.${minLevel}+` : '')))),
+            el('div', {}, el('div', { class: 'sc-name', style: { color: r.color } }, name), el('div', { class: 'sc-rar' }, r.name + (minLevel > 1 ? tf(' · Lv.{minLevel}+', { minLevel }) : '')))),
           el('div', { class: 'sc-desc' }, desc),
           owned ? (onEquip ? this.button(equipped ? t('Equipped') : t('Equip'), onEquip, equipped ? 'small disabled' : 'small') : el('div', { class: 'dim' }, t('Owned')))
             : this.button(`◈ ${price}`, onBuy, 'small' + (locked || p.coins < price ? ' disabled' : ' primary')),
@@ -988,13 +994,13 @@ export class UI {
         for (const w of MARKET.weapons) {
           const d = ITEMS[w.id];
           if (!d) continue;
-          grid.appendChild(card(d.name, d.rarity, `DMG ${d.dmg} · ${d.ranged ? 'Ranged' : 'Melee'} · reach ${d.reach}m${d.stun ? ' · stuns' : ''}${d.hands === 2 ? ' · two-handed' : ''}`, w.coin, w.minLevel, p.owned.includes(w.id), p.loadout.weapon === w.id,
+          grid.appendChild(card(d.name, d.rarity, [tf('DMG {dmg}', { dmg: d.dmg }), t(d.ranged ? 'Ranged' : 'Melee'), tf('reach {reach}m', { reach: d.reach }), d.stun ? t('stuns') : null, d.hands === 2 ? t('two-handed') : null].filter(Boolean).join(' · '), w.coin, w.minLevel, p.owned.includes(w.id), p.loadout.weapon === w.id,
             buy(w.coin, () => { p.owned.push(w.id); p.loadout.weapon = w.id; }), () => { p.loadout.weapon = w.id; saveProfile(p); render(); }, w.id));
         }
       } else if (tab === 'Armor' || tab === 'Perks') {
         const list = tab === 'Armor' ? MARKET.armor : MARKET.perks;
         for (const a of list) {
-          const desc = a.desc || `${a.slot.toUpperCase()} · ${Math.round((a.armor || 0) * 100)}% damage reduction${a.hp ? ` · +${a.hp} HP` : ''}${a.speed ? ` · +${a.speed * 100}% speed` : ''}`;
+          const desc = a.desc || [t(a.slot.toUpperCase()), tf('{n}% damage reduction', { n: Math.round((a.armor || 0) * 100) }), a.hp ? tf('+{n} HP', { n: a.hp }) : null, a.speed ? tf('+{n}% speed', { n: a.speed * 100 }) : null].filter(Boolean).join(' · ');
           grid.appendChild(card(a.name, a.rarity, desc, a.coin, a.minLevel, p.owned.includes(a.id), p.loadout[a.slot] === a.id,
             buy(a.coin, () => { p.owned.push(a.id); p.loadout[a.slot] = a.id; game.refreshStats(); }), () => { p.loadout[a.slot] = a.id; saveProfile(p); game.refreshStats(); render(); }, ITEMS[a.id] ? a.id : null));
         }
@@ -1004,8 +1010,8 @@ export class UI {
           const owned = kind === 'suit' ? p.cosmetics.suits.includes(id) : p.cosmetics.hats.includes(id);
           const meta = kind === 'suit' ? SUIT_COLORS.find((s) => s.id === id) : HATS.find((h) => h.id === id);
           if (!meta) continue;
-          const nm = (kind === 'suit' ? 'Suit: ' : 'Hat: ') + (meta.name || id);
-          grid.appendChild(card(nm, c.coin > 1000 ? 'legendary' : c.coin > 300 ? 'epic' : c.coin > 120 ? 'rare' : 'uncommon', kind === 'suit' ? 'A fresh coverall.' : 'Headwear. Fashion is survival.', c.coin, c.minLevel, owned, false,
+          const nm = (kind === 'suit' ? t('Suit') : t('Hat')) + ': ' + (meta.name || id);
+          grid.appendChild(card(nm, c.coin > 1000 ? 'legendary' : c.coin > 300 ? 'epic' : c.coin > 120 ? 'rare' : 'uncommon', kind === 'suit' ? t('A fresh coverall.') : t('Headwear. Fashion is survival.'), c.coin, c.minLevel, owned, false,
             buy(c.coin, () => { if (kind === 'suit') p.cosmetics.suits.push(id); else p.cosmetics.hats.push(id); }), null));
         }
       }
@@ -1043,13 +1049,13 @@ export class UI {
       const p = game.profile;
       wrap.innerHTML = '';
       wrap.appendChild(this.panelHead(t('Bounty board')));
-      const body = el('div', { class: 'cp-body' }, el('div', { class: 'dim' }, 'Daily contracts. Accept up to 3. Progress is personal. Claim rewards here.'));
+      const body = el('div', { class: 'cp-body' }, el('div', { class: 'dim' }, t('Daily contracts. Accept up to 3. Progress is personal. Claim rewards here.')));
       const list = el('div', { class: 'bounty-list' });
       const extra = (p.bounties || []).filter((x) => !board.some((b) => b.id === x.id));
       for (const b of [...extra, ...board]) {
         const active = p.bounties.find((x) => x.id === b.id);
-        const status = active ? (active.done ? this.button(t('Claim'), () => { prog.claim(active); render(); }, 'small primary') : el('span', { class: 'dim' }, `${active.progress}/${active.n}`)) : b.accepted ? el('span', { class: 'dim' }, '✔') : this.button(t('Accept'), () => { if (!prog.accept(b)) this.toast('You can only hold 3 bounties.'); render(); }, 'small');
-        list.appendChild(el('div', { class: 'bounty-row' + (active ? ' active' : '') + (active?.done ? ' done' : '') }, el('span', {}, bountyText(b)), el('span', { class: 'b-rew' }, `+${b.xp} XP · ◈${b.coin}`), status));
+        const status = active ? (active.done ? this.button(t('Claim'), () => { prog.claim(active); render(); }, 'small primary') : el('span', { class: 'dim' }, `${active.progress}/${active.n}`)) : b.accepted ? el('span', { class: 'dim' }, '✔') : this.button(t('Accept'), () => { if (!prog.accept(b)) this.toast(t('You can only hold 3 bounties.')); render(); }, 'small');
+        list.appendChild(el('div', { class: 'bounty-row' + (active ? ' active' : '') + (active?.done ? ' done' : '') }, el('span', {}, bountyText(b)), el('span', { class: 'b-rew' }, tf('+{xp} XP · ◈{coin}', { xp: b.xp, coin: b.coin })), status));
       }
       body.appendChild(list);
       body.appendChild(el('div', { class: 'menu-row' }, this.button(t('Close'), () => this.closePanel(), 'back')));
@@ -1110,30 +1116,30 @@ export class UI {
     const score = d.allDead ? -1 : ratio * 100 - (deaths.length / nP) * 40;
     const grade = d.company ? null : score >= 70 ? 'S' : score >= 50 ? 'A' : score >= 35 ? 'B' : score >= 20 ? 'C' : score >= 8 ? 'D' : 'F';
     const GRADE_COL = { S: '#ffd84a', A: '#7dffa0', B: '#7fd4ff', C: '#e8e0d0', D: '#ff9a4a', F: '#ff4a3a' };
-    const GRADE_QUIP = { S: 'The Algorithm is aroused.', A: 'Solid content. Engagement up.', B: 'Mid. Acceptable mid.', C: 'Ratioed by a moon.',
-      D: 'Your metrics are being reviewed.', F: 'Shadowbanned by reality.' };
+    const GRADE_QUIP = { S: t('The Algorithm is aroused.'), A: t('Solid content. Engagement up.'), B: t('Mid. Acceptable mid.'), C: t('Ratioed by a moon.'),
+      D: t('Your metrics are being reviewed.'), F: t('Shadowbanned by reality.') };
     // crew badges
     const badges = new Map(players.map((p) => [p.id, []]));
     const top = players.reduce((m, p) => (p.loot > (m?.loot || 0) ? p : m), null);
-    if (top) badges.get(top.id).push(['MVP', '#ffd84a']);
+    if (top) badges.get(top.id).push([t('MVP'), '#ffd84a']);
     const slayer = players.reduce((m, p) => (p.kills > (m?.kills || 0) ? p : m), null);
-    if (slayer) badges.get(slayer.id).push(['SLAYER', '#ff7a5a']);
+    if (slayer) badges.get(slayer.id).push([t('SLAYER'), '#ff7a5a']);
     const first = deaths[0];
-    if (first && badges.has(first.id)) badges.get(first.id).push([first.cause === 'left' ? 'LEFT BEHIND' : 'DIED FIRST', '#ff4a3a']);
-    for (const p of players) if (!p.dead && !p.loot && !d.company && players.length > 1) badges.get(p.id).push(['SHIP GUARD', '#9a9aa8']);
+    if (first && badges.has(first.id)) badges.get(first.id).push([first.cause === 'left' ? t('LEFT BEHIND') : t('DIED FIRST'), '#ff4a3a']);
+    for (const p of players) if (!p.dead && !p.loot && !d.company && players.length > 1) badges.get(p.id).push([t('SHIP GUARD'), '#9a9aa8']);
     const crew = players.map((p) => `<div class="rp-crew${p.dead ? ' dead' : ''}"><span class="rp-name">${p.dead ? '✖ ' : ''}${escapeHtml(p.name)}</span>`
       + `<span class="rp-badges">${badges.get(p.id).map(([b, c]) => `<i style="--c:${c}">${b}</i>`).join('')}</span>`
-      + `<span class="rp-stat">▮${p.loot || 0} · ${p.kills || 0} kills</span></div>`).join('');
+      + `<span class="rp-stat">▮${p.loot || 0} · ${tf('{n} kills', { n: p.kills || 0 })}</span></div>`).join('');
     const rows = [
-      [t('Scrap collected'), d.collected, '▮', avail > 0 ? `${Math.round(ratio * 100)}% of moon` : ''],
+      [t('Scrap collected'), d.collected, '▮', avail > 0 ? tf('{n}% of moon', { n: Math.round(ratio * 100) }) : ''],
       [t('On board'), d.shipValue, '▮', ''],
       [t('Creatures killed'), d.kills, '', ''],
-      [t('Casualties'), deaths.length, '', deaths.length ? deaths.map((x) => escapeHtml(x.name)).join(', ') : 'none'],
+      [t('Casualties'), deaths.length, '', deaths.length ? deaths.map((x) => escapeHtml(x.name)).join(', ') : t('none')],
       [t('Fines'), d.fines, '-▮', ''],
     ];
     const box = el('div', { class: 'report', html: `
       <div class="rp-head"><span>${t('PERFORMANCE REPORT')}</span><span>${escapeHtml(d.moon)} · ${t('Day').toUpperCase()} ${d.day}</span></div>
-      ${d.allDead ? `<div class="rp-bad">ALL CREW LOST. Scrap on board was lost.</div>` : ''}
+      ${d.allDead ? `<div class="rp-bad">${t('ALL CREW LOST. Scrap on board was lost.')}</div>` : ''}
       <div class="rp-rows">${rows.map(([l, v, pre, note], i) => `<div class="rp-row" style="--i:${i}"><span>${l}</span><span class="rp-note">${note}</span><b data-v="${Number(v) || 0}" data-pre="${pre}">${pre}0</b></div>`).join('')}</div>
       ${crew ? `<div class="rp-crewlist" style="--i:${rows.length}">${crew}</div>` : ''}
       ${extra.map((x) => `<div class="sum-extra">${x}</div>`).join('')}
@@ -1176,15 +1182,15 @@ export class UI {
   renderFired(d, game, done) {
     document.querySelectorAll('.fired').forEach((x) => x.remove());
     const lines = [
-      '> reviewing creator metrics...',
-      `> profit quota ........ ▮${d.sold} / ▮${d.quota}   [FAILED]`,
-      `> days survived ....... ${d.days}`,
-      `> quotas met .......... ${d.quotaIndex}`,
-      '> community guidelines  VIOLATED (being bad at your job)',
-      '> action .............. PERMANENT SUSPENSION',
+      t('> reviewing creator metrics...'),
+      tf('> profit quota ........ ▮{sold} / ▮{quota}   [FAILED]', { sold: d.sold, quota: d.quota }),
+      tf('> days survived ....... {days}', { days: d.days }),
+      tf('> quotas met .......... {n}', { n: d.quotaIndex }),
+      t('> community guidelines  VIOLATED (being bad at your job)'),
+      t('> action .............. PERMANENT SUSPENSION'),
     ];
-    const box = el('div', { class: 'fired', html: `<div class="f-term"></div><div class="f-main" data-t="DEPLATFORMED">DEPLATFORMED</div>
-      <div class="f-sub">The Algorithm thanks you for your service.<br><span>Your level, skills and Clout were kept. The run starts over.</span></div>` });
+    const box = el('div', { class: 'fired', html: `<div class="f-term"></div><div class="f-main" data-t="${t('DEPLATFORMED')}">${t('DEPLATFORMED')}</div>
+      <div class="f-sub">${t('The Algorithm thanks you for your service.')}<br><span>${t('Your level, skills and Clout were kept. The run starts over.')}</span></div>` });
     this.root.appendChild(box);
     const term = box.querySelector('.f-term');
     lines.forEach((ln, i) => setTimeout(() => {
@@ -1201,7 +1207,7 @@ export class UI {
   renderQuotaMet(d, game, done) {
     document.querySelectorAll('.quotamet').forEach((x) => x.remove());
     const box = el('div', { class: 'quotamet', html: `<div class="qm-main">${t('QUOTA MET')}</div>
-      <div class="qm-sub">Quota #${d.quotaIndex} cleared${d.surplus > 0 ? ` · surplus ▮${d.surplus}` : ''}</div>
+      <div class="qm-sub">${tf('Quota #{n} cleared', { n: d.quotaIndex })}${d.surplus > 0 ? ' · ' + tf('surplus ▮{n}', { n: d.surplus }) : ''}</div>
       <div class="qm-rows"><div><span>${t('OVERTIME BONUS')}</span><b>+▮${d.bonus}</b></div><div><span>${t('NEXT QUOTA')}</span><b class="qm-next">▮${d.prev}</b></div><div><span>${t('DEADLINE')}</span><b>3 ${t('DAYS')}</b></div></div>
       <div class="qm-tag">${t('The Algorithm is pleased. For now.')}</div>` });
     for (let i = 0; i < 70; i++) {

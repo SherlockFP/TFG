@@ -34,6 +34,7 @@ import {
   mixColor,
   easeOutCubic,
 } from './common.js';
+import { tf } from '../core/i18n.js';
 
 const W = 192;
 const H = 144;
@@ -383,7 +384,7 @@ export function createSlots(rawOpts = {}) {
 
   function updateStatus() {
     const s = net >= 0 ? `+${net}` : `${net}`;
-    mg.setStatus(`NET ${s}`, net > 0 ? 'good' : net < 0 ? 'warn' : 'dim');
+    mg.setStatus(tf('NET {s}', { s }), net > 0 ? 'good' : net < 0 ? 'warn' : 'dim');
   }
   updateStatus();
 

@@ -20,6 +20,7 @@ import { installDailyEvents, DAILY_EVENTS, eventEffects, wrapMethod } from './da
 import { unlockEmote } from './emotes.js';
 import { MOONS } from './moons.js';
 import { createServiceRecord } from '../ui/panels/record.js';
+import { t, tf, t as _t } from '../core/i18n.js';
 
 export const RECORD_KEY = 'KeyJ';
 
@@ -140,11 +141,11 @@ export function installMeta(game) {
         return true;
       }
       case 'weekly': {
-        if (!weekly) { t.print('Weekly challenge unavailable.', 'err'); return true; }
+        if (!weekly) { t.print(_t('Weekly challenge unavailable.'), 'err'); return true; }
         if (/^start/i.test(arg)) {
           const why = weekly.startBlock();
           if (why) t.print(why, 'err');
-          else { weekly.requestStart(); t.print('Weekly Challenge requested...'); }
+          else { weekly.requestStart(); t.print(_t('Weekly Challenge requested...')); }
           return true;
         }
         const w = run.weekly;
@@ -163,9 +164,9 @@ export function installMeta(game) {
       }
       case 'rebirth': case 'prestige': {
         if (/^confirm/i.test(arg)) {
-          if (!canRebirth(p)) { t.print(`Rebirth needs level ${REBIRTH_LEVEL}. You are Lv.${p.level}.`, 'err'); return true; }
+          if (!canRebirth(p)) { t.print(tf('Rebirth needs level {REBIRTH_LEVEL}. You are Lv.{level}.', { REBIRTH_LEVEL, level: p.level }), 'err'); return true; }
           const r = rebirth();
-          t.print(r ? `REBORN. ★${prestigeStars(p)}. ${p.skillPoints} skill points ready.` : 'Rebirth failed.');
+          t.print(r ? tf('REBORN. ★{prestigeStars}. {skillPoints} skill points ready.', { prestigeStars: prestigeStars(p), skillPoints: p.skillPoints }) : _t('Rebirth failed.'));
           return true;
         }
         const pv = rebirthPreview(p);
@@ -186,10 +187,10 @@ export function installMeta(game) {
         return true;
       }
       case 'crewname': case 'crewtag': {
-        if (!crew) { t.print('Crew unavailable.', 'err'); return true; }
-        if (!arg) { const c = publicCrew(crew.crew); t.print(`Your crew: [${c.tag}] ${c.name} · Lv.${c.level}. Usage: ${w.toUpperCase()} <${w === 'crewname' ? 'name' : 'TAG'}>`); return true; }
+        if (!crew) { t.print(_t('Crew unavailable.'), 'err'); return true; }
+        if (!arg) { const c = publicCrew(crew.crew); t.print(tf('Your crew: [{tag}] {name} · Lv.{level}. Usage: {n} <{n2}>', { tag: c.tag, name: c.name, level: c.level, n: w.toUpperCase(), n2: w === 'crewname' ? 'name' : 'TAG' })); return true; }
         const why = w === 'crewname' ? crew.rename(arg) : crew.rename(undefined, arg);
-        t.print(why || `Crew updated: [${crew.crew.tag}] ${crew.crew.name}`, why ? 'err' : '');
+        t.print(why || tf('Crew updated: [{tag}] {name}', { tag: crew.crew.tag, name: crew.crew.name }), why ? 'err' : '');
         return true;
       }
       case 'record': {

@@ -1,6 +1,7 @@
 // MMO-style personal progression: XP curve, ranks, skill effects, mastery tree, rebirth (prestige),
 // black market, bounties, quota formula.
 import { RNG } from '../core/rng.js';
+import { t } from '../core/i18n.js';
 import { CREATURES } from './creatures.js';
 import { treeBonus, treeFlags, treeSpent } from './passivetree.js';
 
@@ -92,7 +93,7 @@ export const RANKS = [
 export function rankOf(level) {
   let r = RANKS[0][1];
   for (const [lv, name] of RANKS) if (level >= lv) r = name;
-  return r;
+  return t(r);
 }
 
 // LEGACY base skills. Since the passive tree (passivetree.js, K) the six skills are no longer sold: profile.js refunds every

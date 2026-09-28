@@ -5,7 +5,7 @@
 // game.horde?.spawnHitSquad?.(factionId, pos, n) near the facility entrance or on the outdoor map.
 import * as THREE from 'three';
 import { FACTIONS, FACTION_IDS, START_REP, WAR_AT, HOSTILE_AT, REP_TIERS, INNER_PERKS, CHAINS, CHAIN_REQ, pickLang } from './loredata.js';
-import { getLang } from '../core/i18n.js';
+import { getLang, t, sysMsg, t as _t } from '../core/i18n.js';
 import { RNG, hashString } from '../core/rng.js';
 import { clamp } from '../core/util.js';
 
@@ -52,13 +52,13 @@ export function installFactions(core) {
     run.factions = { ...run.factions };   // new object: the diff sync sees the change
     if (before >= WAR_AT && after < WAR_AT) {
       core.emit('tfg:war', { faction: id, on: true });
-      game.net.broadcast('sys', { text: `⚔ ${FACTIONS[id].name.toUpperCase()} HAS DECLARED WAR ON YOUR CREW`, kind: 'bad' });
+      game.net.broadcast('sys', sysMsg('⚔ {n} HAS DECLARED WAR ON YOUR CREW', { n: FACTIONS[id].name.toUpperCase() }, 'bad'));
       core.broadcast('war', { f: id, on: true });
       core.algo?.hostSayFaction(id, 'war');
       game.later?.(() => core.algo?.hostSay('war', { faction: id }, { gap: 2 }), 5000);
     } else if (before < WAR_AT && after >= WAR_AT) {
       core.emit('tfg:war', { faction: id, on: false });
-      game.net.broadcast('sys', { text: `${FACTIONS[id].name} has called off the war.`, kind: 'good' });
+      game.net.broadcast('sys', sysMsg('{@name} has called off the war.', { name: FACTIONS[id].$name ?? FACTIONS[id].name }, 'good'));
       core.broadcast('war', { f: id, on: false });
       core.algo?.hostSay('peace', { faction: id }, { gap: 2 });
     }
@@ -80,7 +80,7 @@ export function installFactions(core) {
     hostAdd(id, again ? RESIGN_GAIN : SIGN_GAIN, 'sign');
     hostAdd(f.rival, again ? RESIGN_RIVAL : SIGN_RIVAL, 'rival');
     run.signed = { f: id, day: run.day };
-    game.net.broadcast('sys', { text: `${game.playerName(from)} signed an EXCLUSIVE contract with ${f.name}. ${FACTIONS[f.rival].name} is not happy.`, kind: 'warn' });
+    game.net.broadcast('sys', sysMsg('{name} signed an EXCLUSIVE contract with {@name2}. {@name3} is not happy.', { name: game.playerName(from), name2: f.$name ?? f.name, name3: FACTIONS[f.rival].$name ?? FACTIONS[f.rival].name }, 'warn'));
     core.algo?.hostSayFaction(id, 'sign');
     core.emit('tfg:contract', { id: 'sign:' + id, state: 'signed', faction: id });
     const lines = [`EXCLUSIVE CONTRACT SIGNED: ${f.name} (${f.org})`, `  ${f.name} +${again ? RESIGN_GAIN : SIGN_GAIN} rep   ${FACTIONS[f.rival].name} ${again ? RESIGN_RIVAL : SIGN_RIVAL} rep`];
@@ -100,7 +100,7 @@ export function installFactions(core) {
     run.credits -= cost;
     game.broadcastRun?.(['credits']);
     hostAdd(id, 15, 'tribute');
-    game.net.broadcast('sys', { text: `${game.playerName(from)} wired ▮${cost} tribute to ${f.name}.`, kind: 'info' });
+    game.net.broadcast('sys', sysMsg('{name} wired ▮{cost} tribute to {@name2}.', { name: game.playerName(from), cost, name2: f.$name ?? f.name }, 'info'));
     return { text: `Tribute of ▮${cost} accepted by ${f.name}. Reputation +15 (now ${rep(id)}).` };
   }
 
@@ -123,7 +123,7 @@ export function installFactions(core) {
     const f = FACTIONS[id];
     if (!game.isHost || !f) return null;
     const pos = invasionPos();
-    game.net.broadcast('sys', { text: `⚠ ${f.name.toUpperCase()} HIT SQUAD HAS ENTERED THE SECTOR`, kind: 'bad' });
+    game.net.broadcast('sys', sysMsg('⚠ {n} HIT SQUAD HAS ENTERED THE SECTOR', { n: f.name.toUpperCase() }, 'bad'));
     core.broadcast('invade', { f: id });
     core.algo?.hostSayFaction(id, 'invade');
     game.later?.(() => core.algo?.hostSay('invasion', { faction: id }, { gap: 2 }), 5500);
@@ -132,7 +132,7 @@ export function installFactions(core) {
     if (typeof fn === 'function' && pos) {
       try { const r = fn.call(game.horde, id, pos, n); spawned = r !== false; } catch (e) { console.warn('[factions] hit squad', e); }
     }
-    if (!spawned) game.net.broadcast('sys', { text: `(The ${f.short} squad lost its signal in the Dead Feed. Lucky you.)`, kind: 'info' });
+    if (!spawned) game.net.broadcast('sys', sysMsg('(The {short} squad lost its signal in the Dead Feed. Lucky you.)', { short: f.short }, 'info'));
     st.lastInvasion = { f: id, n, pos: pos ? [Math.round(pos.x), Math.round(pos.y), Math.round(pos.z)] : null, spawned, day: game.run?.day, t: Math.round(game.run?.time || 0) };
     core.day?.events.push(`${f.short} hit squad invasion`);
     core.emit('tfg:war', { faction: id, on: true, invasion: true, n, spawned });
@@ -183,7 +183,7 @@ export function installFactions(core) {
     const out = [];
     for (const t of [...REP_TIERS].reverse()) {
       const on = rep(id) >= t.at;
-      out.push({ on, text: `${pickLang(t.name, T)} (${t.at}+): ${Math.round(t.discount * 100)}% ${T ? 'indirim' : 'discount'}, ${T ? 'sözleşme' : 'contracts'} +${Math.round(t.pay * 100)}%${t.id === 'inner' ? ' · ' + pickLang(INNER_PERKS[id], T) : ''}` });
+      out.push({ on, text: `${pickLang(t.name, T)} (${t.at}+): ${Math.round(t.discount * 100)}% ${_t('discount')}, ${_t('contracts')} +${Math.round(t.pay * 100)}%${t.id === 'inner' ? ' · ' + pickLang(INNER_PERKS[id], T) : ''}` });
     }
     return out;
   }
@@ -196,18 +196,18 @@ export function installFactions(core) {
     const run = game.run || {};
     ensure(run);
     const T = tr();
-    const out = [T ? 'FRAKSİYONLAR — itibar -100..100 (savaş < -40)' : 'FACTIONS — reputation -100..100 (war below -40)', ''];
+    const out = [t('FACTIONS — reputation -100..100 (war below -40)'), ''];
     for (const id of FACTION_IDS) {
       const f = FACTIONS[id], r = rep(id), s = standing(r);
       const bar = '[' + '#'.repeat(Math.round((r + 100) / 10)).padEnd(20, '-') + ']';
       out.push(`${f.glyph} ${f.name.padEnd(18)} ${String(r).padStart(4)} ${bar} ${pickLang(s.name, T)}${run.signed?.f === id ? '  [SIGNED]' : ''}`);
-      out.push(`    ${f.org} · ${T ? 'lider' : 'leader'}: ${f.leader} · ${T ? 'rakip' : 'rival'}: ${FACTIONS[f.rival].name}`);
+      out.push(`    ${f.org} · ${t('leader')}: ${f.leader} · ${t('rival')}: ${FACTIONS[f.rival].name}`);
       const ch = chainInfo(id);
-      out.push(`    ${T ? 'zincir' : 'chain'} "${pickLang(ch.name, T)}" ${ch.step}/${ch.total}${ch.next ? ` · ${T ? 'sıradaki' : 'next'}: ${pickLang(ch.next.title, T)} (rep ${ch.req.rep}+)` : ' · COMPLETE'}`);
+      out.push(`    ${t('chain')} "${pickLang(ch.name, T)}" ${ch.step}/${ch.total}${ch.next ? ` · ${t('next')}: ${pickLang(ch.next.title, T)} (rep ${ch.req.rep}+)` : ' · COMPLETE'}`);
       const d = discount(id);
-      if (d) out.push(`    ${d > 0 ? (T ? 'indirim' : 'discount') + ' ' + Math.round(d * 100) + '%' : (T ? 'zam' : 'surcharge') + ' ' + Math.round(-d * 100) + '%'}`);
+      if (d) out.push(`    ${d > 0 ? (t('discount')) + ' ' + Math.round(d * 100) + '%' : (t('surcharge')) + ' ' + Math.round(-d * 100) + '%'}`);
     }
-    out.push('', T ? '>SIGN <fraksiyon>  özel sözleşme (+20, rakibi -30; günde bir)' : '>SIGN <faction>   exclusive contract (+20, its rival -30; once a day)');
+    out.push('', t('>SIGN <faction>   exclusive contract (+20, its rival -30; once a day)'));
     out.push(T ? `>TRIBUTE <fraksiyon>  ▮${tributeCost(run)} öde, +15 itibar (savaşı bitirir)` : `>TRIBUTE <faction>  pay ▮${tributeCost(run)} for +15 rep (ends wars)`);
     return out.join('\n');
   }

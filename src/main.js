@@ -7,7 +7,7 @@ import { Engine } from './core/engine.js';
 import { Input } from './core/input.js';
 import { AudioManager } from './audio/audio.js';
 import { loadSettings, saveSettings, loadProfile, saveProfile, defaultProfile } from './core/save.js';
-import { setLang } from './core/i18n.js';
+import { setLang, t, tf } from './core/i18n.js';
 import { lobbyCode } from './core/rng.js';
 import { initPhysics, Physics } from './physics/physics.js';
 import { LightPool } from './render/lightpool.js';
@@ -22,6 +22,7 @@ import { CRTMenu } from './ui/crtmenu.js';
 import { loadExtManifest, registerExtSounds } from './audio/extassets.js';
 import { preloadExtModels, EXT_PRELOAD } from './world/extmodels.js';
 import { registerExtContent } from './game/extcontent.js';
+import './i18n/display.js';   // display-name path: item / creature / moon names go through t()
 
 class MenuScene {
   constructor(engine) {
@@ -91,14 +92,14 @@ class App {
 
   async boot() {
     this.installAudioUnlock();
-    this.ui.showLoading('Loading physics...');
+    this.ui.showLoading(t('Loading physics...'));
     await initPhysics();
-    this.ui.showLoading('Loading assets...');
+    this.ui.showLoading(t('Loading assets...'));
     await loadExtManifest();
     registerExtSounds(this.audio);
-    await preloadExtModels(EXT_PRELOAD, (d, n) => this.ui.showLoading(`Loading models... ${d}/${n}`));
+    await preloadExtModels(EXT_PRELOAD, (d, n) => this.ui.showLoading(tf('Loading models... {d}/{n}', { d, n })));
     registerExtContent();
-    this.ui.showLoading('Loading mods...');
+    this.ui.showLoading(t('Loading mods...'));
     await this.mods.loadAll();
     this.mods.maxPlayersAllowed = () => this.mods.maxPlayers || 4;
     this.mods.emit('boot', this);
@@ -187,7 +188,7 @@ class App {
   }
 
   async startGame(opts) {
-    this.ui.showLoading(opts.host ? 'Preparing the ship...' : 'Connecting to ' + opts.code + '...');
+    this.ui.showLoading(opts.host ? t('Preparing the ship...') : tf('Connecting to {code}...', { code: opts.code }));
     await this.audio.init();
     this.audio.resume();
     this.audio.stopAll();
@@ -204,7 +205,7 @@ class App {
       await this.game.startSession(opts);
     } catch (e) {
       console.error(e);
-      alert('Could not start the session: ' + e.message);
+      alert(tf('Could not start the session: {message}', { message: e.message }));
       this.leaveGame();
       return false;
     }
@@ -283,7 +284,7 @@ class App {
     if (this.fpsT > 0.5) {
       const st = this.audio.state();
       this.ui.soundHint.classList.toggle('hidden', st === 'running' || !this.booted);
-      if (st === 'suspended' || st === 'interrupted') this.ui.soundHint.textContent = '🔇 The browser paused the sound - click anywhere to resume';
+      if (st === 'suspended' || st === 'interrupted') this.ui.soundHint.textContent = t('🔇 The browser paused the sound - click anywhere to resume');
       if (this.settings.showFps) { this.fpsEl.textContent = Math.round(this.frames / this.fpsT) + ' fps · ' + (this.engine.sceneStats?.calls ?? 0) + ' dc · ' + Math.round((this.engine.sceneStats?.tris ?? 0) / 1000) + 'k tris'; this.fpsEl.style.display = ''; }
       else this.fpsEl.style.display = 'none';
       this.frames = 0; this.fpsT = 0;

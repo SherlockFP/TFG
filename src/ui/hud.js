@@ -12,7 +12,7 @@ import { ensureInventoryStyles } from './inventory_style.js';
 import { xpForLevel, rankOf } from '../game/progression.js';
 import { MOONS, WEATHER } from '../game/moons.js';
 import * as DailyEvents from '../game/dailyEvents.js';
-import { t, getLang } from '../core/i18n.js';
+import { t, getLang, tf } from '../core/i18n.js';
 import { INTERIOR_NAMES as REG_INTERIOR_NAMES } from '../world/interiors/index.js';
 
 const BODY_SVG = `<svg viewBox="0 0 40 80" class="hud-body"><g fill="currentColor">
@@ -76,16 +76,16 @@ export function eventEffects(ev) {
   if (!list) {
     const pct = (m) => `${m > 1 ? '+' : ''}${Math.round((m - 1) * 100)}%`;
     list = [];
-    if (ev.valueMul && Math.abs(ev.valueMul - 1) > 0.001) list.push(`scrap ${pct(ev.valueMul)}`);
-    if (ev.dangerMul && Math.abs(ev.dangerMul - 1) > 0.001) list.push(`danger ${pct(ev.dangerMul)}`);
-    if (ev.outdoorMul && Math.abs(ev.outdoorMul - 1) > 0.001) list.push(`outdoor loot ${pct(ev.outdoorMul)}`);
-    if (ev.blackout) list.push('starts dark');
+    if (ev.valueMul && Math.abs(ev.valueMul - 1) > 0.001) list.push(`${t('scrap')} ${pct(ev.valueMul)}`);
+    if (ev.dangerMul && Math.abs(ev.dangerMul - 1) > 0.001) list.push(`${t('danger')} ${pct(ev.dangerMul)}`);
+    if (ev.outdoorMul && Math.abs(ev.outdoorMul - 1) > 0.001) list.push(`${t('outdoor loot')} ${pct(ev.outdoorMul)}`);
+    if (ev.blackout) list.push(t('starts dark'));
   }
   return list.map((x) => { let o = String(x); for (const w of FX_WORDS) if (o.includes(w)) o = o.replace(w, t(w)); return o; });
 }
 /** Display name / description of an event in the current language (events carry tr: [name, desc]). */
-export function eventName(ev) { return (getLang() === 'tr' && !ev?.weekly && ev?.tr?.[0]) || ev?.name || ''; }
-export function eventDesc(ev) { return (getLang() === 'tr' && !ev?.weekly && ev?.tr?.[1]) || ev?.desc || ''; }
+export function eventName(ev) { return (getLang() === 'tr' && !ev?.weekly && ev?.tr?.[0]) || t(ev?.name || ''); }
+export function eventDesc(ev) { return (getLang() === 'tr' && !ev?.weekly && ev?.tr?.[1]) || t(ev?.desc || ''); }
 /** 'good' | 'bad' | 'mixed' (older events without a mood: judged by danger / blackout). */
 export function eventMood(ev) {
   if (!ev) return 'mixed';
@@ -252,13 +252,13 @@ export class HUD {
 
   xpGain(xp, reason) {
     if (!xp) return;
-    const e = el('div', { class: 'xpline' }, `+${xp} XP`, reason ? el('span', {}, ' ' + reason) : null);
+    const e = el('div', { class: 'xpline' }, tf('+{xp} XP', { xp }), reason ? el('span', {}, ' ' + reason) : null);
     this.$.xpfeed.appendChild(e);
     setTimeout(() => e.remove(), 2600);
     while (this.$.xpfeed.children.length > 5) this.$.xpfeed.firstChild.remove();
   }
   levelUp(level, rank) {
-    this.bigText(t('LEVEL UP!') + ' ' + level, rank + ' · +1 ' + t('skill point') + ' [TAB]');
+    this.bigText(t('LEVEL UP!') + ' ' + level, tf('{rank} · +1 {t} [TAB]', { rank, t: t('skill point') }));
     this.$.lvl.parentElement.classList.remove('pulse'); void this.$.lvl.offsetWidth; this.$.lvl.parentElement.classList.add('pulse');
   }
 
@@ -393,7 +393,7 @@ export class HUD {
       ctx.globalAlpha = fade;
       if (LET[deg]) {
         ctx.fillStyle = deg === 0 ? '#ff6a4a' : card ? '#ffd9b8' : '#c8a080';
-        ctx.font = card ? '20px "TFG Credit", VT323, monospace' : '16px "TFG Credit", VT323, monospace';
+        ctx.font = card ? '20px "TFG Credit", VT323, "TFG Cyr VT", monospace' : '16px "TFG Credit", VT323, "TFG Cyr VT", monospace';
         ctx.fillText(LET[deg], x, card ? 1 : 3);
       } else {
         ctx.fillStyle = 'rgba(255,190,140,0.7)';
@@ -407,7 +407,7 @@ export class HUD {
     const marks = [{ x: 0, z: 0, label: t('SHIP'), col: '#9fd4ff', dist: true }];
     if (out?.mainExit) marks.push({ x: out.mainExit.pos.x, z: out.mainExit.pos.z, label: t('ENTRANCE'), col: '#9fffb0', dist: true });
     for (const f of out?.fireExits || []) marks.push({ x: f.pos.x, z: f.pos.z, label: t('EXIT'), col: 'rgba(160,255,176,0.55)', dist: false, small: true });
-    ctx.font = '15px "TFG Credit", VT323, monospace';
+    ctx.font = '15px "TFG Credit", VT323, "TFG Cyr VT", monospace';
     for (const m of marks) {
       const dx = m.x - p.pos.x, dz = m.z - p.pos.z;
       const d = Math.hypot(dx, dz);
@@ -578,12 +578,12 @@ export class HUD {
 
 function bountyShort(b) {
   switch (b.type) {
-    case 'kill': return `Kill ${b.target}`;
-    case 'collect': return 'Secure scrap';
-    case 'fish': return 'Catch fish';
-    case 'minigame': return b.target === 'safe' ? 'Crack vaults' : 'Fix fuse boxes';
-    case 'survive': return 'Survive days';
-    case 'sell': return 'Sell scrap';
+    case 'kill': return tf('Kill {target}', { target: t(String(b.target)) });
+    case 'collect': return t('Secure scrap');
+    case 'fish': return t('Catch fish');
+    case 'minigame': return b.target === 'safe' ? t('Crack vaults') : t('Fix fuse boxes');
+    case 'survive': return t('Survive days');
+    case 'sell': return t('Sell scrap');
     default: return b.type;
   }
 }

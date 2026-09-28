@@ -37,6 +37,7 @@ import {
   mixColor,
   TAU,
 } from './common.js';
+import { t, tf, t as _t } from '../core/i18n.js';
 
 const W = 192;
 const H = 144;
@@ -327,7 +328,7 @@ export function createFishing(rawOpts = {}) {
     }));
   }
 
-  mg.setStatus('CAST YOUR LINE');
+  mg.setStatus(_t('CAST YOUR LINE'));
 
   // ───────────── input
   function press() {
@@ -422,7 +423,7 @@ export function createFishing(rawOpts = {}) {
     setPhase('bite');
     sfx('fish_bite');
     mg.shake(4);
-    mg.setStatus('!!! BITE !!!', 'bad');
+    mg.setStatus(_t('!!! BITE !!!'), 'bad');
     splash(bob.x, bob.y, 14, 1.2);
     ripple(bob.x, bob.y, 2, 20, 1.2, '#ffffff');
     ripple(bob.x, bob.y, 1, 12, 1.0);
@@ -434,7 +435,7 @@ export function createFishing(rawOpts = {}) {
     mg.flash('#ffb000', 0.3);
     mg.shake(3);
     mg.setHelp(HELP_REEL);
-    mg.setStatus(`HOOKED! ${fish.rarity.toUpperCase()}`, 'warn');
+    mg.setStatus(tf('HOOKED! {n}', { n: fish.rarity.toUpperCase() }), 'warn');
     splash(bob.x, bob.y, 16, 1.4);
   }
 
@@ -458,7 +459,7 @@ export function createFishing(rawOpts = {}) {
     mg.flash('#ff2020', 0.35);
     mg.shake(6);
     mg.glitch(0.2);
-    mg.setStatus(reason === 'escaped' ? 'IT GOT AWAY...' : 'LINE SNAPPED!', 'bad');
+    mg.setStatus(reason === 'escaped' ? _t('IT GOT AWAY...') : _t('LINE SNAPPED!'), 'bad');
     splash(bob.x, bob.y, 10);
     mg.finishAfter({ success: false, cancelled: false, fishId: fish.id, fishName: fish.name, rarity: fish.rarity, reason }, 1.9);
   }
@@ -531,7 +532,7 @@ export function createFishing(rawOpts = {}) {
         power = 0;
         powerDir = 1;
       }
-      mg.setStatus(`POWER ${Math.round(power * 100)}%`, power > 0.9 ? 'warn' : undefined);
+      mg.setStatus(tf('POWER {n}%', { n: Math.round(power * 100) }), power > 0.9 ? 'warn' : undefined);
     } else if (phase === 'flying') {
       const u = clamp01(phaseT / flightDur);
       bob.x = lerp(bob.sx, bob.tx, u);

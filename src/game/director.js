@@ -23,6 +23,7 @@ import { RNG } from '../core/rng.js';
 import { clamp, lerp } from '../core/util.js';
 import { MOONS } from './moons.js';
 import { CREATURES, spawnTable, canSpawnMore } from './creatures.js';
+import { sysMsg } from '../core/i18n.js';
 
 // ---- tuning ----
 const TICK = 1.0;                 // s between host tension evaluations
@@ -605,7 +606,7 @@ export function installDirector(game) {
       it.pulled = true;
       b.pulled = true;
       if (hd) hd.powerBoost = (hd.powerBoost || 0) + 3;
-      net()?.broadcast('sys', { text: 'Something has been disconnected... the power is not coming back.', kind: 'bad' });
+      net()?.broadcast('sys', sysMsg('Something has been disconnected... the power is not coming back.', {}, 'bad'));
     }
   }
   // Blast doors closed at the start were forced open by the power cut (hostSetPower(false)): close them again.

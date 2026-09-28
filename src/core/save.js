@@ -1,6 +1,7 @@
 // Persistent storage: settings, personal profile (MMO progression) and run saves (host).
 import { randomId } from './rng.js';
 import { migrateXpCurve, XP_CURVE_VERSION } from '../game/progression.js';
+import { detectLang } from './i18n.js';
 
 const KEY_SETTINGS = 'kefal.settings.v1';
 const KEY_PROFILE = 'kefal.profile.v1';
@@ -28,7 +29,7 @@ export const DEFAULT_KEYS = {
 
 export function defaultSettings() {
   return {
-    lang: (navigator.language || 'en').toLowerCase().startsWith('tr') ? 'tr' : 'en',
+    lang: detectLang(navigator.language),   // first run: tr -> TR, ru -> RU, anything else -> EN
     renderHeight: 360,      // internal PSX resolution (240/360/480/720)
     fov: 72,
     sensitivity: 1.0,

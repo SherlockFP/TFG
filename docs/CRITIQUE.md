@@ -75,3 +75,9 @@ overclock effects (shock / burn / vamp) untested with 2 real players; economy: s
 Melee combos / heavy / block-parry, 6 melee + 5 tech weapons (rocket jump, grenades, grav tool), 5 spells, Blood Magic and 12 role skills were added
 (`docs/wave2/combat.md`). **Feel is unverified**: arcs / guard poses / hit timing were tuned by numbers only, `tools/harness/wave2_combat.js` has not been run and
 nothing was hand-played. RMB is now block-hold / scan-tap while a melee weapon is held - check that this feels right before shipping.
+## Localization round (EN/TR/RU)
+Was: TR covered ~900 strings, everything else (toasts, terminal, host messages, item / creature / moon names, prompts) stayed English,
+no RU. Now: EN/TR/RU with a picker + `navigator.language` default, ~2.3k RU / ~1.8k TR strings, display-name getters, localised host
+messages, Cyrillic font fallback, RU voice spells, audit + codemod tools (docs/wave2/i18n.md). Honest gaps: passive tree / lore-log bodies /
+some minigame strings are still English in TR+RU, wave-2 files were not covered, RU layout (longer text, Cyrillic in the retro fonts)
+was verified by build and a scripted run only — no screenshot review yet.

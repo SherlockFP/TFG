@@ -8,7 +8,7 @@ import { isSellable } from '../game/items.js';
 import { affixDisplayName, describeAffix, affixCooldown } from '../game/loot.js';
 import { iconHTML } from './icons.js';
 import { escapeHtml } from '../core/util.js';
-import { t } from '../core/i18n.js';
+import { t, tf } from '../core/i18n.js';
 import { plusMul, plusBonus, OVERCLOCKS } from '../game/enhance.js';   // [forge]
 
 const CELL = 50, GAP = 3, PAD = 6;
@@ -275,21 +275,21 @@ export class InventoryPanel {
     // header
     let carried = 0;
     for (const e of list) if (isSellable(e.def) && e.it.type !== 'body') carried += e.value || 0;
-    el.querySelector('.tinv-sub').textContent = `▮${carried} ${t('carried')} · ${wShown} lb · ${C.usedCells(list)}/${grid.cols * grid.rows}`;
+    el.querySelector('.tinv-sub').textContent = tf('▮{carried} {t} · {wShown} lb · {usedCells}/{n}', { carried, t: t('carried'), wShown, usedCells: C.usedCells(list), n: grid.cols * grid.rows });
     // character sheet
     const s = g.stats;
     const sp = (s.speedMul || 1) * (p.weightMul || 1) - 1;
     let bagVal = 0; for (const e of bagged) if (isSellable(e.def)) bagVal += e.value || 0;
     const statRow = (k, v, cls = '') => `<span class="k">${escapeHtml(t(k))}</span><span class="v ${cls}">${v}</span>`;
     el.querySelector('.tinv-stats').innerHTML = [
-      statRow('Armor', `${Math.round(Math.min(0.6, s.armor || 0) * 100)}%`, s.armor > 0 ? 'up' : ''),
-      statRow('Move speed', pct(sp), sp < -0.005 ? 'down' : sp > 0.005 ? 'up' : ''),
-      statRow('Stamina', `${Math.round(s.maxStamina || 100)}`, b.stamina > 0 ? 'up' : ''),
-      statRow('Scan range', `${Math.round(s.scanRange || 0)} m`, b.scan > 0 ? 'up' : ''),
-      statRow('Crit chance', `${Math.round((s.crit || 0) * 100)}%`, b.crit > 0 ? 'up' : ''),
-      statRow('Crew loot luck', `+${Math.round((b.luck || 0) * 100)}`, b.luck > 0 ? 'up' : ''),
-      statRow('Carrying', `${wShown} lb`),
-      statRow('Bag value', `▮${bagVal}`),
+      statRow(t('Armor'), `${Math.round(Math.min(0.6, s.armor || 0) * 100)}%`, s.armor > 0 ? 'up' : ''),
+      statRow(t('Move speed'), pct(sp), sp < -0.005 ? 'down' : sp > 0.005 ? 'up' : ''),
+      statRow(t('Stamina'), `${Math.round(s.maxStamina || 100)}`, b.stamina > 0 ? 'up' : ''),
+      statRow(t('Scan range'), `${Math.round(s.scanRange || 0)} m`, b.scan > 0 ? 'up' : ''),
+      statRow(t('Crit chance'), `${Math.round((s.crit || 0) * 100)}%`, b.crit > 0 ? 'up' : ''),
+      statRow(t('Crew loot luck'), `+${Math.round((b.luck || 0) * 100)}`, b.luck > 0 ? 'up' : ''),
+      statRow(t('Carrying'), `${wShown} lb`),
+      statRow(t('Bag value'), `▮${bagVal}`),
     ].join('');
     if (this.hoverId && !byId.has(this.hoverId)) this.setHover(null);
   }

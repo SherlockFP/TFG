@@ -8,7 +8,7 @@ import { createRpgController } from '../../game/rpgctl.js';
 import { ensureRpgProfile } from '../../game/profile.js';
 import { drawIcon, iconCanvas } from './treeicons.js';
 import { createRolesPanel } from './roles.js';
-import { getLang, addTranslations } from '../../core/i18n.js';
+import { getLang, addTranslations, t, tf } from '../../core/i18n.js';
 
 const TR = {
   'PASSIVE TREE': 'PASİF AĞAÇ', POINTS: 'PUAN', ROLE: 'ROL', RESPEC: 'SIFIRLA', FIT: 'SIĞDIR', Close: 'Kapat', STATS: 'DURUM',
@@ -18,7 +18,7 @@ const TR = {
 };
 addTranslations({ 'PASSIVE TREE [K]': 'PASİF AĞAÇ [K]' });
 const tr = () => { try { return getLang() === 'tr'; } catch { return false; } };
-const L = (s) => (tr() && TR[s]) || s;
+const L = (s) => (tr() ? TR[s] : null) || t(s);
 
 // ------------------------------------------------------------------ css
 const STYLE_ID = 'tfg-tree-style';
@@ -213,7 +213,7 @@ export function createTreePanel({ game = null, ctl = null, profile = game?.profi
     pts.classList.toggle('pulse', p > 0);
     clout.textContent = '◈ ' + ctl.coins();
     const cost = ctl.respecCost();
-    respecBtn.textContent = respecArm > Date.now() ? `CONFIRM ◈${cost}?` : L('RESPEC') + (cost ? ` ◈${cost}` : '');
+    respecBtn.textContent = respecArm > Date.now() ? tf('CONFIRM ◈{cost}?', { cost }) : L('RESPEC') + (cost ? ` ◈${cost}` : '');
     respecBtn.classList.toggle('warn', respecArm > Date.now());
     respecBtn.style.opacity = ctl.state().nodes.length ? '1' : '.4';
     count.textContent = matches.size ? `${matches.size} match${matches.size > 1 ? 'es' : ''}` : (search.value ? '0 matches' : '');
@@ -269,16 +269,16 @@ export function createTreePanel({ game = null, ctl = null, profile = game?.profi
     for (const t of n.text) tip.appendChild(mk('div', 'tx', '◆ ' + t));
     if (n.tip) tip.appendChild(mk('div', 'tf', '"' + n.tip + '"'));
     const st = mk('div', 'ts');
-    if (isMyPost) { st.style.color = '#8dff8d'; st.textContent = 'YOUR ROLE POST - everything connects from here.'; }
+    if (isMyPost) { st.style.color = '#8dff8d'; st.textContent = t('YOUR ROLE POST - everything connects from here.'); }
     else if (on) {
       const info = ctl.refundInfo(id);
       st.style.color = '#ffd98a';
-      st.textContent = L('ALLOCATED') + (info.ok ? ` · right-click to refund (${info.free ? 'free undo' : '◈' + info.cost})` : ` · ${info.reason}`);
-    } else if (!ctl.role()) { st.style.color = '#ff8d7d'; st.textContent = 'Pick a role first (ROLE button).'; }
+      st.textContent = L('ALLOCATED') + (info.ok ? tf(' · right-click to refund ({n})', { n: info.free ? 'free undo' : '◈' + info.cost }) : ` · ${info.reason}`);
+    } else if (!ctl.role()) { st.style.color = '#ff8d7d'; st.textContent = t('Pick a role first (ROLE button).'); }
     else if (prevPlan?.ok) {
       const c = prevPlan.cost, k = prevPlan.path.length;
       st.style.color = prevPlan.affordable ? '#8dff8d' : '#ff8d7d';
-      st.textContent = prevPlan.affordable ? `Click: allocate ${k > 1 ? k + ' nodes, ' : ''}${c} point${c > 1 ? 's' : ''}` : prevPlan.reason;
+      st.textContent = prevPlan.affordable ? tf('Click: allocate {n}{c} point{n2}', { n: k > 1 ? k + ' nodes, ' : '', c, n2: c > 1 ? 's' : '' }) : prevPlan.reason;
     } else { st.style.color = '#ff8d7d'; st.textContent = prevPlan?.reason || ''; }
     tip.appendChild(st);
     tip.style.display = 'block';
@@ -363,10 +363,10 @@ export function createTreePanel({ game = null, ctl = null, profile = game?.profi
 
   function onClickNode(n) {
     if (alloc.has(n.id)) {
-      flash(n.type === 'start' && ctl.role() === n.role ? 'This is your role post.' : 'Right-click to refund this node.', 'warn');
+      flash(n.type === 'start' && ctl.role() === n.role ? t('This is your role post.') : t('Right-click to refund this node.'), 'warn');
       return;
     }
-    if (!ctl.role()) { flash('Pick a role first.', 'bad'); openRoles(); return; }
+    if (!ctl.role()) { flash(t('Pick a role first.'), 'bad'); openRoles(); return; }
     const r = ctl.allocate(n.id);
     flash(r.msg, r.ok ? 'good' : 'bad');
     sfx(r.ok ? 'ui_confirm' : 'ui_click', r.ok ? 0.55 : 0.3);
@@ -379,7 +379,7 @@ export function createTreePanel({ game = null, ctl = null, profile = game?.profi
     const now = Date.now();
     if (info.cost > 0 && !(pendingRefund && pendingRefund.id === n.id && now - pendingRefund.t < 3000)) {
       pendingRefund = { id: n.id, t: now };
-      flash(`Right-click again to refund ${n.name} for ◈${info.cost}`, 'warn');
+      flash(tf('Right-click again to refund {name} for ◈{cost}', { name: n.name, cost: info.cost }), 'warn');
       return;
     }
     pendingRefund = null;
@@ -425,7 +425,7 @@ export function createTreePanel({ game = null, ctl = null, profile = game?.profi
   function closeOverlay() { overlay?.remove(); overlay = null; refresh(); }
   roleBtn.addEventListener('click', () => { sfx(); openRoles(); });
   respecBtn.addEventListener('click', () => {
-    if (!ctl.state().nodes.length) { flash('Nothing to refund.', 'warn'); return; }
+    if (!ctl.state().nodes.length) { flash(t('Nothing to refund.'), 'warn'); return; }
     if (respecArm < Date.now()) { respecArm = Date.now() + 3200; refresh(); setTimeout(refresh, 3300); return; }
     respecArm = 0;
     const r = ctl.respecAll();
@@ -633,7 +633,7 @@ export function decorateSkills(skillsEl, profile, ui) {
     skillsEl.replaceChildren();
     const el = (tag, cls, text) => mk(tag, cls, text);
     skillsEl.appendChild(el('div', 'label', `${L('PASSIVE TREE')} · ${L('POINTS')}: ${profile.skillPoints}`));
-    const info = el('div', 'dim', role ? `${role.name.toUpperCase()} · ${r.nodes.length} nodes · ${role.tag}` : L('No role yet'));
+    const info = el('div', 'dim', role ? tf('{n} · {length} nodes · {tag}', { n: role.name.toUpperCase(), length: r.nodes.length, tag: role.tag }) : L('No role yet'));
     if (role) info.style.color = role.color;
     skillsEl.appendChild(info);
     const open = () => {

@@ -6,6 +6,7 @@ import {
 } from './progression.js';
 import { ROLES, NODE, TREE_VERSION, nodeCost, pruneState } from './passivetree.js';
 import { CREATURES } from './creatures.js';
+import { t, tf } from '../core/i18n.js';
 
 // Rewards that are already "final" numbers: never multiplied by stars / mastery / events / crew.
 const FLAT_REASONS = /^(Achievement|Daily login|Codex|Weekly|Rebirth|Bounty)/i;
@@ -112,7 +113,7 @@ export class Progress {
       g.net?.send('pinfo', g.helloData());
       g.mods?.emit('levelUp', p.level, g);
       if (before < REBIRTH_LEVEL && p.level >= REBIRTH_LEVEL) {
-        setTimeout(() => g.ui?.toast?.(`REBIRTH available! Press J → REBIRTH for a permanent ★ (or keep climbing to ${MAX_LEVEL}).`, 'good'), 2500);
+        setTimeout(() => g.ui?.toast?.(tf('REBIRTH available! Press J → REBIRTH for a permanent ★ (or keep climbing to {MAX_LEVEL}).', { MAX_LEVEL }), 'good'), 2500);
       }
     }
     this.save();
@@ -134,7 +135,7 @@ export class Progress {
   allocate(skill) {
     const p = this.p;
     // legacy base skills were replaced by the passive tree (K): refuse instead of silently re-spending into a dead system
-    if (p.rpg?.v) { this.game.ui?.toast?.('Skills moved to the Passive Tree - press K.', 'info'); return false; }
+    if (p.rpg?.v) { this.game.ui?.toast?.(t('Skills moved to the Passive Tree - press K.'), 'info'); return false; }
     if (p.skillPoints <= 0 || (p.skills[skill] || 0) >= SKILL_CAP) return false;
     p.skills[skill] = (p.skills[skill] || 0) + 1;
     p.skillPoints -= 1;
@@ -174,7 +175,7 @@ export class Progress {
     if (!b[type].seen) {
       b[type].seen = true;
       b[type].at = Date.now();
-      if (announce && CREATURES[type]) this.game.ui.toast(`New Codex entry: ${CREATURES[type].name} (J / terminal: BESTIARY)`, 'info');
+      if (announce && CREATURES[type]) this.game.ui.toast(tf('New Codex entry: {name} (J / terminal: BESTIARY)', { name: CREATURES[type].name }), 'info');
       this.save();
     }
   }
@@ -188,7 +189,7 @@ export class Progress {
   fish(id) { this.p.stats.fish += 1; this.bountyEvent('fish', 'any', 1); this.save(); }
   arcade(score) {
     const s = this.p.stats;
-    if (score > (s.bestArcade || 0)) { s.bestArcade = score; this.game.ui.toast('New arcade high score: ' + score, 'good'); }
+    if (score > (s.bestArcade || 0)) { s.bestArcade = score; this.game.ui.toast(tf('New arcade high score: {score}', { score }), 'good'); }
     const day = Math.floor(Date.now() / 86400000);
     if (s.arcadeDay !== day) { s.arcadeDay = day; s.arcadeXp = 0; }
     const xp = Math.min(Math.round(score * 2), 100 - (s.arcadeXp || 0));
@@ -235,7 +236,7 @@ export class Progress {
       if (b.done || b.type !== type) continue;
       if (b.target !== target && b.target !== 'any' && !(type === 'collect' || type === 'sell')) continue;
       b.progress = Math.min(b.n, b.progress + n);
-      if (b.progress >= b.n) { b.done = true; this.game.ui.toast(`Bounty complete! Claim it at the HQ board.`, 'good'); this.game.audio.ui('ui_confirm', 0.7); }
+      if (b.progress >= b.n) { b.done = true; this.game.ui.toast(t('Bounty complete! Claim it at the HQ board.'), 'good'); this.game.audio.ui('ui_confirm', 0.7); }
       changed = true;
     }
     if (changed) { this.save(); this.game.ui.hud?.refreshBounties?.(); }

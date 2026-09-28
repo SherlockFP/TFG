@@ -61,6 +61,7 @@ import { installShop } from './shop.js';
 import { installCrafting } from './crafting.js';
 
 import { installLore } from './lore.js';
+import { t, tf, sysText } from '../core/i18n.js';
 
 import { installHorde } from './horde.js';
 
@@ -277,7 +278,7 @@ export class Game extends Emitter {
     if (opts.host) {
       this.hostInit(opts.runData, opts.slot);
     } else {
-      this.ui.toast('Connecting to lobby ' + opts.code + '...');
+      this.ui.toast(tf('Connecting to lobby {code}...', { code: opts.code }));
       this.joinTimeout = setTimeout(() => { if (!this.net.connected) this.emit('fatal', 'Could not reach the host. Check the lobby code / network mode.'); }, 25000);
     }
     this.setupVoice();
@@ -288,16 +289,16 @@ export class Game extends Emitter {
   // the low-quality "hands-free" profile and the normal stereo output can go silent.
   setupVoice() {
     const s = this.settings;
-    if (this.opts?.strategy === 'local') { this.ui.toast('Local (same PC) mode: voice chat is not carried between tabs. Use an Online P2P network for voice.', 'info'); return; }
-    if (!s.micEnabled || s.micConsent === 'no') { this.ui.toast('Voice chat: listening only (enable your mic in Settings > Voice).', 'info'); return; }
+    if (this.opts?.strategy === 'local') { this.ui.toast(t('Local (same PC) mode: voice chat is not carried between tabs. Use an Online P2P network for voice.'), 'info'); return; }
+    if (!s.micEnabled || s.micConsent === 'no') { this.ui.toast(t('Voice chat: listening only (enable your mic in Settings > Voice).'), 'info'); return; }
     if (s.micConsent === 'yes') { this.enableMic(); return; }
     setTimeout(() => { if (!this.net) return; this.ui.askVoice(this); }, 1200);
   }
   enableMic() {
     return this.voice.startMic().then(() => {
-      if (!window.isSecureContext) this.ui.toast('Voice chat needs HTTPS (or localhost). You can still hear others.', 'bad');
-      else if (this.voice.micError) this.ui.toast('Microphone unavailable: ' + this.voice.micError, 'bad');
-      else if (this.voice.enabled) this.ui.toast(this.settings.voiceMode === 'ptt' ? 'Voice chat on (hold V to talk).' : 'Voice chat on (open mic).', 'good');
+      if (!window.isSecureContext) this.ui.toast(t('Voice chat needs HTTPS (or localhost). You can still hear others.'), 'bad');
+      else if (this.voice.micError) this.ui.toast(tf('Microphone unavailable: {micError}', { micError: this.voice.micError }), 'bad');
+      else if (this.voice.enabled) this.ui.toast(this.settings.voiceMode === 'ptt' ? t('Voice chat on (hold V to talk).') : t('Voice chat on (open mic).'), 'good');
     }).catch(() => {});
   }
 
@@ -313,7 +314,7 @@ export class Game extends Emitter {
     net.on('peerLeave', (id, p) => {
       if (this.isHost) this.hostOnPlayerLeave(id);
       const r = this.remotes.get(id);
-      if (r) { this.ui.toast(`${r.name} left the ship.`); r.dispose(); this.remotes.delete(id); }
+      if (r) { this.ui.toast(tf('{name} left the ship.', { name: r.name })); r.dispose(); this.remotes.delete(id); }
       this.voice.removePeer(id);
     });
     net.on('hostLeft', () => this.emit('fatal', 'The host has left. Session ended.'));
@@ -344,7 +345,7 @@ export class Game extends Emitter {
     net.on_('hurt', (d) => this.onHurt(d));
     net.on_('fx', (d, from) => this.onFx(d, from));
     net.on_('chat', (d, from) => this.onChat(d, from));
-    net.on_('sys', (d) => this.ui.systemMessage(d.text, d.kind));
+    net.on_('sys', (d) => this.ui.systemMessage(sysText(d), d.kind));   // d.k/d.v: every peer localises host messages itself
     net.on_('xp', (d) => this.onReward(d));
     net.on_('power', (d) => this.setPower(d.on, true));
     net.on_('term', (d) => this.terminal.onRemote(d));
@@ -378,7 +379,7 @@ export class Game extends Emitter {
     if (!r) {
       r = new RemotePlayer(this, id, info || {});
       this.remotes.set(id, r);
-      if (info?.name) this.ui.toast(`${info.name} joined the ship.`);
+      if (info?.name) this.ui.toast(tf('{name} joined the ship.', { name: info.name }));
     }
     return r;
   }
@@ -386,7 +387,7 @@ export class Game extends Emitter {
   onWelcome(d) {
     clearTimeout(this.joinTimeout);
     clearTimeout(this._pwErrTimer);
-    this.ui.toast('Connected! Welcome aboard.');
+    this.ui.toast(t('Connected! Welcome aboard.'));
     this.config = { ...this.config, ...(d.config || {}) };
     for (const p of d.players || []) if (p.id !== this.selfId) { const r = this.ensureRemote(p.id, p); if (p.dead) r.setDead(true); if (p.st) r.applyState(p.st); }
     this.applyRunState(d.run, true);
@@ -613,7 +614,7 @@ export class Game extends Emitter {
     if (this.run) this.run.powerOn = on;
     if (announce) {
       this.audio.play(on ? 'power_up' : 'power_down', { volume: 0.9 });
-      if (this.player.indoor) this.ui.toast(on ? 'Power restored.' : 'The lights go out...', on ? 'good' : 'bad');
+      if (this.player.indoor) this.ui.toast(on ? t('Power restored.') : t('The lights go out...'), on ? 'good' : 'bad');
     }
   }
 
@@ -900,7 +901,7 @@ export class Game extends Emitter {
       this.sfx('fish_splash', 0.8);
       this.spawnInShip();
       p.vel?.set(0, 0, 0);
-      this.ui.toast('The Company fished you out of the harbour.', 'info');
+      this.ui.toast(t('The Company fished you out of the harbour.'), 'info');
       return;
     }
     if ((ph === 'orbit' || ph === 'fired') && p.pos.y < -120) { this.spawnInShip(); p.vel?.set(0, 0, 0); }

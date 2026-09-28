@@ -18,7 +18,7 @@ import { isSellable } from './items.js';
 import { tierOfItem, tierIndex } from './tiers.js';
 import { wrapMethod } from './dailyEvents.js';
 import { RNG, hashString } from '../core/rng.js';
-import { getLang } from '../core/i18n.js';
+import { getLang, t, tf } from '../core/i18n.js';
 import { SHIP } from '../world/ship.js';
 
 HOST_ONLY.add('lore');   // clients only take 'lore' broadcasts from the host
@@ -89,7 +89,7 @@ export function installLore(game) {
       for (const k of ['fragile', 'big', 'noisy', 'artifact']) cls[k] = retrievalMatch(k, it);
       const artifact = cls.artifact || tierIndex(tierOfItem(it, it.def)) >= tierIndex('epic');
       day.collected.push({ id, type: it.type, name: it.def.name, value: it.value || 0, artifact, cls });
-      if (it.def.special === 'apparatus' && !day.extracted) { day.extracted = true; addEvent('Reactor core extracted'); }
+      if (it.def.special === 'apparatus' && !day.extracted) { day.extracted = true; addEvent(t('Reactor core extracted')); }
     }
     // kills (+ who)
     const kills = hd.dayStats?.kills || 0;
@@ -113,7 +113,7 @@ export function installLore(game) {
     }
     // power cut by the crew (not the director's blackout, not the landing blackout event)
     const pw = run.powerOn !== false;
-    if (day.powerWas && !pw && (hd.moonT || 0) > 3 && core.clock - lastBlackoutT > 3) { day.sabotage = true; addEvent('Power cut'); }
+    if (day.powerWas && !pw && (hd.moonT || 0) > 3 && core.clock - lastBlackoutT > 3) { day.sabotage = true; addEvent(t('Power cut')); }
     day.powerWas = pw;
   }
 
@@ -175,22 +175,22 @@ export function installLore(game) {
       case 'case': cases.receive(d.c); break;
       case 'secret': {
         const s = SECRETS[d.id];
-        hud?.bigText?.(T ? 'GİZLİ GÖREV TAMAM' : 'SECRET OBJECTIVE COMPLETE', `${pickLang(s?.name, T)} — ▮${d.credits} · ${d.xp} XP`);
+        hud?.bigText?.(t('SECRET OBJECTIVE COMPLETE'), tf('{pickLang} — ▮{credits} · {xp} XP', { pickLang: pickLang(s?.name, T), credits: d.credits, xp: d.xp }));
         game.sfx?.('ui_quota_met', 0.6);
         break;
       }
-      case 'contract': if (d.state === 'complete') { hud?.bigText?.(T ? 'SÖZLEŞME TAMAM' : 'CONTRACT COMPLETE', `${pickLang(d.title, T)} · ${FACTIONS[d.f]?.name || ''}`); game.sfx?.('ui_quota_met', 0.5); } break;
+      case 'contract': if (d.state === 'complete') { hud?.bigText?.(t('CONTRACT COMPLETE'), `${pickLang(d.title, T)} · ${FACTIONS[d.f]?.name || ''}`); game.sfx?.('ui_quota_met', 0.5); } break;
       case 'war': {
         const f = FACTIONS[d.f];
         if (!f) break;
-        hud?.bigText?.(d.on ? (T ? '⚔ SAVAŞ İLAN EDİLDİ' : '⚔ WAR DECLARED') : (T ? 'ATEŞKES' : 'CEASEFIRE'), f.name.toUpperCase());
+        hud?.bigText?.(d.on ? (t('⚔ WAR DECLARED')) : (t('CEASEFIRE')), f.name.toUpperCase());
         if (d.on) { game.engine?.flash?.(0xff2010, 0.35); game.engine?.shake?.(0.3); }
         break;
       }
       case 'invade': {
         const f = FACTIONS[d.f];
         if (!f) break;
-        hud?.bigText?.(`⚠ ${f.name.toUpperCase()} ${T ? 'TETİKÇİ EKİBİ' : 'HIT SQUAD'}`, T ? 'SEKTÖRE GİRDİ' : 'HAS ENTERED THE SECTOR');
+        hud?.bigText?.(`⚠ ${f.name.toUpperCase()} ${t('HIT SQUAD')}`, t('HAS ENTERED THE SECTOR'));
         game.engine?.flash?.(0xff2010, 0.45); game.engine?.shake?.(0.4);
         game.sfx?.('ship_alarm', 0.6);
         break;
@@ -198,7 +198,7 @@ export function installLore(game) {
       case 'ending': {
         const c = CHAINS[d.f];
         if (!c) break;
-        const item = { tier: 'gold', icon: FACTIONS[d.f].glyph, kicker: T ? 'FRAKSİYON SONU' : 'FACTION ENDING', name: pickLang(c.name, T), desc: pickLang(c.ending, T), reward: '' };
+        const item = { tier: 'gold', icon: FACTIONS[d.f].glyph, kicker: t('FACTION ENDING'), name: pickLang(c.name, T), desc: pickLang(c.ending, T), reward: '' };
         if (game.achievements?.banner) game.achievements.banner(item); else hud?.bigText?.(item.kicker, item.name);
         break;
       }
@@ -307,15 +307,15 @@ export function installLore(game) {
     x.save();
     x.fillStyle = '#0a0409'; x.fillRect(80, 0, 112, 112); x.fillRect(0, 60, 80, 52);
     x.fillStyle = '#ff3d7f'; x.font = 'bold 9px monospace';
-    x.fillText(T ? 'ALGORİTMA BAĞLANTISI' : 'THE ALGORITHM LINK', 84, 11);
+    x.fillText(t('THE ALGORITHM LINK'), 84, 11);
     x.font = '9px monospace'; x.fillStyle = '#ffd9e6';
     const lines = [];
     const f = run.algo?.focus;
-    lines.push(`${T ? 'ODAK' : 'FOCUS'}: ${f ? pickLang(FOCUS_NAME[f], T) : '???'}`);
+    lines.push(`${t('FOCUS')}: ${f ? pickLang(FOCUS_NAME[f], T) : '???'}`);
     const c = run.contract;
     if (c) { const tt = pickLang(c.title, T); lines.push(`${FACTIONS[c.faction]?.short || ''}: ${tt}`.slice(0, 20)); lines.push(`${c.state === 'complete' ? '✔' : ''} ${c.progress || 0}/${c.n}`); }
-    else lines.push(`${(run.contracts?.offers || []).filter((o) => !o.taken).length} ${T ? 'TEKLİF' : 'OFFERS'} [E]`);
-    for (const id of FACTION_IDS) if (factions.war(id)) lines.push(`⚔ ${T ? 'SAVAŞ' : 'WAR'}: ${FACTIONS[id].short}`);
+    else lines.push(`${(run.contracts?.offers || []).filter((o) => !o.taken).length} ${t('OFFERS')} [E]`);
+    for (const id of FACTION_IDS) if (factions.war(id)) lines.push(`⚔ ${t('WAR')}: ${FACTIONS[id].short}`);
     lines.slice(0, 7).forEach((l, i) => x.fillText(l.slice(0, 20), 84, 25 + i * 11));
     // bottom-left: current intercom line / chapter
     x.fillStyle = '#ff3d7f'; x.font = '8px monospace';
@@ -369,19 +369,19 @@ export function installLore(game) {
     api.registerCommand('contracts', (rest, term) => { ensureRun(); term.print(contracts.listText()); }, 'contract board (3 daily offers)');
     api.registerCommand('accept', (rest, term) => {
       const i = parseInt(rest[0], 10);
-      if (!i) { term.print(T() ? 'Kullanım: ACCEPT <n>  (CONTRACTS listesi)' : 'Usage: ACCEPT <n>  (see CONTRACTS)', 'err'); return; }
-      req('accept', { i: i - 1 }); term.print(T() ? 'Host onayı bekleniyor...' : 'Waiting for the host...');
+      if (!i) { term.print(t('Usage: ACCEPT <n>  (see CONTRACTS)'), 'err'); return; }
+      req('accept', { i: i - 1 }); term.print(t('Waiting for the host...'));
     }, 'accept contract <n>');
     api.registerCommand('abandon', (rest, term) => { req('abandon', {}); term.print('...'); }, 'abandon the active contract (-5 rep)');
     api.registerCommand('factions', (rest, term) => term.print(factions.statusText()), 'faction reputation, rivals, perks, wars');
     api.registerCommand('sign', (rest, term) => {
       const f = findFaction(rest.join(' '));
-      if (!f) { term.print(T() ? 'Hangi fraksiyon? SIGN FEED / ARCHIVE / BUREAU / DARKWEB' : 'Which faction? SIGN FEED / ARCHIVE / BUREAU / DARKWEB', 'err'); return; }
+      if (!f) { term.print(t('Which faction? SIGN FEED / ARCHIVE / BUREAU / DARKWEB'), 'err'); return; }
       req('sign', { f }); term.print(`${FACTIONS[f].name}...`);
     }, 'sign an exclusive contract (+rep, its rival -rep)');
     api.registerCommand('tribute', (rest, term) => {
       const f = findFaction(rest.join(' '));
-      if (!f) { term.print('TRIBUTE FEED / ARCHIVE / BUREAU / DARKWEB', 'err'); return; }
+      if (!f) { term.print(t('TRIBUTE FEED / ARCHIVE / BUREAU / DARKWEB'), 'err'); return; }
       req('tribute', { f }); term.print(`${FACTIONS[f].name}...`);
     }, 'pay credits for +15 rep (ends wars)');
     api.registerCommand('cases', (rest, term) => term.print(cases.listText()), 'case file archive');
@@ -389,11 +389,11 @@ export function installLore(game) {
     api.registerCommand('logs', (rest, term) => {
       const p = game.profile.loreLogs || {};
       const got = LORE_LOGS.map((l, i) => ({ l, i })).filter((x) => p[x.l.id]);
-      term.print([(T() ? 'KURTARILAN KAYITLAR ' : 'RECOVERED LOGS ') + `${got.length}/${LORE_LOGS.length}`, ...got.map((x) => `${String(x.i + 1).padStart(2, '0')}. ${x.l.title} — ${x.l.author}`), '', '>LOG <n>'].join('\n'));
+      term.print([(t('RECOVERED LOGS ')) + `${got.length}/${LORE_LOGS.length}`, ...got.map((x) => `${String(x.i + 1).padStart(2, '0')}. ${x.l.title} — ${x.l.author}`), '', '>LOG <n>'].join('\n'));
     }, 'recovered lore logs');
     api.registerCommand('log', (rest, term) => {
       const l = LORE_LOGS[(parseInt(rest[0], 10) || 0) - 1];
-      if (!l || !game.profile.loreLogs?.[l.id]) { term.print(T() ? 'Bu kayıt henüz bulunmadı.' : 'Log not recovered yet.', 'err'); return; }
+      if (!l || !game.profile.loreLogs?.[l.id]) { term.print(t('Log not recovered yet.'), 'err'); return; }
       readLog(l, false);
     }, 'LOG <n>: read a recovered log');
     api.registerCommand('algo', (rest, term) => {
@@ -401,15 +401,15 @@ export function installLore(game) {
         const v = (rest[1] || '').toLowerCase();
         const onv = v === 'on' ? true : v === 'off' ? false : !game.settings?.algoVoice;
         algo.setVoice(onv);
-        term.print(`THE ALGORITHM voice: ${onv ? 'ON' : 'OFF'}`);
+        term.print(tf('THE ALGORITHM voice: {n}', { n: onv ? 'ON' : 'OFF' }));
         return;
       }
       const a = game.run?.algo || {};
       const s = a.scores || {};
       term.print([
-        'THE ALGORITHM — ' + (T() ? 'davranış analizi' : 'behaviour analysis'),
-        `${T() ? 'Bugünün odağı' : "Today's focus"}: ${a.focus ? pickLang(FOCUS_NAME[a.focus], T()) : '???'}   ${T() ? 'ruh hali' : 'mood'}: ${a.mood || 'curious'}   engagement: ${a.engagement ?? '?'}`,
-        `${T() ? 'Dünkü skorlar' : "Yesterday's scores"}: ${Object.entries(s).map(([k, v]) => `${k} ${v}`).join(' · ') || '-'}`,
+        'THE ALGORITHM — ' + (t('behaviour analysis')),
+        `${t("Today's focus")}: ${a.focus ? pickLang(FOCUS_NAME[a.focus], T()) : '???'}   ${t('mood')}: ${a.mood || 'curious'}   engagement: ${a.engagement ?? '?'}`,
+        `${t("Yesterday's scores")}: ${Object.entries(s).map(([k, v]) => `${k} ${v}`).join(' · ') || '-'}`,
         ...(a.lines || []).map((l) => `  "${l}"`),
         '', '>ALGO VOICE ON|OFF   robotic voice (speech synthesis)',
       ].join('\n'));
@@ -461,7 +461,7 @@ export function installLore(game) {
     if (!d.company && c && (c.state === 'running' || c.state === 'complete') && Array.isArray(extra)) {
       const f = FACTIONS[c.faction], T = tr();
       const ok = c.state === 'complete' && !d.allDead;
-      extra.push(`<span style="color:${f.color}">${f.glyph} ${T ? 'SÖZLEŞME' : 'CONTRACT'}</span> ${pickLang(c.title, T).replace(/</g, '&lt;')} — <b style="color:${ok ? '#7dff7d' : '#ff6b5a'}">${ok ? (T ? 'ÖDENDİ' : 'PAID') : (T ? 'BAŞARISIZ' : 'FAILED')}</b>`);
+      extra.push(`<span style="color:${f.color}">${f.glyph} ${t('CONTRACT')}</span> ${pickLang(c.title, T).replace(/</g, '&lt;')} — <b style="color:${ok ? '#7dff7d' : '#ff6b5a'}">${ok ? (t('PAID')) : (t('FAILED'))}</b>`);
     }
   });
   on('update', (dt, g) => {
@@ -491,14 +491,14 @@ export function installLore(game) {
     const p = game.player;
     if (board.mesh && p.inShip) {
       const pos = new THREE.Vector3(BOARD_POS.x, 1.55, BOARD_POS.z - 0.25);
-      out.push({ pos, r: 0.9, reach: 2.6, label: tr() ? 'Sözleşme panosu — Algoritma [E]' : 'Contract board — The Algorithm [E]', sub: () => (game.run?.contract ? pickLang(game.run.contract.title, tr()) : ''), action: () => openBoard() });
+      out.push({ pos, r: 0.9, reach: 2.6, label: t('Contract board — The Algorithm [E]'), sub: () => (game.run?.contract ? pickLang(game.run.contract.title, tr()) : ''), action: () => openBoard() });
     }
     if (p.indoor && logState.placed.length) {
       for (const L of logState.placed) {
         if (L.pos.distanceTo(p.pos) > 4) continue;
         const log = LOG_BY_ID[L.id];
         const read = !!game.profile.loreLogs?.[L.id];
-        out.push({ pos: L.pos, r: 0.5, reach: 2.2, label: `${tr() ? 'Kaydı oku' : 'Read log'}: ${log.title} [E]`, sub: read ? (tr() ? '(okundu)' : '(read)') : (tr() ? 'kayıp kayıt' : 'lost log'), action: () => readLog(log, true) });
+        out.push({ pos: L.pos, r: 0.5, reach: 2.2, label: `${t('Read log')}: ${log.title} [E]`, sub: read ? (t('(read)')) : (t('lost log')), action: () => readLog(log, true) });
       }
     }
   });
@@ -527,9 +527,9 @@ export function installLore(game) {
     if (!game.isHost || !core.day) return;
     const ph = String(d?.phase || '').toLowerCase();
     if (d?.success === true || ['done', 'success', 'complete', 'extracted', 'escaped'].includes(ph)) {
-      if (!core.day.extracted) { core.day.extracted = true; addEvent('Extraction'); algo.hostSay('extraction_done', {}, { gap: 3 }); }
+      if (!core.day.extracted) { core.day.extracted = true; addEvent(t('Extraction')); algo.hostSay('extraction_done', {}, { gap: 3 }); }
     } else if (d?.success !== false && ph && !core.day.said.extraction) {
-      core.day.said.extraction = true; addEvent('Extraction alarm'); algo.hostSay('extraction', {}, { force: true });
+      core.day.said.extraction = true; addEvent(t('Extraction alarm')); algo.hostSay('extraction', {}, { force: true });
     }
   });
   on('tfg:spell', (d) => algo.onSpell(d));

@@ -3,6 +3,15 @@
 @font-face { font-family: 'TFG Credit'; src: url(data:font/ttf;base64,AAEAAAAKAIAAAwAgT1MvMoqNaQIAAAEoAAAAYGNtYXAADCYBAAABkAAAADRnbHlmTYp2cQAAAcwAAAAaaGVhZC57EuAAAACsAAAANmhoZWEExgFCAAAA5AAAACRobXR4AfQAAAAAAYgAAAAGbG9jYQANAAAAAAHEAAAABm1heHAABAAGAAABCAAAACBuYW1lrszN8gAAAegAAABpcG9zdOdraswAAAJUAAAALQABAAAAAQAAXlP4CV8PPPUAAwPoAAAAAObgZ/wAAAAA5uBn/AA8ACgBaAHgAAAAAwACAAAAAAAAAAEAAAMg/zgAAAG4ADwAUAFoAAEAAAAAAAAAAAAAAAAAAAABAAEAAAACAAQAAQAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAwG4AZAABQAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAPz8/PwAAJa4lrgMg/zgAAAMgAMgAAAAAAAAAAAAAAAAAAAAgAAABuAAAADwAAAAAAAIAAAADAAAAFAADAAEAAAAUAAQAIAAAAAQABAABAAAlrv//AAAlrv//2lMAAQAAAAAAAAAAAA0AAAABADwAKAFoAeAAAwAANxEhETwBLCgBuP5IAAAAAAAEADYAAQAAAAAAAQAKAAAAAQAAAAAAAgAHAAoAAwABBAkAAQAUABEAAwABBAkAAgAOACVURkcgQ3JlZGl0UmVndWxhcgBUAEYARwAgAEMAcgBlAGQAaQB0AFIAZQBnAHUAbABhAHIAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAABAgZjcmVkaXQAAAA=) format('truetype'); unicode-range: U+25AE; font-display: block; }
 @font-face { font-family: 'TFG Credit PS'; src: url(data:font/ttf;base64,AAEAAAAKAIAAAwAgT1MvMoqMa8gAAAEoAAAAYGNtYXAADCYBAAABkAAAADRnbHlmFom5dAAAAcwAAAAaaGVhZC/FFEMAAACsAAAANmhoZWEG1wNtAAAA5AAAACRobXR4A2sAAAAAAYgAAAAGbG9jYQANAAAAAAHEAAAABm1heHAABAAGAAABCAAAACBuYW1ll9LVngAAAegAAABycG9zdOdraswAAAJcAAAALQABAAAAAQAA8KdV8l8PPPUAAwPoAAAAAObgZ/wAAAAA5uBn/AB9AH0CcQLuAAAAAwACAAAAAAAAAAEAAAPoAAAAAALuAH0AfQJxAAEAAAAAAAAAAAAAAAAAAAABAAEAAAACAAQAAQAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAwLuAZAABQAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAPz8/PwAAJa4lrgPoAAAAAAPoAAAAAAAAAAAAAAAAAAAAAAAgAAAC7gAAAH0AAAAAAAIAAAADAAAAFAADAAEAAAAUAAQAIAAAAAQABAABAAAlrv//AAAlrv//2lMAAQAAAAAAAAAAAA0AAAABAH0AfQJxAu4AAwAANxEhEX0B9H0Ccf2PAAAAAAAEADYAAQAAAAAAAQANAAAAAQAAAAAAAgAHAA0AAwABBAkAAQAaABQAAwABBAkAAgAOAC5URkcgQ3JlZGl0IFBTUmVndWxhcgBUAEYARwAgAEMAcgBlAGQAaQB0ACAAUABTAFIAZQBnAHUAbABhAHIAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAECBmNyZWRpdAAAAA==) format('truetype'); unicode-range: U+25AE; font-display: block; }
 
+/* Cyrillic (RU) for the VT323 stack: VT323 has no Cyrillic glyphs, Press Start 2P does (bundled @fontsource subset, no CDN).
+   size-adjust scales the wide 8x8 pixel glyphs down to VT323's narrow terminal proportions. Only U+04xx uses this face. */
+@font-face { font-family: 'TFG Cyr VT'; font-style: normal; font-weight: 400; font-display: swap; size-adjust: 58%;
+  src: url(../../node_modules/@fontsource/press-start-2p/files/press-start-2p-cyrillic-400-normal.woff2) format('woff2'), url(../../node_modules/@fontsource/press-start-2p/files/press-start-2p-cyrillic-400-normal.woff) format('woff');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: 'TFG Cyr VT'; font-style: normal; font-weight: 400; font-display: swap; size-adjust: 58%;
+  src: url(../../node_modules/@fontsource/press-start-2p/files/press-start-2p-cyrillic-ext-400-normal.woff2) format('woff2'), url(../../node_modules/@fontsource/press-start-2p/files/press-start-2p-cyrillic-ext-400-normal.woff) format('woff');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F; }
+
 :root {
   --amber: #ff8a3d;
   --amber-dim: #a8531f;
@@ -14,7 +23,7 @@
   --text: #ffd9b8;
   --bad: #ff4a3a;
   --good: #7dff7d;
-  --font: 'TFG Credit', 'VT323', ui-monospace, monospace;
+  --font: 'TFG Credit', 'VT323', 'TFG Cyr VT', ui-monospace, monospace;
   --font2: 'TFG Credit PS', 'Press Start 2P', ui-monospace, monospace;
   --cond: 'TFG Credit', 'Arial Narrow', 'Roboto Condensed', 'Oswald', Impact, sans-serif;
 }
@@ -49,6 +58,9 @@ body { font-family: var(--font); color: var(--text); user-select: none; }
 .title-profile { position: absolute; left: 8vw; bottom: 5vh; font-size: 22px; }
 .title-profile .xpbar { width: 280px; }
 .version { position: absolute; right: 16px; bottom: 10px; opacity: 0.5; font-size: 18px; }
+.lang-picker { position: absolute; right: 16px; top: 14px; display: flex; gap: 6px; }
+.lang-picker .btn.lang { position: static; }
+.btn.lang.active { background: #dfe9ff; color: #05070a; }
 .btn.lang { position: absolute; right: 16px; top: 14px; font-family: var(--cond); font-weight: bold; color: #dfe9ff; border: 1px solid rgba(200,215,255,0.35); text-shadow: 0 0 8px rgba(170,200,255,0.5); }
 .btn.lang:hover, .btn.lang:focus-visible { background: #dfe9ff; color: #05070a; outline: none; }
 

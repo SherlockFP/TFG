@@ -28,7 +28,7 @@ export class CharPreview {
     this.canvas = el('canvas', { class: 'cpv-canvas', width: RW, height: RH });
     this.tag = el('div', { class: 'cpv-tag' }, el('div', { class: 'cpv-name' }), el('div', { class: 'cpv-title' }));
     this.emoteLbl = el('div', { class: 'cpv-emote' });
-    this.stage.append(this.canvas, this.tag, this.emoteLbl, el('div', { class: 'cpv-scan' }), el('div', { class: 'cpv-corner' }, 'CAM-01 · LIVE'));
+    this.stage.append(this.canvas, this.tag, this.emoteLbl, el('div', { class: 'cpv-scan' }), el('div', { class: 'cpv-corner' }, t('CAM-01 · LIVE')));
     this.controls = el('div', { class: 'cpv-controls' });
     this.el.append(this.stage, this.controls);
     this.ok = false;
