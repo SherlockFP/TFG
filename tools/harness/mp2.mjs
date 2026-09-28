@@ -13,6 +13,7 @@ const ctx = await b.newContext({ viewport: { width: 640, height: 360 } });
 const logs = [];
 const mk = async (url, tag) => {
   const p = await ctx.newPage();
+  p.on('dialog', (d) => { logs.push(tag + ' dialog: ' + d.message()); d.dismiss().catch(() => {}); });
   p.on('pageerror', (e) => logs.push(tag + ' pageerror: ' + String(e.stack || e.message).slice(0, 400)));
   p.on('console', (m) => { if (m.type() === 'error') logs.push(tag + ' error: ' + m.text().slice(0, 300)); });
   await p.goto(`http://127.0.0.1:${port}${url}`);
