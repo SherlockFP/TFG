@@ -164,6 +164,11 @@ export class LocalPlayer {
   heldItem() { const id = this.heldId(); return id ? this.game.items.get(id) : null; }
   heldDef() { const it = this.heldItem(); return it ? itemDef(it.type) : null; }
   twoHanded() { const d = this.heldDef(); return d?.hands === 2; }
+  /** A crewmate's body is in our hands (heavy: no sprint, slower walk). */
+  carriesBody() {
+    for (const id of this.slots) if (id && this.game.items.get(id)?.type === 'body') return true;
+    return false;
+  }
 
   carryWeight() {
     let w = 0;
@@ -224,12 +229,15 @@ export class LocalPlayer {
     const weightMul = clamp(1 - Math.max(0, weight - 10) / 260, 0.60, 1);
     this.weightMul = weightMul;
     const moving = len > 0;
-    const wantSprint = canMove && moving && input.isDown('sprint') && !this.crouch && !this.exhausted && mz <= 0.1;
+    const bodyCarry = this.carriesBody();
+    this.bodyCarry = bodyCarry;
+    const wantSprint = canMove && moving && input.isDown('sprint') && !this.crouch && !this.exhausted && mz <= 0.1 && !bodyCarry;   // no sprinting with a body over your shoulder
     this.sprinting = wantSprint && this.stamina > 0;
     // Snappier than the old 3.9/6.6 but still LC-paced so creatures stay threatening.
     let speed = this.crouch ? 2.6 : this.sprinting ? 8.2 : 5.0;
     speed *= weightMul * s.speedMul * (this.speedBoost > 0 ? 1.25 : 1) * (this.slowT > 0 ? 0.35 : 1);
     if (this.game.grab?.item) speed *= 0.88;
+    if (bodyCarry) speed *= 0.85;   // on top of the 90 lb weight penalty: a slow, heavy trudge (~2.9 m/s), never frozen
     if (this.game.weatherMud && !this.indoor && !this.inShip) speed *= 0.92;
     // facility set pieces: wading through the flooded room
     const spZones = this.indoor ? this.game.world.facility?.zones : null;

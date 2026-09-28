@@ -11,6 +11,7 @@ import { clamp, damp } from '../core/util.js';
 import { MINIGAMES } from '../minigames/index.js';
 import { applyAffixes, applyAffixEffects, affixCooldown, affixDisplayName, affixColor, describeAffix } from './loot.js';
 import { TIERS } from './tiers.js';
+import { t } from '../core/i18n.js';
 
 /** Weapon damage multiplier of an item's tier (tiers.js statMul; plain / store weapons are Common = 1). */
 // Relative to the definition's own tier: def.dmg is the damage at def.tier/def.rarity, a better roll scales it up.
@@ -131,6 +132,7 @@ export const actionMethods = {
     const aimBig = target?.bigItem;
     if (input.mouseClicked(0)) {
       if (aimBig && (!held || itemDef(held.type).hands !== 2)) this.grab.start(aimBig);
+      else if (target?.bodyItem && !held) this.pickup(target.bodyItem);   // empty hands: LMB carries a body like it grabbed one before
       else this.useHeldPress();
     }
     if (input.mouseDown(0)) this.useHeldHold(dt);
@@ -185,10 +187,15 @@ export const actionMethods = {
       if (it && it.state === 'world') {
         const def = it.def;
         const r = it.tierColor;
-        if (def.kind === 'big' || it.type === 'body') {
+        if (it.type === 'body') {
+          // a crewmate's body is carried in the hands (2-handed, heavy, ONE at a time) so it follows you through every door
+          if (hit.distance < reach) {
+            const has = this.carriedBody();
+            return { label: `Carry ${it.label ? it.label + "'s " : ''}body [E]`, sub: t(has ? 'You already carry a body' : 'Heavy - slows you down'), bodyItem: it, action: () => this.pickup(it) };
+          }
+        } else if (def.kind === 'big') {
           if (hit.distance < 3.6) {
-            const lbl = it.type === 'body' ? `Grab ${it.label || 'body'} [LMB]` : `Grab ${def.name} [LMB]`;
-            return { label: lbl, sub: it.type === 'body' ? '' : `▮${it.value}`, bigItem: it, action: () => this.grab.start(it) };
+            return { label: `Grab ${def.name} [LMB]`, sub: `▮${it.value}`, bigItem: it, action: () => this.grab.start(it) };
           }
         } else if (hit.distance < reach) {
           const toBag = this.inventory?.pickTargetHint?.(it);
@@ -333,9 +340,16 @@ export const actionMethods = {
   },
 
   // ------------------------------------------------------------------ inventory
+  /** The body item this player carries (hands, hotbar or bag), or null. */
+  carriedBody() {
+    for (const o of this.items.all()) if (o.type === 'body' && o.holder === this.selfId) return o;
+    return null;
+  },
+
   pickup(it) {
     const p = this.player;
     const def = it.def;
+    if (it.type === 'body' && this.carriedBody()) { this.ui.toast(t('You can only carry ONE body at a time.'), 'bad'); this.sfx('ui_error', 0.4); return; }
     const held = p.heldItem();
     const handsFull = held && itemDef(held.type).hands === 2;
     let slot = p.slots[p.slot] ? findFreeSlot(p) : p.slot;
@@ -356,6 +370,7 @@ export const actionMethods = {
     this.net.request('pick', { id: it.id, slot });
     this.refreshHeldVisuals();
     if (it.nest) this.ui.toast('Something is angry...', 'bad');
+    if (it.type === 'body') this.ui.toast(t('Carrying a body: heavy, no sprinting. Bring it to the ship to cut the fine.'), 'info');
   },
 
   onPickFail(id, d = {}) {
@@ -428,6 +443,7 @@ export const actionMethods = {
   },
   dropItem(it, throwIt, extra = {}) {
     const p = this.player;
+    if (it.type === 'body') throwIt = false;   // 90 lb of body: put it down, never a 9 m/s throw
     const i = p.slots.indexOf(it.id);
     if (i >= 0) p.slots[i] = null;
     const fwd = p.forward();
@@ -436,7 +452,7 @@ export const actionMethods = {
     const hit = this.physics.raycast(eye, fwd, 0.9, G.STATIC | G.DOOR);
     const dist = hit ? Math.max(0.1, hit.distance - 0.3) : 0.8;
     const pos = eye.clone().addScaledVector(fwd, dist).add(new THREE.Vector3(0, -0.25, 0));
-    const q = new THREE.Quaternion().setFromAxisAngle(UP, p.yaw);
+    const q = new THREE.Quaternion().setFromAxisAngle(UP, p.yaw + (it.type === 'body' ? Math.PI / 2 : 0));   // a body is long: lie it across the view
     const v = throwIt ? fwd.clone().multiplyScalar(9).add(new THREE.Vector3(0, 2.5, 0)).add(p.vel.clone().multiplyScalar(0.5)) : p.vel.clone().multiplyScalar(0.5);
     it.obj.visible = false;
     // battery drained locally (jetpack, flashlight...) reaches every peer before the item leaves our hands
