@@ -305,6 +305,8 @@ Chat / spell / emote speech bubbles over crewmates, first-person body (own avata
 and the walking-stutter fixes. **Root cause of "hitching while walking": LocalPlayer's constant `vel.y = -1` stick-to-ground push made the Rapier controller stall ~3 frames every ~0.7 s (7 % of frames) on flat floors; fixed (desired.y = 0 while grounded).**
 Also: the tool grip offset in `refreshHeldVisuals` had the wrong sign (weapons ended up behind the camera). Shared-file edits marked `[fpbody]` (avatar.js IK, actions.js hooks, localplayer.js, game.js slot).
 `tools/harness/fpbody.js` (browser script) was written but NOT run (lead cancelled the headless runs); node harnesses `fpbody_{offline,body_offline,smoke,walk_offline,stall_offline,terrain_offline}.mjs` did run.
+### 5.14 Wave 2 - SECURED LOOT + BREACHING TOOLS (module `secureloot`, docs/wave2/secureloot.md)
+Secured containers in facilities (glass case, wall / floor safe, cage / locker, electronic lockbox, vault crate) opened with Glass Cutter / Breaching Drill (Payday-style jam + noise) / Bolt Cutters / Hack Tool / Plasma Torch / lockpick / crowbar / EMP / Code Slip, each with a loud crude melee fallback. Pure rules `src/game/secureloot_core.js` + `node tools/harness/secureloot.test.mjs`; net `slAct` / `slSt`. NOT hand-played; `tools/harness/wave2_secureloot.js` written, not run.
 
 ### 5.5 Smoke test (paste in the browser console on `?autohost=local&code=T1&name=Tester`, after ~4 s)
 ```js

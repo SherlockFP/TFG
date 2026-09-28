@@ -138,7 +138,7 @@ import { installTrade } from './trade.js';
 // [import:boardgame]
 
 
-// [import:secureloot]
+import { installSecureLoot } from './secureloot.js';   // wave 2: secured containers + breaching tools
 
 
 // [import:maps2]
@@ -296,7 +296,7 @@ export class Game extends Emitter {
     // [slot:boardgame]
 
 
-    // [slot:secureloot]
+    this.useModule('secureloot', installSecureLoot);
 
 
     // [slot:maps2]
