@@ -72,7 +72,7 @@ export function installRpg(game) {
   const has = (id) => flags().has(normId(id));
 
   // ------------------------------------------------------------------ net sync (role for name tags / kits, scrap value for sales)
-  const myState = () => ({ role: ctl.role(), sv: Math.round(clamp(game.stats?.valueMul || 1, 0.5, 3) * 1000) / 1000 });
+  const myState = () => ({ role: ctl.role(), sv: Math.round(clamp(game.stats?.valueMul || 1, 0.5, 3) * 1000) / 1000, ll: Math.round(clamp(bonus('lootLuck'), 0, 1) * 1000) / 1000 });
   function sendState(to) {
     const net = game.net;
     if (!net) return;
@@ -86,7 +86,7 @@ export function installRpg(game) {
     const sv = clamp(Number(d.sv) || 1, 0.5, 3);
     const first = !roles.has(from);
     const prev = roles.get(from);
-    roles.set(from, { role, sv });
+    roles.set(from, { role, sv, ll: clamp(Number(d.ll) || 0, 0, 1) });
     if (first) sendState(from);   // gossip: a peer we had not heard from learns our role too
     if (prev && prev.role !== role && role) toast(`${game.remotes.get(from)?.name || 'A crewmate'} is now a ${ROLES[role].name}.`, 'info');
   }
@@ -319,6 +319,8 @@ export function installRpg(game) {
     flags: () => new Set(flags()),
     points: () => ctl.points(),
     roleOf: (peerId) => (peerId === game.selfId || !peerId ? ctl.role() : roles.get(peerId)?.role || null),
+    /** Sum of the crew's passive-tree lootLuck (own + crewmates synced over 'rpgst'); read by inventory tier rolls. */
+    crewLootLuck: () => { let v = bonus('lootLuck'); for (const [id, r] of roles) if (id !== game.selfId && game.remotes?.has(id)) v += r.ll || 0; return Math.min(1, v); },
     open, close: closePanel, toggle, openRoles,
     isOpen: () => !!panelEl && game.ui?.panelOpen === panelEl,
     ROLES, KEYSTONES: KEYSTONE_NODES.map((n) => n.id),

@@ -482,6 +482,7 @@ export function installInventory(game) {
     const danger = game.hostData?.danger ?? ((MOONS[run.moon]?.tier || 1) + (run.quotaIndex || 0) * 0.35);
     let bal = 0;
     try { bal = Number(game.balance?.lootLuck?.()) || 0; } catch { bal = 0; }
+    try { crew += Number(game.rpg?.crewLootLuck?.()) || 0; } catch { /* rpg module absent */ }   // Scavenger's Luck & tree lootLuck nodes
     st.luck = C.lootLuck({ balance: bal, danger, crewLuck: crew });
     st.luckT = game.time;
     return st.luck;

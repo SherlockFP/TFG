@@ -99,8 +99,10 @@ export class Objectives {
     }
     if (run.phase !== 'moon') this.enteredToday = false;
     try { g.mods?.emit('objectives', add, g, run.phase); } catch (e) { console.warn('objectives hook', e); }   // wave-1 modules add lines here
-    for (const b of (g.profile.bounties || []).slice(0, 3)) add(`${b.done ? '✔ ' : ''}${bountyText(b)} ${b.done ? t('(claim at HQ)') : `${Math.min(b.progress, b.n)}/${b.n}`}`, 'bounty', b.done, b.n ? Math.min(1, b.progress / b.n) : 0);
-    return out;
+    for (const b of (g.profile.bounties || []).slice(0, out.length >= 6 ? 0 : 2)) add(`${b.done ? '✔ ' : ''}${bountyText(b)} ${b.done ? t('(claim at HQ)') : `${Math.min(b.progress, b.n)}/${b.n}`}`, 'bounty', b.done, b.n ? Math.min(1, b.progress / b.n) : 0);
+    // keep the tracker readable: warnings and main goals first, at most 7 lines
+    const rank = (o) => (o.kind === 'warn' ? 0 : o.kind === 'main' ? 1 : o.kind === 'bounty' ? 3 : 2);
+    return out.map((o, i) => [o, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).slice(0, 7).map((x) => x[0]);
   }
 
   clientCollected() {
