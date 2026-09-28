@@ -56,7 +56,7 @@ import { installMagic } from './magic.js';
 
 import { installRpg } from './rpg.js';
 
-// [import:shop]
+import { installShop } from './shop.js';
 
 import { installCrafting } from './crafting.js';
 
@@ -142,7 +142,7 @@ export class Game extends Emitter {
 
     this.useModule('rpg', installRpg);
 
-    // [slot:shop]
+    this.useModule('shop', installShop);
 
     this.useModule('crafting', installCrafting);
 
