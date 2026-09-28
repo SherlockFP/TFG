@@ -144,7 +144,7 @@ import { installSecureLoot } from './secureloot.js';   // wave 2: secured contai
 // [import:maps2]
 
 
-// [import:food]
+import { installFood } from './food.js';   // wave 2: food & drinks (buffs, booze, cheers, ship table)
 
 
 // [import:homeworld]
@@ -302,7 +302,7 @@ export class Game extends Emitter {
     // [slot:maps2]
 
 
-    // [slot:food]
+    this.useModule('food', installFood);
 
 
     // [slot:homeworld]

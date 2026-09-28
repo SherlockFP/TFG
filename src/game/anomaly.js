@@ -97,8 +97,8 @@ export function installAnomaly(game) {
       if (r) {   // no stacking: the longer of what is left and the new duration
         if (dur > 0) { r.until = Math.max(r.until === Infinity ? 0 : r.until, now + dur); r.dur = Math.max(r.dur, dur); }
       } else {
-        const same = [...B.values()].filter((x) => !!x.def.power === !!def.power).sort((a, b) => a.t0 - b.t0);
-        if (same.length >= 3) buffs.remove(same[0].id, 'bumped');   // max 3 mutations + 3 power-ups at once
+        const same = [...B.values()].filter((x) => !!x.def.power === !!def.power && !!x.def.food === !!def.food).sort((a, b) => a.t0 - b.t0);   // [food] own class
+        if (same.length >= (def.food ? 6 : 3)) buffs.remove(same[0].id, 'bumped');   // max 3 mutations + 3 power-ups (+ 6 food / drink buffs, food.js) at once
         r = { id, def, t0: now, until: dur > 0 ? now + dur : Infinity, dur };
         B.set(id, r);
       }

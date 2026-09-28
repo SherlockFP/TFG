@@ -270,6 +270,8 @@ Every creature emotes (body language layer + internet-style bubble), gloats afte
 ~25% of outdoor maps from sector 1 carry a portal mirror (E to step in / out). Inside: host-owned membership, flipped screen + mirrored A/D / mouse X, dark ASCII post look (own shader program, safe fallback), wraith / flame fiend /
 mirror copy / zombie fodder waves (cap 50), XP crystals + 3-card level-ups (8 temporary upgrades), Reflection Meter -> chests + power-ups. Owner rules: 3:00 countdown then OVERTIME (+1 level / 20 s), a death = sit out one round
 (respawn while a crewmate inside lives), everyone inside dead = SHATTERED (real death), day end = lost in the reflection. Hooks: game.js slots + 6 `[mirror]` lines in engine.js; the rest are instance wraps. `tools/harness/mirror.test.mjs` PASS.
+### 5.14 Wave 2 - FOOD & DRINKS (module `food`, docs/wave2/food.md; node-tested only, NOT browser-verified)
+14 optional consumables (`fd_*`, store tab Food) with temporary buffs through the anomaly buff registry, drunk stacking (sway / drift / lag / slur / hiccups / harmless blackout), eat / drink animations, CHEERS!, Party Cake sharing, offer with H, ship mess table (Well Fed), vending machines / fridges. Tests: `tools/harness/food.test.mjs`, `food_install.test.mjs`.
 
 ### 5.11 Wave 2 - HQ FORGE (module `forge`, see docs/wave2/forge.md)
 THE MONETIZER (+1..+9, overclocks), Ascension Altar (tier up, workbench capped at Rare), Shard Exchange, 6 shard items + Backup Drive, weapon glow (+3/+5/+7/+9), creature tiers
