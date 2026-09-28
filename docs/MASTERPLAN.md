@@ -424,3 +424,21 @@ GÜN 1 → GÜN 2 → GÜN 3 (HQ'da sat, kotayı doldur)
   barı + faz göstergesi, zafer sonrası "SECTOR CLEARED" + CASE kaydı.
 - **Teknik:** host phase akışına `core` fazı (landing → core → takeoff), `moongen` sektör başına `coreMoon`, bosses.js
   kayıt API'siyle yeni boss'lar (her biri kendi dosyası), facility generator'a `layout.plan = 'core'` (kanatlar + arena).
+
+### 14.1 GLITCH GATES (Solo Leveling ilhamı, TFG'ye uyarlanmış)
+- Aylarda rastgele **Glitch Gate**'ler (yırtık, titreşen portal) açılır; her birinin **rütbesi** var: **E / D / C / B / A / S**
+  (terminal `GATES` ve iniş brifinginde görünür; rütbe = boss gücü + loot tier tabanı; S nadir ve sektör 4+).
+- Kapının içi ayrı, rütbesine göre üretilen kısa bir zindan: temalı koridorlar → mini-boss → **özel boss odası**.
+- **Gate Break:** bir kapı 2 gün içinde temizlenmezse **kırılır** → yaratıklar dışarı taşar ve gemiye yürür → otomatik
+  **SIEGE** (§11 #22). Temizlemeyi ertelemenin bedeli var.
+- **Red Gate** (nadir): girince çıkış kapanır, boss ölene kadar dışarı çıkılamaz; ödül ×2.
+- **Hidden Gate / "Double Core"** (çok nadir): normal kapının içinde gizli ikinci oda — heykel/kural bulmacası
+  ("1. Algoritmaya saygı göster. 2. İzleyicilere ibadet et. 3. Canlı kal."), yanlış hamle ölümcül, ödül mythic + özel unvan.
+- **Özel boss'lar:** her rütbede isimli, arenası kendine özel boss havuzu (tema × rütbe); boss girişinde isim kartı
+  sinematiği (ad, unvan, rütbe) ve faz müziği.
+- **ARCHIVE ("Arise" karşılığı):** yenilen boss'un "kaydını" alırsın (`EXTRACT DATA`, 3 sn kanal) → **Archived Copy**:
+  sonraki run'larda çağırılabilen, sınırlı süreli, gölge-glitch görünümlü yoldaş (boss'un zayıflatılmış hali). Aynı anda 1
+  kopya, her kopyanın kullanım hakkı sınırlı; Occultist/Technician kanal süresini kısaltır. The Algorithm bunu sever:
+  "Harika. İçeriği yeniden kullanıyorsun."
+- **Oyuncu rütbesi:** hesap başına Hunter Rank (E→S) — temizlenen kapılarla yükselir, yüksek rütbeli kapılara girme şartı
+  değil ama önerilen; hub'da ve isim etiketinde görünür.
