@@ -253,6 +253,8 @@ The headless feature script `tools/harness/wave2_combat.js` exists but was not r
 STATIC exposure per player (hot rooms / hot items / breach; Buzzing 25, Glitching 50, Corrupted 75, DELETED 100), Decon Shower in the ship, Antivirus Shot, Faraday Suit, Signal Counter,
 10 mutations, 6 temporary power-ups (holographic pickups), Loot Box Shrine (d20) + throwable Cursed Die, left-dock buff bar. Net types `an` / `anfx` / `anst`. Shared edits: game.js slot lines, magic.js (Mute hook).
 Verified: node test (`tools/harness/anomaly_core.test.mjs`), build, smoke_land. NOT hand-played; `tools/harness/wave2_anomaly.js` was written but not executed (budget freeze).
+### 5.13 Wave 2 - CREATURE EMOTES (module `cemotes`, docs/wave2/cemotes.md)
+Every creature emotes (body language layer + internet-style bubble), gloats after killing a player (chat line + victim camera on the killer) and reacts to player emotes by personality (dance-along = safe passage, taunt = enrage, mimic copies, shy flees, bosses laugh). Net type `ce` (HOST_ONLY). Only game.js slot lines are shared. Verified: `node tools/harness/cemotes.test.mjs` (data + fake-game simulation), build, one headless run (`wave2_cemotes.js`); NOT hand-played.
 ### 5.11 Wave 2 - HQ FORGE (module `forge`, see docs/wave2/forge.md)
 THE MONETIZER (+1..+9, overclocks), Ascension Altar (tier up, workbench capped at Rare), Shard Exchange, 6 shard items + Backup Drive, weapon glow (+3/+5/+7/+9), creature tiers
 (Uncommon..Mythic: HP/dmg/XP mul on top of balance.scale, aura/nameplate, shard drops). Pure rules `src/game/enhance.js` + `node tools/harness/forge_rules.test.mjs`. Hooks in shared files are

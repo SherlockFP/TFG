@@ -111,7 +111,7 @@ import { installGameplay2 } from './gameplay2.js';
 // [import:skeletons]
 
 
-// [import:cemotes]
+import { installCreatureEmotes } from './cemotes.js';
 
 
 // [import:fpbody]
@@ -250,7 +250,7 @@ export class Game extends Emitter {
     // [slot:skeletons]
 
 
-    // [slot:cemotes]
+    this.useModule('cemotes', installCreatureEmotes);
 
 
     // [slot:fpbody]
