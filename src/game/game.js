@@ -115,7 +115,7 @@ import { installForge } from './forge.js';
 // [import:fpbody]
 
 
-// [import:grenades]
+import { installGrenades } from './grenades.js';
 
 
 export class Game extends Emitter {
@@ -238,7 +238,7 @@ export class Game extends Emitter {
     // [slot:fpbody]
 
 
-    // [slot:grenades]
+    this.useModule('grenades', installGrenades);
 
   }
 

@@ -249,6 +249,11 @@ The headless feature script `tools/harness/wave2_combat.js` exists but was not r
 - Integration wiring: interior names come from `interiors/index.js INTERIOR_NAMES` (HUD brief, codex, terminal, moongen);
   interior carpet/tile floors use the new feel footstep sets; interior ambience prefers the shipped theme loops.
 
+### 5.13 Wave 2 - GRENADES (module `grenades`, docs/wave2/grenades.md)
+Hold-LMB throw for every grenade (dotted arc with predicted bounce, cook, deterministic ball sim on all peers, host-authoritative boom): stun / cryo / molotov / EMP / crafted decoy
+moved onto it; new flashbang, smoke, decoy beacon, sticky charge (store + workbench) and RARE bombs (gravity well, blackout, confetti, glitch, cluster: chest / boss / world drops only).
+Net `grth` (request) + `grfx` (broadcast). Pure rules `src/game/grenades_core.js` + `node tools/harness/grenades.test.mjs`. Shared edits: game.js slot lines only (instance wraps listed in the doc).
+Headless feature script `tools/harness/wave2_grenades.js` passed once (host only); aim preview / cook bar, smoke blocking check and 2-player play are NOT verified.
 ### 5.12 Wave 2 - ANOMALY system (`game.anomaly`, docs/wave2/anomaly.md)
 STATIC exposure per player (hot rooms / hot items / breach; Buzzing 25, Glitching 50, Corrupted 75, DELETED 100), Decon Shower in the ship, Antivirus Shot, Faraday Suit, Signal Counter,
 10 mutations, 6 temporary power-ups (holographic pickups), Loot Box Shrine (d20) + throwable Cursed Die, left-dock buff bar. Net types `an` / `anfx` / `anst`. Shared edits: game.js slot lines, magic.js (Mute hook).
