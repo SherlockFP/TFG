@@ -155,7 +155,7 @@ import { installHomeworld } from './homeworld.js';
 import { installPets } from './pets.js';
 
 
-// [import:cycle]
+import { installCycle } from './cycle.js';   // [cycle] inert: rules only, see docs/wave2/cycle.md
 
 
 export class Game extends Emitter {
@@ -315,7 +315,7 @@ export class Game extends Emitter {
     this.useModule('pets', installPets);
 
 
-    // [slot:cycle]
+    this.useModule('cycle', installCycle);   // [cycle]
 
   }
 
