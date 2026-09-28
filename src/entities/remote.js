@@ -68,6 +68,7 @@ export class RemotePlayer {
       m.position.y = 0.9; g.add(m);
       this.avatar = { root: g, parts: { head: m, handR: m, handL: m }, update() {}, setMouth() {}, setExpression() {}, setSuitColor() {}, setHat() {}, setHitFlash() {}, setVisible(v) { g.visible = v; }, dispose() {} };
     }
+    try { this.avatar.setLook?.({ suit: this.suit, hat: this.hat, face: info.face, back: info.back }); } catch (e) { console.warn('wardrobe look', e); }   // wardrobe outfit + accessories
     this.root = this.avatar.root;
     game.engine.scene.add(this.root);
     this.tag = makeNameTag(this.name, this.level);
@@ -89,6 +90,7 @@ export class RemotePlayer {
     }
     if (info.suit && info.suit !== this.suit) { this.suit = info.suit; this.avatar.setSuitColor(suitColor(this.suit)); }
     if (info.hat && info.hat !== this.hat) { this.hat = info.hat; this.avatar.setHat(this.hat); }
+    try { this.avatar.setLook?.({ suit: info.suit, hat: info.hat, face: info.face, back: info.back }); } catch { /* wardrobe */ }   // outfit / face / back (undefined fields keep their value)
   }
 
   // state packet: { p:[x,y,z], y:yaw, pt:pitch, f:flags, h:heldType, fl:flashOn, vl:voice, n:noise, sw:swing, e:emote }

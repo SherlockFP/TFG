@@ -66,7 +66,7 @@ import { installLore } from './lore.js';
 
 import { installWorldX } from './worldx.js';
 
-// [import:fun]
+import { installFun } from './fun.js';
 
 
 // [import:brlevels]
@@ -170,7 +170,7 @@ export class Game extends Emitter {
 
     this.useModule('worldx', installWorldX);
 
-    // [slot:fun]
+    this.useModule('fun', installFun);
 
 
     // [slot:brlevels]
@@ -259,7 +259,7 @@ export class Game extends Emitter {
 
   helloData() {
     const p = this.profile;
-    return { name: p.name, level: p.level, suit: p.suit, hat: p.hat, pid: p.id, title: titleOf(p), mods: this.mods?.enabledIds() || [] };
+    return { name: p.name, level: p.level, suit: p.suit, hat: p.hat, face: p.face || 'none', back: p.back || 'none', pid: p.id, title: titleOf(p), mods: this.mods?.enabledIds() || [] };   // face/back: wardrobe accessories (old clients ignore them)
   }
 
   installNetHandlers() {
