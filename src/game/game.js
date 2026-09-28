@@ -129,6 +129,9 @@ import { installGameplay2 } from './gameplay2.js';
 // [import:avatar2]
 
 
+// [import:trade]
+
+
 export class Game extends Emitter {
   constructor({ engine, audio, settings, profile, ui, input, mods }) {
     super();
@@ -260,6 +263,9 @@ export class Game extends Emitter {
 
 
     // [slot:avatar2]
+
+
+    // [slot:trade]
 
   }
 
