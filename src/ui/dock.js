@@ -4,7 +4,7 @@
 //   box.innerHTML = '...';  ...  box.remove() on dispose
 // Items are ordered by `order` (lower = first). Hidden automatically while the HUD root is hidden (menus, death cam).
 const SIDES = {
-  right: 'position:fixed;right:14px;top:150px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;pointer-events:none;z-index:6;max-width:300px',
+  right: 'position:fixed;right:14px;top:44vh;display:flex;flex-direction:column;align-items:flex-end;gap:6px;pointer-events:none;z-index:6;max-width:300px',
   bottom: 'position:fixed;left:50%;bottom:92px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:none;z-index:6',
   left: 'position:fixed;left:14px;bottom:170px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;pointer-events:none;z-index:6;max-width:300px',
 };
