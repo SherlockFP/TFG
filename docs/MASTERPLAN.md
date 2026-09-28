@@ -468,3 +468,28 @@ Sahip: modeller "çok AI duruyor", hafif yuvarlak, Among Us'ımsı ama **çakma 
   boyuttan çıkınca veya gün bitince söner. Daha zor, daha çok loot (tier şansı +).
 - **Denge:** boyutta kalma süresi arttıkça dalga gücü artar; ölürsen boyutta topladıkların düşer (ayna önünde); gün sonu
   kalanlar "yansımada kaybolur" (ölüm).
+
+## 17. HOMEWORLD TYCOON — kendi gezegenin + gemin (tasarım, §13 Shipyard ile birlikte)
+- **Homeworld:** her ekibin kendine ait küçük bir **ev gezegeni** ("Personal Server"): yörüngeden `HOME` rotasıyla gidilir,
+  gemi oraya iner; başta çorak bir kaya + tek bir iniş pisti.
+- **İnşa (tycoon):** pist etrafında ızgaraya binalar kurulur (hayalet önizleme, döndür, yerleştir; host onaylı):
+  | Bina | Üretir | Yükseltme |
+  |---|---|---|
+  | Content Farm | pasif ▮ (gün başına) | Lv1-5: daha çok ▮, daha çok elektrik |
+  | Server Rack Array | Engagement → Clout ◈ | soğutma ister |
+  | Generator / Solar | elektrik (her bina ister) | yakıt / verim |
+  | Scrap Refinery | hurdayı otomatik component'e çevirir | hız |
+  | Shard Distiller | yavaşça shard üretir | tier |
+  | Garden / Kitchen | yemek-içecek (§ food) | çeşit |
+  | Barracks | kiralık NPC işçi (bina hızı +) | kapasite |
+  | Defense Tower | SIEGE'e karşı ev gezegeni savunması | menzil |
+  | Trophy Hall / Museum | boss trophy + artifact sergisi → ziyaretçi = pasif ◈ | vitrin sayısı |
+  | Arcade / Lounge | mini oyunlar, jam, arkadaş ziyareti | — |
+- **Ekonomi döngüsü:** binalar **oyun günü geçtikçe** üretir (gerçek zamanlı değil — sadece oynadıkça; idle suistimali yok),
+  üretim gemi deposuna / ev deposuna gider, tavan (storage cap) var → geri dönüp toplamak gerekir.
+- **Tehdit:** bazen ev gezegenine **baskın** (SIEGE varyantı) — savunma kulesi + deployable'lar; kaybedersen bir bina hasar alır
+  (yıkılmaz, tamir gerekir).
+- **Sosyal:** arkadaşlar ev gezegenini ziyaret edebilir (lobi), müzeye bakar, ziyaret bonusu.
+- **Kalıcılık:** ev gezegeni **profil + crew** kaydına yazılır (run sıfırlansa bile kalır — kalıcı ilerleme), gemi modülleri de öyle.
+- **Denge:** pasif gelir, aktif oynanışın ~%20-30'unu geçmez; yükseltme maliyetleri üstel; elektrik/soğutma kısıtı "her şeyi
+  kur" yerine seçim yaptırır.
