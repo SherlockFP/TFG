@@ -716,13 +716,15 @@ export function installInventory(game) {
       if (it?.tier) out.tr = it.tier;
       if (it?.plus) out.pl = it.plus;   // [forge] +N and overclocks survive saves
       if (it?.oc?.length) out.oc = [...it.oc];
+      if (it?.dur != null) out.du = Math.round(it.dur * 10) / 10;   // [durability] wear + full-repair count survive saves
+      if (it?.dr) out.dr = it.dr;
       const holder = it?.holder && !String(it.holder).startsWith('c:') ? it.holder : null;
       const pid = holder ? pidOf(holder) : it?.reclaim?.pid;
       if (pid) out.rc = { pid, iv: holder ? (it.inv ? { ...it.inv } : null) : (it.reclaim?.iv || null) };
       return out;
     },
     /** host.js hostInit restore hook: fields to pass through into the 'sp' event */
-    loadFields(s) { return { tr: s?.tr, rc: s?.rc, pl: s?.pl, oc: s?.oc }; },   // [forge] pl / oc
+    loadFields(s) { return { tr: s?.tr, rc: s?.rc, pl: s?.pl, oc: s?.oc, du: s?.du, dr: s?.dr }; },   // [forge] pl / oc  [durability] du / dr
     flash: (msg) => panel.flash(msg),
     debug: () => ({ beams: st.beams.size, ver: st.ver, luck: st.luck }),
     dispose() {

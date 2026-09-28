@@ -258,6 +258,12 @@ THE MONETIZER (+1..+9, overclocks), Ascension Altar (tier up, workbench capped a
 (Uncommon..Mythic: HP/dmg/XP mul on top of balance.scale, aura/nameplate, shard drops). Pure rules `src/game/enhance.js` + `node tools/harness/forge_rules.test.mjs`. Hooks in shared files are
 marked `[forge]`. Only node test + build + one smoke were run; `tools/harness/wave2_forge.js` is written but NOT run yet.
 
+### 5.13 Wave 2 - ITEM DURABILITY (module `durability`, docs/wave2/durability.md)
+Weapons (per swing / hit / shot) and worn armour (per damage taken) wear out: Common / Uncommon items shatter (one scrap shard left), Rare+ or forged items become BROKEN (cannot attack, x0.3 sell value) until repaired
+(workbench REPAIR tab, Repair Kit +40 %, HQ mechanic bench; every full repair ages the max by 5 %, floor 60 %). Bar under hotbar / grid icons, tooltip row, BROKEN overlay. Pure rules `src/game/durability_core.js`
++ `node tools/harness/durability.test.mjs`; browser proof `tools/harness/wave2_durability.js` (35/35, host path only). Item fields `it.dur` / `it.dr` (`du` / `dr` on `sp`, serialize, saveFields). Net types `duw` `dukit` `durep` `dus` `dubrk` `dures`.
+Hooks in shared files are marked `[durability]`. NOT verified: client prediction / `duw` flush with a real second player, HQ mechanic bench placement + panel by eye.
+
 ### 5.5 Smoke test (paste in the browser console on `?autohost=local&code=T1&name=Tester`, after ~4 s)
 ```js
 const g = kefal.game, errs = []; addEventListener('error', e => errs.push(e.message));

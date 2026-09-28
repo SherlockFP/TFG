@@ -127,7 +127,7 @@ export function createCraftingPanel({ game, api, tab, onClose } = {}) {
       mk('div', 'crp-pill', `${t('BLUEPRINTS')} ${api.blueprints().length}/${Object.keys(BLUEPRINTS).length}`));
     root.appendChild(head);
     const tabs = mk('div', 'crp-tabs');
-    for (const id of ['craft', 'upgrade', 'dismantle', 'analyze', 'blueprints']) {
+    for (const id of ['craft', 'upgrade', 'dismantle', 'analyze', 'blueprints', ...(game.durability ? ['repair'] : [])]) {   // [durability] REPAIR tab
       const b = mk('button', 'crp-tab' + (lastTab === id ? ' sel' : ''), t(id.toUpperCase()));
       b.dataset.nav = 'crp:' + id;
       b.addEventListener('click', (e) => { e.stopPropagation(); if (busy) return; lastTab = id; sel = null; stamp = null; sfx(); render(); root.querySelector(`[data-nav="crp:${id}"]`)?.focus({ preventScroll: true }); });
@@ -141,6 +141,7 @@ export function createCraftingPanel({ game, api, tab, onClose } = {}) {
       else if (lastTab === 'upgrade') renderUpgrade(body, st);
       else if (lastTab === 'dismantle') renderDismantle(body);
       else if (lastTab === 'analyze') renderAnalyze(body);
+      else if (lastTab === 'repair' && game.durability) game.durability.renderRepairTab(body, render);   // [durability]
       else renderBlueprints(body);
     } catch (e) { console.warn('[crafting panel]', e); body.appendChild(mk('div', 'crp-empty', 'Error: ' + e.message)); }
     // component stock bar

@@ -118,7 +118,7 @@ import { installForge } from './forge.js';
 // [import:grenades]
 
 
-// [import:durability]
+import { installDurability } from './durability.js';   // [durability]
 
 
 export class Game extends Emitter {
@@ -244,7 +244,7 @@ export class Game extends Emitter {
     // [slot:grenades]
 
 
-    // [slot:durability]
+    this.useModule('durability', installDurability);   // [durability]
 
   }
 
