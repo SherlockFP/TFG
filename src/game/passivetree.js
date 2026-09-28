@@ -350,7 +350,7 @@ const primaryKey = (b) => Object.keys(b)[0];
   });
 })();
 
-export const START_ID = (role) => `start_${role}`;
+export const START_ID = (role) => `start_${ROLES[role]?.home || role}`;   // `home`: wave-2 roles (Trader / Engineer) share a tree post
 export const NODE_COUNT = NODES.length;
 export const KEYSTONE_NODES = NODES.filter((n) => n.type === 'keystone');
 /** Radius that contains the whole tree (renderer fit). */
