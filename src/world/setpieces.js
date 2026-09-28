@@ -58,6 +58,7 @@ import * as THREE from 'three';
 import { RNG } from '../core/rng.js';
 import { createProp } from '../models/props.js';
 import { t, tf } from '../core/i18n.js';
+import { SPECIAL_ROOMS } from './interiors/common.js';   // [maps2]
 
 // ------------------------------------------------------------------------------------ tuning
 const CATWALK_H = 3.4;           // deck top above the floor
@@ -90,7 +91,7 @@ const CABLE_LIT = 0xfff2b0;
 const DX = [1, 0, -1, 0], DZ = [0, 1, 0, -1];
 const INWARD = [[-1, 0], [0, -1], [1, 0], [0, 1]];                 // edge d of a cell -> back into the cell
 const WALL_ROT = [-Math.PI / 2, Math.PI, Math.PI / 2, 0];          // prop front (+Z) faces into the cell
-const SKIP_ROOMS = new Set(['entrance', 'vault', 'generator', 'core']);
+const SKIP_ROOMS = SPECIAL_ROOMS;   // [maps2] shared set (also holds the m2_* room types)
 const NO_FLOOD = new Set(['flooded_cave', 'poolrooms', 'overflow', 'sludge_pit', 'cistern']);   // rooms with their own water
 const FLOOD_W = { bathroom: 4, boiler: 3, kitchen: 3, nest: 2, storage: 2, lab: 2, lockers: 2, collapsed_shaft: 2 };
 // creature types the steam may stun (simple state machines that recover from 'stunned' -> 'idle')

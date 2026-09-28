@@ -259,6 +259,8 @@ Every creature emotes (body language layer + internet-style bubble), gloats afte
 THE MONETIZER (+1..+9, overclocks), Ascension Altar (tier up, workbench capped at Rare), Shard Exchange, 6 shard items + Backup Drive, weapon glow (+3/+5/+7/+9), creature tiers
 (Uncommon..Mythic: HP/dmg/XP mul on top of balance.scale, aura/nameplate, shard drops). Pure rules `src/game/enhance.js` + `node tools/harness/forge_rules.test.mjs`. Hooks in shared files are
 marked `[forge]`. Only node test + build + one smoke were run; `tools/harness/wave2_forge.js` is written but NOT run yet.
+### 5.14 Wave 2 - MAPS2 (module `maps2`, docs/wave2/maps2.md) - PARTIAL
+Story rooms (party / last stand / nursery / streamer shrine / flooded break room, readable lore notes), a triangle liminal room, per-room light switches, void windows, extra furniture; retyped from the normal layout with an own RNG fork (`globalThis.__kefalM2Off` disables). Challenge rooms are built but switched off (`M2_CHALLENGE_ON`), events / interactable state / outdoor landmarks NOT done. Node test `tools/harness/maps2.test.mjs`; not seen in a browser.
 ### 5.11 Localization wave (EN / TR / RU) — see docs/wave2/i18n.md
 `core/i18n.js` is multi-language (`t`, `tf` with `{x}` / `{@x}`, `L`, `sysMsg`, `addTranslations(map, lang = 'tr')`, `localizeDeep`);
 bulk dictionaries live in `src/i18n/tr_*.js` / `ru_*.js`; `src/i18n/display.js` localises item / creature / moon / ... names through

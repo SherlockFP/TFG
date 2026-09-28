@@ -138,7 +138,7 @@ import { installCreatureEmotes } from './cemotes.js';
 // [import:secureloot]
 
 
-// [import:maps2]
+import { installMaps2 } from './maps2.js';   // maps2 (story rooms, switches)
 
 
 export class Game extends Emitter {
@@ -283,7 +283,7 @@ export class Game extends Emitter {
     // [slot:secureloot]
 
 
-    // [slot:maps2]
+    this.useModule('maps2', installMaps2);
 
   }
 
