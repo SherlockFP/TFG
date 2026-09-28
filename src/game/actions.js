@@ -13,7 +13,14 @@ import { applyAffixes, applyAffixEffects, affixCooldown, affixDisplayName, affix
 import { TIERS } from './tiers.js';
 
 /** Weapon damage multiplier of an item's tier (tiers.js statMul; plain / store weapons are Common = 1). */
-const tierDmg = (it) => (it && it.def?.kind === 'weapon' ? (TIERS[it.rarity?.()]?.statMul || 1) : 1);
+// Relative to the definition's own tier: def.dmg is the damage at def.tier/def.rarity, a better roll scales it up.
+// This is the ONLY place melee/shotgun tier damage is applied (crafting/shop check inventory.appliesTierDamage).
+const tierDmg = (it) => {
+  if (!it || it.def?.kind !== 'weapon') return 1;
+  const own = TIERS[it.rarity?.()]?.statMul || 1;
+  const base = TIERS[it.def.tier]?.statMul || TIERS[it.def.rarity]?.statMul || 1;
+  return own / base;
+};
 /** "Rare" suffix for labels of tiered items (plain scrap without a rolled tier shows nothing extra). */
 const tierTag = (it) => (it?.tier && it.tier !== 'common' && !it.affix ? TIERS[it.tier]?.name || '' : '');
 

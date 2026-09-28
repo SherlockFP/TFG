@@ -648,6 +648,7 @@ export function installInventory(game) {
 
   // ------------------------------------------------------------------ api
   const api = {
+    appliesTierDamage: true,   // actions.js tierDmg owns weapon tier damage; crafting/shop wrappers stand down
     // ---- soft interface ----
     open() { if (!game.player?.dead && game.net) panel.open(); return api.isOpen(); },
     close() { panel.close(); },

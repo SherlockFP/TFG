@@ -523,7 +523,7 @@ export function installWeapons(game, ctx) {
   });
 
   // ---------------------------------------------------------------- melee: tier scaling (instance wrapper, actions.js untouched)
-  ctx.wrap(g, 'meleeSwing', (orig) => function (it, power) { return orig(it, power * (it ? relMul(it) : 1)); });
+  // (tier damage for melee is applied once, in actions.js meleeSwing via tierDmg - relative to the definition's tier)
 
   // ---------------------------------------------------------------- crowbar: pry locked doors and crates (hold E)
   let pry = null;   // { kind, target, it, t, dur, next }
