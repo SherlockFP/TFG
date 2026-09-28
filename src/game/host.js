@@ -315,10 +315,10 @@ export const hostMethods = {
         return;
       }
       run.seed = Math.floor(Math.random() * 1e9);
-      run.weather = MOONS[run.moon]?.company ? 'clear' : (run.forecast?.[run.moon] || 'clear');
+      run.weather = (MOONS[run.moon]?.company || MOONS[run.moon]?.home) ? 'clear' : (run.forecast?.[run.moon] || 'clear');
       run.time = 480;
       run.powerOn = true;
-      { const ev = MOONS[run.moon]?.company ? null : dailyEventFor(run.seed, run.day, run.moon); run.dailyEvent = ev ? { ...ev } : null; }   // copy: never mutate the event table
+      { const ev = (MOONS[run.moon]?.company || MOONS[run.moon]?.home) ? null : dailyEventFor(run.seed, run.day, run.moon); run.dailyEvent = ev ? { ...ev } : null; }   // copy: never mutate the event table
       this.meta?.weekly?.hostOnLever(run);   // weekly challenge: fixed seed per (week, day, moon) + weekly mutators merged into run.dailyEvent
       this.hostData.dayStats = this.freshDayStats();
       this.hostData.collected = new Set();
@@ -340,6 +340,8 @@ export const hostMethods = {
       this.hostSetPhase('company');
       this.run.buyRate = buyRate(this.run.daysLeft, this.run.buyRnd);
       this.broadcastRun(['buyRate']);
+    } else if (moon.home) {   // [hw] homeworld: no population, no daily event, no clock
+      this.hostSetPhase('moon');
     } else {
       this.hostSetPhase('moon');
       const ev = this.run.dailyEvent;
@@ -367,6 +369,12 @@ export const hostMethods = {
     const run = this.run;
     const moon = MOONS[run.moon];
     const hd = this.hostData;
+    if (moon?.home) {   // [hw] leaving the homeworld costs no day, no fines, no summary; anyone left outside is beamed back aboard
+      for (const p of this.aiPlayers()) if (!p.inShip && !inDoorway(p.pos)) this.net.sendTo(p.id, 'tp', { p: this.ship.spawns[0].toArray(), yaw: Math.PI / 2 });
+      this.hostSetPhase('orbit', { daysLeft: run.daysLeft, day: run.day, credits: run.credits, forecast: run.forecast, powerOn: true });
+      this.hostSave();
+      return;
+    }
     // who is aboard?
     const players = this.aiPlayers();
     // (standing in the doorway counts as aboard: the door leaf waits for them, so nobody is sealed out or 'left behind' on the sill)
@@ -720,7 +728,9 @@ export const hostMethods = {
     const run = this.run;
     if (!run) return;
     const hd = this.hostData;
-    if (run.phase === 'moon') {
+    if (run.phase === 'moon' && MOONS[run.moon]?.home) {   // [hw] homeworld: the clock never runs, nothing spawns
+      this.creatures.hostUpdate(dt);
+    } else if (run.phase === 'moon') {
       hd.moonT = (hd.moonT || 0) + dt;
       const rate = (16 * 60) / (this.config.dayLengthSec || 720);
       run.time += dt * rate;

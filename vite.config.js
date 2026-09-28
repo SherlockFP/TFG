@@ -8,7 +8,7 @@ import basicSsl from '@vitejs/plugin-basic-ssl';
 export default defineConfig(({ mode }) => ({
   base: './',
   plugins: mode === 'https' ? [basicSsl()] : [],
-  server: { port: 5173, host: true, hmr: process.env.KEFAL_HMR === '1' },
+  server: { port: 5173, host: true, hmr: process.env.KEFAL_HMR === '1', watch: { ignored: ['**/.claude/**', '**/tools/raw/**'] } },
   preview: { port: 4173, host: true, allowedHosts: ['.onrender.com'] },
   build: {
     target: 'es2022',

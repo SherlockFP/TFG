@@ -148,6 +148,7 @@ import { installFood } from './food.js';   // wave 2: food & drinks (buffs, booz
 
 
 // [import:homeworld]
+import { installHomeworld } from './homeworld.js';
 
 
 // [import:pets]
@@ -306,6 +307,7 @@ export class Game extends Emitter {
 
 
     // [slot:homeworld]
+    this.useModule('homeworld', installHomeworld);
 
 
     // [slot:pets]
@@ -561,6 +563,12 @@ export class Game extends Emitter {
       this.world.mapGroup = this.world.company.group;
       this.env.setMoon(BIOMES.pier, run.weather || 'clear', 'company');
       this.companyNpc();
+    } else if (moon.customMap) {   // [hw] homeworld: own outdoor map, no facility
+      const outdoor = moon.customMap(run.seed, moon, { physics: this.physics, lightPool: this.lights, biome: BIOMES[moon.biome] });
+      this.world.outdoor = outdoor; this.world.terrain = outdoor.terrain;
+      this.scene.add(outdoor.group);
+      this.world.mapGroup = outdoor.group;
+      this.env.setMoon(BIOMES[moon.biome], run.weather || 'clear', 'moon');
     } else {
       const outdoor = buildMoonOutdoor(run.seed, moon, { physics: this.physics, lightPool: this.lights });
       this.world.outdoor = outdoor; this.world.terrain = outdoor.terrain;
