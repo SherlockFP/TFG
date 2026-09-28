@@ -274,6 +274,11 @@ Weapons (per swing / hit / shot) and worn armour (per damage taken) wear out: Co
 + `node tools/harness/durability.test.mjs`; browser proof `tools/harness/wave2_durability.js` (35/35, host path only). Item fields `it.dur` / `it.dr` (`du` / `dr` on `sp`, serialize, saveFields). Net types `duw` `dukit` `durep` `dus` `dubrk` `dures`.
 Hooks in shared files are marked `[durability]`. NOT verified: client prediction / `duw` flush with a real second player, HQ mechanic bench placement + panel by eye.
 
+### 5.13 Wave 2 - SKELETONS + tier looks for every creature (module `skeletons`, docs/wave2/skeletons.md)
+DELETED USERS family (Bone Walker: collapses + rebuilds once unless the skull is smashed, Bone Archer: visible wind-up + projectiles, Bone Knight: frontal shield, Bone Swarm: skull hands) with glitchy
+username tags, spawn weights (mansion / hospital / backrooms / mineshaft + night outdoors), plus a GENERIC per-tier armour / colour layer (`src/render/tierlooks.js`, hooked in `creature_tiers.js`) that dresses every
+creature Uncommon..Mythic (scrap -> iron -> runes -> gold + cape -> glitch shader + crown + halo). Node test `tools/harness/skeletons.test.mjs`, build, ONE headless run + one screenshot (host rules + 26 tiered views verified). Not hand-played; tags / poses unseen.
+
 ### 5.5 Smoke test (paste in the browser console on `?autohost=local&code=T1&name=Tester`, after ~4 s)
 ```js
 const g = kefal.game, errs = []; addEventListener('error', e => errs.push(e.message));
@@ -348,4 +353,4 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
 `docs/THEME.md` TFG naming bible · `docs/BUGS.md` verified bug list · `docs/AUDIO_AUDIT.md` deferred audio issues ·
 `docs/CRITIQUE.md` honest critique + plan · `CREDITS.md` asset licenses · `README.md` player-facing readme ·
 `docs/REVIEW_WAVE1.md` reviewer report for the wave-1 merge (scores, dead stats, HUD collisions, top-10 fixes; run `tools/harness/wave1_day.js` first, it was written but not executed) ·
-`docs/wave1/*.md` per-module notes.
+`docs/wave1/*.md` per-module notes · `docs/wave2/*.md` wave-2 modules (anomaly, forge, skeletons).

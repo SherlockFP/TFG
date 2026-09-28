@@ -108,7 +108,7 @@ import { installGameplay2 } from './gameplay2.js';
 // [import:shipyard]
 
 
-// [import:skeletons]
+import { installSkeletons } from './skeletons.js';
 
 
 import { installCreatureEmotes } from './cemotes.js';
@@ -262,7 +262,7 @@ export class Game extends Emitter {
     // [slot:shipyard]
 
 
-    // [slot:skeletons]
+    this.useModule('skeletons', installSkeletons);
 
 
     this.useModule('cemotes', installCreatureEmotes);
