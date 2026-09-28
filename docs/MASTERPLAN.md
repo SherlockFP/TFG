@@ -493,3 +493,27 @@ Sahip: modeller "çok AI duruyor", hafif yuvarlak, Among Us'ımsı ama **çakma 
 - **Kalıcılık:** ev gezegeni **profil + crew** kaydına yazılır (run sıfırlansa bile kalır — kalıcı ilerleme), gemi modülleri de öyle.
 - **Denge:** pasif gelir, aktif oynanışın ~%20-30'unu geçmez; yükseltme maliyetleri üstel; elektrik/soğutma kısıtı "her şeyi
   kur" yerine seçim yaptırır.
+
+## 18. PET SİSTEMİ (Pokémon tarzı, tasarım)
+- **Edinme:** yumurta (chest / boss / anomaly "Unknown Egg" / Store) → gemide kuluçka (N oyun günü); küçük yaratıkları
+  **Pet Carrier** ile yakalama (canı düşükken, şans); HQ **Pet Shop**'tan sahiplenme. Nadir **Shiny** varyantlar (%2).
+- **Türler ve roller:**
+  | Pet | Rol | Özel yetenek |
+  |---|---|---|
+  | Kedi | Scout | yakındaki yaratıkları hisseder (HUD işareti), sessiz |
+  | Köpek | Fetch | küçük hurdayı sana/gemiye taşır, havlayarak uyarır |
+  | Tilki | Thief | Collector yuvalarından çalar, gizli odaları koklar |
+  | Ayı | Tank | saldırır, büyük eşyayı seninle birlikte taşır |
+  | Arı (sürü) | Swarm | sokar (DoT), çiçek/yemek bulur, polen = küçük iyileşme |
+  | Baykuş | Vision | gece görüşü paylaşır, uzak işaretleme |
+  | Papağan | Decoy | sesleri taklit eder, yaratıkları kandırır |
+  | Karga | Collector | parlak/nadir item bulur (tier şansı +) |
+  | Tamagotchi-bot | Support | kalkan/şarj, internet temalı dijital pet |
+- **İlerleme:** XP → seviye (1-30), **evrim** (ör. Yavru Köpek → Köpek → Server Hound Lv20), rastgele **karakter özelliği**
+  (Brave, Lazy, Greedy, Loyal…), 3 yetenek slotu, sadakat (bakım: besleme = §food yemekleri, oynama).
+- **Komutlar:** takip / bekle / getir / saldır (nişan + tuş) / gemiyi koru; pet düşerse "bayılır", gemide 1 gün dinlenir (kalıcı ölüm yok).
+- **Menü:** ayrı **PET** paneli: ahır (6 slot), istatistik, yetenekler, evrim ağacı, isim verme, **skinler** (tasma, şapka,
+  renk, Shiny, sezon skinleri), aktif pet seçimi (oyuncu başına 1 aktif).
+- **Denge:** pet ≈ ekstra yarım oyuncu değil — yardımcı; loot getirme yavaş ve sınırlı taşıma; saldırı hasarı düşük-orta;
+  sadakat düşükse emir dinlemez.
+- **Sonra:** hub'da pet arenası (pet düelloları), ev gezegeninde (§17) Pet Barn binası.

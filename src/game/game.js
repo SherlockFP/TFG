@@ -147,6 +147,9 @@ import { installCreatureEmotes } from './cemotes.js';
 // [import:homeworld]
 
 
+// [import:pets]
+
+
 export class Game extends Emitter {
   constructor({ engine, audio, settings, profile, ui, input, mods }) {
     super();
@@ -296,6 +299,9 @@ export class Game extends Emitter {
 
 
     // [slot:homeworld]
+
+
+    // [slot:pets]
 
   }
 
