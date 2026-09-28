@@ -122,6 +122,12 @@ import { installMusic } from './music.js';
 // [import:durability]
 
 
+// [import:mirror]
+
+
+// [import:avatar2]
+
+
 export class Game extends Emitter {
   constructor({ engine, audio, settings, profile, ui, input, mods }) {
     super();
@@ -246,6 +252,12 @@ export class Game extends Emitter {
 
 
     // [slot:durability]
+
+
+    // [slot:mirror]
+
+
+    // [slot:avatar2]
 
   }
 

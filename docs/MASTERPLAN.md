@@ -455,3 +455,16 @@ Sahip: modeller "çok AI duruyor", hafif yuvarlak, Among Us'ımsı ama **çakma 
 - **Renkler:** suit rengi gövdede, ekran çerçevesi koyu, eldiven/bot açık gri; Venom vb. suit'ler yeni gövdeye uyarlanır.
 - **Animasyon:** yürürken gövde sallanması (squash & stretch), zıplamada esneme, ölünce ekran "NO SIGNAL".
 - Uyumluluk: `avatar.js` API'si (setSuitColor, setHat, setLook, face canvas, first-person kollar/bacaklar) korunur.
+
+## 16. MIRROR DIMENSION (tasarım)
+- **Portal:** dış haritaların ~%25'inde (sektör 1+) büyük karanlık **ayna** (süslü siyah-gümüş çerçeve, dalgalanan
+  karanlık yüzey shader'ı, hafif fısıltı). E ile gir; aynı aynadan geri dön.
+- **Ayna boyutu:** aynı harita, görüntü yatay ters (ekran-uzayı flip + fare X ve A/D ters → kontrol doğal hisseder),
+  karanlık palet, her yerde kalın outline, **ASCII/dither** post efekti, kırmızı-mor sis. Diğer boyuttaki arkadaşlar soluk
+  silüet. Yaratıklar ve loot sadece o boyuttakilere görünür/etkiler (host boyut üyeliği tutar).
+- **Vampire Survivors döngüsü:** sürekli dalgalar (hayaletler duvardan geçer, alev canavarları ateş izi bırakır, ayna
+  kopyaları) → öldürdükçe **XP kristali** + **Reflection Meter**; her seviye atlamada 3 geçici güçten birini seç (hasar,
+  hız, dönen bıçaklar, alev aurası, ek mermi, can çalma, mıknatıs…); meter eşiklerinde loot sandığı + power-up; güçler
+  boyuttan çıkınca veya gün bitince söner. Daha zor, daha çok loot (tier şansı +).
+- **Denge:** boyutta kalma süresi arttıkça dalga gücü artar; ölürsen boyutta topladıkların düşer (ayna önünde); gün sonu
+  kalanlar "yansımada kaybolur" (ölüm).
