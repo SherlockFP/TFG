@@ -729,6 +729,7 @@ export class UI {
         const micState = el('span', { class: 'dim' }, g0 ? (g0.voice.enabled ? t('mic active') : g0.voice.micError ? t('mic error') + ': ' + g0.voice.micError : t('mic off')) : (s.micConsent === 'ask' ? t('you will be asked in game') : s.micConsent === 'yes' ? t('mic on') : t('listen only')));
         body.append(row(t('Microphone'), el('div', { class: 'slider' }, micBtn || el('span'), micState)), row(t('Voice mode'), mode), row(t('Device'), dev), slider(t('Mic gain'), 'micGain', 0.2, 3, 0.1, (v) => v.toFixed(1) + 'x'), row(t('Level'), meter),
           el('div', { class: 'dim note' }, t('Proximity voice chat: nearby crewmates hear you in 3D. Walls muffle. Hold a walkie-talkie (turned on) to talk across the map. Creatures like the Blind Hound can HEAR you talk.')));
+        body.append(check(t('Voice spells'), 'voiceSpells', t('hold V and say a spell word (Chrome / Edge)'), true));   // magic.js
         const g = this.app.game;
         const tick = () => { if (!meter.isConnected) return; meter.firstChild.style.width = ((g?.voice.localLevel || 0) * 100) + '%'; requestAnimationFrame(tick); };
         tick();

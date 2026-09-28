@@ -52,7 +52,7 @@ import { installNetStats } from '../net/netstats.js';   // NETSTATS network diag
 import { installBalance } from './balance.js';
 import { doorwayBusy } from '../world/doorsafe.js';
 
-// [import:magic]
+import { installMagic } from './magic.js';
 
 import { installRpg } from './rpg.js';
 
@@ -138,7 +138,7 @@ export class Game extends Emitter {
 
     this.useModule('balance', installBalance);
 
-    // [slot:magic]
+    this.useModule('magic', installMagic);
 
     this.useModule('rpg', installRpg);
 
