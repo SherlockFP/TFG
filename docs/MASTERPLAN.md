@@ -442,3 +442,16 @@ GÜN 1 → GÜN 2 → GÜN 3 (HQ'da sat, kotayı doldur)
   "Harika. İçeriği yeniden kullanıyorsun."
 - **Oyuncu rütbesi:** hesap başına Hunter Rank (E→S) — temizlenen kapılarla yükselir, yüksek rütbeli kapılara girme şartı
   değil ama önerilen; hub'da ve isim etiketinde görünür.
+
+## 15. Karakter yeniden tasarımı — "TFG Employee" (tasarım)
+Sahip: modeller "çok AI duruyor", hafif yuvarlak, Among Us'ımsı ama **çakma durmasın**.
+- **Siluet:** yumuşak, yuvarlak "hap/fasulye" gövde (kapüşonlu iş tulumu gibi), kısa tombul bacaklar — ama Among Us'tan
+  farklı olarak **küçük yuvarlak kollar ve eldivenli eller** var (eşya tutma, emote, enstrüman için şart).
+- **Kafa = ekran:** vizör yerine gövdeye kaynaşık, köşeleri yumuşatılmış **retro CRT kask**; ekranda mevcut piksel yüz
+  (gözler + ağız animasyonu, mood ifadeleri, konuşurken ağız) — TFG'nin imzası. Üstte küçük anten, kenarda kulaklık.
+- **Sırt:** "battery pack" (kozmetik back slotu burada: plushie, oksijen tankı, anten…).
+- **Oranlar:** chibi — kafa büyük, gövde kısa; kalın siyah dış çizgi (mevcut outline pass) + düz renk + hafif gölge; PSX
+  vertex snap ile uyumlu düşük poligon ama yuvarlak (segment sayısı dengeli).
+- **Renkler:** suit rengi gövdede, ekran çerçevesi koyu, eldiven/bot açık gri; Venom vb. suit'ler yeni gövdeye uyarlanır.
+- **Animasyon:** yürürken gövde sallanması (squash & stretch), zıplamada esneme, ölünce ekran "NO SIGNAL".
+- Uyumluluk: `avatar.js` API'si (setSuitColor, setHat, setLook, face canvas, first-person kollar/bacaklar) korunur.
