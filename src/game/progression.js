@@ -2,6 +2,7 @@
 // black market, bounties, quota formula.
 import { RNG } from '../core/rng.js';
 import { CREATURES } from './creatures.js';
+import { treeBonus, treeFlags, treeSpent } from './passivetree.js';
 
 // Level cap (raised from 50 -> 100 in the meta round). REBIRTH_LEVEL is where a Rebirth becomes available:
 // levels past it keep paying skill points, a Rebirth trades the level for a permanent star.
@@ -94,6 +95,9 @@ export function rankOf(level) {
   return r;
 }
 
+// LEGACY base skills. Since the passive tree (passivetree.js, K) the six skills are no longer sold: profile.js refunds every
+// point once (profile.rpg.v) and the tree carries the same effects (Vitality -> Thick Skin, Agility -> Quick Feet ...).
+// The table and the derivedStats terms stay so old saves, mods and tools keep working (all zero after the refund).
 export const SKILLS = {
   vit: { name: 'Vitality', short: 'VIT', desc: '+10 max health per point' },
   end: { name: 'Endurance', short: 'END', desc: '+12 max stamina, faster regen' },
@@ -171,14 +175,14 @@ export function prestigeBonus(stars) {
 export function canRebirth(profile) { return (profile?.level || 1) >= REBIRTH_LEVEL && prestigeStars(profile) < MAX_STARS; }
 /** What a Rebirth would give right now (pure). */
 export function rebirthPreview(profile) {
-  const spent = Object.values(profile?.skills || {}).reduce((a, v) => a + (Number(v) | 0), 0);
+  const spent = Object.values(profile?.skills || {}).reduce((a, v) => a + (Number(v) | 0), 0) + treeSpent(profile?.rpg);
   const lv = profile?.level || 1;
   const keep = Math.floor(spent * 0.25);
   const extra = 3 + Math.floor(Math.max(0, lv - REBIRTH_LEVEL) / 10);
   return { spent, keep, extra, points: (profile?.skillPoints || 0) + keep + extra, stars: prestigeStars(profile) + 1 };
 }
 /**
- * Rebirth (mutates the profile, never saves): level -> 1, XP -> 0, base skills refunded at 25%, +3 bonus points
+ * Rebirth (mutates the profile, never saves): level -> 1, XP -> 0, base skills + passive tree refunded at 25%, +3 bonus points
  * (+1 per 10 levels past 50), +1 star. Mastery, gear, Clout, cosmetics and achievements are kept.
  */
 export function applyRebirth(profile) {
@@ -192,6 +196,7 @@ export function applyRebirth(profile) {
   pr.peak = Math.max(pr.peak || 0, profile.level);
   profile.skills = profile.skills || {};
   for (const k of Object.keys(SKILLS)) profile.skills[k] = 0;
+  if (profile.rpg && Array.isArray(profile.rpg.nodes)) profile.rpg.nodes = [];   // passive tree: 25% refunded like the base skills, the role stays
   profile.skillPoints = pv.points;
   profile.level = 1;
   profile.xp = 0;
@@ -211,7 +216,8 @@ export const STAR_REWARDS = [
 export function metaMultipliers(profile) {
   const pb = prestigeBonus(prestigeStars(profile));
   const mf = masteryFx(profile);
-  return { xp: 1 + pb.xpPct + (mf.xpPct || 0), coin: 1 + pb.coinPct + (mf.coinPct || 0) };
+  const tb = profile?.rpg ? treeBonus(profile.rpg) : null;   // passive tree: XP Gain / Clout Gain nodes
+  return { xp: 1 + pb.xpPct + (mf.xpPct || 0) + (tb?.xpGain || 0), coin: 1 + pb.coinPct + (mf.coinPct || 0) + (tb?.cloutGain || 0) };
 }
 
 export function derivedStats(profile) {
@@ -221,22 +227,29 @@ export function derivedStats(profile) {
   const mf = masteryFx(profile);
   const pb = prestigeBonus(prestigeStars(profile));
   const mm = metaMultipliers(profile);
+  // passive tree + role (passivetree.js): every static bonus folds in here so the TAB sheet (which calls derivedStats on the
+  // profile) and game.stats agree. Dynamic keystones (Adrenaline Junkie, Lone Wolf) are layered on by rpg.js via the 'stats' event.
+  const tb = treeBonus(profile.rpg);
+  const packMule = !!profile.rpg && treeFlags(profile.rpg).has('packmule');
   return {
-    maxHp: 100 + (s.vit || 0) * 10 + Math.floor(lv / 5) * 5 + gear.hp + (mf.maxHp || 0) + pb.maxHp,
-    maxStamina: Math.round((100 + (s.end || 0) * 12 + (mf.maxStamina || 0)) * (1 + pb.staminaPct)),
-    staminaRegen: 16 * (1 + (s.end || 0) * 0.04 + (mf.regenPct || 0)),
-    meleeMul: (1 + (s.str || 0) * 0.08 + (mf.meleePct || 0)) * gear.dmgMul,
-    carryRelief: (s.str || 0) * 6 + (mf.carryRelief || 0),
-    speedMul: 1 + (s.agi || 0) * 0.025 + gear.speed + (mf.speedPct || 0),
-    jumpMul: 1 + (s.agi || 0) * 0.03 + (mf.jumpPct || 0),
-    valueMul: 1 + (s.lck || 0) * 0.02,
-    crit: 0.05 + (s.lck || 0) * 0.015 + (mf.crit || 0),
-    batteryMul: 1 + (s.tec || 0) * 0.1 + (mf.batteryPct || 0),
-    scanRange: 22 + (s.tec || 0) * 2 + (mf.scanRange || 0),
-    minigameEase: (s.tec || 0) * 0.02 + (mf.minigameEase || 0),
-    armor: gear.armor + (mf.armor || 0),
+    maxHp: Math.max(20, Math.round((100 + (s.vit || 0) * 10 + Math.floor(lv / 5) * 5 + gear.hp + (mf.maxHp || 0) + pb.maxHp + tb.maxHp) * (1 + tb.maxHpPct))),
+    maxStamina: Math.max(30, Math.round((100 + (s.end || 0) * 12 + (mf.maxStamina || 0) + tb.stamina) * (1 + pb.staminaPct))),
+    staminaRegen: 16 * Math.max(0.2, 1 + (s.end || 0) * 0.04 + (mf.regenPct || 0) + tb.staminaRegen),
+    meleeMul: (1 + (s.str || 0) * 0.08 + (mf.meleePct || 0) + tb.meleeDmg) * gear.dmgMul,
+    rangedMul: (1 + tb.rangedDmg) * gear.dmgMul,
+    carryRelief: (s.str || 0) * 6 + (mf.carryRelief || 0) + tb.carry + (packMule ? 9999 : 0),   // Pack Mule: weight never slows you (no sprint: rpg.js)
+    speedMul: Math.max(0.5, 1 + (s.agi || 0) * 0.025 + gear.speed + (mf.speedPct || 0) + tb.moveSpeed),
+    jumpMul: 1 + (s.agi || 0) * 0.03 + (mf.jumpPct || 0) + tb.jump,
+    valueMul: Math.max(0.5, 1 + (s.lck || 0) * 0.02 + tb.scrapValue),
+    crit: 0.05 + (s.lck || 0) * 0.015 + (mf.crit || 0) + tb.crit,
+    batteryMul: 1 + (s.tec || 0) * 0.1 + (mf.batteryPct || 0) + tb.batteryLife,
+    scanRange: 22 + (s.tec || 0) * 2 + (mf.scanRange || 0) + tb.scanRange,
+    minigameEase: (s.tec || 0) * 0.02 + (mf.minigameEase || 0) + tb.minigameEase,
+    armor: gear.armor + (mf.armor || 0) + tb.armor,
     xpBonus: mm.xp,
     coinBonus: mm.coin,
+    tree: tb,             // full bonus map (maxMana, spellPower, bagSlots, lootLuck ... for modules reading game.stats)
+    noSprint: packMule,
   };
 }
 

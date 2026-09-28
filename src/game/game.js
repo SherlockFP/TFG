@@ -54,7 +54,7 @@ import { doorwayBusy } from '../world/doorsafe.js';
 
 // [import:magic]
 
-// [import:rpg]
+import { installRpg } from './rpg.js';
 
 // [import:shop]
 
@@ -140,7 +140,7 @@ export class Game extends Emitter {
 
     // [slot:magic]
 
-    // [slot:rpg]
+    this.useModule('rpg', installRpg);
 
     // [slot:shop]
 
