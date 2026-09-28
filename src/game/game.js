@@ -138,6 +138,9 @@ import { installCreatureEmotes } from './cemotes.js';
 // [import:secureloot]
 
 
+// [import:maps2]
+
+
 export class Game extends Emitter {
   constructor({ engine, audio, settings, profile, ui, input, mods }) {
     super();
@@ -278,6 +281,9 @@ export class Game extends Emitter {
 
 
     // [slot:secureloot]
+
+
+    // [slot:maps2]
 
   }
 
