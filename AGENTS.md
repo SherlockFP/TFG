@@ -272,6 +272,8 @@ mirror copy / zombie fodder waves (cap 50), XP crystals + 3-card level-ups (8 te
 (respawn while a crewmate inside lives), everyone inside dead = SHATTERED (real death), day end = lost in the reflection. Hooks: game.js slots + 6 `[mirror]` lines in engine.js; the rest are instance wraps. `tools/harness/mirror.test.mjs` PASS.
 ### 5.14 Wave 2 - FOOD & DRINKS (module `food`, docs/wave2/food.md; node-tested only, NOT browser-verified)
 14 optional consumables (`fd_*`, store tab Food) with temporary buffs through the anomaly buff registry, drunk stacking (sway / drift / lag / slur / hiccups / harmless blackout), eat / drink animations, CHEERS!, Party Cake sharing, offer with H, ship mess table (Well Fed), vending machines / fridges. Tests: `tools/harness/food.test.mjs`, `food_install.test.mjs`.
+### 5.14 Wave 2 - PETS (module `pets`, docs/wave2/pets.md; first cut, node-tested only)
+9 species / 3 evolutions / shiny / skins / eggs+incubator / capture odds / PET panel (N, terminal PETS), profile.pets. NOT done: host-simulated fetch/attack/guard/role abilities + net sync (design in the doc).
 
 ### 5.11 Wave 2 - HQ FORGE (module `forge`, see docs/wave2/forge.md)
 THE MONETIZER (+1..+9, overclocks), Ascension Altar (tier up, workbench capped at Rare), Shard Exchange, 6 shard items + Backup Drive, weapon glow (+3/+5/+7/+9), creature tiers

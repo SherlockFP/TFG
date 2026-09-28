@@ -152,6 +152,7 @@ import { installHomeworld } from './homeworld.js';
 
 
 // [import:pets]
+import { installPets } from './pets.js';
 
 
 // [import:cycle]
@@ -311,6 +312,7 @@ export class Game extends Emitter {
 
 
     // [slot:pets]
+    this.useModule('pets', installPets);
 
 
     // [slot:cycle]
