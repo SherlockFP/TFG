@@ -45,7 +45,7 @@ import './components.js';   // shared crafting components (registered at import)
 import { setDocksVisible } from '../ui/dock.js';
 import { installNetStats } from '../net/netstats.js';   // NETSTATS network diagnostics
 // ---- WAVE 1 module imports: one line per module, keep the blank separator lines (avoids merge conflicts) ----
-// [import:inventory]
+import { installInventory } from './inventory.js';
 
 // [import:facilitysys]
 
@@ -132,7 +132,7 @@ export class Game extends Emitter {
     this.netstats = installNetStats(this);   // terminal NETSTATS / chat /net
     // ---- WAVE 1 modules (docs/MASTERPLAN.md): this.useModule(name, installFn) stores game[name], disposes on destroy ----
     this.wave1 = [];
-    // [slot:inventory]
+    this.useModule('inventory', installInventory);
 
     // [slot:facilitysys]
 

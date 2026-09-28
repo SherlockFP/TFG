@@ -9,6 +9,7 @@ export const RARITY = {
   rare: { color: '#3d8bff', name: 'Rare' },
   epic: { color: '#b35cff', name: 'Epic' },
   legendary: { color: '#ff9a1f', name: 'Legendary' },
+  mythic: { color: '#ff3b6b', name: 'Mythic' },   // tiers.js (wave 1): rolled item tiers go one step past legendary
 };
 
 export function rarityOfValue(v) {
@@ -137,8 +138,31 @@ export const ITEMS = {
   ladder: { id: 'ladder', name: 'Extension Ladder', kind: 'tool', price: 60, weight: 16, hands: 2, tip: 'Face a wall that has a ledge on top and press LMB to set it up. [E] climbs, crouch + [E] folds it.' },
   booster: { id: 'booster', name: 'Signal Booster', kind: 'tool', price: 50, weight: 8, hands: 1, throwable: true, tip: 'LMB arms and tosses it. While armed it pings nearby scrap and creatures through walls (and hums a little).' },
   inhaler: { id: 'inhaler', name: 'Hype Inhaler', kind: 'tool', price: 120, weight: 0, hands: 1, charges: 100, tip: 'Hold LMB to inhale: faster, tireless, very wobbly. Do not overdo it.' },
-  beltbag: { id: 'beltbag', name: 'Belt Bag', kind: 'tool', price: 45, weight: 0, hands: 1, tip: 'Aim at small scrap and press LMB to stash it (4 max, 60% weight). LMB at nothing dumps it out.' },
+  beltbag: { id: 'beltbag', name: 'Belt Bag', kind: 'bag', price: 45, value: [10, 18], weight: 1, hands: 1, tier: 'common', shopCat: 'bag', bag: { cols: 5, rows: 3, weightMul: 0.9 },
+    tip: 'A bag: LMB (or drag it onto the BAG slot in the inventory [I]) to wear it. 5x3 grid, stashed loot weighs 10% less.' },
   adblock: { id: 'adblock', name: 'Adblock Spray', kind: 'tool', price: 35, weight: 4, hands: 1, charges: 100, tip: 'Hold LMB to spray. Melts spam, pop-ups, reply guys and webs. Everything else just gets annoyed.' },
+
+  // ---- wave 1 inventory gear (src/game/inventory.js). kind 'bag' = BAG slot, 'armor' = SUIT slot, 'trinket' = 2 TRINKET slots.
+  //  bag: { cols, rows, weightMul (stashed loot weight), speed (move speed delta) }  gear: bonuses x tier statMul (speed not scaled)
+  //  size: [w, h] grid footprint override. Store copies are Common; loot copies roll a tier (luck: moon danger + Lucky Dongles).
+  bag_fieldpack: { id: 'bag_fieldpack', name: 'Field Pack', kind: 'bag', price: 180, value: [40, 60], weight: 3, hands: 1, tier: 'uncommon', shopCat: 'bag', size: [1, 2], bag: { cols: 6, rows: 4, weightMul: 0.85 },
+    tip: 'A proper backpack: 6x4 grid, stashed loot weighs 15% less. LMB to wear it.' },
+  bag_hauler: { id: 'bag_hauler', name: 'Hauler Frame', kind: 'bag', price: 420, value: [90, 130], weight: 8, hands: 1, tier: 'rare', shopCat: 'bag', size: [2, 2], bag: { cols: 7, rows: 5, weightMul: 0.8, speed: -0.05 },
+    tip: 'Steel-frame pack: 7x5 grid, stashed loot weighs 20% less, but you walk 5% slower. LMB to wear it.' },
+  bag_void: { id: 'bag_void', name: 'Void Satchel', kind: 'bag', value: [260, 360], weight: 2, hands: 1, tier: 'mythic', shopCat: 'bag', bag: { cols: 8, rows: 6, weightMul: 0.7 },
+    tip: 'Bigger on the inside. Nobody knows who uploaded it. 8x6 grid, stashed loot weighs 30% less.' },
+  arm_hoodie: { id: 'arm_hoodie', name: 'Padded Hoodie', kind: 'armor', price: 60, value: [14, 24], weight: 4, hands: 1, shopCat: 'suit', gear: { armor: 0.06 },
+    tip: 'Comfy, and it stops a little bit of pain. Wear it in the SUIT slot.' },
+  arm_riot: { id: 'arm_riot', name: 'Riot Vest', kind: 'armor', price: 220, value: [50, 80], weight: 12, hands: 1, shopCat: 'suit', gear: { armor: 0.12, speed: -0.02 },
+    tip: 'Moderation Bureau surplus. Solid protection, a little stiff.' },
+  arm_kevlar: { id: 'arm_kevlar', name: 'Kevlar Suit', kind: 'armor', price: 480, value: [110, 160], weight: 18, hands: 1, shopCat: 'suit', gear: { armor: 0.18, speed: -0.04 },
+    tip: 'Heavy plates. The best protection money can buy, at a walking-speed cost.' },
+  trk_dongle: { id: 'trk_dongle', name: 'Lucky Dongle', kind: 'trinket', price: 150, value: [30, 55], weight: 0.5, hands: 1, shopCat: 'trinket', gear: { luck: 0.06, crit: 0.02 },
+    tip: 'Plug it in for luck. The whole crew finds higher-tier loot (and you crit more).' },
+  trk_charm: { id: 'trk_charm', name: 'Energy Drink Charm', kind: 'trinket', price: 90, value: [20, 40], weight: 0.5, hands: 1, shopCat: 'trinket', gear: { stamina: 15, regenPct: 0.12 },
+    tip: 'A tiny can on a keyring. More stamina, faster recovery.' },
+  trk_amulet: { id: 'trk_amulet', name: 'Signal Amulet', kind: 'trinket', price: 120, value: [25, 45], weight: 0.5, hands: 1, shopCat: 'trinket', gear: { scan: 8, battery: 0.1 },
+    tip: 'Full bars, always. Longer scan range and longer battery life.' },
 };
 
 
@@ -237,7 +261,10 @@ export const FISH_TABLE = [
 
 // Terminal store stock (credits)
 export const STORE_ITEMS = ['flashlight', 'proflash', 'walkie', 'shovel', 'pipe', 'stungrenade', 'medkit', 'adrenaline', 'boombox', 'spraypaint', 'glowstick', 'rod', 'lockpick', 'shells', 'taser', 'jetpack',
-  'ladder', 'booster', 'inhaler', 'beltbag', 'adblock'];
+  'ladder', 'booster', 'inhaler', 'beltbag', 'adblock',
+  'bag_fieldpack', 'bag_hauler', 'arm_hoodie', 'arm_riot', 'arm_kevlar', 'trk_dongle', 'trk_charm', 'trk_amulet'];
+/** Wave-1 gear ids (bags / armor / trinkets) for loot tables and the store. */
+export const GEAR_IDS = Object.freeze(['beltbag', 'bag_fieldpack', 'bag_hauler', 'bag_void', 'arm_hoodie', 'arm_riot', 'arm_kevlar', 'trk_dongle', 'trk_charm', 'trk_amulet']);
 
 // Ship upgrades (credits)
 export const SHIP_UPGRADES = {

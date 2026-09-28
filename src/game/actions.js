@@ -10,6 +10,12 @@ import { FACILITY_Y } from '../world/facility.js';
 import { clamp, damp } from '../core/util.js';
 import { MINIGAMES } from '../minigames/index.js';
 import { applyAffixes, applyAffixEffects, affixCooldown, affixDisplayName, affixColor, describeAffix } from './loot.js';
+import { TIERS } from './tiers.js';
+
+/** Weapon damage multiplier of an item's tier (tiers.js statMul; plain / store weapons are Common = 1). */
+const tierDmg = (it) => (it && it.def?.kind === 'weapon' ? (TIERS[it.rarity?.()]?.statMul || 1) : 1);
+/** "Rare" suffix for labels of tiered items (plain scrap without a rolled tier shows nothing extra). */
+const tierTag = (it) => (it?.tier && it.tier !== 'common' && !it.affix ? TIERS[it.tier]?.name || '' : '');
 
 const tmp = new THREE.Vector3();
 const UP = new THREE.Vector3(0, 1, 0);
@@ -171,14 +177,15 @@ export const actionMethods = {
       const it = this.items.get(hit.info.itemId);
       if (it && it.state === 'world') {
         const def = it.def;
-        const r = RARITY[it.rarity()]?.color;
+        const r = it.tierColor;
         if (def.kind === 'big' || it.type === 'body') {
           if (hit.distance < 3.6) {
             const lbl = it.type === 'body' ? `Grab ${it.label || 'body'} [LMB]` : `Grab ${def.name} [LMB]`;
             return { label: lbl, sub: it.type === 'body' ? '' : `▮${it.value}`, bigItem: it, action: () => this.grab.start(it) };
           }
         } else if (hit.distance < reach) {
-          return { label: `Pick up ${affixDisplayName(def.name, it.affix)} [E]`, sub: [isSellable(def) && it.value ? `▮${it.value}` : '', ...describeAffix(it.affix, { rarity: true })].filter(Boolean).join(' · '), color: it.affix ? affixColor(it.affix) : r, action: () => this.pickup(it) };
+          const toBag = this.inventory?.pickTargetHint?.(it);
+          return { label: `Pick up ${affixDisplayName(def.name, it.affix)} [E]`, sub: [isSellable(def) && it.value ? `▮${it.value}` : '', tierTag(it), ...describeAffix(it.affix, { rarity: true }), toBag ? '→ BAG' : ''].filter(Boolean).join(' · '), color: it.affix ? affixColor(it.affix) : r, action: () => this.pickup(it) };
         }
       }
     }
@@ -323,10 +330,15 @@ export const actionMethods = {
     const p = this.player;
     const def = it.def;
     const held = p.heldItem();
-    if (held && itemDef(held.type).hands === 2) { this.ui.toast('Your hands are full.'); return; }
+    const handsFull = held && itemDef(held.type).hands === 2;
     let slot = p.slots[p.slot] ? findFreeSlot(p) : p.slot;
     if (def.hands === 2 && p.slots[p.slot]) slot = findFreeSlot(p);
-    if (slot < 0) { this.ui.toast('Inventory full.'); this.sfx('ui_error', 0.4); return; }
+    if (handsFull || slot < 0) {
+      // hotbar full / hands busy: straight into the backpack when it fits (inventory.js, host-validated)
+      if (this.inventory?.pickToBag?.(it)) return;
+      if (handsFull) { this.ui.toast('Your hands are full.'); return; }
+      this.ui.toast(this.inventory ? 'Inventory full. [I] to make room.' : 'Inventory full.'); this.sfx('ui_error', 0.4); return;
+    }
     // predict (remember where it lay, so a rejected pick puts it back exactly there)
     it.predFrom = { p: it.obj.position.clone(), q: it.obj.quaternion.clone() };
     p.slots[slot] = it.id;
@@ -346,6 +358,7 @@ export const actionMethods = {
     const it = this.items.get(id);
     if (it && it.holder === this.selfId) {
       it.setHeld(null);
+      it.inv = null;
       it.obj.removeFromParent(); this.scene.add(it.obj);
       // back to the host's transform (or where we picked it from) - not wherever the hand anchor left it
       if (Array.isArray(d.p) && Array.isArray(d.q)) { it.obj.position.fromArray(d.p); it.obj.quaternion.fromArray(d.q); }
@@ -361,10 +374,17 @@ export const actionMethods = {
   onItemHeld(it, holder, slot) {
     const p = this.player;
     if (holder === this.selfId) {
+      if (it.inv) {   // stashed in the bag / equipped: never in a hotbar slot, never in hand
+        const i = p.slots.indexOf(it.id);
+        if (i >= 0) p.slots[i] = null;
+        it.predicted = false;
+        this.refreshHeldVisuals();
+        return;
+      }
       if (!p.slots.includes(it.id)) {
         let s = Number.isInteger(slot) && slot >= 0 && slot < p.slots.length && !p.slots[slot] ? slot : findFreeSlot(p);
-        if (s < 0) { // no room: drop it right away
-          setTimeout(() => this.dropItem(it, false), 50);
+        if (s < 0) { // no room: into the bag if it fits, else drop it right away
+          setTimeout(() => { if (!this.inventory?.stashOrDrop?.(it)) this.dropItem(it, false); }, 50);
           return;
         }
         p.slots[s] = it.id;
@@ -445,6 +465,8 @@ export const actionMethods = {
       }
       it.obj.traverse((o) => { if (o.isMesh) { o.frustumCulled = false; } });
     }
+    // stashed / equipped items (inventory.js) are carried but never rendered
+    for (const it of this.items.all()) if (it.inv && it.holder === this.selfId) it.obj.visible = false;
     const held = p.heldItem();
     this.heldDefCache = held ? itemDef(held.type) : null;
     this.ui.hud?.setInventory(p.slots.map((id) => (id ? this.items.get(id) : null)), p.slot);
@@ -463,6 +485,7 @@ export const actionMethods = {
       if (!it.holder || it.holder === this.selfId || it.holder.startsWith?.('c:')) continue;
       const r = this.remotes.get(it.holder);
       if (!r) continue;
+      if (it.inv) { it.obj.visible = false; continue; }   // in their bag / equipment slots
       const hand = r.avatar.parts?.handR || r.root;
       if (it.obj.parent !== hand) hand.add(it.obj);
       const g = it.obj.userData.gripOffset || new THREE.Vector3();
@@ -480,7 +503,7 @@ export const actionMethods = {
       if (!it.holder || it.holder === this.selfId || it.holder.startsWith?.('c:')) continue;
       const r = this.remotes.get(it.holder);
       if (!r) continue;
-      it.obj.visible = !r.dead && r.heldType === it.type;
+      it.obj.visible = !it.inv && !r.dead && r.heldType === it.type;
     }
   },
 
@@ -659,7 +682,7 @@ export const actionMethods = {
     if (p.stamina > 4) p.stamina -= def.kind === 'weapon' ? 5 : 2;
     this.sfx('swing_whoosh', 0.6, 0.9 + Math.random() * 0.2);
     this.engine.punch?.(-0.006, 0.01, -0.012);
-    let dmg = (def.kind === 'weapon' ? def.dmg : 5 + (def.weight || 0) * 0.15) * power * this.stats.meleeMul;
+    let dmg = (def.kind === 'weapon' ? def.dmg * tierDmg(it) : 5 + (def.weight || 0) * 0.15) * power * this.stats.meleeMul;
     if (this.hasPerk('berserk') && p.hp < p.maxHp * 0.5) dmg *= 1.25;
     const crit = Math.random() < this.stats.crit;
     if (crit) dmg *= 2;
@@ -756,7 +779,7 @@ export const actionMethods = {
       const r = this.creatures.raycast(eye, dir, maxD);
       if (r) {
         const falloff = it.type === 'shotgun' ? clamp(1.3 - r.t / 18, 0.2, 1) : 1;
-        hits.set(r.view.id, (hits.get(r.view.id) || 0) + (def.dmg / pellets) * falloff * this.stats.meleeMul);
+        hits.set(r.view.id, (hits.get(r.view.id) || 0) + (def.dmg * tierDmg(it) / pellets) * falloff * this.stats.meleeMul);
       }
     }
     for (const [cid, dmg] of hits) {
@@ -772,7 +795,7 @@ export const actionMethods = {
     const p = this.player;
     const it = p.heldItem();
     if (!it || it.type !== 'shotgun') return;
-    const shellsId = p.slots.find((id) => id && this.items.get(id)?.type === 'shells');
+    const shellsId = p.slots.find((id) => id && this.items.get(id)?.type === 'shells') || this.inventory?.bagItems?.().find((b) => b.type === 'shells')?.id;
     if (!shellsId) { this.ui.toast('No shells.'); return; }
     it.ammo = 2;
     this.net.broadcast('itst', { id: it.id, am: 2 });
@@ -847,7 +870,8 @@ export const actionMethods = {
       const fuzz = 0.85 + (Math.abs(hashId(it.id)) % 30) / 100;
       const shown = it.type === 'body' ? 0 : Math.round(it.value * fuzz);
       total += shown;
-      labels.push({ pos, name: it.type === 'body' ? `${it.label || 'Body'}` : it.def.name, sub: it.type === 'body' ? 'Recover to reduce fines' : `Value: ▮${shown}`, color: it.type === 'body' ? '#ff6b6b' : RARITY[it.rarity()].color });
+      const tg = tierTag(it);
+      labels.push({ pos, name: it.type === 'body' ? `${it.label || 'Body'}` : it.def.name, sub: it.type === 'body' ? 'Recover to reduce fines' : `Value: ▮${shown}${tg ? ' · ' + tg : ''}`, color: it.type === 'body' ? '#ff6b6b' : it.tierColor });
       labels[labels.length - 1].type = it.type;
       if (it.affix) { const l = labels[labels.length - 1]; l.name = affixDisplayName(it.def.name, it.affix); l.color = affixColor(it.affix); l.sub += ' · ' + describeAffix(it.affix).slice(0, 2).join(', '); }
     }
@@ -940,6 +964,17 @@ export const actionMethods = {
       this.net.request('drop', { id, p: pos.toArray(), q: [0, 0, 0, 1], lv: [0, 1, 0] });
       const i = p.slots.indexOf(id); p.slots[i] = null;
     }
+    // bag + equipment spill around the body (inventory.js); soulbound gear goes back to the Black Market as usual
+    let k = 0;
+    for (const it of [...this.items.all()]) {
+      if (it.holder !== this.selfId || !it.inv) continue;
+      if (it.soulbound) { this.net.request('consume', { id: it.id }); continue; }
+      const a = k * 2.399, r = 0.35 + Math.min(1.1, k * 0.09);
+      const pos = p.pos.clone().add(new THREE.Vector3(Math.cos(a) * r, 0.7 + (k % 4) * 0.12, Math.sin(a) * r));
+      this.net.request('drop', { id: it.id, p: pos.toArray(), q: [0, Math.sin(a / 2), 0, Math.cos(a / 2)], lv: [Math.cos(a) * 1.2, 1.4, Math.sin(a) * 1.2] });
+      k++;
+    }
+    this.inventory?.close?.();
     this.refreshHeldVisuals();
     this.sfx('death', 0.9);
     this.engine.fx.blind = 0;

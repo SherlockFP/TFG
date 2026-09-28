@@ -168,6 +168,7 @@ export class LocalPlayer {
   carryWeight() {
     let w = 0;
     for (const id of this.slots) { if (!id) continue; const it = this.game.items.get(id); if (it) w += (itemDef(it.type).weight || 0) + (it.extraWeight || 0); }
+    w += this.game.inventory?.stashedWeight?.() || 0;   // bag contents (x bag weight multiplier) + worn gear
     if (this.game.grab?.item) w += Math.min(60, (itemDef(this.game.grab.item.type).weight || 0) * 0.4);
     return Math.max(0, w - (this.stats.carryRelief || 0));
   }

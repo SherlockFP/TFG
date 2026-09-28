@@ -50,7 +50,7 @@ export const hostMethods = {
     this.env.landingT = 0;
     // restore ship items
     for (const s of runData?.shipItems || []) {
-      this.items.onEvent({ e: 'sp', id: this.items.hostSpawnId?.() || ('i' + Math.random().toString(36).slice(2, 9)), ty: s.ty, v: s.v, bv: s.bv ?? s.v, p: s.p, q: s.q, b: s.b, c: s.c, am: s.am, af: s.af, bg: s.bg });
+      this.items.onEvent({ e: 'sp', id: this.items.hostSpawnId?.() || ('i' + Math.random().toString(36).slice(2, 9)), ty: s.ty, v: s.v, bv: s.bv ?? s.v, p: s.p, q: s.q, b: s.b, c: s.c, am: s.am, af: s.af, bg: s.bg, ...this.inventory?.loadFields?.(s) });
     }
     this.registerHandlers();
     this.spawnInShip();
@@ -478,7 +478,7 @@ export const hostMethods = {
     const held = [...this.items.all()].filter((it) => it.holder && !String(it.holder).startsWith('c:') && !it.soulbound && it.type !== 'body' && (this.run.phase === 'orbit' || this.run.phase === 'company'));
     const shipItems = [...this.items.inShipItems(), ...held].filter((it) => !it.soulbound && it.type !== 'body').map((it, k) => ({
       ty: it.type, v: it.value, bv: it.baseValue, p: it.holder ? [3.5 + (k % 4) * 0.5, 1.0, -1.5 + Math.floor(k / 4) * 0.5] : it.obj.position.toArray(), q: it.holder ? [0, 0, 0, 1] : it.obj.quaternion.toArray(), col: it.collected ? 1 : undefined, af: it.affix || undefined, b: it.battery ?? undefined, c: it.charges ?? undefined, am: it.ammo ?? undefined,
-      bg: it.bag?.length ? it.bag.map((e) => ({ ...e })) : undefined,
+      bg: it.bag?.length ? it.bag.map((e) => ({ ...e })) : undefined, ...this.inventory?.saveFields?.(it),
     }));
     const { phase, ...rest } = this.run;
     saveRun(this.saveSlot, { ...rest, shipItems, crew: [this.profile.name, ...[...this.remotes.values()].map((r) => r.name)] });

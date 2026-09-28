@@ -4,8 +4,10 @@
 import * as THREE from 'three';
 import { iconHTML, typeFromName } from './icons.js';
 import { el, escapeHtml, fmtClock, clamp } from '../core/util.js';
-import { itemDef, RARITY } from '../game/items.js';
-import { affixColor, affixShortName } from '../game/loot.js';
+import { itemDef } from '../game/items.js';
+import { affixShortName } from '../game/loot.js';
+import { TIERS } from '../game/tiers.js';
+import { ensureInventoryStyles } from './inventory_style.js';
 import { xpForLevel, rankOf } from '../game/progression.js';
 import { MOONS, WEATHER } from '../game/moons.js';
 import * as DailyEvents from '../game/dailyEvents.js';
@@ -111,6 +113,7 @@ const wrapPI = (a) => ((a + Math.PI) % TAU + TAU) % TAU - Math.PI;
 export class HUD {
   constructor(root) {
     this.root = root;
+    ensureInventoryStyles();   // tier frames on the hotbar + the [I] bag tag (shared with the inventory panel)
     this.el = el('div', { class: 'hud hidden' });
     root.appendChild(this.el);
     this.el.innerHTML = `
@@ -222,13 +225,23 @@ export class HUD {
     this.invItems = items; this.invActive = active;
     const html = items.map((it, i) => {
       const d = it ? itemDef(it.type) : null;
-      const col = it?.affix ? affixColor(it.affix) : it && d.value ? RARITY[it.rarity()].color : '#cfc6b8';
+      // tier frame: rolled / affix / def tiers and valued scrap; plain tools keep the neutral amber frame
+      const tier = it && (it.tier || it.affix || d.tier || d.value) ? (it.rarity?.() || 'common') : null;
+      const col = tier ? (TIERS[tier] || TIERS.common).color : '#cfc6b8';
       const nm = it ? it.label || affixShortName(d.name, it.affix) : '';
       const bar = it && d.battery ? `<div class="inv-bat"><div style="width:${clamp((Number(it.battery) / d.battery) * 100 || 0, 0, 100)}%"></div></div>` : '';
       const extra = it && d.ammo !== undefined ? `<div class="inv-ammo">${Number(it.ammo) || 0}/${Number(d.ammo) || 0}</div>` : it && it.charges !== undefined && it.charges !== null && d.charges ? `<div class="inv-ammo">${Number(it.charges) || 0}</div>` : '';
-      return `<div class="inv-slot ${i === active ? 'active' : ''} ${it ? 'full' : ''}"><div class="inv-num">${i + 1}</div>${it ? iconHTML(it.type, 'inv-ico') + `<div class="inv-name" style="color:${col}">${escapeHtml(nm)}</div>` : ''}${bar}${extra}${it?.on ? '<div class="inv-on">●</div>' : ''}</div>`;
+      const tcls = tier && tier !== 'common' ? ` tier tier-${tier}` : '';
+      return `<div class="inv-slot ${i === active ? 'active' : ''} ${it ? 'full' : ''}${tcls}"${tcls ? ` style="--tc:${col}"` : ''}><div class="inv-num">${i + 1}</div>${it ? iconHTML(it.type, 'inv-ico') + `<div class="inv-name" style="color:${col}">${escapeHtml(nm)}</div>` : ''}${bar}${extra}${it?.on ? '<div class="inv-on">●</div>' : ''}</div>`;
     }).join('');
-    this.$.inv.innerHTML = html;
+    this.$.inv.innerHTML = (this.bagTag || '') + html;
+  }
+  /** [I] inventory hint left of the hotbar: bag cells used / capacity (inventory.js). null hides it. */
+  setBagTag(info) {
+    const s = info ? `<div class="inv-bagtag${info.full ? ' full' : ''}"><kbd>I</kbd><span class="bt-l">${escapeHtml(info.label || 'BAG')}</span><span class="bt-n">${Number(info.used) || 0}/${Number(info.cap) || 0}</span></div>` : '';
+    if (s === (this.bagTag || '')) return;
+    this.bagTag = s;
+    if (this.invItems) this.setInventory(this.invItems, this.invActive);
   }
 
   setCoins(c, delta) {
