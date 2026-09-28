@@ -257,6 +257,8 @@ Verified: node test (`tools/harness/anomaly_core.test.mjs`), build, smoke_land. 
 THE MONETIZER (+1..+9, overclocks), Ascension Altar (tier up, workbench capped at Rare), Shard Exchange, 6 shard items + Backup Drive, weapon glow (+3/+5/+7/+9), creature tiers
 (Uncommon..Mythic: HP/dmg/XP mul on top of balance.scale, aura/nameplate, shard drops). Pure rules `src/game/enhance.js` + `node tools/harness/forge_rules.test.mjs`. Hooks in shared files are
 marked `[forge]`. Only node test + build + one smoke were run; `tools/harness/wave2_forge.js` is written but NOT run yet.
+### 5.13 Wave 2 - THE ADMINISTRATOR + THE BOARD (module `boardgame`, docs/wave2/boardgame.md)
+Rare (~4 % per landing, once a day, quota >= 1) tall grey-suit entity; stare at its face for 2 s and you + crew within 10 m are sent to a dice-and-cards board (24-tile ring, 12 turns, LOOT / TRAP / CARD / DUEL / SHORTCUT / EXIT). Fail = most valuable item + 90 % HP. Pure rules `src/game/board_rules.js` + `node tools/harness/board.test.mjs` (PASS). NOT browser-tested (headless run cancelled); hooks marked `[boardgame]` in game.js.
 ### 5.11 Localization wave (EN / TR / RU) — see docs/wave2/i18n.md
 `core/i18n.js` is multi-language (`t`, `tf` with `{x}` / `{@x}`, `L`, `sysMsg`, `addTranslations(map, lang = 'tr')`, `localizeDeep`);
 bulk dictionaries live in `src/i18n/tr_*.js` / `ru_*.js`; `src/i18n/display.js` localises item / creature / moon / ... names through

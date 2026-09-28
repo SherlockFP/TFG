@@ -132,7 +132,7 @@ import { installGameplay2 } from './gameplay2.js';
 // [import:trade]
 
 
-// [import:boardgame]
+import { installBoardGame } from './boardgame.js';   // [boardgame]
 
 
 export class Game extends Emitter {
@@ -271,7 +271,7 @@ export class Game extends Emitter {
     // [slot:trade]
 
 
-    // [slot:boardgame]
+    this.useModule('boardgame', installBoardGame);   // [boardgame]
 
   }
 
