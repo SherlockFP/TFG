@@ -36,6 +36,7 @@ export function defaultSettings() {
     masterVolume: 0.8,
     sfxVolume: 0.9,
     musicVolume: 0.6,
+    instrumentVolume: 0.8,   // playable instruments (game/music.js)
     voiceVolume: 1.0,
     micEnabled: true,
     micConsent: 'ask',      // 'ask' | 'yes' | 'no'  (never grab the mic without asking)

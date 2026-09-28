@@ -276,6 +276,7 @@ Useful debug calls: `g.bosses.hostSpawnForeman(pos)`, `g.creatures.hostSpawn('ho
 | `src/render/particles.js` | ✅ new, wired | hit/death particles |
 | `src/ui/icons.js` | ✅ wired in inventory | item thumbnails + pixel glyphs |
 | `src/entities/cruiser.js` + `src/models/cruiser.js` | ✅ new (hooks: game/localplayer/actions/terminal/i18n) | UPLINK VAN: buyable 4-seat van (terminal BUY VAN, ▮350), Rapier ray-cast vehicle, driver-authoritative 20 Hz stream (`vanst`), host owns seats/cargo (`van` req/msg), cargo bed, ramming, flip-push, dock at takeoff (<38 m) or lost; saved in `run.cruiser`; physics.js gained additive `addPreStep` / `createVehicleBody` / `createVehicleController` |
+| `src/game/music.js` (+ `audio/instruments.js`, `game/songbook.js`, `models/instruments.js`, `ui/musicpanel.js`) | ⚠️ wave 2, node-tested only (`tools/harness/music.test.mjs`, `music.sim.test.mjs`); NOT hand-played in a browser | playable Acoustic / Electric Guitar, Keytar, Drum Pad: LMB = play mode, real-note key layouts, chords, songbook follow-along, 'mu' net events, noise + jam session; controls table in `docs/wave2/music.md` |
 
 How hooks work: the agents returned integration hooks (file / anchor / mode / code) in workflow journals under
 `C:\Users\Sher\.claude\projects\D--KefalCompany\459d8598-…\subagents\workflows\wf_*/journal.jsonl`

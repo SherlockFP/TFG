@@ -96,7 +96,7 @@ import { installWorldX } from './worldx.js';
 // [import:forge]
 
 
-// [import:music]
+import { installMusic } from './music.js';
 
 
 export class Game extends Emitter {
@@ -200,7 +200,7 @@ export class Game extends Emitter {
     // [slot:forge]
 
 
-    // [slot:music]
+    this.useModule('music', installMusic);
 
   }
 
