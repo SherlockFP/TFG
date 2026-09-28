@@ -18,6 +18,7 @@ import { MOONS, MOON_ORDER, BIOMES, GEN_BIOME_IDS } from './moons.js';
 import { RNG, hashString } from '../core/rng.js';
 import { getLang } from '../core/i18n.js';
 import { CREATURES } from './creatures.js';
+import '../world/biomes_wave1_data.js';   // registers lava / ice / jungle into BIOMES (data only) so every peer rolls the same sectors
 
 export const GEN_PREFIX = 'gen';
 const GEN_RE = /^gen(\d+)_(\d+)$/;
@@ -34,7 +35,10 @@ const BIOME_INTERIOR_BONUS = {
   datascape: { serverfarm: 12, backrooms: 9 }, servermarsh: { sewer: 13, serverfarm: 6 }, ashfield: { factory: 8, serverfarm: 7, hospital: 4 },
   crystal: { mineshaft: 12, backrooms: 5 }, snow: { mansion: 6, hospital: 6 }, desert: { mineshaft: 10, office: 3 },
   moor: { mansion: 9, hospital: 6 }, blackforest: { mansion: 6, backrooms: 6 }, swamp: { sewer: 9, factory: 3 }, hills: { office: 7, factory: 4 },
+  lava: { factory: 9, serverfarm: 9, mineshaft: 5 }, ice: { hospital: 9, backrooms: 6, mansion: 5 }, jungle: { sewer: 8, mansion: 8, mineshaft: 4 },
 };
+// wave 1 (worldx): planets that only show up in deeper sectors (defined in world/biomes_wave1.js, registered into BIOMES on import)
+const WAVE1_BIOMES = ['ice', 'jungle', 'lava'];
 // set by the world layer (terrain.js) once facility.js is loaded: (themeId) => true | false | null(unknown)
 let interiorProbe = null;
 export function setInteriorProbe(fn) { interiorProbe = typeof fn === 'function' ? fn : null; }
@@ -61,6 +65,8 @@ const BIOME_ADJ = {
   ashfield: ['Burnt', 'Scorched', 'Melted', 'Overheated', 'Charred'], crystal: ['Cached', 'Crystal', 'Compressed', 'Prismatic', 'Frozen'],
   snow: ['Frozen', 'Cold', 'Snowed-In'], desert: ['Sunbaked', 'Dusty', 'Buried'], swamp: ['Soggy', 'Sunken', 'Rotting'],
   moor: ['Stormy', 'Haunted', 'Grim'], blackforest: ['Dark', 'Eclipsed', 'Blackout'], hills: ['Retro', 'Sunny', 'Early'],
+  lava: ['Molten', 'Overclocked', 'Thermal', 'Meltdown', 'Throttled'], ice: ['Frozen', 'Permafrost', 'Cold-Storage', 'Glacial', 'Archived'],
+  jungle: ['Overgrown', 'Link-Rot', 'Tangled', 'Humid', 'Rainforest'],
 };
 const CODES = ['8080', '1337', '443', '503', '418', '0x7F', '2600', '9001', '127', '2038', '1999', '451', '101', '0xFF', '777', '3DS', 'IPv6'];
 const SECTOR_NAMES = ['Deadnet Reach', 'The Lost Tabs', 'Broken Link Belt', 'Cache Drift', 'Legacy Expanse', 'The Unindexed', 'Null Route',
@@ -78,6 +84,9 @@ const BIOME_DESC = {
   desert: ['Red desert of dead chats. Something digs under the sand.', 'Sun-baked dunes over forgotten servers.'],
   moor: ['A storm-battered moor. Something wanders the heather.', 'Grey moorland and endless drizzle.'],
   blackforest: ['A black forest under a dead sun.', 'Pines so dense the flashlight gives up.'],
+  lava: ['A thermal-throttled basin: rivers of molten silicon. Do not fall in.', 'Everything overclocked at once. The ground glows, the rivers kill.'],
+  ice: ['Permafrost cold storage: frozen lakes, blizzard gusts, everything preserved.', 'A whiteout of archived data. The lakes are slippery.'],
+  jungle: ['Link rot everywhere: giant plants strangle the old web. Humid, dense, loud.', 'A tangled rainforest of dead links and hanging vines.'],
 };
 const INTERIOR_DESC = {
   factory: 'Inside: a cramped data center.', mansion: 'Inside: a haunted personal homepage.', mineshaft: 'Inside: a crypto mine dug deep under the surface.',
@@ -100,6 +109,10 @@ export const MODIFIERS = {
   meetup: { name: 'INFLUENCER MEETUP', desc: 'Influencers gather outside. Scrap +15%.', risk: 0.9, minTier: 2, apply(d) { add(d.outdoor, 'giant', 16); d.scrapMul *= 1.15; } },
   wormsign: { name: 'WORMSIGN', desc: 'The Worm moves under the ground. Scrap +12%.', risk: 0.8, biomes: ['desert', 'ashfield', 'datascape', 'hills', 'crystal'], apply(d) { add(d.outdoor, 'sandkefal', 14); d.scrapMul *= 1.12; } },
   legacyvaults: { name: 'LEGACY VAULTS', desc: 'Bigger facility, more scrap.', risk: 0.5, apply(d) { d.size = Math.min(2.6, +(d.size + 0.3).toFixed(2)); d.scrapCount = d.scrapCount.map((v) => v + 3); } },
+  meltdown: { name: 'MELTDOWN', desc: 'The lava rivers run wide. Scrap +25%, creature power +10%.', risk: 0.7, biomes: ['lava'], apply(d) { d.lavaMul = 1.5; d.scrapMul *= 1.25; d.power = Math.round(d.power * 1.1); } },
+  whiteout: { name: 'WHITEOUT', desc: 'Permanent blizzard. Outdoor threats +25%, scrap +20%.', risk: 0.7, biomes: ['ice'], apply(d) { d.blizzard = true; d.weather = ['foggy']; d.outdoorPower = Math.round(d.outdoorPower * 1.25); d.scrapMul *= 1.2; } },
+  linkbloom: { name: 'LINK BLOOM', desc: 'Rampant overgrowth. Bots and leechers love it. Scrap +15%.', risk: 0.5, biomes: ['jungle'], apply(d) { d.treeMul = 2.0; add(d.creatures, 'scuttler', 20); add(d.creatures, 'leech', 10); d.scrapMul *= 1.15; } },
+  expedition: { name: 'EXPEDITION SITE', desc: 'More towers, ruins and parkour routes outside (and more chests).', risk: 0.1, apply(d) { d.landmarkBonus = 2; } },
   lowtraffic: { name: 'LOW TRAFFIC', desc: 'Fewer creatures, scrap -15%.', risk: -0.6, apply(d) { d.power = Math.max(2, Math.round(d.power * 0.7)); d.scrapMul *= 0.85; } },
 };
 function add(tbl, id, w) { tbl[id] = (tbl[id] || 0) + w; }
@@ -112,6 +125,7 @@ const WEATHER_POOL = {
   ashfield: ['clear', 'foggy', 'stormy', 'eclipsed'], crystal: ['clear', 'clear', 'foggy', 'eclipsed'],
   hills: ['clear', 'clear', 'rainy', 'foggy'], swamp: ['rainy', 'rainy', 'foggy', 'clear', 'stormy'], snow: ['clear', 'foggy', 'stormy', 'eclipsed'],
   desert: ['clear', 'clear', 'foggy', 'eclipsed'], moor: ['stormy', 'rainy', 'foggy', 'eclipsed'], blackforest: ['eclipsed', 'foggy', 'stormy'],
+  lava: ['clear', 'clear', 'foggy', 'stormy', 'eclipsed'], ice: ['foggy', 'stormy', 'clear', 'foggy'], jungle: ['rainy', 'rainy', 'foggy', 'clear', 'stormy'],
 };
 // indoor creature weights: [tier 1, tier 6] (lerped by tier); hazards handled separately
 const INDOOR = { scuttler: [30, 10], yoinker: [22, 8], crawler: [10, 16], lurker: [5, 16], mannequin: [4, 16], sludge: [8, 10], spider: [10, 16],
@@ -124,6 +138,11 @@ const INTERIOR_PACKS = {
 const DRY = new Set(['desert', 'ashfield', 'datascape']);
 const RISK = [[1.8, 'LOW'], [2.9, 'MODERATE'], [4.0, 'HIGH'], [5.2, 'SEVERE'], [Infinity, 'LETHAL']];
 export function riskLabel(score) { return RISK.find(([lim]) => score < lim)[1]; }
+
+/** Map scale of a generated moon: bigger facilities and deeper sectors open bigger maps (terrain.js clamps to 1.6x for perf). */
+export function mapScaleFor(size, index) {
+  return +Math.min(1.6, Math.max(1, 1 + Math.max(0, size - 1.45) * 0.45 + Math.max(0, index) * 0.03)).toFixed(2);
+}
 
 // ------------------------------------------------------------------ generation (pure)
 const sectorCache = new Map();
@@ -146,6 +165,17 @@ export function generateSector(runKey, index) {
     biomes.push(R.weighted(avail).id);
   }
   if (!biomes.some((b) => BIOMES[b]?.decor)) biomes[R.int(0, biomes.length - 1)] = R.pick(pool.filter((p) => BIOMES[p.id].decor && !biomes.includes(p.id))).id;
+  if (index >= 1) {
+    const W = new RNG(hashString('wx1:' + key));
+    const avail = WAVE1_BIOMES.filter((id) => BIOMES[id] && (id !== 'lava' || index >= 2));
+    const nSwap = index >= 4 && W.chance(0.5) ? 2 : W.chance(Math.min(0.95, 0.55 + index * 0.1)) ? 1 : 0;
+    for (let sw = 0; sw < nSwap && avail.length; sw++) {
+      const id = W.pick(avail);
+      avail.splice(avail.indexOf(id), 1);
+      if (biomes.includes(id)) continue;
+      biomes[W.int(id === 'lava' ? 1 : 0, biomes.length - 1)] = id;   // lava never as the soft first server
+    }
+  }
   const base = 1 + Math.floor(index / 2);
   const tiers = [];
   for (let k = 0; k < biomes.length; k++) {
@@ -222,11 +252,11 @@ function generateMoon({ runKey, index, k, biome, tier, usedNames, safe, deep }) 
   if (tier >= 2) outdoor.giant = Math.round(2 + tier * 1.5);
   if (DRY.has(biome)) outdoor.sandkefal = 3 + tier;
   // ponds: flooded / burnt maps have none, datascape gets glowing data pools sometimes
-  const ponds = B.flood != null || biome === 'ashfield' ? 0 : biome === 'crystal' ? 1 : biome === 'datascape' ? R.int(0, 1) : undefined;
+  const ponds = B.flood != null || biome === 'ashfield' || biome === 'lava' || biome === 'ice' ? 0 : biome === 'crystal' ? 1 : biome === 'datascape' ? R.int(0, 1) : undefined;
   const def = {
     id: `${GEN_PREFIX}${index}_${k}`, name, short, tier, cost, biome, interior, size, generated: true, sector: index, slot: k,
     weather, scrapCount, scrapMul, power, outdoorPower, creatures, outdoor, mods: [],
-    mapScale: size >= 1.6 ? +Math.min(1.5, 1 + (size - 1.5) * 0.45).toFixed(2) : 1,
+    mapScale: mapScaleFor(size, index),
   };
   if (ponds !== undefined) def.ponds = ponds;
   if (interior !== wanted) def.wantedInterior = wanted;
@@ -240,7 +270,7 @@ function generateMoon({ runKey, index, k, biome, tier, usedNames, safe, deep }) 
     def.mods.push(id);
   }
   def.scrapMul = +def.scrapMul.toFixed(2);
-  if (def.mods.includes('legacyvaults')) def.mapScale = def.size >= 1.6 ? +Math.min(1.5, 1 + (def.size - 1.5) * 0.45).toFixed(2) : 1;
+  if (def.mods.includes('legacyvaults')) def.mapScale = mapScaleFor(def.size, index);
   const riskMods = def.mods.reduce((s, id) => s + (MODIFIERS[id].risk || 0), 0);
   def.riskScore = +(tier + riskMods).toFixed(2);   // relative to other moons (every moon scales with the quota the same way)
   def.risk = riskLabel(def.riskScore);

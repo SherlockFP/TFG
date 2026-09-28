@@ -424,3 +424,11 @@ function buildCrystal(C) {
 
 const BUILDERS = { datascape: buildDatascape, servermarsh: buildServerMarsh, ashfield: buildAshfield, crystal: buildCrystal };
 export const DECOR_KINDS = Object.keys(BUILDERS);
+
+/** Wave-1 hook: other files (world/biomes_wave1.js) register their own decor builders (same ctx as the built-in ones)
+ *  and reuse these helpers, so every biome decor shares one instancing / disposal path. */
+export function registerDecor(kind, fn) {
+  BUILDERS[kind] = fn;
+  if (!DECOR_KINDS.includes(kind)) DECOR_KINDS.push(kind);
+}
+export const DECOR_HELPERS = { instanced, instancedProp, mergeSimple, groundDisc, emitter, softPuffTexture, tintClone, TAU };

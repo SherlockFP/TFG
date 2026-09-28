@@ -64,7 +64,7 @@ import { installLore } from './lore.js';
 
 // [import:horde]
 
-// [import:worldx]
+import { installWorldX } from './worldx.js';
 
 // [import:fun]
 
@@ -165,7 +165,7 @@ export class Game extends Emitter {
 
     // [slot:horde]
 
-    // [slot:worldx]
+    this.useModule('worldx', installWorldX);
 
     // [slot:fun]
 
