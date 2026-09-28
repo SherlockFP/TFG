@@ -198,8 +198,10 @@ export class CreatureView {
   audible() { return !this.private || this.extra === this.mgr.game.selfId; }
 
   startLoops() {
+    // '*' loops, plus the loops tied to the state this view is created in (a view that spawns mid-state, e.g. a late
+    // joiner's hidden / rumbling Worm, used to stay silent until the next state change)
     for (const [st, snd, vol, pitch] of LOOPS[this.type] || []) {
-      if (st === '*') this.setLoop(snd, vol, pitch);
+      if (st === '*' || st === this.state) this.setLoop(snd, vol, pitch);
     }
   }
   setLoop(snd, vol, pitch) {
@@ -405,6 +407,9 @@ class HostCreature {
     // 'Viral': faster walk; the run is capped just above sprint speed so fast chargers stay outrunnable at corners
     if (as !== 1) { this.def.walk *= as; this.def.run = Math.max(this.def.run, Math.min(this.def.run * as, 9.5)); }
     const st = creatureLevelStats(this.def, this.level, this.elite, V0);
+    // sector / threat scale (game.balance): HP is baked at spawn for EVERY creature type, mod creatures included
+    const bs = mgr.game.balance?.scale(this.def.boss ? 'boss' : this.def.hazard ? 'hazard' : 'creature');
+    if (bs && st.maxHp) st.maxHp = Math.max(1, Math.round(st.maxHp * bs.hp));
     this.maxHp = st.maxHp; this.hp = st.maxHp;
     this.age = 0;           // s since spawn: no attacks during the first second (vent spawns, swarms)
     this.lastHurtT = -99;
@@ -434,6 +439,7 @@ class HostCreature {
 }
 
 const WANDER_TIME = [4, 9];
+const NO_HUNT = new Set(['yoinker', 'leech', 'spider', 'sludge', 'mimicdoor', 'web', 'stalker', 'ticketswarm', 'editor']);   // guard a nest / lair, or have their own hunting rules
 
 export class CreatureManager {
   constructor(game) {
@@ -563,6 +569,7 @@ export class CreatureManager {
     return out;
   }
   noise(pos, loud, owner = null) {
+    this.game.balance?.onNoise?.(loud);   // every noise event also feeds the Threat meter
     this.noises.push({ pos: pos.clone ? pos.clone() : new THREE.Vector3(pos.x, pos.y, pos.z), loud, t: 0, owner });
   }
   // s: sound name or fallback list; pt: pitch; max: max distance
@@ -658,7 +665,7 @@ export class CreatureManager {
   canSee(c, p, range = 20, fovDeg = 70) {
     const e = this.eye(c).clone();
     const d = e.distanceTo(p.eye);
-    let r = range * (p.flash ? 1.4 : 1) * (p.crouch ? 0.6 : 1);
+    let r = range * (p.flash ? 1.4 : 1) * (p.crouch ? 0.6 : 1) * this.detectMul(c);
     if (d > r) return false;
     if (fovDeg < 180) {
       const ang = Math.atan2(-(p.pos.x - c.pos.x), -(p.pos.z - c.pos.z));
@@ -678,12 +685,24 @@ export class CreatureManager {
     if (dir.dot(p.look) < cone) return false;
     return this.game.physics.lineOfSight(p.eye, target);
   }
+  // ---- balance (game.balance): detection, speed, wandering towards the crew, all in the generic paths ----
+  balanceKind(c) { return c.def.boss ? 'boss' : c.def.hazard ? 'hazard' : 'creature'; }
+  detectMul(c) { const B = this.game.balance; return B ? B.scale(this.balanceKind(c)).detect : 1; }
+  speedMul(c, speed) {
+    const B = this.game.balance;
+    if (!B) return speed;
+    const kind = this.balanceKind(c);
+    speed *= B.scale(kind).speed;
+    const cap = kind === 'creature' ? B.speedCap() : 0;   // early sectors: nothing outruns a sprinting player
+    return cap ? Math.min(speed, cap) : speed;
+  }
   nearest(c, list, maxD = 1e9) {
     let best = null, bd = maxD;
     for (const p of list) { const d = p.pos.distanceTo(c.pos); if (d < bd) { bd = d; best = p; } }
     return best ? { p: best, d: bd } : null;
   }
   hear(c, radius) {
+    radius *= this.detectMul(c);
     let best = null, bl = 0;
     for (const n of this.noises) {
       const d = n.pos.distanceTo(c.pos);
@@ -699,18 +718,30 @@ export class CreatureManager {
     c.dest = new THREE.Vector3(x, c.pos.y, z);
     const nav = this.nav(c);
     if (nav) {
-      c.path = nav.findPath(c.pos.x, c.pos.z, x, z) || null;
+      const found = nav.findPath(c.pos.x, c.pos.z, x, z);
+      c.path = found || null;
       c.pathIdx = 0;
+      c.repath = found ? 0.8 + Math.random() * 0.4 : 1.5 + Math.random();   // unreachable target: back off instead of re-running A* every timer
+      return;
     } else c.path = [{ x, z }];
     c.repath = 0.8 + Math.random() * 0.4;
   }
   // goTo for per-tick stimuli (noise): keeps the current path while the goal moved less than `tol` metres,
   // so a creature hearing continuous footsteps does not run A* every frame
   goToLazy(c, x, z, tol = 2) {
-    if (c.dest && c.path && c.pathIdx < c.path.length && Math.hypot(c.dest.x - x, c.dest.z - z) < tol) return;
+    if (c.dest && Math.hypot(c.dest.x - x, c.dest.z - z) < tol && ((c.path && c.pathIdx < c.path.length) || (!c.path && c.repath > 0))) return;   // (2nd: the last search failed, wait)
     this.goTo(c, x, z);
   }
   wander(c, radius = 14) {
+    // Threat: the higher the meter, the more often an idle creature wanders TOWARDS a crewmate (never for nest / ambush / trap types)
+    const B = this.game.balance;
+    if (B && !c.def.hazard && !c.def.noHunt && !NO_HUNT.has(c.type)) {
+      const hunt = B.scale(this.balanceKind(c)).hunt;
+      if (hunt > 0 && Math.random() < hunt) {
+        const near = this.nearest(c, this.playersFor(c).filter((p) => !p.inShip), 70);
+        if (near) { this.goTo(c, near.p.pos.x + (Math.random() - 0.5) * 6, near.p.pos.z + (Math.random() - 0.5) * 6); return; }
+      }
+    }
     const nav = this.nav(c);
     if (nav) {
       const p = nav.randomWalkable(Math.random, c.pos.x, c.pos.z, radius);
@@ -727,6 +758,7 @@ export class CreatureManager {
   // follow current path; returns true when arrived
   follow(c, dt, speed, turnRate = 8) {
     if (!c.path || c.pathIdx >= c.path.length) return true;
+    speed = this.speedMul(c, speed);
     const wp = c.path[c.pathIdx];
     const dx = wp.x - c.pos.x, dz = wp.z - c.pos.z;
     const d = Math.hypot(dx, dz);
@@ -1343,7 +1375,7 @@ export const BEHAVIORS = {
     d.heardT -= dt;
     if (d.heardT <= 0) {
       const n = M.hear(c, 10);
-      if (n) { d.heardT = 3; M.goTo(c, n.pos.x, n.pos.z); c.setState('patrol'); }
+      if (n) { d.heardT = 3; M.goToLazy(c, n.pos.x, n.pos.z); c.setState('patrol'); }
     }
     if (st === 'idle') { if (c.t > 1.5) { M.wander(c, 16); c.setState('patrol'); } }
     else if (st === 'patrol' || st === 'hunt') { if (M.follow(c, dt, c.def.walk)) c.setState('idle'); }

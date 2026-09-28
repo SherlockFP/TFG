@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { GeoBuilder, levelMaterial } from './geobuilder.js';
 import { createProp } from '../models/props.js';
 import { G } from '../physics/physics.js';
+import { boxOccupied } from './doorsafe.js';
 
 export const SHIP = {
   x0: -7, x1: 7, z0: -3.5, z1: 3.5, h: 3.4,
@@ -13,6 +14,16 @@ export const SHIP = {
 export function insideShip(p, margin = 0) {
   return p.x > SHIP.x0 - margin && p.x < SHIP.x1 + margin && p.z > SHIP.z0 - margin && p.z < SHIP.z1 + margin && p.y > -0.8 && p.y < SHIP.h + 0.5;
 }
+
+/** The doorway itself (between the door leaf and the outer hull, incl. the first step): counts as aboard when the ship lifts off. */
+export function inDoorway(p) {
+  return Math.abs(p.x - SHIP.door.x) < SHIP.door.width / 2 + 0.2 && p.z >= SHIP.z1 - 0.05 && p.z < SHIP.z1 + 1.0 && p.y > -1.2 && p.y < SHIP.door.height + 0.5;
+}
+
+// Ship door leaf / collider tuning. The collider used to appear at t < 0.6 on the way down, while the leaf was still 60 % open
+// (an invisible wall) and on top of whoever stood in the doorway. Now: hysteresis (on < 0.3, off > 0.45, like the facility
+// doors) and a safety sensor: the leaf stops at HOLD_T while a capsule is in the doorway and closes when it is clear.
+const COL_ON = 0.3, COL_OFF = 0.45, HOLD_T = 0.5, DOOR_SPEED = 1.6;
 
 export function buildShip({ physics, lightPool, scene }) {
   const group = new THREE.Group();
@@ -154,16 +165,50 @@ export function buildShip({ physics, lightPool, scene }) {
   const leaf = new THREE.Mesh(new THREE.BoxGeometry(S.door.width, S.door.height, 0.12), leafMat);
   leaf.position.set(S.door.x, S.door.height / 2, S.z1 + 0.02);
   group.add(leaf);
+  const DZ = S.z1 + 0.15;   // door collider centre z
+  const addCollider = () => physics.addStaticBox(S.door.x, S.door.height / 2, DZ, S.door.width / 2, S.door.height / 2, 0.15, 0, G.DOOR, { kind: 'shipdoor' });
+  // capsules touching the doorway: margin 0.1 around the collider; y range covers the steps below the sill
+  const busy = (margin = 0.1, mask) => boxOccupied(physics, S.door.x, 0.9, DZ, S.door.width / 2 + margin, 1.8, 0.15 + margin, mask);
   const door = {
     leaf, open: false, t: 0, collider: null,
-    setOpen(v) { this.open = v; },
+    blocked: false,                       // closing, but somebody stands in the doorway: the leaf waits
+    setOpen(v, snap = false) { this.open = !!v; if (snap) { this.t = this.open ? 1 : 0; this.blocked = false; this.update(0); } },
+    /** Interact prompt. phase = run.phase: the host seals the door while the ship flies. */
+    label(phase) {
+      if (phase === 'orbit' || phase === 'landing' || phase === 'takeoff' || phase === 'fired') return 'Ship door (sealed in flight)';
+      if (!this.open && this.blocked) return 'Ship door (something is in the way)';
+      return this.open ? 'Close ship door [E]' : 'Open ship door [E]';
+    },
     update(dt) {
       const target = this.open ? 1 : 0;
-      this.t += Math.sign(target - this.t) * Math.min(Math.abs(target - this.t), dt * 1.6);
-      leaf.position.x = S.door.x + this.t * (S.door.width + 0.1);
-      const shouldBlock = this.t < 0.6;
-      if (shouldBlock && !this.collider) this.collider = physics.addStaticBox(S.door.x, S.door.height / 2, S.z1 + 0.15, S.door.width / 2, S.door.height / 2, 0.15, 0, G.DOOR, { kind: 'shipdoor' });
-      if (!shouldBlock && this.collider) { physics.removeCollider(this.collider); this.collider = null; }
+      let t = this.t + Math.sign(target - this.t) * Math.min(Math.abs(target - this.t), dt * DOOR_SPEED);
+      this.blocked = false;
+      if (this.collider) {
+        if (t > COL_OFF) { physics.removeCollider(this.collider); this.collider = null; }
+        else if (dt > 0 && (this._pt = (this._pt || 0) + dt) > 0.3) { this._pt = 0; this.pushOut(); }   // (teleports / a peer that joined mid-close): never leave a capsule inside the closed door
+      } else if (target < this.t || (target === 0 && t <= 0)) {
+        // closing (or resting closed) with no collider yet. Below HOLD_T + a little the safety sensor runs EVERY frame, so
+        // while somebody stands in the doorway the leaf rests at HOLD_T instead of creeping down and snapping back.
+        if (t < HOLD_T + 0.06) {
+          if (busy()) { t = Math.max(t, HOLD_T); this.blocked = true; }
+          else if (t < COL_ON) this.collider = addCollider();
+        }
+      }
+      this.t = t;
+      leaf.position.x = S.door.x + t * (S.door.width + 0.1);
+    },
+    // Local capsule overlapping the closed door collider (deeper than the contact offset): move it to the nearer side.
+    pushOut() {
+      if (!this.collider) return;
+      let fix = null;
+      boxOccupied(physics, S.door.x, S.door.height / 2, DZ, S.door.width / 2 - 0.03, S.door.height / 2, 0.12, G.PLAYER, (col) => { fix = col; return false; });
+      const body = fix?.parent?.();
+      if (!body || body.isFixed?.()) return;
+      const p = body.translation();
+      const outside = p.z > DZ;
+      const nz = outside ? S.z1 + 0.3 + 0.4 : S.z1 - 0.4;
+      body.setTranslation({ x: p.x, y: p.y, z: nz }, true);
+      body.setNextKinematicTranslation?.({ x: p.x, y: p.y, z: nz });
     },
   };
   door.update(0);

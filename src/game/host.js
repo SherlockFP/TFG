@@ -7,7 +7,7 @@ import { ITEMS, itemDef, SCRAP_TABLE, BIG_TABLE, isSellable, scrapTableFor, bigT
 import { CREATURES } from './creatures.js';
 import { spawnTable, canSpawnMore } from './creatures.js';
 import { nextQuota, buyRate, scrapValueMul, scrapCountBonus, indoorPowerMul, outdoorPowerMul, creatureBaseLevel } from './progression.js';
-import { insideShip, SHIP } from '../world/ship.js';
+import { insideShip, inDoorway, SHIP } from '../world/ship.js';
 import { saveRun } from '../core/save.js';
 import { lobbyCode } from '../core/rng.js';
 import { clamp } from '../core/util.js';
@@ -24,7 +24,7 @@ export function newRun() {
   return {
     phase: 'orbit', moon: 'hamsi', seed: Math.floor(Math.random() * 1e9), weather: 'clear',
     time: 480, day: 1, daysLeft: 3, quota: nextQuota(0, 0), quotaIndex: 0, sold: 0, credits: 60,
-    upgrades: {}, powerOn: true, buyRnd: Math.random(), forecast: {}, totalScrap: 0, runId: lobbyCode(),
+    upgrades: {}, powerOn: true, buyRnd: Math.random(), forecast: {}, totalScrap: 0, runId: lobbyCode(), threat: 0,
   };
 }
 
@@ -242,6 +242,9 @@ export const hostMethods = {
     });
     H('shipdoor', (d, from) => {
       if (['landing', 'takeoff', 'orbit', 'fired'].includes(this.run.phase)) { this.net.sendTo(from, 'sys', { text: 'The door is sealed during flight.', kind: 'bad' }); return; }
+      // state-set request, not a toggle: two players pressing at once end in the last request, and a request for the state the door
+      // is already in (double press, stale label) is dropped instead of replaying the hydraulics for everybody
+      if (this.ship.door.open === !!d.open) return;
       this.net.broadcast('door', { id: 'ship', open: !!d.open });
     });
     H('lever', (d, from) => this.hostLever(from));
@@ -363,8 +366,10 @@ export const hostMethods = {
     const hd = this.hostData;
     // who is aboard?
     const players = this.aiPlayers();
-    const aboard = players.filter((p) => !p.dead && p.inShip);
-    const leftBehind = players.filter((p) => !p.dead && !p.inShip);
+    // (standing in the doorway counts as aboard: the door leaf waits for them, so nobody is sealed out or 'left behind' on the sill)
+    const aboardNow = (p) => p.inShip || inDoorway(p.pos);
+    const aboard = players.filter((p) => !p.dead && aboardNow(p));
+    const leftBehind = players.filter((p) => !p.dead && !aboardNow(p));
     for (const it of [...this.items.all()]) if (it.holder && leftBehind.some((p) => p.id === it.holder)) this.net.broadcast('it', { e: 'rm', id: it.id });
     hd.leftBehindIds = new Set(leftBehind.map((p) => p.id));
     for (const p of leftBehind) this.hostHurtPlayer(p.id, 999, 'left');
@@ -557,7 +562,9 @@ export const hostMethods = {
 
   indoorBudget() {
     const moon = MOONS[this.run.moon];
-    const pressure = 1 + (this.hostData.pressureStage || 0) * 0.15;
+    // Threat + sector scale (game.balance). Haul pressure used to be a flat +15 % per stage here: it is now part of the
+    // Threat meter (greed term + a spike per stage), so it is not counted twice.
+    const pressure = this.balance ? this.balance.scale().spawn : 1;
     // daily event danger (CONTENT PURGE +22%, QUIET FEED -22%...) scales the creature budget, not just the traps
     const ev = this.run.phase === 'moon' ? (this.run.dailyEvent?.dangerMul || 1) : 1;
     return (moon.power || 3) * indoorPowerMul(this.run.quotaIndex) * (this.config.dangerMul || 1) * ev * pressure + (this.hostData.powerBoost || 0);
@@ -665,7 +672,7 @@ export const hostMethods = {
     const out = moon.outdoor || {};
     const entries = Object.entries(spawnTable(moon, 'out', this.run)).filter(([id]) => CREATURES[id] && !CREATURES[id].boss && canSpawnMore(id, this.creatures.host));
     if (!entries.length) return;
-    const pressure = 1 + (this.hostData.pressureStage || 0) * 0.18;
+    const pressure = this.balance ? this.balance.scale().spawn : 1;   // (threat + sector scale; see indoorBudget)
     const budget = (moon.outdoorPower || 2) * outdoorPowerMul(this.run.quotaIndex) * (this.config.dangerMul || 1) * (this.run.dailyEvent?.dangerMul || 1) * pressure;
     if (this.hostData.outPowerUsed >= budget) return;
     let tot = 0; for (const [, w] of entries) tot += w;
@@ -716,12 +723,13 @@ export const hostMethods = {
       if (hd.lastTimeSync <= 0) { hd.lastTimeSync = 3; this.broadcastRun(['time']); }
       // spawns
       hd.spawnT -= dt;
-      if (hd.spawnT <= 0) { hd.spawnT = 45 + Math.random() * 35; this.hostSpawnWave(0); }
+      const pace = this.balance ? this.balance.scale().pace : 1;   // the more you are hunted, the sooner the next wave
+      if (hd.spawnT <= 0) { hd.spawnT = (45 + Math.random() * 35) / pace; this.hostSpawnWave(0); }
       const moon = MOONS[run.moon];
       const outdoorActive = run.weather === 'eclipsed' || run.time > 17 * 60;
       if (outdoorActive) {
         hd.outdoorSpawnT -= dt;
-        if (hd.outdoorSpawnT <= 0) { hd.outdoorSpawnT = 40 + Math.random() * 40; this.hostSpawnOutdoor(); }
+        if (hd.outdoorSpawnT <= 0) { hd.outdoorSpawnT = (40 + Math.random() * 40) / pace; this.hostSpawnOutdoor(); }
       }
       void moon;
       if (run.time >= 23 * 60 && !hd.alarmPlayed) {
@@ -749,6 +757,7 @@ export const hostMethods = {
         const nextStage = secured >= q ? 3 : secured >= q * 0.7 ? 2 : secured >= q * 0.35 ? 1 : 0;
         if (nextStage > (hd.pressureStage || 0)) {
           hd.pressureStage = nextStage;
+          this.balance?.onPressure?.(nextStage);   // greed: a spike on the Threat meter per stage
           const msg = nextStage === 1
             ? 'The haul is getting noticed. More creatures are moving in.'
             : nextStage === 2
@@ -799,6 +808,9 @@ export const hostMethods = {
 
   hostHurtPlayer(id, dmg, cause, fromId, fromPos) {
     if (!id) return;
+    // Sector scale + early-game hit cap for EVERY creature / trap hit, whichever behaviour (built in or a module's) made
+    // it: the source is a host creature id. Players, lightning, 'left behind' and the like are never scaled.
+    if (fromId && this.balance) { const src = this.creatures?.host?.get(fromId); if (src) dmg = this.balance.hitDamage(dmg, src); }
     const p = fromPos ? [fromPos.x, fromPos.y, fromPos.z] : null;
     this.net.sendTo(id, 'hurt', { dmg, cause, from: fromId, p });
   },
@@ -918,6 +930,7 @@ export const hostMethods = {
     const pos = d.pos ? new THREE.Vector3().fromArray(d.pos) : (this.aiPlayerById(id)?.pos || new THREE.Vector3());
     const name = this.playerName(id);
     this.hostData.dayStats?.deaths.push({ id, name, cause: d.cause });
+    if (d.cause !== 'left') this.balance?.onDeath?.(id);   // relief: the building eases off after a death
     if (d.cause !== 'left' && d.cause !== 'sandkefal' && d.cause !== 'giant' && d.cause !== 'void') {
       this.items.hostSpawn('body', pos.clone().add(new THREE.Vector3(0, 0.6, 0)), { value: 0, label: name });
     }
