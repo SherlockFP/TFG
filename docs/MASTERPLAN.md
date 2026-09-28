@@ -214,3 +214,56 @@ Hedef ölçek (uzun vade): 12 tesis/harita ailesi, 30-40 yaratık/anomali, 150-2
 
 ## 9. Durum (her tur güncellenir)
 - 2026-09-28: Plan yazıldı; Wave 1 başlatıldı (11 modül, paralel ajanlar). Sonuçlar AGENTS.md §5.11'de.
+
+## 10. Yaratıcı içerik havuzu (Wave 2+ adayları)
+
+Kural: her fikir **dead internet** kimliğine ve **The Algorithm** villain'ına bağlanır; "LC'de de var" dedirten şey eklenmez.
+
+### 10.1 İmza fikirler (oyunu farklı yapacak 5 şey)
+1. **Canlı Yayın / Seyirci Chat'i** — The Algorithm run'ları bot seyircilere yayınlıyor. Ekranın kenarında sahte chat
+   akar ("KILL HIM", "F", "that was scripted"). Seyirci **bağış/oylama** ile olay tetikler: "$5: ışıkları kapat",
+   "oylama: kapıları kilitle / loot yağmuru". Heyecanlı an = **Views** = bonus para. Ölüm, kıl payı kaçış, fizik
+   kazası, ihanet → viewer patlaması. Villain + ekonomi + komedi tek sistemde.
+2. **Klip & Bölüm sistemi** — oyun son 10 sn'lik pozisyon/olay kaydını tutar; gün sonunda gemide **TOP 3 CLIPS**
+   tekrar oynatılır (kamera replay) ve güne otomatik başlık verilir: *"S01E04 — Ali'nin Asansörle İmtihanı"*.
+   Case file ile birleşir; paylaşılabilir an üretir.
+3. **Unfinished Level (Beta Build ayları)** — The Algorithm haritayı **gözünün önünde yapıyor**: duvarlar sen
+   bakınca yükleniyor, texture'suz alanlar, mor-siyah "missing texture" yaratıklar, `TODO_monster`, yere düşen
+   debug küpleri, "LOADING 87%" kapıları. Oyunun kendisi korku malzemesi.
+4. **Ctrl+Z ekonomisi** — nadir **Undo** itemleri: son 5 sn'yi geri sar (pozisyon + can), kırılan eşyayı "restore",
+   ölen arkadaşı son checkpoint'e geri al. Pahalı, gürültülü, Algorithm'ın dikkatini çeker.
+5. **Captcha kapıları** — kilitli kapılar "İnsan olduğunu kanıtla" der: kameradan alınmış gerçek görüntüden
+   "yaratık olan kareleri seç" bulmacası. Yanlış seçim = alarm. Mimic de captcha'yı geçemez (karşı-oyun).
+
+### 10.2 Yaratık fikirleri (amaç tabanlı)
+| Yaratık | Amaç | Karşı oyun |
+|---|---|---|
+| **Buffering** | Yakınındayken hareketin takılır (stutter), sesin gecikir | Uzak dur, hızlı geç |
+| **Doomscroller** | Baktığı sürece koridor sonsuz döngüye girer | Göz temasını kes, arkadaş kapıyı açar |
+| **Tracking Cookie** | Sana yapışır, konumunu diğer yaratıklara yayınlar | Adblock spray, suya gir |
+| **Recommended For You** | En çok seni öldüren yaratığın kopyası olur | Çeşitli oyna |
+| **Influencer** | Işık + müzikle çeker, etrafında "fan" sürüsü | Işığını kır, fanlar dağılır |
+| **Ratio** | İki beden: birine vurmak diğerini iyileştirir | Aynı anda vur (co-op) |
+| **Autoplay** | Seni bir sonraki odaya "otomatik oynatır" (çeker) | Bir şeye tutun (E) |
+| **Terms of Service** | Metin duvarı; okumadan geçersen "kabul ettin" → lanet | Scroll et / atla bedeli |
+| **Unsubscribe Button** | Dev kırmızı buton taklidi (interactable mimic) | Tarama, kamera |
+
+### 10.3 Item fikirleri
+Copy-Paste Gun (değersiz sahte kopya yapar — Collector'u / arkadaşı kandır), VPN Cloak (Algorithm focus'undan
+kaçar), Incognito Tab (10 sn görünmez ama loot taşıyamazsın), Like-Button Grenade (sese gelen yaratıkları çeker),
+Ratio Ray, Cookie Jar (tracking cookie yakalar → üste evcil hayvan), Firmware Update (tier yükseltir, %10 brick),
+Ban Hammer (boss drop), Loading Bar (taşınabilir mini checkpoint).
+
+### 10.4 Sosyal kaos
+Oyuncu taşıma (omuza al), **"KILLED BY: YOUR FRIEND"** suçlama ekranı, gürültü eşiği (bağırmak = yaratık yemi),
+sahte teammate (Mimic + chat taklidi), ihanet kontratları (Dark Web), "biri içeride kalmalı" extraction'ları,
+alışveriş arabası / forklift / ofis sandalyesi fizik komedisi.
+
+### 10.5 Yol (verimli üretim döngüsü)
+1. **Wave 1 + Backrooms'u birleştir → tek scripted test → main'e push (Render deploy).**
+2. **Sahip 15 dk oynar** → en kötü 5 şeyi yazar → önce onlar düzelir (eğlence > içerik miktarı).
+3. Her tur **1 imza sistem + 1 içerik paketi** (yaratık/item/oda), 1-3 Sonnet ajanı, Opus sadece mimari.
+   Önerilen sıra: (a) Canlı Yayın/Seyirci Chat, (b) Klip & Bölüm, (c) Unfinished Level ayı, (d) Captcha kapıları,
+   (e) Ctrl+Z itemleri, sonra F2 tesis kimlikleri (Hotel Shift vb.).
+4. İçerik paketleri **veri odaklı şablonla** (tek dosya = 1 yaratık/item + model + TR çeviri) → ucuz, çakışmasız.
+5. Test: ajan başına 1 smoke + 1 özellik scripti, ≤2 ekran görüntüsü; oyun hissi testi = sahibin playtest'i.
