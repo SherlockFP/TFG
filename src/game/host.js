@@ -14,6 +14,7 @@ import { clamp } from '../core/util.js';
 import { hostPopulateOutposts } from '../world/outposts.js';
 import { rollWeaponAffixes, lootLevelFor, affixDisplayName } from './loot.js';
 import { dailyEventFor } from './dailyEvents.js';
+import { liteOf } from '../ui/avatarpic.js';   // [profile]
 
 const EARLY_SAFE_T = 90;   // s after landing with no creature spawns near the facility doors
 const EARLY_SAFE_D = 25;   // m of walking distance
@@ -75,7 +76,7 @@ export const hostMethods = {
       code: this.net.code, name: this.opts.lobbyName || (this.profile.name + "'s crew"), host: this.profile.name,
       players: this.net.playerCount(), max: this.config.maxPlayers, phase: this.run.phase, moon: MOONS[this.run.moon]?.short,
       quota: this.run.quota, day: this.run.day, locked: !!this.opts.password, mods: this.mods?.enabledIds() || [],
-      level: this.profile.level,
+      level: this.profile.level, av: liteOf(this.profile),   // [profile] host avatar (258 chars)
     };
     this.emit('announce', info);
   },

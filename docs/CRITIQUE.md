@@ -102,3 +102,7 @@ card layout, dash feel and every 2-player path are unverified); some creature be
 Every grenade now throws the same way (hold LMB, dotted arc, cook, bounce / roll, beeps) and there are 4 new common bombs + 5 rare drop-only ones (`docs/wave2/grenades.md`).
 Risks: the aim preview and cook bar were never run with a real mouse (headless has no held button); visuals (smoke puffs, blackout dome, glitch slices, vortex) are unseen; 2-player sync is
 untested; rare drop rates (void chest 80 %, boss always, world 28 % per day) and damage numbers (sticky 100, glitch 140) are design numbers; blackout also dims your own screen (vignette) while inside.
+## Wave 2 - nickname + avatar (docs/wave2/profile.md)
+The owner could not find a way to rename himself (a bare, unvalidated text box hid inside CHARACTER) and lobbies were anonymous. Now: PROFILE on the CRT menu,
+validated nickname, pixel / 3D-snapshot avatar with frames, shown in the lobby browser, TAB, chat, summary and above name tags. Honest gaps: never opened in a browser
+(layout, snapshot camera framing, pointer drawing, 2-player `pf` sync unverified), no avatars in the case-file panel, no gamepad drawing, slur list is deliberately small.

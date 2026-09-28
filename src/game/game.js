@@ -30,6 +30,8 @@ import { actionMethods } from './actions.js';
 import { Terminal } from './terminal.js';
 import { installDirector } from './director.js';
 import { Progress } from './profile.js';
+import { installProfileSync, avatarOfPeer } from './profilesync.js';   // [profile]
+import { liteOf } from '../ui/avatarpic.js';   // [profile]
 import { installAchievements, titleOf } from './achievements.js';
 import { installPings } from './pings.js';
 import { EmoteSystem } from './emotes.js';
@@ -366,11 +368,12 @@ export class Game extends Emitter {
 
   helloData() {
     const p = this.profile;
-    return { name: p.name, level: p.level, suit: p.suit, hat: p.hat, face: p.face || 'none', back: p.back || 'none', pid: p.id, title: titleOf(p), mods: this.mods?.enabledIds() || [] };   // face/back: wardrobe accessories (old clients ignore them)
+    return { name: p.name, level: p.level, suit: p.suit, hat: p.hat, face: p.face || 'none', back: p.back || 'none', pid: p.id, title: titleOf(p), mods: this.mods?.enabledIds() || [], av: liteOf(p) };   // face/back: wardrobe accessories (old clients ignore them)
   }
 
   installNetHandlers() {
     const net = this.net;
+    installProfileSync(this, net);   // [profile] nickname / avatar sync ('pf')
     net.on('playerJoin', (id, info) => this.hostOnPlayerJoin(id, info));
     net.on('peerHello', () => {});
     net.on('peerLeave', (id, p) => {
@@ -1100,7 +1103,7 @@ export class Game extends Emitter {
   onChat(d, from) {
     this.mods?.emit('chat', d, from, this);
     const name = d.n || this.playerName(from);
-    this.ui.chatMessage(name, d.text, from === this.selfId);
+    this.ui.chatMessage(name, d.text, from === this.selfId, undefined, avatarOfPeer(this, from, name));   // [profile] tiny avatar icon
     if (from !== this.selfId) this.audio.ui('ui_chat', 0.4);
   }
   sendChat(text) {

@@ -19,6 +19,13 @@ import { createServiceRecord } from './panels/record.js';
 import { decorateSkills } from './panels/passivetree.js';
 import { createShopPanel } from './panels/shop.js';
 import { getCharPreview, peekCharPreview, CharPreview } from './charpreview.js';
+import { profilePanel, applyProfileName } from './panels/profile.js';   // [profile]
+import { NAME_REASONS, NAME_MAX } from '../core/profilename.js';   // [profile]
+import { avatarCanvas, avatarDataUrl, fromWire, defaultAvatar } from './avatarpic.js';   // [profile]
+import { avatarOfPeer } from '../game/profilesync.js';   // [profile]
+
+// [profile] tiny avatar icon (16x16 thumbnail) for chat / lists
+const avIcon = (av, px = 16) => { const c = avatarCanvas(av, px, { thumb: true }); c.style.marginRight = '4px'; return c; };
 
 const LOGO = `<div class="logo"><div class="logo-main">TFG</div><div class="logo-long">TOTALLY FUCKED GAME</div><div class="logo-fish">(( ◉ ))</div><div class="logo-sub">"Engagement is love."</div></div>`;
 void LOGO; void dailyBounties;
@@ -100,9 +107,9 @@ export class UI {
   }
   toast(text, kind) { this.hud.toast(t(text), kind); }   // t(): safety net for static strings that were not wrapped at the call site
   systemMessage(text, kind = 'info') { text = t(text); this.chatMessage(null, text, false, kind); this.hud.toast(text, kind === 'signal' ? 'info' : kind); }
-  chatMessage(name, text, self, kind) {
+  chatMessage(name, text, self, kind, avatar) {
     this.chatEl.classList.remove('hidden');
-    const line = el('div', { class: 'chat-line ' + (kind || '') + (self ? ' self' : '') }, name ? el('span', { class: 'cn' }, name + ': ') : null, text);
+    const line = el('div', { class: 'chat-line ' + (kind || '') + (self ? ' self' : '') }, name && avatar ? avIcon(avatar, 14) : null, name ? el('span', { class: 'cn' }, name + ': ') : null, text);   // [profile] icon
     this.chatLog.appendChild(line);
     while (this.chatLog.children.length > 40) this.chatLog.firstChild.remove();
     this.chatLog.scrollTop = this.chatLog.scrollHeight;
@@ -397,7 +404,7 @@ export class UI {
     this.menuEl.innerHTML = '';
     this.currentScreen = screen;
     this.menuOpts = opts;
-    const labels = { host: t('HOST GAME'), browser: t('JOIN GAME'), character: t('CHARACTER'), mods: t('MODS'), settings: t('SETTINGS'), howto: t('HOW TO PLAY') };
+    const labels = { host: t('HOST GAME'), browser: t('JOIN GAME'), profile: t('PROFILE'), character: t('CHARACTER'), mods: t('MODS'), settings: t('SETTINGS'), howto: t('HOW TO PLAY') };
     this.app.menu?.setMode?.(screen === 'title' ? 'title' : 'sub', labels[screen] || '');
     this.menuEl.classList.toggle('over-crt', screen !== 'title');
     const fn = this['screen_' + screen];
@@ -520,7 +527,7 @@ export class UI {
         const blocked = full || l.incompatible;
         const row_ = el('div', { class: 'lobby-row' + (l.incompatible ? ' bad' : '') + (full ? ' full' : ''), tabindex: blocked ? -1 : 0, 'data-code': l.code },
           el('div', { class: 'l-name' }, (l.locked ? '🔒 ' : '') + (l.name || '?')),
-          el('div', { class: 'l-host' }, (l.host || '?') + tf(' · Lv.{n}', { n: l.level || 1 }) + (l.stars ? ` ★${l.stars | 0}` : '') + (l.crew ? ` · [${String(l.crewTag || '').slice(0, 4)}] ${String(l.crew).slice(0, 24)} (C${l.crewLv | 0})` : '')),
+          el('div', { class: 'l-host' }, avIcon(fromWire(l.av) || defaultAvatar(l.host || '?'), 16), (l.host || '?') + tf(' · Lv.{n}', { n: l.level || 1 }) + (l.stars ? ` ★${l.stars | 0}` : '') + (l.crew ? ` · [${String(l.crewTag || '').slice(0, 4)}] ${String(l.crew).slice(0, 24)} (C${l.crewLv | 0})` : '')),
           el('div', { class: 'l-pl' }, el('span', { class: 'l-bar' }, el('i', { style: { width: clamp((l.players / Math.max(1, l.max)) * 100, 0, 100) + '%' } })), ` ${l.players}/${l.max}`),
           el('div', { class: 'l-ph' }, `${String(l.phase || '').toUpperCase()} ${l.moon || ''}`),
           el('div', { class: 'l-q' }, `${t('Day')} ${l.day || 1} · ▮${l.quota || 0}`),
@@ -550,6 +557,12 @@ export class UI {
     this.focusFirst(this.menuEl, '.lobby-row[tabindex="0"], .code-in');
   }
 
+  screen_profile() {   // [profile]
+    const p = profilePanel(this, { inGame: false });
+    this.menuEl.appendChild(p);
+    this.focusFirst(p, 'input');
+  }
+
   screen_character() {
     const p = this.characterPanel(false);
     this.menuEl.appendChild(p);
@@ -564,8 +577,12 @@ export class UI {
       const focusKey = document.activeElement?.dataset?.nav;
       wrap.innerHTML = '';
       wrap.appendChild(this.panelHead(t('CHARACTER'), tf('Lv.{level} · {rank}', { level: p.level, rank: t(rankOf(p.level)) })));
-      const nameIn = el('input', { value: p.name, maxlength: 18 });
-      nameIn.addEventListener('change', () => { p.name = nameIn.value.trim().slice(0, 18) || p.name; saveProfile(p); this.app.game?.net?.send('pinfo', this.app.game.helloData()); });
+      const nameIn = el('input', { value: p.name, maxlength: NAME_MAX });
+      nameIn.addEventListener('change', () => {   // [profile] validated (2-16 chars, filter, no look-alike of a crewmate / host)
+        const r = applyProfileName(this.app, nameIn.value);
+        if (!r.ok) { this.toast(t(NAME_REASONS[r.reason]), 'bad'); }
+        nameIn.value = p.name;
+      });
       const suits = el('div', { class: 'swatches' });
       for (const s of SUIT_COLORS) {
         const owned = p.cosmetics.suits.includes(s.id);
@@ -596,6 +613,7 @@ export class UI {
       const left = el('div', { class: 'col' },
         pv.el,
         row(t('Name'), nameIn),
+        el('div', { class: 'menu-row' }, this.button(t('Edit profile'), () => (inGame ? this.openPanel(profilePanel(this, { inGame: true })) : this.showMenu('profile')), 'small')),   // [profile]
         el('div', { class: 'label' }, t('Suit')), suits,
         el('div', { class: 'label' }, t('Hat')), hats,
         el('div', { class: 'label' }, tf('Lv.{level} · {rankOf} · {xp}/{xpForLevel} XP', { level: p.level, rankOf: rankOf(p.level), xp: p.xp, xpForLevel: xpForLevel(p.level) })),
@@ -768,6 +786,7 @@ export class UI {
           section(t('Comfort')),
           check(t('Reduce motion'), 'reduceMotion', t('less camera shake, bob and screen warp; calmer menus')),
           check(t('Head bob'), 'headBob', null, true),
+          check(t('Avatars above name tags'), 'tagAvatars', t("small picture over teammates' heads"), true),   // [profile]
           section(t('HUD')),
           check(t('Objective tracker'), 'showObjectives', null, true),
           check(t('Crosshair'), 'showCrosshair', null, true),
@@ -954,9 +973,10 @@ export class UI {
     const g = this.app.game;
     if (!g) return;
     const party = el('div', { class: 'party' });
-    const line = (name, lvl, hp, dead, you) => el('div', { class: 'party-row' + (dead ? ' dead' : '') + (you ? ' you' : '') }, el('span', {}, (you ? '▶ ' : '') + name), el('span', {}, 'Lv.' + lvl), el('span', {}, dead ? t('DECEASED') : Math.round(hp) + ' HP'));
-    party.appendChild(line(g.profile.name, g.profile.level, g.player.hp, g.player.dead, true));
-    for (const r of g.remotes.values()) party.appendChild(line(r.name, r.level, r.hp ?? 100, r.dead));
+    // [profile] each row starts with the crewmate's tiny avatar
+    const line = (name, lvl, hp, dead, you, av) => el('div', { class: 'party-row' + (dead ? ' dead' : '') + (you ? ' you' : '') }, el('span', {}, av ? avIcon(av, 16) : null, (you ? '▶ ' : '') + name), el('span', {}, 'Lv.' + lvl), el('span', {}, dead ? t('DECEASED') : Math.round(hp) + ' HP'));
+    party.appendChild(line(g.profile.name, g.profile.level, g.player.hp, g.player.dead, true, avatarOfPeer(g, g.selfId)));
+    for (const r of g.remotes.values()) party.appendChild(line(r.name, r.level, r.hp ?? 100, r.dead, false, avatarOfPeer(g, r.id, r.name)));
     const run = g.run || {};
     const info = el('div', { class: 'dim' }, tf('Quota ▮{sold}/{quota} · {daysLeft} days left · Credits ▮{credits} · Moon: {name}', { sold: run.sold, quota: run.quota, daysLeft: run.daysLeft, credits: run.credits, name: MOONS[run.moon]?.name }));
     const char = this.characterPanel(true);
@@ -1127,7 +1147,7 @@ export class UI {
     const first = deaths[0];
     if (first && badges.has(first.id)) badges.get(first.id).push([first.cause === 'left' ? t('LEFT BEHIND') : t('DIED FIRST'), '#ff4a3a']);
     for (const p of players) if (!p.dead && !p.loot && !d.company && players.length > 1) badges.get(p.id).push([t('SHIP GUARD'), '#9a9aa8']);
-    const crew = players.map((p) => `<div class="rp-crew${p.dead ? ' dead' : ''}"><span class="rp-name">${p.dead ? '✖ ' : ''}${escapeHtml(p.name)}</span>`
+    const crew = players.map((p) => `<div class="rp-crew${p.dead ? ' dead' : ''}"><span class="rp-name">${p.dead ? '✖ ' : ''}<img class="av" width="16" height="16" style="image-rendering:pixelated;vertical-align:middle;margin-right:4px" src="${avatarDataUrl(avatarOfPeer(game, p.id, p.name), 16)}" alt="">${escapeHtml(p.name)}</span>`
       + `<span class="rp-badges">${badges.get(p.id).map(([b, c]) => `<i style="--c:${c}">${b}</i>`).join('')}</span>`
       + `<span class="rp-stat">▮${p.loot || 0} · ${tf('{n} kills', { n: p.kills || 0 })}</span></div>`).join('');
     const rows = [

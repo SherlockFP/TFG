@@ -6,6 +6,8 @@ import { G } from '../physics/physics.js';
 import { damp, dampAngle } from '../core/util.js';
 import { applyNameTagTitle } from '../game/achievements.js';
 import { emoteFromNet, applyEmoteFx } from '../game/emotes.js';
+import { avatarOfPeer } from '../game/profilesync.js';   // [profile]
+import { drawAvatar } from '../ui/avatarpic.js';   // [profile]
 
 export function suitColor(id) {
   return (SUIT_COLORS?.find((s) => s.id === id) || SUIT_COLORS?.[0] || { color: '#d9642b' }).color;
@@ -41,6 +43,7 @@ export class RemotePlayer {
     this.suit = info.suit || 'orange';
     this.hat = info.hat || 'none';
     this.title = String(info.title || '').slice(0, 24);
+    this.av = typeof info.av === 'string' ? info.av : '';   // [profile] lite avatar wire string
     this.pos = new THREE.Vector3(0, -1000, 0);
     this.target = new THREE.Vector3(0, -1000, 0);
     this.vel = new THREE.Vector3();
@@ -75,6 +78,7 @@ export class RemotePlayer {
     this.tag.position.y = 2.15;
     applyNameTagTitle(this.tag, this.name, this.level, this.title);
     this.root.add(this.tag);
+    this.refreshAvatarTag();   // [profile]
     const { body, col } = game.physics.createKinematicCapsule({ x: 0, y: -1000, z: 0 }, 0.56, 0.34, G.REMOTE, G.ITEM | G.BIG, { kind: 'remote', peerId: id });
     this.body = body; this.col = col;
   }
@@ -87,10 +91,29 @@ export class RemotePlayer {
       this.root.remove(this.tag); this.tag.material.map?.dispose(); this.tag.material.dispose();
       this.tag = makeNameTag(this.name, this.level); this.tag.position.y = 2.15; this.root.add(this.tag);
       applyNameTagTitle(this.tag, this.name, this.level, this.title); this.tag.visible = !this.dead;
+      this.refreshAvatarTag();
     }
+    if (typeof info.av === 'string' && info.av !== this.av) { this.av = info.av; this.refreshAvatarTag(); }   // [profile]
     if (info.suit && info.suit !== this.suit) { this.suit = info.suit; this.avatar.setSuitColor(suitColor(this.suit)); }
     if (info.hat && info.hat !== this.hat) { this.hat = info.hat; this.avatar.setHat(this.hat); }
     try { this.avatar.setLook?.({ suit: info.suit, hat: info.hat, face: info.face, back: info.back }); } catch { /* wardrobe */ }   // outfit / face / back (undefined fields keep their value)
+  }
+
+  // [profile] small avatar sprite above the name tag (settings.tagAvatars, default on): the 16x16 thumbnail, 32 px texture
+  refreshAvatarTag() {
+    if (this.avTag) { this.root.remove(this.avTag); this.avTag.material.map?.dispose(); this.avTag.material.dispose(); this.avTag = null; }
+    if (this.game.settings?.tagAvatars === false) return;
+    try {
+      const c = document.createElement('canvas'); c.width = c.height = 32;
+      drawAvatar(c.getContext('2d'), avatarOfPeer(this.game, this.id, this.name, this.av), 0, 0, 32, { thumb: true });
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace; tex.minFilter = THREE.NearestFilter; tex.magFilter = THREE.NearestFilter; tex.generateMipmaps = false;
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: true, fog: false }));
+      sp.scale.set(0.26, 0.26, 1);
+      sp.position.y = this.tag.position.y + this.tag.scale.y / 2 + 0.15;
+      sp.visible = !this.dead;
+      this.avTag = sp; this.root.add(sp);
+    } catch (e) { console.warn('[profile] tag avatar', e); }
   }
 
   // state packet: { p:[x,y,z], y:yaw, pt:pitch, f:flags, h:heldType, fl:flashOn, vl:voice, n:noise, sw:swing, e:emote }
@@ -129,6 +152,7 @@ export class RemotePlayer {
     this.avatar.setExpression(dead ? 'dead' : 'normal');
     this.root.visible = !dead;           // body is represented by a body item
     this.tag.visible = !dead;
+    if (this.avTag) this.avTag.visible = !dead;
     if (dead) this.body.setNextKinematicTranslation({ x: 0, y: -1000, z: 0 });
   }
 
@@ -172,6 +196,7 @@ export class RemotePlayer {
     this.root.removeFromParent();
     this.avatar.dispose?.();
     this.tag?.material?.map?.dispose(); this.tag?.material?.dispose();
+    this.avTag?.material?.map?.dispose(); this.avTag?.material?.dispose();
     this.game.physics.removeBody(this.body);
   }
 }
