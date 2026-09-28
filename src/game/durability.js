@@ -168,6 +168,7 @@ export function installDurability(game) {
   /** wear an item the LOCAL player uses. ev: 'swing' | 'hit' | 'shot' | 'pry' | 'dmg' */
   function wear(it, amount, ev) {
     if (!it || !(amount > 0) || disposed) return;
+    { const q = game.run?.quotaIndex | 0; if (q === 0) amount *= 0.5; else if (q === 1) amount *= 0.75; }   // early-game comfort: gear lasts longer at first
     const max = D.itemMax(it), cur = D.itemDur(it);
     if (!max || cur <= 0) return;
     if (game.isHost) { hostApply(it, amount, game.selfId, true); if (ev === 'hit' || ev === 'shot') crackSfx(it, D.itemDur(it), max); return; }

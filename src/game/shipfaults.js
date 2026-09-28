@@ -328,6 +328,9 @@ export function installShipFaults(game, ctx = {}) {
         if (reason === 'lever' && now - F.remindT > 3) { F.remindT = now; const n = F.list.filter((f) => !f.done).length; if (n) sys(`Takeoff blocked: ${n} fault${n > 1 ? 's' : ''} left.`, 'bad'); }
         return;
       }
+      // early-game comfort: never at the Company (HQ) and only ~35% of takeoffs in the first quota
+      const q0 = this.run?.quotaIndex | 0;
+      if (ph === 'company' || (q0 === 0 && Math.random() < 0.65)) return origTakeoff.call(this, reason);
       begin(reason);
     };
   }

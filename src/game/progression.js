@@ -76,7 +76,7 @@ export const BALANCE = {
   levelCap: 20,               // creature base-level ceiling (normal creatures + bosses)
 };
 export function scrapValueMul(q) { return 1 + BALANCE.valuePerQuota * Math.max(0, q | 0); }
-export function scrapCountBonus(q) { return BALANCE.countPerQuota * Math.max(0, q | 0); }
+export function scrapCountBonus(q) { const n = Math.max(0, q | 0); return BALANCE.countPerQuota * n + (n === 0 ? 3 : n === 1 ? 2 : 0); }   // early-game: a few extra finds so the first days feel rewarding
 export function indoorPowerMul(q) { return 1 + BALANCE.indoorPowerPerQuota * Math.max(0, q | 0); }
 export function outdoorPowerMul(q) { return 1 + BALANCE.outdoorPowerPerQuota * Math.max(0, q | 0); }
 /** Base creature level for a moon tier + quota index (host adds a -1..+2 roll; bosses use it as is). */

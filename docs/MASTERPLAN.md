@@ -517,3 +517,11 @@ Sahip: modeller "çok AI duruyor", hafif yuvarlak, Among Us'ımsı ama **çakma 
 - **Denge:** pet ≈ ekstra yarım oyuncu değil — yardımcı; loot getirme yavaş ve sınırlı taşıma; saldırı hasarı düşük-orta;
   sadakat düşükse emir dinlemez.
 - **Sonra:** hub'da pet arenası (pet düelloları), ev gezegeninde (§17) Pet Barn binası.
+
+## 19. Erken oyun konforu (kural — sahibin isteği: "başta çok zor olmasın, loot ve keşif hissi olsun")
+- Kota 0-1 **öğrenme ve keşif** dönemidir: bol loot (+3 / +2 ekstra hurda), zayıf ve yavaş yaratıklar (balance.js),
+  tek vuruşta ölüm yok, girişte 90 sn güvenli pencere, radyasyon yarı hızda, dayanıklılık aşınması ×0.5 / ×0.75,
+  gemi arızası HQ'da hiç yok ve kota 0'da ~%35.
+- Cezalı sistemler kademeli açılır: Spambomb / rulet / Administrator kota 1+, SIEGE kota 2+, ayna portalı sektör 1+,
+  ev gezegeni baskını ≥3 bina. Yeni bir sistem eklerken **bu tabloya uy**: önce ödül, sonra risk.
+- Hedef: ilk 30-45 dakikada oyuncu en az 3 "vay be" loot anı, 1 yeni sistem keşfi ve 0 haksız ölüm yaşasın.
