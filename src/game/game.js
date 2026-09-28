@@ -62,7 +62,7 @@ import { installCrafting } from './crafting.js';
 
 import { installLore } from './lore.js';
 
-// [import:horde]
+import { installHorde } from './horde.js';
 
 import { installWorldX } from './worldx.js';
 
@@ -166,7 +166,7 @@ export class Game extends Emitter {
 
     this.useModule('lore', installLore);
 
-    // [slot:horde]
+    this.useModule('horde', installHorde);
 
     this.useModule('worldx', installWorldX);
 
