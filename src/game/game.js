@@ -99,6 +99,12 @@ import { installFun } from './fun.js';
 // [import:music]
 
 
+// [import:gameplay2]
+
+
+// [import:shipyard]
+
+
 export class Game extends Emitter {
   constructor({ engine, audio, settings, profile, ui, input, mods }) {
     super();
@@ -201,6 +207,12 @@ export class Game extends Emitter {
 
 
     // [slot:music]
+
+
+    // [slot:gameplay2]
+
+
+    // [slot:shipyard]
 
   }
 
