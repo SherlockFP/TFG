@@ -41,6 +41,7 @@ import { installLootFx } from './loot.js';
 import { installShipFeatures } from './shipfeatures.js';
 import { installMeta } from './prestige.js';
 import { installCruiser } from '../entities/cruiser.js';
+import './components.js';   // shared crafting components (registered at import)
 // ---- WAVE 1 module imports: one line per module, keep the blank separator lines (avoids merge conflicts) ----
 // [import:inventory]
 
