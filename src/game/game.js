@@ -81,6 +81,15 @@ import { installCrafting } from './crafting.js';
 // [import:liminal]
 
 
+// [import:combat]
+
+
+// [import:siege]
+
+
+// [import:bugfix]
+
+
 export class Game extends Emitter {
   constructor({ engine, audio, settings, profile, ui, input, mods }) {
     super();
@@ -165,6 +174,15 @@ export class Game extends Emitter {
 
 
     // [slot:liminal]
+
+
+    // [slot:combat]
+
+
+    // [slot:siege]
+
+
+    // [slot:bugfix]
 
   }
 
