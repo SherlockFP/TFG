@@ -75,3 +75,5 @@ overclock effects (shock / burn / vamp) untested with 2 real players; economy: s
 Melee combos / heavy / block-parry, 6 melee + 5 tech weapons (rocket jump, grenades, grav tool), 5 spells, Blood Magic and 12 role skills were added
 (`docs/wave2/combat.md`). **Feel is unverified**: arcs / guard poses / hit timing were tuned by numbers only, `tools/harness/wave2_combat.js` has not been run and
 nothing was hand-played. RMB is now block-hold / scan-tap while a melee weapon is held - check that this feels right before shipping.
+## Wave 2 - creature emotes (module cemotes, docs/wave2/cemotes.md)
+Creatures emote (idle / victory + chat line + victim camera) and react to player emotes (dance-along pacifies swarm/partygoer types 4-8 s, taunts enrage predators, mimics copy, shy types flee). Risks: taunt-enrage and the dance-along freeze are balance levers tuned by numbers only; bubble legibility in dark interiors and the killer-focus camera feel are unverified; the freeze (host AI skipped via stunT) also pauses a creature's detection for its emote length.

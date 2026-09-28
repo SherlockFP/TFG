@@ -109,7 +109,7 @@ import { installForge } from './forge.js';
 // [import:skeletons]
 
 
-// [import:cemotes]
+import { installCreatureEmotes } from './cemotes.js';
 
 
 export class Game extends Emitter {
@@ -226,7 +226,7 @@ export class Game extends Emitter {
     // [slot:skeletons]
 
 
-    // [slot:cemotes]
+    this.useModule('cemotes', installCreatureEmotes);
 
   }
 
