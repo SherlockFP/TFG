@@ -60,7 +60,7 @@ import { setDocksVisible } from '../ui/dock.js';   // shared crafting components
 
 // [import:lore]
 
-// [import:horde]
+import { installHorde } from './horde.js';
 
 // [import:worldx]
 
@@ -133,7 +133,7 @@ export class Game extends Emitter {
 
     // [slot:lore]
 
-    // [slot:horde]
+    this.useModule('horde', installHorde);
 
     // [slot:worldx]
 
