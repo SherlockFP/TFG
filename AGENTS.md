@@ -28,6 +28,13 @@ Proje klasörü `D:\KefalCompany`. Yeni AI önce bu dosyayı (AGENTS.md), sonra 
 bilinen sorunlar §5.3'te, sıradaki işler öncelik sırasıyla §6'da. Yeni AI'a şunu demen yeterli:
 "D:\KefalCompany projesindeki AGENTS.md dosyasını oku ve §6'daki yol haritasından devam et."
 
+### Git / deploy (read before pushing!)
+- Work on **`main`** — it tracks `origin` = https://github.com/SherlockFP/TFG and **Render auto-deploys it**
+  (static site, `render.yaml`). Every push to `main` = live update for the players.
+- Local **`master`** is an archive of the full dev history. It contains ~2.5 GB of raw downloads (`tools/raw/`) in
+  its first commit — **never push `master`** (GitHub rejects it). `main` started as one clean commit of the same tree.
+- `tools/raw/` (raw itch.io downloads) is git-ignored; only processed assets under `public/assets/ext/` are committed.
+
 ## 1. What the game is
 Browser co-op PSX-style horror scavenging game: **Lethal Company + R.E.P.O.** core loop with an **MMO-style
 progression layer** (levels, skill points, personal currency "Clout" ◈, black market, bounties, achievements),
