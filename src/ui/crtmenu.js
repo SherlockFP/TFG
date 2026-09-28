@@ -8,6 +8,7 @@ import { t, tf } from '../core/i18n.js';
 import { rankOf, xpForLevel } from '../game/progression.js';
 import { listRuns, saveProfile } from '../core/save.js';
 import { MenuRoom } from './menuroom.js';
+import { avatarOfProfile, drawAvatar } from './avatarpic.js';   // [profile]
 
 export const CRT_VS = `
 varying vec2 vUv;
@@ -189,7 +190,7 @@ export class CRTMenu {
     const runs = listRuns().filter((r) => r.data);
     const items = [];
     if (runs.length) items.push({ id: 'continue', label: t('CONTINUE') });
-    items.push({ id: 'host', label: t('HOST GAME') }, { id: 'browser', label: t('JOIN GAME') }, { id: 'character', label: t('CHARACTER') },
+    items.push({ id: 'host', label: t('HOST GAME') }, { id: 'browser', label: t('JOIN GAME') }, { id: 'profile', label: t('PROFILE') }, { id: 'character', label: t('CHARACTER') },
       { id: 'mods', label: t('MODS') }, { id: 'settings', label: t('SETTINGS') }, { id: 'howto', label: t('HOW TO PLAY') });
     this.items = items;
     this.sel = Math.min(this.sel, items.length - 1);
@@ -217,11 +218,12 @@ export class CRTMenu {
     const lh = Math.min(60, (H - 70) / n);
     const y0 = H / 2 - (n - 1) * lh / 2;
     ctx.textAlign = 'left';
+    const fsc = Math.min(1, lh / 52);   // [profile] 8-9 entries: shrink the type a little
     this.itemRects = [];
     for (let i = 0; i < n; i++) {
       const y = y0 + i * lh;
       const on = i === this.sel;
-      ctx.font = MENU_FONT(on ? 58 : 52);
+      ctx.font = MENU_FONT(Math.round((on ? 58 : 52) * fsc));
       ctx.fillStyle = on ? '#ffffff' : '#b8b8b8';
       ctx.shadowColor = on ? 'rgba(210,225,255,0.95)' : 'rgba(160,170,190,0.5)';
       ctx.shadowBlur = on ? 22 : 8;
@@ -283,14 +285,17 @@ export class CRTMenu {
     const p = this.app.profile;
     ctx.fillStyle = '#100a05'; ctx.fillRect(0, 0, W, H);
     ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-    ctx.fillStyle = '#ff9a4a'; ctx.font = FONT(30); ctx.fillText(p.name.slice(0, 16) + (this.room?.isVerified() ? ' ✓' : ''), 12, 10);
-    ctx.fillStyle = '#ffd9b8'; ctx.font = FONT(22); ctx.fillText(`${t('Lv.')}${p.level}  ${t(rankOf(p.level))}${p.title ? ' · ' + p.title : ''}`, 12, 46);
+    // [profile] avatar top right; name + rank text is shrunk to fit beside it
+    drawAvatar(ctx, avatarOfProfile(p), W - 78, 8, 64);
+    const fit = (txt, px, maxW) => { ctx.font = FONT(px); while (px > 13 && ctx.measureText(txt).width > maxW) ctx.font = FONT(--px); return txt; };
+    ctx.fillStyle = '#ff9a4a'; ctx.fillText(fit(String(p.name).slice(0, 18) + (this.room?.isVerified() ? ' ✓' : ''), 30, W - 100), 12, 10);
+    ctx.fillStyle = '#ffd9b8'; ctx.fillText(fit(`${t('Lv.')}${p.level}  ${t(rankOf(p.level))}${p.title ? ' · ' + p.title : ''}`, 22, W - 100), 12, 46);
     ctx.fillStyle = '#3a2412'; ctx.fillRect(12, 78, W - 24, 10);
     ctx.fillStyle = '#ff9a4a'; ctx.fillRect(12, 78, (W - 24) * Math.min(1, p.xp / xpForLevel(p.level)), 10);
     ctx.fillStyle = '#ffd23f'; ctx.font = FONT(24); ctx.fillText(tf('◈ {coins} clout', { coins: p.coins }), 12, 100);
     ctx.fillStyle = '#c9a98a'; ctx.font = FONT(19);
     ctx.fillText(tf('kills {kills} · quotas {quotas} · deaths {deaths}', { kills: p.stats.kills, quotas: p.stats.quotasMet, deaths: p.stats.deaths }), 12, 134);
-    ctx.fillText(t('[CHARACTER] to customize'), 12, 158);
+    ctx.fillText(t('[PROFILE] name / avatar'), 12, 158);
     const badges = this.room?.badges();
     if (badges) { ctx.fillStyle = '#ffd23f'; ctx.fillText(badges.slice(0, 26), 12, 174); }
   }

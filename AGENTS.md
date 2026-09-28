@@ -233,6 +233,12 @@ Melee combos + charged heavy + block / parry for every melee weapon (RMB hold = 
 grenade launcher (rocket jump), SMG, rifle, Grav-Tool, spells ZAP / FROST / METEOR / DECOY / TOTEM, Blood Magic keystone in `magic.js`, role skills on **Y / U**. Net types `cb*`.
 The headless feature script `tools/harness/wave2_combat.js` exists but was not run.
 
+### 5.9c Wave 2 - nickname + avatar (PROFILE; `docs/wave2/profile.md`; build + node test only, NOT hand-played)
+PROFILE entry on the CRT menu + "Edit profile" in the CHARACTER sheet: validated nickname (2-16, slur filter EN/TR/RU, no look-alike of a host / crewmate)
+and a 16x16 pixel editor or 3D snapshot avatar (64x64 PNG <= 6 KB) with frames. Sync: `helloData.av` (258 chars) + unique `pf` message; shown on the menu card,
+lobby browser, TAB list, chat, day summary and above name tags (setting `tagAvatars`). Files: `src/ui/avatarpic.js`, `src/ui/panels/profile.js`, `src/core/profilename.js`,
+`src/game/profilesync.js`, test `tools/harness/profile.test.mjs`.
+
 ### 5.10 Round 3 - content wave (11 builders, integrated; NOT yet browser-verified)
 - **Endless moons** `src/game/moongen.js`: every quota opens a new SECTOR of 3-5 generated moons (pure fn of run.runId + quotaIndex,
   registered into MOONS at `applyRunState` via `ensureSector`), 10 biomes (4 new in `world/outdoor_biomes.js`), map scale up to 1.5x,

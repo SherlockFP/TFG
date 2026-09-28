@@ -2,6 +2,7 @@
 import { randomId } from './rng.js';
 import { migrateXpCurve, XP_CURVE_VERSION } from '../game/progression.js';
 import { detectLang } from './i18n.js';
+import { sanitizeAvatar } from '../ui/avatarpic.js';   // [profile]
 
 const KEY_SETTINGS = 'kefal.settings.v1';
 const KEY_PROFILE = 'kefal.profile.v1';
@@ -52,6 +53,7 @@ export function defaultSettings() {
     headBob: true,
     reduceMotion: false,    // scales camera shake/bob/punch + screen warp down, disables the sprint FOV kick
     showFps: false,
+    tagAvatars: true,       // [profile] small avatar sprite above remote name tags
     netStrategy: 'nostr',   // nostr | mqtt | torrent | local
     keys: { ...DEFAULT_KEYS },
   };
@@ -73,6 +75,7 @@ export function defaultProfile() {
     name: 'Employee' + Math.floor(Math.random() * 900 + 100),
     suit: 'orange',
     hat: 'none',
+    avatar: null,            // [profile] { m, f, px, png?, bg? } (ui/avatarpic.js); null = generated default seeded by the name
     level: 1,
     xp: 0,
     xpCurve: XP_CURVE_VERSION,   // XP curve the banked xp was earned under (progression.js migrateXpCurve)
@@ -99,6 +102,8 @@ export function loadProfile() {
   // a corrupted field must not brick the profile: fall back per field, keep everything else (and unknown new keys)
   const out = {
     ...d, ...p,
+    name: typeof p.name === 'string' && p.name.trim() ? p.name : d.name,   // [profile]
+    avatar: sanitizeAvatar(p.avatar),   // [profile]
     bestiary: obj(p.bestiary, {}),
     bounties: arr(p.bounties, []),
     owned: arr(p.owned, d.owned),
