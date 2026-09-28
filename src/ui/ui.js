@@ -16,6 +16,7 @@ import { CREATURES } from '../game/creatures.js';
 import { GAME_VERSION } from '../net/lobby.js';
 import { renderAchievementsPanel } from '../game/achievements.js';
 import { createServiceRecord } from './panels/record.js';
+import { createShopPanel } from './panels/shop.js';
 import { getCharPreview, peekCharPreview, CharPreview } from './charpreview.js';
 
 const LOGO = `<div class="logo"><div class="logo-main">TFG</div><div class="logo-long">TOTALLY FUCKED GAME</div><div class="logo-fish">(( ◉ ))</div><div class="logo-sub">"Engagement is love."</div></div>`;
@@ -892,7 +893,9 @@ export class UI {
     this.marketOpen = false;
     this.overlay.classList.add('hidden');
     this.overlay.innerHTML = '';
-    if (!silent && this.app.game && !this.app.game.player.dead) this.app.input.lock();
+    const onClose = this.onPanelClose; this.onPanelClose = null;
+    const tookOver = onClose ? onClose(!!silent) : false;   // e.g. the Company Store returns to the terminal it was opened from
+    if (!silent && !tookOver && this.app.game && !this.app.game.player.dead) this.app.input.lock();
   }
 
   // First-time voice chat consent (the click is also the user gesture getUserMedia needs)
@@ -1011,6 +1014,22 @@ export class UI {
     this.openPanel(wrap);
     this.marketOpen = true;
     game.audio.play('market_greet', { volume: 0.8 });
+  }
+
+  // Company Store screen (game/shop.js owns the data, ui/panels/shop.js the DOM). opts.from === 'terminal' returns there on close.
+  openShop(game, category, opts = {}) {
+    const shop = game.shop;
+    if (!shop) return;
+    const ctl = createShopPanel(this, game, { category, ...opts });
+    this.openPanel(ctl.el);
+    shop.panel = ctl;
+    this.onPanelClose = (silent) => {
+      ctl.dispose();
+      if (shop.panel === ctl) shop.panel = null;
+      if (!silent && opts.from === 'terminal' && !game.player.dead) { game.terminal.open(); return true; }
+      return false;
+    };
+    game.audio.play('ui_confirm', { volume: 0.6, bus: 'ui' });
   }
 
   openBounties(game) {

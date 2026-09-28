@@ -54,7 +54,7 @@ import { setDocksVisible } from '../ui/dock.js';   // shared crafting components
 
 // [import:rpg]
 
-// [import:shop]
+import { installShop } from './shop.js';
 
 // [import:crafting]
 
@@ -127,7 +127,7 @@ export class Game extends Emitter {
 
     // [slot:rpg]
 
-    // [slot:shop]
+    this.useModule('shop', installShop);
 
     // [slot:crafting]
 

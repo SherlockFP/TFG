@@ -141,7 +141,7 @@ export class Terminal {
           '>SECTOR       map of the current uncharted sector',
           '>INFO <moon>  details: biome, interior, risk, modifiers',
           '>ROUTE <moon> set the autopilot destination (or ROUTE #2)',
-          '>STORE        tools, weapons, upgrades',
+          '>STORE        the Company Store screen (STORE LIST = plain text)',
           '>BUY <item> [n]',
           '>BUY VAN      order the Uplink Van (4 seats + cargo bed)',
           '>SCAN         scrap remaining on this moon',
@@ -205,6 +205,13 @@ export class Terminal {
         return;
       }
       case 'store': case 'shop': {
+        // the Company Store screen (game/shop.js + ui/panels/shop.js); STORE LIST / STORE TEXT keeps the plain text list
+        if (g.shop?.open && arg !== 'list' && arg !== 'text') {
+          this.close();
+          g.shop.open(arg || undefined, { from: 'terminal' });
+          return;
+        }
+        if (g.shop?.textList) { const out = g.shop.textList(); out.splice(out.length - 1, 0, ...(g.cruiser?.storeLines?.() || [])); this.print(out.join('\n')); return; }
         const out = ['Welcome to the Company store. Deliveries arrive instantly (for a small fee we do not mention).', ''];
         for (const id of STORE_ITEMS) { const d = ITEMS[id]; if (d) out.push(`* ${d.name.padEnd(18)} ▮${d.price}`); }
         out.push('', 'SHIP UPGRADES:');
@@ -220,7 +227,9 @@ export class Terminal {
         const n = Math.max(1, Math.min(10, parseInt(m?.[2] || '1', 10)));
         if (g.cruiser?.terminalBuy?.(q, this)) return;
         const up = fuzzyFind(Object.entries(SHIP_UPGRADES), q, ([id, u]) => u.name + ' ' + id);
-        const it = fuzzyFind(STORE_ITEMS.map((id) => ITEMS[id]), q, (d) => d.name + ' ' + d.id);
+        // data-driven stock (game/shop.js): every registered item with a price + shop category, at today's deal prices
+        const pool = g.shop?.buyables ? g.shop.buyables().map((e) => ({ ...e.def, price: e.price })) : STORE_ITEMS.map((id) => ITEMS[id]);
+        const it = fuzzyFind(pool, q, (d) => d.name + ' ' + d.id);
         if (it && (!up || it.name.toLowerCase().startsWith(q))) {
           const cost = it.price * n;
           this.pending = { op: 'buy', item: it.id, n };
@@ -401,7 +410,10 @@ export class Terminal {
         reply(`Routing autopilot to ${m.name}. Your new balance is ▮${run.credits}.\nPull the lever to land.`);
         return;
       }
+      case 'cart': { if (g.shop?.hostCart) g.shop.hostCart(cmd, from, reply); else reply('The store is offline.', true); return; }
+      case 'coinbuy': { if (g.shop?.hostCoin) g.shop.hostCoin(cmd, from, reply); else reply('The store is offline.', true); return; }
       case 'buy': {
+        if (g.shop?.hostCart) { g.shop.hostCart({ lines: [{ id: cmd.item, n: cmd.n }] }, from, reply); return; }   // same deal prices / stock / delivery as the store screen
         const d = itemDef(cmd.item);
         const n = Math.max(1, Math.min(10, cmd.n | 0));
         if (!STORE_ITEMS.includes(cmd.item)) { reply('Not sold here.', true); return; }
@@ -411,7 +423,7 @@ export class Terminal {
         g.broadcastRun(['credits']);
         for (let i = 0; i < n; i++) {
           const pos = { x: 4.5 + Math.random() * 1.5, y: 1.2 + i * 0.25, z: -2 + Math.random() * 1.2 };
-          g.items.hostSpawn(cmd.item, pos, {});
+          g.items.hostSpawn(cmd.item, pos, { value: 0 });
         }
         g.net.broadcast('fx', { k: 'snd', s: 'dropship', p: [5, 2, -1], v: 0.8 });
         reply(`Ordered ${n}x ${d.name}. Your new balance is ▮${run.credits}.\nYour order has been delivered to the ship's storage.`);
