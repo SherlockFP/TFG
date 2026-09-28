@@ -47,7 +47,7 @@ import { installNetStats } from '../net/netstats.js';   // NETSTATS network diag
 // ---- WAVE 1 module imports: one line per module, keep the blank separator lines (avoids merge conflicts) ----
 import { installInventory } from './inventory.js';
 
-// [import:facilitysys]
+import { installFacilitySystems } from './facilitysys.js';
 
 import { installBalance } from './balance.js';
 import { doorwayBusy } from '../world/doorsafe.js';
@@ -134,7 +134,7 @@ export class Game extends Emitter {
     this.wave1 = [];
     this.useModule('inventory', installInventory);
 
-    // [slot:facilitysys]
+    this.useModule('facilitysys', installFacilitySystems);
 
     this.useModule('balance', installBalance);
 
