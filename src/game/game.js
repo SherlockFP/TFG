@@ -175,7 +175,6 @@ import { installWorlds2 } from './worlds2.js';   // wave 3: Soviet raids + twin-
 // [import:eggs]
 
 
-// [import:cycle3]
 
 
 // [import:social]
@@ -404,7 +403,6 @@ export class Game extends Emitter {
     // [slot:eggs]
 
 
-    // [slot:cycle3]
 
 
     // [slot:social]
