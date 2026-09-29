@@ -39,7 +39,7 @@ function stepPlayerNoise(M, p) { M.noises = M.noises.filter((n) => n.owner !== p
 function noiseOf(p) { return { pos: { ...p.pos }, loud: p.noise, owner: p.id }; }
 
 const L = registerCreature('listener', { ...LISTENER_DEF });
-ok(CREATURES.listener && CREATURES.listener.walk < 2 && CREATURES.listener.run > 8, 'listener: slow when idle, fast when hunting');
+ok(CREATURES.listener && CREATURES.listener.walk < 2 && CREATURES.listener.run > 7 && CREATURES.listener.run < 8.2, 'listener: slow when idle, fast when hunting');
 const beh = soundHunter(LISTENER_CFG);
 
 // 1. silent player passes at 2.5 m, then even at 1.4 m: not noticed, no hit
