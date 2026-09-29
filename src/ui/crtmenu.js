@@ -9,6 +9,7 @@ import { rankOf, xpForLevel } from '../game/progression.js';
 import { listRuns, saveProfile } from '../core/save.js';
 import { MenuRoom } from './menuroom.js';
 import { avatarOfProfile, drawAvatar } from './avatarpic.js';   // [profile]
+import { attention as dailyAttention } from '../game/daily_core.js';   // [daily] NEW! badge on the DAILY entry
 
 export const CRT_VS = `
 varying vec2 vUv;
@@ -199,10 +200,16 @@ export class CRTMenu {
     const runs = listRuns().filter((r) => r.data);
     const items = [];
     if (runs.length) items.push({ id: 'continue', label: t('CONTINUE') });
-    items.push({ id: 'host', label: t('HOST GAME') }, { id: 'browser', label: t('JOIN GAME') }, { id: 'profile', label: t('PROFILE') }, { id: 'character', label: t('CHARACTER') },
+    items.push({ id: 'host', label: t('HOST GAME') }, { id: 'browser', label: t('JOIN GAME') }, { id: 'daily', label: t('DAILY') }, { id: 'profile', label: t('PROFILE') }, { id: 'character', label: t('CHARACTER') },
       { id: 'mods', label: t('MODS') }, { id: 'settings', label: t('SETTINGS') }, { id: 'howto', label: t('HOW TO PLAY') });
     this.items = items;
     this.sel = Math.min(this.sel, items.length - 1);
+    this.refreshDailyBadge();
+  }
+  // [daily] gold NEW! next to DAILY while a login reward / finished challenge / crate / season tier is waiting
+  refreshDailyBadge() {
+    try { const p = this.app.profile; this.dailyBadge = !!p && dailyAttention(p).total > 0; } catch { this.dailyBadge = false; }
+    this.dailyBadgeT = 0;
   }
 
   // ------------------------------------------------------------------ drawing
@@ -238,6 +245,11 @@ export class CRTMenu {
       ctx.shadowBlur = on ? 22 : 8;
       const x = 90 + (on ? 14 : 0);
       ctx.fillText(this.items[i].label, x, y);
+      if (this.items[i].id === 'daily' && this.dailyBadge && Math.floor(time * 2) % 3 !== 0) {   // [daily]
+        const w = ctx.measureText(this.items[i].label).width;
+        ctx.save(); ctx.shadowBlur = 0; ctx.fillStyle = '#ffd23f'; ctx.font = FONT(Math.round(24 * fsc));
+        ctx.fillText(t('NEW!'), x + w + 16, y - 4); ctx.restore();
+      }
       if (on) { ctx.fillText('▶', 46, y); }
       this.itemRects.push({ y0: (y - lh / 2) / H, y1: (y + lh / 2) / H });
     }
@@ -415,6 +427,8 @@ export class CRTMenu {
   update(dt) {
     if (this.engine.camera.children.length) this.stripViewModel();   // [ux]
     this.t += dt;
+    this.dailyBadgeT = (this.dailyBadgeT || 0) + dt;
+    if (this.dailyBadgeT > 3 && this.mode === 'title') this.refreshDailyBadge();   // [daily]
     const t = this.t;
     // camera: wide shot of the rack, drifting; dolly in when a submenu is open
     const target = this.mode === 'title' ? 0 : 1;

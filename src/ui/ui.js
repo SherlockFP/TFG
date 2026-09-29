@@ -16,6 +16,8 @@ import { CREATURES } from '../game/creatures.js';
 import { GAME_VERSION } from '../net/lobby.js';
 import { renderAchievementsPanel } from '../game/achievements.js';
 import { createServiceRecord } from './panels/record.js';
+import { createDailyPanel } from './panels/daily.js';   // [daily]
+import { createDailyService } from '../game/daily_svc.js';   // [daily]
 import { decorateSkills } from './panels/passivetree.js';
 import { createShopPanel } from './panels/shop.js';
 import { getCharPreview, peekCharPreview, CharPreview } from './charpreview.js';
@@ -419,7 +421,7 @@ export class UI {
     this.menuEl.innerHTML = '';
     this.currentScreen = screen;
     this.menuOpts = opts;
-    const labels = { host: t('HOST GAME'), browser: t('JOIN GAME'), profile: t('PROFILE'), character: t('CHARACTER'), mods: t('MODS'), settings: t('SETTINGS'), howto: t('HOW TO PLAY') };
+    const labels = { host: t('HOST GAME'), browser: t('JOIN GAME'), daily: t('DAILY'), profile: t('PROFILE'), character: t('CHARACTER'), mods: t('MODS'), settings: t('SETTINGS'), howto: t('HOW TO PLAY') };
     this.app.menu?.setMode?.(screen === 'title' ? 'title' : 'sub', labels[screen] || '');
     this.menuEl.classList.toggle('over-crt', screen !== 'title');
     const fn = this['screen_' + screen];
@@ -681,6 +683,14 @@ export class UI {
     };
     render();
     return wrap;
+  }
+
+  // [daily] main-menu DAILY screen: login calendar, challenges, season track, crates (src/ui/panels/daily.js)
+  screen_daily() {
+    const svc = createDailyService({ profile: this.app.profile, ui: this, audio: this.app.audio });
+    const ctl = createDailyPanel({ ui: this, svc, closeButton: this.backButton(() => { ctl.dispose(); this.showMenu('title'); }) });
+    this.menuEl.appendChild(ctl.el);
+    this.focusFirst(ctl.el, '.tabs .btn.sel');
   }
 
   screen_settings() {

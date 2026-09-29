@@ -147,3 +147,7 @@ The 3-day + boss loop is now real (gate -> core with wings, a labyrinth and a ca
 Proven by numbers only: node tests drive the REAL host.js flow, the real CreatureManager and real layouts (soft-lock fuzz, weekly lock, all 8 themes); nothing was seen in a browser.
 Risks: boss models and telegraph readability, the maze / arena look and lighting, whether a labyrinth is fun with creatures in it (it is a spanning tree + few loops), keystone / raid numbers (design values), 2-player sync of `run.cycle` and `cyx`,
 the arena auto-open (720 s) as the only fallback for lost cards, Legacy Bot sector (outdoor boss, no cards) never seen, `shrines` mutator unwired, no Trophy Hall / CASE entry / first-kill cosmetic yet.
+
+## Wave 4 - DAILY: login calendar, challenges, crates, season track (module `daily`, docs/wave4/daily.md)
+There is finally a reason to come back tomorrow that is not a grind: a gentle 7-day calendar with a grace day, three daily + three weekly challenges everybody shares, crates that are earned (never bought) with a proper reveal, a free monthly season track, first-win x2 and a bit of level-up / quota juice.
+Proven by node tests (streak / grace / clock guard / seeded sets / crates / season) and one headless session; never hand-played. Risks: reward numbers are guesses, the reel needs a look with real audio, "survive an anomaly" is a proxy (STATIC stage 2 + survive), kill-based challenges ignore pet / grenade kills, the clock guard is a deterrent only (all local), nobody tested `dyclaim` with two players.

@@ -454,3 +454,11 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
 - Wrappers on the host.js flow live in `src/game/cycle.js` (`hostEvaluateQuota / hostLever / hostSetPhase / hostPopulateMoon / hostBeginTakeoff / hostFinishTakeoff / hostUpdate`, `applyRunState`, `onPhase`, the `unlock` handler). Net: `cyx`, `cyreq`. State: `run.cycle`.
 - Tests: `node tools/harness/cycle.test.mjs`, `cycle2_plan.test.mjs`, `cycle2_bosses.test.mjs`, `cycle2_flow.test.mjs` (real host flow + fuzz + soft-lock proof), `cycle2_i18n.test.mjs`.
 - First job when a browser is available: land on a core of every interior, watch the 3 new boss fights (name card, HP bar, rings), open the arena with cards, run a keystone and a raid with 2 tabs.
+
+### 5.16 Wave 4 - DAILY (module `daily`; docs/wave4/daily.md; node-tested + one headless run, NOT hand-played, NOT tested with 2 real players)
+- Retention loop, tasteful (no money, gentle streak): main-menu **DAILY** screen (also in game: **B** / terminal `DAILY`) with a 7-day login calendar (Clout, components, forge shards, day-7 cosmetic crate; one grace day, gentle reset, comeback bonus),
+  3 daily + 3 weekly challenges seeded by the local date / ISO week (same set for everybody, one reroll per day), earned crates with a spinning reel reveal (tier colours from `tiers.js`, existing sfx, duplicate protection),
+  a free 30-tier monthly season track (cosmetic crates + titles), first win of the day x2 XP / Clout, level-up fanfare + milestone crates, quota celebration + Quota Crate, NEW! badges (CRT menu entry, tabs, HUD chip).
+- State in `profile.daily` (local). Rules are pure and node-tested in `src/game/daily_core.js` (`node tools/harness/daily.test.mjs`); clock guard = high-water mark + one claim per date. Net: only `dyclaim` (request) / `dymsg` (host -> one client) to deliver parts / shards to the ship in orbit.
+- The old automatic login bonus in `achievements.js` stands down when `game.daily` exists; `profile.login` is still mirrored. `FLAT_REASONS` in `profile.js` now also skips multipliers for `Daily*` / `Season*` reasons.
+- First job next: play a day, watch the crate reveal at 1280x720 with real audio, tune `QUEST_REWARD` / `SEASON_NEED` against real session lengths, and run 2 players to check `dyclaim`.

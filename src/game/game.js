@@ -164,6 +164,9 @@ import { installWorlds2 } from './worlds2.js';   // wave 3: Soviet raids + twin-
 
 // [import:ux]
 
+// [import:daily]
+import { installDaily } from './daily.js';   // wave 4: login calendar, daily/weekly challenges, crates, season track (docs/wave4/daily.md)
+
 
 
 export class Game extends Emitter {
@@ -331,6 +334,9 @@ export class Game extends Emitter {
 
 
     // [slot:ux]
+
+    // [slot:daily]
+    this.useModule('daily', installDaily);
 
 
   }

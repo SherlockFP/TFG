@@ -1,6 +1,6 @@
 // Headless runner for the MAIN MENU (headless.mjs waits for kefal.game, which never exists at "/").
 // Usage:  flock /tmp/tfg-browser.lock node tools/harness/headless_menu.mjs --port 5258 --script tools/harness/menu_feature.js \
-//            [--url2 '/?autohost=local&code=T1&name=Tester' --script2 tools/harness/smoke_land.js]
+//            [--shot out.png] [--url2 '/?autohost=local&code=T1&name=Tester' --script2 tools/harness/smoke_land.js]
 // Script 1 runs at "/" once kefal.menu exists; script 2 (optional) runs in a fresh load of url2 once kefal.game exists.
 // Script files are the BODY of an async function evaluated in the page; whatever they return is printed as JSON.
 import { createRequire } from 'module';
@@ -27,6 +27,7 @@ const run = async (label, url, ready, scriptFile) => {
   catch (e) { console.log(label, 'EVAL ERROR', e.message); }
 };
 await run('MENU', arg('url', '/'), () => window.kefal?.menu?.room, arg('script', null));
+if (arg('shot', null)) await p.screenshot({ path: arg('shot') });   // screenshot of the menu state left by script 1
 if (arg('url2', null)) await run('GAME', arg('url2'), () => window.kefal?.game, arg('script2', null));
 console.log('LOGS', JSON.stringify(logs.slice(0, 60), null, 1));
 await b.close();
