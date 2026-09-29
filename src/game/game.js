@@ -174,6 +174,7 @@ import { installCycle3 } from './cycle3.js';   // wave 4: Glitch Gates (red / hi
 import { installSocial } from './social.js';   // [social] wave 4: phone + walkie text radio (hub lives on the App: net/hub.js)
 import { installWorlds2 } from './worlds2.js';   // wave 3: Soviet raids + twin-sun planet + plasma blade + fauna + loot pacing (docs/wave3/worlds2.md)
 import { installMaps5 } from './maps5.js';   // [import:maps5] wave 4: Estate 9 (hedge maze, paper archive) + Cold Storage (shifting server stacks, cryo caves) (docs/wave4/maps5.md)
+import { installAlgo1 } from './algo1.js';   // [import:algo1] wave 5: The Algorithm learns you + morning rule vote + LIVE viewers (docs/wave5/algo1.md)
 
 import { installPolish4 } from './polish4.js';   // wave 4: pet egg drops, ship decals + furniture, cantina barter, maw / squad fixes (docs/wave4/polish4.md)
 
@@ -411,6 +412,7 @@ export class Game extends Emitter {
 
     this.useModule('worlds2', installWorlds2);   // [worlds2]
     this.useModule('maps5', installMaps5);   // [slot:maps5]
+    this.useModule('algo1', installAlgo1);   // [slot:algo1]
 
     this.useModule('polish4', installPolish4);   // [polish4]
 
