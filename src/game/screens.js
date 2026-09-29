@@ -121,7 +121,7 @@ export class ShipScreens {
     // creatures
     ctx.fillStyle = '#ff3030';
     for (const v of g.creatures.views.values()) {
-      if (v.state === 'dead' || v.type === 'web' || v.type === 'mimicdoor') continue;
+      if (v.state === 'dead' || v.type === 'web' || v.type === 'mimicdoor' || v.def?.noScan) continue;
       if (Math.abs(v.pos.y - tpos.y) > 30) continue;
       if ((v.type === 'sandkefal' || v.type === 'dunemaw') && v.state === 'hidden') continue;
       const [sx, sy] = toS(v.pos.x, v.pos.z);

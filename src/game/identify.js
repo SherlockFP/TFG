@@ -146,7 +146,7 @@ export function stepProgress(p, dt, aiming, dur) {
 export const identifyXp = (stars) => 15 + 10 * clamp(stars | 0, 1, 5);
 /** creatures the scan label / aim read-out must NOT relabel (hazards keep their codes; mimics keep their disguise). */
 export function gated(view) {
-  return !!view && !view.def?.hazard && view.type !== 'mimic' && view.hType !== 'doppel' && view.type !== 'doppel';
+  return !!view && !view.def?.hazard && !view.def?.noScan && view.type !== 'mimic' && view.hType !== 'doppel' && view.type !== 'doppel';
 }
 
 const STYLE_ID = 'g2-ident-style';

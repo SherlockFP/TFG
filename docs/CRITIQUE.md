@@ -265,3 +265,5 @@ Palettes are tuned by simulation, not by eye (tests check delta-E under CVD matr
 Low preset is unverified against the 60 percent draw-call target (instanced decor thinning cuts triangles, not calls); module-added ship props (workbench, arcade table...) still unmerged; Rapier wasm (4.3 MB) dominates first load.
 ## Wave 8 - balance (docs/wave8/balance.md)
 One-shots are gone except telegraphed hazards from quota 4, but the sim's solo shovel player still dies 40-60 % on mid quotas from attrition alone (no healing/dodge model); the 0.4 s wind-up gate is untested in a live browser and relies on behaviours setting an attack state as the visible tell.
+## Wave 8 - lcmonsters (docs/wave8/lcmonsters.md)
+Six new threats (Blood Witch, Lantern Keeper, Trick-or-Treater, Cursed Scraps, Other Side / Rift Stalker, Loot Mimic + Masked) exist only as node-tested logic: no browser run, so model proportions, the circle / rift / sign visuals, the flicker telegraph, audio picks (several fall back to generic samples) and the real spawn cadence are unseen. The curse marker is not persisted across saves, and outdoor spawn pressure now also depends on the crdirector veto being wired.

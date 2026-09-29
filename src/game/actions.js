@@ -906,7 +906,7 @@ export const actionMethods = {
       else if (it.plus || it.oc?.length) labels[labels.length - 1].name = affixDisplayName(it.def.name, null, it);   // [forge]
     }
     for (const v of this.creatures.views.values()) {
-      if (v.state === 'dead' || v.type === 'web' || v.type === 'mimicdoor') continue;
+      if (v.state === 'dead' || v.type === 'web' || v.type === 'mimicdoor' || v.def?.noScan) continue;   // noScan: disguised (lcmonsters Loot Mimic paints its own item label)
       const to = v.pos.clone().add(new THREE.Vector3(0, v.height * 0.6, 0)).sub(eye);
       const d = to.length();
       if (d > 30 || to.normalize().dot(fwd) < 0.5) continue;
@@ -926,6 +926,7 @@ export const actionMethods = {
       labels.push({ pos: new THREE.Vector3(0, 4, 0), name: 'Ship', sub: '', color: '#9fd4ff' });
       this.world.outdoor.outposts?.scanLabels(eye, labels);
     }
+    this.mods?.emit('scanLabels', labels, eye, fwd, this);   // [lcmonsters] cursed-scrap tell + Loot Mimic label
     this.scanFx?.reveal(labels);   // sort near->far, give each label a pop-in delay synced to the wave + blips
     this.ui.hud?.showScan(labels, total);
   },
