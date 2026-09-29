@@ -6,7 +6,7 @@ export const MULT = {
   tree: { axe: 2, pick: 0.6, weapon: 0.6, hand: 0.3 },
   rock: { axe: 0.6, pick: 2, weapon: 0.6, hand: 0.3 },
 };
-export const TOOL_IDS = { axe: /^(tool_axe|axe|hatchet|x_axe)$/, pick: /^(tool_pickaxe|pickaxe|x_pickaxe)$/ };
+export const TOOL_IDS = { axe: /^(tool_axe|axe|hatchet|x_axe)$/, pick: /^(tool_pickaxe|tool_pickaxe_steel|tool_drill|pickaxe|x_pickaxe)$/ };
 export const MAX_BASE_DMG = 120;      // host clamp on the client-reported base melee damage (crits / heavy swings included)
 export const MIN_BASE_DMG = 3;        // floor so a bare-handed swing always chips something
 export const HIT_RANGE = 6;           // host: max horizontal distance sender -> target
