@@ -39,7 +39,7 @@ const cellsOf = (L, r) => { const out = []; for (let z = r.z; z < r.z + r.h; z++
     const a = generateLayout(500 + s, theme, 1.4), b = generateLayout(500 + s, theme, 1.4, null), c = generateLayout(500 + s, theme, 1.4, {});
     const key = (L) => JSON.stringify([L.rooms.map((r) => [r.x, r.z, r.w, r.h, r.type]), [...L.open].sort((p, q) => p - q), L.cells.join('')]);
     ok(key(a) === key(b) && key(a) === key(c), `${theme}: no opts == null == {}`);
-    ok(!a.arena && a.mazes.length === 0 && a.wings.length === 0, `${theme}: no arena / maze / wings by default`);
+    ok(!a.arena && a.mazes.every((m) => m.varMaze) && a.wings.length === 0, `${theme}: no arena / cycle labyrinth / wings by default (stealth variety mazes are flagged varMaze)`);
     same++;
   }
   say(`${same} default layouts identical with and without opts`);

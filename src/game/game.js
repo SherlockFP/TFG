@@ -173,6 +173,9 @@ import { installMaps5 } from './maps5.js';   // [import:maps5] wave 4: Estate 9 
 import { installPolish4 } from './polish4.js';   // wave 4: pet egg drops, ship decals + furniture, cantina barter, maw / squad fixes (docs/wave4/polish4.md)
 
 
+import { installStealth } from './stealth.js';   // wave 4: sneak, noise, sound-hunting creatures, noisemaker (docs/wave4/stealth.md)
+
+
 // [import:ux]
 import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
 
@@ -211,7 +214,6 @@ import { installCosm5 } from './cosm5.js';   // wave 4: cosmetics drop (suits/ha
 // [import:ui2]
 
 
-// [import:stealth]
 
 
 // [import:horror]
@@ -407,6 +409,9 @@ export class Game extends Emitter {
     this.useModule('social', installSocial);   // [social]
 
 
+    this.useModule('stealth', installStealth);
+
+
     // [slot:ux]
     this.useModule('hostmig', installHostMig);
 
@@ -445,7 +450,6 @@ export class Game extends Emitter {
     // [slot:ui2]
 
 
-    // [slot:stealth]
 
 
     // [slot:horror]
@@ -1010,6 +1014,7 @@ export class Game extends Emitter {
     }
     if (surf === 'concrete' && !insideShip(pos) && pos.y < FACILITY_Y + 40 && this.world.facility?.layout.theme === 'mineshaft') surf = mineshaftFootstep(this.world.facility, pos, (n) => this.audio.has(n));
     surf = footSurface(this, pos, surf);   // carpet / tile / metal / gravel / water from the floor under the foot
+    this.lastStepSurface = surf;   // [stealth] the noise of the next steps depends on it (game/stealth.js surfaceMul)
     const name = this.audio.variant('step_' + surf);
     if (local) this.audio.play(name, { volume: vol * 0.8, bus: 'sfx', pitch: 0.95 + Math.random() * 0.1 });
     else this.audio.at(name, pos.clone().add(new THREE.Vector3(0, 0.1, 0)), vol, { occlude: true, refDistance: 1.5, maxDistance: 30 });

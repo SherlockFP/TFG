@@ -712,8 +712,11 @@ export class CreatureManager {
   hear(c, radius) {
     radius *= this.detectMul(c);
     let best = null, bl = 0;
+    const acoustic = this.game.stealth?.hearDist;   // [stealth] walls and closed doors muffle sound (nav-grid line count)
     for (const n of this.noises) {
-      const d = n.pos.distanceTo(c.pos);
+      const d0 = n.pos.distanceTo(c.pos);
+      if (n.loud * radius - d0 <= 0) continue;
+      const d = acoustic ? acoustic(n.pos, c.pos, c, d0) : d0;
       const heard = n.loud * radius - d;
       if (heard > 0 && heard > bl) { bl = heard; best = n; }
     }

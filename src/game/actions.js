@@ -235,6 +235,7 @@ export const actionMethods = {
     if (door.kind === 'blast') return { label: door.open ? t('Secure door (open)') : tf('Secure door [{n}] - use the ship terminal', { n: (door.code || '').toUpperCase() }), action: () => {} };
     if (door.kind === 'vault') return { label: door.locked ? t('Vault (locked) - use the keypad') : t('Vault'), action: () => {} };
     if (door.teleport) return null;
+    if (door.locked && door.info?.shortcut) { const sc = this.stealth?.shortcutPrompt?.(door); if (sc) return sc; }   // [stealth] latch shortcut: opens from the deep side
     if (door.locked) {
       if (door.info?.arena) return held?.type === 'corecard'   // [cycle] the boss arena door only takes the Key Holders' access cards
         ? { label: t('Insert the access card [E]'), action: () => this.net.request('unlock', { id: door.id, key: held.id }) }
