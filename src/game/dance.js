@@ -199,6 +199,7 @@ export function installDance(game) {
   offs.push(mods.on('remoteAvatar', (r) => { if (!disposed) remoteMusic(r); }));
 
   return {
+    musicActive: () => music.size > 0 || !!game.emotes?.current?.music,   // [score] duck the adaptive music under dance music
     list: DD.DANCE_LIST, defs: () => DANCE_DEF_IDS.map((id) => EMOTE_BY_ID[id]),
     clusters: () => clusters, tick, pop, applyDance, resetFx,
     dispose() {
