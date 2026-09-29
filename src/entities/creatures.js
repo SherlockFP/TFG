@@ -220,7 +220,8 @@ export class CreatureView {
     const prev = this.state;
     this.state = st; this.stateT = 0;
     if (st === 'primed') this.fuseT = 0;   // bomb telegraph (blink + beeps), same as a 'Hot Take' corpse
-    const s = STATE_SOUNDS[this.type]?.[st];
+    const sxOwn = this.mgr.game.sfx?.onState?.(this, prev, st) === 'own';   // [sfx] the procedural voice layer / sound pack took this event
+    const s = sxOwn ? null : STATE_SOUNDS[this.type]?.[st];
     if (s && this.audible()) {
       const name = pickSound(this.mgr.game.audio, s[0]);
       if (name) this.mgr.game.audio.play(name, { follow: this.root, volume: s[1], pitch: s[2], occlude: true, refDistance: this.type === 'giant' ? 8 : 3, maxDistance: this.type === 'giant' ? 120 : 55 });
@@ -478,6 +479,7 @@ export class CreatureManager {
       case 'hp': {
         const v = this.views.get(d.id); if (!v) return;
         v.hp = d.hp; v.hitFlash = 1; v.showBar = 4;
+        if (d.dmg) this.game.sfx?.onHurt?.(v, d);   // [sfx]
         if (d.dmg && this.game.particles) {
           const pre = v.type === 'turret' || v.type === 'mine' || v.maxHp === null ? 'sparks' : v.type === 'sludge' ? 'goo' : v.type === 'mimicdoor' ? 'dust' : 'blood';
           const at = v.pos.clone(); at.y += (v.model?.height || 1.2) * 0.6;

@@ -125,7 +125,7 @@ function noticeAt(c, d, pos, owner, cfg, M, retarget = false) {
 
 // ------------------------------------------------------------------------------------------------ definitions (registered by game/stealth.js)
 export const LISTENER_DEF = {
-  name: 'The Listener', hp: 170, dmg: 55, walk: 1.5, run: 8.8, power: 2.5, xp: 190, coin: 34, zone: 'in', radius: 0.5, height: 2.2, maxAlive: 2,
+  name: 'The Listener', hp: 170, dmg: 55, walk: 1.5, run: 7.6, power: 2.5, xp: 190, coin: 34, zone: 'in', radius: 0.5, height: 2.2, maxAlive: 2,
   drop: ['drop_lurker', 0.3],
   deathText: 'made one noise too many for The Listener.',
   lore: 'It has no eyes and does not need them. It creeps slowly through the halls, head tilted, waiting. The moment it hears you it sprints to the sound. '

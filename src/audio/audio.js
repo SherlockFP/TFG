@@ -38,6 +38,7 @@ export class AudioManager {
     this.env = 'none';
     this.occluder = null;          // fn(pos) -> 0..1 occlusion
     this.occlTimer = 0;
+    this.pack = null;              // [sfx] SoundPack (src/audio/soundpack.js), attached in init()
   }
 
   async init() {
@@ -78,6 +79,7 @@ export class AudioManager {
     if (this.settings.outputDevice) this.setOutputDevice(this.settings.outputDevice);
     try { sfxlib = await import('./sfxlib.js'); } catch (e) { console.warn('sfxlib not available', e); }
     this.ready = true;
+    import('./soundpack.js').then((m) => m.attachSoundPack(this)).catch(() => {});   // [sfx] the player's own sound pack (local IndexedDB, never uploaded)
     // warm up common sounds in idle time
     const warm = ['ui_click', 'ui_hover', 'ui_confirm', 'step_metal_1', 'step_metal_2', 'step_concrete_1', 'step_concrete_2', 'item_pickup', 'item_drop', 'ui_scan', 'ship_hum', 'door_open', 'door_close', 'swing_whoosh',
       'jump', 'land_soft', 'cloth_rustle', 'scan_blip', 'heartbeat', 'hit_wall', 'step_carpet_1', 'step_tile_1', 'step_gravel_1'];
