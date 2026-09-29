@@ -112,6 +112,7 @@ export function createEngine(ctx) {
     for (let i = 0; i < len; i++) d[i] = rnd() * 2 - 1;
     return noiseBuf;
   }
+  const fq = (f) => Math.min(f, ctx.sampleRate / 2 - 100);   // [perf4] Oscillator.frequency above Nyquist (midi 124/127 x2 = 21096/25087 Hz) logged a console.warn per node
   const biquad = (type, f, q = 0.7, gain = 0) => { const b = ctx.createBiquadFilter(); b.type = type; b.frequency.value = f; b.Q.value = q; b.gain.value = gain; return b; };
 
   /** persistent strip for (dest, voice); returns the node voices connect into */
@@ -151,7 +152,7 @@ export function createEngine(ctx) {
       done(src, () => g.disconnect());
       if (voice === 'ksdist' && o.feedback && vel > 60) {   // slight amp feedback: a sine an octave up that swells under the ring
         const os = ctx.createOscillator(), og = ctx.createGain();
-        os.type = 'sine'; os.frequency.value = midiToFreq(midi) * 2;
+        os.type = 'sine'; os.frequency.value = fq(midiToFreq(midi) * 2);
         og.gain.setValueAtTime(0, when);
         og.gain.linearRampToValueAtTime(0.09 * v, when + 0.9);
         og.gain.exponentialRampToValueAtTime(0.0002, when + 3);
@@ -168,7 +169,7 @@ export function createEngine(ctx) {
     if (o.piano) {                                          // FM electric piano: sine + 1:1 modulator whose index decays (bell -> mellow)
       const car = ctx.createOscillator(), mod = ctx.createOscillator(), mg = ctx.createGain();
       car.type = 'sine'; mod.type = 'sine';
-      car.frequency.value = f; mod.frequency.value = f;
+      car.frequency.value = fq(f); mod.frequency.value = fq(f);
       mg.gain.setValueAtTime(f * (1.2 + 2.2 * v), when);
       mg.gain.exponentialRampToValueAtTime(f * 0.12, when + 0.5);
       mod.connect(mg).connect(car.frequency);
@@ -190,7 +191,7 @@ export function createEngine(ctx) {
     let first = null;
     for (const [type, mul, gain] of [['sawtooth', 1.004, 0.55], ['sawtooth', 0.996, 0.55], ['square', 0.5, 0.35]]) {
       const os = ctx.createOscillator(), og = ctx.createGain();
-      os.type = type; os.frequency.value = f * mul; og.gain.value = gain;
+      os.type = type; os.frequency.value = fq(f * mul); og.gain.value = gain;
       os.connect(og).connect(lp);
       os.start(when); os.stop(when + 1.05 * sus);
       first = first || os;
@@ -215,7 +216,7 @@ export function createEngine(ctx) {
     const env = (g, peak, dec) => { g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(peak, t + 0.002); g.gain.exponentialRampToValueAtTime(0.0002, t + dec); };
     const osc = (type, f0, f1, sweep, peak, dec) => {
       const os = ctx.createOscillator(), g = ctx.createGain();
-      os.type = type; os.frequency.setValueAtTime(f0, t); os.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t + sweep);
+      os.type = type; os.frequency.setValueAtTime(fq(f0), t); os.frequency.exponentialRampToValueAtTime(Math.max(20, fq(f1)), t + sweep);
       env(g, peak, dec); os.connect(g).connect(ch); os.start(t); os.stop(t + dec + 0.05);
       return os;
     };

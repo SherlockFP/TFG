@@ -189,6 +189,7 @@ import { installA11y } from './a11y.js';   // [import:a11y] wave 7 accessibility
 import { installHardmode } from './hardmode.js';   // [import:hardmode] wave 5: Casual / Standard / Hard difficulty rules (docs/wave5/hardmode.md)
 import { installOnboard } from './onboard.js';   // [import:onboard] wave 5: Hiring Day first-time start + staged unlocks (docs/wave5/onboard.md)
 import { installAlgo2 } from './algo2.js';   // [import:algo2] wave 6: live stream hype + ghost replay + glitch exploits (docs/wave6/algo2.md)
+import { installLandQ } from './landingq.js';   // [import:landq] wave 8 perf4: landing job queue (build steps + mapLoaded handlers spread over frames)
 import { installGpuSweep } from './gpusweep.js';   // [import:gpusweep] wave 5: frees GPU geometry / textures of unloaded maps (docs/wave5/zfixperf.md)
 
 import { installAimtell } from './aimtell.js';   // wave 5: telegraphed NPC aim laser (docs/wave5/aimchase.md)
@@ -467,6 +468,7 @@ export class Game extends Emitter {
     this.useModule('a11y', installA11y);   // [slot:a11y]
     this.useModule('algo2', installAlgo2);   // [slot:algo2]
     this.useModule('dance', installDance);   // [slot:dance]
+    this.useModule('landQ', installLandQ);   // [slot:landq]
     this.useModule('gpusweep', installGpuSweep);   // [slot:gpusweep]
 
     this.useModule('polish4', installPolish4);   // [polish4]
@@ -769,6 +771,7 @@ export class Game extends Emitter {
     this.applyRunState(d, true);
     this.stateTimer = 0;
     const ph = d.phase;
+    if (ph !== 'landing') this.landQ?.flush();   // [perf4] never leave a half-built map behind a later phase
     if (ph === 'landing') {
       this.secondWindUsed = false;   // Second Wind perk: once per trip
       this.loadMapFor(this.run, false);
@@ -801,7 +804,8 @@ export class Game extends Emitter {
     }
     this.updateAmbience();
     this.tutorialHint(ph);
-    this.mods?.emit('phase', ph, this);
+    if (ph === 'landing' && this.landQ?.pending) this.landQ.add('phase:landing', () => this.mods?.emit('phase', ph, this));   // [perf4] after the map is built, as before
+    else this.mods?.emit('phase', ph, this);
   }
 
   // first-time player hints (LC-style onboarding)
@@ -827,40 +831,60 @@ export class Game extends Emitter {
   loadMapFor(run, instant) {
     const moonId = run.moon;
     const needMap = ['landing', 'moon', 'company', 'takeoff'].includes(run.phase);
+    if (instant) this.landQ?.flush();
     if (!needMap) { this.unloadMap(); this.env.setSpace(this.planetColorFor(moonId)); this.env.landingT = 0; return; }
     if (this.world.moonId === moonId && this.world.seed === run.seed) return;
     this.unloadMap();
     const moon = MOONS[moonId];
     this.world.moonId = moonId; this.world.seed = run.seed;
     if (!moon) { this.world.moonId = null; if (!this.mods?.missingMoon?.(this, moonId)) this.emit('fatal', 'Unknown moon "' + moonId + '" - enable the same mods as the host.'); return; }
-    if (moon.company) {
-      this.world.company = buildCompany({ physics: this.physics, lightPool: this.lights });
-      this.scene.add(this.world.company.group);
-      this.world.mapGroup = this.world.company.group;
-      this.env.setMoon(BIOMES.pier, run.weather || 'clear', 'company');
-      this.companyNpc();
-    } else if (moon.customMap) {   // [hw] homeworld: own outdoor map, no facility
-      const outdoor = moon.customMap(run.seed, moon, { physics: this.physics, lightPool: this.lights, biome: BIOMES[moon.biome], profile: this.profile });
-      this.world.outdoor = outdoor; this.world.terrain = outdoor.terrain;
-      this.scene.add(outdoor.group);
-      this.world.mapGroup = outdoor.group;
-      this.env.setMoon(BIOMES[moon.biome], run.weather || 'clear', 'moon');
-    } else {
-      const outdoor = buildMoonOutdoor(run.seed, moon, { physics: this.physics, lightPool: this.lights });
-      this.world.outdoor = outdoor; this.world.terrain = outdoor.terrain;
-      this.scene.add(outdoor.group);
-      this.world.mapGroup = outdoor.group;
-      const layout = generateLayout(run.seed, moon.interior, moon.size, moon.layoutOpts || this.facjobs?.layoutOpts?.(moon, run) || undefined);   // [cycle] Sector Core / Raid / Keystone moons carry layoutOpts
-      const fac = buildFacility(layout, { physics: this.physics, lightPool: this.lights });
-      this.world.facility = fac;
-      this.env.interiorFog = fac.atmosphere || null;   // per-theme indoor haze (backrooms yellow, sewer green, server farm blue)
-      this.scene.add(fac.group);
-      this.env.setMoon(BIOMES[moon.biome], run.weather || 'clear', 'moon');
-      this.weatherMud = run.weather === 'rainy' || run.weather === 'stormy';
-    }
+    // [perf4] a landing (not a late join / resume) builds as queued jobs, a few ms per frame (landingq.js); same steps, same order
+    const q = !instant && this.landQ?.enabled ? this.landQ : null;
+    const step = (name, fn) => (q ? q.add(name, fn) : fn());
     this.env.landingT = instant ? 1 : 0;
-    if (!instant && this.world.mapGroup) this.world.mapGroup.position.y = -260;
-    this.mods?.emit('mapLoaded', this.world, this);
+    const slide = () => { if (!instant && this.world.mapGroup) this.world.mapGroup.position.y = -260; };
+    if (moon.company) {
+      step('company', () => {
+        this.world.company = buildCompany({ physics: this.physics, lightPool: this.lights });
+        this.scene.add(this.world.company.group);
+        this.world.mapGroup = this.world.company.group;
+        this.env.setMoon(BIOMES.pier, run.weather || 'clear', 'company');
+        this.companyNpc();
+        slide();
+      });
+    } else if (moon.customMap) {   // [hw] homeworld: own outdoor map, no facility
+      step('outdoor', () => {
+        const outdoor = moon.customMap(run.seed, moon, { physics: this.physics, lightPool: this.lights, biome: BIOMES[moon.biome], profile: this.profile });
+        this.world.outdoor = outdoor; this.world.terrain = outdoor.terrain;
+        this.scene.add(outdoor.group);
+        this.world.mapGroup = outdoor.group;
+        this.env.setMoon(BIOMES[moon.biome], run.weather || 'clear', 'moon');
+        slide();
+      });
+    } else {
+      step('outdoor', () => {
+        const outdoor = buildMoonOutdoor(run.seed, moon, { physics: this.physics, lightPool: this.lights });
+        this.world.outdoor = outdoor; this.world.terrain = outdoor.terrain;
+        this.scene.add(outdoor.group);
+        this.world.mapGroup = outdoor.group;
+        this.env.setMoon(BIOMES[moon.biome], run.weather || 'clear', 'moon');
+        this.weatherMud = run.weather === 'rainy' || run.weather === 'stormy';
+        slide();
+      });
+      let layout = null;
+      const size = moon.size, lopts = moon.layoutOpts || this.facjobs?.layoutOpts?.(moon, run) || undefined;   // read now: worlds3 patches moon.size around this call
+      step('layout', () => { layout = generateLayout(run.seed, moon.interior, size, lopts); });   // [cycle] Sector Core / Raid / Keystone moons carry layoutOpts
+      step('facility', () => {
+        const fac = buildFacility(layout, { physics: this.physics, lightPool: this.lights });
+        this.world.facility = fac;
+        this.env.interiorFog = fac.atmosphere || null;   // per-theme indoor haze (backrooms yellow, sewer green, server farm blue)
+        this.scene.add(fac.group);
+      });
+    }
+    if (q) {
+      this.mods?.emitSliced?.('mapLoaded', [this.world, this], (n, f) => q.add(n, f));
+      q.add('prewarm', () => q.prewarm());   // shaders of everything built above compile during the descent, not on first sight
+    } else this.mods?.emit('mapLoaded', this.world, this);
   }
 
   companyNpc() {
@@ -893,6 +917,7 @@ export class Game extends Emitter {
   }
 
   unloadMap() {
+    this.landQ?.clear();   // [perf4] jobs of a map that is going away never run
     const w = this.world;
     if (!w.moonId) return;
     w.facility?.dispose(this.physics);

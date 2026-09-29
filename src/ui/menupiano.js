@@ -80,7 +80,7 @@ export class PianoSynth {
     for (const det of [-3.2, 3.2]) {
       const o = ctx.createOscillator();
       o.setPeriodicWave(this.wave);
-      o.frequency.value = f;
+      o.frequency.value = Math.min(f, ctx.sampleRate / 2 - 100);
       o.detune.value = det + (Math.random() - 0.5) * 1.5;
       o.connect(lp); o.start(t); o.stop(t + 9);
       oscs.push(o);
