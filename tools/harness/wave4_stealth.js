@@ -7,6 +7,16 @@ const tick = async (n, dt = 1 / 30) => { kefal.tick(n, dt, false); await new Pro
 const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
 const cellC = (L, x, z) => [L.ox + x * L.cell + L.cell / 2, L.oz + z * L.cell + L.cell / 2];
 
+// ---- smoke: the ordinary landing flow on three moons still works (tools/harness/smoke_land.js) and reports what the variety pass made there
+out.smoke = [];
+for (const m of ['hamsi', 'lufer', 'palamut']) {
+  g.run.daysLeft = 3; g.run.moon = m; g.player.inShip = true; g.hostLever(g.selfId); g.hostFinishLanding();
+  for (let i = 0; i < 12; i++) await tick(10);
+  const v = g.world.facility?.layout?.variety;
+  out.smoke.push({ m, theme: g.world.facility?.layout?.theme, creatures: g.creatures.host.size, mazes: v?.mazes.length, liminal: v?.liminal.map((l) => l.kind), hatches: v?.hatches.length, shortcut: !!v?.shortcut, rewards: g.stealth?.stats.rewards });
+  g.player.teleport(V3(0, 1, 0)); g.player.inShip = true; g.hostBeginTakeoff('lever'); g.hostFinishTakeoff(); await tick(5);
+}
+
 // ---- land (try a few seeds until the facility has a hatch + a shortcut)
 let fac = null;
 for (const seed of [11, 23, 37, 51]) {

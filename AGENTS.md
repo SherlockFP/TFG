@@ -454,7 +454,7 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
 - Wrappers on the host.js flow live in `src/game/cycle.js` (`hostEvaluateQuota / hostLever / hostSetPhase / hostPopulateMoon / hostBeginTakeoff / hostFinishTakeoff / hostUpdate`, `applyRunState`, `onPhase`, the `unlock` handler). Net: `cyx`, `cyreq`. State: `run.cycle`.
 - Tests: `node tools/harness/cycle.test.mjs`, `cycle2_plan.test.mjs`, `cycle2_bosses.test.mjs`, `cycle2_flow.test.mjs` (real host flow + fuzz + soft-lock proof), `cycle2_i18n.test.mjs`.
 - First job when a browser is available: land on a core of every interior, watch the 3 new boss fights (name card, HP bar, rings), open the arena with cards, run a keystone and a raid with 2 tabs.
-### 5.16 Wave 4 - STEALTH (module `stealth`; docs/wave4/stealth.md; node-tested + one short headless run)
+### 5.16 Wave 4 - STEALTH (module `stealth`; docs/wave4/stealth.md; node-tested + builds, NOT run in a browser: `tools/harness/wave4_stealth.js` is written but unexecuted)
 - **Facility variety** on every regular facility (size >= 0.75, not backrooms / cycle cores): 6 maze styles (`world/maze_styles.js`), liminal rooms (cubicle farm, pool room, hall loop), dead-end nooks with a guaranteed prize,
   creaky hatch plates (one-way drop unless you sneak), a latch-controlled locked shortcut (extra edge). `world/facility_variety.js` + 9 `[stealth]` hooks in `facility.js`; `layout.variety` / `fac.variety`; off with `opts.variety === false`.
 - **Sneak** (Alt or crouch-walk), noise table + surfaces + HUD NOISE meter + footstep rings (`game/stealth_core.js`, `localplayer.js`), walls / closed doors muffle sound in `CreatureManager.hear()` (`game.stealth.hearDist`).

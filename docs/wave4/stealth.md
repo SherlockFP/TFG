@@ -1,8 +1,9 @@
 # Wave 4 - STEALTH: facility variety, sneaking, sound-hunting creatures (module `stealth`)
 
 Owner ask: "improve the labyrinth-like loot-chasing places, more maze styles, light Backrooms-like rooms; bring silent walking; some creatures work by sound and we can
-outsmart them tactically". Status: node-tested (three new test files, the old facility / maps2 / cycle tests stay green), builds, one short headless run
-(`tools/harness/wave4_stealth.js`). NOT hand-played, NOT tested with 2 real players.
+outsmart them tactically". Status: node-tested (three new test files incl. a stub-physics `buildFacility` smoke; the old facility / maps2 / cycle tests stay green) and builds. **NOT run in a browser**
+(the shared browser queue was skipped on the lead's order): `tools/harness/wave4_stealth.js` is written (smoke landing on 3 moons, noise levels with real input, Listener / Crawler / decoy,
+hatch, latch, Noisemaker, HUD meter) but was never executed - run it first when a browser is free. NOT hand-played, NOT tested with 2 real players.
 
 ## What the player gets
 | Feature | How it feels |
@@ -48,8 +49,9 @@ Shared edits: `game.js` (import + slot, `lastStepSurface`), `localplayer.js` (sn
 - `node tools/harness/stealth_noise.test.mjs` - loudness table, wall / door attenuation on real nav grids, batcher, sanitizer, rate limiter.
 - `node tools/harness/stealth_listener.test.mjs` - the real `soundHunter` against a fake manager: silent player ignored (even at 1.4 m), bump = hit, walk 5.5 m heard / 8 m not, sprint 14 m hunted,
   decoy chain `idle > alert > hunt > inspect > search > idle`, re-targeting, hit reaction, crawler ramp.
+- `node tools/harness/stealth_install.test.mjs` - the REAL `game/stealth.js` on a fake Game + a real built facility (stub physics): registration, spawn weights (none on tier 1), sneak key, surfaces, `stn` batch -> host -> `creatures.noise`, host rate limit, wall muffling, door / item wrappers, hatch (quiet vs noisy), latch prompt + `unlock`, nook prizes, dispose restores.
 - Also green: `wave1_facility_paths.mjs`, `maps2*.test.mjs`, `cycle2_plan.test.mjs` (assertion relaxed: variety mazes are flagged `varMaze`), `cycle2_flow.test.mjs`, `grenades.test.mjs`.
-- Headless: `flock /tmp/tfg-browser.lock node tools/harness/headless.mjs --port PORT --script tools/harness/wave4_stealth.js --shot out.png --wait 4000`.
+- Headless (written, NOT yet run): `flock /tmp/tfg-browser.lock node tools/harness/headless.mjs --port PORT --script tools/harness/wave4_stealth.js --shot out.png --wait 4000`.
 
 ## Knobs
 `game.config.stealth` (false = old sight AI for the Crawler, no wall muffling, no noise events), `game.config.stealthLoot` (false = no extra nook prizes), `game.settings.stealthMeter`, `game.settings.stealthRings`,
