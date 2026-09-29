@@ -65,5 +65,15 @@ all Press-Start-2P labels (9-12 px, wider than their boxes) now use the condense
   (menu title/host/character, HUD in run, inventory, shop, roles at both sizes; tree, market, pause, shipyard, pets, crafting, bounties at 1280).
 - Screenshots: `docs/wave4/ui2/{before,after}_<size>_<name>.jpg`.
 
+## Screenshot review (honest)
+Captured in one headless run (1280x720 + 1920x1080, `--both`): `docs/wave4/ui2/{before,after}_<size>_{menu_title,menu_host,menu_character,hud,inventory,roles}.jpg`.
+- Host panel: before, save slots and START were cut off / cramped, after they fit; plate title + tape reads clearly as one device. Form rows now wrap label-over-input in the narrow column (slightly ragged, acceptable).
+- HUD: clock/quota plates, level plate, segmented stamina/xp, numbered hotbar plates, ability chips (`HEAL BEAM`/`REVIVE PUL` no longer collide with their key). Objective list unchanged.
+- Inventory and role menu: same frame/plate/tape/section language; role cards keep their accent colour on a hard top edge.
+- The 1280 shop shot in that run caught the CRT power-on frame (not usable), the panel rows for shop / market / pause / shipyard / pets / crafting / bounties / forge / homeworld / trade were not captured (the run hit a screenshot timeout on the busy shared machine). They use the same base classes, but they were NOT looked at.
+
 ## Known gaps
-See the bottom of this file after the screenshot review.
+- Panels not visually verified (above). Some small labels (9-12 px Press Start 2P) were bumped to 15 px by selector list; unlisted ones may still be small.
+- Panel emoji are still blanked by the `ui.js` observer instead of being drawn as pictograms (only record.js, HUD and the sound hint use `glyph`).
+- Inline-styled widgets (minigame overlays, some dock widgets) only get shape via `.hud-dock-item > *`.
+- `theme.css` relies on `html.tfg-ui #ui` specificity; a panel that mounts outside `#ui` is only themed if its selector is listed (tooltips already are).
