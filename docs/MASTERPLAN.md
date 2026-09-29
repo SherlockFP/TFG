@@ -818,3 +818,8 @@ Amaç: kimliği (§21) taşıyan sistemleri oyunun merkezine koymak. Ajanlar `.c
 | `zones2` | İç mekân bölgeleri + tuzaklar, duvar/kapı + doğrulanmış yerleşim, bölge madencisi, rotasyonda kalıcılık, barikat çevresinden yol bulan akıncılar, gemide sektör haritası CRT | §26 |
 Sonraki (wave 6b): rol kısıtlı günler (§23.8), hub'da trend yaratık + bölge liderlik tablosu, 2 kişi gerçek oturum kontrol listesi, son Opus değerlendirmesi.
 Lead kuralları: her birleştirmede ilgili node testleri + build; toplu tarayıcı turu wave sonunda; GitHub 503 verirse yerelde birleştirip sonra pushla.
+
+---
+
+## 28. WAVE 8 — Çekirdek eylem ("Kameradan kaç / yayını kes") — bkz. docs/REVIEW_W7.md
+Karar (Game Director): yeni yan sistem yok; tüm sistemler tek bir ana eyleme bağlanır. Sıra: 28.1 core verb → 28.3 Hızlı Vardiya → 28.2 öne çıkanlar klibi → 28.4 fizik komedisi → 28.5 Operatör rolü → 28.6 kalıcı Algoritma hafızası. Hile koruması: şimdilik YOK (sahibin kararı). Altyazı zaten var.
