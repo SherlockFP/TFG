@@ -2,6 +2,7 @@
 // repair / sell), STATUS (power, income, docks, wave clock, storage), RAID (share code, PvP flag, ghost targets).
 //   createHomeworld2Panel(ui, game, hw2, { tab }) -> { el, refresh(), dispose() }   (hw2 = the module api)
 import { el, escapeHtml } from '../../core/util.js';
+import { glyphify } from '../glyphs.js';
 import { t, tf } from '../../core/i18n.js';
 import * as H from '../../game/homeworld_core.js';
 import * as X from '../../game/homeworld2_core.js';
@@ -70,7 +71,7 @@ export function createHomeworld2Panel(ui, game, hw2, opts = {}) {
     sub.innerHTML = `<b>▮${f0(wallet())}</b> · ${S().p.length} ${t('pieces')} · ${f1(hw2.income())}/${t('min')}`;
     for (const [k, label, icon] of [['cr', 'Credits', '▮'], ['parts', 'Components', '⚙'], ['s2', 'Circuit Core', '']]) {
       const cap = H.capOf(hw, k), v = hw.s[k], full = v >= cap - 1e-9;
-      resEl.appendChild(el('div', { class: 'h2-chip' + (full ? ' warn' : ''), html: `${icon} ${f0(v)}/${f0(cap)}<br><small>${escapeHtml(t(label))}${full ? ' · ' + escapeHtml(t('FULL')) : ''}</small>` }));
+      resEl.appendChild(el('div', { class: 'h2-chip' + (full ? ' warn' : ''), html: glyphify(`${icon} ${f0(v)}/${f0(cap)}<br><small>${escapeHtml(t(label))}${full ? ' · ' + escapeHtml(t('FULL')) : ''}</small>`) }));
     }
   }
 
@@ -95,7 +96,7 @@ export function createHomeworld2Panel(ui, game, hw2, opts = {}) {
     h += `<div class="h2-cat">${escapeHtml(t('ROOM KITS'))}</div><div class="h2-grid">${Object.keys(X.KITS).map(kitCard).join('')}</div>`;
     h += `<div class="h2-cat">${escapeHtml(t('ROOM PIECES'))}</div><div class="h2-grid">${X.TYPES.filter((k) => X.PT[k].cat === 'str').map(card).join('')}</div>`;
     h += `<div class="h2-cat">${escapeHtml(t('GARDEN'))}</div><div class="h2-grid">${X.TYPES.filter((k) => X.PT[k].cat === 'nat').map(card).join('')}</div>`;
-    mainEl.innerHTML = h;
+    mainEl.innerHTML = glyphify(h);
     mainEl.querySelectorAll('[data-place]').forEach((n) => n.addEventListener('click', () => { if (!n.classList.contains('off')) hw2.startPlace(n.dataset.place); }));
     mainEl.querySelectorAll('[data-kit]').forEach((n) => n.addEventListener('click', () => hw2.startKit(n.dataset.kit)));
   }
@@ -115,7 +116,7 @@ export function createHomeworld2Panel(ui, game, hw2, opts = {}) {
         <button class="btn" data-op="sell">${escapeHtml(p.t === 'tree' ? t('FELL') : t('SELL'))} ▮${sv.cr}</button></div>`;
     }
     if (s.p.some((p) => p.br)) h += `<div style="margin-top:8px"><button class="btn" data-op="repairall">${escapeHtml(t('REPAIR ALL'))}</button></div>`;
-    mainEl.innerHTML = h;
+    mainEl.innerHTML = glyphify(h);
     mainEl.querySelectorAll('[data-op]').forEach((n) => n.addEventListener('click', () => {
       const id = +n.closest('[data-id]')?.dataset.id, op = n.dataset.op;
       ui.sfx?.('ui_click', 0.5);
@@ -134,14 +135,14 @@ export function createHomeworld2Panel(ui, game, hw2, opts = {}) {
     else if (!gate.ok) wave = `${escapeHtml(t('No waves yet: build a few things first.'))} (${gate.n}/${gate.needN}, ▮${f0(gate.v)}/${gate.needV})`;
     else wave = `${escapeHtml(t('NEXT WAVE'))} <b class="${wv.left < 60 ? 'bad' : ''}">${mmss(wv.left)}</b> · ${escapeHtml(t('waves survived'))} ${wv.n} · ${escapeHtml(t('power'))} ${f1(X.wavePower(X.baseValue(hw, s), wv.n, game.run?.quotaIndex || 0))}${wv.left > 20 ? `<br><button class="btn" data-op="call">${escapeHtml(t('CALL WAVE EARLY (+25 % loot)'))}</button>` : ''}`;
     const full = ['cr', 'parts', 's2'].some((k) => hw.s[k] >= H.capOf(hw, k) - 1e-9);
-    mainEl.innerHTML = `<div class="h2-box">${bar(P.dem, P.sup, '⚡ ' + t('Power'))}
+    mainEl.innerHTML = glyphify(`<div class="h2-box">${bar(P.dem, P.sup, '⚡ ' + t('Power'))}
       <div class="h2-note">${escapeHtml(t('Poles link within 12 m, machines need a pole within 7.5 m, and the pole network has to reach the landing pad. Generators burn scrap from a belt; the pad shore power is shared with your buildings.'))}</div></div>
       <div class="h2-box">${escapeHtml(t('Income now'))}: <b>${f1(hw2.income())}</b> ${escapeHtml(t('credit-equivalents per minute'))} · ${escapeHtml(t('exported in total'))} ≈ ▮${f0(s.st.exported)}<br>
       ${full ? `<span class="warn">${escapeHtml(t('STORAGE FULL: the export docks are backing up. COLLECT at the console, or build Warehouses / a Storage Room.'))}</span><br>` : ''}
       <span class="h2-note">${escapeHtml(t('The factory runs while you are online (any phase). While you are away it earns 10 % of the live rate for up to 8 hours, and it can never pay more than your storage holds.'))}</span></div>
       <div class="h2-box">${wave}<br><span class="h2-note">${escapeHtml(t('Waves come only while somebody is on the homeworld. A lost wave breaks a machine or two (repair it, nothing is ever deleted) and raises a shield.'))}</span></div>
       <div class="h2-row"><button class="btn" data-op="collect">${escapeHtml(t('COLLECT'))}</button><span class="h2-note">${escapeHtml(t('(the classic homeworld console also collects)'))}</span></div>
-      <div class="h2-box h2-note">${escapeHtml(t('Rooms: ') + `${m.rooms || 0} ${t('closed rooms')} · ${t('storage')} +${Math.round((m.storage || 0) * 100)}% · ${t('machine speed')} +${Math.round((m.speed || 0) * 100)}% · Clout ${f1(m.clout || 0)}/${t('min')}`)}</div>`;
+      <div class="h2-box h2-note">${escapeHtml(t('Rooms: ') + `${m.rooms || 0} ${t('closed rooms')} · ${t('storage')} +${Math.round((m.storage || 0) * 100)}% · ${t('machine speed')} +${Math.round((m.speed || 0) * 100)}% · Clout ${f1(m.clout || 0)}/${t('min')}`)}</div>`);
     mainEl.querySelectorAll('[data-op]').forEach((n) => n.addEventListener('click', () => { ui.sfx?.('ui_click', 0.5); if (n.dataset.op === 'collect') game.homeworld?.req?.('collect', {}); else hw2.req(n.dataset.op, {}); }));
   }
 
@@ -160,7 +161,7 @@ export function createHomeworld2Panel(ui, game, hw2, opts = {}) {
         ${cd > 0 ? `<span class="warn">${escapeHtml(t('cooldown'))} ${mmss(cd)}</span>` : `<button class="btn" data-op="gtarget">${escapeHtml(t('SELECT'))}</button>`}</div>`;
     }
     h += `<div class="h2-box h2-note">${escapeHtml(t('Then take off and type GHOST GO at the ship terminal (GHOST lists the targets). You land next to the base; leave with the lever when you are done.'))}</div>`;
-    mainEl.innerHTML = h;
+    mainEl.innerHTML = glyphify(h);
     mainEl.querySelectorAll('[data-op]').forEach((n) => {
       const op = n.dataset.op;
       const fn = () => {

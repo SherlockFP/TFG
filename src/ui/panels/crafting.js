@@ -8,6 +8,8 @@ import { BLUEPRINTS, CATS, tierOdds, upgradeInfo, isUpgradable } from '../../gam
 import { analyzeInfo, dismantleYield, dismantleBlock, isStrange } from '../../game/research.js';
 import { iconImg } from '../icons.js';
 import { t, tf } from '../../core/i18n.js';
+import { glyph } from '../glyphs.js';
+import { escapeHtml } from '../../core/util.js';
 
 const STYLE_ID = 'tfg-crafting-style';
 const CSS = `
@@ -183,7 +185,7 @@ export function createCraftingPanel({ game, api, tab, onClose } = {}) {
       row.dataset.nav = 'crp:r:' + r.id;
       const nm = mk('div', 'crp-rn');
       nm.append(mk('div', 'crp-name', t(r.name)), mk('div', 'crp-mini', r.locked ? t('Blueprint required') : r.in.map(([id, n]) => `${nameOf(id)} ${n}`).join(' · ')));
-      row.append(r.locked ? Object.assign(mk('div', 'crp-ic'), { textContent: '🔒' }) : icon(r.out), nm, mk('span', 'crp-tag ' + (r.locked ? 'lock' : s.can ? 'ok' : 'no'), r.locked ? 'BP' : s.can ? 'READY' : '—'));
+      row.append(r.locked ? Object.assign(mk('div', 'crp-ic'), { innerHTML: glyph('lock') }) : icon(r.out), nm, mk('span', 'crp-tag ' + (r.locked ? 'lock' : s.can ? 'ok' : 'no'), r.locked ? 'BP' : s.can ? 'READY' : '—'));
       row.addEventListener('click', (e) => { e.stopPropagation(); if (busy) return; sel = r.id; stamp = null; sfx('ui_hover', 0.3); render(); });
       rows.appendChild(row);
     }
@@ -214,7 +216,7 @@ export function createCraftingPanel({ game, api, tab, onClose } = {}) {
       det.appendChild(line);
     }
     if (r.credits) { const line = mk('div', 'crp-ing'); line.append(Object.assign(mk('div', 'crp-ic'), { textContent: '▮' }), mk('span', 'nm', t('Credits (ship funds)')), mk('span', 'crp-cnt ' + (s.credits.ok ? 'ok' : 'no'), `${fmt(s.credits.have)} / ${fmt(r.credits)}`)); det.appendChild(line); }
-    if (r.bp) { const line = mk('div', 'crp-ing'); line.append(Object.assign(mk('div', 'crp-ic'), { textContent: '📐' }), mk('span', 'nm', `${t('Blueprint')}: ${t(BLUEPRINTS[r.bp].name)}`), mk('span', 'crp-cnt ' + (s.bp.ok ? 'ok' : 'no'), s.bp.ok ? t('KNOWN') : t('UNKNOWN'))); det.appendChild(line); }
+    if (r.bp) { const line = mk('div', 'crp-ing'); line.append(Object.assign(mk('div', 'crp-ic'), { innerHTML: glyph('book') }), mk('span', 'nm', `${t('Blueprint')}: ${t(BLUEPRINTS[r.bp].name)}`), mk('span', 'crp-cnt ' + (s.bp.ok ? 'ok' : 'no'), s.bp.ok ? t('KNOWN') : t('UNKNOWN'))); det.appendChild(line); }
     if (r.locked) { det.appendChild(mk('div', 'crp-dd', `${t('Unlocked by analyzing')}: ${t(BLUEPRINTS[r.bp].from)}`)); }
     det.appendChild(mk('div', 'crp-h', t('TIER CHANCE')));
     det.appendChild(oddsBar(odds));
@@ -317,7 +319,7 @@ export function createCraftingPanel({ game, api, tab, onClose } = {}) {
     const cr = game.run?.credits || 0, cok = cr >= u.credits; can = can && cok;
     const cl = mk('div', 'crp-ing'); cl.append(Object.assign(mk('div', 'crp-ic'), { textContent: '▮' }), mk('span', 'nm', t('Credits (ship funds)')), mk('span', 'crp-cnt ' + (cok ? 'ok' : 'no'), `${fmt(cr)} / ${fmt(u.credits)}`)); det.appendChild(cl);
     let bpOk = true;
-    if (u.bp) { bpOk = api.blueprints().includes(u.bp); can = can && bpOk; const l = mk('div', 'crp-ing'); l.append(Object.assign(mk('div', 'crp-ic'), { textContent: '📐' }), mk('span', 'nm', `${t('Blueprint')}: ${t(BLUEPRINTS[u.bp].name)}`), mk('span', 'crp-cnt ' + (bpOk ? 'ok' : 'no'), bpOk ? t('KNOWN') : t('UNKNOWN'))); det.appendChild(l); }
+    if (u.bp) { bpOk = api.blueprints().includes(u.bp); can = can && bpOk; const l = mk('div', 'crp-ing'); l.append(Object.assign(mk('div', 'crp-ic'), { innerHTML: glyph('book') }), mk('span', 'nm', `${t('Blueprint')}: ${t(BLUEPRINTS[u.bp].name)}`), mk('span', 'crp-cnt ' + (bpOk ? 'ok' : 'no'), bpOk ? t('KNOWN') : t('UNKNOWN'))); det.appendChild(l); }
     det.appendChild(mk('div', 'crp-h', t('SUCCESS CHANCE')));
     const chance = mk('div', 'crp-odds'); const sp = mk('span', '', pct(u.chance) + '%'); sp.style.width = u.chance * 100 + '%'; sp.style.background = '#7dff7d'; const sp2 = mk('span', '', ''); sp2.style.width = (1 - u.chance) * 100 + '%'; sp2.style.background = '#ff5a4a'; chance.append(sp, sp2);
     det.append(chance, mk('div', 'crp-dd', t('On failure the weapon is kept; parts are lost and half the credits.')));
@@ -391,7 +393,7 @@ export function createCraftingPanel({ game, api, tab, onClose } = {}) {
     for (const [id, b] of Object.entries(BLUEPRINTS)) {
       const on = known.includes(id);
       const c = mk('div', 'crp-bp' + (on ? '' : ' off'));
-      c.append(mk('div', 'n', `${b.icon || '📐'} ${on ? t(b.name) : '???'}`), mk('div', 'd', on ? t(b.desc) : t('Not yet discovered.')), mk('div', 's', `${t('Source')}: ${t(b.from)}`));
+      c.append(Object.assign(mk('div', 'n'), { innerHTML: `${glyph('book')} ${escapeHtml(on ? t(b.name) : '???')}` }), mk('div', 'd', on ? t(b.desc) : t('Not yet discovered.')), mk('div', 's', `${t('Source')}: ${t(b.from)}`));
       grid.appendChild(c);
     }
     wrap.appendChild(grid);

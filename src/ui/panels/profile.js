@@ -6,6 +6,7 @@
 // chat, day summary and above remote name tags.
 import * as THREE from 'three';
 import { el, clamp } from '../../core/util.js';
+import { glyphEl } from '../glyphs.js';
 import { t, tf, addTranslations } from '../../core/i18n.js';
 import { saveProfile } from '../../core/save.js';
 import { validateName, NAME_REASONS, NAME_MAX } from '../../core/profilename.js';
@@ -175,7 +176,7 @@ export function profilePanel(ui, { inGame = false } = {}) {
     for (const f of FRAMES) {
       const open = frameUnlocked(f.id, p);
       const need = f.need?.level ? tf('Unlocks at level {n}', { n: f.need.level }) : f.need?.ach ? tf('Unlocks with achievement: {a}', { a: frameNeedText(f.id).replace('Achievement: ', '') }) : '';
-      const c = el('div', { class: 'pf-fr' + (frame === f.id ? ' sel' : '') + (open ? '' : ' locked'), tabindex: open ? 0 : -1, title: open ? '' : need }, (open ? '' : '🔒 ') + t(frameName(f.id)));
+      const c = el('div', { class: 'pf-fr' + (frame === f.id ? ' sel' : '') + (open ? '' : ' locked'), tabindex: open ? 0 : -1, title: open ? '' : need }, open ? null : glyphEl('lock'), (open ? '' : ' ') + t(frameName(f.id)));
       c.addEventListener('click', () => { if (!open) { ui.toast(need, 'bad'); return; } frame = f.id; ui.sfx(); markDirty(); drawFrames(); });
       framesBox.appendChild(c);
     }
@@ -268,13 +269,14 @@ export function profilePanel(ui, { inGame = false } = {}) {
       angle.innerHTML = '';
       for (const [label, y] of [['Left', -0.45], ['Front', 0], ['Right', 0.45]]) angle.appendChild(ui.button(t(label), () => { snapYaw = y; drawAngle(); }, 'small tab' + (snapYaw === y ? ' sel' : '')));
     };
-    const take = ui.button('📷 ' + t('TAKE SNAPSHOT'), () => {
+    const take = ui.button(t('TAKE SNAPSHOT'), () => {
       const canvas = capturePortrait(p, snapBg, snapYaw);
       const png = capPng(canvas);
       if (!png) { ui.toast(t('Snapshot too heavy, try another background.'), 'bad'); return; }
       snap = { png, thumb: thumbOfCanvas(canvas), bg: snapBg };
       mode = 's'; markDirty(); paintPrev();
     }, 'primary');
+    take.prepend(glyphEl('camera'), ' ');
     paintPrev(); drawBg(); drawAngle();
     return el('div', { class: 'pf-edit' }, prev,
       el('div', { class: 'pf-right', style: { minWidth: '200px' } },

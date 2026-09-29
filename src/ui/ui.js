@@ -168,7 +168,9 @@ export class UI {
   }
   panelFoot(extra = []) {
     const pad = this.padActive;
-    const keys = [[pad ? '✚' : '↑↓', t('SELECT')], [pad ? 'A' : 'ENTER', t('CONFIRM')], [pad ? 'B' : 'ESC', t('BACK')], ...extra];
+    const keys = [[pad ? '✚' : '↑↓', t('SELECT')], [pad ? 'A' : 'ENTER', t('CONFIRM')], [pad ? 'B' : 'ESC', t('BACK')]];
+    // [ui3] a panel that passes its own "ESC BACK" / "E CONFIRM" no longer prints the same hint twice (shipyard, forge)
+    for (const x of extra) if (!document.documentElement.classList.contains('tfg-ui3') || !keys.some(([k, l]) => k === x[0] || l === x[1])) keys.push(x);
     return el('div', { class: 'cp-foot' }, ...keys.map(([k, l]) => el('span', {}, el('kbd', {}, k), ' ' + l)));
   }
   panel(cls = '') { return el('div', { class: 'menu-frame crt-panel' + (cls ? ' ' + cls : '') }); }

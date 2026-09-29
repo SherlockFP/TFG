@@ -5,6 +5,7 @@
 import { el, escapeHtml } from '../../core/util.js';
 import { t } from '../../core/i18n.js';
 import { iconHTML } from '../icons.js';
+import { glyph, glyphify } from '../glyphs.js';
 import { TIERS, TIER_ORDER, tierColor } from '../../game/tiers.js';
 import { affixDisplayName } from '../../game/loot.js';
 import * as F from '../../game/enhance.js';
@@ -116,8 +117,8 @@ export function createForgePanel(ui, game, forge, opts = {}) {
       <div class="fg-row"><span>${t('Cost')}</span><span><b class="${credits() >= info.credits ? '' : 'bad'}">▮${fmt(info.credits)}</b> + ${matLine(info.mat)}</span></div>
       <div class="fg-row"><span>${isW ? t('Damage') : t('Stats')}</span><span><b>+${Math.round(info.from * 100)}%</b> → <b class="ok">+${Math.round(info.bonus * 100)}%</b></span></div>
       <div class="fg-row"><span>${t('On failure')}</span><span class="${info.failDrops ? 'bad' : 'ok'}">${info.failDrops ? (backup ? t('Backup Drive protects the level') : t('drops one level')) : t('level stays the same')}</span></div>`;
-    const ocLine = (it.oc || []).map((id) => F.OVERCLOCKS[id] ? `<span style="color:${F.OVERCLOCKS[id].color}">${F.OVERCLOCKS[id].icon} ${t(F.OVERCLOCKS[id].name)}</span>` : '').join('  ');
-    if (info.opens && isW) b2.insertAdjacentHTML('beforeend', `<div class="fg-oc warn">⚡ ${t('Success opens an OVERCLOCK socket (random effect)')}</div>`);
+    const ocLine = (it.oc || []).map((id) => F.OVERCLOCKS[id] ? `<span style="color:${F.OVERCLOCKS[id].color}">${glyphify(F.OVERCLOCKS[id].icon)} ${t(F.OVERCLOCKS[id].name)}</span>` : '').join('  ');
+    if (info.opens && isW) b2.insertAdjacentHTML('beforeend', `<div class="fg-oc warn">${glyph('bolt')} ${t('Success opens an OVERCLOCK socket (random effect)')}</div>`);
     if (ocLine) b2.insertAdjacentHTML('beforeend', `<div class="fg-oc">${ocLine}</div>`);
     detEl.appendChild(b2);
     if (info.failDrops) {

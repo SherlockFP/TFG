@@ -2,6 +2,7 @@
 // sell / repair), STATUS (power + cooling, storage, collect, deposit, raid record, controls).
 //   createHomeworldPanel(ui, game, hw, { tab }) -> { el, refresh(), dispose() }   (hw = the module api: state(), req(), startPlace(), startMove())
 import { el, escapeHtml } from '../../core/util.js';
+import { glyphify } from '../glyphs.js';
 import { t, tf } from '../../core/i18n.js';
 import * as H from '../../game/homeworld_core.js';
 import { classify, walletRowOf } from '../../game/wallet.js';   // [unify] two currencies + materials
@@ -89,7 +90,7 @@ export function createHomeworldPanel(ui, game, hw, opts = {}) {
       const cap = H.capOf(st, k), v = st.s[k], full = v >= cap - 1e-9;
       const label = k === 's1' ? t('Scrap Shard') : k === 's2' ? t('Circuit Core') : k === 's3' ? t('Data Crystal') : k === 's4' ? t('Ecto Core') : k === 'meals' ? t('Meals') : k === 'parts' ? t('Components') : k === 'clout' ? 'Clout' : t('Credits');
       const isMat = classify(k) === 'material';   // [unify] shards / components / meals are materials, not money
-      resEl.appendChild(el('div', { class: 'hw-chip' + (full ? ' full' : '') + (isMat ? ' mat' : ''), title: isMat ? t('Materials: crafting only, not money') : '', html: `${H.RES_ICON[k].length === 1 ? H.RES_ICON[k] : ''} ${f0(v)}/${f0(cap)}<br><small>${escapeHtml(label)}</small><i><b style="width:${Math.min(100, (v / cap) * 100)}%"></b></i>` }));
+      resEl.appendChild(el('div', { class: 'hw-chip' + (full ? ' full' : '') + (isMat ? ' mat' : ''), title: isMat ? t('Materials: crafting only, not money') : '', html: glyphify(`${H.RES_ICON[k].length === 1 ? H.RES_ICON[k] : ''} ${f0(v)}/${f0(cap)}<br><small>${escapeHtml(label)}</small><i><b style="width:${Math.min(100, (v / cap) * 100)}%"></b></i>`) }));
     }
   }
 
@@ -108,7 +109,7 @@ export function createHomeworldPanel(ui, game, hw, opts = {}) {
       }
       h += '</div>';
     }
-    mainEl.innerHTML = h;
+    mainEl.innerHTML = glyphify(h);
     mainEl.querySelectorAll('[data-place]').forEach((n) => n.addEventListener('click', () => { if (!n.classList.contains('off')) hw.startPlace(n.dataset.place); }));
   }
 
@@ -128,7 +129,7 @@ export function createHomeworldPanel(ui, game, hw, opts = {}) {
         <button class="btn" data-op="move">${escapeHtml(t('MOVE'))}</button><button class="btn" data-op="sell">${escapeHtml(t('SELL'))} ▮${sv.cr}</button></div>`;
     }
     if (st.b.some((b) => H.hpOf(b) < H.hpMax(b))) h += `<div style="margin-top:8px"><button class="btn" data-op="repairall">${escapeHtml(t('REPAIR ALL'))}</button></div>`;
-    mainEl.innerHTML = h;
+    mainEl.innerHTML = glyphify(h);
     mainEl.querySelectorAll('[data-op]').forEach((n) => n.addEventListener('click', () => {
       const id = +n.closest('[data-id]')?.dataset.id, op = n.dataset.op;
       ui.sfx?.('ui_click', 0.5);
@@ -142,14 +143,14 @@ export function createHomeworldPanel(ui, game, hw, opts = {}) {
     const bar = (a, b, label) => `<div class="hw-row"><span class="nm">${label} ${a}/${b}</span><span class="hw-bar${a > b ? ' bad' : ''}"><span style="width:${Math.min(100, (a / Math.max(1, b)) * 100)}%"></span></span></div>`;
     const daily = H.RES_KEYS.filter((k) => out[k] > 0.001).map((k) => `${H.RES_ICON[k].length === 1 ? H.RES_ICON[k] : t('shards')}${out[k].toFixed(1)}`).join('  ');
     const rs = st.st;
-    mainEl.innerHTML = `<div class="hw-box">${bar(P.demand, P.supply, '⚡ ' + t('Power'))}${bar(P.heat, P.cooling, '❄ ' + t('Cooling'))}
+    mainEl.innerHTML = glyphify(`<div class="hw-box">${bar(P.demand, P.supply, '⚡ ' + t('Power'))}${bar(P.heat, P.cooling, '❄ ' + t('Cooling'))}
       <div class="hw-note">${escapeHtml(t('Buildings produce per GAME DAY (a day on a moon), not in real time. Storage is capped: come back and collect.'))}</div></div>
       <div class="hw-box">${escapeHtml(t('Per day now'))}: <b>${daily || '-'}</b> · ${escapeHtml(t('worth'))} ≈ ▮${Math.round(H.valueOf(out))} · ${escapeHtml(t('workers'))} ${H.workersOf(st)} · +${Math.round(H.boostOf(st) * 100)}%<br>
       ${escapeHtml(t('Ready to collect'))}: <b>${H.stored(st)}</b>  ·  ${escapeHtml(t('Days accounted'))}: ${st.days}</div>
       <div class="hw-row"><button class="btn" data-op="collect">${escapeHtml(t('COLLECT'))}</button><button class="btn" data-op="deposit">${escapeHtml(t('DEPOSIT HELD COMPONENTS'))}</button><button class="btn" data-op="withdraw">${escapeHtml(t('WITHDRAW 6 COMPONENTS'))}</button></div>
       <div class="hw-box">${escapeHtml(t('Raids'))}: ${escapeHtml(t('repelled'))} ${rs.repelled} · ${escapeHtml(t('held'))} ${rs.held} · ${escapeHtml(t('breached'))} ${rs.breached} · ${escapeHtml(t('Chance per landed day'))} ${Math.round(H.raidChance(st, (game.run?.day || 0) + 99) * 1000) / 10}%<br>
       <span class="hw-note">${escapeHtml(t('While the crew is away the homeworld can be raided. Towers, walls and mines defend it on their own; fly home in time and the crew adds firepower. A lost raid wrecks a building (repair it, it is never destroyed) and steals part of the storage.'))}</span></div>
-      <div class="hw-box hw-note">${escapeHtml(t('Controls on the homeworld: [E] at the console or [H] opens this panel · LMB place · R rotate · RMB / ESC leave · U upgrade / X sell / M move the building under the crosshair.'))}</div>`;
+      <div class="hw-box hw-note">${escapeHtml(t('Controls on the homeworld: [E] at the console or [H] opens this panel · LMB place · R rotate · RMB / ESC leave · U upgrade / X sell / M move the building under the crosshair.'))}</div>`);
     mainEl.querySelectorAll('[data-op]').forEach((n) => n.addEventListener('click', () => { ui.sfx?.('ui_click', 0.5); hw.req(n.dataset.op, {}); }));
   }
 

@@ -4,6 +4,7 @@
 // the saved profile only). Clicking a tile TRIES it on in the preview; EQUIP / BUY act on the selection.
 import { el } from '../../core/util.js';
 import { t } from '../../core/i18n.js';
+import { glyphEl } from '../glyphs.js';
 import { saveProfile } from '../../core/save.js';
 import { getCharPreview } from '../charpreview.js';
 import { tierColor, tierDef } from '../../game/tiers.js';
@@ -114,8 +115,8 @@ export function openWardrobe({ game = null, profile, ui, from = null } = {}) {
       el('div', { class: 'wd-name', style: { color: col } }, t(cur.name)),
       el('div', { class: 'wd-tier', style: { color: col } }, `${t(tierDef(cur.tier || 'common').name)} · ${X ? t(X.slotLabel ? X.slotLabel(cur) : X.label) : t(tab === 'suit' ? 'Suits' : tab === 'hat' ? 'Hats' : tab === 'face' ? 'Face' : 'Back')}`),
       el('div', { class: 'wd-desc' }, t(cur.desc || '')),
-      owned ? el('div', { class: 'wd-how ok' }, isEq ? '✔ ' + t('Equipped') : '✔ ' + t('Owned'))
-        : el('div', { class: 'wd-how' }, `🔒 ${t('Unlock')}: ${t(cur.how || '?')}`),
+      owned ? el('div', { class: 'wd-how ok' }, glyphEl('check'), ' ' + (isEq ? t('Equipped') : t('Owned')))
+        : el('div', { class: 'wd-how' }, glyphEl('lock'), ` ${t('Unlock')}: ${t(cur.how || '?')}`),
       prog ? el('div', { class: 'wd-bar' }, el('i', { style: { width: Math.round(Math.min(1, prog[0] / prog[1]) * 100) + '%' } })) : null,
       prog ? el('div', { class: 'wd-note' }, `${Math.min(prog[0], prog[1])} / ${prog[1]}`) : null,
       !owned && price ? el('div', { class: 'wd-how' }, `◈ ${price}${cur.minLevel > 1 ? ` · Lv.${cur.minLevel}+` : ''}`) : null,
@@ -153,9 +154,9 @@ export function openWardrobe({ game = null, profile, ui, from = null } = {}) {
       const tp = X && X.price ? X.price(e) : 0;
       const tile = el('div', { class: 'wd-tile' + (sel.id === e.id ? ' sel' : '') + (own ? '' : ' locked'), style: { '--tc': tierColor(e.tier || 'common') }, tabindex: 0, 'data-nav': `wd:${slot}:${e.id}`, title: e.desc || '' },
         el('div', { class: 'n' }, t(e.name)),
-        el('div', { class: 's' }, own ? (eq ? t('Equipped') : t('Owned')) : (p2 ? `🔒 ${Math.min(p2[0], p2[1])}/${p2[1]}` : tp ? `◈ ${tp}` : '🔒 ' + t('Locked'))),
+        el('div', { class: 's' }, ...(own ? [eq ? t('Equipped') : t('Owned')] : p2 ? [glyphEl('lock'), ` ${Math.min(p2[0], p2[1])}/${p2[1]}`] : tp ? [`◈ ${tp}`] : [glyphEl('lock'), ' ' + t('Locked')])),
         e.color ? el('div', { class: 'sw', style: { background: e.color } }) : null,
-        eq ? el('div', { class: 'ck' }, '✔') : null);
+        eq ? el('div', { class: 'ck' }, glyphEl('check')) : null);
       const pick = () => { sel = { slot, id: e.id }; if (X) X.select?.(ctx, e); else { tryOn[slot] = e.id; applyTry(); } ui.sfx?.('ui_hover', 0.3); render(); };
       tile.addEventListener('click', pick);
       tile.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); pick(); } });

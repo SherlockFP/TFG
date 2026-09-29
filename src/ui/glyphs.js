@@ -65,4 +65,19 @@ export function glyphFromEmoji(s, opts) {
   return k.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 }
 
+/** UI3: a <span> holding the pictogram (for el() children where html strings are not an option). */
+export function glyphEl(name, opts) {
+  const s = document.createElement('span');
+  s.className = 'tfg-gi';
+  s.innerHTML = glyph(name, opts);
+  return s;
+}
+
+/** UI3: swap the leftover symbol/emoji characters inside an ALREADY-ESCAPED html string for pictograms (use right before innerHTML). */
+const INLINE = { '⚡': 'bolt', '❄': 'snow', '⚙': 'gear', '🔥': 'flame', '🔒': 'lock', '📷': 'camera', '📐': 'book', '🚐': 'van', '🎙': 'mic' };
+const INLINE_RE = /(⚡|❄|⚙|🔥|🔒|📷|📐|🚐|🎙)\uFE0F?/g;
+export function glyphify(html, opts) {
+  return String(html ?? '').replace(INLINE_RE, (_, c) => glyph(INLINE[c], opts));
+}
+
 export const GLYPH_NAMES = Object.keys(P);

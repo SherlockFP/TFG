@@ -1,6 +1,7 @@
 // In-game HUD (helmet visor style): health figure, stamina, weight, clock, inventory, prompts,
 // scan labels (with item icons), floating damage numbers, XP/level, coins, toasts, death/spectate
 // overlays, run chips (daily event / favor / streak), outdoor compass, and the landing briefing card.
+import { spreadLabels } from './compass_labels.js';
 import * as THREE from 'three';
 import { iconHTML, typeFromName } from './icons.js';
 import { glyph } from './glyphs.js';   // [ui2]
@@ -412,6 +413,7 @@ export class HUD {
     if (out?.mainExit) marks.push({ x: out.mainExit.pos.x, z: out.mainExit.pos.z, label: t('ENTRANCE'), col: '#9fffb0', dist: true });
     for (const f of out?.fireExits || []) marks.push({ x: f.pos.x, z: f.pos.z, label: t('EXIT'), col: 'rgba(160,255,176,0.55)', dist: false, small: true });
     ctx.font = '15px "TFG Credit", VT323, "TFG Cyr VT", monospace';
+    const labels = [];
     for (const m of marks) {
       const dx = m.x - p.pos.x, dz = m.z - p.pos.z;
       const d = Math.hypot(dx, dz);
@@ -429,8 +431,13 @@ export class HUD {
       const txt = m.dist ? `${m.label} ${Math.round(d)}m` : m.label;
       const tw = ctx.measureText(txt).width;
       const tx = clamp(x + (edge ? -Math.sign(rel) * (tw / 2 + 10) : 0), tw / 2 + 2, W - tw / 2 - 2);
-      ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillText(txt, tx + 1, 32);
-      ctx.fillStyle = m.col; ctx.fillText(txt, tx, 31);
+      labels.push({ txt, tw, tx, col: m.col });
+    }
+    // [ui3] two markers on (nearly) the same bearing used to print SHIP / ENTRANCE on top of each other: push the labels apart sideways
+    if (document.documentElement.classList.contains('tfg-ui3') && labels.length > 1) spreadLabels(labels, W);
+    for (const l of labels) {
+      ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillText(l.txt, l.tx + 1, 32);
+      ctx.fillStyle = l.col; ctx.fillText(l.txt, l.tx, 31);
     }
   }
 

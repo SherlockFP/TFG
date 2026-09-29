@@ -1,6 +1,7 @@
 // Magic UI: mana bar + spell slots (bottom HUD dock) and the hold-C spell wheel.
 // Pure DOM + injected CSS; all state comes from the magic module (src/game/magic.js) passed in.
 import { hudDock } from '../dock.js';
+import { glyph } from '../glyphs.js';
 import { t } from '../../core/i18n.js';
 
 // 12x12 pixel glyphs per spell ('#' = filled)
@@ -160,7 +161,7 @@ export class ManaDock {
     const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     let h = esc(text.slice(-60));
     for (const w of matched) h = h.replace(new RegExp('(' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'i'), '<b>$1</b>');
-    this.$.heard.innerHTML = '🎙 "' + h + '"';
+    this.$.heard.innerHTML = glyph('mic') + ' "' + h + '"';
     this.$.heard.classList.add('on');
     this.heardT = 2.6;
   }
