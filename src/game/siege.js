@@ -270,10 +270,11 @@ export function installSiege(game) {
     const crew = crewCount();
     const threat = Number(game.balance?.threat?.() ?? run.threat ?? 0) || 0;
     const sc = siegePower({ quotaIndex: run.quotaIndex || 0, crew, threat, reason });
-    const P = (opts.power || 1) * sc.power;
+    const sgCap = opts.power || opts.waves ? null : game.crdirector?.siegeCaps?.();   // [crdirector] early sieges are smaller and shorter
+    const P = sgCap ? Math.min((opts.power || 1) * sc.power, sgCap.power) : (opts.power || 1) * sc.power;
     const rate = (16 * 60) / (game.config.dayLengthSec || 720);
     const secLeft = (1436 - (run.time || 480)) / (rate * TUNE.clockSlow);
-    const W = opts.waves || waveCount(P, reason, secLeft);
+    const W = opts.waves || Math.min(waveCount(P, reason, secLeft), sgCap ? sgCap.waves : 5);
     rng = new RNG(hashStr(`${run.runId || run.seed}:siege:${run.day}:${stats.started}`));
     plan = []; for (let w = 1; w <= W; w++) plan.push(planWave(w, W, P));
     queue = []; members.clear(); spawnAcc = 0; waveT = 0; raidT = 0; doneT = 0;

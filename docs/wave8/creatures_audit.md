@@ -87,3 +87,12 @@ Deepfake already copies a crewmate's voice and name tag; its remaining gap is a 
 6. **Directional cue for hazards** (Fake Exit breathing, turret lock) using the same edge pulse.
 7. **Per-player pacing**: the director is per landing; add per-player relief for split crews (director.js already has per-player tension: merge).
 8. **Dimmer / Auditor in the codex** (bestiary art + scan hint) and a Follower photo challenge.
+
+## 9. Follow-up: set pieces gated (owner: "too many creatures")
+Per-source caps by quota 0-1 / 2-3 / 4-5 / 6+ (`K.sourceCaps`, applied in the `hostSpawn` wrapper; a refused spawn returns null, which all these spawners already handle):
+- Horde night / alarm swarm: max 4 / 7 / 12 / 20 zombies per burst and 8 / 14 / 24 / 40 alive. Ambient loose zombie groups: 4 / 6 / vanilla alive.
+- Horror pockets: Shamblers 4 / 7 / 14 / 14, Wardens 2 / 4 / 6 / 6.
+- Siege and zone raids (sg_* bodies): 12 / 12 / 20 / 40 alive; siege.js takes two hook values from `game.crdirector.siegeCaps()`: wave power <= 1.0 (quota 2-3) / 1.5 (4-5) / vanilla and 3 / 4 / 5 waves max.
+- Events are peaks: the first accepted event body forces the phase to `peak` (same sting + caption), ambient releases stop, peak-early-end is off; when the last event body is gone the phase becomes `relax`.
+- lcmonsters (`game.lcm`): creatures are budgeted (Rift Stalker 3, Keeper / Loot Mimic / Masked / Witch 1.5, even the damage-less Witch) and `game.crdirector.canSpawn(type, pos)` (the veto lcmonsters already calls) says no when the crew is carrying more than 1.6 x the cap.
+Model (`--report`, 3 crew, threat 40): night swarm quota 0: 35 bodies / 25 alive peak -> 12 / 8; quota 2: 66 / 36 -> 28 / 14; quota 4: 78 / 40 -> 48 / 24. Siege quota 2-3: 4 waves, 122 bodies, 40 alive in the last wave, ~357 s -> 3 waves, 37 bodies, 12 alive, ~283 s; quota 4: 5 waves 194 bodies ~431 s -> 3 waves 54 bodies 20 alive ~283 s. Shamblers 14 -> 4 at quota 0. Ambient zombies 3-20 -> 4.

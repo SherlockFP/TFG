@@ -195,6 +195,29 @@ ok(Object.values(N.DEFS).every((d) => d.dmg <= R.hitCapFrac(0) * 100 && d.noSpaw
   const zs = []; for (let i = 0; i < 10; i++) zs.push(game.creatures.hostSpawn('zombot', { x: 60 + i, z: 0 }, { data: { ambient: true } }));
   ok(zs.filter(Boolean).length === K.ambientZombieCap(0), 'ambient zombies capped at ' + K.ambientZombieCap(0) + ' on quota 0 (got ' + zs.filter(Boolean).length + ')');
   ok(game.creatures.hostSpawn('zombot', { x: 5, z: 5 }, { data: { wave: 1 } }) !== null, 'wave zombies are not capped');
+  // ---- set pieces: per-source caps, events are peaks, lcmonsters are budgeted
+  for (const [id, d] of [['hr_zombie', { name: 'Shambler', hp: 42, dmg: 11, power: 0.6 }], ['hr_warden', { name: 'Warden', hp: 95, dmg: 24, power: 1.4 }], ['sg_swarmer', { name: 'Swarmer', hp: 26, dmg: 6, power: 0 }], ['lm_hunter', { name: 'Rift Stalker', hp: 300, dmg: 40, power: 0 }], ['lm_witch', { name: 'Witch', hp: 170, dmg: 0, power: 0 }]]) if (!C.CREATURES[id]) C.registerCreature(id, d);
+  game.creatures.host.clear();
+  const spawnN = (type, n, data) => { let ok = 0; for (let i = 0; i < n; i++) if (game.creatures.hostSpawn(type, { x: 80 + i, z: 0 }, { data: { ...data } })) ok++; return ok; };
+  ok(spawnN('zombot', 20, { wave: 7 }) === 4, 'quota 0: one swarm burst adds at most 4 zombies');
+  game.time += 10; ok(spawnN('zombot', 20, { wave: 7 }) === 4, 'the next burst (8 alive max): 4 more');
+  game.time += 10; ok(spawnN('zombot', 20, { wave: 7 }) === 0, 'alive cap 8 for the whole swarm at quota 0');
+  ok(K.sourceCaps(0).swarmAlive <= 8 && K.sourceCaps(0).shambler <= 4 && K.sourceCaps(6).swarmAlive === 40 && K.sourceCaps(2).swarmAlive > K.sourceCaps(0).swarmAlive, 'source caps grow with quota, vanilla from quota 6');
+  ok(spawnN('hr_zombie', 14, {}) === 4 && spawnN('hr_warden', 6, {}) === 2, 'Horror pocket: 4 Shamblers, 2 Wardens at quota 0');
+  ok(spawnN('sg_swarmer', 30, { sg: 1 }) === 12, 'siege bodies alive capped (12 early)');
+  ok(K.siegeCaps(2).power === 1 && K.siegeCaps(2).waves === 3 && K.siegeCaps(4).waves === 4 && K.siegeCaps(6).waves === 5 && api.siegeCaps().waves === 3, 'siege: smaller and shorter early');
+  // an event is a peak: forced, ambient releases stay quiet, relax when the last body is gone
+  const nq = api.debug().queue.length; sent.length = 0; const spawnedBefore = game.spawnLog.length;
+  tickN(2); ok(api.phase() === 'peak' && sent.some(([t, d]) => t === 'cd' && d.k === 'ph' && d.p === 'peak'), 'a swarm / siege in progress is announced as the peak');
+  tickN(30); ok(game.spawnLog.length === spawnedBefore, 'no ambient release while the event runs');
+  for (const c of game.creatures.host.values()) c.dead = true;
+  tickN(10); ok(api.phase() === 'relax', 'event over: relax (' + api.phase() + ')');
+  game.creatures.host.clear();
+  ok(K.costOf('lm_hunter', C.CREATURES.lm_hunter) === 3 && K.costOf('lm_witch', C.CREATURES.lm_witch) === 1.5 && K.isCounted('lm_witch', C.CREATURES.lm_witch), 'lcmonsters creatures are budgeted (even the damage-less Witch)');
+  ok(api.canSpawn('lm_hunter', {}) === true, 'lcm spawn allowed when the crew is not overloaded');
+  for (let i = 0; i < 6; i++) game.creatures.hostSpawn('crawler', { x: 10 + i, z: 0 }, {});
+  ok(api.canSpawn('lm_hunter', {}) === false, 'lcm spawn vetoed when active threat > 1.6 x cap');
+  game.creatures.host.clear();
   game.config.crdirector = false; game.spawnLog.length = 0; game.hostSpawnCreatureIndoor('crawler'); ok(game.spawnLog.length === 1 && api.debug().queue.length >= 0, 'config.crdirector = false: vanilla spawning');
   game.config.crdirector = true;
   ok(game.toggleFlashlight() === 'toggled', 'flashlight works normally');
@@ -315,10 +338,37 @@ if (process.argv.includes('--report')) {
   for (const r of rows) console.log(String(r.q).padEnd(5), r.moon.padEnd(9), '|', fx(r.van.bodies).padStart(5), fx(r.van.max).padStart(5), fx(r.van.p95).padStart(5), fx(r.van.mean).padStart(6), (r.van.busy * 100).toFixed(0).padStart(5), '|', fx(r.dir.bodies).padStart(5), fx(r.dir.max).padStart(5), fx(r.dir.p95).padStart(5), fx(r.dir.mean).padStart(6), (r.dir.busy * 100).toFixed(0).padStart(5));
 }
 const cx = (r) => ({ q: r.q, tier: MOONS[r.moon].tier });
+// set pieces: horde swarm (waveSize maths of horde.js), siege plan (siege_core), shamblers (per-source caps)
+const SG = await import('../../src/game/siege_core.js');
+function swarmPeak(q, capped) {
+  const sec = q, th = 40, press = scaleFor(q, th).spawn, total = 3 + (sec >= 2 ? 1 : 0) + (th >= 70 ? 1 : 0), gap = (60 + Math.min(30, sec * 6 + th * 0.15)) / total, caps = K.sourceCaps(q);
+  let peak = 0, bodies = 0; const alive = [];
+  for (let w = 1; w <= total; w++) {
+    const t = 2.5 + (w - 1) * gap, size = Math.round(Math.min(20, Math.max(6, (6 + sec * 1.5 + th / 12 + (w - 1) * 1.6) * press * 1.05)));
+    const n = capped ? Math.min(size, caps.swarmBurst, Math.max(0, caps.swarmAlive - alive.filter((e) => e > t).length)) : Math.min(size, 40 - alive.filter((e) => e > t).length);
+    for (let i = 0; i < n; i++) alive.push(t + 30); bodies += n;
+    peak = Math.max(peak, alive.filter((e) => e > t).length);   // 30 s engaged per zombie (18 HP)
+  }
+  return { total, bodies, peak };
+}
+function siegeStats(q, capped) {
+  const sc = SG.siegePower({ quotaIndex: q, crew: 3, threat: 40, reason: 'extraction' }), cap = SG.siegePower && K.siegeCaps(q);
+  const P = capped ? Math.min(sc.power, cap.power) : sc.power, W = capped ? Math.min(SG.waveCount(P, 'extraction'), cap.waves) : SG.waveCount(P, 'extraction');
+  let bodies = 0, big = 0; for (let w = 1; w <= W; w++) { const pw = SG.planWave(w, W, P); bodies += pw.total; big = Math.max(big, pw.total); }
+  return { W, bodies, big: capped ? Math.min(big, K.sourceCaps(q).siegeAlive) : Math.min(big, SG.TUNE.maxAlive), secs: SG.TUNE.prep + W * (SG.TUNE.waveCap * 0.75 + SG.TUNE.lull) };
+}
+const setRows = [0, 2, 4].map((q) => ({ q, sw: [swarmPeak(q, false), swarmPeak(q, true)], sg: [siegeStats(q === 0 ? 2 : q, false), siegeStats(q === 0 ? 2 : q, true)], caps: K.sourceCaps(q), zc: K.ambientZombieCap(q) }));
+if (process.argv.includes('--report')) {
+  console.log('SET PIECES (vanilla -> director)   quota | night swarm: waves, bodies, peak alive | siege (quota max(2,q), 3 crew): waves, bodies, biggest wave alive, ~s | shamblers | ambient zombies');
+  for (const r of setRows) console.log(String(r.q).padEnd(4), '| swarm', r.sw[0].total, r.sw[0].bodies, r.sw[0].peak, '->', r.sw[1].total, r.sw[1].bodies, r.sw[1].peak, '| siege', r.sg[0].W, r.sg[0].bodies, r.sg[0].big, Math.round(r.sg[0].secs), '->', r.sg[1].W, r.sg[1].bodies, r.sg[1].big, Math.round(r.sg[1].secs), '| shamblers 14 ->', r.caps.shambler, '| ambient zombies 3-20 ->', r.zc > 40 ? 'vanilla' : r.zc);
+}
+ok(setRows[0].sw[1].peak <= 8 && setRows[0].sw[0].peak > 8, 'quota 0 swarm: peak alive <= 8 (vanilla more)');
+ok(setRows.every((r) => r.sw[1].peak <= r.sw[0].peak && r.sg[1].bodies <= r.sg[0].bodies && r.sg[1].W <= r.sg[0].W), 'set pieces never grow');
+ok(setRows[1].sg[1].bodies < setRows[1].sg[0].bodies * 0.6, 'quota 2 siege has < 60 % of the vanilla bodies');
 ok(rows.filter((r) => r.q === 0).every((r) => r.dir.p95 <= r.van.p95 - 0.8 && r.dir.max <= 3.6 && r.dir.bodies < r.van.bodies), 'quota 0 (model): fewer bodies, 95th percentile <= vanilla - 0.8, never more than 3-4 at once');
 ok(rows.every((r) => r.dir.p95 <= K.bodyCap(cx(r)) + 1 && r.dir.max <= K.bodyCap(cx(r)) + 2), 'quota 0-4 (model): concurrent bodies stay within the body cap (+ the one featured creature)');
 ok(rows.every((r) => r.dir.busy < r.van.busy), 'quiet stretches exist (share of time with a hostile active drops at every quota)');
-ok(K.ambientZombieCap(0) === 3 && K.ambientZombieCap(2) === 6 && K.ambientZombieCap(4) > 40, 'ambient zombie cap');
+ok(K.ambientZombieCap(0) === 4 && K.ambientZombieCap(2) === 6 && K.ambientZombieCap(4) > 40, 'ambient zombie cap');
 ok(K.bodyCap({ q: 0, tier: 1 }) === 3 && K.bodyCap({ q: 2, tier: 2 }) === 4 && K.bodyCap({ q: 4, tier: 3 }) === 4 && K.packMax(0) === 2 && K.packMax(2) === 3 && K.packMax(4) === 4, 'body cap / pack trim tables');
 
 console.log(fails ? `${fails} FAILED of ${checks}` : `crdirector: all ${checks} checks passed`);

@@ -47,7 +47,7 @@ export function installCrdirector(game) {
   const nowMs = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
   const S = {
     st: null, q: [], acc: 0, now: 0, rng: new RNG(1), landing: false, residents: 0, orig: {},
-    lastStage: 0, newThisLanding: 0, newThisCycle: 0, cullT: 0, trk: new Map(), trkGap: new Map(),
+    bursts: new Map(), evt: false, evtT: -99, lastStage: 0, newThisLanding: 0, newThisCycle: 0, cullT: 0, trk: new Map(), trkGap: new Map(),
     stats: { spawned: 0, queued: 0, dropped: 0, released: 0, culled: 0, peaks: 0, featured: 0 },
     // client
     told: new Map(), typeTell: new Map(), anyTell: -99, seen: loadSeen(), capT: 0, capCool: 0, scanT: 0, edge: { f: 0, b: 0, l: 0, r: 0 }, edgeSet: { f: -1, b: -1, l: -1, r: -1 },
@@ -95,7 +95,7 @@ export function installCrdirector(game) {
     const c = ctxNow();
     S.rng = new RNG(((run().seed | 0) ^ 0xcd11 ^ ((run().day | 0) * 7919)) >>> 0);
     S.st = K.newState(c, () => S.rng.float(0, 1));
-    S.q.length = 0; S.now = 0; S.acc = 0; S.trk.clear(); S.trkGap.clear();
+    S.q.length = 0; S.now = 0; S.acc = 0; S.trk.clear(); S.trkGap.clear(); S.bursts.clear(); S.evt = false; S.evtT = -99;
     S.residents = K.residentsFor(c.q); S.newThisLanding = 0; S.newThisCycle = 0; S.lastStage = 0; S.cullT = 0;
     S.stats = { spawned: 0, queued: 0, dropped: 0, released: 0, culled: 0, peaks: 0, featured: 0 };
     send({ k: 'ph', p: 'calm', n: 0 });
@@ -103,6 +103,26 @@ export function installCrdirector(game) {
   const costFor = (type) => { const d = CREATURES[type]; const c = K.costOf(type, d); return type === 'scuttler' ? c * K.packMax(run().quotaIndex | 0) : c; };   // a Spam Bot pack costs per body
   const OUT_COST = 1.5;
 
+  const isEventCreature = (c) => !!(c.data && (c.data.sg || c.data.zl || c.data.wave != null)) || K.SIEGE_TYPES.includes(c.type);
+  function overCap(M, type, opts) {
+    const q = run().quotaIndex | 0, caps = K.sourceCaps(q), d = opts?.data;
+    const count = (f) => { let n = 0; for (const c of M.host.values()) if (!c.dead && f(c)) n++; return n; };
+    if (type === 'zombot') {
+      if (d?.ambient) return count((c) => c.type === 'zombot' && c.data?.ambient) >= K.ambientZombieCap(q);
+      if (d?.wave != null) {
+        const now = game.time || 0, b = S.bursts.get(d.wave);
+        if (!b || now - b.t > 3) S.bursts.set(d.wave, { t: now, n: 0 });
+        const bb = S.bursts.get(d.wave);
+        if (bb.n >= caps.swarmBurst || count((c) => c.type === 'zombot' && c.data?.wave != null) >= caps.swarmAlive) return true;
+        bb.n++; bb.t = now;
+      }
+      return false;
+    }
+    if (type === 'hr_zombie') return count((c) => c.type === 'hr_zombie') >= caps.shambler;
+    if (type === 'hr_warden') return count((c) => c.type === 'hr_warden') >= caps.warden;
+    if (K.SIEGE_TYPES.includes(type)) return count((c) => K.SIEGE_TYPES.includes(c.type)) >= caps.siegeAlive;
+    return false;
+  }
   function installWrappers() {
     const g = game;
     S.orig.indoor = g.hostSpawnCreatureIndoor?.bind(g);
@@ -112,15 +132,15 @@ export function installCrdirector(game) {
       try { startLanding(); S.landing = true; } catch (e) { console.warn('[crdirector] start', e); }
       try { return orig.apply(this, a); } finally { S.landing = false; }
     });
-    // ambient Zombie Account groups (horde.js, 3-5 per group, up to 4 groups at landing) are the biggest silent crowd: cap the loose ones for small crews.
-    // (spawnZombot / the callers already handle a null spawn; wave swarms are announced set pieces and untouched)
+    // SET-PIECE crowds (audit: the real "too many"): per-source caps by quota. spawnZombot / the horror + siege spawners already handle a null spawn;
+    // events keep their banners and rewards, they are just smaller (K.sourceCaps). Wave zombies are limited per burst AND alive, ambient groups alive.
     wrap(g.creatures, 'hostSpawn', (orig) => function (type, pos, opts) {
-      if (type === 'zombot' && opts?.data?.ambient && enabled() && S.st && host()) {
-        const lim = K.ambientZombieCap(run().quotaIndex | 0);
-        let n = 0; for (const c of this.host.values()) if (!c.dead && c.type === 'zombot' && c.data?.ambient) n++;
-        if (n >= lim) { S.stats.dropped++; return null; }
+      if (enabled() && S.st && host() && !S.bypassCaps) {
+        try { if (overCap(this, type, opts)) { S.stats.dropped++; return null; } } catch (e) { console.warn('[crdirector] cap', e); }
       }
-      return orig.call(this, type, pos, opts);
+      const c = orig.call(this, type, pos, opts);
+      if (c && S.st && isEventCreature(c)) S.evtT = S.now;
+      return c;
     });
     wrap(g, 'hostSpawnCreatureIndoor', (orig) => function (type) {
       if (!enabled() || !S.st || !host() || S.bypass) return orig.call(this, type);
@@ -209,11 +229,11 @@ export function installCrdirector(game) {
     return true;
   }
 
-  function onPhase(ph, crew, active, cap) {
+  function onPhase(ph, crew, active, cap, evt = false) {
     send({ k: 'ph', p: ph, n: S.st.cycle });
     try { mods?.emit?.('crdirector', { kind: 'phase', phase: ph, cycle: S.st.cycle }, game); } catch { /* mods optional */ }
     if (ph === 'build') S.newThisCycle = 0;
-    if (ph === 'peak') {
+    if (ph === 'peak' && !evt) {
       S.stats.peaks++;
       const type = pickNew(crew);
       if (type && active + K.costOf(type, CREATURES[type]) <= cap * 1.15) spawnNew(type, crew);
@@ -271,10 +291,16 @@ export function installCrdirector(game) {
     const act = K.activeThreat(list, crew);
     const stage = game.hostData.pressureStage | 0;
     if (stage > S.lastStage) { S.lastStage = stage; if (S.st.phase === 'calm' || S.st.phase === 'relax') { S.st.phase = 'calm'; S.st.len = S.st.t; } }   // a greedy haul calls the next wave early
-    const ph = K.step(S.st, step, c, () => S.rng.float(0, 1), { active: act.sum, cap, stress: stressed(crew) });
+    // an event (horde swarm, siege, raid wave) IS the peak: announce it as one, keep ambient spawns quiet meanwhile, relax when the last body is gone
+    let evtAlive = false;
+    for (const e of list) if (!e.dead && isEventCreature(e.c)) { evtAlive = true; break; }
+    if (evtAlive || S.now - S.evtT < 6) {
+      if (!S.evt) { S.evt = true; if (S.st.phase !== 'peak') { S.st.phase = 'peak'; S.st.t = 0; S.st.len = 240; S.st.overT = 0; onPhase('peak', crew, act.sum, cap, true); } }
+    } else if (S.evt) { S.evt = false; if (S.st.phase === 'peak') S.st.len = S.st.t; }
+    const ph = K.step(S.st, step, c, () => S.rng.float(0, 1), { active: act.sum, cap, stress: !S.evt && stressed(crew), evt: S.evt });
     if (ph) onPhase(ph, crew, act.sum, cap);
     K.expire(S.q, S.now);
-    release(act, crew);
+    if (!S.evt) release(act, crew);
     if (S.st.phase === 'relax') cull(crew);
     tracking(crew, list);
   }
@@ -503,6 +529,14 @@ export function installCrdirector(game) {
     /** may a spawner add `cost` threat points right now? (advisory: modules that spawn hostiles by themselves can ask) */
     ask(cost = 1) { return !enabled() || !S.st || K.mayRelease({ ...S.st, gapT: 0 }, ctxNow(), K.activeThreat(hostCreatures(), crewNow()).sum, cost); },
     cap() { return K.capOf(ctxNow()); },
+    /** lcmonsters / any scripted spawner: false = veto (the crew is already carrying more than 1.6 x the cap) */
+    canSpawn(type, pos) {
+      if (!enabled() || !S.st || !host()) return true;
+      const cost = K.costOf(type, CREATURES[type]) || 1;
+      return K.activeThreat(hostCreatures(), crewNow()).sum + cost <= K.capOf(ctxNow()) * 1.6;
+    },
+    /** siege.js: wave power / count ceilings for the current quota */
+    siegeCaps() { return enabled() && S.st ? K.siegeCaps(run().quotaIndex | 0) : null; },
     phase() { return S.st?.phase || null; },
     debug() { return { phase: S.st?.phase, t: S.st ? Math.round(S.st.t) : 0, len: S.st ? Math.round(S.st.len) : 0, cycle: S.st?.cycle, queue: S.q.map((e) => e.type || e.zone), stats: { ...S.stats }, cues: S.cues }; },
     dispose() {

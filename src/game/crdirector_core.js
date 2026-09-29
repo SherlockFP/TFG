@@ -51,8 +51,16 @@ export function bodyCap(o) {
 }
 /** Spam Bot packs are trimmed to this many bodies while the crew is still small (quota 0-1: 2, 2-3: 3, later: the vanilla 4) */
 export const packMax = (q) => (q >= 4 ? 4 : q >= 2 ? 3 : 2);
-/** loose ambient Zombie Accounts (horde.js) that may exist at once: 3 / 6 / vanilla */
-export const ambientZombieCap = (q) => (q >= 4 ? 99 : q >= 2 ? 6 : 3);
+/** loose ambient Zombie Accounts (horde.js) that may exist at once: 4 / 6 / vanilla */
+export const ambientZombieCap = (q) => (q >= 4 ? 99 : q >= 2 ? 6 : 4);
+/** concurrent bodies per SET-PIECE source by quota (quota 0-1 / 2-3 / 4-5 / 6+). Events stay events, just smaller (vanilla: swarm 40, shamblers 14, siege 40). */
+export function sourceCaps(q) {
+  const i = q >= 6 ? 3 : q >= 4 ? 2 : q >= 2 ? 1 : 0;
+  return { swarmAlive: [8, 14, 24, 40][i], swarmBurst: [4, 7, 12, 20][i], shambler: [4, 7, 14, 14][i], warden: [2, 4, 6, 6][i], siegeAlive: [12, 12, 20, 40][i] };
+}
+/** siege: wave power and wave count ceilings (siege starts at quota 2 at the earliest): 1.0 x 3 waves / 1.5 x 4 / vanilla */
+export const siegeCaps = (q) => (q >= 6 ? { power: 3.4, waves: 5 } : q >= 4 ? { power: 1.5, waves: 4 } : { power: 1.0, waves: 3 });
+export const SIEGE_TYPES = Object.freeze(['sg_swarmer', 'sg_runner', 'sg_brute']);
 /** bodies one queued spawn will add (estimate before it spawns) */
 export function bodiesEst(type, q) { return type === 'scuttler' ? packMax(q) : !type ? 2 : 1; }
 
@@ -61,11 +69,14 @@ const NEUTRAL = new Set(['kefaldayi', 'company', 'alien_npc', 'vy_specimen', 'ja
 /** hostile, non-boss, non-hazard creatures are budgeted; traps and bosses run their own show */
 export function isCounted(type, def) {
   if (!def || def.hazard || def.boss || NEUTRAL.has(type)) return false;
-  return (def.dmg || 0) > 0;
+  return (def.dmg || 0) > 0 || type in COST_OVERRIDE;
 }
+/** lcmonsters (game.lcm) creatures have power 0 and some deal no damage (the Witch curses): they cost what their rule is worth */
+export const COST_OVERRIDE = Object.freeze({ lm_hunter: 3, lm_keeper: 1.5, lm_lootmimic: 1.5, lm_masked: 1.5, lm_witch: 1.5 });
 /** threat points of one creature */
 export function costOf(type, def) {
   if (!isCounted(type, def)) return 0;
+  if (COST_OVERRIDE[type]) return COST_OVERRIDE[type];
   if (def.power > 0) return def.power;
   return def.minion ? 0.3 : 1;   // squad / raid / mirror spawns carry power 0: count them as one small hostile
 }
@@ -110,7 +121,7 @@ export function newState(o, rnd) {
  */
 export function step(s, dt, o, rnd, info = {}) {
   s.t += dt; s.gapT = Math.max(0, s.gapT - dt);
-  if (s.phase === 'peak') {
+  if (s.phase === 'peak' && !info.evt) {
     s.overT = info.cap > 0 && info.active > info.cap * TUNE.peakOverrun ? s.overT + dt : 0;
     if (info.stress || s.overT > TUNE.peakOverrunS) s.len = Math.min(s.len, s.t);
   }
