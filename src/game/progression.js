@@ -74,8 +74,11 @@ export const BALANCE = {
   levelPerTier: 0.6,          // creature level per moon tier above 1
   levelPerQuota: 0.25,        // creature level per met quota
   levelCap: 20,               // creature base-level ceiling (normal creatures + bosses)
+  lootCountMul: 0.7,          // wave 3: indoor scrap count x0.7 (owner: "too much loot"); the early-game bonus below is added AFTER, so it stays
 };
 export function scrapValueMul(q) { return 1 + BALANCE.valuePerQuota * Math.max(0, q | 0); }
+/** Indoor scrap count for a moon range [lo, hi] rolled as `base`: base x lootCountMul + the early-game bonus (docs/wave3/worlds2.md). */
+export function scrapCountFor(base, q) { return Math.round(base * BALANCE.lootCountMul + scrapCountBonus(q)); }
 export function scrapCountBonus(q) { const n = Math.max(0, q | 0); return BALANCE.countPerQuota * n + (n === 0 ? 3 : n === 1 ? 2 : 0); }   // early-game: a few extra finds so the first days feel rewarding
 export function indoorPowerMul(q) { return 1 + BALANCE.indoorPowerPerQuota * Math.max(0, q | 0); }
 export function outdoorPowerMul(q) { return 1 + BALANCE.outdoorPowerPerQuota * Math.max(0, q | 0); }

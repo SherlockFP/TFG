@@ -256,7 +256,7 @@ export function installCombatWeapons(g, K) {
     if (def.spread) dir.add(tmp.set((Math.random() - 0.5) * def.spread, (Math.random() - 0.5) * def.spread, (Math.random() - 0.5) * def.spread)).normalize();
     const wall = g.physics.raycast(eye, dir, def.reach, G.STATIC | G.DOOR), maxD = wall ? wall.distance : def.reach;
     const r = g.creatures.raycast(eye, dir, maxD), end = eye.clone().addScaledVector(dir, r ? r.t : maxD);
-    K.fx('tr', { a: arr3(muzzleOf(fwd)), b: arr3(end), w: !r && wall ? 1 : 0, s: def.auto ? 1 : 0 });
+    K.fx('tr', { a: arr3(muzzleOf(fwd)), b: arr3(end), w: !r && wall ? 1 : 0, s: def.auto ? 1 : 0, c: def.tracer });
     if (r) {
       const crit = Math.random() < (g.stats.crit || 0);
       g.net.request('cbshot', { id: it.id, cid: r.view.id, crit, mul: +rangedMul().toFixed(2) });
@@ -268,7 +268,7 @@ export function installCombatWeapons(g, K) {
   K.onFx('tr', (d) => {
     const a = fin3(d.a), b = fin3(d.b);
     if (!a || !b) return;
-    K.beam(a, b, 0xffe8a0, 0.07, d.s ? 0.008 : 0.014);
+    K.beam(a, b, Number.isFinite(d.c) ? d.c : 0xffe8a0, 0.07, d.s ? 0.008 : 0.014);   // wave 3: def.tracer colours (blaster = red)
     if (d.w) K.burst(b, 'sparks', null, 0.5);
   });
   K.on('useItem', (it, hk, gg) => {

@@ -158,7 +158,7 @@ import { installPets } from './pets.js';
 import { installCycle } from './cycle.js';   // [cycle] inert: rules only, see docs/wave2/cycle.md
 
 
-// [import:worlds2]
+import { installWorlds2 } from './worlds2.js';   // wave 3: Soviet raids + twin-sun planet + plasma blade + fauna + loot pacing (docs/wave3/worlds2.md)
 
 
 // [import:ux]
@@ -325,7 +325,7 @@ export class Game extends Emitter {
     this.useModule('cycle', installCycle);   // [cycle]
 
 
-    // [slot:worlds2]
+    this.useModule('worlds2', installWorlds2);   // [worlds2]
 
 
     // [slot:ux]

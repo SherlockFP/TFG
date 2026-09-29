@@ -116,5 +116,13 @@ Found and fixed by numbers (node, real LocalPlayer + Rapier): the walking "hitch
 (shovel / rod / sledge behind the camera, 25 of 101 item models inside the forearm). Chat bubbles, first-person legs, two-hand arm IK and the view-model-over-world depth pass are written but **never seen in a real renderer** (headless run cancelled):
 check bubble size / font, leg look when crouching, elbow direction of the IK arms, outlines on the view model, and that the ship mirror does not show the first-person body. PSX vertex snap still shimmers while walking (setting `vertexJitter`).
 
+## Wave 3 - WORLDS2 (Soviet raids, twin-sun planet, plasma blade, fauna, loot pacing) - node-tested only
+- Everything is box geometry with flat PSX shading: the Soviet blocks should read as prefab panel buildings from 30 m (tint jitter + windows), but proportions / stair readability / billboard text orientation are unverified by eye.
+  The twin-sun "second sun" is a sprite and fake shadow quads; no light is added, so the second sun does not light or shadow anything for real.
+- Loot -28 % and decay / lockdown are numbers on paper: median 4-competent run ends one quota earlier in the sim, but nobody has felt it. Watch for "the last hour is punishing" (decay + lockdown + late spawns stack after 19:00) and for crews that
+  simply skip the facility. The days-in-run factor is deliberately small (+3.5 % spawns per day after day 3): raise `DAYS` in `worlds2_core.js` if runs still feel flat.
+- Raids reuse the wave-1 hit-squad AI (straight-line outdoors, no cover): they will feel like a clump walking at you. Cover-aware outdoor movement would make raids much better. Cantina NPCs only talk; no trading / quests yet.
+- The Dune Maw can be hit while buried (only the radar hides it); the Tusked Beast charge has no dodge-window tuning beyond the 0.8 s paw telegraph.
+
 ## Food & drinks (wave 2, module `food`)
 Added optional buffs + social fun (cheers, cake, table, booze). Unverified in a browser: first-person eat arcs, blur overlay, table / machine placement. Booze courage only touches STATIC; no chat bubbles exist to slur yet.

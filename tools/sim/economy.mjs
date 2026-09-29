@@ -84,7 +84,7 @@ const theme = (m) => (THEMES.includes(m.interior) ? m.interior : 'factory');
 function dayValue(m, q, ev, weather) {
   const vm = m.scrapMul * scrapValueMul(q) * (WEATHER_BONUS[weather] || 1) * (ev.valueMul || 1);
   const spotsCap = Math.round(10 + (m.size || 1) * 22);
-  const n = Math.min(spotsCap, (m.scrapCount[0] + m.scrapCount[1]) / 2 + scrapCountBonus(q));
+  const n = Math.min(spotsCap, (m.scrapCount[0] + m.scrapCount[1]) / 2 * BALANCE.lootCountMul + scrapCountBonus(q));   // wave 3: x0.7 count, early bonus kept
   const t = theme(m);
   let v = n * SCRAP_AVG[t] * vm * DEPTH_AVG;
   const bigN = (1 + 2 + Math.floor(m.tier / 2)) / 2;

@@ -1062,6 +1062,8 @@ export function createViewModel({ suitColor = '#d9642b' } = {}) {
     root,
     handR: R.hand,
     handL: L.hand,
+    /** swing trail colour (THREE.Color, mutated in place: plasma blade tier colours, game/worlds2_weapons.js) */
+    trailColor,
     update,
     /** Melee hit feedback: kind 'flesh' | 'metal' | 'wall', strength ~1. */
     impact(kind = 'flesh', strength = 1) { impactKind = kind; impactAmt = clamp(strength, 0.3, 1.6); impactT = 1; },

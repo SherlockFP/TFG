@@ -6,7 +6,7 @@ import { MOONS, MOON_ORDER } from './moons.js';
 import { ITEMS, itemDef, SCRAP_TABLE, BIG_TABLE, isSellable, scrapTableFor, bigTableFor } from './items.js';
 import { CREATURES } from './creatures.js';
 import { spawnTable, canSpawnMore } from './creatures.js';
-import { nextQuota, buyRate, scrapValueMul, scrapCountBonus, indoorPowerMul, outdoorPowerMul, creatureBaseLevel } from './progression.js';
+import { nextQuota, buyRate, scrapValueMul, scrapCountFor, indoorPowerMul, outdoorPowerMul, creatureBaseLevel, BALANCE } from './progression.js';
 import { insideShip, inDoorway, SHIP } from '../world/ship.js';
 import { saveRun } from '../core/save.js';
 import { lobbyCode } from '../core/rng.js';
@@ -515,7 +515,7 @@ export const hostMethods = {
     const afRng = new RNG((run.seed ^ 0xaff1c5) >>> 0);   // own stream: weapon affixes don't shift the world rolls
     const lootLvl = lootLevelFor(danger);
     // scrap inside
-    const count = Math.round(rng.int(moon.scrapCount[0], moon.scrapCount[1]) + scrapCountBonus(run.quotaIndex));
+    const count = scrapCountFor(rng.int(moon.scrapCount[0], moon.scrapCount[1]), run.quotaIndex);   // wave 3: -30 % (BALANCE.lootCountMul), early-game bonus kept
     const spots = rng.shuffle(fac.scrapSpots.slice());
     spots.sort((a, b) => (b.item ? 1 : 0) - (a.item ? 1 : 0));   // set-piece spots that ask for an item (skull at blood trails) first
     for (let i = 0; i < Math.min(count, spots.length); i++) {
@@ -528,7 +528,7 @@ export const hostMethods = {
       void iid;
     }
     // big physics valuables
-    const bigN = Math.min(fac.bigSpots.length, rng.int(1, 2 + Math.floor(moon.tier / 2)));
+    const bigN = Math.min(fac.bigSpots.length, Math.max(1, Math.round(rng.int(1, 2 + Math.floor(moon.tier / 2)) * BALANCE.lootCountMul)));   // wave 3: -30 %
     const bigSpots = rng.shuffle(fac.bigSpots.slice());
     const bigW = bigTableFor(fac.layout?.theme || moon.interior).map(([id, w]) => ({ id, w }));
     for (let i = 0; i < bigN; i++) this.items.hostSpawn(rng.weighted(bigW).id, new THREE.Vector3(bigSpots[i].x, bigSpots[i].y + 1, bigSpots[i].z), { valueMul });
@@ -541,7 +541,7 @@ export const hostMethods = {
     }
     // vault loot
     for (const s of fac.vaultSpots) {
-      if (!rng.chance(0.8)) continue;
+      if (!rng.chance(0.8 * BALANCE.lootCountMul)) continue;   // wave 3: fewer vault drops
       const t = rng.pick(['goldbar', 'ring', 'figurine', 'goldbar', 'perfume', 'trophy', 'register']);
       this.items.hostSpawn(t, new THREE.Vector3(s.x, s.y + 0.5, s.z), { valueMul: valueMul * 1.4 });
     }
@@ -550,7 +550,7 @@ export const hostMethods = {
     // keys
     for (let k = 0; k < 2; k++) { const s = rng.pick(fac.scrapSpots); if (s) this.items.hostSpawn('key', new THREE.Vector3(s.x, s.y + 0.4, s.z)); }
     // outdoor scrap
-    for (const s of (out?.outdoorScrapSpots || []).slice(0, 3)) this.items.hostSpawn(rng.weighted(tableW).id, new THREE.Vector3(s.x, s.y + 0.6, s.z), { valueMul: valueMul * 0.8 * (event.outdoorMul || 1) });
+    for (const s of (out?.outdoorScrapSpots || []).slice(0, 2)) this.items.hostSpawn(rng.weighted(tableW).id, new THREE.Vector3(s.x, s.y + 0.6, s.z), { valueMul: valueMul * 0.8 * (event.outdoorMul || 1) });   // wave 3: 3 -> 2
 
     // outposts: scrap at the outdoor points of interest (value scaled by moon.scrapMul via valueMul) + crate handlers
     if (out?.outposts) hostPopulateOutposts(this, out.outposts, { table: tableW, valueMul });

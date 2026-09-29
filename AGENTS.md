@@ -393,6 +393,13 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
 `docs/REVIEW_WAVE1.md` reviewer report for the wave-1 merge (scores, dead stats, HUD collisions, top-10 fixes; run `tools/harness/wave1_day.js` first, it was written but not executed) ·
 `docs/wave1/*.md` per-module notes · `docs/wave2/*.md` wave-2 modules (anomaly, forge, skeletons).
 
+### 5.15 Wave 3 - WORLDS2 (module `worlds2`, docs/wave3/worlds2.md; node-tested + builds, NOT browser-verified)
+- Soviet panel-block moon `w2sov` (enterable khrushchyovka blocks with stairwells, playgrounds, statues, propaganda billboards, snow/fog) with **RAIDS** (horde hit squads every ~250 s, shrinking with days),
+  twin-sun desert `w2sun` (dunes, moisture harvesters, cantina outpost with neutral alien NPCs, sand crawler wreck, Dune Maw / Tusked Beast / Scavenger Raider / Dusk Prowler), **Plasma Blade** (saber class, tier colours, deflects
+  blaster bolts) + Blaster Pistol, visible planet fauna on every outdoor moon (instanced herds + flyers, radar dots), **loot -28 %** (early bonus kept), **facility decay** (x0.92 at 14:00 / 16:30 / 19:00 / 21:30 + lockdown pulses)
+  and **days-in-run difficulty** (x1.0 until day 4, then +3.5 % spawn / +1.5 % hp / +1 % dmg per day). Shared edits are tiny (moongen, terrain `reserved` + `dunes`, host / progression loot count, combat tracer colour, avatar `trailColor`).
+- Tests: `node tools/harness/worlds2.test.mjs` (25) + `worlds2_decor.test.mjs` (10). First job next: land on both moons in a browser (block proportions, sun discs, blade grip / glow, creature animation).
+
 ### 5.14 Session handoff (2026-09-28 night, lead) — READ THIS FIRST
 - Branch `claude/focused-hawking-32j4um` (pushed) holds everything merged; **`main` (live on Render) was NOT updated** —
   playtest the branch first, then merge to main.

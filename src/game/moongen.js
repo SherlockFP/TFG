@@ -19,6 +19,7 @@ import { RNG, hashString } from '../core/rng.js';
 import { getLang } from '../core/i18n.js';
 import { CREATURES } from './creatures.js';
 import '../world/biomes_wave1_data.js';   // registers lava / ice / jungle into BIOMES (data only) so every peer rolls the same sectors
+import '../world/worlds2_data.js';   // wave 3: soviet / twinsun biomes + the two fixed moons (own RNG stream below, older rolls stay identical)
 
 export const GEN_PREFIX = 'gen';
 const GEN_RE = /^gen(\d+)_(\d+)$/;
@@ -36,9 +37,12 @@ const BIOME_INTERIOR_BONUS = {
   crystal: { mineshaft: 12, backrooms: 5 }, snow: { mansion: 6, hospital: 6 }, desert: { mineshaft: 10, office: 3 },
   moor: { mansion: 9, hospital: 6 }, blackforest: { mansion: 6, backrooms: 6 }, swamp: { sewer: 9, factory: 3 }, hills: { office: 7, factory: 4 },
   lava: { factory: 9, serverfarm: 9, mineshaft: 5 }, ice: { hospital: 9, backrooms: 6, mansion: 5 }, jungle: { sewer: 8, mansion: 8, mineshaft: 4 },
+  soviet: { office: 12, hospital: 8, factory: 6 }, twinsun: { mineshaft: 12, factory: 5, sewer: 4 },
 };
 // wave 1 (worldx): planets that only show up in deeper sectors (defined in world/biomes_wave1.js, registered into BIOMES on import)
 const WAVE1_BIOMES = ['ice', 'jungle', 'lava'];
+// wave 3 (worlds2): Soviet panel district (raids) + twin-sun desert; deeper sectors only, third RNG stream
+const WORLDS2_BIOMES = ['soviet', 'twinsun'];
 // set by the world layer (terrain.js) once facility.js is loaded: (themeId) => true | false | null(unknown)
 let interiorProbe = null;
 export function setInteriorProbe(fn) { interiorProbe = typeof fn === 'function' ? fn : null; }
@@ -67,6 +71,7 @@ const BIOME_ADJ = {
   moor: ['Stormy', 'Haunted', 'Grim'], blackforest: ['Dark', 'Eclipsed', 'Blackout'], hills: ['Retro', 'Sunny', 'Early'],
   lava: ['Molten', 'Overclocked', 'Thermal', 'Meltdown', 'Throttled'], ice: ['Frozen', 'Permafrost', 'Cold-Storage', 'Glacial', 'Archived'],
   jungle: ['Overgrown', 'Link-Rot', 'Tangled', 'Humid', 'Rainforest'],
+  soviet: ['Brutalist', 'Frozen', 'Panel', 'Propaganda', 'Grey'], twinsun: ['Binary', 'Twin-Sun', 'Sunbaked', 'Dusty', 'Dune'],
 };
 const CODES = ['8080', '1337', '443', '503', '418', '0x7F', '2600', '9001', '127', '2038', '1999', '451', '101', '0xFF', '777', '3DS', 'IPv6'];
 const SECTOR_NAMES = ['Deadnet Reach', 'The Lost Tabs', 'Broken Link Belt', 'Cache Drift', 'Legacy Expanse', 'The Unindexed', 'Null Route',
@@ -87,6 +92,8 @@ const BIOME_DESC = {
   lava: ['A thermal-throttled basin: rivers of molten silicon. Do not fall in.', 'Everything overclocked at once. The ground glows, the rivers kill.'],
   ice: ['Permafrost cold storage: frozen lakes, blizzard gusts, everything preserved.', 'A whiteout of archived data. The lakes are slippery.'],
   jungle: ['Link rot everywhere: giant plants strangle the old web. Humid, dense, loud.', 'A tangled rainforest of dead links and hanging vines.'],
+  soviet: ['A grey district of brutalist panel blocks in the snow. Enter the stairwells; squads raid you.', 'Khrushchyovka ruins, rusted playgrounds, propaganda billboards. The fog never lifts.'],
+  twinsun: ['A desert under two suns: moisture towers, a cantina outpost, things that burrow.', 'Binary dunes. Heat shimmer, twin shadows, hooded scavengers.'],
 };
 const INTERIOR_DESC = {
   factory: 'Inside: a cramped data center.', mansion: 'Inside: a haunted personal homepage.', mineshaft: 'Inside: a crypto mine dug deep under the surface.',
@@ -126,6 +133,7 @@ const WEATHER_POOL = {
   hills: ['clear', 'clear', 'rainy', 'foggy'], swamp: ['rainy', 'rainy', 'foggy', 'clear', 'stormy'], snow: ['clear', 'foggy', 'stormy', 'eclipsed'],
   desert: ['clear', 'clear', 'foggy', 'eclipsed'], moor: ['stormy', 'rainy', 'foggy', 'eclipsed'], blackforest: ['eclipsed', 'foggy', 'stormy'],
   lava: ['clear', 'clear', 'foggy', 'stormy', 'eclipsed'], ice: ['foggy', 'stormy', 'clear', 'foggy'], jungle: ['rainy', 'rainy', 'foggy', 'clear', 'stormy'],
+  soviet: ['foggy', 'foggy', 'stormy', 'clear', 'eclipsed'], twinsun: ['clear', 'clear', 'clear', 'foggy', 'eclipsed'],
 };
 // indoor creature weights: [tier 1, tier 6] (lerped by tier); hazards handled separately
 const INDOOR = { scuttler: [30, 10], yoinker: [22, 8], crawler: [10, 16], lurker: [5, 16], mannequin: [4, 16], sludge: [8, 10], spider: [10, 16],
@@ -174,6 +182,12 @@ export function generateSector(runKey, index) {
       avail.splice(avail.indexOf(id), 1);
       if (biomes.includes(id)) continue;
       biomes[W.int(id === 'lava' ? 1 : 0, biomes.length - 1)] = id;   // lava never as the soft first server
+    }
+    // wave 3 (worlds2): deeper sectors may swap one slot for the Soviet district / twin-sun desert (own RNG stream, never the soft first server)
+    const W3 = new RNG(hashString('w2:' + key));
+    if (index >= 2 && W3.chance(Math.min(0.8, 0.25 + index * 0.12)) && biomes.length > 1) {
+      const id = W3.pick(WORLDS2_BIOMES.filter((b) => BIOMES[b] && (b !== 'soviet' || index >= 2)));
+      if (id && !biomes.includes(id)) biomes[W3.int(1, biomes.length - 1)] = id;
     }
   }
   const base = 1 + Math.floor(index / 2);
@@ -251,14 +265,17 @@ function generateMoon({ runKey, index, k, biome, tier, usedNames, safe, deep }) 
   const outdoor = { hound: 5 + tier * 2, mimic: 2 + tier };
   if (tier >= 2) outdoor.giant = Math.round(2 + tier * 1.5);
   if (DRY.has(biome)) outdoor.sandkefal = 3 + tier;
+  if (biome === 'twinsun') Object.assign(outdoor, { dunemaw: 5 + tier * 2, tuskbeast: 6 + tier, scavraider: 4 + tier * 2 });   // wave 3: planet creatures (game/worlds2_creatures.js)
   // ponds: flooded / burnt maps have none, datascape gets glowing data pools sometimes
-  const ponds = B.flood != null || biome === 'ashfield' || biome === 'lava' || biome === 'ice' ? 0 : biome === 'crystal' ? 1 : biome === 'datascape' ? R.int(0, 1) : undefined;
+  const ponds = B.flood != null || biome === 'ashfield' || biome === 'lava' || biome === 'ice' || biome === 'twinsun' || biome === 'soviet' ? 0 : biome === 'crystal' ? 1 : biome === 'datascape' ? R.int(0, 1) : undefined;
   const def = {
     id: `${GEN_PREFIX}${index}_${k}`, name, short, tier, cost, biome, interior, size, generated: true, sector: index, slot: k,
     weather, scrapCount, scrapMul, power, outdoorPower, creatures, outdoor, mods: [],
     mapScale: mapScaleFor(size, index),
   };
   if (ponds !== undefined) def.ponds = ponds;
+  if (biome === 'soviet') def.raid = { first: 190, every: 270, n: 3, factions: ['bureau', 'algorithm', 'archive', 'darkweb'] };   // wave 3: raid director (game/worlds2.js)
+  if (biome === 'twinsun') def.cantina = true;
   if (interior !== wanted) def.wantedInterior = wanted;
   // modifiers
   const M = R.fork('mods');

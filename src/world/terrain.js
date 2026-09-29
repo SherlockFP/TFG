@@ -11,6 +11,7 @@ import { buildOutposts } from './outposts.js';
 import { buildBiomeDecor } from './outdoor_biomes.js';
 import { planLandmarks, buildLandmarks } from './landmarks.js';
 import './biomes_wave1.js';   // registers the lava / ice / jungle biomes (BIOMES + decor builders)
+import './worlds2_biomes.js';   // wave 3: registers the Soviet panel district + twin-sun desert (BIOMES, fixed moons, decor builders)
 import * as FACILITY from './facility.js';
 import { setInteriorProbe } from '../game/moongen.js';
 
@@ -207,6 +208,8 @@ export class Terrain {
     h += this.noise2.fbm(x * 0.08, z * 0.08, 2) * 0.8;
     // blocky "voxel" terraces (corrupted datascape)
     if (b.terrace) { const q = Math.round(h / b.terrace) * b.terrace; h += (q - h) * 0.82; }
+    // wave 3 (worlds2) crescent dunes: long wind-blown ridges (twin-sun desert)
+    if (b.dunes) { const w = Math.sin((x * 0.93 + z * 0.37) * 0.042 + n.fbm(x * 0.01 + 3, z * 0.01 - 5, 2) * 5); h = h * 0.4 + Math.pow(1 - Math.abs(w), 1.7) * b.dunes; }
     // flooded biomes: valleys bottom out just below the water sheet (wade-deep, never swim-deep)
     if (b.flood != null) h = Math.max(h, b.flood - 0.85);
     // border mountains
@@ -469,7 +472,8 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
   };
   // wave 1 landmarks (towers, ruins, parkour, billboards) reserve their footprint before trees / rocks / outposts are placed
   try { landmarkSites = planLandmarks({ seed, moon, plan, terrain, avoid: avoidBase }); } catch (err) { console.warn('landmark plan', err); landmarkSites = []; }
-  const avoid = (x, z, m = 0) => avoidBase(x, z, m) || landmarkSites.some((st) => siteBlocks(st, x, z, m));
+  const reserved = [];   // wave 3 (worlds2): footprints reserved by biome decor (Soviet blocks, cantina outpost) so props / outposts keep off them
+  const avoid = (x, z, m = 0) => avoidBase(x, z, m) || landmarkSites.some((st) => siteBlocks(st, x, z, m)) || reserved.some((st) => siteBlocks(st, x, z, m));
   const treeId = b.trees;
   const trees = [];
   if (treeId) {
@@ -526,7 +530,7 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
   let decor = null;
   if (b.decor) {
     try {
-      decor = buildBiomeDecor({ seed, moon, biome: b, terrain, plan, group, addBox, avoid, emitters, sc });
+      decor = buildBiomeDecor({ seed, moon, biome: b, terrain, plan, group, addBox, avoid, emitters, sc, reserve: (x, z, radius) => reserved.push({ x, z, radius }) });
     } catch (err) { console.warn('biome decor', err); decor = null; }
   }
 

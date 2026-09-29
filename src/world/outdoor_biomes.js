@@ -29,7 +29,7 @@ export function buildBiomeDecor(ctx) {
     R: new RNG(((ctx.seed | 0) ^ 0xb10e5 ^ (kind.length * 7919)) >>> 0),
     lim: 120 * (ctx.sc || 1),
     geos: [], mats: [], texs: [], objs: [], updaters: [], scrapSpots: [],
-    t: 0,
+    t: 0, info: {},   // info: free-form data a builder exposes (outdoor.decor.info, wave 3 worlds2)
   };
   C.h = (x, z) => ctx.terrain.heightAt(x, z);
   C.own = (o) => { if (o.geometry) C.geos.push(o.geometry); return o; };
@@ -54,6 +54,7 @@ export function buildBiomeDecor(ctx) {
   return {
     kind,
     scrapSpots: C.scrapSpots,
+    info: C.info,
     update(dt, game) {
       C.t += dt;
       for (const u of C.updaters) u(dt, C.t, game);
