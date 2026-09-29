@@ -13,3 +13,5 @@ Wired with `this.useModule('pets', installPets)` in game.js. Persisted in `profi
 Host-simulated behaviour and net sync: fetch (walk to small scrap, carry to owner/ship), attack (aim key), guard, role abilities (cat sense marks, fox nest theft, bear tank via `hostHurtPlayer` wrap, bee DoT, owl night vision, parrot decoy, crow tier luck, bot shield/recharge), 'pt*' net types + late join, physical incubator prop + HQ shop kiosk, chest/boss egg drops, pet achievements. Suggested design: host map ownerId -> pet record, owner sends `{op:'sync'}`/`{op:'cmd'}` through one request handler `pt`, host broadcasts `ptinfo` (appearance) + `ptst` rows; carried items use holder `c:pt<owner>`.
 
 **UPDATE (wave 3 [finish]):** the NOT-done list above (host-simulated fetch / attack / guard, role abilities, `pt*` net sync, Pet Carrier + treat handlers, incubator prop) is implemented: see docs/wave3/finish.md.
+
+**UPDATE (wave 4 polish4, docs/wave4/polish4.md):** chest / boss / elite egg drops (seeded, day cap, pity) and the redesigned STABLE tab (portraits, turntable, XP bar, Summon / Feed) are done. Still missing: pet achievements.

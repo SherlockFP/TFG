@@ -100,6 +100,19 @@ export function installPets(game) {
       if (res.length) { save(); rebuildView(); }
       return res;
     },
+    /** Pet Treats the local player carries (PET panel FEED button) */
+    treats() { let n = 0; for (const it of game.items?.all?.() || []) if (it.holder === game.selfId && it.type === 'pet_treat') n++; return n; },
+    /** feed one carried Pet Treat to a stable pet (loyalty) - same effect as using the treat on the active pet */
+    feed(id) {
+      const pet = C.findPet(state(), id);
+      if (!pet) return { ok: false, err: 'Empty' };
+      const it = (game.items?.all?.() || []).find((i) => i.holder === game.selfId && i.type === 'pet_treat');
+      if (!it) return { ok: false, err: 'You need a Pet Treat.' };
+      C.addLoyalty(pet, 'treat'); save();
+      try { game.net.request('consume', { id: it.id }); } catch { /* ignore */ }
+      say(`${pet.nm} ♥`, 'good');
+      return { ok: true };
+    },
     /** dev / tests: give XP (raw) to the active pet, returns { from, to, evolved } */
     giveXp(n, id = null) {
       const s = state(), pet = id ? C.findPet(s, id) : C.activePet(s);

@@ -49,7 +49,7 @@ const SOUNDS = {
 
 const CSS = `.rs{display:flex;gap:8px;font-family:var(--font,monospace);pointer-events:none}
 .rs-c{position:relative;width:74px;height:40px;border:1px solid var(--rc);background:rgba(6,10,22,.78);color:var(--rc);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 8px rgba(0,0,0,.6)}
-.rs-c b{font-size:12px;letter-spacing:1px;color:#fff;text-shadow:0 0 4px #000}.rs-c span{font-size:14px;line-height:1}
+.rs-c b{font-size:12px;letter-spacing:1px;color:#fff;text-shadow:0 0 4px #000}.rs-c span{position:relative;z-index:1;font-size:15px;line-height:1;color:#fff;text-shadow:0 0 4px #000,0 0 2px #000;font-variant-numeric:tabular-nums}
 .rs-c i{position:absolute;inset:0;background:conic-gradient(rgba(0,0,0,.72) var(--cd,0%),transparent 0)}
 .rs-c u{position:absolute;left:2px;top:-1px;font-size:14px;text-decoration:none;color:#fff}
 .rs-c.rdy{animation:rsr .5s ease-out}@keyframes rsr{0%{box-shadow:0 0 16px var(--rc)}100%{box-shadow:inset 0 0 8px rgba(0,0,0,.6)}}`;
@@ -61,7 +61,10 @@ export function installRoleSkills(g, K) {
   const api = { debugRole: null, cds: new Map() };
   const roleId = () => api.debugRole || g.rpg?.role?.() || null;
   const skillsOf = () => ROLE_SKILLS[roleId()] || null;
-  const cdOf = (sk) => sk.cd * (1 - clamp(bonus('cooldown'), 0, 0.5));
+  // owner rule: abilities 5 min, revive 10 min; no role / tree bonus may bring them below 3 min / 7 min
+  const CD_FLOOR = { revive: 420 }, CD_FLOOR_DEFAULT = 180;
+  const cdOf = (sk) => Math.max(Math.min(sk.cd, CD_FLOOR[sk.id] || CD_FLOOR_DEFAULT), sk.cd * (1 - clamp(bonus('cooldown'), 0, 0.5)));
+  const mmss = (sec) => { const s = Math.max(0, Math.ceil(sec)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
   const S = { dashT: 0, dashDir: new THREE.Vector3(), dashSp: 26, dashHits: null, liftT: 0, ocT: 0, sonarT: 0, link: null };
   const flat = () => { const f = new THREE.Vector3(-Math.sin(g.player.yaw), 0, -Math.cos(g.player.yaw)); return f; };
   const meleeMul = () => clamp(g.stats.meleeMul || 1, 0.5, 2.5), rangedMul = () => clamp(g.stats.rangedMul || 1, 0.5, 2.5);
@@ -96,7 +99,7 @@ export function installRoleSkills(g, K) {
     const p = g.player;
     if (!sk || p.dead || !g.run) return false;
     const left = (api.cds.get(sk.id) || 0) - g.time;
-    if (left > 0) { g.ui?.toast?.(`${t(sk.name)}: ${left.toFixed(1)}s`, 'info'); return false; }
+    if (left > 0) { g.ui?.toast?.(`${t(sk.name)}: ${mmss(left)}`, 'info'); return false; }
     const ok = SKILL_FN[sk.id]?.();
     if (ok === false) return false;
     api.cds.set(sk.id, g.time + cdOf(sk));
@@ -117,7 +120,7 @@ export function installRoleSkills(g, K) {
         const s = sk?.[i]; if (!s) return;
         const left = Math.max(0, (api.cds.get(s.id) || 0) - g.time), f = left > 0 ? clamp(left / cdOf(s), 0, 1) : 0;
         c.cd.style.setProperty('--cd', (f * 100).toFixed(1) + '%');
-        c.sp.textContent = left > 0 ? left.toFixed(0) : '';
+        c.sp.textContent = left > 0 ? mmss(left) : '';
         const rdy = left <= 0;
         if (rdy && !c.ready) { c.e.classList.remove('rdy'); void c.e.offsetWidth; c.e.classList.add('rdy'); }
         c.ready = rdy;

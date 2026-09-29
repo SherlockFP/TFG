@@ -16,15 +16,15 @@ import { addTranslations } from '../core/i18n.js';
 import { clamp, fin3, arr3, synth, sin, ex, nz } from './combat_kit.js';
 
 const NEW_SPELLS = [
-  { id: 'zap', name: 'Chain Lightning', say: { en: 'ZAP', tr: 'ŞİMŞEK' }, words: { en: ['zap', 'zaps'], tr: ['şimşek', 'simsek', 'zap'] }, mana: 30, cd: 9, tier: 'rare', color: 0xb8e8ff,
+  { id: 'zap', name: 'Chain Lightning', say: { en: 'ZAP', tr: 'ŞİMŞEK', ru: 'МОЛНИЯ' }, words: { en: ['zap', 'zaps'], tr: ['şimşek', 'simsek', 'zap'], ru: ['молния', 'молнии', 'разряд'] }, mana: 30, cd: 9, tier: 'rare', color: 0xb8e8ff,
     desc: 'A bolt that arcs from the first enemy you aim at through up to 4 more (26 damage, -20% per jump).' },
-  { id: 'frost', name: 'Frost Nova', say: { en: 'FROST', tr: 'BUZ' }, words: { en: ['frost', 'frozen'], tr: ['buz', 'buzz'] }, mana: 35, cd: 16, tier: 'epic', color: 0x9fe8ff,
+  { id: 'frost', name: 'Frost Nova', say: { en: 'FROST', tr: 'BUZ', ru: 'ХОЛОД' }, words: { en: ['frost', 'frozen'], tr: ['buz', 'buzz'], ru: ['холод', 'мороз', 'лёд', 'лед'] }, mana: 35, cd: 16, tier: 'epic', color: 0x9fe8ff,
     desc: 'A ring of ice around you: everything within 7 m is slowed by 65% for 5 s.' },
-  { id: 'meteor', name: 'Meteor', say: { en: 'METEOR', tr: 'METEOR' }, words: { en: ['meteor', 'meteors', 'meteorite'], tr: ['meteor', 'göktaşı', 'goktasi'] }, mana: 60, cd: 40, tier: 'legendary', color: 0xff5a1a,
+  { id: 'meteor', name: 'Meteor', say: { en: 'METEOR', tr: 'METEOR', ru: 'МЕТЕОР' }, words: { en: ['meteor', 'meteors', 'meteorite'], tr: ['meteor', 'göktaşı', 'goktasi'], ru: ['метеор', 'метеорит'] }, mana: 60, cd: 40, tier: 'legendary', color: 0xff5a1a,
     desc: 'Marks the spot you look at: 1.7 s later a meteor lands (6.5 m blast, 90 damage). Very loud.' },
-  { id: 'decoy', name: 'Decoy', say: { en: 'DECOY', tr: 'KOPYA' }, words: { en: ['decoy', 'decoys'], tr: ['kopya', 'kopyala'] }, mana: 30, cd: 30, tier: 'rare', color: 0x7dffe0,
+  { id: 'decoy', name: 'Decoy', say: { en: 'DECOY', tr: 'KOPYA', ru: 'ДВОЙНИК' }, words: { en: ['decoy', 'decoys'], tr: ['kopya', 'kopyala'], ru: ['двойник', 'приманка', 'копия'] }, mana: 30, cd: 30, tier: 'rare', color: 0x7dffe0,
     desc: 'A fake you appears for 10 s and draws the attention of nearby creatures.' },
-  { id: 'totem', name: 'Totem', say: { en: 'TOTEM', tr: 'TOTEM' }, words: { en: ['totem', 'totems'], tr: ['totem'] }, mana: 25, cd: 5, tier: 'rare', color: 0xffd27a,
+  { id: 'totem', name: 'Totem', say: { en: 'TOTEM', tr: 'TOTEM', ru: 'ТОТЕМ' }, words: { en: ['totem', 'totems'], tr: ['totem'], ru: ['тотем'] }, mana: 25, cd: 5, tier: 'rare', color: 0xffd27a,
     desc: 'Plants a return point where you stand. Cast again (free) to teleport back to it.' },
 ];
 registerSpellData(NEW_SPELLS);

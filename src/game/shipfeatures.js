@@ -553,11 +553,11 @@ export function installShipFeatures(game) {
         if (d.t === game.selfId) game.engine?.flash?.(0x9fe8ff, 0.7);
         break;
       case 'deny':
-        if (d.msg) game.ui?.toast?.(String(d.msg).slice(0, 90), 'bad');
+        if (d.msg) game.ui?.toast?.(t(String(d.msg).slice(0, 90)), 'bad');
         game.sfx?.('ui_error', 0.35);
         break;
       case 'info':
-        if (d.msg) game.ui?.toast?.(String(d.msg).slice(0, 90), 'info');
+        if (d.msg) game.ui?.toast?.(t(String(d.msg).slice(0, 90)), 'info');
         break;
       default:
     }

@@ -165,6 +165,8 @@ import { installCycle3 } from './cycle3.js';   // wave 4: Glitch Gates (red / hi
 
 import { installWorlds2 } from './worlds2.js';   // wave 3: Soviet raids + twin-sun planet + plasma blade + fauna + loot pacing (docs/wave3/worlds2.md)
 
+import { installPolish4 } from './polish4.js';   // wave 4: pet egg drops, ship decals + furniture, cantina barter, maw / squad fixes (docs/wave4/polish4.md)
+
 
 // [import:ux]
 import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
@@ -183,7 +185,6 @@ import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs
 // [import:arcade]
 
 
-// [import:polish4]
 
 
 // [import:daily]
@@ -393,6 +394,8 @@ export class Game extends Emitter {
 
     this.useModule('worlds2', installWorlds2);   // [worlds2]
 
+    this.useModule('polish4', installPolish4);   // [polish4]
+
 
     // [slot:ux]
     this.useModule('hostmig', installHostMig);
@@ -411,7 +414,6 @@ export class Game extends Emitter {
     // [slot:arcade]
 
 
-    // [slot:polish4]
 
 
     // [slot:daily]
