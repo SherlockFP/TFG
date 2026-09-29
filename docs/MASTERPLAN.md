@@ -748,6 +748,16 @@ Model politikası aynı (§6): Sonnet varsayılan, ağ/AI/çekirdek işlerde Opu
 - **Bütün ajanlar Sonnet 5.5.** **Opus 5.5 sadece en sonda, tek bir değerlendirme turu** yapar (wave 5 bitince: kod okuma + toplu tarayıcı testi, en fazla birkaç düzeltme).
 - Maliyet: ajan başına en fazla 2 kısa tarayıcı koşusu, tercihen node testi; aynı anda en fazla 5 ajan; ajan prompt'ları kısa ve dosya yolu belirtilmiş; gereksiz büyük dosya okuması yok; iş bitince hemen teslim.
 
+### 25.12 Zombiler bazen görünmüyor (araştırılacak)
+- Test (açık alan, host): zombot + hr_zombie modelleri ve pozları görünüyor (docs yok, lead ekran görüntüsü). Yani sorun duruma bağlı. Şüpheliler: (a) `SWARM` instanced renderer ilk kaydın `root.parent`'ına bağlanıyor — zombi mirror/cep odası (x≥6400/8000) gibi başka bir sahnede/yerdeyse hepsi oraya taşınıyor; (b) client tarafında `SWARM.update` sadece horde `update`'inde, horde yoksa/dispose olduysa çizilmez; (c) iç mekân fog/ışık. Düzeltme: SWARM'ı her zaman ana `game.scene`'e bağla, cep/mirror zombilerini normal mesh modeline düşür; client'ta update'i creatures view tick'ine taşı. Animasyon: zombot yürüme/saldırı pozları var ama sade → 2-3 ek poz (sürünme, yakalama, kalkma).
+- Lead hızlı düzeltmeler (yapıldı): NaN ses pitch/volume guard (audio.js), `h2_guard` bilinmeyen 'troll' modeli → 'giant'.
+
+### 25.13 Yaratıklar: hızlı ama kaçılabilir — gerilim (sahibin isteği)
+- Kural: **hiçbir yaratık düz sprintte oyuncudan sürekli hızlı olmamalı** (sprint 8.2 m/s); hızlı olanlar **patlama** hızında (2-3 sn) koşar, sonra yorulur/yavaşlar, köşede savrulur, kapıda takılır → kaçış = zamanlama + rota.
+- Gerilim araçları: kovalama müziği/nabız sesi yaklaştıkça artar, ekran kenarı kararması, yaratığın adım sesi (sfx cvoice), "son anda kurtulma" (kapıyı kapatınca 1-2 sn gecikme), stamina yönetimi (sprint biter → saklanma/sessiz yürüme şart).
+- Tüm yaratık hız tablosu tek yerde gözden geçirilir (burst hız, burst süresi, dönüş hızı, kapı etkileşimi); node testi: "sprinter oyuncu açık alanda 10 sn'de yakalanmaz, köşeli koridorda kaçabilir".
+- Ajan: `chase` (Sonnet), `aimtell` ile birlikte.
+
 ### 25.7 Ajan tablosu (sıra = öncelik)
 | # | Ajan | Model | Kapsam | Tarayıcı |
 |---|---|---|---|---|
@@ -763,3 +773,36 @@ Model politikası aynı (§6): Sonnet varsayılan, ağ/AI/çekirdek işlerde Opu
 | 10 | algo1 | Sonnet | §25.6 iki v1 | 1 kısa |
 - Paralel en fazla 5 ajan (4 çekirdek, tek tarayıcı kuyruğu). Sıra: 1 → (2,3,4,5,6) → (7,8,9,10).
 - Her ajan bitince lead birleştirir, node testleri + build, main'e push.
+
+## 26. YENİ ANA YÖN ÖNERİSİ — "Bölge Ele Geçirme" (sahibin fikri, orta yol)
+
+**Sahibin fikri:** yaratıklara karşı tuzak kurup bölgeleri tek tek ele geçirmek, pasif gelire çevirmek, tycoon + strateji + savunma, arkadaşlarla.
+**Orta yol (korku/ganimet çekirdeğini bozmadan):** extraction oyunu aynen kalır; üstüne **"geri alınan bölgeler" meta katmanı** gelir. Kimlikle bağ: Algoritma dünyayı "içerik" için ele geçirmiş; ekip onu bölge bölge geri alıyor — Algoritma da yayında karşı saldırı düzenliyor.
+
+### 26.1 Döngü
+1. **Keşif/loot (mevcut):** moon'a in, tesisi/açık alanı gez, loot topla.
+2. **Ele geçirme:** her moon 3-6 **bölgeye** ayrılır (açık alan sektörleri + tesis kanatları). Bölgenin "çekirdeği"ni (sinyal kulesi/röle/sunucu) temizleyip ona **İşaret (Beacon)** dikersin → bölge senin.
+3. **Tahkim:** bölgeye tuzak (horror tuzakları), taret (ship2/siege), duvar/kapı (homeworld2 parçaları) kurarsın — hepsi TEK `defense` çekirdeğiyle (§25.5 #2). Kuruluş kredi + malzeme ister.
+4. **Pasif gelir:** ele geçirilen bölge her oyun günü gelir üretir (kredi + o biyomun malzemesi; madenci/çıkarıcı kurulursa homeworld2 fabrika mantığı). Gelir bölge sayısı ve yükseltmeyle artar ama tavanlı (bir iyi run'dan fazla değil).
+5. **Karşı saldırı:** Algoritma geceleri/gün sonunda **rastgele 1-2 bölgeye** dalga yollar (yayında "izleyiciler oyladı" diye). Ekip oradaysa canlı savunur (TD + FPS); yoksa savunma otomatik hesaplanır (kurulu savunmanın gücü vs dalga) → kayıp = bölge "enfekte" olur, gelir durur, geri almak gerekir.
+6. **Harita:** gemide/terminalde **sektör haritası**: moon'lar, bölgeler, sahiplik rengi, gelir, tehdit seviyesi. Bu ekranın kendisi tycoon/strateji hissi verir.
+
+### 26.2 Neden iyi
+- Mevcut dağınık sistemleri **tek anlamlı döngüde toplar:** horror tuzakları, siege/ship2 taretleri, homeworld2 fabrika + dalgalar, voyage görevleri, stealth, cycle sektörleri.
+- Arkadaşlarla rol ayrımı doğal: biri kurar, biri loot'lar, biri savunur.
+- Uzun vadeli hedef ve "benim bölgelerim" sahiplenmesi; kaybetme riski gerilimi korur.
+- Özgün: extraction + bölge savunması + canlı yayın kötüsü birlikte başka oyunda yok.
+
+### 26.3 Denge kuralları
+- Bölge başına bakım maliyeti (taret cephanesi, tuzak şarjı) → sonsuz genişleme yok; en fazla ~8-12 aktif bölge (yükseltmeyle).
+- Erken oyun: ilk bölge kota 1'de açılır, ilk karşı saldırı kota 2'den önce yok.
+- Solo: otomatik savunma cömert; co-op: canlı savunma daha çok ödül.
+- Pasif gelir hiçbir zaman aktif oynamanın yerini tutmaz (günlük tavan).
+
+### 26.4 Uygulama sırası (wave 6, wave 5 sağlamlıktan sonra)
+1. `defense` çekirdeği (birleştirme, wave 5 #7) — ön koşul.
+2. `zones` modülü: moon → bölge bölümlemesi (seed), beacon, sahiplik durumu (run + profil), sektör haritası UI.
+3. Pasif gelir + bakım (homeworld2 ekonomi kodu yeniden kullanılır).
+4. Karşı saldırı direktörü (siege/homeworld2 dalga kodu) + otomatik savunma hesabı.
+5. Algoritma bağlantısı: "izleyiciler bu bölgeye saldırı istedi" yayın metinleri.
+- Hepsi Sonnet; sonunda Opus tek değerlendirme (§25.11).

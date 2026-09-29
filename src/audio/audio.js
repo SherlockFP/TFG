@@ -230,10 +230,11 @@ export class AudioManager {
     const src = ctx.createBufferSource();
     src.buffer = buf;
     src.loop = !!opts.loop;
-    const pitch = opts.pitch ?? 1;
+    const pitch = Number.isFinite(opts.pitch) && opts.pitch > 0 ? opts.pitch : 1;   // a NaN pitch (e.g. from a creature voice) used to throw
     src.playbackRate.value = pitch;
     const gain = ctx.createGain();
-    const baseVol = (opts.volume ?? 1) * (this.meta(name).vol ?? 1);
+    let baseVol = (opts.volume ?? 1) * (this.meta(name).vol ?? 1);
+    if (!Number.isFinite(baseVol)) baseVol = 0;
     gain.gain.value = baseVol;
     let node = src;
     let lowpass = null;

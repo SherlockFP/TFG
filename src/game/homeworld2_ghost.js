@@ -54,7 +54,7 @@ const sentryBehavior = (c, dt, M) => {
 };
 registerCreature('h2_sentry', { name: 'Ghost Sentry', model: 'turret', hp: 150, dmg: 6, walk: 0, run: 0, power: 0, xp: 25, coin: 0, zone: 'out', radius: 0.55, height: 1.3, noSpawn: true, noHunt: true, noCompDrop: true, ghost: true,
   lore: 'A tower of somebody else\'s base, rebuilt from a snapshot. It only knows how to shoot.' }, sentryBehavior);
-registerCreature('h2_guard', { name: 'Base Guard', model: 'troll', hp: 85, dmg: 11, walk: 3.4, run: 5.6, power: 0, xp: 22, coin: 0, zone: 'out', radius: 0.5, height: 1.7, noSpawn: true, noHunt: true, noCompDrop: true, ghost: true,
+registerCreature('h2_guard', { name: 'Base Guard', model: 'giant', modelScale: 0.7, hp: 85, dmg: 11, walk: 3.4, run: 5.6, power: 0, xp: 22, coin: 0, zone: 'out', radius: 0.5, height: 1.7, noSpawn: true, noHunt: true, noCompDrop: true, ghost: true,
   lore: 'Hired to stand next to a vault. It takes the job seriously.' }, chaser({ sight: 24, fov: 200, hearR: 22, reach: 1.6, cd: 1.1, leash: 46 }));
 
 const TR = { 'GHOST RAID': 'HAYALET BASKINI', 'Ghost Base': 'Hayalet Üs', 'Ghost Sentry': 'Hayalet Nöbetçi', 'Base Guard': 'Üs Muhafızı', 'Crack the vault [E]': 'Kasayı kır [E]', 'CRACKING THE VAULT': 'KASA KIRILIYOR', 'VAULT CRACKED': 'KASA KIRILDI',
