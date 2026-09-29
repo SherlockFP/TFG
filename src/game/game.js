@@ -158,6 +158,13 @@ import { installPets } from './pets.js';
 import { installCycle } from './cycle.js';   // [cycle] inert: rules only, see docs/wave2/cycle.md
 
 
+// [import:worlds2]
+
+
+// [import:ux]
+
+
+
 export class Game extends Emitter {
   constructor({ engine, audio, settings, profile, ui, input, mods }) {
     super();
@@ -316,6 +323,13 @@ export class Game extends Emitter {
 
 
     this.useModule('cycle', installCycle);   // [cycle]
+
+
+    // [slot:worlds2]
+
+
+    // [slot:ux]
+
 
   }
 
