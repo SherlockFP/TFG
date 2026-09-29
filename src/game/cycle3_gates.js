@@ -73,6 +73,7 @@ export function installGates(C3) {
     if (ph === 'orbit' || ph === 'takeoff' || ph === 'landing') { if (live()) setLive(null); }
     if (ph === 'moon' || ph === 'landing') landAt = game.time;
   });
+  C3.hostStartFns.push(() => { if (game.run?.c3live) delete game.run.c3live; });   // a save never resumes inside a gate day
   // a pending gate-break siege starts ~2 min into the next regular moon day (siege.js decides whether it is allowed: quota 2+, one per day)
   C3.ticks.push((dt) => {
     if (!C3.host() || !game.run) return;
