@@ -483,7 +483,7 @@ export const actionMethods = {
         it.obj.quaternion.identity();
       } else {
         // melee weapons are held tilted up like Lethal Company's shovel; tools/guns point forward
-        if (def.kind === 'weapon' && !def.ranged) it.obj.quaternion.setFromEuler(new THREE.Euler(0.45, 0.35, 0.3));
+        if (def.kind === 'weapon' && !def.ranged) it.obj.quaternion.setFromEuler(new THREE.Euler(0.75, 0.22, 0));   // [ux] no roll
         else it.obj.quaternion.identity();
         it.obj.position.copy(g).applyQuaternion(it.obj.quaternion).multiplyScalar(-1);
       }

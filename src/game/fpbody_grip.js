@@ -111,6 +111,16 @@ function clearOfArms(pts, q, pos, hand, caps, iters = 60) {
   return Math.max(0, pen);
 }
 
+// [ux] per-weapon grip rotations (Euler XYZ, rad; model -Z = blade / head direction): pitch tips the weapon up-forward, a little yaw
+// points it across the view, NO roll (the old shared roll of 0.3 made blades and bats sit crooked). Unknown melee -> GRIP_MELEE_DEFAULT.
+export const GRIP_MELEE_DEFAULT = [0.7, 0.24, 0];
+export const GRIP_MELEE = {
+  knife: [0.5, 0.2, 0], twindaggers: [0.5, 0.25, 0], machete: [0.7, 0.25, 0], katana: [0.78, 0.26, 0], longsword: [0.72, 0.22, 0],
+  bat: [0.86, 0.22, 0], nailbat: [0.86, 0.22, 0], pipe: [0.8, 0.2, 0], crowbar: [0.8, 0.2, 0], shovel: [0.8, 0.2, 0], stopsign: [0.55, 0.2, 0],
+  spear: [0.55, 0.15, 0], waraxe: [0.78, 0.2, 0], greatsword: [0.76, 0.2, 0], warhammer: [0.76, 0.2, 0], sledge: [0.76, 0.2, 0],
+};
+const meleeQuat = (id) => { const g = GRIP_MELEE[id] || GRIP_MELEE_DEFAULT; return qFromEuler(g[0], g[1], g[2]); };
+
 const qFromEuler = (x, y, z, out = new THREE.Quaternion()) => out.setFromEuler(_e.set(x, y, z));
 
 /** Classify an item: 'body' | 'carry' (two-hand, in front) | 'long2h' (gun / hammer, left hand on the fore-end) | 'melee' | 'tool' | 'scrap'. */
@@ -148,8 +158,8 @@ export function fitGrip(geom, def, id = '') {
     if (longAxis === 'y' && s.y > 1.5 * s.z) auto.setFromAxisAngle(V(1, 0, 0), -Math.PI / 2);
     else if (longAxis === 'x' && s.x > 1.5 * s.z) auto.setFromAxisAngle(V(0, 1, 0), Math.PI / 2);
   }
-  if (cls === 'melee') q.copy(qFromEuler(0.45, 0.35, 0.3)).multiply(auto);
-  else if (cls === 'long2h') q.copy(def?.ranged ? qFromEuler(0.04, 0.16, 0) : qFromEuler(0.5, 0.25, 0.15)).multiply(auto);
+  if (cls === 'melee') q.copy(meleeQuat(id)).multiply(auto);   // [ux]
+  else if (cls === 'long2h') q.copy(def?.ranged ? qFromEuler(0.04, 0.16, 0) : meleeQuat(id)).multiply(auto);
   else if (cls === 'body') q.setFromAxisAngle(V(0, 1, 0), Math.PI / 2);
   else if (cls === 'carry') {
     const tilt = -Math.min(0.5, Math.max(0, (s.y - 0.3) * 0.75));   // tall things lean away so they do not blot out the view

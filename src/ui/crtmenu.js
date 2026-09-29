@@ -82,12 +82,21 @@ const FONT = (px) => `${px}px "TFG Credit", VT323, "TFG Cyr VT", monospace`;   /
 const MENU_FONT = (px) => `bold ${px}px "Arial Narrow", "Roboto Condensed", Impact, sans-serif`;
 
 export class CRTMenu {
+  /** [ux] the first-person viewmodel / hands / fp-body are camera children of the last game: never show them in the menu room */
+  stripViewModel() {
+    try {
+      const cam = this.engine.camera;
+      for (const c of [...cam.children]) c.removeFromParent();
+      cam.layers.disable(2);
+    } catch { /* ignore */ }
+  }
   constructor(engine, app) {
     this.engine = engine;
     this.app = app;
     this.scene = new THREE.Scene();
     engine.scene = this.scene;
     this.scene.add(engine.camera);
+    this.stripViewModel();   // [ux]
     engine.camera.far = 60; engine.camera.fov = 58; engine.camera.updateProjectionMatrix();
     this.scene.background = new THREE.Color(0x020202);
     this.scene.fog = new THREE.FogExp2(0x050303, 0.09);
@@ -404,6 +413,7 @@ export class CRTMenu {
 
   // ------------------------------------------------------------------ frame
   update(dt) {
+    if (this.engine.camera.children.length) this.stripViewModel();   // [ux]
     this.t += dt;
     const t = this.t;
     // camera: wide shot of the rack, drifting; dolly in when a submenu is open

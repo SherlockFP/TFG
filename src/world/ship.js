@@ -60,7 +60,14 @@ export function buildShip({ physics, lightPool, scene }) {
 
   // --- exterior hull (slightly larger box, faces outward) ---
   const E = 0.25, ex0 = S.x0 - E, ex1 = S.x1 + E, ez0 = S.z0 - E, ez1 = S.z1 + E, eh = S.h + 0.45;
-  gb.vrect('metal_plate', ex0, ez1, ex1, ez1, -0.6, eh, 0.35);         // +z outer (faces +z) -> direction +x gives +z normal
+  // [ux] the +z outer plate has a real door opening now (it used to be one solid plate, so the ship looked CLOSED from outside even with the door open)
+  gb.vrect('metal_plate', ex0, ez1, dL, ez1, -0.6, eh, 0.35);          // +z outer, left of the door (faces +z) -> direction +x gives +z normal
+  gb.vrect('metal_plate', dR, ez1, ex1, ez1, -0.6, eh, 0.35);          // right of the door
+  gb.vrect('metal_plate', dL, ez1, dR, ez1, S.door.height, eh, 0.35);  // above the door
+  gb.vrect('metal_plate', dL, ez1, dR, ez1, -0.6, 0, 0.35);            // below the sill
+  gb.vrect('metal_dark', dL, ez1, dL, S.z1, 0, S.door.height, 0.5);    // jamb (faces +x): hull thickness between the inner wall and the outer plate
+  gb.vrect('metal_dark', dR, S.z1, dR, ez1, 0, S.door.height, 0.5);    // jamb (faces -x)
+  gb.hrect('metal_dark', dL, S.z1, dR, ez1, S.door.height, false, 0.5); // lintel underside
   gb.vrect('metal_plate', ex1, ez0, ex0, ez0, -0.6, eh, 0.35);         // -z outer
   gb.vrect('metal_plate', ex1, ez1, ex1, ez0, -0.6, eh, 0.35);         // +x outer
   gb.vrect('metal_plate', ex0, ez0, ex0, ez1, -0.6, eh, 0.35);         // -x outer (window cut handled by overlay glass)
@@ -92,10 +99,14 @@ export function buildShip({ physics, lightPool, scene }) {
   // exterior details: hull stripe, number decal, nav lights, roof rails, thruster bells
   const stripeMat = new THREE.MeshLambertMaterial({ color: 0xc8581c });
   for (const zz of [ez0 - 0.02, ez1 + 0.02]) {
-    const stripe = new THREE.Mesh(new THREE.PlaneGeometry(ex1 - ex0, 0.5), stripeMat);
-    stripe.position.set(0, 2.6, zz);
-    stripe.rotation.y = zz > 0 ? 0 : Math.PI;
-    group.add(stripe);
+    // [ux] the +z stripe stops at the door opening
+    const segs = zz > 0 ? [[ex0, dL], [dR, ex1]] : [[ex0, ex1]];
+    for (const [a, b] of segs) {
+      const stripe = new THREE.Mesh(new THREE.PlaneGeometry(b - a, 0.5), stripeMat);
+      stripe.position.set((a + b) / 2, 2.6, zz);
+      stripe.rotation.y = zz > 0 ? 0 : Math.PI;
+      group.add(stripe);
+    }
   }
   if (typeof document !== 'undefined') {
     const c = document.createElement('canvas'); c.width = 128; c.height = 48;

@@ -24,8 +24,52 @@ export const PRICES = {
   'hat:beanie': 80, 'hat:bucket': 90, 'hat:headlamp': 260, 'hat:wizard': 700,
   'face:moustache': 60, 'face:gasmask': 220, 'face:shades': 350,
   'back:antenna': 100, 'back:o2tank': 260, 'back:plushie': 420,
+  'suit:modarmor': 900, 'suit:soviet': 350, 'suit:tracksuit': 200, 'suit:knight': 1100, 'suit:viking': 700,   // [ux] wave 3
 };
-const MIN_LEVEL = { 'suit:clown': 5, 'suit:hazmat': 4, 'hat:wizard': 10, 'face:shades': 6, 'back:plushie': 6 };
+const MIN_LEVEL = { 'suit:clown': 5, 'suit:hazmat': 4, 'hat:wizard': 10, 'face:shades': 6, 'back:plushie': 6, 'suit:modarmor': 12, 'suit:soviet': 6, 'suit:tracksuit': 3, 'suit:knight': 15, 'suit:viking': 10 };
+
+// [ux] wave-3 suit names / descriptions (Turkish + Russian)
+const W3_TR = {
+  'Moderator Armor': 'Moderatör Zırhı', 'Data Monk': 'Veri Keşişi', 'Lunar Astronaut': 'Ay Astronotu', 'Mars Astronaut': 'Mars Astronotu', 'Deep-Space Astronaut': 'Derin Uzay Astronotu',
+  'Soviet Worker': 'Sovyet İşçisi', Tracksuit: 'Eşofman', Samurai: 'Samuray', Knight: 'Şövalye', 'Cyber Ninja': 'Siber Ninja', Viking: 'Viking', 'Secret Agent': 'Gizli Ajan',
+  'White plastoid plates, black joints, a very confident helmet. Bans on sight.': 'Beyaz plastoid plakalar, siyah eklemler, çok kendinden emin bir kask. Görür görmez banlar.',
+  'A hooded robe, a rope belt and a glowing data-stylus. Trust the Codex.': 'Kapüşonlu cübbe, ip kemer ve parlayan bir veri kalemi. Kodeks\'e güven.',
+  'Gold visor, silver rings, clean boots. One giant leap for scrap.': 'Altın vizör, gümüş halkalar, temiz botlar. Hurda için devasa bir adım.',
+  'Rust-red pressure suit, dusty boots. The red planet called.': 'Pas kırmızısı basınç tulumu, tozlu botlar. Kızıl gezegen aradı.',
+  'Black hardsuit with cyan status lights. Nobody hears you scream.': 'Camgöbeği ışıklı siyah zırh tulum. Çığlığını kimse duymaz.',
+  'Quilted jacket, ushanka, red armband. The quota is a five-year plan.': 'Kapitone mont, kulaklı kalpak, kırmızı pazubent. Kota beş yıllık plandır.',
+  'Three stripes, gold chain, zero regrets.': 'Üç şerit, altın zincir, sıfır pişmanlık.',
+  'Lacquered plates, layered shoulder guards and a crested kabuto.': 'Cilalı plakalar, katmanlı omuz koruyucular ve tepelikli bir kabuto.',
+  'Full steel plate, a great helm and a cross on the tabard.': 'Tam çelik zırh, büyük bir miğfer ve tabardda haç.',
+  'Matte black, cyan light lines, a scarf that flutters in nothing.': 'Mat siyah, camgöbeği ışık çizgileri, hiçlikte dalgalanan bir atkı.',
+  'Fur mantle, horned helm and a very loud voice.': 'Kürk pelerin, boynuzlu miğfer ve çok yüksek bir ses.',
+  'Black suit, thin tie, earpiece. Definitely not a janitor.': 'Siyah takım, ince kravat, kulaklık. Kesinlikle temizlikçi değil.',
+  'Black Market (HQ), level 12': 'Karaborsa (HQ), seviye 12', 'Black Market (HQ), level 6': 'Karaborsa (HQ), seviye 6', 'Black Market (HQ), level 3': 'Karaborsa (HQ), seviye 3',
+  'Black Market (HQ), level 15': 'Karaborsa (HQ), seviye 15', 'Black Market (HQ), level 10': 'Karaborsa (HQ), seviye 10',
+  'Fill 50% of the Codex': 'Kodeks\'in %50\'sini doldur', 'Reach level 25': 'Seviye 25\'e ulaş', 'Land on 6 different moons': '6 farklı aya in', 'Meet the quota 5 times': 'Kotayı 5 kez doldur',
+  'Kill 100 creatures': '100 yaratık öldür', 'Crack 10 vaults': '10 kasa aç', 'Hit the GACHA jackpot 3 times': 'GACHA jackpotunu 3 kez vur',
+};
+const W3_RU = {
+  'Moderator Armor': 'Броня модератора', 'Data Monk': 'Монах данных', 'Lunar Astronaut': 'Лунный астронавт', 'Mars Astronaut': 'Марсианский астронавт', 'Deep-Space Astronaut': 'Астронавт дальнего космоса',
+  'Soviet Worker': 'Советский рабочий', Tracksuit: 'Спортивный костюм', Samurai: 'Самурай', Knight: 'Рыцарь', 'Cyber Ninja': 'Кибер-ниндзя', Viking: 'Викинг', 'Secret Agent': 'Секретный агент',
+  'White plastoid plates, black joints, a very confident helmet. Bans on sight.': 'Белые пластоидные пластины, чёрные сочленения, очень уверенный шлем. Банит с первого взгляда.',
+  'A hooded robe, a rope belt and a glowing data-stylus. Trust the Codex.': 'Мантия с капюшоном, верёвочный пояс и светящийся стилус данных. Верь Кодексу.',
+  'Gold visor, silver rings, clean boots. One giant leap for scrap.': 'Золотое забрало, серебряные кольца, чистые ботинки. Один гигантский скачок для хлама.',
+  'Rust-red pressure suit, dusty boots. The red planet called.': 'Ржаво-красный скафандр, пыльные ботинки. Красная планета зовёт.',
+  'Black hardsuit with cyan status lights. Nobody hears you scream.': 'Чёрный жёсткий скафандр с бирюзовыми индикаторами. Твой крик никто не услышит.',
+  'Quilted jacket, ushanka, red armband. The quota is a five-year plan.': 'Телогрейка, ушанка, красная повязка. Квота - это пятилетка.',
+  'Three stripes, gold chain, zero regrets.': 'Три полоски, золотая цепь, ноль сожалений.',
+  'Lacquered plates, layered shoulder guards and a crested kabuto.': 'Лакированные пластины, наплечники и кабуто с гребнем.',
+  'Full steel plate, a great helm and a cross on the tabard.': 'Полные стальные латы, большой шлем и крест на табарде.',
+  'Matte black, cyan light lines, a scarf that flutters in nothing.': 'Матовый чёрный, бирюзовые линии света, шарф, развевающийся на пустом месте.',
+  'Fur mantle, horned helm and a very loud voice.': 'Меховая накидка, рогатый шлем и очень громкий голос.',
+  'Black suit, thin tie, earpiece. Definitely not a janitor.': 'Чёрный костюм, тонкий галстук, наушник. Точно не уборщик.',
+  'Black Market (HQ), level 12': 'Чёрный рынок (штаб), ур. 12', 'Black Market (HQ), level 6': 'Чёрный рынок (штаб), ур. 6', 'Black Market (HQ), level 3': 'Чёрный рынок (штаб), ур. 3',
+  'Black Market (HQ), level 15': 'Чёрный рынок (штаб), ур. 15', 'Black Market (HQ), level 10': 'Чёрный рынок (штаб), ур. 10',
+  'Fill 50% of the Codex': 'Заполни 50% Кодекса', 'Reach level 25': 'Достигни 25 уровня', 'Land on 6 different moons': 'Посети 6 разных лун', 'Meet the quota 5 times': 'Выполни квоту 5 раз',
+  'Kill 100 creatures': 'Убей 100 существ', 'Crack 10 vaults': 'Вскрой 10 сейфов', 'Hit the GACHA jackpot 3 times': 'Сорви джекпот GACHA 3 раза',
+};
+addTranslations(W3_TR); addTranslations(W3_RU, 'ru');
 
 addTranslations({
   WARDROBE: 'GARDIROP', 'WARDROBE [E]': 'GARDIROP [E]', Suits: 'Tulumlar', Hats: 'Şapkalar', Face: 'Yüz', Back: 'Sırt', Equip: 'Kuşan', Equipped: 'Kuşanıldı',
@@ -112,6 +156,14 @@ const RULES = {
   'suit:astronaut': { test: (p) => p.level >= 20, prog: (p) => [p.level, 20] },
   'suit:goldemp': { test: (p) => !!p.achievements?.quota_10 },
   'suit:venom': { test: (p) => fun(p).symbiote || n(st(p).creatureKills) >= 50, prog: (p) => [Math.min(50, n(st(p).creatureKills)), 50] },
+  // [ux] wave 3: purchasable suits (modarmor / soviet / tracksuit / knight / viking) use PRICES; these are earned
+  'suit:datamonk': { test: (p) => n(p.codex?.pct) >= 50, prog: (p) => [Math.min(50, n(p.codex?.pct)), 50] },
+  'suit:astro_lunar': { test: (p) => p.level >= 25, prog: (p) => [p.level, 25] },
+  'suit:astro_mars': { test: (p) => (st(p).moonsVisited || []).length >= 6, prog: (p) => [(st(p).moonsVisited || []).length, 6] },
+  'suit:astro_deep': { test: (p) => n(st(p).quotasMet) >= 5, prog: (p) => [n(st(p).quotasMet), 5] },
+  'suit:samurai': { test: (p) => n(st(p).creatureKills) >= 100, prog: (p) => [Math.min(100, n(st(p).creatureKills)), 100] },
+  'suit:cyberninja': { test: (p) => n(st(p).vaults) >= 10, prog: (p) => [n(st(p).vaults), 10] },
+  'suit:agent': { test: (p) => n(st(p).jackpots) >= 3, prog: (p) => [n(st(p).jackpots), 3] },
   'hat:beanie': { test: (p) => p.level >= 2 },
   'hat:bucket': { test: (p) => n(p.login?.best) >= 2 },
   'hat:headlamp': { test: (p) => n(st(p).fuses) >= 3, prog: (p) => [n(st(p).fuses), 3] },
