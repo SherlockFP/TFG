@@ -67,7 +67,7 @@ export function installDaily(game) {
     const r = C.seasonAdd(profile, n);
     if (r.newTiers.length) {
       const tier = r.newTiers[r.newTiers.length - 1];
-      toast(tf('Season tier {n} reached. Claim it in DAILY [B].', { n: tier }), 'good');
+      toast(tf('Season tier {n} reached. Claim it in DAILY [F2].', { n: tier }), 'good');
       sfx('ui_notify', 0.6);
     }
     return r.added;
@@ -116,7 +116,7 @@ export function installDaily(game) {
       game.progress?.save?.();
       whenClear(() => {
         celebrate({ root: game.ui.root, text: t('QUOTA CRATE'), sub: t('EARNED'), color: '#ffd23f', sfx, reduce: reduce() });
-        toast(t('The Algorithm is pleased. A Quota Crate is waiting in DAILY [B].'), 'good');
+        toast(t('The Algorithm is pleased. A Quota Crate is waiting in DAILY [F2].'), 'good');
         dockT = 0;
       });
     }
@@ -163,7 +163,7 @@ export function installDaily(game) {
     if (level % 5 === 0 && key > (d.stats.lvlCrate || 0)) {
       d.stats.lvlCrate = key;
       C.grantCrate(profile, 'supply', 'level' + level);
-      lines.push(tf('Level {n} milestone: a Supply Crate is waiting in DAILY [B]', { n: level }));
+      lines.push(tf('Level {n} milestone: a Supply Crate is waiting in DAILY [F2]', { n: level }));
     }
     game.progress.save();
     levelUpFanfare({ root: game.ui.root, level, lines, color: '#ffd23f', sfx, reduce: reduce() });
@@ -244,7 +244,7 @@ export function installDaily(game) {
     },
   };
   const onKey = (e) => {
-    if (e.code !== 'KeyB' || e.repeat || disposed || game.destroyed || !game.run || !game.net || e.ctrlKey || e.altKey || e.metaKey) return;
+    if (e.code !== 'F2' || e.repeat || disposed || game.destroyed || !game.run || !game.net || e.ctrlKey || e.altKey || e.metaKey) return;
     if (game.input?.isTyping?.() || game.minigame || game.terminal?.active || game.ui?.chatOpen) return;
     if (game.ui?.panelOpen && game.ui.panelOpen !== api._panel?.el) return;
     if (game.player?.dead) return;
@@ -258,7 +258,7 @@ export function installDaily(game) {
     const a = svc.attention();
     const fw = game.run?.phase === 'moon' && C.firstWinAvailable(profile);
     const hot = a.total > 0;
-    const html = hot || fw ? `<div style="font:15px 'VT323',monospace;color:#ffe2b8;background:rgba(14,8,3,.72);border:1px solid rgba(255,150,70,.45);padding:2px 8px;letter-spacing:1px"><kbd style="border:1px solid #ff8a3d;padding:0 5px;color:#ff8a3d">B</kbd> ${t('DAILY')}${hot ? ` <span style="background:#ffd23f;color:#120800;padding:0 4px;font:9px monospace;margin-left:4px">${t('NEW!')}</span>` : ''}${fw ? ` <span style="color:#3dd6ff;margin-left:6px">${t('First win: XP x2')}</span>` : ''}</div>` : '';
+    const html = hot || fw ? `<div style="font:15px 'VT323',monospace;color:#ffe2b8;background:rgba(14,8,3,.72);border:1px solid rgba(255,150,70,.45);padding:2px 8px;letter-spacing:1px"><kbd style="border:1px solid #ff8a3d;padding:0 5px;color:#ff8a3d">F2</kbd> ${t('DAILY')}${hot ? ` <span style="background:#ffd23f;color:#120800;padding:0 4px;font:9px monospace;margin-left:4px">${t('NEW!')}</span>` : ''}${fw ? ` <span style="color:#3dd6ff;margin-left:6px">${t('First win: XP x2')}</span>` : ''}</div>` : '';
     if (html !== dockHtml) { dockHtml = html; dock.innerHTML = html; }
   }
 
@@ -291,7 +291,7 @@ export function installDaily(game) {
       svc.settleSeason();
       const a = svc.attention();
       if (a.login) toast(t('Your daily reward is ready. Press B to claim it.'), 'good');
-      else if (a.total > 0) toast(t('Rewards are waiting in DAILY [B].'), 'info');
+      else if (a.total > 0) toast(t('Rewards are waiting in DAILY [F2].'), 'info');
     }
     if (dockT <= 0) { dockT = 1.5; try { drawDock(); } catch { /* dock optional */ } }
     tryDeliver(dt);
