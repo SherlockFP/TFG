@@ -59,7 +59,7 @@ export function buildModsScreen(mm, ui) {
         else if (spec.type === 'select') { input = el('select', {}, ...spec.options.map((o) => el('option', { value: o, selected: cur[k] === o }, o))); input.addEventListener('change', () => mm.setConfig(def.id, k, input.value)); }
         else { input = el('input', { type: 'number', value: cur[k], min: spec.min, max: spec.max, step: spec.step || 1, style: { width: '70px' } }); input.addEventListener('change', () => mm.setConfig(def.id, k, +input.value)); }
         input.addEventListener('keydown', (e) => e.stopPropagation());
-        cfg.appendChild(el('label', { class: 'cfg' }, (spec.label || k) + ' ', input));
+        cfg.appendChild(el('label', { class: 'cfg' }, t(spec.label || k) + ' ', input));
       }
       const badges = [];
       if (def.builtin) badges.push(el('span', { class: 'tfgm-badge ' + (def.scope === 'local' ? 'local' : 'host') }, def.scope === 'local' ? t('PERSONAL') : t('CREW')));
@@ -68,9 +68,9 @@ export function buildModsScreen(mm, ui) {
       const more = entries.length ? el('span', { class: 'tfgm-more' }, `⚙ ${t('settings')}`) : null;
       if (more) more.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); cfg.classList.toggle('collapsed'); });
       return el('div', { class: 'mod-row' + (on ? ' on' : '') },
-        el('label', { class: 'mod-head' }, tog, el('span', { class: 'mod-name' }, def.name), ...badges,
+        el('label', { class: 'mod-head' }, tog, el('span', { class: 'mod-name' }, t(def.name)), ...badges,
           el('span', { class: 'dim' }, ` v${def.version || '1.0'}${def.inspiredBy ? ' · ' + t('port of') + ' ' + def.inspiredBy : ''}${def.source === 'imported' ? ' · imported' : ''}`), more),
-        el('div', { class: 'mod-desc' }, def.description || ''),
+        el('div', { class: 'mod-desc' }, t(def.description || '')),
         cfg);
     };
     if (tab === 'features') {

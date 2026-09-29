@@ -1,4 +1,4 @@
-// cosm5 (wave 4) - procedural three.js models for the cosmetics drop: 14 suits, 19 hats / head items, 10 back items.
+// cosm5 (wave 4) - procedural three.js models for the cosmetics drop: 14 suits, 19 hats / head items, 10 back items (+ wave 8: cosm8_models.js).
 // Same contracts as models/cosmetics.js + cosmetics_wave3.js:
 //   SUIT builder  { tint, glove, boot, belt, emissive, hide, scale, visor, eye, build(c, headgear) }  (c = look-controller ctx)
 //   BACK builder  (c, rig) => void   attaches to rig.backpack (hidden by the first-person body, so it never clips the FP camera)
@@ -8,6 +8,7 @@
 import * as THREE from 'three';
 import { G, xf, merged, lam, bas, mk, pv, clamp, PI, TAU } from './modelkit.js';
 import { C5, bySlot } from '../game/cosm5_data.js';
+import { C8_SUITS, C8_BACKS, C8_HATS, C8_BACK_HIDES } from './cosm8_models.js';   // wave 8 (+8 suits, +8 hats, +6 backs)
 
 const flat = (c) => lam(c);
 const glow = (c, e) => lam(c, { emissive: e });
@@ -586,6 +587,7 @@ const HAT_BUILD = {
     tick(disc, (t) => { disc.rotation.z = t * 1.4; ring2.rotation.z = -t * 2.2; disc.position.y = ring2.position.y = 0.2 + Math.sin(t * 1.5) * 0.015; });
   },
 };
+Object.assign(C5_SUIT_BUILDERS, C8_SUITS); Object.assign(C5_BACK_BUILDERS, C8_BACKS); Object.assign(HAT_BUILD, C8_HATS); C5_BACK_HIDES.push(...C8_BACK_HIDES);
 export const C5_HAT_IDS = Object.keys(HAT_BUILD);
 /** hat group for one of the cosm5 head items (null when the id is not ours) */
 export function buildC5Hat(id) {

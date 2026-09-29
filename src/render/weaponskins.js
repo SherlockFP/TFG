@@ -8,9 +8,9 @@
 // One program per skin id (customProgramCacheKey); clones are cached per (skin, source material) and never disposed while alive.
 import * as THREE from 'three';
 
-export const SKIN_IDS = ['camo', 'carbon', 'damascus', 'bubblegum', 'circuit', 'lava', 'frost', 'holo', 'bone', 'rusted'];
+export const SKIN_IDS = ['camo', 'carbon', 'damascus', 'bubblegum', 'circuit', 'lava', 'frost', 'holo', 'bone', 'rusted', 'hazard', 'static', 'neongrid', 'voidstar'];   // wave 8 appended (patterns 11-14)
 const PAT = Object.fromEntries(SKIN_IDS.map((id, i) => [id, i + 1]));
-export const SKIN_ACCENT = { camo: 0x8a9a4a, carbon: 0x5a6a8a, damascus: 0xcfd6e0, bubblegum: 0xff6ac8, circuit: 0x2affb0, lava: 0xff6a10, frost: 0x7fd4ff, holo: 0xff88ff, bone: 0xe8dfc4, rusted: 0xc8641e };
+export const SKIN_ACCENT = { camo: 0x8a9a4a, carbon: 0x5a6a8a, damascus: 0xcfd6e0, bubblegum: 0xff6ac8, circuit: 0x2affb0, lava: 0xff6a10, frost: 0x7fd4ff, holo: 0xff88ff, bone: 0xe8dfc4, hazard: 0xffcc00, static: 0xb0b8c0, neongrid: 0xff2fd0, voidstar: 0x6a5aff, rusted: 0xc8641e };
 export const skinClock = { value: 0 };
 
 const GLSL = /* glsl */`
@@ -80,6 +80,28 @@ vec3 c5skin(vec3 p, vec3 base) {
     float cr = 1.0 - smoothstep(0.0, 0.05, abs(c5n(p * 34.0) - 0.5));
     col = mix(col, vec3(0.32, 0.26, 0.18), cr * 0.7);
     col *= 1.0 - 0.4 * step(0.9, c5n(p * 70.0));
+  } else if (C5P == 11) {    // hazard stripes: diagonal yellow / black warning bands
+    float b = step(0.5, fract((p.x + p.y + p.z) * 22.0));
+    col = mix(vec3(0.06, 0.06, 0.05), vec3(0.98, 0.78, 0.05), b);
+    col *= 0.9 + 0.2 * c5n(p * 50.0);
+  } else if (C5P == 12) {    // dead channel: crawling tv static + rolling bar
+    float n = c5h(floor(p * 90.0) + floor(uC5T * 14.0));
+    float bar = smoothstep(0.85, 1.0, sin(p.y * 9.0 - uC5T * 3.0));
+    col = vec3(0.10 + 0.55 * n) + vec3(0.12) * bar;
+    c5e = vec3(0.10, 0.12, 0.13) * n + vec3(0.1) * bar;
+  } else if (C5P == 13) {    // neon grid: magenta / cyan wireframe on dark
+    vec3 q = p * 28.0; vec3 f = abs(fract(q) - 0.5);
+    float line = 1.0 - smoothstep(0.0, 0.07, min(min(f.x, f.z), f.y));
+    float sw = 0.5 + 0.5 * sin(uC5T * 2.0 + p.z * 9.0);
+    vec3 neon = mix(vec3(1.0, 0.18, 0.8), vec3(0.2, 0.9, 1.0), sw);
+    col = vec3(0.03, 0.02, 0.07) + neon * line * 0.5;
+    c5e = neon * line * 0.9;
+  } else if (C5P == 14) {    // void starfield: black with drifting stars and a violet nebula
+    float st = step(0.985, c5h(floor(p * 70.0 + vec3(0.0, 0.0, uC5T * 0.15))));
+    float tw = 0.6 + 0.4 * sin(uC5T * 3.0 + c5h(floor(p * 70.0)) * 6.28);
+    float neb = c5f(p * 6.0 + vec3(uC5T * 0.03));
+    col = vec3(0.01, 0.01, 0.03) + vec3(0.12, 0.05, 0.25) * smoothstep(0.4, 0.8, neb);
+    c5e = vec3(0.9, 0.95, 1.0) * st * tw * 1.4 + vec3(0.05, 0.02, 0.12) * neb;
   } else {                   // rusted
     float n = c5f(p * 17.0); float pit = step(0.86, c5n(p * 45.0));
     col = mix(vec3(0.42, 0.20, 0.09), vec3(0.72, 0.34, 0.12), smoothstep(0.3, 0.7, n));

@@ -18,12 +18,14 @@ import { createItemModel } from '../models/items.js';
 import { applySkin, clearSkin, skinClock, skinOf, SKIN_IDS } from '../render/weaponskins.js';
 import { WARDROBE_EXT, TABS } from '../ui/panels/wardrobe.js';
 import { installCosm5I18n } from './cosm5_i18n.js';
+import { installCosm8I18n } from './cosm8_i18n.js';
 import {
   C5, C5_BY_KEY, C5_BY_ID, keyOf, bySlot, BOSS_DROPS, cosmeticPool, rollCosmetic, encodeLook, decodeLook, rotationFor, offerPrice, utcDay,
 } from './cosm5_data.js';
 
 export { C5, cosmeticPool, rollCosmetic, encodeLook, decodeLook, rotationFor, BOSS_DROPS };
 installCosm5I18n(addTranslations);
+installCosm8I18n(addTranslations);
 
 const SLOT_TAB = { suit: 'suit', hat: 'hat', back: 'back', skin: 'skin', emote: 'emote' };
 const DUPE_COINS = { common: 30, uncommon: 60, rare: 120, epic: 240, legendary: 500, mythic: 900 };
@@ -79,6 +81,44 @@ const EMOTE_DEFS = {
     root.position.y += Math.sin(ph * Math.PI) * 0.12;
     set(A.shR, -1.4, 0, -0.5 - Math.sin(ph * Math.PI * 2) * 0.4); if (A.elR) A.elR.rotation.x = -0.7;
     if (P.neck) P.neck.rotation.x += 0.1;
+  } },
+  // ---- wave 8 (cosm8_data.js)
+  standup: { base: null, face: 'normal', fx(a, root, tt) {
+    const A = armsOf(a), P = a.parts, k = sm(tt * 3);
+    set(A.shL, 0, 0, 0.5 * k); set(A.shR, 0, 0, -0.5 * k); if (A.elL) A.elL.rotation.x = -1.0 * k; if (A.elR) A.elR.rotation.x = -1.0 * k;
+    if (P.torso) P.torso.rotation.z += Math.sin(tt * 1.6) * 0.07 * k;
+    if (P.neck) { P.neck.rotation.y += Math.sin(tt * 0.9) * 0.3 * k; P.neck.rotation.x += 0.05 + 0.1 * Math.max(0, Math.sin(tt * 2.3)); }
+    root.position.x += Math.sin(tt * 1.6) * 0.02 * k;
+  } },
+  shuffle: { base: null, face: 'normal', fx(a, root, tt) {
+    const A = armsOf(a), P = a.parts, k = sm(tt * 3);
+    set(A.shL, -1.1 * k, 0, 0.15 * k); set(A.shR, -1.1 * k, 0, -0.15 * k);
+    if (A.elL) A.elL.rotation.x = (-0.9 + Math.sin(tt * 22) * 0.12) * k; if (A.elR) A.elR.rotation.x = (-0.9 + Math.sin(tt * 22 + 2) * 0.12) * k;
+    if (P.neck) P.neck.rotation.x += 0.25 * k; if (P.torso) { P.torso.rotation.y += Math.sin(tt * 4) * 0.2 * k; P.torso.rotation.z += Math.sin(tt * 4 + 1) * 0.06 * k; }
+    root.position.y += Math.abs(Math.sin(tt * 4)) * 0.03 * k; root.position.x += Math.sin(tt * 4) * 0.025 * k;
+  } },
+  scroll: { base: null, face: 'normal', fx(a, root, tt) {
+    const A = armsOf(a), P = a.parts, k = sm(tt * 3), f = (tt % 0.7) / 0.7;
+    set(A.shR, -1.0 * k, 0, -0.2 * k); if (A.elR) A.elR.rotation.x = (-1.4 + 0.5 * Math.sin(f * Math.PI)) * k;
+    set(A.shL, 0, 0, 0.12 * k);
+    if (P.neck) { P.neck.rotation.x += 0.5 * k; P.neck.rotation.y += Math.sin(tt * 0.8) * 0.08 * k; }
+    if (P.torso) P.torso.rotation.x += 0.2 * k;
+    root.position.y -= 0.02 * k * Math.sin(f * Math.PI);
+  } },
+  shimmy: { base: null, face: 'happy', fx(a, root, tt) {
+    const A = armsOf(a), P = a.parts, k = sm(tt * 4), drop = 1 - sm((tt - 3.2) / 0.5);
+    set(A.shR, -0.3 * k, 0, (-1.9 + Math.sin(tt * 9) * 0.25) * k * drop - 0.2 * (1 - drop)); if (A.elR) A.elR.rotation.x = -0.4 * k * drop;
+    set(A.shL, 0, 0, 0.45 * k); if (A.elL) A.elL.rotation.x = -0.9 * k;
+    if (P.torso) { P.torso.rotation.z += Math.sin(tt * 16) * 0.15 * k; P.torso.rotation.y += Math.sin(tt * 8) * 0.12 * k; }
+    root.position.x += Math.sin(tt * 8) * 0.025 * k; root.position.y += Math.abs(Math.sin(tt * 8)) * 0.02 * k;
+  } },
+  mosh: { base: null, face: 'angry', fx(a, root, tt) {
+    const A = armsOf(a), P = a.parts, s = Math.sin(tt * 7), k = sm(tt * 3);
+    set(A.shL, (-2.2 + s * 0.5) * k, 0, 0.3 * k); set(A.shR, (-2.2 - s * 0.5) * k, 0, -0.3 * k);
+    if (A.elL) A.elL.rotation.x = -1.2 * k; if (A.elR) A.elR.rotation.x = -1.2 * k;
+    if (P.neck) P.neck.rotation.x += Math.sin(tt * 14) * 0.55 * k;
+    if (P.torso) P.torso.rotation.x += (0.25 + Math.sin(tt * 14) * 0.15) * k;
+    root.position.y += Math.abs(s) * 0.14 * k;
   } },
   lagspike: { base: null, face: 'scared', fx(a, root, tt) {
     const n = Math.floor(tt * 6), back = n % 4 === 3, ry = root.rotation.y;
@@ -140,6 +180,12 @@ export const RULES = {
   'hat:blackhole': { test: (p) => p.level >= 40, prog: (p) => [Math.min(40, p.level), 40] },
   'skin:lava': { test: (p) => nn(st(p).creatureKills) >= 300, prog: (p) => [Math.min(300, nn(st(p).creatureKills)), 300] },
   'emote:undo': { test: (p) => p.level >= 15, prog: (p) => [Math.min(15, p.level), 15] },
+  // wave 8 (cosm8_data.js): mod counters live in profile.cosm5.flags (game.cosm5.bump(name))
+  'suit:reaper': { test: (p) => nn(st(p).quotasMet) >= 8, prog: (p) => [Math.min(8, nn(st(p).quotasMet)), 8] },
+  'hat:trendcrown': { test: (p) => p.level >= 30, prog: (p) => [Math.min(30, p.level), 30] },
+  'suit:chosen': { test: (p) => nn(p.cosm5?.flags?.quoted) >= 8, prog: (p) => [Math.min(8, nn(p.cosm5?.flags?.quoted)), 8] },
+  'skin:voidstar': { test: (p) => nn(p.cosm5?.flags?.appraised) >= 40, prog: (p) => [Math.min(40, nn(p.cosm5?.flags?.appraised)), 40] },
+  'emote:mosh': { test: (p) => nn(p.cosm5?.flags?.raved) >= 5, prog: (p) => [Math.min(5, nn(p.cosm5?.flags?.raved)), 5] },
 };
 export const progress5 = (p, key) => { try { return RULES[key]?.prog?.(p) || null; } catch { return null; } };
 
@@ -449,6 +495,7 @@ export function installCosm5(game) {
 
   const api = {
     catalog: () => C5.slice(), entry: (key) => C5_BY_KEY[key] || null, owns: (key) => owns5(profile(), C5_BY_KEY[key]), ownedKeys: () => ownedKeys(profile()),
+    bump: (flag, n = 1) => { const c = profile().cosm5; c.flags[flag] = nn(c.flags[flag]) + n; scanT = 0; game.progress?.save?.(); return c.flags[flag]; },   // wave 8: mod counters
     grant: (key, o) => grant(key, o), reward, buy, equipSkin, skin: () => profile().cosm5.skin,
     offers: () => offersFor(profile()), rotation, cosmeticPool, rollCosmetic, encodeLook, decodeLook, code: codeOfSelf, peerLooks,
     skinOfItem: (it) => skinOf(it?.obj?.userData?.inner), scan, syncSkins,

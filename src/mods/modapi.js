@@ -26,7 +26,8 @@ import { G } from '../physics/physics.js';
 import { loadModState, saveModState } from '../core/save.js';
 import { Emitter } from '../core/events.js';
 import { buildModsScreen } from './modscreen.js';
-import { t, tf } from '../core/i18n.js';
+import { t, tf, addTranslations } from '../core/i18n.js';
+import { installLcModsI18n } from '../game/lcmods_i18n.js';   // wave 8: names / texts of the lcmods pack
 
 // events that are never gated for built-in features: 'boot'/'netReady' install patches (the patched
 // code checks featureOn itself), 'sessionEnd' must always clean up
@@ -59,9 +60,11 @@ export class ModManager extends Emitter {
 
   // ------------------------------------------------------------------ public API (window.KefalAPI)
   installGlobal() {
+    installLcModsI18n(addTranslations);
     const mm = this;
     const api = {
       version: 2,
+      t, tf,   // wave 8: mods can localise their own strings (lcmods_i18n.js)
       THREE,
       ITEMS, CREATURES, MOONS, MOON_ORDER, BIOMES, WEATHER, BEHAVIORS, STORE_ITEMS, SHIP_UPGRADES, SCRAP_TABLE, MARKET,
       SUIT_COLORS, HATS, STATE_SOUNDS, LOOPS, SHIP, FACILITY_Y, RNG, hashString, G,

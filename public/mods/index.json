@@ -33,6 +33,12 @@
     "disco-facility.js",
     "infinite-sprint.js",
     "night-vision.js",
-    "more-suits.js"
+    "more-suits.js",
+    "loot-appraiser.js",
+    "quick-change.js",
+    "ship-radio.js",
+    "dance-party.js",
+    "shift-awards.js",
+    "algorithm-quotes.js"
   ]
 }
