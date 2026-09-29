@@ -1,7 +1,7 @@
 // The crew ship: always at the world origin. Interior (terminal, lever, monitors, door, storage,
 // arcade, bunks) + exterior hull, floodlight, steps. Colliders are static; the door has a toggled collider.
 import * as THREE from 'three';
-import { GeoBuilder, levelMaterial } from './geobuilder.js';
+import { GeoBuilder, levelMaterial, mergeStaticMeshes } from './geobuilder.js';
 import { createProp } from '../models/props.js';
 import { G } from '../physics/physics.js';
 import { boxOccupied } from './doorsafe.js';
@@ -284,12 +284,12 @@ export function buildShip({ physics, lightPool, scene }) {
   door.update(0);
 
   // --- furniture (props) ---
-  const anchors = {};
+  const anchors = {}, propRoots = [];
   const put = (id, x, y, z, rotY, name) => {
     let o = null;
     try { o = createProp(id, { seed: 3 }); } catch (e) { console.warn('ship prop', id, e); return null; }
     o.position.set(x, y, z); o.rotation.y = rotY;
-    group.add(o);
+    group.add(o); propRoots.push(o);
     o.updateMatrixWorld(true);
     for (const c of o.userData.colliders || []) {
       const cp = new THREE.Vector3(...c.c).applyMatrix4(o.matrixWorld);
@@ -324,6 +324,15 @@ export function buildShip({ physics, lightPool, scene }) {
   emitters.forEach((e) => { if (e.pos.y > S.h - 0.05) e.pos.y = S.h - 0.4; });
   if (!emitters.length) {
     for (const [x, z] of LAMPS) emitters.push(lightPool.add({ pos: new THREE.Vector3(x, S.h - 0.4, z), color: 0xffe2b8, intensity: 1, distance: 9, group: 'ship' }));
+  }
+
+  // [perf2] merge the static parts of the furniture into per-material meshes (draw calls). Interactables stay separate: every prop anchor
+  // (screens, lever handle, doors, buttons ...) is flagged noMerge, so only fixed casings / frames / lamps are baked. Kill switch: __kefalNoShipMerge or ?nomerge.
+  if (!globalThis.__kefalNoShipMerge && !(typeof location !== 'undefined' && /[?&]nomerge\b/.test(location.search || ''))) {
+    try {
+      for (const o of propRoots) for (const a of Object.values(o.userData.anchors || {})) for (const n of Array.isArray(a) ? a : [a]) if (n?.isObject3D) n.userData.noMerge = true;
+      group.userData.shipMerged = mergeStaticMeshes(propRoots, group, 24, 2.5);
+    } catch (e) { console.warn('ship prop merge', e); }
   }
 
   // floodlight on the roof (for night): emitter toggled by game

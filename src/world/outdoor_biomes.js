@@ -15,6 +15,7 @@ import { RNG } from '../core/rng.js';
 import { createAnyProp } from './propfactory.js';
 import { levelTexture } from './geobuilder.js';
 import { getTexture, getBasicMaterial, makeCanvasTexture } from '../render/textures.js';
+import { thinDecor } from '../render/quality.js';   // [perf2]
 
 const TAU = Math.PI * 2;
 const _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3();
@@ -74,6 +75,7 @@ function disposeAll(C) {
 // ------------------------------------------------------------------ shared helpers
 /** InstancedMesh from a list of { x, y, z, rx, ry, rz, sx, sy, sz, color? } */
 function instanced(C, geo, mat, list, { owned = true, colors = false } = {}) {
+  list = thinDecor(list);   // [perf2] graphics preset: fewer decor instances on Low
   if (!list.length) return null;
   const inst = new THREE.InstancedMesh(geo, mat, list.length);
   list.forEach((p, i) => {

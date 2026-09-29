@@ -1,6 +1,7 @@
 // Renderer + PSX pipeline: low-res render target, vertex snapping (global shader chunk patch),
 // depth-based outlines, Bayer dithering + color quantization, screen effects.
 import * as THREE from 'three';
+import { QUALITY, applyQualityLevel, resolveLevel } from '../render/quality.js';   // [perf2]
 import { MIRROR_FS_DECL, MIRROR_FS_UV, MIRROR_FS_GRADE } from '../render/mirrorfx.js';   // [mirror] dimension post look (docs/wave2/mirror.md)
 
 let psxPatched = false;
@@ -113,8 +114,8 @@ ${MIR ? MIRROR_FS_UV : ''}   // [mirror]
     col *= 1.0 - edge * 0.8 * uOutline;
   }
 
-  // cheap bloom: gather bright neighbours at 2 radii
-  {
+  // cheap bloom: gather bright neighbours at 2 radii (skipped on Low)
+  if (uBloom > 0.0) {
     vec2 px = 1.0 / uRes;
     vec3 bl = vec3(0.0);
     for (int i = 0; i < 8; i++) {
@@ -192,6 +193,7 @@ const POST_FS = postFS(false), POST_FS_MIRROR = postFS(true);   // [mirror]
 export class Engine {
   constructor(container, settings) {
     this.settings = settings;
+    applyQualityLevel(resolveLevel(settings));   // [perf2]
     patchPSX(settings.vertexJitter ?? 1);
     this.renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance', stencil: false });
     this.renderer.setPixelRatio(1);
@@ -252,6 +254,7 @@ export class Engine {
   applySettings() {
     const s = this.settings;
     this.camera.fov = s.fov;
+    applyQualityLevel(resolveLevel(s));   // [perf2]
     this.camera.updateProjectionMatrix();
     this.postMat.uniforms.uDither.value = s.dither ? 1.0 : 0.0;
     this.postMat.uniforms.uOutline.value = s.outlines ? 1.0 : 0.0;
@@ -317,6 +320,7 @@ export class Engine {
     fx.shake = Math.max(0, fx.shake - dt * 2.5);
     fx.fade += (this.fadeTarget - fx.fade) * Math.min(1, dt * 4);
     u.uTime.value = this.time;
+    u.uBloom.value = QUALITY.bloom;   // [perf2]
     u.uFlash.value.set(fx.flashColor.r, fx.flashColor.g, fx.flashColor.b, Math.min(1, fx.flash));
     u.uHurt.value = Math.min(0.85, fx.hurt);
     u.uFade.value = fx.fade;

@@ -20,6 +20,8 @@ import { LobbyDirectory } from './net/lobby.js';
 import { installHub } from './net/hub.js';   // [social]
 import { createHubNotifier } from './ui/panels/hub.js';   // [social]
 import { Game } from './game/game.js';
+import { FpsProbe, chooseQuality, applyQualityLevel, resolveLevel } from './render/quality.js';   // [perf2]
+import { preloadLazyModules } from './game/lazymods.js';   // [perf2] heavy session-only modules are separate chunks
 import { setClassicAvatar } from './models/avatar.js';   // [avatar2]
 import { ShipScreens } from './game/screens.js';
 import { CRTMenu } from './ui/crtmenu.js';
@@ -113,6 +115,8 @@ class App {
     this.ui.showMenu('title');
     this.bindKeys();
     this.booted = true;
+    if (this.settings.quality === 'auto' && !this.settings.qualityAuto && !navigator.webdriver) this.qprobe = new FpsProbe(3);   // [perf2] first boot: 3 s fps probe on the menu scene
+    setTimeout(() => preloadLazyModules(), 1200);   // [perf2] prefetch the lazy chunks while the player reads the menu
     try { installHub(this); this.hubNotifier = createHubNotifier(this); } catch (e) { console.warn('[social] hub', e); }   // [social] optional, never blocks the game
     if (this.audio.ctx && !this.game) this.startMenuAudio();
     requestAnimationFrame((t) => this.loop(t));
@@ -213,6 +217,7 @@ class App {
     await this.audio.init();
     this.audio.resume();
     this.audio.stopAll();
+    if ((await preloadLazyModules()).length) await preloadLazyModules();   // [perf2] usually already prefetched in idle time after boot; one retry
     this.menu?.dispose();
     this.menu = null;
     const scene = new THREE.Scene();
@@ -279,10 +284,21 @@ class App {
   }
 
   // ------------------------------------------------------------------ loop
+  finishQualityProbe() {   // [perf2] auto quality: Medium keeps the player's own resolution/outline settings, Low/High write their preset
+    const level = this.qprobe.level();
+    this.qprobe = null;
+    this.settings.qualityAuto = level;
+    if (level === 'medium') applyQualityLevel('medium'); else chooseQuality(this.settings, 'auto');
+    saveSettings(this.settings);
+    this.applySettings();
+    console.info('[perf2] auto quality ->', level);
+  }
+
   loop(now) {
     requestAnimationFrame((t) => this.loop(t));
     let dt = (now - this.last) / 1000;
     this.last = now;
+    if (this.qprobe && this.booted && !this.game && this.qprobe.push(dt)) this.finishQualityProbe();   // [perf2]
     if (dt > 0.1) dt = 0.1;
     try {
       if (this.game) {

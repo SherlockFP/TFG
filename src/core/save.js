@@ -31,6 +31,8 @@ export const DEFAULT_KEYS = {
 export function defaultSettings() {
   return {
     lang: detectLang(navigator.language),   // first run: tr -> TR, ru -> RU, anything else -> EN
+    quality: 'auto',        // [perf2] 'auto' | 'low' | 'medium' | 'high' (render/quality.js)
+    qualityAuto: null,      // [perf2] level the first-boot 3 s fps probe picked (null = not probed yet)
     renderHeight: 360,      // internal PSX resolution (240/360/480/720)
     fov: 72,
     sensitivity: 1.0,

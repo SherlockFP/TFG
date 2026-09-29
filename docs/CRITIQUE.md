@@ -253,3 +253,6 @@ Every outdoor moon now has the same original signature layer (pylons that watch,
 
 ## Wave 6 - dance (docs/wave6/dance.md)
 The dance list is now big and readable (wheel pages, favourites, search, thumbnails) and the crew can lock to one beat, but every animation is hand-typed numbers checked by unit tests and a couple of screenshots, not by an animator's eye; sync is per-viewer and the music is not beat-locked across players, and most dances are free so the shop/crate rows are thin incentives.
+
+## Wave 7 - perf2
+Low preset is unverified against the 60 percent draw-call target (instanced decor thinning cuts triangles, not calls); module-added ship props (workbench, arcade table...) still unmerged; Rapier wasm (4.3 MB) dominates first load.

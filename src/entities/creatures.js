@@ -1,6 +1,7 @@
 // Creatures: host-side AI simulation (behaviors per type) + client-side views (interpolated models,
 // state sounds, loops, hit flash, nameplates). Hazards (turret, mine, web, mimic door) are creatures too.
 import * as THREE from 'three';
+import { QUALITY } from '../render/quality.js';   // [perf2]
 import { CREATURES, creatureLevelStats, VARIANTS, AFFIXES, variantOf, rollAffix, creatureDisplayName } from '../game/creatures.js';
 import { createCreatureModel } from '../models/creatures.js';
 import { createProp } from '../models/props.js';
@@ -275,7 +276,13 @@ export class CreatureView {
       const head = game.playerHeadById(this.extra);
       if (head) { this.root.updateMatrixWorld(); aim = this.root.worldToLocal(head.clone().add(V.set(0, -0.35, 0))); }
     }
-    this.model.update(dt, { state: this.state, speed: Math.min(speed, 14), t: this.stateT, time: game.time, progress: typeof this.extra === 'number' ? this.extra : 0, aim });
+    // [perf2] creature LOD: far-away bodies animate every lodSkip-th frame with the accumulated dt (dead / aiming ones always run)
+    let mdt = dt;
+    if (QUALITY.lodFar && QUALITY.lodSkip > 1 && !aim && this.state !== 'dead' && this.pos.distanceToSquared(game.camera.position) > QUALITY.lodFar * QUALITY.lodFar) {
+      this._lodT = (this._lodT || 0) + dt; this._lodN = (this._lodN || 0) + 1;
+      if (this._lodN % QUALITY.lodSkip) mdt = -1; else { mdt = this._lodT; this._lodT = 0; }
+    } else this._lodT = 0;
+    if (mdt >= 0) this.model.update(mdt, { state: this.state, speed: Math.min(speed, 14), t: this.stateT, time: game.time, progress: typeof this.extra === 'number' ? this.extra : 0, aim });
     this.hitFlash = Math.max(0, this.hitFlash - dt * 4);
     // 'Hot Take' affix: the corpse blinks and beeps faster and faster until the host detonates it
     if (this.fuseT >= 0) {

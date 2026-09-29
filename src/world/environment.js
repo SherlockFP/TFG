@@ -2,6 +2,7 @@
 // space backdrop for orbit (stars + planet).
 import * as THREE from 'three';
 import { clamp, lerp } from '../core/util.js';
+import { QUALITY } from '../render/quality.js';   // [perf2]
 
 function skyDome() {
   const geo = new THREE.SphereGeometry(380, 16, 10);
@@ -277,7 +278,7 @@ export class Environment {
     this.frameSky = this.frameSky || 0;
     if ((this.frameSky++ % 10) === 0) this.setSkyColors(top, horizon, fogC);
     this.scene.fog.color.copy(fogC);
-    this.scene.fog.density = fogD;
+    this.scene.fog.density = fogD * (this.indoor ? 1 : QUALITY.fogMul);   // [perf2]
     this.scene.background.copy(fogC);
     this.sky.visible = !this.indoor;
     this.sky.position.copy(camPos);

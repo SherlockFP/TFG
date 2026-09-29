@@ -356,7 +356,7 @@ await ok('host.js loot edits are real statements (no comment swallowed the outdo
   assert.match(src, /rng\.chance\(0\.8 \* BALANCE\.lootCountMul\)/);
   assert.match(src, /Math\.round\(rng\.int\(1, 2 \+ Math\.floor\(moon\.tier \/ 2\)\) \* BALANCE\.lootCountMul\)/);
   const g = fs.readFileSync(new URL('../../src/game/game.js', import.meta.url), 'utf8');
-  assert.match(g, /this\.useModule\('worlds2', installWorlds2\)/); assert.match(g, /import \{ installWorlds2 \} from '\.\/worlds2\.js'/);
+  assert.match(g, /this\.useModule\('worlds2', installWorlds2\)/); assert.match(g, /import \{ installWorlds2 \} from '\.\/(worlds2|lazymods)\.js'/);
 });
 
 console.log(`worlds2: ${n} checks passed`);
