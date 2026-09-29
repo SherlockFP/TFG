@@ -73,3 +73,9 @@ Most packs are CC0 (public domain) — credit is not required but given anyway.
   JDSherbert Footstep Foley SFX (no redistribution of raw files), Polarsound Household Interior Foley
   (no redistribution as standalone files), Hove Audio Horror Ambiences (no license stated),
   Quaternius Bestiary Standard (free models ship without animations).
+
+## Fonts (UI2, bundled in `src/ui/fonts/`, SIL Open Font License 1.1)
+
+- **Barlow Condensed** (Jeremy Tribby) - label / title face, latin + latin-ext subsets, via `@fontsource/barlow-condensed`.
+- **Roboto Condensed** (Christian Robertson) - Cyrillic fallback of the label face, via `@fontsource/roboto-condensed`.
+- VT323 (Peter Hull) and Press Start 2P (CodeMan38) are bundled through `@fontsource` (package.json).

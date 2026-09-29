@@ -16,6 +16,7 @@ import { isoWeek, weeklySpec, weeklyMods, ensureWeeklyProfile } from '../../game
 import { crewLevelOf, ensureCrewProfile, publicCrew } from '../../game/crew.js';
 import { EMOTES, LOCKED_EMOTES, isEmoteUnlocked } from '../../game/emotes.js';
 import { iconImg } from '../icons.js';
+import { glyphFromEmoji } from '../glyphs.js';   // [ui2]
 import { getLang, addTranslations, t, t as _t } from '../../core/i18n.js';
 import { saveProfile } from '../../core/save.js';
 
@@ -117,7 +118,7 @@ function btn(label, fn, cls = '') {
 function card(on, icon, name, tag, lines) {
   const c = mk('div', 'rec-card ' + (on ? 'on' : 'off'));
   const ic = mk('div', 'rec-ic');
-  if (icon instanceof HTMLElement) ic.appendChild(icon); else ic.textContent = icon || '?';
+  if (icon instanceof HTMLElement) ic.appendChild(icon); else ic.innerHTML = glyphFromEmoji(icon || '?');   // [ui2] vector pictograms instead of emoji
   const body = mk('div', 'rec-cb');
   const n = mk('div', 'rec-n', name);
   if (tag) n.appendChild(mk('span', 'rec-t', tag));

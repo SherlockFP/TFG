@@ -7,6 +7,7 @@ import { el, escapeHtml, clamp } from '../core/util.js';
 import { t, setLang, getLang, LANGS, tf } from '../core/i18n.js';
 import { HUD, randomTip } from './hud.js';
 import { iconHTML, typeFromName } from './icons.js';
+import { glyph } from './glyphs.js';   // [ui2]
 import { listRuns, loadRun, deleteRun, saveSettings, saveProfile, DEFAULT_KEYS } from '../core/save.js';
 import { SKILLS, SKILL_CAP, xpForLevel, rankOf, derivedStats, MARKET, armorDef, dailyBounties, bountyText } from '../game/progression.js';
 import { ITEMS, RARITY } from '../game/items.js';
@@ -69,7 +70,7 @@ export class UI {
     this.root.appendChild(this.mgLayer);
     this.clickHint = el('div', { class: 'click-hint hidden' }, t('Click to resume'));
     this.root.appendChild(this.clickHint);
-    this.soundHint = el('div', { class: 'sound-hint hidden' }, t('🔇 Sound is off - click anywhere to enable it'));
+    this.soundHint = el('div', { class: 'sound-hint hidden', html: glyph('mute') + ' ' + escapeHtml(t('🔇 Sound is off - click anywhere to enable it').replace('🔇 ', '')) });   // [ui2]
     this.root.appendChild(this.soundHint);
     this.panelOpen = null;
     this.marketOpen = false;
@@ -541,7 +542,7 @@ export class UI {
         const full = l.players >= l.max;
         const blocked = full || l.incompatible;
         const row_ = el('div', { class: 'lobby-row' + (l.incompatible ? ' bad' : '') + (full ? ' full' : ''), tabindex: blocked ? -1 : 0, 'data-code': l.code },
-          el('div', { class: 'l-name' }, (l.locked ? '🔒 ' : '') + (l.name || '?')),
+          el('div', { class: 'l-name', html: (l.locked ? glyph('lock') + ' ' : '') + escapeHtml(l.name || '?') }),   // [ui2]
           el('div', { class: 'l-host' }, avIcon(fromWire(l.av) || defaultAvatar(l.host || '?'), 16), (l.host || '?') + tf(' · Lv.{n}', { n: l.level || 1 }) + (l.stars ? ` ★${l.stars | 0}` : '') + (l.crew ? ` · [${String(l.crewTag || '').slice(0, 4)}] ${String(l.crew).slice(0, 24)} (C${l.crewLv | 0})` : '')),
           el('div', { class: 'l-pl' }, el('span', { class: 'l-bar' }, el('i', { style: { width: clamp((l.players / Math.max(1, l.max)) * 100, 0, 100) + '%' } })), ` ${l.players}/${l.max}`),
           el('div', { class: 'l-ph' }, `${String(l.phase || '').toUpperCase()} ${l.moon || ''}`),

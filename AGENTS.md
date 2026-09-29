@@ -454,3 +454,10 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
 - Wrappers on the host.js flow live in `src/game/cycle.js` (`hostEvaluateQuota / hostLever / hostSetPhase / hostPopulateMoon / hostBeginTakeoff / hostFinishTakeoff / hostUpdate`, `applyRunState`, `onPhase`, the `unlock` handler). Net: `cyx`, `cyreq`. State: `run.cycle`.
 - Tests: `node tools/harness/cycle.test.mjs`, `cycle2_plan.test.mjs`, `cycle2_bosses.test.mjs`, `cycle2_flow.test.mjs` (real host flow + fuzz + soft-lock proof), `cycle2_i18n.test.mjs`.
 - First job when a browser is available: land on a core of every interior, watch the 3 new boss fights (name card, HP bar, rings), open the arena with cards, run a keystone and a raid with 2 tabs.
+### 5.16 Wave 4 - UI2: one art direction "company-issued equipment" (module `ui2`, docs/wave4/ui2.md; build + one headless screenshot run)
+- New override layer `src/ui/theme.css` (+ `theme.js`, imported from main.js, adds class `tfg-ui` on `<html>`; remove that class to compare with the old look). Tokens `--t-*`,
+  bundled condensed label font (Barlow Condensed / Roboto Condensed Cyrillic, `src/ui/fonts/`), `--font2` and `--cond` now both = that face (Press Start 2P is no longer used for labels).
+  Hard edges, plate titles on hazard tape, segmented bars, flat cards, no glow/lift. Panel JS was not rewritten: everything keys off the existing base classes
+  (`.menu-frame`, `.cp-head/.cp-sec/.cp-body/.cp-foot`, `.btn*`, `*card*`, `.rl/.pt/.rec/.lb/.crp` roots). New helpers: `src/ui/glyphs.js` (`glyph(name)`, `glyphFromEmoji`), classes `.tfg-plate/.tfg-tag/.tfg-kbd/.tfg-num/.tfg-bar/.tfg-card/.tfg-hazard`.
+- Rule for panel authors: use `ui.frame()` / the base classes, `glyph()` instead of emoji, no border-radius/glow/gradient cards/`backdrop-filter`, colours from `--t-*` / `--ph*`.
+- Tools: `tools/harness/ui2_shots.mjs` (before/after from ONE page, `--both`), `tools/harness/ui2_glyphs.test.mjs`.

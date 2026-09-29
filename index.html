@@ -10,6 +10,7 @@
     html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
     #loading { position: fixed; inset: 0; background: #050302; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; color: #ff9a4a; font-family: monospace; }
     #loading.hidden { display: none; }
+    #loading::after { content: ''; width: 220px; height: 6px; margin-top: 16px; background: repeating-linear-gradient(-45deg, #ffb800 0 5px, #17110a 5px 10px); }   /* ui2: hazard tape */
   </style>
 </head>
 <body>

@@ -3,6 +3,7 @@
 // overlays, run chips (daily event / favor / streak), outdoor compass, and the landing briefing card.
 import * as THREE from 'three';
 import { iconHTML, typeFromName } from './icons.js';
+import { glyph } from './glyphs.js';   // [ui2]
 import { el, escapeHtml, fmtClock, clamp } from '../core/util.js';
 import { itemDef } from '../game/items.js';
 import { affixShortName } from '../game/loot.js';
@@ -126,7 +127,7 @@ export class HUD {
         <div class="hud-weight">0 lb</div>
         <div class="hud-chips"></div>
       </div>
-      <div class="hud-clock hidden"><span class="clock-icon">☀</span><span class="clock-time">8:00 AM</span></div>
+      <div class="hud-clock hidden"><span class="clock-icon">${glyph('sun')}</span><span class="clock-time">8:00 AM</span></div>
       <div class="hud-compass hidden"><canvas width="440" height="46"></canvas></div>
       <div class="hud-tr">
         <div class="hud-level"><span class="lvl">Lv.1</span> <span class="rank">Intern</span></div>
@@ -143,7 +144,7 @@ export class HUD {
       <div class="hud-big hidden"><div class="big-main"></div><div class="big-sub"></div></div>
       <div class="hud-dead hidden"><div class="dead-main">DECEASED</div><div class="dead-sub"></div><div class="dead-tip"></div></div>
       <div class="hud-spec hidden"></div>
-      <div class="hud-voice hidden">🎙</div>
+      <div class="hud-voice hidden">${glyph('mic')}</div>
       <div class="hud-dmgdir"></div>
       <div class="hud-xpfeed"></div>
       <div class="hud-scanring hidden"></div>
@@ -357,7 +358,7 @@ export class HUD {
     const ev = todaysEvent(run);
     if (ev) {
       const fx = eventEffects(ev).slice(0, 3);
-      parts.push(`<span class="chip-ev ${eventMood(ev)}"><b>⚡ ${escapeHtml(eventName(ev))}</b>${fx.length ? `<i>${escapeHtml(fx.join(' · '))}</i>` : ''}</span>`);
+      parts.push(`<span class="chip-ev ${eventMood(ev)}"><b>${glyph('bolt')} ${escapeHtml(eventName(ev))}</b>${fx.length ? `<i>${escapeHtml(fx.join(' · '))}</i>` : ''}</span>`);
     }
     const favor = Number(run.favor);
     if (Number.isFinite(favor) && favor > 0 && Math.abs(favor - 1) > 0.004) parts.push(`<span class="chip-m ${favor >= 1 ? 'good' : 'bad'}">${t('FAVOR')} ×${favor.toFixed(2)}</span>`);
@@ -448,7 +449,7 @@ export class HUD {
          <div><span>${t('DANGER')}</span><b class="br-danger d${danger}"><span class="br-pips">${pips}</span>${dangerName(danger)}</b></div>
          <div><span>${t('LOOT')}</span><b>×${lootMul.toFixed(2)}</b></div>`;
     const fx = eventEffects(ev);
-    const evHtml = ev ? `<div class="br-event ${eventMood(ev)}"><div class="br-ek">${t('DAILY EVENT')}</div><div class="br-en">⚡ ${escapeHtml(eventName(ev))}</div>
+    const evHtml = ev ? `<div class="br-event ${eventMood(ev)}"><div class="br-ek">${t('DAILY EVENT')}</div><div class="br-en">${glyph('bolt')} ${escapeHtml(eventName(ev))}</div>
       <div class="br-ed">${escapeHtml(eventDesc(ev))}</div>${fx.length ? `<div class="br-fx">${fx.map((x) => `<i>${escapeHtml(x)}</i>`).join('')}</div>` : ''}</div>` : '';
     this.briefTip = randomTip(this.briefTip);
     this.$.brief.innerHTML = `<div class="br-bar top"></div><div class="br-bar bot"><span class="br-tip"><b>${t('TIP')}</b> ${escapeHtml(t(this.briefTip))}</span></div>
@@ -509,7 +510,8 @@ export class HUD {
     this.$.clock.classList.toggle('hidden', !onMoon);
     if (onMoon) {
       this.$.clockTime.textContent = fmtClock(run.time || 480);
-      this.$.clockIcon.textContent = (run.time || 480) > 18.5 * 60 ? '☾' : '☀';
+      const night = (run.time || 480) > 18.5 * 60;   // [ui2] vector sun / moon instead of text glyphs
+      if (this._night !== night) { this._night = night; this.$.clockIcon.innerHTML = glyph(night ? 'moon' : 'sun'); }
       this.$.clock.classList.toggle('late', (run.time || 0) > 22 * 60);
     }
     // compass (outdoors on a moon, not inside the ship)
