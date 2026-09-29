@@ -10,6 +10,7 @@
 // (facilitysys 'alarm' when present), loot spawns, tool wear. Clients only start / cancel work and play the minigames; the host checks the
 // tool, the distance and that enough time really passed. Net (one handler each): request 'slAct' {op: sync|begin|end|open|fail|drill|fix|pack},
 // host -> all 'slSt' (HOST_ONLY) container deltas / the late-join list. Never changes the light count (glow is emissive only).
+import { cageDifficulty } from './lockpick2_core.js';   // [lockpick2] cage lock tier by quota
 import * as THREE from 'three';
 import { RNG } from '../core/rng.js';
 import { addTranslations, t, tf, sysMsg } from '../core/i18n.js';
@@ -273,7 +274,7 @@ export function installSecureLoot(game) {
     req('begin', { id: c.id, m: m.id, tool: sel.entry?.id, aux: sel.aux?.id });
     const ti = tierIndex(sel.entry?.tier || 'common');
     const opts = m.minigame === 'hack' ? { difficulty: clamp(0.3 + q * 0.04, 0, 0.9), tries: 2 + (ti >= 2 ? 1 : 0) }
-      : m.minigame === 'safe' ? { difficulty: clamp(0.22 + q * 0.03, 0, 0.8) } : { difficulty: clamp(0.4 + q * 0.03, 0, 0.9) };
+      : m.minigame === 'safe' ? { difficulty: clamp(0.22 + q * 0.03, 0, 0.8) } : { difficulty: cageDifficulty(q), noXp: false };
     game.openMinigame(m.minigame, opts, (res) => {
       if (!map || c.opened) return;
       if (res.cancelled) { req('end', { id: c.id }); return; }

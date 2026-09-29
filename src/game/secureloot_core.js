@@ -7,6 +7,7 @@
 //   planContainers()       how many / which containers a facility gets per quota (seeded, deterministic)
 //   rollContents()         the (seeded) loot of a container: tier floor +1 and up, shards / tools / gear sometimes
 //   registerSecureItems() / registerSecureRecipes()   the 5 tools + Code Slip + crafting recipes (idempotent)
+import { CAGE_PICKS } from './lockpick2_core.js';   // [lockpick2] lockpick + titanium pick + bypasser
 import { RNG, hashString } from '../core/rng.js';
 import { TIER_ORDER, TIERS, tierIndex, rollTier, tierOfItem } from './tiers.js';
 import { ITEMS, registerItem } from './items.js';
@@ -118,7 +119,7 @@ export const METHODS = {
   ],
   cage: [
     { id: 'bolt', tools: [T.BOLT], base: 3, noise: { loud: 0.6, every: 1.5 }, wear: 1 },
-    { id: 'pick', tools: [T.PICK], minigame: 'lockpick', noise: { loud: 0.25, every: 2 }, wear: 1 },
+    { id: 'pick', tools: CAGE_PICKS, minigame: 'lockpick', noise: { loud: 0.25, every: 2 }, wear: 1 },
     { id: 'pry', pry: true, base: 6, noise: { loud: 1.1, every: 0.9 }, alarmP: 0.05, crude: true },
     { id: 'bash', melee: true, base: 14, noise: { loud: 1.9, every: 1.1 }, alarmP: 0.15, crude: true },
   ],

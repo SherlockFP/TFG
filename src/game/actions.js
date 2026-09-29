@@ -1,5 +1,6 @@
 // Local player actions (installed on Game.prototype): interaction, inventory, item use, combat,
 // grab beam, scan, damage/death/spectate, minigame launching, held item visuals.
+import { isPickType, doorDifficulty } from './lockpick2_core.js';   // [lockpick2] door locks: Simple on tier-1 moons, Standard later
 import * as THREE from 'three';
 import { G } from '../physics/physics.js';
 import { itemDef, isSellable, RARITY, FISH_TABLE } from './items.js';
@@ -241,7 +242,7 @@ export const actionMethods = {
         ? { label: t('Insert the access card [E]'), action: () => this.net.request('unlock', { id: door.id, key: held.id }) }
         : { label: t('Locked'), sub: t('Needs the access cards of the Key Holders'), action: () => this.audio.at('door_locked', door.pos.clone().add(UP), 0.8) };
       if (held?.type === 'key') return { label: t('Unlock door with key [E]'), action: () => this.net.request('unlock', { id: door.id, key: held.id }) };
-      if (held?.type === 'lockpick') return { label: t('Pick the lock [E]'), action: () => this.startLockpick(door, held) };
+      if (isPickType(held?.type)) return { label: t('Pick the lock [E]'), action: () => this.startLockpick(door, held) };
       return { label: t('Locked'), sub: t('Needs a key or lockpicker'), action: () => this.audio.at('door_locked', door.pos.clone().add(UP), 0.8) };
     }
     return { label: door.open ? t('Close door [E]') : t('Open door [E]'), action: () => this.net.request('door', { id: door.id, open: !door.open }) };
@@ -1181,7 +1182,7 @@ export const actionMethods = {
     });
   },
   startLockpick(door, pick) {
-    this.openMinigame('lockpick', { difficulty: 0.4 }, (res) => {
+    this.openMinigame('lockpick', { difficulty: doorDifficulty(this.hostDangerGuess()) }, (res) => {
       if (res.success) this.net.request('unlock', { id: door.id });
       if (!res.cancelled) {
         pick.charges = Math.max(0, (pick.charges ?? 3) - 1);
