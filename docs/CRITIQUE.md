@@ -265,3 +265,5 @@ Palettes are tuned by simulation, not by eye (tests check delta-E under CVD matr
 Low preset is unverified against the 60 percent draw-call target (instanced decor thinning cuts triangles, not calls); module-added ship props (workbench, arcade table...) still unmerged; Rapier wasm (4.3 MB) dominates first load.
 ## Wave 8 - balance (docs/wave8/balance.md)
 One-shots are gone except telegraphed hazards from quota 4, but the sim's solo shovel player still dies 40-60 % on mid quotas from attrition alone (no healing/dodge model); the 0.4 s wind-up gate is untested in a live browser and relies on behaviours setting an attack state as the visible tell.
+## Wave 8 - arcade2 (docs/wave8/arcade2.md)
+Four mini-games are only node-simulated (scripted input, ceilings, determinism), never played in a browser: feel/difficulty and the TARGETS (25 / 30 / 60 / 90) are guesses; the canvas HUD shows English arcade words (bitmap font has no Cyrillic/Turkish glyphs); the per-day cap depends on the UTC clock so a host restart only keeps it via the host profile copy; the cabinet screen still shows the old attract loop.

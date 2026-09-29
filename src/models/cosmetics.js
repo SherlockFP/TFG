@@ -57,6 +57,7 @@ export const HATS_EXTRA = [
   { id: 'headlamp', name: 'Headlamp', tier: 'uncommon', desc: 'Looks bright. Is not a light.', how: 'Repair 3 fuse boxes' },
   { id: 'wizard', name: 'Wizard Hat', tier: 'rare', desc: 'You shall not pass the quota.', how: 'Fill 25% of the Codex' },
   ...C5_HATS,   // [cosm5]
+  { id: 'arcadecap', name: 'Arcade Champion', tier: 'legendary', desc: 'A joystick on a cap. Worn by whoever beat the cabinet.', how: 'Beat a target score on the ship arcade' },   // [arcade2]
   { id: 'crthead', name: 'Retired CRT', tier: 'mythic', desc: 'A tiny monitor with a green smile. It watches the Algorithm for you.', how: 'A secret hidden between Cell 07 and the moons' },   // [eggs] meta-secret reward
 ];
 
@@ -188,6 +189,10 @@ export function buildHatExtra(id) {
     case 'wizard':
       add('a', flat('#43307a'), () => [xf(G.cone(0.13, 0.36, 8), [0, 0.15, 0], [0, 0, 0.08]), xf(G.cyl(0.25, 0.25, 0.018, 10), [0, -0.05, 0])]);
       add('b', flat('#f5d02a'), () => [xf(G.box(0.03, 0.03, 0.03), [0.06, 0.07, 0.11], [0, 0.4, 0.6]), xf(G.box(0.03, 0.03, 0.03), [-0.07, 0.14, 0.08], [0.3, 0.2, 0.7]), xf(G.box(0.028, 0.028, 0.028), [0.02, 0.2, -0.1], [0.5, 0.3, 0.1]), xf(G.cyl(0.135, 0.15, 0.03, 8, true), [0, -0.02, 0])]);
+      break;
+    case 'arcadecap':   // [arcade2] dark cap, joystick stick + red ball, red band
+      add('a', flat('#1c2a33'), () => [xf(G.cyl(0.13, 0.17, 0.12, 9), [0, -0.01, 0]), xf(G.cyl(0.026, 0.026, 0.14, 6), [0, 0.13, 0])]);
+      add('b', bas('#ff3b3b'), () => [xf(G.box(0.07, 0.07, 0.07), [0, 0.22, 0]), xf(G.box(0.1, 0.02, 0.02), [0, -0.03, 0.17])]);
       break;
     case 'crthead':   // [eggs] the meta-secret hat: a little CRT with a green smile
       add('a', flat('#b9b19a'), () => [xf(G.box(0.2, 0.15, 0.17), [0, 0.02, 0]), xf(G.box(0.12, 0.09, 0.1), [0, 0.02, -0.12])]);
