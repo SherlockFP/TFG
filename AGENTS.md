@@ -317,6 +317,12 @@ Also: the tool grip offset in `refreshHeldVisuals` had the wrong sign (weapons e
 Secured containers in facilities (glass case, wall / floor safe, cage / locker, electronic lockbox, vault crate) opened with Glass Cutter / Breaching Drill (Payday-style jam + noise) / Bolt Cutters / Hack Tool / Plasma Torch / lockpick / crowbar / EMP / Code Slip, each with a loud crude melee fallback. Pure rules `src/game/secureloot_core.js` + `node tools/harness/secureloot.test.mjs`; net `slAct` / `slSt`. NOT hand-played; `tools/harness/wave2_secureloot.js` written, not run.
 + Homeworld tycoon (module `homeworld`, docs/wave2/homeworld.md): moon HOME (terminal `ROUTE HOME`), build mode ([E] console / [H]), per-game-day economy, power/cooling limits, away-raid sim + HUD; node test `tools/harness/homeworld.test.mjs` PASS (26), build OK, NOT browser-tested; shared-file hooks marked `[hw]` in game.js / host.js.
 
+### 5.15 Wave 3 - SHIPYARD (module `shipyard`, docs/wave3/shipyard.md; node-tested + builds, NOT run in a browser)
+Starter Pod core untouched, 12 modules (Cargo Bay, Garage, Engine Room, Hangar, Workshop, Med Bay, Lab, Bunk Room, Trophy Hall, Lounge, roof Observation Deck + service lift, roof Turret Hardpoint) Mk I-III on 8 sockets (`src/world/hardpoints.js`),
+doorways cut into the core walls (seals in `world/ship.js`, `ship.hardpoints`, `SHIP_EXTRA` feeds `insideShip`). Bought with credits (terminal `SHIPYARD`) or built free from ship parts (Hull Plate / Bulkhead / Engine Coil / Hardpoint Bracket: chests, bosses, siege, extraction) fed to the Frame Console (core cabin, +z wall).
+State = host profile (`profile.shipyard`, survives fired runs) mirrored in `run.sy`; paint / pattern / theme / name plate; weight = route cost +5 % per module + landing Threat + wider siege hull. Rules `src/game/shipyard_core.js`, models `src/models/shipyard.js`, panel `src/ui/panels/shipyard.js`, tests `tools/harness/shipyard*.test.mjs`.
+Gaps: no -x (nose) hardpoint, no furniture placement mode / decals / faction unlocks, never seen in a renderer (see the Unverified list in the doc).
+
 ### 5.5 Smoke test (paste in the browser console on `?autohost=local&code=T1&name=Tester`, after ~4 s)
 ```js
 const g = kefal.game, errs = []; addEventListener('error', e => errs.push(e.message));

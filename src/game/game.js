@@ -108,6 +108,7 @@ import { installGameplay2 } from './gameplay2.js';
 
 
 // [import:shipyard]
+import { installShipyard } from './shipyard.js';
 
 
 import { installSkeletons } from './skeletons.js';
@@ -275,6 +276,7 @@ export class Game extends Emitter {
 
 
     // [slot:shipyard]
+    this.useModule('shipyard', installShipyard);
 
 
     this.useModule('skeletons', installSkeletons);

@@ -118,3 +118,7 @@ check bubble size / font, leg look when crouching, elbow direction of the IK arm
 
 ## Food & drinks (wave 2, module `food`)
 Added optional buffs + social fun (cheers, cake, table, booze). Unverified in a browser: first-person eat arcs, blur overlay, table / machine placement. Booze courage only touches STATIC; no chat bubbles exist to slur yet.
+
+## Wave 3 - SHIPYARD (module `shipyard`)
+The ship finally grows: twelve Mk I-III modules on eight hardpoints (doorways cut into the core walls, nothing in the cabin moved), Frame Console + ship-part drops, paint / name plate, weight = route cost + Threat + siege hull. Honest critique: it is all node-tested (rules, model sanity, an installer run against the real ship + a fake game) and never seen in a renderer, so scale, prop placement, paint z-fighting on the hull and the roof lift are unchecked.
+Design weak spots: free travel is on by default so the "+5 % route cost" is a small surcharge unless the host turns it off; several effects are small numbers (Rested buff, Overwatch) that may not read as gameplay; the Trophy Hall is per-client cosmetic; creatures ignore module walls outside SIEGE; there is no -x hardpoint, no furniture placement mode, no faction unlocks. Module count vs sockets (12 vs 8) is meant to force choices, but nobody has played it to see if it feels like a choice or a chore.

@@ -245,7 +245,7 @@ export function createCraftingPanel({ game, api, tab, onClose } = {}) {
     return row;
   }
   function start(seconds, fire, fill, txt) {
-    const total = Math.max(700, seconds * 1000);
+    const total = Math.max(700, seconds * 1000 * (Number(api.timeMul?.()) || 1));   // [shipyard] Workshop: faster crafting
     busy = { until: performance.now() + total, total };
     stamp = null;
     txt.textContent = t('WORKING...');
