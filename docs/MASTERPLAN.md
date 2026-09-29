@@ -739,6 +739,15 @@ Model politikası aynı (§6): Sonnet varsayılan, ağ/AI/çekirdek işlerde Opu
 - Host-otoriter: nişan başlangıcı/kilit/ateş olayları mevcut creature state senkronuyla (yeni ağır mesaj yok; state + hedef noktası).
 - Ajan tablosuna: #12 `aimtell` (Sonnet), `hardmode` ile paralel; test: node (zamanlama/isabet tabloları) + 1 kısa ekran görüntüsü (nişan çizgisi).
 
+### 25.10 Merdivenler + gemi üst katı (sahibin isteği)
+- **Merdiven hatası (genel):** bazı binalarda (worldx kuleleri, worlds2 Sovyet binaları, maps5 arşivi, horror malikanesi, voyage set piece'leri) merdivenler çıkılamıyor. Tek bir ortak **`stairs` yardımcısı**: basamak yerine görünmez eğimli rampa collider'ı (Rapier, karakter kontrolcüsünün `maxSlope`/`stepHeight` değerleriyle uyumlu), görsel basamaklar ayrı. Tüm modüllerin merdiven üreticileri buna geçer. Node testi: her merdiven için alt→üst yürünebilirlik (collider eğimi ≤ maxSlope, basamak ≤ stepHeight); tek tarayıcı koşusu: 3 binada otomatik tırmanma.
+- **Gemi üst katı (tycoon tarzı gemi geliştirme):** şu an gemide çatıya sadece ship2 merdiveni var, üst kat yok. Shipyard'a **"Üst Kat" genişlemesi**: iç merdiven/rampa (gemi içinden) → üst güverte (köprü/gözlem kubbesi, yatakhane, depo veya taret kontrol odası seçilebilir). Kademeli geliştirme: Mk1 çıplak güverte → Mk2 odalar → Mk3 cam kubbe + ekstra taret yuvası. Tycoon hissi: geliştirme menüsünde gemi kesit görünümü, her yükseltme görünür değişiklik yapar (odalar, ışıklar, dış gövde). shiplayout.js tek otorite kalır; üst kat fixture'ları da çakışma testine girer.
+- Ajan tablosuna: #13 `stairs` (Sonnet), #14 `shipdeck` (Sonnet, stairs'ten sonra).
+
+### 25.11 Model ve maliyet kuralı (sahibin kararı, 2026-09-29)
+- **Bütün ajanlar Sonnet 5.5.** **Opus 5.5 sadece en sonda, tek bir değerlendirme turu** yapar (wave 5 bitince: kod okuma + toplu tarayıcı testi, en fazla birkaç düzeltme).
+- Maliyet: ajan başına en fazla 2 kısa tarayıcı koşusu, tercihen node testi; aynı anda en fazla 5 ajan; ajan prompt'ları kısa ve dosya yolu belirtilmiş; gereksiz büyük dosya okuması yok; iş bitince hemen teslim.
+
 ### 25.7 Ajan tablosu (sıra = öncelik)
 | # | Ajan | Model | Kapsam | Tarayıcı |
 |---|---|---|---|---|
