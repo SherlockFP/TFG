@@ -73,6 +73,12 @@ Identity (binding, see `docs/MASTERPLAN.md` §21):
 - **NOT verified:** almost every wave-4 feature in a real browser; **nothing tested with 2 real players over WebRTC**; balance numbers are paper values.
 - **Known issues:** see `MASTERPLAN §22` + `§25.12` (zombies invisible in some contexts), `AGENTS.md §5.17` (mirror timer/compass/LIVE banner/VHS overlaps, GPU geometry growth per landing), `docs/wave4/*.md` "not verified" lists.
 
+### 7.1 Update — waves 5-6 (2026-09-29, later)
+Merged to main (all node-tested + build; almost none seen in a browser yet — a QA agent is running `docs/wave6/qa_pass.md`):
+harvest2 (hit-to-harvest), lockpick2 (tiered fast lockpicking), stairs (shared ramp stairs), algo1 (Algorithm learns you + morning vote + LIVE viewers), chess3d, zones v1 + zones2 (zone capture: interior trap wings, walls/gates, extractor, raider flow fields, ship CRT map), aimchase (telegraphed NPC aim + escapable chases), shipdeck (ship upper deck Mk I-III), hardmode (Casual/Standard/Hard), onboard (Hiring Day start + staged unlocks), ui3 (HUD overlaps + panel flattening), unify (defense_core, mazegen, consumables, wallet = Credits + Clout), fixes (flaky tests, hardmode gaps, algo1 sync), story (Company vs Algorithm allegiance, patron jobs, 3 acts + 3 endings, weekly trend creature).
+In progress at time of writing: zfixperf (zombie visibility, leaks, draw calls), algo2 (hype rewards, ghost replays, glitch exploits), roledays (§23.8), home3 (original homeworld look), mapart (original moon signature layer), QA browser pass.
+Tooling: `.claude/agents/tfg-fixer.md` (Sonnet, medium effort) for small fixes; `tfg-builder` is Sonnet high effort. rtk (token saver) may be installed as a Bash hook — if plain `git` is blocked in a worktree, use `/usr/bin/git`.
+
 ## 8. What to do next
 
 Follow **`MASTERPLAN §25` (wave 5)** in order — robustness before new content:
