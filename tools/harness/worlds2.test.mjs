@@ -45,15 +45,15 @@ await ok('raid schedule: interval shrinks with days, size grows, factions determ
   const seen = new Set(); for (let k = 0; k < 40; k++) seen.add(core.raidFaction(cfg, 5, 'w2sov', k)); assert.ok(seen.size >= 2, 'factions vary');
   for (let k = 0; k < 10; k++) { const a = core.raidAngle(9, 'w2sov', k); assert.ok(a >= 0 && a < 6.3); }
 });
-await ok('loot pacing: indoor count x0.7 + early-game bonus, ~30 % less overall', () => {
-  assert.equal(P.BALANCE.lootCountMul, 0.7);
+await ok('loot pacing: indoor count x0.6 (wave 8) + early-game bonus, ~40 % less overall', () => {
+  assert.equal(P.BALANCE.lootCountMul, 0.6);
   const oldCount = (base, q) => Math.round(base + P.scrapCountBonus(q));
-  assert.equal(P.scrapCountFor(12, 0), Math.round(12 * 0.7 + 3));   // early bonus (+3 / +2) survives
-  assert.equal(P.scrapCountFor(12, 1), Math.round(12 * 0.7 + 2 + 0.2));
+  assert.equal(P.scrapCountFor(12, 0), Math.round(12 * 0.6 + 3));   // early bonus (+3 / +2) survives
+  assert.equal(P.scrapCountFor(12, 1), Math.round(12 * 0.6 + 2 + 0.2));
   let oldSum = 0, newSum = 0;
   for (const base of [10, 12, 14, 16, 20, 24, 30]) for (let q = 2; q < 14; q++) { oldSum += oldCount(base, q); newSum += P.scrapCountFor(base, q); }
   const cut = 1 - newSum / oldSum;
-  assert.ok(cut > 0.22 && cut < 0.32, 'overall cut ' + cut.toFixed(3));
+  assert.ok(cut > 0.32 && cut < 0.42, 'overall cut ' + cut.toFixed(3));
   console.log(`   mid-game indoor scrap count -${(cut * 100).toFixed(1)}%  (quota 0: 12 -> ${P.scrapCountFor(12, 0)} vs old ${oldCount(12, 0)})`);
 });
 await ok('fauna plan: deterministic, visible near the landing, per-biome species', () => {
