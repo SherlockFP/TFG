@@ -3,6 +3,7 @@
 // exact core positions, from the terrain plan of the current landing (host computes them, clients receive them).
 import { RNG, hashString } from '../core/rng.js';
 import { siegePower, planWave, SG } from './siege_core.js';
+import * as DC from './defense_core.js';
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 export const ZN = {
@@ -25,21 +26,10 @@ export const ZN = {
   winBonusMul: 2.2,
 };
 
-// ------------------------------------------------------------------ defences (built with EXISTING deployable kinds: deployables.js DEPS)
-export const DEFS = {
-  barr_wood: { name: 'Wood Barricade', cost: 60, upkeep: 2, power: 4, minQ: 0 },
-  spikes: { name: 'Spike Strip', cost: 70, upkeep: 2, power: 5, minQ: 0 },
-  mine: { name: 'Proximity Mine', cost: 90, upkeep: 3, power: 8, minQ: 0 },
-  turret1: { name: 'Auto-Turret MK1', cost: 180, upkeep: 6, power: 12, minQ: 0 },
-  flood: { name: 'Floodlight Tower', cost: 150, upkeep: 4, power: 4, minQ: 0 },
-  barr_metal: { name: 'Metal Barricade', cost: 140, upkeep: 3, power: 9, minQ: 1 },
-  turret2: { name: 'Auto-Turret MK2', cost: 320, upkeep: 8, power: 17, minQ: 1 },
-  tesla: { name: 'Tesla Coil', cost: 400, upkeep: 10, power: 21, minQ: 1 },
-  shield: { name: 'Shield Dome', cost: 350, upkeep: 6, power: 14, minQ: 2 },
-  turret3: { name: 'Auto-Turret MK3', cost: 560, upkeep: 12, power: 26, minQ: 2 },
-};
+// ------------------------------------------------------------------ defences (built with EXISTING deployable kinds; the numbers live in defense_core.js)
+export const DEFS = DC.zoneDefs();
 export const DEF_IDS = Object.keys(DEFS);
-export const BASE_DEF = 6;   // the core defends itself a little
+export const BASE_DEF = DC.BASE_DEF;   // the core defends itself a little
 
 // ------------------------------------------------------------------ eligibility + zone partition
 export function zonesEligible(moon) {
@@ -185,10 +175,7 @@ export function payUpkeep(funds, rows) {
   return { paid, dry, left };
 }
 export function defencePower(st, dry = false, moonUps = 0) {
-  let p = BASE_DEF;
-  for (const [k, n] of Object.entries(st?.d || {})) p += (DEFS[k]?.power || 0) * (n | 0);
-  p *= dry ? 0.4 : 1;
-  return Math.round(p * (1 + 0.1 * clamp((st?.up | 0) + moonUps, 0, 6)) * 10) / 10;
+  return DC.defencePower(st?.d, { dry, ups: (st?.up | 0) + moonUps });
 }
 export const offlineDays = (elapsedSec) => {
   const o = ZN.offline;
@@ -231,8 +218,7 @@ export function wavePowerMean(threat, qi, crew = 1) { return (10 + 9 * threat) *
 export const wavePower = (threat, qi, crew, rnd) => wavePowerMean(threat, qi, crew) * (ZN.waveJitter[0] + (ZN.waveJitter[1] - ZN.waveJitter[0]) * clamp(rnd, 0, 1));
 /** win probability of the auto-resolve: defence >= wave * jitter, jitter uniform in waveJitter */
 export function winChance(def, threat, qi, crew = 1) {
-  const r = def / wavePowerMean(threat, qi, crew), [a, b] = ZN.waveJitter;
-  return clamp((r - a) / (b - a), 0, 1);
+  return DC.winOdds(def, wavePowerMean(threat, qi, crew), ZN.waveJitter);
 }
 export function resolveAuto(def, threat, qi, crew, rnd) {
   const w = wavePower(threat, qi, crew, rnd);

@@ -5,7 +5,7 @@
 //   * a low drifting mist sheet + a fog surge while you are inside (game/maps5.js)
 // info (decor.info.hedge) = everything the runtime needs: frame, plan, world points of the prize / warden / gates / pockets.
 import * as THREE from 'three';
-import { HEDGE, wallLattice, cellCentre, toWorld, mazeRoute } from '../game/maps5_core.js';
+import { HEDGE, wallLattice, cellCentre, toWorld, mazeRoute } from './mazegen.js';
 import { buildRuns, mistSheets } from './maps5_kit.js';
 
 export function buildHedge(C, S, site, plan, out) {

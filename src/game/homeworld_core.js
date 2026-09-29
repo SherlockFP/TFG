@@ -6,6 +6,7 @@
 //   b.i id, b.t type, b.x/b.z grid cell (lower-left cell of the footprint), b.r rotation (0..3 quarter turns), b.l level 1-5, b.h current hp (absent = full).
 import { RNG } from '../core/rng.js';
 import { SG, planWave, waveCount } from './siege_core.js';
+import * as DC from './defense_core.js';   // [unify] towers / walls / spikes / mines are registered in the shared defence table
 
 export const CELL = 3;                 // metres per grid cell
 export const GRID_MIN = -15, GRID_MAX = 15;   // cell index range [-15, 15): 30 x 30 cells = 90 m square plateau
@@ -78,6 +79,7 @@ export const BUILDINGS = {
   mines: D({ cat: 'def', name: 'Mine Field', size: 1, max: 6, base: { cr: 40, parts: 3 }, g: 1.8, hp: [100, 150, 220, 320, 470], pw: [0, 0, 0, 0, 0], heat: [0, 0, 0, 0, 0],
     trap: { burst: [120, 200, 320, 500, 800], r: 5, charges: [1, 2, 3, 4, 5] }, passable: true, desc: 'Rearmed free after every raid.' }),
 };
+DC.regHomeworld(BUILDINGS);   // [unify] hw_gun, hw_tesla, hw_flame, hw_cryo, hw_sniper, hw_wall, hw_gate, hw_spikes, hw_mines
 export const TYPE_ORDER = Object.keys(BUILDINGS);
 export const CATS = [['eco', 'ECONOMY'], ['pow', 'POWER'], ['def', 'DEFENCE']];
 export const isTower = (t) => !!BUILDINGS[t]?.tw;
@@ -355,13 +357,15 @@ export function defenseOf(state) {
   for (const b of state.b) {
     if (wrecked(b)) continue;
     const d = BUILDINGS[b.t], i = b.l - 1, c = cellCenter(b, d);
-    if (d.tw) towers.push({ id: b.i, t: b.t, lv: b.l, x: c.x, z: c.z, dps: d.tw.dps[i] * P.powerRatio, range: d.tw.range[i], chain: d.tw.chain?.[i] || 1, slow: d.tw.slow?.[i] || 0 });
+    if (d.tw) towers.push({ id: b.i, t: b.t, lv: b.l, x: c.x, z: c.z, ...DC.towerStats(d, b.l, P.powerRatio) });   // [unify] shared stat read
     else if (d.trap) traps.push({ id: b.i, t: b.t, lv: b.l, x: c.x, z: c.z, dps: d.trap.dps?.[i] || 0, burst: d.trap.burst?.[i] || 0, charges: d.trap.charges?.[i] || 0 });
     else if (isWall(b.t)) walls.push({ id: b.i, t: b.t, x: c.x, z: c.z });
   }
   return { towers, traps, walls, P };
 }
 export const defenseScore = (state) => defenseOf(state).towers.reduce((s, t) => s + t.dps, 0);
+/** the same "defence power" number zones use (defense_core ratings of every live defence building, walls / traps included) */
+export const defenseRating = (state) => DC.round1(state.b.reduce((n, b) => (BUILDINGS[b.t].cat === 'def' && !wrecked(b) ? n + DC.hwDef(b.t, BUILDINGS[b.t], b.l).rating : n), 0));
 
 /**
  * Abstract raid while the crew is away: a deterministic (seeded) 1 s stepper. The host steps it once per second and publishes frame() to

@@ -13,3 +13,5 @@ Shared-file edits: `game.js` (import + `useModule('food', installFood)`), `anoma
 * Not done / risks: never run in a browser (arc poses, blur overlay, table position, machine rotation are unverified visually); booze courage only refunds STATIC (no other fear system exists); chat bubbles do not exist yet, only the chat line is slurred.
 
 **UPDATE (wave 4, survival):** packaged snacks are now weak (Pizza Slice 12 HP, Pizza Box 24, Party Cake 15, Instant Noodles 0.5 HP/s, Deluxe Ramen 0.8 HP/s); real healing comes from cooked meals (docs/wave4/survival.md). `applyEaten` emits `tfg:ate` so snacks feed the hunger meter a little.
+
+**UPDATE (wave 5, unify):** the rule is now written down and tested in `src/game/consumables.js` (docs/wave5/unify.md): snacks <= 24 HP in total, so Deluxe Ramen is 0.8 HP/s for 25 s (20 HP), Cake Day 0.2 HP/s, Meat Sweats 0.3 HP/s; every packaged item has an explicit `hunger` (12, Pizza Box 24, drinks 3) that `survival.js` reads.

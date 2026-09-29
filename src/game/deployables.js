@@ -20,6 +20,7 @@ import { MOONS } from './moons.js';
 import { addTranslations, t, tf } from '../core/i18n.js';
 import { clamp, angleDiff } from '../core/util.js';
 import { HULL, DOOR, distToHull, inBox } from './siege_core.js';
+import { applyToDeps, pickTarget, chainTargets, shotDamage } from './defense_core.js';   // [unify] one defence table + targeting helper
 import { createDeployableModel, createKitModel, createGhost, createRelicModel, staticGeometry, staticMaterial, STATIC_TYPES } from '../models/deployables.js';
 
 // ---------------------------------------------------------------------------------------------- definitions
@@ -40,6 +41,7 @@ export const DEPS = {
   gen: { name: 'Portable Generator', kind: 'gen', hp: 180, r: 0.7, hx: 0.55, hz: 0.4, h: 1.25, solid: 1, cost: 6, range: 14, cap: 100, burn: 0.3, supply: ['comp_fuel', 50], price: 220, weight: 14, blurb: 'Burns fuel, powers everything within 14 m. No wires.' },
   bank: { name: 'Battery Bank', kind: 'bank', hp: 150, r: 0.6, hx: 0.5, hz: 0.36, h: 1.0, solid: 1, cost: 6, range: 10, cap: 500, supply: ['comp_battery', 60], price: 200, weight: 12, blurb: 'Stores 500 units; a generator nearby charges it.' },
 };
+applyToDeps(DEPS);   // [unify] combat + footprint stats come from defense_core.js (price / weight / supply / cap / ammo stay here)
 export const DEP_TYPES = Object.keys(DEPS);
 const CAPS = { turret: 8, tesla: 4, barricade: 24, spikes: 8, mine: 12, flood: 4, drone: 3, sensor: 4, shield: 2, gen: 3, bank: 3 };
 const TOTAL_CAP = 48;
@@ -455,15 +457,7 @@ export function installDeployables(game, siege) {
   }
   const canDraw = (d, amt) => !!supplier(d, amt) || (!!d.cap && !d.def.ammo && d.res >= amt);
   function creatureTargets(from, range, pred) {
-    let best = null, bd = range * range;
-    for (const c of creatureList) {
-      const dx = c.pos.x - from.x, dz = c.pos.z - from.z, dy = c.pos.y - from.y;
-      const dd = dx * dx + dz * dz;
-      if (dd > bd || Math.abs(dy) > range * 0.6 + 3) continue;
-      if (pred && !pred(c)) continue;
-      bd = dd; best = c;
-    }
-    return best;
+    return pickTarget(creatureList, from, range, { dy: range * 0.6 + 3, pred });
   }
   function creditKill(d, c) {
     if (!c.dead || !d.owner) return;
@@ -486,13 +480,7 @@ export function installDeployables(game, siege) {
       d.retarget = 0.18 + Math.random() * 0.08;
       const from = { x: d.pos.x, y: d.pos.y + 1, z: d.pos.z };
       d.tgt = null;
-      let best = null, bd = 1e9;
-      for (const c of creatureList) {
-        const dx = c.pos.x - d.pos.x, dz = c.pos.z - d.pos.z, dd = Math.hypot(dx, dz);
-        if (dd > def.range || Math.abs(c.pos.y - d.pos.y) > 6 || dd >= bd) continue;
-        if (!losClear(from, { x: c.pos.x, y: c.pos.y + Math.min(c.def.height || 1, 2) * 0.55, z: c.pos.z })) continue;
-        bd = dd; best = c;
-      }
+      const best = pickTarget(creatureList, d.pos, def.range, { dy: 6, pred: (c) => losClear(from, { x: c.pos.x, y: c.pos.y + Math.min(c.def.height || 1, 2) * 0.55, z: c.pos.z }) });
       d.tgt = best ? best.id : null;
     }
     const c = d.tgt ? game.creatures.host.get(d.tgt) : null;
@@ -507,7 +495,7 @@ export function installDeployables(game, siege) {
     if (def.ammo) { if (d.res < 1) { d.on = false; return; } d.res -= 1; d.on = true; }
     else { if (!draw(d, def.draw)) { d.on = false; return; } d.on = true; }
     d.cd = 1 / def.rate; d.shots++;
-    hurtCreature(d, c, def.dmg * d.mul * (0.9 + Math.random() * 0.2));
+    hurtCreature(d, c, shotDamage(def, d.mul));
   }
   function simTesla(d, dt) {
     d.cd -= dt;
@@ -517,14 +505,11 @@ export function installDeployables(game, siege) {
     if (!draw(d, d.def.draw)) { d.on = false; return; }
     d.on = true; d.target = true; d.cd = d.def.cd; d.shots++;
     const pts = [[d.pos.x, d.pos.y + 1.95, d.pos.z]];
-    const hit = new Set();
-    let cur = c0, dmg = d.def.dmg * d.mul;
-    for (let i = 0; i < d.def.chain && cur; i++) {
-      hit.add(cur.id);
+    let dmg = d.def.dmg * d.mul;
+    for (const cur of chainTargets(c0, creatureList, d.def.chain, 6, { dy: 6.6 })) {
       pts.push([cur.pos.x, cur.pos.y + Math.min(1.6, (cur.def.height || 1) * 0.6), cur.pos.z]);
       hurtCreature(d, cur, dmg);
       dmg *= d.def.fall;
-      cur = creatureTargets(cur.pos, 6, (x) => !hit.has(x.id));
     }
     game.net.broadcast('sgd', { e: 'zap', pts }, true);
   }

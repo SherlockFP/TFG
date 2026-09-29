@@ -15,7 +15,7 @@ import { buildHazards } from './interiors/hazards.js';
 import { buildFacilitySystems, planChestSpots } from './interiors/facsys.js';
 import { planMaps2, buildRooms2, installRoomStyles2 } from './rooms2.js';   // [maps2]
 import { planVarietyRooms, planVarietyFeatures, shortcutInfo, buildVariety, installVarietyStyles } from './facility_variety.js';   // [stealth] wave 4 variety
-import { carveMaze } from './maze_styles.js';
+import { carveMaze } from './mazegen.js';
 
 // Interior theme registry (ids: factory, mansion, mineshaft, office, backrooms, serverfarm, sewer, hospital).
 export { INTERIORS, INTERIOR_THEMES, INTERIOR_NAMES, getInterior, isInteriorTheme };

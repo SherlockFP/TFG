@@ -4,7 +4,7 @@
 //   * two fountains, a topiary walk with benches, glowing garden lanterns; a low pollen drift comes from the biome fx ('spores')
 // decor.info = { kind:'m5estate', hedge, archive, zones[], loot[{x,y,z,kind}], prizes[{x,y,z,item}], counts }  (used by game/maps5.js)
 import { RNG } from '../core/rng.js';
-import { planHedge, planArchive, HEDGE, ARCHIVE, siteSeed } from '../game/maps5_core.js';
+import { planHedge, planArchive, HEDGE, ARCHIVE, siteSeed } from './mazegen.js';
 import { registerDecor, DECOR_HELPERS } from './outdoor_biomes.js';
 import { makeBuilder, flush, findSite, placeProps, guard, TAU } from './maps5_kit.js';
 import { buildHedge } from './maps5_hedge.js';

@@ -84,7 +84,7 @@ ok(TABLE_SPOTS.length >= 3 && TABLE_SPOTS.every(([x, z]) => Math.abs(x) < 6.2 &&
   const w = applyBuffStats(BUFFS.f_wellfed, base());
   ok(w.maxHp === 110 && near(w.speedMul, 1.03), 'Well Fed');
   ok(applyBuffStats(null, base()).speedMul === 1, 'null def is a no-op');
-  ok(BUFFS.f_noodles.hps === 0.5 && BUFFS.f_ramen.hps > BUFFS.f_noodles.hps && BUFFS.f_cake.hps === 0.6, 'regen numbers');
+  ok(BUFFS.f_noodles.hps === 0.5 && BUFFS.f_ramen.hps > BUFFS.f_noodles.hps && BUFFS.f_cake.hps === 0.2, 'regen numbers');
   // no buff can make you invulnerable / immobile
   for (const [id, b] of Object.entries(BUFFS)) {
     const st = applyBuffStats(b, base());

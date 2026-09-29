@@ -322,7 +322,7 @@ export function installSurvival(game) {
   }
   // meals and hunger from the older food module (packaged snacks): they feed a little too
   offs.push(mods.on('tfg:ate', (ty, fd) => {
-    if (typeof ty === 'string' && ty.startsWith('fd_')) { F.hunger = D.eatHunger(F.hunger, /booze|drink/.test(fd?.kind || '') ? 3 : 12); saveHunger(false); }
+    if (typeof ty === 'string' && ty.startsWith('fd_')) { F.hunger = D.eatHunger(F.hunger, fd?.hunger ?? (/booze|drink/.test(fd?.kind || '') ? 3 : 12)); saveHunger(false); }   // [unify] hunger of a packaged item = its row in the food table (consumables.js)
   }));
 
   // ================================================================================================ WILD PLANTS

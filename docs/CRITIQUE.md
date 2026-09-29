@@ -223,3 +223,6 @@ The new core loop exists end to end in code (partition, capture, fortify, capped
 
 ## Wave 5 - aimchase (docs/wave5/aimchase.md)
 NPC shooters now telegraph (laser, white lock, fire at the locked point) and creatures obey one speed table (sustained < sprint, short bursts, fatigue, door hesitation); only node-tested, laser/vignette look and difficulty feel are unverified in a browser.
+
+## Wave 5 - unify (docs/wave5/unify.md)
+Duplicate systems now share one defence table / power calculator / targeting helper, one maze library with a single solvability checker, one consumable table with a tested food rule and a two-currency wallet row. Honest limits: adapters, not rewrites (DEPS and homeworld BUILDINGS still hold their literals, live raider movement is still per system), zones' auto-resolve numbers shifted by <= 1 point per defence (turret2 17 -> 16, turret3 26 -> 27), the wallet row is only on the HUD and the homeworld panel, and nothing was seen in a browser.
