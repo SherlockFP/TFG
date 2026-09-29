@@ -20,5 +20,11 @@ Browser: `tools/harness/wave5_chess3d.js` (sit, open, click e2/e4 via synthetic 
 ## Known gaps
 - No visual check of piece shapes / camera framing / HUD layout at 1280x720 yet (lathe profiles are hand-tuned blind).
 - Drag uses a fixed plane at piece height; very shallow angles are not tuned. No touch support.
-- Captured pieces just vanish (no fade / tray). Dama partial jump steps show no path preview.
+- Captured pieces vanish from the board (no fade); the HUD lists them (chess only, no tray on the table, nothing for dama). Dama partial jump steps show no path preview.
 - The held-item viewmodel / own body can still show in the top-down view.
+
+## Wave 8: seats + captures
+- Seats are physical: two stool interactables per table (White on the +z side, Black on -z): `Sit at White [E]` / `Sit at Black [E]` sits you at that colour and opens the 3D view with the camera locked to your side; `Stand up [E]` (or ESC, or E again inside the view, or the HUD button) stands you up. The table centre now only says `Watch the game` (spectator view: no moves). Host-authoritative (`arreq sit/stand`, `arcade_core.sit`): one player per seat, you can only move your own colour on your turn (host + picker both check). A lone player on one side gets the other side by AI (`AI easy / AI normal` buttons, also mid-game) or the HUD says `Waiting for an opponent`. Nothing depends on where you look any more.
+- Rules were already fully legal (perft-tested): captures for every piece, en passant, castling, auto-queen promotion (picker offers Q/R/B/N), check / mate / stalemate. HUD: `Your move (White)` / `X to move`, `CHECK!`, last move (yellow squares + SAN), legal targets green, captures red ring, captured-piece row, legend.
+- Test: `node tools/harness/chess_capture.test.mjs` (pawn diagonal capture, knight capture, en passant, promotion capture, mate in one, pinned piece / self-check rejected, seat rules, picker capture, captured list). Browser: `tools/harness/chess_seats.js` (written, NOT run: browser lock jammed).
+- Known: standing up mid-game leaves the seat free (the game continues for the other side; an AI opponent alone resets the table). Only one human can sit per stool; the player body is not moved onto the stool (camera only).

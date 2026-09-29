@@ -338,14 +338,25 @@ export function installArcade(game) {
   let panel = null, openId = null;
   // [chess3d] the real 3D board is the default view; the 2D overlay is "Classic view" (saved per browser)
   const c3 = createChess3d({ game, arc: { get: entry, subscribe: (f) => { subs.add(f); return () => subs.delete(f); }, request: (op, data) => request(op, data) }, viewOf: (id) => { const v = views.get(id); return v ? { model: v.model, root: v.model.root } : null; }, request: (op, data) => request(op, data), closeView: () => close(), openView: (id) => open(id) });
+  // [chess-seats] seats are physical: E on a stool sits (open), closing the view (ESC / E / Stand up) stands you up again. Re-opening the same table keeps the seat.
+  let keepSeat = false;
+  const seatedAt = (id) => { const s = entry(id).snap.seats; return s.w === game.selfId ? 'w' : s.b === game.selfId ? 'b' : null; };
   function open(id) {
     if (disposed || !SITES[id]) return;
     if (!tables.has(id)) request('sync');
-    close();
+    keepSeat = true; close(); keepSeat = false;
     openId = id;
     const ctl = isClassic() || !views.has(id) ? createArcadePanel(game.ui, game, api, id) : c3.create(id);
     game.ui.openPanel(ctl.el); panel = ctl;
-    game.ui.onPanelClose = () => { ctl.dispose(); if (panel === ctl) panel = null; return false; };
+    const openedAt = performance.now();
+    const onKey = (e) => { if (e.code === 'KeyE' && !e.repeat && !e.ctrlKey && !e.altKey && performance.now() - openedAt > 250 && !/^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName || '')) { e.preventDefault(); e.stopImmediatePropagation(); close(); } };
+    window.addEventListener('keydown', onKey, true);
+    game.ui.onPanelClose = () => {
+      window.removeEventListener('keydown', onKey, true);
+      ctl.dispose(); if (panel === ctl) panel = null;
+      if (!keepSeat && !disposed && seatedAt(id)) request('stand', { id });
+      return false;
+    };
   }
   function close() { if (panel) game.ui.closePanel(); }
   function toggleClassic(v) { setClassic(v); if (panel && openId) open(openId); }
@@ -395,8 +406,22 @@ export function installArcade(game) {
       if (!w || Math.hypot(pp.x - w.x, pp.z - w.z) > 6 || Math.abs(pp.y - w.y) > 3.5) continue;
       const e = entry(id).snap;
       const seatTxt = (c) => (e.seats[c] ? nameOf(e.seats[c]) : e.ai[c] ? t('Computer') : '-');
-      list.push({ pos: w.clone().add(new THREE.Vector3(0, TABLE.topY + 0.1, 0)), r: 1.15, reach: 3.3, label: () => `${tableTitle(entry(id).snap.kind)} [E]`, sub: () => `${t('White')}: ${seatTxt('w')} · ${t('Black')}: ${seatTxt('b')}`, action: () => open(id) });
-      void v;
+      list.push({ pos: w.clone().add(new THREE.Vector3(0, TABLE.topY + 0.1, 0)), r: 0.5, reach: 3.3, label: () => `${t('Watch the game')} - ${tableTitle(entry(id).snap.kind)} [E]`, sub: () => `${t('White')}: ${seatTxt('w')} · ${t('Black')}: ${seatTxt('b')}`, action: () => open(id) });
+      // [chess-seats] two stools (White on the +z side of the table, Black on -z): E sits you at that colour and locks the camera to it
+      for (const c of ['w', 'b']) {
+        const sp = v.model.root.localToWorld(new THREE.Vector3(0, 0.62, c === 'w' ? 0.78 : -0.78));
+        list.push({
+          pos: sp, r: 0.55, reach: 3.3,
+          label: () => { const sn = entry(id).snap; return sn.seats[c] === game.selfId ? t('Stand up [E]') : sn.seats[c] ? tf('Seat taken: {name}', { name: nameOf(sn.seats[c]) }) : sn.ai[c] && sn.ply > 0 && !sn.over ? t('Seat taken: Computer') : c === 'w' ? t('Sit at White [E]') : t('Sit at Black [E]'); },
+          sub: () => `${t('White')}: ${seatTxt('w')} · ${t('Black')}: ${seatTxt('b')}`,
+          action: () => {
+            const sn = entry(id).snap;
+            if (sn.seats[c] === game.selfId) { if (panel) close(); else request('stand', { id }); return; }
+            if (sn.seats[c] || (sn.ai[c] && sn.ply > 0 && !sn.over)) { game.ui?.toast?.(t('That seat is taken.'), 'bad'); return; }
+            request('sit', { id, c }); open(id);
+          },
+        });
+      }
     }
     if (carn && !booths.active) {
       for (const b of A.BOOTH_IDS) {
