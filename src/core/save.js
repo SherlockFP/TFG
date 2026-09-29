@@ -38,6 +38,8 @@ export function defaultSettings() {
     masterVolume: 0.8,
     sfxVolume: 0.9,
     musicVolume: 0.6,
+    dynamicMusic: true,      // [score] adaptive procedural music (src/audio/score.js); false = old looping menu theme only
+    musicIntensity: 0.7,     // [score] 0..1: how loud the tension / chase / boss / extraction layers get
     instrumentVolume: 0.8,   // playable instruments (game/music.js)
     danceVolume: 0.8,        // dance music loops (game/dance.js)
     voiceVolume: 1.0,

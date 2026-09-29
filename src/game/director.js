@@ -1094,6 +1094,7 @@ export function installDirector(game) {
     dispose,
     trigger,
     tensionOf(id) { return H.players.get(id)?.tension ?? 0; },
+    chaseLevel() { return C.t > C.hb.expire ? 0 : C.hb.level; },   // [score] 0..1 nearest-chaser closeness for THIS player (host sends it per peer)
     debug() {
       const players = [];
       for (const [id, s] of H.players) players.push({ id, tension: r2(s.tension), raw: r2(s.raw), calm: s.calmT, high: s.highT, chase: r2(s.chase), boss: s.boss, indoor: s.indoor });

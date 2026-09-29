@@ -57,7 +57,7 @@ export function installAlgo1(game) {
   const send = (d) => { try { game.net.broadcast('a1s', d); } catch { /* net closing */ } };
   function onMsg(m, fromId) {
     if (disposed || !m || typeof m.k !== 'string' || (fromId !== game.selfId && fromId !== game.net?.hostId)) return;
-    if (m.k === 'open') { S.vote = { cards: m.cards, counts: [0, 0, 0], me: -1, left: m.sec, debt: m.debt || null }; showVote(); }
+    if (m.k === 'open') { try { mods.emit('tfg:score', { k: 'vote' }, game); } catch { /* optional */ } S.vote = { cards: m.cards, counts: [0, 0, 0], me: -1, left: m.sec, debt: m.debt || null }; showVote(); }
     else if (m.k === 'tally') { if (S.vote) { S.vote.counts = m.c; renderVote(); } }
     else if (m.k === 'result') { S.rule = m.win ? { win: m.win, debt: m.debt || null, half: m.half || null } : null; hideVote(); }
     else if (m.k === 'say') { try { game.lore?.say?.(tf(m.s, m.v || {})); } catch { /* lore optional */ } }

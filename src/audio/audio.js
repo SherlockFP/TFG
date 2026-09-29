@@ -38,6 +38,7 @@ export class AudioManager {
     this.env = 'none';
     this.occluder = null;          // fn(pos) -> 0..1 occlusion
     this.occlTimer = 0;
+    this.score = null;             // [score] adaptive music engine (src/audio/score.js), attached in init()
     this.pack = null;              // [sfx] SoundPack (src/audio/soundpack.js), attached in init()
   }
 
@@ -78,6 +79,7 @@ export class AudioManager {
     this.applyVolumes();
     if (this.settings.outputDevice) this.setOutputDevice(this.settings.outputDevice);
     try { sfxlib = await import('./sfxlib.js'); } catch (e) { console.warn('sfxlib not available', e); }
+    try { const sm = await import('./score.js'); this.score = new sm.Score(this); } catch (e) { console.warn('score not available', e); }   // [score] adaptive procedural music (docs/wave7/score.md)
     this.ready = true;
     import('./soundpack.js').then((m) => m.attachSoundPack(this)).catch(() => {});   // [sfx] the player's own sound pack (local IndexedDB, never uploaded)
     // warm up common sounds in idle time
@@ -322,6 +324,7 @@ export class AudioManager {
 
   playMusic(name, volume = 0.6, fade = 2) {
     if (!this.ctx) return;
+    if (this.score?.claim(name)) { if (this.music) { this.music.stop(fade); this.music = null; } this.wantedMusic = name; return; }   // [score] dynamic music plays the menu theme itself
     if (this.music && this.music.name === name) return;
     if (this.music) this.music.stop(fade);
     this.music = null;
@@ -371,5 +374,6 @@ export class AudioManager {
     this.wantedAmb?.clear();
     this.wantedMusic = null;
     this.music = null;
+    this.score?.stop();
   }
 }

@@ -96,11 +96,12 @@ export function installAlgo2(game) {
         const tier = m.t | 0, up = tier > S.hs.tier;
         S.hs.h = +m.h || 0; S.hs.tier = tier; paintFeed();
         if (m.e) chat(m.e);
-        if (up) chat('tier');
+        if (up) { chat('tier'); try { game.mods.emit('tfg:score', { k: 'hype', tier }, game); } catch { /* optional */ } }
         break;
       }
       case 'g': {
         S.ps.meter = m.meter | 0; S.ps.wall = m.wall | 0;
+        const nu = (m.used || []).length; if (S.ps.gN !== undefined && nu > S.ps.gN) { try { mods.emit('tfg:score', { k: 'glitch' }, game); } catch { /* optional */ } } S.ps.gN = nu;   // [score]
         S.ps.used = {}; for (const id of m.used || []) S.ps.used[id] = 1;
         for (const id of m.used || []) if (id[0] !== 'w') view.hideGlitch(id);
         if (m.patched) { S.ps.patched = true; view.clearGlitches(); chat('patch'); }

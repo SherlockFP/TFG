@@ -256,3 +256,4 @@ The dance list is now big and readable (wheel pages, favourites, search, thumbna
 
 ## Wave 7 - feel (docs/wave7/feel.md)
 Combat now has weight (hitstop, class sounds, muzzle flash, toppling corpses, heartbeat) but the procedural sound recipes have only been checked numerically, not by ear, and gun kick was left as it was.
+- Wave 7 score: in-game had no music (only stingers); now an adaptive procedural score. Unverified by ear: stem loudness balance, real OfflineAudioContext render time, echo-tail seam. No in-game trigger for the Company shop motif yet.
