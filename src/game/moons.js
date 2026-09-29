@@ -34,8 +34,8 @@ export const MOONS = {
     outdoor: { sandkefal: 8, hound: 6, giant: 3, mimic: 3 },
   },
   cipura: {
-    id: 'cipura', name: '666-Creepypasta', short: 'Creepypasta', tier: 3, cost: 450, biome: 'moor', interior: 'mansion', size: 1.5,
-    desc: 'Storm-battered moor. A haunted homepage. Elites roam.',
+    id: 'cipura', name: '666-Creepypasta', short: 'Creepypasta', tier: 3, cost: 450, biome: 'moor', interior: 'prison', size: 1.5,   // [labyrinths] was mansion
+    desc: 'Storm-battered moor. A penitentiary of banned accounts: the cell doors slam shut when the alarm sounds. Elites roam.',
     weather: ['stormy', 'rainy', 'foggy', 'eclipsed'], scrapCount: [20, 26], scrapMul: 1.55, power: 8, outdoorPower: 6,
     creatures: { scuttler: 10, yoinker: 10, crawler: 16, lurker: 16, mannequin: 14, sludge: 10, spider: 14, leech: 12, jester: 12, screamer: 12, mimic: 10, turret: 8, mine: 10 },
     outdoor: { hound: 12, giant: 8, mimic: 6 },

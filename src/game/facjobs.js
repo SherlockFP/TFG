@@ -15,6 +15,7 @@ import { t, tf } from '../core/i18n.js';
 import { HOST_ONLY } from '../net/session.js';
 import { ITEMS, registerItem } from './items.js';
 import { MOONS } from './moons.js';
+import { LAB_IDS } from './labyrinths_core.js';   // [labyrinths]
 import { insideShip } from '../world/ship.js';
 import { fallbackChestLoot } from './chests.js';
 import * as C from './facjobs_core.js';
@@ -458,7 +459,7 @@ export function installFacjobs(game) {
     const row = (k, v) => { const d = document.createElement('div'); d.className = 'fj-row'; const a = document.createElement('span'); a.textContent = k; const b = document.createElement('b'); b.textContent = v; d.append(a, b); grid.appendChild(d); };
     row(t('JOB'), title(roll.main));
     if (roll.side) row(t('SIDE'), title(roll.side));
-    row(t('LAYOUT'), roll.arch && !['metro', 'greenhouse'].includes(MOONS[r.moon]?.interior) ? t(ARCH_NAME[roll.arch]) : t('Classic'));   // [labyrinths]
+    row(t('LAYOUT'), roll.arch && !LAB_IDS.includes(MOONS[r.moon]?.interior) ? t(ARCH_NAME[roll.arch]) : t('Classic'));   // [labyrinths]
   }
 
   offs.push(mods.on('update', (dt, g) => {

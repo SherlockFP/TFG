@@ -1048,7 +1048,7 @@ export class Game extends Emitter {
       scuttler: 'was nibbled to death.', spider: 'got wrapped up for later.', screamer: 'was screamed to death.', scream: 'was screamed to death.',
       sludge: 'was dissolved.', yoinker: 'touched the wrong pile of junk.', crewmate: 'was bonked by a crewmate.', electric: 'was electrocuted.',
       lightning: 'was struck by lightning.', kefalshark: 'was eaten by a land shark.', foreman: 'was flattened by the Foreman.',
-      steam: 'was boiled alive by a steam vent.',
+      steam: 'was boiled alive by a steam vent.', train: 'was flattened by the ghost train.',   // [labyrinths]
       laser: 'walked into a laser grid.', collapse: 'was buried by a cave-in.', toxic: 'dissolved in toxic sludge.',
       cruiser: 'was run over by the Uplink Van.',
     };

@@ -2,6 +2,14 @@
 import { addTranslations } from '../core/i18n.js';
 
 export const TR = {
+  'Lockdown alarms slam every cell door for 20 seconds. Loot the cells, mind the siren.': 'Kilit alarmı her hücre kapısını 20 saniye çarparak kapatır. Hücreleri yağmala, sirene dikkat.',
+  'Ride the central elevator down. The deeper the floor, the richer the loot, and the louder the ride back up.': 'Merkez asansörle aşağı in. Kat ne kadar derinse ganimet o kadar zengin, geri dönüş de o kadar gürültülü.',
+  'LOCKDOWN - the cell doors slam shut for 20 s': 'KİLİT ALARMI - hücre kapıları 20 sn kapandı',
+  'LOCKDOWN INBOUND - get out of the cells!': 'KİLİT ALARMI GELİYOR - hücrelerden çık!',
+  'The elevator stalls...': 'Asansör takıldı...', 'Call the elevator [E]': 'Asansörü çağır [E]', 'Floor': 'Kat', 'Down': 'Aşağı', 'Up': 'Yukarı',
+  'Inside: a three-tier penitentiary. Lockdown slams the cell doors.': 'İçerisi: üç katlı bir cezaevi. Kilit alarmı hücre kapılarını kapatır.',
+  'Inside: a tower with an elevator shaft. The lower floors pay more.': 'İçerisi: asansör boşluklu bir kule. Alt katlar daha çok öder.',
+  'Storm-battered moor. A penitentiary of banned accounts: the cell doors slam shut when the alarm sounds. Elites roam.': 'Fırtınalı bozkır. Yasaklı hesapların cezaevi: alarm çalınca hücre kapıları kapanır. Elitler dolaşıyor.',
   'Hazard': 'Tehlike', 'HAZARD': 'TEHLİKE',
   'A ghost train runs the tunnel. Horn + red lights = get into an alcove.': 'Tünelde bir hayalet tren koşuyor. Korna + kırmızı ışık = bir girintiye gir.',
   'Vine walls can be cut with a melee weapon. Spore puffs blur your vision.': 'Sarmaşık duvarlar yakın dövüş silahıyla kesilir. Spor bulutları görüşünü bulanıklaştırır.',
@@ -15,6 +23,17 @@ export const TR = {
   'Inside: a feral hydroponics greenhouse. Vines and spores.': 'İçerisi: vahşileşmiş bir hidroponik sera. Sarmaşık ve spor.',
 };
 export const RU = {
+  'Banhammer Penitentiary': 'Тюрьма Бан-молота', 'The Ivory Tower': 'Башня из слоновой кости',
+  'Every banned account ends up here. When the alarm sounds, the cell doors slam shut.': 'Здесь оказывается каждый забаненный аккаунт. Когда звучит сирена, двери камер захлопываются.',
+  'A corporate skyscraper with a hole in the middle. Ride the elevator down: the lower the floor, the richer the loot.': 'Корпоративный небоскрёб с дырой посередине. Спускайся на лифте: чем ниже этаж, тем богаче добыча.',
+  'Lockdown alarms slam every cell door for 20 seconds. Loot the cells, mind the siren.': 'Тревога блокировки захлопывает все двери камер на 20 секунд. Грабь камеры, следи за сиреной.',
+  'Ride the central elevator down. The deeper the floor, the richer the loot, and the louder the ride back up.': 'Спускайся на центральном лифте. Чем глубже этаж, тем богаче добыча и тем громче подъём обратно.',
+  'LOCKDOWN - the cell doors slam shut for 20 s': 'БЛОКИРОВКА - двери камер закрыты на 20 с',
+  'LOCKDOWN INBOUND - get out of the cells!': 'БЛОКИРОВКА СКОРО - выходи из камер!',
+  'The elevator stalls...': 'Лифт застрял...', 'Call the elevator [E]': 'Вызвать лифт [E]', 'Floor': 'Этаж', 'Down': 'Вниз', 'Up': 'Вверх',
+  'Inside: a three-tier penitentiary. Lockdown slams the cell doors.': 'Внутри: трёхъярусная тюрьма. Блокировка захлопывает двери камер.',
+  'Inside: a tower with an elevator shaft. The lower floors pay more.': 'Внутри: башня с шахтой лифта. Нижние этажи платят больше.',
+  'Storm-battered moor. A penitentiary of banned accounts: the cell doors slam shut when the alarm sounds. Elites roam.': 'Истрёпанная штормами пустошь. Тюрьма забаненных аккаунтов: при сирене двери камер захлопываются. Бродят элиты.',
   'The Packet Subway': 'Пакетное метро', 'Link Rot Greenhouse': 'Оранжерея гнилых ссылок',
   'Ghost trains still run the old routes. When the horn sounds, get into an alcove.': 'Поезда-призраки всё ещё ходят по старым линиям. Услышал гудок — прячься в нишу.',
   'Hydroponics gone feral. Cut the vines for shortcuts, hold your breath in the spores.': 'Одичавшая гидропоника. Руби лианы ради коротких путей, задерживай дыхание в спорах.',

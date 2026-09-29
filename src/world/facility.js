@@ -812,6 +812,7 @@ export function buildFacility(layout, { physics, lightPool }) {
   const wallSpots = [];
   const ceilingSpots = [];
 
+  const pit = def.pit ? def.pit(L) : null;   // [labyrinths] tower: a well through the floor of the hub room ({ cells:Set, x0,z0,x1,z1, depth })
   const wx = (x) => L.ox + x * C, wz = (z) => L.oz + z * C;
   const roomStyle = (i) => {
     const r = L.roomOf[i];
@@ -831,7 +832,7 @@ export function buildFacility(layout, { physics, lightPool }) {
     const st = roomStyle(i);
     const h = L.heightOf[i];
     const shade = 0.85 + ((x * 7 + z * 13) % 5) * 0.035;
-    gb.hrect('f:' + st.floor, wx(x), wz(z), wx(x + 1), wz(z + 1), Y, true, 0.5, [shade, shade, shade]);
+    if (!pit || !pit.cells.has(i)) gb.hrect('f:' + st.floor, wx(x), wz(z), wx(x + 1), wz(z + 1), Y, true, 0.5, [shade, shade, shade]);   // [labyrinths] no floor over the well
     gb.hrect('c:' + st.ceil, wx(x), wz(z), wx(x + 1), wz(z + 1), Y + h, false, 0.5);
     addBox(wx(x) + C / 2, Y + h + 0.25, wz(z) + C / 2, C, 0.5, C);
     if (L.cells[i] === 2 && theme.corridor.carpet) {
@@ -839,7 +840,12 @@ export function buildFacility(layout, { physics, lightPool }) {
     }
   }
   // one big floor slab
-  addBox(0, Y - 0.5, 0, W * C + 8, 1, H * C + 8);
+  if (!pit) addBox(0, Y - 0.5, 0, W * C + 8, 1, H * C + 8);
+  else {   // [labyrinths] the same slab with a hole for the well: four boxes around it
+    const sw = W * C + 8, sd = H * C + 8, hx0 = -sw / 2, hx1 = sw / 2, hz0 = -sd / 2, hz1 = sd / 2;
+    addBox((hx0 + pit.x0) / 2, Y - 0.5, 0, pit.x0 - hx0, 1, sd); addBox((pit.x1 + hx1) / 2, Y - 0.5, 0, hx1 - pit.x1, 1, sd);
+    addBox((pit.x0 + pit.x1) / 2, Y - 0.5, (hz0 + pit.z0) / 2, pit.x1 - pit.x0, 1, pit.z0 - hz0); addBox((pit.x0 + pit.x1) / 2, Y - 0.5, (pit.z1 + hz1) / 2, pit.x1 - pit.x0, 1, hz1 - pit.z1);
+  }
 
   // walls
   const wallSeg = (x, z, d, s0, s1, y0, y1, tex) => {
@@ -1453,6 +1459,6 @@ export function buildFacility(layout, { physics, lightPool }) {
       if (gx < 0 || gz < 0 || gx >= W || gz >= H) return -1;
       return L.idx(gx, gz);
     },
-    contains(p) { return p.y < Y + 12 && p.y > Y - 5 && this.cellAt(p.x, p.z) >= 0 && L.cells[this.cellAt(p.x, p.z)] > 0; },
+    contains(p) { return p.y < Y + 12 && p.y > Y - 5 - (pit ? pit.depth + 1 : 0) && this.cellAt(p.x, p.z) >= 0 && L.cells[this.cellAt(p.x, p.z)] > 0; },
   };
 }
