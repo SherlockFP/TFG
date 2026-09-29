@@ -81,8 +81,17 @@ export function installLockpick2(game) {
         try { done?.(res); } catch (e) { console.error(e); }
       },
     };
-    return createLockpick2(opts);
+    // owner: keep the ORIGINAL round dial game; tiers only change its tempo, window and pin count. Drill / bypasser keep the auto path.
+    if (tool === L.PICK.DRILL || tool === L.PICK.BYPASS || !original) return createLockpick2(opts);
+    const R = DIAL[tier] || DIAL.standard;
+    const arcMul = (1 + 0.05 * Math.max(0, (opts.level | 0) - 1)) * (1 + 0.15 * (opts.helpers() | 0));
+    return original({ ...opts, difficulty: R.d, pinCount: R.pins, speedMul: R.speed, arcMul });
   }
+  // round-dial tuning per lock tier (difficulty 0..1 feeds the old game's speed + window curves)
+  const DIAL = {
+    simple: { d: 0.05, pins: 1, speed: 0.9 }, standard: { d: 0.3, pins: 2, speed: 1.0 }, security: { d: 0.5, pins: 3, speed: 1.05 },
+    vault: { d: 0.72, pins: 3, speed: 1.15 }, algorithm: { d: 0.9, pins: 3, speed: 1.3 },
+  };
   MINIGAMES.lockpick = wrapped;
 
   // ---- co-op: host book + client prompt ---------------------------------------------------------------------------------------------

@@ -34,7 +34,6 @@ const R = 40;
 const ARC_R0 = 33;
 const ARC_R1 = 39;
 const DIAL = 96;
-const PINS = 3;
 
 function buildDoor() {
   const { canvas, ctx } = makeCanvas(W, H);
@@ -124,6 +123,7 @@ export function createLockpick(rawOpts = {}) {
   const rng = opts.rng;
   const sfx = opts.sfx;
   const D = opts.difficulty;
+  const PINS = clamp(Math.round(Number(opts.pinCount) || 3), 1, 4);   // lockpick tiers: Simple 1 pin .. Vault/Algorithm 3
 
   const door = buildDoor();
   const dial = buildDial();
@@ -135,8 +135,8 @@ export function createLockpick(rawOpts = {}) {
   let hits = 0;
   let angle = rng() * TAU;
   let dir = rng() < 0.5 ? 1 : -1;
-  let speed = lerp(1.7, 2.7, D);
-  let arcHW = lerp(0.46, 0.17, D);
+  let speed = lerp(1.7, 2.7, D) * (Number(opts.speedMul) || 1);   // tier tempo: easy locks sweep slower, hard ones faster
+  let arcHW = lerp(0.46, 0.17, D) * (Number(opts.arcMul) || 1);   // skill level / helpers widen the window
   let arcC = 0;
   let arcPx = [];
   let phase = 'play';
@@ -266,7 +266,7 @@ export function createLockpick(rawOpts = {}) {
 
   function drawPins() {
     for (let i = 0; i < PINS; i++) {
-      const x = CX - 20 + i * 20;
+      const x = CX + Math.round((i - (PINS - 1) / 2) * 20);
       ctx.fillStyle = '#050505';
       ctx.fillRect(x - 4, 2, 9, 17);
       ctx.fillStyle = '#15191c';
