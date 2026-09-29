@@ -5,6 +5,8 @@ import * as C from '../../src/game/chess_rules.js';
 import * as D from '../../src/game/draughts_rules.js';
 import * as A from '../../src/game/arcade_core.js';
 import * as R from '../../src/game/arcade_rps.js';
+import * as M from '../../src/game/chess3d_map.js';
+import { createPieceSet } from '../../src/models/chess3d.js';
 
 let fails = 0;
 const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m); } };
@@ -295,6 +297,75 @@ const play = (s, uci) => {   // 'e2e4' / 'e7e8q'
   // fairness sanity: the auto pick distribution covers all three moves
   const seen = new Set(); for (const x of [0, 0.4, 0.8]) { rv = x; const hh = mk(); hh.challenge(0, 'a', 'b', 0); hh.respond(0, 'b', true); hh.drain(); hh.tick(99); seen.add(hh.drain().find((e) => e.msg.k === 'rpsv').msg.picks[0]); }
   eq(seen.size, 3, 'random auto picks reach rock, paper and scissors');
+}
+
+// ---------------------------------------------------------------- chess3d: square <-> world mapping, instancing, pick -> move
+{
+  for (let sq = 0; sq < 64; sq++) { const l = M.sqToLocal(sq); eq(M.localToSq(l.x, l.z), sq, 'sq round trip ' + sq); }
+  const a1 = M.sqToLocal(0), h8 = M.sqToLocal(63);
+  ok(Math.abs(a1.x + 0.35) < 1e-9 && Math.abs(a1.z - 0.35) < 1e-9, 'a1 is near-left of White (x -0.35, z +0.35)'); ok(Math.abs(h8.x - 0.35) < 1e-9 && Math.abs(h8.z + 0.35) < 1e-9, 'h8 is far-right');
+  eq(M.localToSq(0.6, 0), -1, 'off the board (x)'); eq(M.localToSq(0, -0.51), -1, 'off the board (z)');
+  // a ray from the White camera pose through the e4 square centre picks e4
+  const pose = M.viewPose('w'), e4 = M.sqToLocal(28), py = M.TOP_Y + 0.035;
+  const dir = { x: e4.x - pose.eye.x, y: py - pose.eye.y, z: e4.z - pose.eye.z };
+  eq(M.rayToSq(pose.eye, dir, py), 28, 'camera ray through e4 picks e4'); eq(M.rayToSq(pose.eye, { x: 0, y: 1, z: 0 }, py), -1, 'ray pointing up misses');
+  ok(M.viewPose('b').eye.z < 0 && pose.eye.z > 0, 'black views from the -z side');
+
+  // piece lists + instancing
+  const st = A.newTable('t'), sn = A.snapshot(st), list = M.piecesOf(sn.kind, sn.pos);
+  eq(list.length, 32, 'chess start: 32 pieces'); eq(list.find((p) => p.sq === 4).t, 'k', 'e1 king'); eq(list.find((p) => p.sq === 4).c, 'w', 'e1 is white'); eq(list.find((p) => p.sq === 60).t, 'k', 'e8 king');
+  const cnt = M.instanceCounts(list);
+  eq(Object.keys(cnt).length, 12, 'chess: 12 instanced meshes (6 types x 2 colours)'); eq(cnt.p_w, 8, '8 white pawns'); eq(cnt.n_b, 2, '2 black knights'); eq(cnt.q_w, 1, '1 white queen');
+  const set = createPieceSet(); set.setPieces(list, {});
+  let sst = set.stats(); eq(sst.instances, 32, 'piece set: 32 instances'); ok(sst.drawCalls <= 12, `piece draw calls <= 12 (got ${sst.drawCalls})`);
+  set.setMarks({ last: [12, 28], check: -1, sel: 12, tgt: [[20, false], [28, true]] }); sst = set.stats(); ok(sst.drawCalls <= 15, `pieces + marks <= 15 draw calls (got ${sst.drawCalls})`);
+  const dl = M.piecesOf('draughts', D.ser(D.initial()));
+  eq(dl.length, 32, 'dama start: 32 men'); eq(Object.keys(M.instanceCounts(dl)).length, 2, 'dama: 2 instanced meshes');
+  set.setMarks({ last: null, check: -1, sel: -1, tgt: [] }); set.setPieces(dl, {}); eq(set.stats().drawCalls, 2, 'dama: 2 piece draw calls');
+  set.dispose();
+
+  // move diff (animation source): pawn push, capture, castling, promotion
+  const p1 = M.piecesOf('chess', C.START_FEN), p2 = M.piecesOf('chess', 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1');
+  const mv = M.diffMoves(p1, p2); eq(mv.length, 1, 'e4: one moved piece'); ok(mv[0].from === 12 && mv[0].to === 28 && mv[0].t === 'p', 'e2 -> e4 pawn');
+  const c1 = M.piecesOf('chess', 'r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1'), c2 = M.piecesOf('chess', 'r3k2r/8/8/8/8/8/8/R4RK1 b kq - 1 1');
+  const cm = M.diffMoves(c1, c2); eq(cm.length, 2, 'castling moves two pieces'); ok(cm.some((m) => m.t === 'k' && m.from === 4 && m.to === 6) && cm.some((m) => m.t === 'r' && m.from === 7 && m.to === 5), 'king e1-g1 + rook h1-f1');
+  const x1 = M.piecesOf('chess', '4k3/8/8/3p4/4P3/8/8/4K3 w - - 0 1'), x2 = M.piecesOf('chess', '4k3/8/8/3P4/8/8/8/4K3 b - - 0 1');
+  const xm = M.diffMoves(x1, x2); eq(xm.length, 1, 'capture: only the mover animates'); ok(xm[0].from === 28 && xm[0].to === 35, 'exd5');
+  const q1 = M.piecesOf('chess', '8/4P3/8/8/8/8/8/k6K w - - 0 1'), q2 = M.piecesOf('chess', '4Q3/8/8/8/8/8/8/k6K b - - 0 1');
+  const qm = M.diffMoves(q1, q2); ok(qm.length === 1 && qm[0].to === 60 && qm[0].t === 'q', 'promotion animates the pawn to the queen');
+  const kp = M.piecesOf('chess', '4k3/8/8/8/8/8/8/4K2r w - - 0 1');
+  eq(M.checkSquare('chess', kp, 'w', true), 4, 'check ring goes under the checked king'); eq(M.checkSquare('chess', kp, 'w', false), -1, 'no ring without check'); eq(M.checkSquare('draughts', dl, 'w', true), -1, 'no ring in dama');
+
+  // pick -> move translation through a real table (host snapshot + client decode)
+  const tb = A.newTable('t'); A.sit(tb, 'p1', 'w'); A.sit(tb, 'p2', 'b');
+  const view = () => { const snap = A.snapshot(tb); return { snap, dec: A.decode(snap) }; };
+  let { snap, dec } = view(); const P = M.createPicker();
+  ok(P.click(snap, dec, 'w', 12).changed && P.sel === 12, 'click e2 selects the pawn'); const tg = P.targets(snap, dec, 'w');
+  ok(tg.has(20) && tg.has(28) && tg.size === 2, 'e2 pawn targets: e3 + e4');
+  const res = P.click(snap, dec, 'w', 28); ok(Array.isArray(res.m) && res.m.join() === '12,28', 'e4 click emits [12, 28]'); eq(P.sel, -1, 'selection cleared after the move');
+  ok(A.move(tb, 'p1', res.m).ok, 'host accepts the picked move'); ({ snap, dec } = view());
+  ok(!P.canPick(snap, dec, 'w', 8), 'not my turn: nothing to pick'); ok(!P.click(snap, dec, 'w', 8).changed, 'not my turn: click ignored'); ok(!P.canPick(snap, dec, null, 52), 'spectator cannot pick');
+  ok(P.click(snap, dec, 'b', 52).changed && P.targets(snap, dec, 'b').size === 2, 'black picks e7'); ok(P.click(snap, dec, 'b', 52).changed && P.sel === -1, 'second click on the same piece deselects');
+  ok(P.click(snap, dec, 'b', 51).changed && P.sel === 51, 'select d7'); ok(P.click(snap, dec, 'b', 52).changed && P.sel === 52, 'clicking another own piece switches the selection');
+  ok(P.click(snap, dec, 'b', 30).changed, 'empty non-target square clears the selection'); eq(P.sel, -1, 'selection cleared');
+  // promotion needs the picker
+  const pt = A.newTable('t'); pt.st = fen('8/4P2k/8/8/8/8/8/K7 w - - 0 1'); A.sit(pt, 'p1', 'w'); A.sit(pt, 'p2', 'b');
+  {
+    const sn2 = A.snapshot(pt), d2 = A.decode(sn2), Q = M.createPicker();
+    Q.click(sn2, d2, 'w', 52); const r = Q.click(sn2, d2, 'w', 60); ok(r.promo && !r.m && Q.promo, 'reaching the last rank asks for a promotion piece');
+    ok(!Q.canPick(sn2, d2, 'w', 52), 'picker locked while choosing'); const pm = Q.choosePromo('n'); ok(pm && pm.join() === '52,60,n', 'promotion choice emits [from, to, n]');
+    ok(A.move(pt, 'p1', pm).ok, 'host accepts the promotion'); eq(Q.choosePromo('q'), null, 'no pending promotion after choosing');
+  }
+  // dama: multi-jump is built step by step
+  const dt = A.newTable('d', 'draughts'); dt.st = D.fromRows(['........', '........', '...b....', '..b.....', '..w.....', '........', '........', '........'], 'w'); A.sit(dt, 'p1', 'w'); A.sit(dt, 'p2', 'b');
+  {
+    const sn3 = A.snapshot(dt), d3 = A.decode(sn3), Q = M.createPicker(), wsq = d3.moves[0].f;
+    ok(Q.click(sn3, d3, 'w', wsq).changed, 'dama: select the capturing man');
+    const tg3 = Q.targets(sn3, d3, 'w'); ok(tg3.size >= 1 && [...tg3.values()].every((v) => v === 'cap'), 'dama: only capture landings are offered (mandatory capture)');
+    let m = null, guard = 0;
+    while (!m && guard++ < 6) { const t2 = Q.targets(sn3, d3, 'w'); m = Q.click(sn3, d3, 'w', [...t2.keys()][0]).m || null; }
+    ok(m && m.length >= 3 && m[0] === wsq, 'dama: the jump path is emitted as [from, ...landings]'); ok(A.move(dt, 'p1', m).ok, 'host accepts the picked dama path');
+  }
 }
 
 if (fails) { console.log(`${fails} FAILED`); process.exit(1); }

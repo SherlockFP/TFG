@@ -217,3 +217,6 @@ Every stair builder (Soviet blocks, towers, ruins, crawler ramp, mansion stairca
 First real step of the identity (§21): the Algorithm now reacts to habits and lets the crew vote its rules. Pure maths is node-tested; the live glue (populate wrap, vote UI, viewers on the LIVE banner) was NOT run in a browser, so first look for layout of `.a1-vote` at 1280x720 and whether `hostPopulateMoon` wrapping stacks cleanly with cycle's.
 ## Wave 5 - ZONES (module `zones`, docs/wave5/zones.md)
 The new core loop exists end to end in code (partition, capture, fortify, capped income + upkeep, counter-attacks live/auto, sector map) and the rules are node-tested, but nobody has seen it: pillar/ring visuals, panel layout at 1280x720 and the live-defence feel are unverified. Income cap and attack odds are paper numbers. Wings are outdoor annex relays, not interior zones; defences are outdoor deployables only.
+
+## Wave 5 - chess3d (docs/wave5/chess3d.md)
+3D chess / dama on the table with instanced lathe pieces, drag + click picking, animated moves. Honest limits: never looked at on screen after the last fix (piece silhouettes, camera framing, HUD at 1280x720 unverified); no capture fade, no touch.

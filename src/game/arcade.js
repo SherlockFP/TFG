@@ -15,6 +15,7 @@ import { createGameTable, createCarnival, TABLE, BOOTH_X } from '../models/arcad
 import { createBoothPlayer } from './arcade_booths.js';
 import { createRpsHost, RPS } from './arcade_rps.js';
 import { createRpsClient } from './arcade_rps_ui.js';
+import { createChess3d, isClassic, setClassic } from './chess3d.js';
 import * as A from './arcade_core.js';
 import { SPOTS as SHIP_SPOTS } from '../world/shiplayout.js';
 
@@ -142,7 +143,7 @@ export function installArcade(game) {
     const [x, y, z] = s.pos;
     const hs = addColliders(ownerColliders, [{ x: 0, y: TABLE.topY / 2, z: 0, hx: 0.5, hy: TABLE.topY / 2, hz: 0.5 }], x, y, z);   // 1 x 1 m top: turning it 90 degrees keeps the box
     const e = tables.get(id);
-    if (e) model.update(e.snap.kind, e.snap.pos);
+    if (e) model.update(e.snap.kind, e.snap.pos, { last: e.snap.last, check: e.dec.check, turn: e.dec.st.turn });
     views.set(id, { model, group: parent, colliders: hs });
   }
   function dropView(id) {
@@ -313,7 +314,7 @@ export function installArcade(game) {
       if (d.k === 't' && d.s?.id && SITES[d.s.id]) {
         const dec = A.decode(d.s);
         tables.set(d.s.id, { snap: d.s, dec });
-        views.get(d.s.id)?.model.update(d.s.kind, d.s.pos);
+        views.get(d.s.id)?.model.update(d.s.kind, d.s.pos, { last: d.s.last, check: dec.check, turn: dec.st.turn, animate: true });   // [chess3d] every peer animates the move
         emitChange(d.s.id);
       } else if (d.k === 'go') {
         if (booths.start(d.booth, d.sid)) {
@@ -334,16 +335,20 @@ export function installArcade(game) {
   function request(op, data = {}) { game.net?.request('arreq', { op, ...data }); }
 
   // ================================================================================================ CLIENT: panel
-  let panel = null;
+  let panel = null, openId = null;
+  // [chess3d] the real 3D board is the default view; the 2D overlay is "Classic view" (saved per browser)
+  const c3 = createChess3d({ game, arc: { get: entry, subscribe: (f) => { subs.add(f); return () => subs.delete(f); }, request: (op, data) => request(op, data) }, viewOf: (id) => { const v = views.get(id); return v ? { model: v.model, root: v.model.root } : null; }, request: (op, data) => request(op, data), closeView: () => close(), openView: (id) => open(id) });
   function open(id) {
     if (disposed || !SITES[id]) return;
     if (!tables.has(id)) request('sync');
     close();
-    const ctl = createArcadePanel(game.ui, game, api, id);
+    openId = id;
+    const ctl = isClassic() || !views.has(id) ? createArcadePanel(game.ui, game, api, id) : c3.create(id);
     game.ui.openPanel(ctl.el); panel = ctl;
     game.ui.onPanelClose = () => { ctl.dispose(); if (panel === ctl) panel = null; return false; };
   }
   function close() { if (panel) game.ui.closePanel(); }
+  function toggleClassic(v) { setClassic(v); if (panel && openId) open(openId); }
 
   // ================================================================================================ CLIENT: booths
   const booths = createBoothPlayer({
@@ -407,6 +412,8 @@ export function installArcade(game) {
       const w = game.world, sig = `${w?.company?.group?.id || 0}|${w?.outdoor?.home ? w.outdoor.group.id : 0}|${game.ship?.group?.id || 0}`;
       if (sig !== worldSig || (!views.has('ship') && game.ship?.group)) { worldSig = sig; syncWorld(); }   // maps come and go with the landings
       booths.update(dt);
+      c3.update(dt);
+      for (const v of views.values()) v.model.tick(dt);
       const act = booths.active;
       if (act) {
         const w = boothWorld(act.booth), pp = game.player.pos;
@@ -426,7 +433,7 @@ export function installArcade(game) {
     get: entry,
     subscribe(fn) { subs.add(fn); return () => subs.delete(fn); },
     request: (op, data) => request(op, data),
-    open, close, booths, rps: rpsc,
+    open, close, booths, rps: rpsc, chess3d: c3, setClassic: toggleClassic,
     state: () => ({ tables: Object.fromEntries([...tables].map(([k, v]) => [k, { kind: v.snap.kind, ply: v.snap.ply, seats: v.snap.seats, ai: v.snap.ai, over: v.snap.over }])), views: [...views.keys()], carnival: !!carn, session: booths.active ? { ...booths.active } : null }),
     host: H,
     site: worldOfSite,
@@ -437,7 +444,7 @@ export function installArcade(game) {
       for (const o of offs) { try { o?.(); } catch { /* ignore */ } }
       window.removeEventListener('mousedown', onMouseDown, true);
       if (boundNet?.msgHandlers?.get('ar') === onMsg) boundNet.msgHandlers.delete('ar');
-      close(); booths.cancel(true); rpsc.dispose();
+      close(); c3.dispose(); booths.cancel(true); rpsc.dispose();
       for (const id of [...views.keys()]) dropView(id);
       dropCarnival();
       dock?.remove();
