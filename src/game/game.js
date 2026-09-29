@@ -201,7 +201,6 @@ import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs
 // [import:homeworld2]
 
 
-// [import:guide]
 
 
 // [import:ship2]
@@ -223,6 +222,7 @@ import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs
 
 
 // [import:voyage]
+import { installGuide } from './guide.js';   // wave 4: Algorithm advisor + first-landing tutorial (docs/wave4/guide.md)
 
 
 
@@ -429,7 +429,6 @@ export class Game extends Emitter {
     // [slot:homeworld2]
 
 
-    // [slot:guide]
 
 
     // [slot:ship2]
@@ -451,6 +450,7 @@ export class Game extends Emitter {
 
 
     // [slot:voyage]
+    this.useModule('guide', installGuide);   // [guide] installed last: wraps the terminal / ALGO command of the modules above
 
 
   }
