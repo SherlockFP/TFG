@@ -38,7 +38,7 @@ for (const id of FOOD_IDS) {
 ok(kinds.food === 7 && kinds.drink === 4 && kinds.booze === 3, 'kind counts ' + JSON.stringify(kinds));
 ok(FOODS.fd_lager.booze.pw < FOODS.fd_raki.booze.pw && FOODS.fd_raki.booze.pw < FOODS.fd_vodka.booze.pw, 'booze strength lager < raki < vodka');
 ok(FOODS.fd_mega.fizzy && FOODS.fd_glitch.fizzy && FOODS.fd_lager.fizzy && !FOODS.fd_coffee.fizzy, 'fizzy drinks burp');
-ok(FOODS.fd_pizza.hp === 30 && FOODS.fd_pizzabox.hp === 60 && FOODS.fd_bar.stam === 45, 'instant effects');
+ok(FOODS.fd_pizza.hp === 12 && FOODS.fd_pizzabox.hp === 24 && FOODS.fd_bar.stam === 45, 'instant effects');
 // loot tables
 const loot = lootByTheme();
 ok(Object.keys(loot).length >= 6 && loot.office.some((e) => e[0] === 'fd_noodles'), 'loot by theme');
@@ -84,7 +84,7 @@ ok(TABLE_SPOTS.length >= 3 && TABLE_SPOTS.every(([x, z]) => Math.abs(x) < 6.2 &&
   const w = applyBuffStats(BUFFS.f_wellfed, base());
   ok(w.maxHp === 110 && near(w.speedMul, 1.03), 'Well Fed');
   ok(applyBuffStats(null, base()).speedMul === 1, 'null def is a no-op');
-  ok(BUFFS.f_noodles.hps === 1.2 && BUFFS.f_ramen.hps > BUFFS.f_noodles.hps && BUFFS.f_cake.hps === 0.6, 'regen numbers');
+  ok(BUFFS.f_noodles.hps === 0.5 && BUFFS.f_ramen.hps > BUFFS.f_noodles.hps && BUFFS.f_cake.hps === 0.6, 'regen numbers');
   // no buff can make you invulnerable / immobile
   for (const [id, b] of Object.entries(BUFFS)) {
     const st = applyBuffStats(b, base());

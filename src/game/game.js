@@ -184,6 +184,9 @@ import { installStealth } from './stealth.js';   // wave 4: sneak, noise, sound-
 import { installHorror } from './horror.js';   // wave 4: pay-to-arm traps, outbreak wing, mansion, closets, chalk + Forger, fake closet (docs/wave4/horror.md)
 
 
+import { installSurvival } from './survival.js';   // wave 4: foraging, farming, cooking, brewing, storage crates, hunger (docs/wave4/survival.md)
+
+
 // [import:ux]
 import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
 
@@ -225,7 +228,6 @@ import { installCosm5 } from './cosm5.js';   // wave 4: cosmetics drop (suits/ha
 
 
 
-// [import:survival]
 
 
 // [import:voyage]
@@ -426,6 +428,9 @@ export class Game extends Emitter {
     this.useModule('horror', installHorror);
 
 
+    this.useModule('survival', installSurvival);   // [survival]
+
+
     // [slot:ux]
     this.useModule('hostmig', installHostMig);
 
@@ -467,7 +472,6 @@ export class Game extends Emitter {
 
 
 
-    // [slot:survival]
 
 
     // [slot:voyage]
