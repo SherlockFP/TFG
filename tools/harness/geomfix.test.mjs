@@ -143,7 +143,7 @@ function auditProps(props, boxes, ctx) {
 // ---------------------------------------------------------------- game modules that add things on mapLoaded (installed one by one on a stub game so children can be attributed)
 const MODS = [['mapart', '../../src/game/mapart.js', 'installMapArt'], ['eggs', '../../src/game/eggs.js', 'installEggs'], ['worldx', '../../src/game/worldx.js', 'installWorldX'],
   ['survival', '../../src/game/survival.js', 'installSurvival'], ['secureloot', '../../src/game/secureloot.js', 'installSecureLoot'], ['cycle3', '../../src/game/cycle3.js', 'installCycle3'],
-  ['maps2', '../../src/game/maps2.js', 'installMaps2'], ['stealth', '../../src/game/stealth.js', 'installStealth'], ['worlds2', '../../src/game/worlds2.js', 'installWorlds2']];
+  ['maps2', '../../src/game/maps2.js', 'installMaps2'], ['stealth', '../../src/game/stealth.js', 'installStealth'], ['worlds2', '../../src/game/worlds2.js', 'installWorlds2'], ['soul', '../../src/game/soul.js', 'installSoul']];
 function stubGame(world, boxes) {
   const listeners = {};
   const mods = { on(ev, fn) { (listeners[ev] ||= []).push(fn); return () => {}; }, emit(ev, ...a) { for (const f of [...(listeners[ev] || [])]) f(...a); } };

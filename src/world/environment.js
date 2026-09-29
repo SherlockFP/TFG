@@ -249,7 +249,7 @@ export class Environment {
     if (this.eclipse) night = Math.max(night, 0.75);
     const skyC = new THREE.Color(b.sky ?? 0x6f8a99);
     const nightC = new THREE.Color(this.eclipse ? 0x1a0707 : (b.night ?? 0x05070c));
-    const duskC = new THREE.Color(0x8a4a30);
+    const duskC = new THREE.Color(b.dusk ?? 0x8a4a30);   // [soul] per-moon dusk colour
     const horizon = skyC.clone().lerp(duskC, duskF * 0.6).lerp(nightC, night);
     const top = horizon.clone().multiplyScalar(0.7);
     let fogC = new THREE.Color(b.fog ?? 0x7d8f95).lerp(duskC, duskF * 0.4).lerp(nightC, night * 0.95);
@@ -303,8 +303,8 @@ export class Environment {
     const overcast = this.weather === 'clear' ? 1 : this.weather === 'foggy' ? 0.6 : 0.55;
     L.sun.intensity = this.indoor ? 0 : (dayF * 1.7 * overcast + night * 0.06 + lf * 3);
     L.hemi.intensity = this.indoor ? 0.02 : (0.15 + dayF * 0.7 * overcast + lf * 1.5) * (this.eclipse ? 0.5 : 1);
-    L.hemi.color.copy(horizon).lerp(new THREE.Color(0xffffff), 0.35);
-    L.hemi.groundColor.set(0x1c1712);
+    L.hemi.color.copy(horizon).lerp(new THREE.Color(0xffffff), b.hemiW ?? 0.35);   // [soul] per-moon hemisphere tint
+    L.hemi.groundColor.set(b.hemiG ?? 0x1c1712);
     L.ambient.intensity = this.indoor ? 0.012 : 0.03;
     this.night = night;
   }

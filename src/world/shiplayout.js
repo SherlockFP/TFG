@@ -68,6 +68,21 @@ export const SPOTS = {
   // ---- outside
   emblem: { x: -0.9, y: 1.45, zOut: 3.84, xNeg: -2.2, s: 1.3 },   // polish4 hull decal (+z side at x, -z side at xNeg: clear of the KC-07 number, the windows and the N1 / N2 doorways)
 };
+/** wave 8 SOUL (module soul.js): lived-in ship details. Flat wall panels + one shelf, all on the cockpit bulkhead (x = -4.0, faces x = -3.92 hub / -4.08 cockpit) or the
+ *  -z hull; the overlap test checks them (fixtureBoxes). x = face plane centre, z = centre along the wall, y = centre height, w/h = panel size, ry = facing (PI/2 = +x). */
+export const SOUL = {
+  whiteboard: { x: -3.905, z: -1.95, y: 1.55, w: 1.5, h: 0.95, t: 0.03, ry: PI / 2 },            // hub face, north of the hatch: days / deaths / best haul
+  shelf: { x: -3.84, z: -1.95, y: 2.25, w: 1.5, d: 0.16, t: 0.04 },                             // above the whiteboard: crew mugs + the quota plant
+  poster: { x: -4.095, z: -1.9, y: 1.55, w: 0.62, h: 0.86, t: 0.03, ry: -PI / 2 },              // cockpit face: the Company motivational poster
+  notes: [                                                                                       // sticky notes (0.14 m squares)
+    { x: -1.1, z: SHELL.z0 + 0.012, y: 1.85, ry: 0, i: 0 },                                     // -z hull, above the coffee machine
+    { x: -4.093, z: -1.3, y: 1.32, ry: -PI / 2, i: 1 },                                          // cockpit face, next to the poster
+    { x: -3.893, z: -2.85, y: 1.55, ry: PI / 2, i: 2 },                                          // hub face, stuck beside the whiteboard
+  ],
+  mugs: [{ z: -2.5, i: 0 }, { z: -2.25, i: 1 }, { z: -1.45, i: 2 }],                            // stand on the shelf (x, y derive from it)
+  plant: { z: -1.85 },                                                                           // the quota plant, on the shelf
+  note: 0.14,
+};
 /** where store deliveries appear: inside the yellow loot bay, i = 0.. stacks upward */
 export function dropPoint(i = 0, rand = Math.random) { const c = SPOTS.cargo; return { x: c.x + (rand() - 0.5) * c.w, y: 1.2 + i * 0.25, z: c.z + (rand() - 0.5) * c.d }; }
 /** food table candidates [x, z, ry], first free one wins (food.js). ry = PI / 2 puts the stools along x. */
@@ -166,6 +181,13 @@ export function fixtureBoxes(S = SPOTS, opts = {}) {
   out.push(box('tpPanel', S.tp.x, SHELL.z0 + 0.03, 0.17, 0.03, S.tp.y - 0.25, S.tp.y + 0.25, { kind: 'wall' }));
   out.push(box('tpPad', PAD.x, PAD.z, PAD.r, PAD.r, 0, 0.05, { kind: 'floor' }));
   if (S.reactor) out.push(box('reactor', S.reactor.x, S.reactor.z, 0.5, 0.5, 0, 2.6, { kind: 'solid' }));
+  if (S === SPOTS) {   // wave 8 soul: whiteboard, shelf, poster, sticky notes (flat wall decor)
+    const W = SOUL.whiteboard, H = SOUL.shelf, P = SOUL.poster, n = SOUL.note / 2;
+    out.push({ id: 'soulBoard', x0: W.x - W.t / 2, x1: W.x + W.t / 2, z0: W.z - W.w / 2, z1: W.z + W.w / 2, y0: W.y - W.h / 2, y1: W.y + W.h / 2, kind: 'wall' });
+    out.push({ id: 'soulShelf', x0: H.x - H.d / 2, x1: H.x + H.d / 2, z0: H.z - H.w / 2, z1: H.z + H.w / 2, y0: H.y - H.t / 2, y1: H.y + H.t / 2 + 0.38, kind: 'wall' });   // + mugs / plant
+    out.push({ id: 'soulPoster', x0: P.x - P.t / 2, x1: P.x + P.t / 2, z0: P.z - P.w / 2, z1: P.z + P.w / 2, y0: P.y - P.h / 2, y1: P.y + P.h / 2, kind: 'wall' });
+    SOUL.notes.forEach((q, i) => { const alongX = Math.abs(Math.sin(q.ry)) < 0.5; out.push({ id: 'soulNote' + i, x0: q.x - (alongX ? n : 0.006), x1: q.x + (alongX ? n : 0.006), z0: q.z - (alongX ? 0.006 : n), z1: q.z + (alongX ? 0.006 : n), y0: q.y - n, y1: q.y + n, kind: 'wall' }); });
+  }
   if (S.trophy) {   // one wall panel covering every plaque (+ the name plates under them)
     const T = S.trophy, P = TROPHY_PLAQUE, hz = ((T.cols - 1) * T.dz + P.w) / 2, hy = ((T.rows - 1) * T.dy + P.h) / 2;
     out.push({ id: 'trophyWall', x0: T.x - 0.01, x1: T.x + 0.09, z0: T.z - hz, z1: T.z + hz, y0: T.y - hy, y1: T.y + hy, kind: 'wall' });
