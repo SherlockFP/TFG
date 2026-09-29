@@ -162,6 +162,10 @@ import { installCycle } from './cycle.js';   // [cycle] inert: rules only, see d
 import { installWorlds2 } from './worlds2.js';   // wave 3: Soviet raids + twin-sun planet + plasma blade + fauna + loot pacing (docs/wave3/worlds2.md)
 
 
+// [import:stealth]
+import { installStealth } from './stealth.js';   // wave 4: sneak, noise, sound-hunting creatures, noisemaker (docs/wave4/stealth.md)
+
+
 // [import:ux]
 
 
@@ -328,6 +332,10 @@ export class Game extends Emitter {
 
 
     this.useModule('worlds2', installWorlds2);   // [worlds2]
+
+
+    // [slot:stealth]
+    this.useModule('stealth', installStealth);
 
 
     // [slot:ux]
@@ -880,6 +888,7 @@ export class Game extends Emitter {
     }
     if (surf === 'concrete' && !insideShip(pos) && pos.y < FACILITY_Y + 40 && this.world.facility?.layout.theme === 'mineshaft') surf = mineshaftFootstep(this.world.facility, pos, (n) => this.audio.has(n));
     surf = footSurface(this, pos, surf);   // carpet / tile / metal / gravel / water from the floor under the foot
+    this.lastStepSurface = surf;   // [stealth] the noise of the next steps depends on it (game/stealth.js surfaceMul)
     const name = this.audio.variant('step_' + surf);
     if (local) this.audio.play(name, { volume: vol * 0.8, bus: 'sfx', pitch: 0.95 + Math.random() * 0.1 });
     else this.audio.at(name, pos.clone().add(new THREE.Vector3(0, 0.1, 0)), vol, { occlude: true, refDistance: 1.5, maxDistance: 30 });

@@ -232,10 +232,11 @@ export class LocalPlayer {
     const moving = len > 0;
     const bodyCarry = this.carriesBody();
     this.bodyCarry = bodyCarry;
-    const wantSprint = canMove && moving && input.isDown('sprint') && !this.crouch && !this.exhausted && mz <= 0.1 && !bodyCarry;   // no sprinting with a body over your shoulder
+    this.sneak = canMove && input.isDown('sneak');   // [stealth] Alt: slow, near-silent walk (game/stealth.js: noise table, HUD meter)
+    const wantSprint = canMove && moving && input.isDown('sprint') && !this.crouch && !this.sneak && !this.exhausted && mz <= 0.1 && !bodyCarry;   // no sprinting with a body over your shoulder
     this.sprinting = wantSprint && this.stamina > 0;
     // Snappier than the old 3.9/6.6 but still LC-paced so creatures stay threatening.
-    let speed = this.crouch ? 2.6 : this.sprinting ? 8.2 : 5.0;
+    let speed = this.sneak ? 2.1 : this.crouch ? 2.6 : this.sprinting ? 8.2 : 5.0;
     speed *= weightMul * s.speedMul * (this.speedBoost > 0 ? 1.25 : 1) * (this.slowT > 0 ? 0.35 : 1);
     if (this.game.grab?.item) speed *= 0.88;
     if (bodyCarry) speed *= 0.85;   // on top of the 90 lb weight penalty: a slow, heavy trudge (~2.9 m/s), never frozen
@@ -253,7 +254,7 @@ export class LocalPlayer {
       this.staminaDelay = 1.1;
     } else {
       this.staminaDelay = Math.max(0, (this.staminaDelay || 0) - dt);
-      if (this.staminaDelay <= 0) this.stamina += s.staminaRegen * (moving ? 0.7 : 1.1) * dt * (this.game.infiniteSprint ? 10 : 1);
+      if (this.staminaDelay <= 0) this.stamina += s.staminaRegen * (moving && !this.sneak ? 0.7 : 1.1) * dt * (this.game.infiniteSprint ? 10 : 1);
     }
     if (this.game.infiniteSprint) this.stamina = this.maxStamina;
     this.stamina = clamp(this.stamina, 0, this.maxStamina);
@@ -277,6 +278,7 @@ export class LocalPlayer {
       this.grounded = false;
       this.jumpedAir = true; this.jumpBuf = 0; this.airT = COYOTE;
       this.game.sfx('jump', 0.4);
+      this.noise = Math.max(this.noise, this.sneak ? 0.1 : 0.5);   // [stealth] a jump is heard
       this.game.engine.punch?.(-0.012, 0, 0);
     }
     // jetpack
@@ -354,15 +356,15 @@ export class LocalPlayer {
     let noise = 0;
     if (this.grounded && hs > 0.5) {
       this.stepDist += hs * dt;
-      const stride = this.sprinting ? 2.3 : this.crouch ? 1.4 : 1.9;
+      const stride = this.sprinting ? 2.3 : this.sneak ? 1.25 : this.crouch ? 1.4 : 1.9;
       this.stride = stride;
       if (this.stepDist > stride) {
         this.stepDist = this.fpLegacy ? 0 : Math.min(this.stepDist - stride, stride * 0.5); this.footIdx++;   // [fpbody] keep the overshoot: the bob phase used to stall a few % every footfall
         const quiet = this.game.hasPerk('lightfoot') ? 0.5 : 1;
-        const vol = (this.crouch ? 0.12 : this.sprinting ? 0.55 : 0.32) * quiet;
+        const vol = (this.sneak ? 0.04 : this.crouch ? 0.12 : this.sprinting ? 0.55 : 0.32) * quiet;
         this.game.footstep(this.pos, vol, true);
       }
-      noise = (this.crouch ? 0.05 : this.sprinting ? 0.7 : 0.3) * (this.game.hasPerk('lightfoot') ? 0.5 : 1);
+      noise = (this.sneak ? 0.02 : this.crouch ? 0.04 : this.sprinting ? 0.7 : 0.3) * (this.game.hasPerk('lightfoot') ? 0.5 : 1) * (this.game.stealth?.surfaceMul?.() ?? 1);   // [stealth] metal / water loud, carpet quiet
       if (this.wading) noise = Math.min(1, noise * 1.6 + 0.1);   // splashing is loud
     }
     this.noise = Math.max(noise, this.noise - dt * 1.5);

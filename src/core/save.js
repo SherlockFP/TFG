@@ -25,7 +25,7 @@ export const DEFAULT_KEYS = {
   jump: 'Space', crouch: 'ControlLeft', sprint: 'ShiftLeft',
   interact: 'KeyE', drop: 'KeyG', flashlight: 'KeyF', ptt: 'KeyV',
   chat: 'Enter', emote1: 'KeyZ', emote2: 'KeyX', menu: 'Tab', throwItem: 'KeyQ',
-  ping: 'KeyP',
+  ping: 'KeyP', sneak: 'AltLeft',   // [stealth]
 };
 
 export function defaultSettings() {

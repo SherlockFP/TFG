@@ -57,6 +57,16 @@ function stickycharge() {
   k.add(L('paint', 0x2a6ee8), box(0.006, 0.05, 0.005), [0.0, 0.0, 0.031], [0, 0, 0.4]);
   return done(k, root);
 }
+function noisemaker() {   // [stealth] a bundle of tin cans on a string around a clockwork bell
+  const k = new Kit(), root = new THREE.Group();
+  k.add(L('metal', 0xb8a070), cyl(0.026, 0.026, 0.06, 10), [0, 0, 0]);
+  k.add(L('paint', 0xe0a020), cyl(0.0275, 0.0275, 0.014, 10), [0, 0.012, 0]);
+  k.add(L('metal', 0x9aa0a8), cyl(0.02, 0.02, 0.045, 8), [0.045, -0.008, 0.01], [0.3, 0, 0.5]);
+  k.add(L('metal', 0x8a9098), cyl(0.018, 0.018, 0.04, 8), [-0.042, -0.012, -0.012], [-0.4, 0, -0.6]);
+  k.add(L('metal', 0xd8d8d8), tor(0.02, 0.002, 3, 8), [0, 0.045, 0], [HP, 0, 0]);
+  k.add(B(null, 0xff5a20), sph(0.007, 5, 4), [0, 0.034, 0.02]);
+  return done(k, root);
+}
 function bombGravity() {
   const k = new Kit(), root = new THREE.Group();
   k.add(L('metal_dark', 0x3a2a66), sph(0.05, 10, 8));
@@ -104,7 +114,7 @@ function bombCluster() {
 }
 
 export const GRENADE_MODELS = {
-  flashbang, smokegrenade, decoybeacon, stickycharge,
+  flashbang, smokegrenade, decoybeacon, stickycharge, noisemaker,
   bomb_gravity: bombGravity, bomb_blackout: bombBlackout, bomb_confetti: bombConfetti, bomb_glitch: bombGlitch, bomb_cluster: bombCluster,
 };
 

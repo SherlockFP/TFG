@@ -14,6 +14,8 @@ import { tintLampLights } from './interiors/common.js';
 import { buildHazards } from './interiors/hazards.js';
 import { buildFacilitySystems, planChestSpots } from './interiors/facsys.js';
 import { planMaps2, buildRooms2, installRoomStyles2 } from './rooms2.js';   // [maps2]
+import { planVarietyRooms, planVarietyFeatures, shortcutInfo, buildVariety, installVarietyStyles } from './facility_variety.js';   // [stealth] wave 4 variety
+import { carveMaze } from './maze_styles.js';
 
 // Interior theme registry (ids: factory, mansion, mineshaft, office, backrooms, serverfarm, sewer, hospital).
 export { INTERIORS, INTERIOR_THEMES, INTERIOR_NAMES, getInterior, isInteriorTheme };
@@ -135,6 +137,9 @@ export function generateLayout(seed, theme = 'factory', size = 1, opts = null) {
     }
   }
 
+  // [stealth] wave 4 variety: extra seeded maze rooms (6 styles) + liminal rooms (cubicles / pool / hall loop); own RNG fork, off with opts.variety === false
+  const VAR = planVarietyRooms({ seed, theme, size, O, W, H, canPlace, addRoom, mazeRooms });
+
   // wing plan (office, hospital): one or two long spine corridors first, rooms hang off them
   const spines = [];
   if (R.plan === 'wings') {
@@ -156,7 +161,7 @@ export function generateLayout(seed, theme = 'factory', size = 1, opts = null) {
     }
   }
 
-  const target = Math.round((9 + size * 9) * (R.roomMul || 1));
+  const target = Math.round((9 + size * 9) * (R.roomMul || 1)) + (VAR ? VAR.count : 0);
   for (let a = 0; a < 900 + size * 400 && rooms.length < target; a++) {
     const big = rng.chance(R.bigChance);
     let w, h;
@@ -298,6 +303,7 @@ export function generateLayout(seed, theme = 'factory', size = 1, opts = null) {
       if (xx < mr.x + mr.w - 1) open.delete(edgeKey(xx, zz, 0));
       if (zz < mr.z + mr.h - 1) open.delete(edgeKey(xx, zz, 1));
     }
+    if (mr.mazeStyle && VAR) { for (const [lx, lz, d] of carveMaze(mr.mazeStyle, mr.w, mr.h, VAR.rng)) open.add(edgeKey(mr.x + lx, mr.z + lz, d)); continue; }   // [stealth] styled maze
     const inRoom = (xx, zz) => xx >= mr.x && xx < mr.x + mr.w && zz >= mr.z && zz < mr.z + mr.h;
     const seenM = new Set([idx(mr.x, mr.z)]);
     const stackM = [[mr.x, mr.z]];
@@ -365,6 +371,9 @@ export function generateLayout(seed, theme = 'factory', size = 1, opts = null) {
     }
   }
 
+  // [stealth] dead ends, hatches, the locked shortcut edge (needs distOf; only ever ADDS an edge between reachable cells)
+  planVarietyFeatures({ V: VAR, W, H, cells, roomOf, rooms, open, edgeKey, idx, distOf, size });
+
   // vault + generator attachments (2x2 rooms with single connection)
   const attach = (type, w, h) => {
     const cand = [];
@@ -425,6 +434,7 @@ export function generateLayout(seed, theme = 'factory', size = 1, opts = null) {
     } else h = R.roomHeight ? R.roomHeight(r.type, rng) : 4.4;
     if (r.type === 'vault' || r.type === 'generator') h = 4;
     if (r.arena) h = Math.max(h, 6.4);
+    if (r.lim) h = r.lim === 'pool' ? 4.2 : 2.95;   // [stealth] liminal rooms: low fluorescent ceilings, tall pool hall
     if (r.type === 'core') h = 5.2;
     r.height = Math.round(h * 10) / 10;
     for (let zz = r.z; zz < r.z + r.h; zz++) for (let xx = r.x; xx < r.x + r.w; xx++) heightOf[idx(xx, zz)] = r.height;
@@ -447,7 +457,7 @@ export function generateLayout(seed, theme = 'factory', size = 1, opts = null) {
   }
   const treasureEdges = new Set();
   {
-    const cand = rooms.filter((r) => r.links === 1 && !r.hub && !r.arena && !r.maze && !['entrance', 'vault', 'generator', 'core'].includes(r.type) && r.w * r.h <= 16 && distOf[idx(r.cx, r.cz)] >= 5);
+    const cand = rooms.filter((r) => r.links === 1 && !r.hub && !r.arena && !r.maze && !r.lim && !['entrance', 'vault', 'generator', 'core'].includes(r.type) && r.w * r.h <= 16 && distOf[idx(r.cx, r.cz)] >= 5);
     rng.shuffle(cand);
     const nTreasure = size >= 1.6 ? 2 : 1;
     for (const r of cand.slice(0, nTreasure)) { r.treasure = true; treasureEdges.add(r.linkKeys[0]); }
@@ -470,7 +480,7 @@ export function generateLayout(seed, theme = 'factory', size = 1, opts = null) {
     const a = idx(x, z), b = idx(nx, nz);
     const ra = roomOf[a], rb = roomOf[b];
     if (ra === rb && ra >= 0) continue;           // inside same room
-    if (cells[a] === 2 && cells[b] === 2) continue; // corridor-corridor
+    if (cells[a] === 2 && cells[b] === 2 && !(VAR?.shortcut && VAR.shortcut.key === key)) continue; // corridor-corridor (the [stealth] shortcut door is the exception)
     const roomA = ra >= 0 ? rooms[ra] : null, roomB = rb >= 0 ? rooms[rb] : null;
     const special = [roomA, roomB].find((r) => r && (r.type === 'vault' || r.type === 'core'));
     let info;
@@ -478,6 +488,8 @@ export function generateLayout(seed, theme = 'factory', size = 1, opts = null) {
       info = { type: 'contain', width: 3.0, doorH: Math.round(Math.min(3.1, Math.min(heightOf[a], heightOf[b]) - 0.15) * 100) / 100 };
     } else if (special) {
       info = { type: 'vault', width: 2.6, doorH: 2.8 };
+    } else if (VAR?.shortcut && VAR.shortcut.key === key) {
+      info = shortcutInfo(VAR);   // [stealth] locked on the entrance side, opens from the deep side
     } else if (arenaEdges.has(key)) {
       info = { type: 'door', width: 1.35, doorH: 2.35, locked: true, arena: true };
     } else if (treasureEdges.has(key)) {
@@ -575,7 +587,7 @@ export function generateLayout(seed, theme = 'factory', size = 1, opts = null) {
     if (!missing) break;
     let best = null;
     for (const inf of doors) {
-      if (inf.type !== 'door' || !inf.locked || inf.treasure || inf.arena || seen[inf.a] === seen[inf.b]) continue;
+      if (inf.type !== 'door' || !inf.locked || inf.treasure || inf.arena || inf.shortcut || seen[inf.a] === seen[inf.b]) continue;   // [stealth] the shortcut is an extra edge: never unlocked by the rule
       if (!best || inf.key < best.key) best = inf;
     }
     if (!best) break;
@@ -661,6 +673,7 @@ export function generateLayout(seed, theme = 'factory', size = 1, opts = null) {
     ox: -W * CELL / 2, oz: -H * CELL / 2, y: FACILITY_Y,
     core: coreRoom || null, generator: genRoom || null, outdoorFires, entrySources: sources, unlockedByRule,
     opts: O, arena: arenaRoom || null, mazes: mazeRooms, wings, keyRooms, areas, areaOf,
+    variety: VAR ? { mazes: VAR.mazes, liminal: VAR.liminal, deadEnds: VAR.deadEnds, hatches: VAR.hatches, shortcut: VAR.shortcut } : null,   // [stealth]
   };
   try { planMaps2(layoutOut); } catch (e) { layoutOut.m2 = null; console.warn('maps2 plan', e); }   // [maps2] retypes a few rooms (own RNG fork, cells / doors untouched)
   return layoutOut;
@@ -749,6 +762,7 @@ for (const th of Object.values(THEMES)) {
 }
 
 installRoomStyles2(THEMES);   // [maps2] story / challenge / liminal room styles for every theme
+installVarietyStyles(THEMES);   // [stealth] lim_office / lim_pool / lim_halls
 
 // Measure prop footprint (cached per id+variant)
 const sizeCache = new Map();
@@ -1367,6 +1381,9 @@ export function buildFacility(layout, { physics, lightPool }) {
   // [maps2] story / liminal rooms + interactable furniture (own RNG fork; failure-isolated)
   let m2 = null;
   try { m2 = buildRooms2({ ...themeCtx, rng: new RNG((L.seed ^ 0x3a92c1 ^ 0x51ed) >>> 0), theme, physics, colliders }); } catch (e) { console.warn('maps2 build', e); }
+  // [stealth] wave 4: cubicle farm / pool room / hall loop dressing, nook rewards, hatches, shortcut latch (own RNG fork; failure-isolated)
+  let variety = null;
+  try { variety = buildVariety({ ...themeCtx, rng: new RNG((L.seed ^ 0x57ea1b) >>> 0), theme }); } catch (e) { console.warn('variety build', e); }
   setPieces.releaseNav();
   // lights
   for (const e of emitters) lightPool.add(e);
@@ -1393,12 +1410,13 @@ export function buildFacility(layout, { physics, lightPool }) {
     wallSpots: wallSpots.filter((s) => nav.nearestWalkable(...nav.toGrid(s.x, s.z), 2)), ceilingSpots: ceilingSpots.filter(okSpot),
     reactorSpot: reactorRoom?.reactorSpot || null, mainDoor, fireDoors,
     setPieces, zones: setPieces.zones, landmarkSpots, hazards,
-    sys, chestSpots, m2,   // [maps2] fac.m2 = story-room notes / light switches / windows (src/game/maps2.js)
+    sys, chestSpots, m2, variety,   // [stealth] fac.variety = hatches / rewards / shortcut latch (src/game/stealth.js); [maps2] fac.m2 = story-room notes / light switches / windows (src/game/maps2.js)
     // facility systems runtime data + chest spots (dead-end / treasure / vault rooms) for the world module
     interior: def.id, interiorName: def.name, atmosphere: def.atmosphere || null,
     dispose(physicsRef) {
       try { sys?.dispose(); } catch (e) { console.warn('facility systems dispose', e); }
       try { m2?.dispose?.(); } catch (e) { console.warn('maps2 dispose', e); }   // [maps2]
+      try { variety?.dispose?.(); } catch (e) { console.warn('variety dispose', e); }   // [stealth]
       setPieces.dispose(physicsRef);
       for (const c of colliders) physicsRef.removeCollider(c);
       for (const e of emitters) lightPool.remove(e);
