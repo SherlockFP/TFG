@@ -53,6 +53,7 @@ export function defaultSettings() {
     headBob: true,
     reduceMotion: false,    // scales camera shake/bob/punch + screen warp down, disables the sprint FOV kick
     showFps: false,
+    classicAvatar: false,   // [avatar2] true = old hazmat avatar instead of the rounded "TFG Employee" (applies to newly built models)
     tagAvatars: true,       // [profile] small avatar sprite above remote name tags
     netStrategy: 'nostr',   // nostr | mqtt | torrent | local
     keys: { ...DEFAULT_KEYS },

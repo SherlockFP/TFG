@@ -198,8 +198,10 @@ export function createLookController(rig) {
   let baseEye = rig.fs.eye;
   const outfitOwn = [], outfitAnims = [], faceOwn = [], faceAnims = [], backOwn = [], backAnims = [];
 
+  // [avatar2] rig.attach = scaled child frames of the real pivots (rounded avatar): builders see those instead, so the classic coordinates fit
+  const view = rig.attach ? Object.assign(Object.create(rig), rig.attach) : rig;
   const ctxFor = (ownList, animList) => ({
-    rig,
+    rig: view,
     mesh(parent, key, mat, geos, p, r) { const m = mk(parent, merged('cs_' + key, geos), mat, p, r); ownList.push(m); return m; },
     raw(parent, geo, mat, p, r, s) { const m = mk(parent, geo, mat, p, r, s); ownList.push(m); return m; },
     group(parent, p, r) { const g = pv(parent, p, r); ownList.push(g); return g; },
@@ -214,7 +216,7 @@ export function createLookController(rig) {
   function resetBase() {
     rig.suitMat.emissive.setRGB(0, 0, 0);
     rig.suitMat.userData.baseEmissive?.setRGB(0, 0, 0);
-    rig.gloveMat.color.set('#2a2622'); rig.bootMat.color.set('#2a2622'); rig.beltMat.color.set('#3b3026');
+    rig.gloveMat.color.set(rig.defaults?.glove || '#2a2622'); rig.bootMat.color.set(rig.defaults?.boot || '#2a2622'); rig.beltMat.color.set(rig.defaults?.belt || '#3b3026');   // [avatar2] defaults
     rig.spine.scale.set(1, 1, 1); rig.neck.scale.set(1, 1, 1);
     const g = rig.gear;
     g.belt.visible = true; g.regulator.visible = true; g.helmetbits.visible = true; g.helmetLight.visible = true;
@@ -267,7 +269,7 @@ export function createLookController(rig) {
     clear(faceOwn, faceAnims);
     rig.fs.led = state.face === 'led';
     const b = FACE_BUILDERS[state.face];
-    if (b && rig.gear.face.visible) { try { b(ctxFor(faceOwn, faceAnims), rig); } catch (e) { console.warn('[cosmetics] face', state.face, e); } }
+    if (b && rig.gear.face.visible) { try { const cx = ctxFor(faceOwn, faceAnims); b(cx, cx.rig); } catch (e) { console.warn('[cosmetics] face', state.face, e); } }
     rig.redraw();
   }
   function setFace(id) {
@@ -286,7 +288,7 @@ export function createLookController(rig) {
     state.back = id;
     syncGear();
     const b = BACK_BUILDERS[id];
-    if (b) { try { b(ctxFor(backOwn, backAnims), rig); } catch (e) { console.warn('[cosmetics] back', id, e); } }
+    if (b) { try { const cx = ctxFor(backOwn, backAnims); b(cx, cx.rig); } catch (e) { console.warn('[cosmetics] back', id, e); } }
     rig.tinterRefresh();
   }
 
@@ -526,7 +528,8 @@ const BUILDERS = {
     build(c) {
       const { spine, head } = c.rig;
       const white = flat('#eef1f1');
-      c.mesh(spine, 'sc_coat', white, () => [xf(G.cyl(0.29, 0.33, 0.6, 8, true), [0, -0.27, 0], [0, PI / 8, 0], [1, 1, 0.72]), xf(G.box(0.2, 0.1, 0.03), [0.085, 0.42, 0.155], [0, 0, 0.5]), xf(G.box(0.2, 0.1, 0.03), [-0.085, 0.42, 0.155], [0, 0, -0.5])]);
+      const [cr0, cr1, cl, cy] = c.rig.dims?.coat || [0.29, 0.33, 0.6, -0.27];   // [avatar2] shorter coat on the bean
+      c.mesh(spine, 'sc_coat' + (c.rig.dims ? '2' : ''), white, () => [xf(G.cyl(cr0, cr1, cl, 8, true), [0, cy, 0], [0, PI / 8, 0], [1, 1, 0.72]), xf(G.box(0.2, 0.1, 0.03), [0.085, 0.42, 0.155], [0, 0, 0.5]), xf(G.box(0.2, 0.1, 0.03), [-0.085, 0.42, 0.155], [0, 0, -0.5])]);
       c.mesh(spine, 'sc_pocket', flat('#dfe4e4'), () => [xf(G.box(0.1, 0.09, 0.02), [0.12, 0.14, 0.16])]);
       c.mesh(spine, 'sc_pens', flat('#2050c8'), () => [xf(G.box(0.012, 0.06, 0.012), [0.1, 0.2, 0.17])]);
       c.mesh(spine, 'sc_pens2', flat('#d02828'), () => [xf(G.box(0.012, 0.06, 0.012), [0.135, 0.2, 0.17])]);
@@ -597,23 +600,25 @@ const BUILDERS = {
 // ------------------------------------------------------------------ face accessory builders (attach to the head pivot)
 const FACE_BUILDERS = {
   gasmask(c, rig) {
-    const { head } = rig;
+    const head = rig.faceHead || rig.head;   // [avatar2]
     c.mesh(head, 'gm_snout', flat('#454d3e'), () => [xf(G.sph(0.095, 8, 5), [0, 0.078, 0.14], [0, 0, 0], [1.1, 0.85, 0.85])]);
     c.mesh(head, 'gm_can', flat('#23272b'), () => [xf(G.cyl(0.042, 0.042, 0.08, 8), [0.062, 0.062, 0.215], [PI / 2, 0, 0]), xf(G.cyl(0.042, 0.042, 0.08, 8), [-0.062, 0.062, 0.215], [PI / 2, 0, 0]), xf(G.tor(0.17, 0.011, 3, 12), [0, 0.1, 0], [PI / 2, 0, 0])]);
     c.mesh(head, 'gm_cap', flat('#b9a83a'), () => [xf(G.cyl(0.03, 0.03, 0.012, 8), [0.062, 0.062, 0.258], [PI / 2, 0, 0]), xf(G.cyl(0.03, 0.03, 0.012, 8), [-0.062, 0.062, 0.258], [PI / 2, 0, 0])]);
   },
   visor(c, rig) {
-    c.raw(rig.head, arcBand('cv', 0.185, 0.05, 2.1, 0.163), bas('#28e6ff'), [0, 0, 0]);
-    c.raw(rig.head, arcBand('cv2', 0.187, 0.012, 2.1, 0.163), bas('#e6ffff'), [0, 0, 0]);
-    c.mesh(rig.head, 'cv_brk', flat('#1c2026'), () => [xf(G.box(0.02, 0.07, 0.03), [0.15, 0.163, 0.11], [0, 0.9, 0]), xf(G.box(0.02, 0.07, 0.03), [-0.15, 0.163, 0.11], [0, -0.9, 0])]);
+    const head = rig.faceHead || rig.head;   // [avatar2]
+    c.raw(head, arcBand('cv', 0.185, 0.05, 2.1, 0.163), bas('#28e6ff'), [0, 0, 0]);
+    c.raw(head, arcBand('cv2', 0.187, 0.012, 2.1, 0.163), bas('#e6ffff'), [0, 0, 0]);
+    c.mesh(head, 'cv_brk', flat('#1c2026'), () => [xf(G.box(0.02, 0.07, 0.03), [0.15, 0.163, 0.11], [0, 0.9, 0]), xf(G.box(0.02, 0.07, 0.03), [-0.15, 0.163, 0.11], [0, -0.9, 0])]);
   },
   shades(c, rig) {
-    c.raw(rig.head, arcBand('sh', 0.184, 0.06, 2.0, 0.165), lam('#0a0a0c'), [0, 0, 0]);
-    c.mesh(rig.head, 'sh_bridge', flat('#0a0a0c'), () => [xf(G.box(0.02, 0.012, 0.012), [0, 0.185, 0.175]), xf(G.box(0.012, 0.012, 0.22), [0.165, 0.185, 0.03]), xf(G.box(0.012, 0.012, 0.22), [-0.165, 0.185, 0.03])]);
+    const head = rig.faceHead || rig.head;   // [avatar2]
+    c.raw(head, arcBand('sh', 0.184, 0.06, 2.0, 0.165), lam('#0a0a0c'), [0, 0, 0]);
+    c.mesh(head, 'sh_bridge', flat('#0a0a0c'), () => [xf(G.box(0.02, 0.012, 0.012), [0, 0.185, 0.175]), xf(G.box(0.012, 0.012, 0.22), [0.165, 0.185, 0.03]), xf(G.box(0.012, 0.012, 0.22), [-0.165, 0.185, 0.03])]);
   },
   moustache(c, rig) {
     const m = flat('#171310');
-    c.mesh(rig.head, 'mo_a', m, () => [
+    c.mesh(rig.faceHead || rig.head, 'mo_a', m, () => [
       xf(G.box(0.05, 0.02, 0.014), [0.032, 0.122, 0.176], [0, -0.25, -0.12]), xf(G.box(0.05, 0.02, 0.014), [-0.032, 0.122, 0.176], [0, 0.25, 0.12]),
       xf(G.box(0.03, 0.016, 0.014), [0.075, 0.13, 0.16], [0, -0.7, 0.6]), xf(G.box(0.03, 0.016, 0.014), [-0.075, 0.13, 0.16], [0, 0.7, -0.6]),
       xf(G.box(0.03, 0.016, 0.012), [0.098, 0.146, 0.148], [0, -0.9, 0.9]), xf(G.box(0.03, 0.016, 0.012), [-0.098, 0.146, 0.148], [0, 0.9, -0.9]),
@@ -683,8 +688,6 @@ const BACK_BUILDERS = {
   },
 };
 
-Object.assign(BUILDERS, W3_BUILDERS);   // [ux]
-
 /** { tint, map, emissive, glove } of an outfit (first-person sleeves use it) */
 export function outfitLook(id) {
   const b = BUILDERS[id];
@@ -694,3 +697,5 @@ export function outfitLook(id) {
 export const FACE_ACC_BY_ID = Object.fromEntries(FACE_ACCS.map((f) => [f.id, f]));
 export const BACK_ACC_BY_ID = Object.fromEntries(BACK_ACCS.map((f) => [f.id, f]));
 export { spiderTex, venomTex };
+
+Object.assign(BUILDERS, W3_BUILDERS);   // [ux]

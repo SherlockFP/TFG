@@ -17,6 +17,7 @@ import { UI } from './ui/ui.js';
 import { ModManager } from './mods/modapi.js';
 import { LobbyDirectory } from './net/lobby.js';
 import { Game } from './game/game.js';
+import { setClassicAvatar } from './models/avatar.js';   // [avatar2]
 import { ShipScreens } from './game/screens.js';
 import { CRTMenu } from './ui/crtmenu.js';
 import { loadExtManifest, registerExtSounds } from './audio/extassets.js';
@@ -57,6 +58,7 @@ class MenuScene {
 class App {
   constructor() {
     this.settings = loadSettings();
+    setClassicAvatar(!!this.settings.classicAvatar);   // [avatar2]
     setLang(this.settings.lang);
     this.profile = loadProfile();
     const devName = new URLSearchParams(location.search).get('name');
@@ -165,6 +167,7 @@ class App {
 
   applySettings() {
     this.engine.applySettings();
+    setClassicAvatar(!!this.settings.classicAvatar);   // [avatar2]
     this.audio.applyVolumes();
     this.game?.refreshStats();
   }

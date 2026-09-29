@@ -239,6 +239,9 @@ and a 16x16 pixel editor or 3D snapshot avatar (64x64 PNG <= 6 KB) with frames. 
 lobby browser, TAB list, chat, day summary and above name tags (setting `tagAvatars`). Files: `src/ui/avatarpic.js`, `src/ui/panels/profile.js`, `src/core/profilename.js`,
 `src/game/profilesync.js`, test `tools/harness/profile.test.mjs`.
 
+### 5.9d Wave 3 - avatar2 (rounded "TFG Employee" body; `docs/wave3/avatar2.md`; build + node test only, NOT hand-played)
+`src/models/avatar2.js` + dispatch in `createAvatar` (setting `classicAvatar`, Settings > Video > Character). Same API/anchors; suits via `rig.attach` frames. Test: `tools/harness/avatar2.test.mjs`. Needs a browser eyeball pass (grips, charpreview, fpbody).
+
 ### 5.10 Round 3 - content wave (11 builders, integrated; NOT yet browser-verified)
 - **Endless moons** `src/game/moongen.js`: every quota opens a new SECTOR of 3-5 generated moons (pure fn of run.runId + quotaIndex,
   registered into MOONS at `applyRunState` via `ensureSector`), 10 biomes (4 new in `world/outdoor_biomes.js`), map scale up to 1.5x,

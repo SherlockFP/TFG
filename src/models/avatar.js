@@ -20,6 +20,7 @@ import {
   clamp, lerp, smooth, damp, rng, TAU, PI,
 } from './modelkit.js';
 import { OUTFIT_BY_ID, OUTFITS, HATS_EXTRA, buildHatExtra, createLookController, outfitLook } from './cosmetics.js';
+import { createAvatar2, A2 } from './avatar2.js';   // [avatar2] rounded "TFG Employee" (docs/wave2/avatar2.md); this file keeps the classic hazmat avatar
 
 export const SUIT_COLORS = [
   { id: 'orange', name: 'Orange', color: '#d9642b' },
@@ -61,10 +62,10 @@ export const HATS = [
 ];
 
 // ------------------------------------------------------------------ shared looks
-const C = {
+export const C = {
   dark: '#2a2622', belt: '#3b3026', tank: '#d9a91e', metal: '#7d8184', visor: '#0d1318', eye: '#bff4ff',
 };
-const suitTex = () => tex('suitFabric', 32, 32, (ctx, w, h, r) => {
+export const suitTex = () => tex('suitFabric', 32, 32, (ctx, w, h, r) => {
   noiseFill(ctx, w, h, r, '#ffffff', 0.09, 2);
   ctx.fillStyle = 'rgba(0,0,0,0.18)';
   ctx.fillRect(0, 15, w, 1); ctx.fillRect(15, 0, 1, h); // seams
@@ -162,7 +163,7 @@ function drawLedFace(ctx, s) {
   ctx.shadowBlur = 0;
 }
 
-function drawFace(ctx, s) {
+export function drawFace(ctx, s) {
   const W = 64, H = 64;
   if (s.style !== 'mimic') {
     if (s.led) { drawLedFace(ctx, s); return; }
@@ -259,7 +260,7 @@ function drawFace(ctx, s) {
 
 // ------------------------------------------------------------------ hats
 // Hat slot origin = top of the helmet dome. Each hat returns a Group (shared geometry/materials).
-function buildHat(id) {
+export function buildHat(id) {
   const g = new THREE.Group();
   g.name = 'hat_' + id;
   const add = (key, mat, parts) => mk(g, merged('hat_' + id + '_' + key, parts), mat);
@@ -370,11 +371,21 @@ function buildArm(parent, side, suitMat, gloveMat = darkMat()) {
   return { sh, el, hand };
 }
 
+// [avatar2] style switch: settings.classicAvatar (ui.js / main.js call setClassicAvatar). Creature models that decorate the old
+// hazmat body (mimic: faceStyle 'mimic', hit squad: visorColor) always stay classic. opts.classic overrides.
+let CLASSIC = false;
+export function setClassicAvatar(b) { CLASSIC = !!b; }
+export function isClassicAvatar() { return CLASSIC; }
+export function createAvatar(opts = {}) {
+  const classic = opts.classic ?? (CLASSIC || opts.faceStyle === 'mimic' || opts.visorColor !== undefined);
+  if (!classic) { try { return createAvatar2(opts); } catch (e) { console.warn('[avatar2] falling back to the classic avatar', e); } }
+  return createAvatarClassic(opts);
+}
 /**
- * createAvatar(opts) — see file header. Extra (non-spec) options:
+ * createAvatarClassic(opts) — see file header. Extra (non-spec) options:
  *   faceStyle: 'normal' | 'mimic', eyeColor: css color of the visor face glow.
  */
-export function createAvatar({ suitColor = '#d9642b', hat = 'none', visorColor, faceStyle = 'normal', eyeColor } = {}) {
+export function createAvatarClassic({ suitColor = '#d9642b', hat = 'none', visorColor, faceStyle = 'normal', eyeColor } = {}) {
   const root = new THREE.Group();
   root.name = 'avatar';
   const baseMap = suitTex();
@@ -857,7 +868,9 @@ export function createViewModel({ suitColor = '#d9642b' } = {}) {
   root.name = 'viewmodel';
   const baseMap = suitTex();
   const sleeveMat = lamI(suitColor, { map: baseMap });
-  const vmGloveMat = lamI(C.dark);
+  const round = !CLASSIC;                     // [avatar2] round mitten gloves in light grey (the classic model keeps the dark boxy ones)
+  const gloveBase = round ? A2.GLOVE : C.dark;
+  const vmGloveMat = lamI(gloveBase);
   const sway = pv(root, null, null, 'sway');
 
   const mkArm = (side) => { // side +1 = right (screen right, +X), -1 = left
@@ -869,7 +882,11 @@ export function createViewModel({ suitColor = '#d9642b' } = {}) {
       xf(G.segZ(0.24, 0.074, 0.064, 7), [0, 0, 0], [0, PI, 0]),
       xf(G.cyl(0.078, 0.078, 0.035, 7), [0, 0, -0.235], [PI / 2, 0, 0]),
     ]), sleeveMat);
-    mk(el, merged('vm_glove' + side, () => [
+    mk(el, round ? merged('vm_gloveR' + side, () => [
+      xf(G.sph(0.062, 8, 6), [0, 0, -0.325], [0, 0, 0], [1.12, 0.95, 1.3]),
+      xf(G.sph(0.03, 5, 4), [-side * 0.06, 0.008, -0.3]),
+      xf(G.cyl(0.084, 0.084, 0.04, 8, true), [0, 0, -0.262], [PI / 2, 0, 0]),
+    ]) : merged('vm_glove' + side, () => [
       xf(G.box(0.095, 0.075, 0.12), [0, 0, -0.31]),
       xf(G.box(0.04, 0.035, 0.08), [-side * 0.055, 0.01, -0.3], [0, side * 0.4, 0]),
       xf(G.box(0.085, 0.04, 0.05), [0, -0.035, -0.37], [0.5, 0, 0]),
@@ -1076,9 +1093,9 @@ export function createViewModel({ suitColor = '#d9642b' } = {}) {
       if (def) {
         const b = outfitLook(def.id);
         sleeveMat.map = b.map || baseMap; sleeveMat.color.set(b.tint || def.color);
-        sleeveMat.emissive.set(b.emissive || '#000000'); vmGloveMat.color.set(b.glove || C.dark);
+        sleeveMat.emissive.set(b.emissive || '#000000'); vmGloveMat.color.set(b.glove || gloveBase);
       } else {
-        sleeveMat.map = baseMap; sleeveMat.emissive.set('#000000'); vmGloveMat.color.set(C.dark);
+        sleeveMat.map = baseMap; sleeveMat.emissive.set('#000000'); vmGloveMat.color.set(gloveBase);
         const c = SUIT_COLORS.find((x) => x.id === l.suit)?.color; if (c) sleeveMat.color.set(c);
       }
     },

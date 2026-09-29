@@ -728,7 +728,8 @@ export class UI {
         jit.addEventListener('change', () => { s.vertexJitter = +jit.value; saveSettings(s); this.toast(t('Vertex jitter applies after reload.')); });
         body.append(section(t('Display')), row(t('Resolution (PSX)'), res), slider(t('Field of view'), 'fov', 55, 100, 1, (v) => v + '°'),
           section(t('Retro filter')), row(t('Vertex jitter') + ` (${t('reload')})`, jit), check(t('Dithering'), 'dither'), check(t('Outlines'), 'outlines'),
-          section(t('Performance')), check(t('Show FPS'), 'showFps'));
+          section(t('Performance')), check(t('Show FPS'), 'showFps'),
+          section(t('Character')), check(t('Classic avatar'), 'classicAvatar', t('Applies to new models after reload.')));   // [avatar2]
       } else if (tab === 'Audio') {
         body.append(section(t('Volume')), slider(t('Master volume'), 'masterVolume', 0, 1, 0.05, pct), slider(t('Effects volume'), 'sfxVolume', 0, 1, 0.05, pct), slider(t('Music volume'), 'musicVolume', 0, 1, 0.05, pct), slider(t('Voice volume'), 'voiceVolume', 0, 1.5, 0.05, pct), slider(t('Instrument volume'), 'instrumentVolume', 0, 1.5, 0.05, pct),
           check(t('Menu sounds'), 'uiSounds', null, true));

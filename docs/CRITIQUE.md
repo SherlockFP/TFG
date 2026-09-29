@@ -122,3 +122,7 @@ Added optional buffs + social fun (cheers, cake, table, booze). Unverified in a 
 ## Wave 3 - backrooms2
 Noclip pocket + Backrooms entities + liminal overlay/photos are integrated but were only node-tested this round (browser budget): look at the VHS caption on small screens, the polaroid scenes, hug/struggle flow with two players, and the pocket hunt pacing (240 s warn, weighted Smiler / Hound / Partygoer) before calling it done.
 - [ux wave 3] Not browser-verified: unified panel CSS may still miss panels with very specific injected styles; ship hull door opening, emote camera and new suit geometry were only node/build checked.
+
+## avatar2 (wave 3)
+- New rounded body is ~2.7x the triangles of the classic avatar (2.4k vs 0.9k) per player; fine for 4 players, watch the Doppel horde.
+- Proportions/grips/first-person body were tuned by numbers only (no browser run): needs a visual pass.
