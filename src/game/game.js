@@ -94,6 +94,9 @@ import { installSiege } from './siege.js';
 import { installBugfix } from './bugfix.js';
 
 
+import { installArcade } from './arcade.js';
+
+
 import { installAnomaly } from './anomaly.js';
 
 
@@ -182,7 +185,6 @@ import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs
 // [import:social]
 
 
-// [import:arcade]
 
 
 
@@ -398,6 +400,9 @@ export class Game extends Emitter {
     this.useModule('polish4', installPolish4);   // [polish4]
 
 
+    this.useModule('arcade', installArcade);
+
+
     // [slot:ux]
     this.useModule('hostmig', installHostMig);
 
@@ -412,7 +417,6 @@ export class Game extends Emitter {
     // [slot:social]
 
 
-    // [slot:arcade]
 
 
 
