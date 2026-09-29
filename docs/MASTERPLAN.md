@@ -806,3 +806,15 @@ Model politikası aynı (§6): Sonnet varsayılan, ağ/AI/çekirdek işlerde Opu
 4. Karşı saldırı direktörü (siege/homeworld2 dalga kodu) + otomatik savunma hesabı.
 5. Algoritma bağlantısı: "izleyiciler bu bölgeye saldırı istedi" yayın metinleri.
 - Hepsi Sonnet; sonunda Opus tek değerlendirme (§25.11).
+
+---
+
+## 27. WAVE 6 — Game Director programı (Opus lead + Sonnet high-effort ajanlar, 2026-09-29)
+Amaç: kimliği (§21) taşıyan sistemleri oyunun merkezine koymak. Ajanlar `.claude/agents/tfg-builder.md` (Sonnet, effort: high).
+| Ajan | Kapsam | Kaynak |
+|---|---|---|
+| `algo2` | Canlı yayın → hype ödülleri + sahte chat; ölüm hayalet tekrarı; glitch istismarları + yama sayacı | §23.3, §23.5, §23.6 |
+| `story` | Şirket vs Algoritma sadakat ölçeği, patron görevleri, 3 perde + 3 son, haftalık trend yaratık | §23.7, §23.9 |
+| `zones2` | İç mekân bölgeleri + tuzaklar, duvar/kapı + doğrulanmış yerleşim, bölge madencisi, rotasyonda kalıcılık, barikat çevresinden yol bulan akıncılar, gemide sektör haritası CRT | §26 |
+Sonraki (wave 6b): rol kısıtlı günler (§23.8), hub'da trend yaratık + bölge liderlik tablosu, 2 kişi gerçek oturum kontrol listesi, son Opus değerlendirmesi.
+Lead kuralları: her birleştirmede ilgili node testleri + build; toplu tarayıcı turu wave sonunda; GitHub 503 verirse yerelde birleştirip sonra pushla.
