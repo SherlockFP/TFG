@@ -7,17 +7,23 @@
 import * as THREE from 'three';
 import { el } from '../core/util.js';
 import { t, tf, addTranslations } from '../core/i18n.js';
-import { TOP_Y, rayToSq, rayToPoint, viewPose, createPicker } from './chess3d_map.js';
+import { TOP_Y, rayToSq, rayToPoint, viewPose, createPicker, piecesOf, capturedOf } from './chess3d_map.js';
 
 export const TR3 = {
   'Classic view': 'Klasik görünüm', '3D view': '3D görünüm', 'Promote to:': 'Terfi:', 'Queen': 'Vezir', 'Rook': 'Kale', 'Bishop': 'Fil', 'Knight': 'At',
   'Drag a piece, or click it and then a square. ESC leaves the table.': 'Taşı sürükle ya da tıkla, sonra bir kare seç. ESC masadan kalkar.',
   'Last move': 'Son hamle',
+  'Sit at White [E]': 'Beyazda otur [E]', 'Sit at Black [E]': 'Siyahta otur [E]', 'Stand up [E]': 'Kalk [E]', 'Seat taken: {name}': 'Koltuk dolu: {name}', 'Seat taken: Computer': 'Koltuk dolu: Bilgisayar',
+  'Watch the game': 'Oyunu izle', 'Your move': 'Sıra sende', 'Waiting for an opponent - or add the computer below': 'Rakip bekleniyor - ya da aşağıdan bilgisayarı ekle',
+  'Captured': 'Alınan taşlar', 'Legal move': 'Yasal hamle', 'Capture': 'Alma',
 };
 export const RU3 = {
   'Classic view': 'Классический вид', '3D view': '3D-вид', 'Promote to:': 'Превращение:', 'Queen': 'Ферзь', 'Rook': 'Ладья', 'Bishop': 'Слон', 'Knight': 'Конь',
   'Drag a piece, or click it and then a square. ESC leaves the table.': 'Перетащите фигуру или щёлкните по ней, затем по клетке. ESC - встать из-за стола.',
   'Last move': 'Последний ход',
+  'Sit at White [E]': 'Сесть за белых [E]', 'Sit at Black [E]': 'Сесть за чёрных [E]', 'Stand up [E]': 'Встать [E]', 'Seat taken: {name}': 'Место занято: {name}', 'Seat taken: Computer': 'Место занято: компьютер',
+  'Watch the game': 'Смотреть партию', 'Your move': 'Ваш ход', 'Waiting for an opponent - or add the computer below': 'Ждём соперника - или добавьте компьютер ниже',
+  'Captured': 'Съедено', 'Legal move': 'Допустимый ход', 'Capture': 'Взятие',
 };
 
 const KEY = 'tfg_arcade_classic';
@@ -69,7 +75,7 @@ export function createChess3d(ctx) {
     o.copy(ray.ray.origin).applyMatrix4(inv); d.copy(ray.ray.direction).transformDirection(inv);
     return { o, d };
   }
-  const sqAt = (e, id) => { const r = localRay(e, id); return r ? rayToSq(r.o, r.d, TOP_Y + 0.035) : -1; };
+  const sqAt = (e, id) => { const r = localRay(e, id); return r ? rayToSq(r.o, r.d, TOP_Y + 0.05) : -1; };
   const entry = () => arc.get(cur.id);
 
   function marks() {
@@ -109,7 +115,7 @@ export function createChess3d(ctx) {
       if (!dr.moved && Math.hypot(e.clientX - dr.x, e.clientY - dr.y) > 6) dr.moved = true;
       if (dr.moved) { const p = rayToPoint(r.o, r.d, TOP_Y + 0.05); if (p) ctx.viewOf(cur.id)?.model.pieces.hold(dr.sq, Math.max(-0.44, Math.min(0.44, p.x)), Math.max(-0.44, Math.min(0.44, p.z))); }
     }
-    const sq = rayToSq(r.o, r.d, TOP_Y + 0.035);
+    const sq = rayToSq(r.o, r.d, TOP_Y + 0.05);
     if (sq !== cur.hover) { cur.hover = sq; marks(); }
   }
   function onUp(e) {
@@ -139,7 +145,11 @@ export function createChess3d(ctx) {
         const w = s.over.winner, why = s.over.reason;
         if (w === 'd') txt = `${t('Draw')}: ${why === 'stalemate' ? t('stalemate') : why === 'insufficient' ? t('insufficient material') : why === 'fifty' ? t('fifty-move rule') : why === 'repetition' ? t('threefold repetition') : why === 'kings' ? t('king against king') : t('no progress')}`;
         else { txt = `${tf('{side} wins', { side: sideName(w) })} - ${why === 'mate' ? t('checkmate') : why === 'resign' ? t('resignation') : t('no legal moves')}`; cls = s.seats[w] === game.selfId ? 'good' : ''; }
-      } else { const base = tf('{side} to move', { side: sideName(dec.st.turn) }); txt = dec.check ? `${base} - ${t('CHECK!')}` : base; cls = dec.check ? 'bad' : ''; }
+      } else {
+        const tn = dec.st.turn, base = m === tn ? `${t('Your move')} (${sideName(tn)})` : tf('{side} to move', { side: sideName(tn) });
+        txt = dec.check ? `${base} - ${t('CHECK!')}` : base; cls = dec.check ? 'bad' : m === tn ? 'good' : '';
+        if (!s.seats[tn] && !s.ai[tn] && m) txt = t('Waiting for an opponent - or add the computer below');   // the other stool is empty and nobody plays it
+      }
       const title = s.kind === 'draughts' ? t('DAMA TABLE') : t('CHESS TABLE');
       root.appendChild(el('div', { class: 'r' }, el('div', { class: 'st ' + cls }, txt), el('div', { class: 'tt' }, `${title} · ${m ? `${t('You play')} ${sideName(m)}` : t('Spectating')}${s.log.length ? ` · ${t('Last move')}: ${s.log[s.log.length - 1]}` : ''}`)));
       // seats
@@ -148,7 +158,7 @@ export function createChess3d(ctx) {
         const row = el('div', { class: 'seat' + (!s.over && dec.st.turn === c ? ' turn' : '') }, el('span', { class: 'dot ' + c }), `${sideName(c)}: ${seatName(c, s)}`);
         const free = !s.seats[c];
         if (free && (!m || !playing) && !(s.ai[c] && playing)) row.appendChild(ui.button(t('Sit'), () => arc.request('sit', { id, c }), 'small'));
-        if (free && m && !playing) {
+        if (free && m) {
           if (s.ai[c] !== 1) row.appendChild(ui.button(t('AI easy'), () => arc.request('ai', { id, c, lv: 1 }), 'small'));
           if (s.ai[c] !== 2) row.appendChild(ui.button(t('AI normal'), () => arc.request('ai', { id, c, lv: 2 }), 'small'));
           if (s.ai[c]) row.appendChild(ui.button(t('No AI'), () => arc.request('ai', { id, c, lv: 0 }), 'small'));
@@ -156,6 +166,13 @@ export function createChess3d(ctx) {
         seats.appendChild(row);
       }
       root.appendChild(seats);
+      // captured pieces (chess) + legend
+      const cap = capturedOf(s.kind, piecesOf(s.kind, s.pos)), GL = { w: { p: '\u2659', n: '\u2658', b: '\u2657', r: '\u2656', q: '\u2655' }, b: { p: '\u265F', n: '\u265E', b: '\u265D', r: '\u265C', q: '\u265B' } };
+      const lost = (c) => cap[c].map((x) => GL[c][x]).join('');
+      const info = el('div', { class: 'r' });
+      if (s.kind !== 'draughts') info.appendChild(el('span', { class: 'tt' }, `${t('Captured')}: ${lost('b') || '-'} | ${lost('w') || '-'}`));
+      info.appendChild(el('span', { class: 'hint' }, el('span', { style: 'color:#7dff8a' }, `\u25CF ${t('Legal move')}`), '  ', el('span', { style: 'color:#ff6a5a' }, `\u25CB ${t('Capture')}`)));
+      root.appendChild(info);
       // promotion picker
       if (P.promo) {
         const pr = el('div', { class: 'r' }, el('span', { class: 'st' }, t('Promote to:')));

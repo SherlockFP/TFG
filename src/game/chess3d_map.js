@@ -54,6 +54,21 @@ export function instanceCounts(list) {
   for (const p of list) n[p.t + '_' + p.c] = (n[p.t + '_' + p.c] || 0) + 1;
   return n;
 }
+const START_N = { p: 8, n: 2, b: 2, r: 2, q: 1 };
+/** chess: pieces each colour has LOST so far, as { w: ['q','p',..], b: [...] } (biggest first; promotions are netted off against missing pawns). draughts: {w:[],b:[]} */
+export function capturedOf(kind, list) {
+  const out = { w: [], b: [] };
+  if (kind === 'draughts') return out;
+  for (const c of ['w', 'b']) {
+    const have = {}; for (const p of list) if (p.c === c) have[p.t] = (have[p.t] || 0) + 1;
+    let promoted = 0;
+    for (const t of ['q', 'r', 'b', 'n']) promoted += Math.max(0, (have[t] || 0) - START_N[t]);
+    const miss = { p: Math.max(0, START_N.p - (have.p || 0) - promoted) };
+    for (const t of ['q', 'r', 'b', 'n']) miss[t] = Math.max(0, START_N[t] - (have[t] || 0));
+    for (const t of ['q', 'r', 'b', 'n', 'p']) for (let i = 0; i < miss[t]; i++) out[c].push(t);
+  }
+  return out;
+}
 /** king square of the side to move when it is in check (chess only), else -1 */
 export function checkSquare(kind, list, turn, check) {
   if (kind === 'draughts' || !check) return -1;

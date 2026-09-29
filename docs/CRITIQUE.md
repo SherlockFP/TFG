@@ -265,3 +265,6 @@ Palettes are tuned by simulation, not by eye (tests check delta-E under CVD matr
 Low preset is unverified against the 60 percent draw-call target (instanced decor thinning cuts triangles, not calls); module-added ship props (workbench, arcade table...) still unmerged; Rapier wasm (4.3 MB) dominates first load.
 ## Wave 8 - balance (docs/wave8/balance.md)
 One-shots are gone except telegraphed hazards from quota 4, but the sim's solo shovel player still dies 40-60 % on mid quotas from attrition alone (no healing/dodge model); the 0.4 s wind-up gate is untested in a live browser and relies on behaviours setting an attack state as the visible tell.
+
+## Wave 8 - chess seats (docs/wave5/chess3d.md)
+Seats are two stool interactables and standing up is ESC / E, but the player body never moves onto the stool and there is no tray of captured pieces on the table (HUD glyph row only); the owner captured-pawn bug was reproduced only in rules tests (rules were already correct), so the real cause was likely UI (seat / turn confusion) and is NOT yet checked in a browser (chess_seats.js unrun).
