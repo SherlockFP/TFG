@@ -118,3 +118,7 @@ check bubble size / font, leg look when crouching, elbow direction of the IK arm
 
 ## Food & drinks (wave 2, module `food`)
 Added optional buffs + social fun (cheers, cake, table, booze). Unverified in a browser: first-person eat arcs, blur overlay, table / machine placement. Booze courage only touches STATIC; no chat bubbles exist to slur yet.
+
+
+## Wave 3 - finish (pets / maps2 / homeworld; docs/wave3/finish.md)
+Node-tested + build only, no browser run. Pets now really fetch / fight / guard and everybody sees them (biggest risk: nav + net glue in `pets_net.js`, never played). maps2 challenge rooms are on: numbers (gamble EV ~46 vs 40, arena sizes, plate weight 60) are paper balance; the treasure-room collapse and Collapse / Migration events need a human to judge the fun / fairness. On-site homeworld raids use real siege creatures + flow field; tower tracers are simple beams. Honest gaps: no pet egg drops from chests / bosses, no pet achievements, Elevator Stop event, raider health bars, NPC workers.

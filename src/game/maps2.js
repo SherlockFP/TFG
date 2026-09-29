@@ -1,12 +1,17 @@
 // MAPS2 runtime (wave 2, module 'maps2'): the interactive part of the new facility rooms (src/world/rooms2.js).
 // SHIPPED: story-room notes (readable, tie into docs/LORE.md), room light switches (pooled emitter intensity, light count
-// never changes), the nursery music box. Local-only state (no host state needed: notes are read-only flavour, lights are
+// never changes), the nursery music box. [finish] wave 3 adds: the 5 challenge rooms, Collapse / Migration events and searchable furniture
+// (maps2_world / _challenge / _events / _furniture.js, rules in maps2_rules.js). Local-only state (no host state needed: notes are read-only flavour, lights are
 // cosmetic). NOT shipped yet (rooms are built but switched off, see M2_CHALLENGE_ON): challenge-room mechanics, drawers /
 // PCs / radios / phones / vending state, Collapse / Migration / Elevator Stop events, outdoor landmarks. docs/wave2/maps2.md.
 import { t } from '../core/i18n.js';
 import { NOTES } from './maps2_text.js';
 import { MINIGAMES } from '../minigames/index.js';
 import { createNotePanel } from '../ui/facilityhud.js';
+import { createWorld } from './maps2_world.js';   // [finish] challenge rooms, events, stateful furniture
+import { installChallenge } from './maps2_challenge.js';
+import { installEvents } from './maps2_events.js';
+import { installFurniture } from './maps2_furniture.js';
 
 const TUNE = [0, 2, 4, 0, 0, 2, 4, 0, 4, 5, 7, 4, 5, 7];   // semitone steps of a simple lullaby (bell_ding pitched)
 
@@ -62,9 +67,15 @@ export function installMaps2(game) {
   });
   on('mapLoaded', () => { lightState.clear(); });
 
+  // [finish] host-authoritative runtime parts (each failure-isolated)
+  const W = createWorld(game, {});
+  const parts = {};
+  for (const [name, fn] of [['challenge', installChallenge], ['events', installEvents], ['furniture', installFurniture]]) { try { parts[name] = fn(game, W); } catch (e) { console.warn('[maps2] ' + name, e); } }
+
   return {
+    world: W, parts,
     /** debug / tests */
     state: () => { const F = fac(); return F ? { rooms: F.m2.rooms.map((r) => r.id), spots: F.m2.spots.length, switches: F.m2.switches.length, windows: F.m2.windows?.list.length || 0 } : null; },
-    dispose() { for (const off of offs) { try { off(); } catch { /* ignore */ } } offs.length = 0; if (MINIGAMES.m2_note === createNotePanel) delete MINIGAMES.m2_note; lightState.clear(); },
+    dispose() { for (const p of Object.values(parts)) { try { p?.dispose?.(); } catch { /* ignore */ } } try { W.dispose(); } catch { /* ignore */ } for (const off of offs) { try { off(); } catch { /* ignore */ } } offs.length = 0; if (MINIGAMES.m2_note === createNotePanel) delete MINIGAMES.m2_note; lightState.clear(); },
   };
 }

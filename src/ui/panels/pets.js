@@ -76,6 +76,13 @@ export function createPetsPanel({ game, api, tab } = {}) {
       btn(t('Rename'), () => { const n = window.prompt(t('Rename'), p.nm); if (n) { api.rename(p.id, n); render(); } }),
       btn(t('Release'), () => { if (window.confirm(t('Release') + ' ' + p.nm + '?')) { api.release(p.id); sel = null; render(); } }));
     a.appendChild(row);
+    if (api.setMode) {   // [finish] behaviour: follow / stay / fetch / guard + delivery (keys O, Shift+O; command L)
+      const mr = mk('div', 'pt-row');
+      for (const m of C.MODES) mr.append(btn(t(m), () => { api.setMode(m); sfx(); render(); }, api.mode() === m ? 'sel' : ''));
+      const dr = mk('div', 'pt-row');
+      for (const d of ['me', 'ship']) dr.append(btn(t(d), () => { api.setDest(d); sfx(); render(); }, (s.dest === 'ship' ? 'ship' : 'me') === d ? 'sel' : ''));
+      a.append(mk('div', 'pt-note', t('Pet mode: {m}').replace('{m}', '') + ' [O]'), mr, mk('div', 'pt-note', t('Deliver to: {d}').replace('{d}', '') + ' [Shift+O]  |  L'), dr);
+    }
     b.append(mk('div', 'pt-h', t('Abilities')));
     for (const ab of sp.abilities) b.append(mk('div', 'pt-ab' + (lv >= ab.lv ? '' : ' off'), `${t(ab.name)} (${t('Level')} ${ab.lv}) - ${t(ab.desc)}`));
     b.append(mk('div', 'pt-h', t('Evolution')));

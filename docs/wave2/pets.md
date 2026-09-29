@@ -11,3 +11,5 @@ Wired with `this.useModule('pets', installPets)` in game.js. Persisted in `profi
 
 ## NOT done (next round; rules are ready in `petStats()`)
 Host-simulated behaviour and net sync: fetch (walk to small scrap, carry to owner/ship), attack (aim key), guard, role abilities (cat sense marks, fox nest theft, bear tank via `hostHurtPlayer` wrap, bee DoT, owl night vision, parrot decoy, crow tier luck, bot shield/recharge), 'pt*' net types + late join, physical incubator prop + HQ shop kiosk, chest/boss egg drops, pet achievements. Suggested design: host map ownerId -> pet record, owner sends `{op:'sync'}`/`{op:'cmd'}` through one request handler `pt`, host broadcasts `ptinfo` (appearance) + `ptst` rows; carried items use holder `c:pt<owner>`.
+
+**UPDATE (wave 3 [finish]):** the NOT-done list above (host-simulated fetch / attack / guard, role abilities, `pt*` net sync, Pet Carrier + treat handlers, incubator prop) is implemented: see docs/wave3/finish.md.

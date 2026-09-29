@@ -5,3 +5,5 @@ Module `maps2`. Files: `src/world/rooms2.js` (planner + builders), `src/models/p
 * **Built but OFF (`M2_CHALLENGE_ON = false` in rooms2.js):** the five challenge rooms (physics, gamble, arena, puzzle, treasure) have geometry, signs and spot lists but no runtime yet, so they are never generated.
 * **Not done:** interactable state (drawers / PCs / radios / phones / vending / windows), Collapse / Migration / Elevator Stop events (`corridorSealEdges` + `safeEdgeSet` are ready: non-bridge edges), long hall / stairwell / mirror rooms, outdoor landmarks, headless run + screenshot, draw-call measurement (lead cancelled the browser run).
 * Shared-file hooks are marked `[maps2]` (facility.js, propfactory.js, setpieces.js SKIP_ROOMS = SPECIAL_ROOMS, game.js slots). Tests: `node tools/harness/maps2.test.mjs` (960 layouts PASS), `wave1_facility_paths.mjs` PASS, build OK.
+
+**UPDATE (wave 3 [finish]):** challenge rooms are ON with full runtime, Collapse / Migration events and stateful furniture are done (Elevator Stop / long halls / outdoor landmarks are not): see docs/wave3/finish.md.
