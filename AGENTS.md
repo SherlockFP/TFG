@@ -542,3 +542,11 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
 - CoC-lite waves: gate (4 things, base value 450), telegraphed countdown while somebody is home, wave power scales with base value, real on-site raid via `homeworld.forceRaid({power})`, loot, lost wave = machines BREAK (repair, never deleted) + 15 min shield, call-early button.
 - Ghost raids (`GHOST` / `GHOST GO`, RAID tab): rival / own / imported base snapshots, real sentries + guards, vault crack, capped loot, share codes (PvP flag = opt in). Live crew-vs-crew is not built (no second host).
 - Offline catch-up from the same sim (8 h max, 10 %, storage-capped). Net types: `h2act`, `h2msg`. Tests: `node tools/harness/homeworld2.test.mjs` (41). First job next: play it with 2 tabs (belts drag, room walls, wave, ghost raid crack).
+### 5.16 Wave 4 - HORROR (module `horror`, docs/wave4/horror.md; node-tested + builds, NOT run in a browser)
+- Pay-to-arm traps in corridors / mazes (laser grid, crusher, spike floor, live floor, flame vent; credits via a wall panel, creature-triggered, refunds + kill credit), the OUTBREAK wing (Shamblers, 8-round sidearm + rare ammo box,
+  typewriter safe room + item box, Green Herb FOOD item, crest-locked quarantine door), a two-floor dark oak MANSION (foyer, stairs, secret bookcases, Manor Wardens), bigger-on-the-inside CLOSETS (ballroom / warehouse / outbreak / mansion
+  pockets at x >= 8000, seamless `portalMap()` teleport), CHALK (arrows / X, 24 per player, synced) + The Forger (scratches, redraws arrows wrong) and the FAKE closet ambush (tells + knock / hook counterplay).
+- Files: `src/game/horror*.js` (core rules, maps, pocket / closet / trap / chalk builders, host, creatures, text), `src/models/horror_models.js`. Slot `horror` in `game.js`. Net: `hrReq`, `hrs`, `hrfx`, `hrch`.
+  Integrates without generator edits (reads the layout on `mapLoaded`; extension event `horrorPlan`).
+- Tests: `node tools/harness/horror.test.mjs`, `horror_build.test.mjs`, `horror_install.test.mjs` (real facility + fake game). Browser script written but NOT run: `tools/harness/wave4_horror.js`.
+- First job with a browser: land on `orkinos` day >= 2, look at a trap panel + lane, cross a closet, read the fake closet tells, draw chalk, and check pocket lighting / performance (each pocket ~800 static boxes).

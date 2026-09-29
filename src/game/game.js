@@ -181,6 +181,9 @@ import { installPolish4 } from './polish4.js';   // wave 4: pet egg drops, ship 
 import { installStealth } from './stealth.js';   // wave 4: sneak, noise, sound-hunting creatures, noisemaker (docs/wave4/stealth.md)
 
 
+import { installHorror } from './horror.js';   // wave 4: pay-to-arm traps, outbreak wing, mansion, closets, chalk + Forger, fake closet (docs/wave4/horror.md)
+
+
 // [import:ux]
 import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
 
@@ -218,7 +221,6 @@ import { installCosm5 } from './cosm5.js';   // wave 4: cosmetics drop (suits/ha
 
 
 
-// [import:horror]
 
 
 
@@ -421,6 +423,9 @@ export class Game extends Emitter {
     this.useModule('ship2', installShip2);   // [ship2] (after gameplay2 / shipyard / siege / food / worlds2: it wraps hostFinishTakeoff and reads game.deployables)
 
 
+    this.useModule('horror', installHorror);
+
+
     // [slot:ux]
     this.useModule('hostmig', installHostMig);
 
@@ -458,7 +463,6 @@ export class Game extends Emitter {
 
 
 
-    // [slot:horror]
 
 
 
