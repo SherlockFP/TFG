@@ -6,6 +6,7 @@
 import { el } from '../../core/util.js';
 import { t } from '../../core/i18n.js';
 import { iconHTML } from '../icons.js';
+import { glyph } from '../glyphs.js';
 import { tierColor, TIERS } from '../../game/tiers.js';
 import { categoryList, statsOf } from '../../game/shop.js';
 
@@ -97,7 +98,7 @@ export function createShopPanel(ui, game, opts = {}) {
     const node = el('div', { class: 'sh-card' + (e.soldOut ? ' sold' : '') + (e.locked ? ' locked' : ''), style: { '--tc': tc }, tabindex: can ? '0' : '-1', 'data-id': e.id, title: e.locked ? e.lockReason : '' });
     const iconId = e.def ? e.id : null;
     node.appendChild(el('div', { class: 'sh-top' },
-      el('div', { class: 'sh-ico', html: iconId ? iconHTML(iconId, 'sh-img') : `<span style="font-size:30px">${e.van ? '🚐' : '⚙'}</span>` }),
+      el('div', { class: 'sh-ico', html: iconId ? iconHTML(iconId, 'sh-img') : `<span style="font-size:30px;display:inline-flex">${glyph(e.van ? 'van' : 'gear')}</span>` }),
       el('div', {}, el('div', { class: 'sh-name' }, e.name), el('div', { class: 'sh-tier' }, `${TIERS[e.tier]?.name || e.tier}${e.def?.weight ? ' · ' + e.def.weight + ' lb' : ''}`))));
     if (e.dealKind) node.appendChild(el('div', { class: 'sh-badge' + (e.dealKind === 'eom' ? ' eom' : '') }, `-${Math.round(e.off * 100)}%`));
     const stats = statsOf(e.def);

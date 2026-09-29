@@ -68,3 +68,6 @@ export function el(tag, attrs = {}, ...children) {
   }
   return e;
 }
+
+/** English indefinite article for a noun: aAn("Enforcer") -> "an", aAn("Medic") -> "a". */
+export const aAn = (w) => (/^[aeiou]/i.test(String(w || "")) ? "an" : "a");

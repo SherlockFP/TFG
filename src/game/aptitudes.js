@@ -11,6 +11,7 @@
 // Pure parts (assignRoles, pickRerollRole, sellMul, discountedPrice, repairTime, ...) are node-tested.
 import { ROLES, ROLE_ORDER, KEYS, KEY_IDS } from './passivetree.js';
 import { addTranslations } from '../core/i18n.js';
+import { aAn } from '../core/util.js';
 
 // ---------------------------------------------------------------- data (registered at import: profile validation runs early)
 export const NEW_KEYS = {
@@ -213,7 +214,7 @@ export function installAptitudes(game, ctx = {}) {
     if (!res.ok) return res;
     ext().rerollUsed = runKey();
     game.progress?.save?.();
-    return { ok: true, msg: `Rerolled: you are now a ${ROLES[role].name}.`, role };
+    return { ok: true, msg: `Rerolled: you are now ${aAn(ROLES[role].name)} ${ROLES[role].name}.`, role };
   }
 
   // ---- terminal REROLL

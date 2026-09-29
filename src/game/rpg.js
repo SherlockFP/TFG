@@ -13,7 +13,7 @@
 // sales, the daily role kit, role name-tag suffix, net sync, K key, ship roster interactable, terminal ROLE / TREE / RESPEC.
 // Events: 'tfg:role' (roleId, game) and 'tfg:rpg' (kind, detail, game) on the mod bus.
 import * as THREE from 'three';
-import { clamp } from '../core/util.js';
+import { clamp, aAn } from '../core/util.js';
 import { addTranslations, t, tf } from '../core/i18n.js';
 import { ROLES, ROLE_ORDER, NODE, KEYSTONE_NODES, treeBonus, treeFlags, normId, bonusLines, treeSpent } from './passivetree.js';
 import { createRpgController } from './rpgctl.js';
@@ -28,7 +28,9 @@ addTranslations({
   'PASSIVE TREE [K]': 'PASİF AĞAÇ [K]', 'Crew roster: choose your role [E]': 'Ekip listesi: rolünü seç [E]', 'Crew roster [E]': 'Ekip listesi [E]',
   'No role yet: press K, then ROLE (or terminal: ROLE <name>).': 'Henüz rolün yok: K tuşuna bas, sonra ROL (ya da terminal: ROLE <isim>).',
   'Passive point available - press K': 'Pasif puan hazır - K tuşuna bas',
+  '{n} is now {art} {name}.': '{n} artık {name}.',
 });
+addTranslations({ '{n} is now {art} {name}.': '{n} теперь {name}.' }, 'ru');
 
 const ALIASES = { medic: 'medic', fieldmedic: 'medic', doc: 'medic', tech: 'technician', engineer: 'technician', porter: 'hauler', mule: 'hauler', tank: 'enforcer', mage: 'occultist', wizard: 'occultist' };
 /** 'Field Medic' / 'medic' / 'tech' -> role id (or null). */
@@ -88,7 +90,7 @@ export function installRpg(game) {
     const prev = roles.get(from);
     roles.set(from, { role, sv, ll: clamp(Number(d.ll) || 0, 0, 1) });
     if (first) sendState(from);   // gossip: a peer we had not heard from learns our role too
-    if (prev && prev.role !== role && role) toast(tf('{n} is now a {name}.', { n: game.remotes.get(from)?.name || 'A crewmate', name: ROLES[role].name }), 'info');
+    if (prev && prev.role !== role && role) toast(tf('{n} is now {art} {name}.', { n: game.remotes.get(from)?.name || 'A crewmate', name: ROLES[role].name, art: aAn(ROLES[role].name) }), 'info');
   }
 
   // ------------------------------------------------------------------ change pipeline
@@ -108,7 +110,7 @@ export function installRpg(game) {
     if (kind === 'role') {
       try { mods?.emit('tfg:role', ctl.role(), game); } catch { /* ignore */ }
       const r = ROLES[ctl.role()];
-      if (r) { toast(tf('Role: {name}. {tag}', { name: r.name, tag: r.tag }), 'good'); try { game.net?.broadcast?.('chat', { text: `${p.name} is now a ${r.name}.`, n: 'TFG' }); } catch { /* offline */ } }
+      if (r) { toast(tf('Role: {name}. {tag}', { name: r.name, tag: r.tag }), 'good'); try { game.net?.broadcast?.('chat', { text: `${p.name} is now ${aAn(r.name)} ${r.name}.`, n: 'TFG' }); } catch { /* offline */ } }
     }
   }
 

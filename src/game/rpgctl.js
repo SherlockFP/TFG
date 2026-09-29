@@ -2,6 +2,7 @@
 // Used identically in game (rpg.js wires hooks to the Progress / stats / net layer) and from the main menu (profile only),
 // so both entry points obey the same rules. Pure w.r.t. three / DOM; returns { ok, msg } for the UI to show.
 import { saveProfile } from '../core/save.js';
+import { aAn } from '../core/util.js';
 import * as T from './passivetree.js';
 import { ensureRpgProfile } from './profile.js';
 
@@ -111,7 +112,7 @@ export function createRpgController(profile, hooks = {}) {
       const prev = st().role;
       st().role = id;
       changed('role', { role: id, prev, refunded: plan.orphans.length, clout: plan.clout });
-      return { ok: true, msg: `You are now a ${T.ROLES[id].name}`, role: id, prev };
+      return { ok: true, msg: `You are now ${aAn(T.ROLES[id].name)} ${T.ROLES[id].name}`, role: id, prev };
     },
   };
   return ctl;

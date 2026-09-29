@@ -1,0 +1,118 @@
+/* =====================================================================================================================
+   TFG UI3 (wave 5) - everything here is scoped `html.tfg-ui3`, so `document.documentElement.classList.remove('tfg-ui3')`
+   shows the state before this pass (tools/harness/ui2_shots.mjs --both3 does exactly that from one page state).
+   Part 1: HUD overlap fixes.  Part 2: the remaining self-styled panels moved onto the ui2 look (flat, hard-edged, no glow,
+   no gradient fills, condensed labels >= 14 px).  No functionality changes: colours still come from each panel's own vars.
+   ===================================================================================================================== */
+
+/* ---------------------------------------------------------------------------------------------------------------------
+   1. HUD OVERLAPS
+   --------------------------------------------------------------------------------------------------------------------- */
+
+/* THE ALGORITHM intercom banner: it lived at z-index 25 inside #ui, i.e. ABOVE every open panel (.overlay is 20). It now sits under
+   the panels and disappears while one is open (openPanel() only toggles `.hidden` on the one .overlay element). */
+html.tfg-ui3 #ui .algo-sub { z-index: 15; border-radius: 0; box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.55); }
+html.tfg-ui3 #ui:has(> .overlay:not(.hidden)) .algo-sub { opacity: 0 !important; visibility: hidden; }
+html.tfg-ui3 .algo-who { text-shadow: none; }
+html.tfg-ui3 .algo-text { text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.7); }
+
+/* Mirror dimension: the countdown + reflection meter were drawn over the clock / quota / compass block (top 14 px .. 104 px). */
+html.tfg-ui3 .mr-timer { top: 112px; }
+html.tfg-ui3 .mr-clock { font-size: 38px; text-shadow: 2px 2px 0 #000; }
+html.tfg-ui3 .mr-meter { top: 196px; }
+@media (max-height: 800px) { html.tfg-ui3 .mr-timer { top: 108px; } html.tfg-ui3 .mr-clock { font-size: 32px; } html.tfg-ui3 .mr-meter { top: 178px; } }
+
+/* Found-footage (VHS) captions: REC sat on the body icon, the battery on the level plate, the date on hotbar slots 3-5.
+   They move into the free strip under the clock and to the bottom-left (next to the PLAY line, under the chat log). */
+html.tfg-ui3 .liminal-vhs .lv-rec { left: 50% !important; right: auto !important; top: 104px !important; transform: translateX(-130%); }
+html.tfg-ui3 .liminal-vhs .lv-bat { left: 50% !important; right: auto !important; top: 104px !important; text-align: left !important; transform: translateX(30%); }
+html.tfg-ui3 .liminal-vhs .lv-stamp { left: 330px !important; right: auto !important; text-align: left !important; }
+html.tfg-ui3 .br-vhs .br-vhs-rec { left: 28px; bottom: 26px; }
+
+/* Hotbar: the item name is one solid strip at the bottom of the slot (2 lines max above the icon used to collide with a label
+   drawn by another widget in the same slot: "LIGHT" over "FLASHLIGHT"). Number plate + ammo keep their corners. */
+html.tfg-ui3 .hud-inv .inv-slot { overflow: hidden; }
+html.tfg-ui3 .hud-inv .inv-slot .inv-name { position: absolute; left: 0; right: 0; bottom: 8px; z-index: 2; padding: 1px 3px 0; font-family: var(--font2); font-weight: 700; letter-spacing: 0.02em; font-size: 15px; line-height: 1;
+  display: block; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; background: rgba(10, 7, 4, 0.86); text-align: center; }
+html.tfg-ui3 .hud-inv .inv-slot .inv-ico { z-index: 1; top: 38%; width: 44px; height: 44px; }
+html.tfg-ui3 .hud-inv .inv-slot > :not(.inv-num):not(.inv-ico):not(.inv-name):not(.inv-bat):not(.inv-ammo):not(.inv-on) { z-index: 3; }
+
+/* QUOTA MET: the credit sign was faux-bolded (the one-glyph credit face has a single weight) and turned into a wide white block. */
+html.tfg-ui3 .quotamet .qm-main, html.tfg-ui3 .quotamet .qm-sub, html.tfg-ui3 .quotamet .qm-rows b, html.tfg-ui3 .report b, html.tfg-ui3 .summary b { font-synthesis: none; }
+html.tfg-ui3 .quotamet .qm-main { text-shadow: 0 0 14px rgba(51, 255, 153, 0.55), 4px 4px 0 #000; }
+html.tfg-ui3 .quotamet .qm-rows { border-radius: 0; box-shadow: var(--t-bezel, none); }
+html.tfg-ui3 .quotamet .qm-rows b { font-weight: 400; letter-spacing: 0.04em; }
+
+/* ---------------------------------------------------------------------------------------------------------------------
+   2. PANELS ON THE UI2 LOOK
+   --------------------------------------------------------------------------------------------------------------------- */
+
+/* every in-game panel: hard corners */
+html.tfg-ui3 #ui .overlay *, html.tfg-ui3 #ui .overlay *::before, html.tfg-ui3 #ui .overlay *::after { border-radius: 0; }
+
+/* shop: coloured top edge (like the role cards) instead of a gradient tile with a left bar; icon well is flat */
+html.tfg-ui3 #ui .shop .sh-card { background: rgba(0, 0, 0, 0.42); border-left-width: 1px; border-top: 3px solid var(--tc); }
+html.tfg-ui3 #ui .shop .sh-card:hover, html.tfg-ui3 #ui .shop .sh-card:focus-visible { background: color-mix(in srgb, var(--tc) 12%, rgba(0, 0, 0, 0.5)); border-color: var(--tc); outline: none; }
+html.tfg-ui3 #ui .shop .sh-ico, html.tfg-ui3 #ui .forge .fg-big { background: rgba(0, 0, 0, 0.5); border: 1px solid var(--ph-line); border-bottom: 3px solid var(--tc); }
+html.tfg-ui3 #ui .shop .sh-price { letter-spacing: 0.02em; }
+html.tfg-ui3 #ui .shop .sh-badge, html.tfg-ui3 #ui .shop .sh-badge.eom { box-shadow: none; }
+
+/* forge + shipyard: rows keep the tier colour as an edge, no glow */
+html.tfg-ui3 #ui .forge .fg-item:hover, html.tfg-ui3 #ui .forge .fg-item:focus-visible, html.tfg-ui3 #ui .forge .fg-item.sel,
+html.tfg-ui3 #ui .shipyard .sy-row:hover, html.tfg-ui3 #ui .shipyard .sy-row:focus-visible, html.tfg-ui3 #ui .shipyard .sy-row.sel { box-shadow: inset 4px 0 0 var(--tc); outline: none; }
+html.tfg-ui3 #ui .forge .fg-name, html.tfg-ui3 #ui .shipyard .sy-name { font-family: var(--font2); font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; text-shadow: none; }
+html.tfg-ui3 #ui .forge .fg-chance { letter-spacing: 0.02em; }
+html.tfg-ui3 #ui .shipyard .sy-sw i.sel { box-shadow: none; outline: 2px solid #fff; outline-offset: 1px; }
+
+/* selected chip-tabs (social hub): `.btn` background beat `.chip.sel`, leaving dark ink on a dark plate */
+html.tfg-ui3 #ui .menu-frame .btn.chip.sel { background: var(--ph-hi); color: var(--ph-ink); border-color: var(--ph-hi); }
+html.tfg-ui3 #ui .menu-frame .btn.chip.sel:hover, html.tfg-ui3 #ui .menu-frame .btn.chip.sel:focus-visible { background: #fff; color: var(--ph-ink); }
+
+/* pets */
+html.tfg-ui3 #ui .pt-title { align-self: flex-start; margin-bottom: 14px; }
+html.tfg-ui3 #ui .pt-tabs { background: var(--t-stripe) left top / 100% 5px no-repeat; padding-top: 12px; border-bottom: 1px solid var(--ph-line); }
+html.tfg-ui3 #ui .pt-slot.sel, html.tfg-ui3 #ui .pt-li.sel { box-shadow: inset 4px 0 0 #ffd23f; }
+html.tfg-ui3 #ui .pt-bar > i { background-color: #ff8a3d; background-image: repeating-linear-gradient(90deg, transparent 0 7px, rgba(0, 0, 0, 0.5) 7px 8px); }
+html.tfg-ui3 #ui .pt-stage { background: rgba(0, 0, 0, 0.5); }
+html.tfg-ui3 #ui .pt-tag { font-family: var(--font2); font-weight: 700; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; }
+html.tfg-ui3 #ui .pt-title { font-family: var(--font2); font-weight: 700; }
+
+/* homeworld + factory */
+html.tfg-ui3 #ui .hwp .hw-card:hover, html.tfg-ui3 #ui .hwp .hw-card:focus-visible,
+html.tfg-ui3 #ui .h2p .h2-card:hover, html.tfg-ui3 #ui .h2p .h2-card:focus-visible { box-shadow: inset 4px 0 0 var(--ph-hi); outline: none; }
+html.tfg-ui3 #ui :is(.hwp, .h2p) .tfg-glyph { width: 1em; height: 1em; }
+
+/* trade: item tiles + boxes flat, tier colour as the bottom edge, no pulsing */
+html.tfg-ui3 #ui .trd-it { background: rgba(10, 6, 3, 0.8); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6), inset 0 -3px 0 var(--tc); }
+html.tfg-ui3 #ui .trd-it:hover { filter: brightness(1.2); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6), inset 0 -3px 0 var(--tc); }
+html.tfg-ui3 #ui .trd-it.t-epic, html.tfg-ui3 #ui .trd-it.t-legendary, html.tfg-ui3 #ui .trd-it.t-mythic { animation: none; }
+html.tfg-ui3 #ui .trd-it .pip { box-shadow: none; }
+html.tfg-ui3 #ui .trd-it.offered::after { text-shadow: none; }
+html.tfg-ui3 #ui .trd-box, html.tfg-ui3 #ui .trd-box.accepted { box-shadow: none; }
+html.tfg-ui3 #ui .trd-box.accepted { box-shadow: inset 4px 0 0 #7dff7d; }
+html.tfg-ui3 #ui .trd-bar i { background: #ffd23f; background-image: repeating-linear-gradient(90deg, transparent 0 7px, rgba(0, 0, 0, 0.5) 7px 8px); }
+html.tfg-ui3 #ui .trd-lamp::before, html.tfg-ui3 #ui .trd-lamp.lock::before, html.tfg-ui3 #ui .trd-lamp.ok::before { box-shadow: none; }
+html.tfg-ui3 #ui .trd-done h2 { font-family: var(--font2); font-weight: 700; text-transform: uppercase; }
+
+/* survival crate / stove / planter */
+html.tfg-ui3 #ui .svp .svp-meter > div.nd { box-shadow: none; }
+html.tfg-ui3 #ui .svp .svp-row:hover { box-shadow: inset 4px 0 0 var(--ph-hi); }
+
+/* daily rewards: no pulsing glow, tiles flat, "ready" = solid edge */
+html.tfg-ui3 #ui .dy-day.ready, html.tfg-ui3 #ui .dy-t.can { animation: none; box-shadow: inset 4px 0 0 var(--ph-hi); }
+html.tfg-ui3 #ui .dy-bar > i { box-shadow: none; background-image: repeating-linear-gradient(90deg, transparent 0 7px, rgba(0, 0, 0, 0.5) 7px 8px); }
+html.tfg-ui3 #ui .dy-cr { background: rgba(0, 0, 0, 0.42); box-shadow: inset 0 -5px 0 var(--c); border-width: 1px; border-bottom-width: 1px; }
+html.tfg-ui3 #ui .dy-t .tk, html.tfg-ui3 #ui .dy-sum .fw.ready { text-shadow: none; }
+html.tfg-ui3 #ui :is(.dy .tabs .btn .dy-new, .dy-newtag) { font-family: var(--font2); font-weight: 700; font-size: 14px; letter-spacing: 0.06em; padding: 0 5px; animation: none; }
+
+/* social hub: square status lamps, hard toast */
+html.tfg-ui3 #ui .hub-stat i { border-radius: 0; box-shadow: none; }
+html.tfg-ui3 .hub-toast { border-radius: 0; box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.55); animation: none; }
+html.tfg-ui3 #ui .hub-row:hover, html.tfg-ui3 #ui .hub-row:focus-visible { box-shadow: inset 4px 0 0 var(--ph-hi); }
+
+/* pictograms placed by glyph()/glyphEl() inside panel text */
+html.tfg-ui3 #ui .tfg-gi { display: inline-flex; vertical-align: -0.14em; }
+html.tfg-ui3 #ui :is(.crp-ic, .wd-how, .wd-tile .s, .wd-tile .ck) .tfg-glyph { width: 1em; height: 1em; }
+html.tfg-ui3 #ui .crp-ic .tfg-glyph { width: 26px; height: 26px; }
+html.tfg-ui3 #ui .pf-fr .tfg-glyph { width: 0.9em; height: 0.9em; }
+html.tfg-ui3 #ui .sh-ico .tfg-glyph { width: 30px; height: 30px; }

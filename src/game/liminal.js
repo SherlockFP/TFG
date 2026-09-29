@@ -85,10 +85,10 @@ class Vhs {
     const bat = info.bat;
     const cells = '▮'.repeat(bat) + '▯'.repeat(3 - bat);
     this.cap.innerHTML =
-      `<div style="position:absolute;left:3%;top:4%"><span style="color:#ff3030;opacity:${blink ? 1 : 0}">●</span> REC</div>`
-      + `<div style="position:absolute;right:3%;top:4%;text-align:right">${cells} <span style="opacity:0.85">${info.batLabel}</span></div>`
-      + `<div style="position:absolute;left:3%;bottom:5%;opacity:0.92">▶ ${t('PLAY')} ${tc}<br><span style="font-size:0.72em;opacity:0.8">${t('SP')} · ${info.level} · CH 03</span></div>`
-      + `<div style="position:absolute;right:3%;bottom:5%;text-align:right;color:#ffa030;opacity:0.9">${info.stamp}</div>`;
+      `<div class="lv-rec" style="position:absolute;left:3%;top:4%"><span style="color:#ff3030;opacity:${blink ? 1 : 0}">●</span> REC</div>`
+      + `<div class="lv-bat" style="position:absolute;right:3%;top:4%;text-align:right">${cells} <span style="opacity:0.85">${info.batLabel}</span></div>`
+      + `<div class="lv-play" style="position:absolute;left:3%;bottom:5%;opacity:0.92">▶ ${t('PLAY')} ${tc}<br><span style="font-size:0.72em;opacity:0.8">${t('SP')} · ${info.level} · CH 03</span></div>`
+      + `<div class="lv-stamp" style="position:absolute;right:3%;bottom:5%;text-align:right;color:#ffa030;opacity:0.9">${info.stamp}</div>`;
   }
   dispose() { this.el.remove(); }
 }
