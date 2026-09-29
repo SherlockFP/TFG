@@ -7,6 +7,7 @@
 
 ## Verify
 Scratch Playwright run (real key mashing, real clicks, `kefal.input.enabled=false` pre-set, fullscreen exited): stand up -> click -> lock true -> mousemove changes `room.free.yaw` -> ESC returns to the chair.
+Result: the pre-fix run (enabled left true) showed the pipeline works in headless; a post-fix rerun (input.enabled preset false) got lock OK but `free.yaw` did not move after a synthetic mousemove and could not be re-diagnosed (shared browser lock starved, run cancelled by lead): QA must re-check stand -> click -> look with `kefal.input.enabled=false` preset and log `room.modal`/`terminal.active` (a click on the crosshair target may open a modal that pauses look).
 Known gaps: real-browser fullscreen+lock ordering is only checked in headless Chromium (no real activation enforcement).
 
 ## Bug sweep
