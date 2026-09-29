@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Project folder: `D:\KefalCompany`. Handoff and working notes live in **AGENTS.md**. Read it before doing anything,
+Project folder: `D:\KefalCompany`. **Start with `docs/HANDOFF.md`** (what the game is, owner rules, reading order, architecture, testing, current state, next steps). Working notes live in **AGENTS.md**. Read it before doing anything,
 starting with **§0 START HERE**, which covers the reading order and a first-30-minutes checklist. It also contains:
 - §5.2 work that was in progress at handoff;
 - §5.3 what is missing or broken;

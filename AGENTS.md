@@ -5,6 +5,8 @@
 > The owner (the user) writes in **Turkish**; answer in Turkish. UI text is English with Turkish translations.
 
 ## 0. START HERE (new AI / developer taking over)
+
+> **Newest summary: read `docs/HANDOFF.md` first** (identity, owner rules, architecture, workflow, current state, wave 5 plan in `docs/MASTERPLAN.md` §25-§26).
 **Project folder:** `D:\KefalCompany` (Windows). Dev server: `npm run dev` → http://localhost:5173.
 
 Reading order (≈15 min):
