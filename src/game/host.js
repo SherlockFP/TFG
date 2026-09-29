@@ -108,20 +108,20 @@ export const hostMethods = {
     for (const k of Object.keys(obj || {})) { try { sent.set(k, JSON.stringify(obj[k] === undefined ? null : obj[k])); } catch { /* ignore */ } }
   },
 
-  hostOnPlayerJoin(id, info) {
-    if (this.mods?.gateJoin && !this.mods.gateJoin(id, info, this)) return;   // Late Join switch + missing content mods: reject before any world data is sent
+  hostOnPlayerJoin(id, info, resume = false) {
+    if (!resume && this.mods?.gateJoin && !this.mods.gateJoin(id, info, this)) return;   // (a resume was already admitted)   // Late Join switch + missing content mods: reject before any world data is sent
     this.ensureRemote(id, info);
     const players = [];
     players.push({ id: this.selfId, ...this.helloData(), dead: this.player.dead, st: this.lastPs });
     for (const r of this.remotes.values()) players.push({ id: r.id, name: r.name, level: r.level, suit: r.suit, hat: r.hat, title: r.title || '', dead: r.dead, st: r.lastState });
     const doors = (this.world.facility?.doors || []).map((d) => ({ id: d.id, open: d.open, locked: d.locked, silent: true }));
     this.net.sendTo(id, 'welcome', {
-      run: this.run, config: this.config, players,
+      resume: resume || undefined, run: this.run, config: this.config, players,
       items: this.items.serialize(), creatures: this.creatures.serializeFor(), doors, shipDoor: this.ship.door.open,
     });
-    this.net.broadcast('sys', sysMsg('{name} joined the crew.', { name: info.name }, 'info'), false);
+    if (!resume) this.net.broadcast('sys', sysMsg('{name} joined the crew.', { name: info.name }, 'info'), false);
     this.hostAnnounce();
-    this.mods?.emit('playerJoin', id, info, this);
+    this.mods?.emit('playerJoin', id, info, this, resume);
   },
   hostOnPlayerLeave(id) {
     // clients without a direct link to the leaver never get a transport 'leave' for them: tell everyone

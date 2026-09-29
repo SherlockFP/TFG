@@ -10,10 +10,28 @@ class BaseTransport {
     this.onError = null;
     this.peers = new Set();
   }
+  congested() { return false; }   // backpressure probe: Session drops state rows for a peer whose sends pile up
 }
 
+// Optional TURN relay (symmetric NATs / mobile carriers can never connect with STUN only, and links that die after a
+// NAT rebind cannot be re-established). Configure with VITE_TURN_URL(+_USER/_CRED) at build time, or in the browser:
+// localStorage['tfg.turn'] = '{"urls":"turn:host:3478","username":"u","credential":"c"}'.
+function turnServers() {
+  const out = [];
+  try {
+    const env = import.meta.env || {};
+    if (env.VITE_TURN_URL) out.push({ urls: env.VITE_TURN_URL.split(','), username: env.VITE_TURN_USER || '', credential: env.VITE_TURN_CRED || '' });
+  } catch { /* not vite */ }
+  try {
+    const j = typeof localStorage !== 'undefined' && localStorage.getItem('tfg.turn');
+    if (j) { const v = JSON.parse(j); for (const x of Array.isArray(v) ? v : [v]) if (x && x.urls) out.push(x); }
+  } catch { /* bad json */ }
+  return out;
+}
+const CONGEST_AT = 30;   // unresolved sends to one peer (Trystero awaits the datachannel drain per chunk, 10 s timeout)
+
 export class TrysteroTransport extends BaseTransport {
-  constructor(strategy = 'nostr') { super(); this.strategy = strategy; this.room = null; }
+  constructor(strategy = 'nostr') { super(); this.strategy = strategy; this.room = null; this.inflight = new Map(); this.rejoins = 0; }
   async load() {
     if (this.mod) return this.mod;
     if (this.strategy === 'mqtt') this.mod = await import('@trystero-p2p/mqtt');
@@ -24,9 +42,12 @@ export class TrysteroTransport extends BaseTransport {
   async join(roomId, password) {
     const mod = await this.load();
     this.selfId = mod.selfId;
+    this._joinArgs = [roomId, password];
     const cfg = { appId: APP_ID };
     if (password) cfg.password = password;
     cfg.relayConfig = { warnOnRelayFailure: false };
+    const turn = turnServers();
+    if (turn.length) cfg.turnConfig = turn;
     this.room = mod.joinRoom(cfg, roomId, {
       onJoinError: (d) => { console.warn('join error', d); this.onError?.(d); },
     });
@@ -39,23 +60,63 @@ export class TrysteroTransport extends BaseTransport {
       const ab = data instanceof ArrayBuffer ? data : ArrayBuffer.isView(data) ? data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength) : data;
       this.onBinary?.(ab, meta?.peerId ?? meta, meta?.metadata);
     };
-    this.room.onPeerJoin = (id) => { this.peers.add(id); this.onPeerJoin?.(id); if (this.stream) this.room.addStream(this.stream, { target: id }); };
-    this.room.onPeerLeave = (id) => { this.peers.delete(id); this.onPeerLeave?.(id); };
+    const room = this.room;
+    room.onPeerJoin = (id) => {
+      if (this.room !== room) return;
+      this.peers.add(id);
+      try { this.onPeerJoin?.(id); } catch (e) { console.error('peerJoin', e); }
+      if (this.stream) { try { room.addStream(this.stream, { target: id }); } catch (e) { console.warn('addStream', e); } }
+    };
+    // never let an app-level exception escape into Trystero: its own peer cleanup runs after this callback
+    room.onPeerLeave = (id) => {
+      if (this.room !== room) return;
+      this.peers.delete(id); this.inflight.delete(id);
+      try { this.onPeerLeave?.(id); } catch (e) { console.error('peerLeave', e); }
+    };
     this.room.onPeerStream = (stream, id) => this.onStream?.(stream, id);
     return this;
   }
+  // One send per peer (not one broadcast): every peer gets its own in-flight counter, so a single stalled link is
+  // detected (congested(id)) without throttling the healthy ones. The promise MUST be caught: a peer that vanishes
+  // mid-send rejects it asynchronously (the old try/catch never saw that -> unhandled rejections).
   send(data, to) {
     if (!this._msg) return;
-    try { this._msg.send(data, to ? { target: to } : undefined); } catch (e) { /* peer gone */ }
+    const targets = to ? [to] : [...this.peers];
+    for (const id of targets) {
+      if (!this.peers.has(id)) continue;
+      try {
+        const p = this._msg.send(data, { target: id });
+        this.inflight.set(id, (this.inflight.get(id) || 0) + 1);
+        const done = () => { const n = (this.inflight.get(id) || 1) - 1; if (n > 0) this.inflight.set(id, n); else this.inflight.delete(id); };
+        if (p && p.then) p.then(done, done); else done();
+      } catch (e) { /* peer gone */ }
+    }
+  }
+  congested(id) { return (this.inflight.get(id) || 0) > CONGEST_AT; }
+  // Re-enter the room (same selfId) to force a fresh signalling announce when links died and were not re-discovered.
+  async rejoin() {
+    if (!this._joinArgs || this._rejoining) return false;
+    this._rejoining = true;
+    try {
+      const old = this.room; const stream = this.stream;
+      this.room = null; this.inflight.clear();
+      const gone = [...this.peers]; this.peers.clear();
+      try { await old?.leave(); } catch { /* ignore */ }
+      for (const id of gone) { try { this.onPeerLeave?.(id); } catch (e) { console.error('peerLeave', e); } }
+      await this.join(...this._joinArgs);
+      this.stream = stream;
+      this.rejoins++;
+      return true;
+    } catch (e) { console.warn('rejoin failed', e); return false; } finally { this._rejoining = false; }
   }
   sendBinary(buf, meta, to) {
     if (!this._bin) return;
-    try { this._bin.send(buf, { target: to || undefined, metadata: meta }); } catch { /* ignore */ }
+    try { const p = this._bin.send(buf, { target: to || undefined, metadata: meta }); p?.catch?.(() => {}); } catch { /* ignore */ }
   }
   addStream(stream) { this.stream = stream; try { this.room?.addStream(stream); } catch (e) { console.warn(e); } }
   removeStream(stream) { try { this.room?.removeStream(stream); } catch { /* ignore */ } this.stream = null; }
   async ping(id) { try { return await this.room.ping(id); } catch { return -1; } }
-  leave() { try { this.room?.leave(); } catch { /* ignore */ } this.room = null; this.peers.clear(); }
+  leave() { try { const p = this.room?.leave(); p?.catch?.(() => {}); } catch { /* ignore */ } this.room = null; this.peers.clear(); this.inflight.clear(); }
 }
 
 // Same-browser transport (multiple tabs). Peers discover each other via hello/heartbeat.
@@ -73,7 +134,7 @@ export class LocalTransport extends BaseTransport {
         if (m.t === 'hello') this.ch.postMessage({ t: 'here', from: this.selfId, to: m.from });
       }
       this.last.set(m.from, performance.now());
-      if (m.t === 'bye') { if (this.peers.delete(m.from)) this.onPeerLeave?.(m.from); return; }
+      if (m.t === 'bye') { if (this.peers.delete(m.from)) this.onPeerLeave?.(m.from, true); return; }
       if (m.t === 'msg') this.onMessage?.(m.d, m.from);
       if (m.t === 'bin') this.onBinary?.(m.d, m.from, m.meta);
     };

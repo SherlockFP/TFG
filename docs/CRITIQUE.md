@@ -118,3 +118,6 @@ check bubble size / font, leg look when crouching, elbow direction of the IK arm
 
 ## Food & drinks (wave 2, module `food`)
 Added optional buffs + social fun (cheers, cake, table, booze). Unverified in a browser: first-person eat arcs, blur overlay, table / machine placement. Booze courage only touches STATIC; no chat bubbles exist to slur yet.
+
+## Net drops (wave 3)
+Reconnect/resume, rejoin, TURN and backpressure are only exercised against a fake transport and BroadcastChannel. Never seen over real WebRTC: check `peerLost`/`peerResume` with Wi-Fi off for 10-30 s, that a resumed client keeps its held item and is not teleported, and that the 45 s ghost avatar of a crashed tab (no `bye`) is acceptable. No TURN server is configured by default.

@@ -114,10 +114,15 @@ class App {
     setInterval(() => {
       if (!document.hidden || !this.game) { this.hiddenLast = performance.now(); return; }
       const now = performance.now();
-      const dt = Math.min(0.1, (now - this.hiddenLast) / 1000);
+      // browsers throttle a hidden tab's timers to ~1 Hz: catch up in <= 0.1 s steps (max 8) so a hidden HOST keeps the world
+      // (creatures, clock, snapshots for the crew) running near real time instead of at 10 % speed
+      let rem = Math.min(0.8, (now - this.hiddenLast) / 1000);
       this.hiddenLast = now;
-      try { this.game.update(dt); } catch (e) { console.error(e); }
-      this.input.endFrame();
+      for (let i = 0; i < 8 && rem > 1e-4 && this.game; i++) {
+        const dt = Math.min(0.1, rem); rem -= dt;
+        try { this.game.update(dt); } catch (e) { console.error(e); }
+        this.input.endFrame();
+      }
     }, 50);
     // dev helpers: ?autohost=local  /  ?autojoin=CODE&net=local
     const qs = new URLSearchParams(location.search);
