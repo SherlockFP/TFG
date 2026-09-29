@@ -29,7 +29,7 @@ const noop = () => {};
 // =====================================================================================================
 // ZOMBIE ACCOUNT swarm (instanced)
 // =====================================================================================================
-const SWARM_CAP = 48;
+const SWARM_CAP = 72;   // > MAX_SWARM (40): other spawners (dice, sieges, dev tools) may exceed it; the nearest bodies are kept when it is hit
 const HOODIES = ['#4a4e57', '#5b4747', '#45524a', '#534e69', '#66625a', '#3f4a5c'];
 
 function swarmFaceAtlas() {
@@ -79,6 +79,7 @@ export class SwarmRenderer {
     this.ready = false;
     this.scene = null;
     this.onDeath = null;     // (rec) => void   death burst hook (set by the horde module)
+    this.lastT = -1;         // performance.now() of the last update: update() is called by the CreatureManager AND the horde module, once per frame wins
   }
   build() {
     const mk2 = (geo, mat, cap = SWARM_CAP, colors = false) => {
@@ -138,33 +139,47 @@ export class SwarmRenderer {
       dispose() { self.recs.delete(rec); },
     };
   }
-  update(dt) {
+  /** dt: seconds; scene: the main game scene (CreatureManager passes it; fallback = the first record's parent); camPos: for the cap */
+  update(dt, scene = null, camPos = null) {
+    const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    if (now - this.lastT < 2) return;   // already advanced this frame
+    this.lastT = now;
     if (!this.recs.size) { if (this.ready) for (const m of this.all) m.count = 0; return; }
-    let scene = null;
-    for (const r of this.recs) { if (r.root.parent) { scene = r.root.parent; break; } }
-    if (scene) this.attach(scene);
-    if (!this.ready) return;
+    if (!scene) for (const r of this.recs) { if (r.root.parent) { scene = r.root.parent; break; } }
+    if (scene) this.attach(scene);   // also (re)builds the meshes after a dispose()
+    else if (!this.ready) return;
+    if (this.scene && !this.torso.parent) this.scene.add(...this.all);   // something removed the meshes from the scene (map unload sweeps): put them back
     let n = 0, ln = 0;
     const fc = [0, 0, 0, 0];
-    for (const r of this.recs) {
-      if (!r.root.parent || n >= SWARM_CAP) continue;
+    let list = this.recs;
+    if (this.recs.size > SWARM_CAP && camPos) {   // over the cap: draw the closest bodies, never an arbitrary subset
+      list = [...this.recs].sort((a, b) => a.root.position.distanceToSquared(camPos) - b.root.position.distanceToSquared(camPos));
+    }
+    for (const r of list) {
+      if (!r.root.parent || !r.root.visible || n >= SWARM_CAP) continue;
+      if (r.root.parent.isScene && r.root.parent !== this.scene) { this.recs.delete(r); continue; }   // leftover of an ended session
       const st = r.state;
       const dead = st === 'dead';
       if (dead && !r.deadFired) { r.deadFired = true; try { this.onDeath?.(r); } catch { /* cosmetic */ } }
       if (dead && r.t > 2.4) continue;
       if (dead && r.t > 1.5 && Math.sin(r.t * 40) > 0) continue;   // de-rez flicker
-      const moving = st === 'walk' || st === 'run';
+      const moving = st === 'walk' || st === 'run' || st === 'crawl';
       const sp = moving ? Math.max(0.6, Math.min(r.speed || 1.2, 3)) : 0;
       r.gait = (r.gait + sp * dt * 3.2) % TAU;
       const gs = Math.sin(r.gait), tm = r.time + r.ph;
       // rise from the ground on spawn, fall + sink on death
       const rise = r.age < 0.9 ? -1.3 * (1 - r.age / 0.9) ** 2 : 0;
-      const fall = dead ? clamp(r.t / 0.55, 0, 1) : 0;
+      // 'getup' (after a stun) plays the fall backwards: lying face down -> pushes up -> shambling again
+      const gu = st === 'getup' ? clamp(r.t / 0.9, 0, 1) : 1;
+      const fall = dead ? clamp(r.t / 0.55, 0, 1) : (1 - gu * gu * (3 - 2 * gu));
+      const crawl = st === 'crawl' ? 1 : 0;
+      const grab = st === 'grab' ? keys(r.t, [[0, 0], [0.22, 0.5], [0.4, 1], [0.72, 1], [0.85, 0]]) : 0;
       const atk = st === 'attack' ? keys(r.t, [[0, 0], [0.3, -0.5], [0.42, 1], [0.7, 0.3], [1, 0]]) : 0;
       const bang = st === 'bang' ? Math.max(0, Math.sin(r.t * 9)) : 0;
       const stun = st === 'stunned' ? 1 : 0;
       // root
       _p.copy(r.root.position); _p.y += rise - fall * 0.25 - (dead ? Math.max(0, r.t - 1.2) * 0.5 : 0);
+      if (grab) { _p.x += Math.sin(r.root.rotation.y) * 0.3 * grab; _p.z += Math.cos(r.root.rotation.y) * 0.3 * grab; }   // lunge at the victim
       _e.set(fall * 1.35, r.root.rotation.y + Math.sin(tm * 1.7) * 0.08 * (1 - fall), r.lean * (1 - fall) + stun * Math.sin(tm * 11) * 0.15);
       _q.setFromEuler(_e);
       const sc = r.root.scale.x * (r.elite ? 1.15 : 1);
@@ -175,28 +190,31 @@ export class SwarmRenderer {
       if (r.flash > 0) _c.lerp(FLASH_COL, r.flash);
       if (dead) _c.multiplyScalar(1 - fall * 0.4);
       // legs (shamble; the left leg drags)
-      const hipY = 0.8;
+      const hipY = crawl ? 0.36 : 0.8;
       const legSwing = moving ? gs * 0.45 : 0;
-      this.limb(ln++, _m, [0.11, hipY, 0], [-legSwing * 0.7 + fall * 0.2, 0, 0.04], [0.13, 0.82, 0.14], _c);
-      this.limb(ln++, _m, [-0.11, hipY, 0], [legSwing + fall * 0.1, 0, -0.04], [0.13, 0.82, 0.14], _c);
+      // crawl: legs trail behind (dead weight), arms do the work
+      this.limb(ln++, _m, [0.11, hipY, 0], [crawl ? 1.25 + gs * 0.15 : -legSwing * 0.7 + fall * 0.2, 0, 0.04], [0.13, 0.82, 0.14], _c);
+      this.limb(ln++, _m, [-0.11, hipY, 0], [crawl ? 1.4 - gs * 0.15 : legSwing + fall * 0.1, 0, -0.04], [0.13, 0.82, 0.14], _c);
       // torso: hunched forward, sways with the gait
-      const hunch = r.hunch + atk * 0.35 + bang * 0.25 + (st === 'run' ? 0.15 : 0);
+      const hunch = crawl ? 1.3 + gs * 0.05 : r.hunch + atk * 0.35 + bang * 0.25 + grab * 0.45 + (st === 'run' ? 0.15 : 0);
       _m2.compose(_p.set(0, hipY, 0), _q.setFromEuler(_e.set(hunch, gs * 0.12, Math.sin(r.gait * 0.5) * 0.1)), _s.set(1, 1, 1));
       const torsoM = _tm.multiplyMatrices(_m, _m2);
       this.torso.setMatrixAt(n, torsoM); this.torso.setColorAt(n, _c);
       // arms: zombie reach, flail on attack / bang on doors
-      const reach = -1.25 - atk * 0.6 - bang * 0.9;
-      this.limb(ln++, torsoM, [0.28, 0.52, 0.02], [reach + Math.sin(tm * 2.1) * 0.12 + r.armL * 0.3 + gs * 0.1, 0, 0.18], [0.1, 0.58, 0.1], _c);
-      this.limb(ln++, torsoM, [-0.28, 0.52, 0.02], [reach + Math.sin(tm * 1.9 + 1) * 0.12 + r.armR * 0.3 - gs * 0.1, 0, -0.18], [0.1, 0.58, 0.1], _c);
+      const reach = crawl ? -1.65 : -1.25 - atk * 0.6 - bang * 0.9 - grab * 0.75 + (1 - gu) * 1.1;
+      const cw = crawl ? gs * 0.7 : 0;   // crawl: arms haul alternately
+      const clasp = grab * 0.55;         // grab: both arms sweep inward around the victim
+      this.limb(ln++, torsoM, [0.28, 0.52, 0.02], [reach + cw + Math.sin(tm * 2.1) * 0.12 + r.armL * 0.3 + gs * 0.1 * (1 - crawl), 0, 0.18 - clasp], [0.1, 0.58, 0.1], _c);
+      this.limb(ln++, torsoM, [-0.28, 0.52, 0.02], [reach - cw + Math.sin(tm * 1.9 + 1) * 0.12 + r.armR * 0.3 - gs * 0.1 * (1 - crawl), 0, -0.18 + clasp], [0.1, 0.58, 0.1], _c);
       // head: lolling, twitching
       const tw = Math.sin(tm * 13) > 0.94 ? 0.35 : 0;
-      _m2.compose(_p.set(0, 0.74, 0.04), _q.setFromEuler(_e.set(-0.25 + Math.sin(tm * 0.9) * 0.15 - atk * 0.3, Math.sin(tm * 0.7) * 0.3, Math.sin(tm * 1.1) * 0.25 + tw)), _s.set(1, 1, 1));
+      _m2.compose(_p.set(0, 0.74, 0.04), _q.setFromEuler(_e.set(-0.25 + Math.sin(tm * 0.9) * 0.15 - atk * 0.3 - crawl * 0.95 + grab * 0.5, Math.sin(tm * 0.7) * 0.3, Math.sin(tm * 1.1) * 0.25 + tw)), _s.set(1, 1, 1));
       const headM = _hm.multiplyMatrices(torsoM, _m2);
       this.head.setMatrixAt(n, headM); this.head.setColorAt(n, _c.set(r.flash > 0 ? 2.2 : 1, 1, 1));
       // face screen (glitching default avatar)
       r.faceT -= dt;
       if (r.faceT <= 0) { if (r.face === 0) { r.face = 1 + ((r.R() * 2) | 0); r.faceT = 0.08 + r.R() * 0.25; } else { r.face = 0; r.faceT = 0.8 + r.R() * 4; } }
-      let f = st === 'attack' || st === 'bang' ? 3 : r.face;
+      let f = st === 'attack' || st === 'bang' || st === 'grab' || st === 'crawl' ? 3 : r.face;
       if (dead) f = 2;
       _m2.compose(_p.set(0, 0, 0.123), _q.identity(), _s.set(1, 1, 1));
       const fm = this.faces[f];
@@ -219,8 +237,8 @@ export class SwarmRenderer {
     this.geos[2].dispose();
     for (const g of this.faceGeos) g.dispose();
     for (const m of this.mats) m.dispose();
-    this.ready = false; this.scene = null;
-    this.recs.clear();
+    this.ready = false; this.scene = null; this.lastT = -1;
+    // recs are kept: the next update() rebuilds the meshes for the bodies that still exist (leftovers of an ended session are pruned there)
   }
 }
 export const SWARM = new SwarmRenderer();

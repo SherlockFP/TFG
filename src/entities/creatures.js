@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { CREATURES, creatureLevelStats, VARIANTS, AFFIXES, variantOf, rollAffix, creatureDisplayName } from '../game/creatures.js';
 import { createCreatureModel } from '../models/creatures.js';
 import { createProp } from '../models/props.js';
+import { SWARM } from '../models/creatures_wave1.js';
 import { G } from '../physics/physics.js';
 import { angleDiff, clamp, damp, dampAngle } from '../core/util.js';
 import { insideShip } from '../world/ship.js';
@@ -518,6 +519,9 @@ export class CreatureManager {
   }
   update(dt) {
     for (const v of this.views.values()) v.update(dt);
+    // the Zombie Account swarm is one instanced draw: advance + attach it to the MAIN scene here (every frame, host and client,
+    // whether or not the horde module is running); SWARM ignores the second call the horde module makes in the same frame
+    if (this.game.camera) SWARM.update(dt, this.scene, this.game.camera.position);
   }
   clearAll() {
     for (const v of this.views.values()) v.dispose();

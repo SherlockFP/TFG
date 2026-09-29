@@ -5,7 +5,7 @@ import { RNG, Noise2D } from '../core/rng.js';
 import { BIOMES } from '../game/moons.js';
 import { createAnyProp as createProp } from './propfactory.js';
 import { getTexture } from '../render/textures.js';
-import { levelTexture } from './geobuilder.js';
+import { levelTexture, mergeStaticMeshes } from './geobuilder.js';
 import { G } from '../physics/physics.js';
 import { buildOutposts } from './outposts.js';
 import { buildBiomeDecor } from './outdoor_biomes.js';
@@ -415,6 +415,13 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
     return obj;
   };
 
+  // plain decorative props (POI junk, landmarks, lamp posts, pond reeds) are merged per material + 24 m cell at the end of the build
+  // (draw calls); anything with animated / interactive sub-parts is left alone by the userData whitelist below
+  const placed = [];
+  const STATIC_KEYS = new Set(['colliders', 'lights', 'propId', 'suggestedY', 'size', 'mount', 'collider']);
+  const placeStatic = (...a) => { const o = placeProp(...a); if (o) placed.push(o); return o; };
+  const isStaticProp = (o) => { let ok = true; o.traverse((n) => { if (ok) for (const k in n.userData) if (!STATIC_KEYS.has(k)) { ok = false; break; } }); return ok; };
+
   // facility entrance building (front faces the ship)
   const e = plan.entrance;
   const entYaw = Math.atan2(-e.x, -e.z);
@@ -454,7 +461,7 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
     for (let k = 0; k < 8; k++) {
       const a = rng.float(0, Math.PI * 2);
       const rx = p.x + Math.cos(a) * (p.r * 1.3), rz = p.z + Math.sin(a) * (p.r * 1.3);
-      placeProp(rng.chance(0.6) ? 'grass_clump' : 'rock_small', rx, rz, rng.float(0, 6.28));
+      placeStatic(rng.chance(0.6) ? 'grass_clump' : 'rock_small', rx, rz, rng.float(0, 6.28));
     }
     interactables.push({ type: 'pond', pos: new THREE.Vector3(p.x, p.y, p.z), r: p.r * 1.25 + 2.5 });
   }
@@ -551,7 +558,7 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
     for (let t = 0; t < 20; t++) {
       const x = rng.float(-115, 115) * sc, z = rng.float(-115, 115) * sc;
       if (avoid(x, z, 8)) continue;
-      placeProp(lm, x, z, rng.float(0, 6.28));
+      placeStatic(lm, x, z, rng.float(0, 6.28));
       break;
     }
   }
@@ -563,7 +570,7 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
     for (let t = 0; t < 10; t++) {
       const x = rng.float(-120, 120) * sc, z = rng.float(-120, 120) * sc;
       if (avoid(x, z, 2)) continue;
-      placeProp(id, x, z, rng.float(0, 6.28));
+      placeStatic(id, x, z, rng.float(0, 6.28));
       if (rng.chance(0.4)) outdoorScrapSpots.push({ x: x + rng.float(-3, 3), z: z + rng.float(-3, 3) });
       break;
     }
@@ -577,13 +584,14 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
   for (let k = 3; k < terrain.pathPts.length - 2; k += 6) {
     const p = terrain.pathPts[k];
     if (Math.hypot(p.x + 3.5, p.z + 1) < 18) continue;
-    placeProp('lamp_post', p.x + 3.5, p.z + 1, rng.float(0, 6.28));
+    placeStatic('lamp_post', p.x + 3.5, p.z + 1, rng.float(0, 6.28));
   }
 
   // wave 1 landmarks: geometry + colliders + chest / scrap spots (own RNG streams: the layout above is unchanged)
   let landmarks = null;
   try { landmarks = buildLandmarks({ seed, moon, plan, terrain, group, addBox, emitters, avoid: avoidBase, sites: landmarkSites }); } catch (err) { console.warn('landmarks', err); landmarks = null; }
 
+  try { if (!globalThis.__kefalNoOutMerge) mergeStaticMeshes(placed.filter(isStaticProp), group); } catch (err) { console.warn('outdoor prop merge', err); }
   for (const em of emitters) lightPool.add(em);
   for (const s of outdoorScrapSpots) s.y = terrain.heightAt(s.x, s.z);
 

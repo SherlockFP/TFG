@@ -626,7 +626,7 @@ export function installHorde(game) {
   function update(dt) {
     if (S.disposed) return;
     if (isHost()) { try { hostUpdate(dt); } catch (e) { console.warn('[horde] host', e); } }
-    SWARM.update(dt);
+    SWARM.update(dt, game.engine?.scene, game.camera?.position);   // normally already advanced by CreatureManager.update this frame (deduped)
     camera.update();
     viewTick(dt);
     tickFx(dt);
