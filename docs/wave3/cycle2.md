@@ -100,6 +100,8 @@ valueMul, scrapKeep, scrapAdd, speedMul, eliteMul, dmgTaken, dmgDealt, weather, 
 | `node tools/harness/cycle2_i18n.test.mjs` | every string has TR + RU with the same placeholders |
 
 ## Honest gaps
+> **Update (wave 4, `docs/wave4/cycle3.md`):** the arena puzzle (three relays), Trophy Hall (ship wall), CASE dossiers, Hidden Gate, Gate Break -> SIEGE, red / ranked gates and the `shrines` mutator are done; ARCHIVE and Hunter Rank are not.
+
 - **Never run in a browser**: boss model proportions / animation, name card + HP bar layout, ring telegraphs, the maze + arena look (props, lamps, lighting), zone toasts,
   terminal text, 2-player sync of `cyx` / `run.cycle`, host migration. The facility builder ran in node with stub physics (geometry + spots), not in a renderer.
 - Not done: the "1 short puzzle" per core (the arena auto-opens after 720 s instead), Trophy Hall placement + ship part + first-kill cosmetic (first kill = extra shard only),

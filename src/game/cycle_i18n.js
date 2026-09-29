@@ -34,6 +34,7 @@ const TR = {
   'THE DEEP FEED': 'DERİN AKIŞ',
   'PATCH 1.0 installed.': 'YAMA 1.0 kuruldu.',
   'Staying in the classic loop.': 'Klasik döngüde kalınıyor.',
+  'GLITCH GATE {r} armed: pull the lever': 'GLITCH KAPISI {r} kuruldu: kolu çek',
   // ---- core / arena
   '{@n}: the boss waits in the arena. {k} access card(s) needed - the Key Holders carry them.': '{@n}: patron arenada bekliyor. {k} erişim kartı gerekli - Anahtar Sahipleri taşıyor.',
   '{@n} dropped an ARENA ACCESS CARD!': '{@n} bir ARENA ERİŞİM KARTI düşürdü!',
@@ -301,7 +302,7 @@ const RU = {
   'PATCH 1.0 is available: type ENDLESS ACCEPT (or ENDLESS DECLINE to stay in the classic loop).': 'ПАТЧ 1.0 доступен: введи ENDLESS ACCEPT (или ENDLESS DECLINE, чтобы остаться в классике).',
   'DEPTH': 'ГЛУБИНА', 'METER': 'ШКАЛА', 'decay': 'убыль', 'day': 'день', 'next day is a RELIEF day': 'следующий день - ДЕНЬ ПЕРЕДЫШКИ', 'Loot': 'Добыча', 'creature power': 'сила существ', 'sales': 'продажи',
   'ACTIVE MUTATORS:': 'АКТИВНЫЕ МУТАТОРЫ:', 'No mutators yet (PATCH NOTES every 3 depths).': 'Мутаторов пока нет (ЗАМЕТКИ К ПАТЧУ каждые 3 глубины).', 'GATE': 'ВРАТА', 'RED GATE': 'КРАСНЫЕ ВРАТА', 'S-RANK GATE': 'ВРАТА S-РАНГА', 'rank': 'ранг', 'title': 'титул',
-  'type GATE to enter (chest x{c}).': 'введи GATE, чтобы войти (сундук x{c}).', 'DAYS (meet the quota)': 'ДНИ (выполни квоту)',
+  'type GATE to enter (chest x{c}).': 'введи GATE, чтобы войти (сундук x{c}).', 'GLITCH GATE {r} armed: pull the lever': 'Глитч-врата {r} выбраны: дёрни рычаг', 'DAYS (meet the quota)': 'ДНИ (выполни квоту)',
 };
 
 addTranslations(TR, 'tr');

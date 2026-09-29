@@ -159,6 +159,10 @@ import { installPets } from './pets.js';
 import { installCycle } from './cycle.js';   // [cycle] inert: rules only, see docs/wave2/cycle.md
 
 
+// [import:cycle3]
+import { installCycle3 } from './cycle3.js';   // wave 4: Glitch Gates (red / hidden), Trophy Wall, cycle case files, Elevator Stop, relay puzzle (docs/wave4/cycle3.md)
+
+
 import { installWorlds2 } from './worlds2.js';   // wave 3: Soviet raids + twin-sun planet + plasma blade + fauna + loot pacing (docs/wave3/worlds2.md)
 
 
@@ -325,6 +329,10 @@ export class Game extends Emitter {
 
 
     this.useModule('cycle', installCycle);   // [cycle]
+
+
+    // [slot:cycle3]
+    this.useModule('cycle3', installCycle3);
 
 
     this.useModule('worlds2', installWorlds2);   // [worlds2]

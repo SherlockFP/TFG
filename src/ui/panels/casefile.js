@@ -6,6 +6,8 @@ import { getLang, t } from '../../core/i18n.js';
 import { escapeHtml } from '../../core/util.js';
 
 const tr = () => { try { return getLang() === 'tr'; } catch { return false; } };
+/** other modules register a renderer for their own case kind: caseRenderers[kind] = (c, opts) => HTMLElement, caseTexts[kind] = (c) => string (terminal CASE <n>) */
+export const caseRenderers = {}, caseTexts = {};
 const L = (en, trs) => (tr() ? trs : t(en));   // RU: dictionary keyed by the English text
 const STYLE_ID = 'tfg-lore-case-style';
 const CSS = `
@@ -88,6 +90,8 @@ function verdictOf(c) {
 /** The case file card. opts: { game, cinematic } */
 export function renderCaseCard(c, opts = {}) {
   ensureCaseStyle();
+  const ext = c?.kind && caseRenderers[c.kind];
+  if (ext) return ext(c, opts);
   const card = mk('div', 'lcase' + (opts.cinematic ? '' : ' mini'));
   const top = mk('div', 'lc-top');
   const left = mk('div', '', `<div class="lc-no">CASE #${escapeHtml(c.n)}</div><div class="lc-org">${L('THE ALGORITHM · CONTENT REVIEW DIVISION · CLASSIFIED', 'ALGORİTMA · İÇERİK İNCELEME BİRİMİ · GİZLİ')}</div>`
