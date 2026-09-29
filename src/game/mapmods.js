@@ -24,7 +24,7 @@ const BOOM_DMG = 22, BOOM_R = 3.2, BOOM_FUSE_MS = 1500, BOOM_MAX_PER_DAY = 6;
 /** items + model (idempotent: every new Game re-installs the module) */
 function registerMapItem() {
   if (!ITEMS[MAP_ITEM]) {
-    registerItem({ id: MAP_ITEM, name: 'Sector Map', kind: 'consumable', price: 110, weight: 1, hands: 1, shop: 'consumables', tier: 'uncommon',
+    registerItem({ id: MAP_ITEM, name: 'Sector Map', kind: 'consumable', price: 200, weight: 1, hands: 1, shop: 'consumables', tier: 'uncommon',
       tip: 'Use at the ship terminal: ATLAS REROLL rerolls tomorrow\'s landing, ATLAS ADD adds one affix. Riskier landing, better payout.' });
   }
   const mm = typeof window !== 'undefined' ? window.__kefalMods : null;

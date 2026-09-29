@@ -29,6 +29,13 @@ import { generateSector, MODIFIERS } from '../../src/game/moongen.js';
 import { DAILY_EVENTS } from '../../src/game/dailyEvents.js';
 import { CREATURES, spawnTable, creatureLevelStats } from '../../src/game/creatures.js';
 import * as DIFF from '../../src/game/difficulty.js';
+import { rollMap, addAffix, effectsOf, rewardOf } from '../../src/game/mapmods_core.js';   // wave 8 layer (see below)
+import * as RS from '../../src/game/resto_core.js';
+import { JOBS as FJ, SIDE_MUL as FJ_SIDE, FAIL_FEE as FJ_FEE, ARCH_CHANCE as FJ_ARCH } from '../../src/game/facjobs_core.js';
+import { TUNE as LCT } from '../../src/game/lcmonsters_core.js';
+import { THEMES as W3T, W3_ITEMS, doorChance as w3DoorChance } from '../../src/game/worlds3_core.js';
+import { FC } from '../../src/game/feedcams_core.js';
+import { MN } from '../../src/game/mining_core.js';
 import { scaleFor } from '../../src/game/balance_core.js';   // wave-1 balance: sector creature scale + threat (default ON, --no-balance = the old flat numbers)
 import {
   nextQuota, scrapValueMul, scrapCountBonus, indoorPowerMul, outdoorPowerMul, creatureBaseLevel,
@@ -43,8 +50,11 @@ const CSV = args.includes('--csv');
 const BALANCE_ON = !args.includes('--no-balance');
 const MODE = DIFF.norm(argv('--mode', DIFF.DEFAULT_MODE));
 const MODES_ONLY = args.includes('--modes-only');
+const PRE8 = args.includes('--pre8');                       // the economy before wave 8: no wave-8 layer and indoor loot x0.7 (pre-wave-8 median for 4 competent Standard was 8 quotas)
+const W8 = !PRE8 && !args.includes('--no-wave8');          // wave-8 income / cost layer (docs/wave8/econ8.md)
 DIFF.setMode(MODE);
 const AVG_THREAT = +argv('--avg-threat', 40);   // mean Threat over a landing for a crew that holds loot and stays a while (see docs/wave1/balance.md)
+if (PRE8) BALANCE.lootCountMul = 0.7;
 Object.assign(BALANCE, JSON.parse(argv('--bal', '{}')));   // try knob changes without editing: --bal '{"levelPerQuota":0.5}'
 
 // ---------------------------------------------------------------- deterministic rng
@@ -184,10 +194,84 @@ function killXp(m, q, level) {
 }
 const META_XP_PER_HOUR = (lv) => 450 + 12 * lv;   // bounties (~1/h, lvScale), achievements + codex (~34k over ~60 h), login
 
+// ---------------------------------------------------------------- wave 8 layer (docs/wave8/econ8.md)
+// What wave 8 added to credits per day, modelled from the REAL constants where a core module exports them. Assumptions (crew behaviour) are in W8K.
+// Everything is gated by W8, so --no-wave8 / --pre8 reproduce the old numbers exactly (no extra rand() calls).
+const W8K = Object.assign({
+  cursedNet: 0.03,              // lcmonsters: 7 % of scrap is cursed x1.6 -> +4.2 % value, minus what crews leave behind (heavy / whispers / lure)
+  lcDanger: 1.05,               // lcmonsters events (witch, keeper, mimics) add a little creature pressure per landing
+  lanternP: 0.35, snatch: { average: 0.4, competent: 0.55, great: 0.7 },   // Lantern Keeper on a landing / crew steals the lantern (value LCT.lanternValue)
+  mapBuy: 0.5, mapMinCredits: 520, mapPrice: 200,   // mapmods: share of crews that buy a Sector Map (ATLAS ADD) once they hold this many credits
+  camMarked: { average: 0.22, competent: 0.15, great: 0.08 }, camCover: 0.9,   // feedcams: share of carried scrap that is ON AIR when it reaches the ship / share of moons with cams
+  jobDone: { average: 0.55, competent: 0.75, great: 0.9 }, jobDivert: 0.08, sideP: 0.55, sideDone: 0.7, jobPartial: 0.4,   // facjobs
+  crate: { wood: 40, iron: 90, gold: 200 },     // sale value of a job crate's contents (mostly components / tools, at most 2 scrap items)
+  mineP: { average: 0.25, competent: 0.35, great: 0.35 }, mineMin: { average: 3, competent: 5, great: 6 }, orePerMin: 30,   // mining: share of days a crew digs / minutes of ONE player / ore value per minute
+  pocketEnter: { average: 0.5, competent: 0.7, great: 0.8 }, pocketDivert: 0.18, pocketWipe: 0.008,   // worlds3 pockets
+  restoP: 0.5, restoMin: 5, restoSetup: 500, restoDone: 0.7,   // resto: share of runs that keep a diner / minutes on the homeworld per cycle / cost of the first pieces / contract + inspector success
+  arcadeClout: 40,              // arcade2: per player per UTC day (a ~5 h session), counted 1 Clout = 1 credit for the share
+}, JSON.parse(argv('--w8', '{}')));
+const POCKET_VAL = (() => {   // mean sale value of a pocket's loot at scrapValueMul 1 (theme loot tables x the theme's lootMul; Level 0 keeps the stock loot)
+  const w3 = Object.fromEntries(W3_ITEMS.map((d) => [d.id, (d.value[0] + d.value[1]) / 2]));
+  const v = (id) => w3[id] ?? avgVal(id);
+  const per = Object.values(W3T).filter((T) => T.loot).map((T) => {
+    const L = T.loot, tot = L.pool.reduce((a, [, w]) => a + w, 0);
+    return (L.sigN * (L.sig.reduce((a, id) => a + v(id), 0) / L.sig.length) + L.n * L.pool.reduce((a, [id, w]) => a + v(id) * w / tot, 0)) * (T.lootMul || 1);
+  });
+  return { l0: SCRAP_AVG.backrooms * 5, other: per.reduce((a, b) => a + b, 0) / per.length };
+})();
+const jobList = Object.values(FJ).filter((j) => j.main);
+const sideList = Object.values(FJ).filter((j) => j.side);
+/** one landing: the affix map + job / mining / pocket / lantern extras. Returns the merged event and what to add after the normal haul. */
+function w8Day(crew, q, gday, ev, mapObj, sk) {
+  const out = { ev, mul: 1, addSold: 0, divert: 0, wipeAdd: 0, ore: 0, job: 0, crate: 0, pocket: 0, lantern: 0 };
+  const fx = effectsOf(mapObj.a);
+  out.ev = { ...ev, valueMul: (ev.valueMul || 1) * (fx.valueMul || 1), dangerMul: (ev.dangerMul || 1) * (fx.dangerMul || 1) * W8K.lcDanger, extraScrap: (ev.extraScrap || 0) + (fx.extraScrap || 0), eliteAdd: (ev.eliteAdd || 0) + (fx.eliteAdd || 0), blackout: ev.blackout || fx.blackout };
+  out.mul *= 1 + W8K.cursedNet;
+  out.mul *= 1 - W8K.camCover * W8K.camMarked[sk] * FC.tax;            // viewer tax
+  if (rand() < W8K.lanternP && rand() < W8K.snatch[sk]) { out.lantern = (LCT.lanternValue[0] + LCT.lanternValue[1]) / 2; out.addSold += out.lantern; }
+  // facility jobs (credits + a crate that is sold like scrap)
+  if (rand() < FJ_ARCH) {
+    const J = jobList[Math.floor(rand() * jobList.length)], m = 1 + 0.15 * q;
+    out.divert += W8K.jobDivert;
+    if (rand() < W8K.jobDone[sk]) { out.job += J.cr * m; out.crate += W8K.crate[J.tier] || 0; }
+    else if (rand() < W8K.jobPartial) out.job += J.cr * m * 0.7 * 0.5;
+    else out.job -= FJ_FEE;
+    if (rand() < W8K.sideP) {   // a side job on the same day
+      const S = sideList[Math.floor(rand() * sideList.length)];
+      out.divert += 0.02;
+      if (rand() < W8K.sideDone) { out.job += S.cr * m * FJ_SIDE; out.crate += S.tier === 'gold' ? W8K.crate.iron : W8K.crate[S.tier] || 0; }
+    }
+  }
+  // mining (ore is scrap: it is sold for the quota; hard-capped per moon and day)
+  if (rand() < W8K.mineP[sk]) { out.ore = Math.min(MN.valueCap, W8K.orePerMin * W8K.mineMin[sk]); out.divert += W8K.mineMin[sk] / REAL_DAY_MIN / crew.n; }
+  // worlds3 pocket (wrong door): guaranteed every 3rd day, else 22 %
+  if (rand() < w3DoorChance(gday) && rand() < W8K.pocketEnter[sk]) {
+    out.pocket = (gday <= 1 ? POCKET_VAL.l0 : POCKET_VAL.other) * scrapValueMul(q) * 0.95;
+    out.divert += W8K.pocketDivert; out.wipeAdd += W8K.pocketWipe;
+  }
+  out.addSold += out.ore + out.crate + out.pocket;
+  return out;
+}
+/** diner income for cycle k of a run that keeps one (gross credits; setup and upgrades are a separate sink) */
+function restoCycle(k) {
+  const stars = Math.min(5, 1 + Math.floor((k - 1) / 2));
+  const dishes = RS.DISHES.filter((d) => d.star <= stars);
+  const price = dishes.reduce((a, d) => a + d.price, 0) / dishes.length * 0.95;
+  const arrival = Math.max(22, 62 - 6 * stars - 8 - 5);
+  const active = Math.min(3 * (RS.ECON.dayCapBase + RS.ECON.dayCapPerStar * stars), W8K.restoMin * 60 / arrival * 0.8 * price);
+  const passive = 3 * (RS.ECON.passiveBase + RS.ECON.passivePerStar * stars);
+  const contract = stars >= 3 ? W8K.restoDone * (RS.ECON.contractBase + RS.ECON.contractPerStar * stars) / (RS.ECON.contractGap / 3) : 0;
+  const insp = W8K.restoDone * (80 + 40 * stars) / (RS.ECON.inspectEvery / 3);
+  return { active, passive, contract, insp, stars, total: active + passive + contract + insp };
+}
+
 // ---------------------------------------------------------------- one run
 function simRun(crew, runKey, stats) {
   let q = 0, quota = nextQuota(0, 0, rand), credits = 60, stash = 0, minutes = 0, xp = 0, current = 'hamsi', van = false;
   const perCycle = [];
+  const inc = { scrap: 0, ore: 0, crate: 0, job: 0, pocket: 0, lantern: 0, resto: 0, arcade: 0, map: 0 };   // where the run's income came from (wave 8 layer)
+  const sk0 = crew.skill, usesResto = W8 && rand() < W8K.restoP;
+  let restoK = -1, restoSpent = 0, mapNow = null;
   for (;;) {
     // ---- routing (quota-aware, like real crews): the safest affordable moon whose expected 3-day haul covers
     // the quota with a margin; ambitious crews also want surplus. Nothing covers it -> best risk-adjusted value.
@@ -216,9 +300,18 @@ function simRun(crew, runKey, stats) {
     for (let d = 0; d < 3; d++) {
       const e = pickW(DAILY_EVENTS);
       const w = m.weather[Math.floor(rand() * m.weather.length)];
-      const o = landingOutcome(crew, m, q, e, w);
+      let w8 = null;
+      if (W8) {
+        let mp = rollMap(runKey + ':' + q + ':' + d, q);                 // every landing carries a free rolled map
+        if (d === 0 && credits >= W8K.mapMinCredits && rand() < W8K.mapBuy) { credits -= W8K.mapPrice; mp = addAffix(mp, runKey + ':' + q, q); }   // Sector Map: ATLAS ADD
+        w8 = w8Day(crew, q, q * 3 + d + 1, e, mp, sk0);
+      }
+      const o = landingOutcome(crew, m, q, w8 ? w8.ev : e, w);
+      if (w8) { o.wipe = Math.min(0.95, o.wipe + w8.wipeAdd); w8.pocket *= SKILL[sk0].eff; w8.addSold = w8.ore + w8.crate + w8.pocket + w8.lantern; }
       rSum += o.r;
-      const got = o.value * o.eff * (van ? 1.08 : 1) * noise(0.3);
+      const base = o.value * o.eff * (van ? 1.08 : 1) * noise(0.3) * (w8 ? w8.mul * (1 - w8.divert) : 1);
+      const got = base + (w8 ? w8.addSold : 0);
+      if (w8) { inc.scrap += base; inc.ore += w8.ore; inc.crate += w8.crate; inc.pocket += w8.pocket; inc.lantern += w8.lantern; }
       minutes += REAL_DAY_MIN * clamp((1440 - (e.startTime || 480)) / 960 / (e.timeMul || 1), 0.5, 1);
       // XP for this landing (per player)
       const lv = o.threat.level;
@@ -238,11 +331,19 @@ function simRun(crew, runKey, stats) {
       credits -= Math.min(credits, Math.round(credits * 0.1 * dd));
       stash += got * (1 - 0.5 * dd / crew.n * 0.3);        // a dead player's carried scrap is often lost
       cycleValue += got;
+      if (w8) { credits = Math.max(0, credits + w8.job); inc.job += w8.job; }   // job pay goes straight to credits (not the quota)
       xp += dxp + (40 + m.tier * 20 + q * 10) * (1 - dd / crew.n);
     }
     minutes += CYCLE_OVERHEAD_MIN;
     const sold = stash; stash = 0;
     credits += sold;
+    if (W8) {
+      inc.arcade += W8K.arcadeClout * crew.n * ((REAL_DAY_MIN * 3 + CYCLE_OVERHEAD_MIN) / 300);
+      if (usesResto) {   // keep a diner: first the setup, then gross income per cycle; half of it is re-invested in pieces until the ~6.5k build is done
+        if (restoK < 0 && credits >= W8K.restoSetup + 300) { credits -= W8K.restoSetup; restoK = 0; }
+        else if (restoK >= 0) { restoK++; const r = restoCycle(restoK); credits += r.total; inc.resto += r.total; const sp = Math.min(6500 - restoSpent, r.total * 0.5); restoSpent += sp; credits -= sp; }
+      }
+    }
     xp += 0.25 * sold / Math.sqrt(crew.n);
     xp += META_XP_PER_HOUR(stats.level) * ((REAL_DAY_MIN * 3 + CYCLE_OVERHEAD_MIN) / 60);
     perCycle.push({ q, quota, sold, moon: m.id, tier: m.tier, cost: best.cost, credits, wipes, deaths, r: rSum / 3, met: sold >= quota });
@@ -254,7 +355,7 @@ function simRun(crew, runKey, stats) {
     { const nq = nextQuota(quota, q, rand); quota = Math.round(quota + (nq - quota) * DIFF.quotaGrowthMul(surplusRatio, q)); }   // wave 5: growth x1..1.15 for crews that overshoot
     if (q >= 40) break;
   }
-  return { quotas: q, perCycle, minutes, xp };
+  return { quotas: q, perCycle, minutes, xp, inc, usesResto };
 }
 
 const pct = (a, p) => { const s = [...a].sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.floor(p * s.length))]; };
@@ -304,7 +405,39 @@ function modeComparison() {
   return out;
 }
 
-if (MODES_ONLY) { console.log(`TFG economy sim (modes only) runs/crew=${RUNS} seed=${SEED}`); modeComparison(); process.exit(0); }
+
+// ---------------------------------------------------------------- wave 8: where the income comes from + shop items
+function w8Report() {
+  const N = +argv('--cmp-runs', Math.min(RUNS, 300));
+  console.log(`\n== WAVE 8 income mix (${MODE}, runs/crew=${N}; per run, credits-equivalent; W8 layer ${W8 ? 'ON' : 'OFF'}) ==`);
+  if (!W8) { console.log('(layer off)'); return; }
+  console.log('crew        | quotas | scrap  ore  crate pocket lantern | jobs | diner (resto runs) | arcade | passive% (resto+ore+arcade) all runs / diner runs | side% (+jobs+crate+pocket)');
+  for (const [label, n, skill] of [['4 average', 4, 'average'], ['4 competent', 4, 'competent'], ['2 great', 2, 'great']]) {
+    const A = [], D = [], qs = [];
+    for (let i = 0; i < N; i++) { rand = mulberry(SEED ^ (n * 7919) ^ skill.length * 104729 ^ Math.imul(i + 1, 2654435761)); const r = simRun({ n, skill }, 'R' + i, { level: 25 }); qs.push(r.quotas); (r.usesResto ? D : A).push(r.inc); }
+    const all = [...A, ...D], mean = (L, k) => (L.length ? L.reduce((a, x) => a + x[k], 0) / L.length : 0);
+    const share = (L) => { const t = L.reduce((a, x) => a + x.scrap + x.ore + x.crate + x.job + x.pocket + x.lantern + x.resto + x.arcade, 0), p = L.reduce((a, x) => a + x.resto + x.ore + x.arcade, 0), sd = L.reduce((a, x) => a + x.resto + x.ore + x.arcade + x.job + x.crate + x.pocket, 0); return [p / t * 100, sd / t * 100]; };
+    const sa = share(all), sd = share(D);
+    console.log(`${label.padEnd(11)} | ${pad(pct(qs, 0.5), 5)}  | ${['scrap', 'ore', 'crate', 'pocket', 'lantern'].map((k) => pad(fmt(mean(all, k)), 6)).join(' ')} | ${pad(fmt(mean(all, 'job')), 4)} | ${pad(fmt(mean(D, 'resto')), 7)} | ${pad(fmt(mean(all, 'arcade')), 5)} | ${fmt(sa[0], 1)}% / ${fmt(sd[0], 1)}% | ${fmt(sa[1], 1)}% / ${fmt(sd[1], 1)}%`);
+  }
+  // diner per cycle (upper bound: a crew that keeps it open every cycle)
+  console.log('\ndiner gross per cycle by cycle number k (stars 1,1,2,2,3...): active / passive / contract / inspector = total');
+  for (const k of [1, 2, 3, 4, 6, 8]) { const r = restoCycle(k); console.log(`k=${k} stars ${r.stars}: ${fmt(r.active)} / ${fmt(r.passive)} / ${fmt(r.contract)} / ${fmt(r.insp)} = ${fmt(r.total)}`); }
+  // shop items: is the price in a sane band? expected credits gained per use vs price, 4 competent
+  console.log('\nshop items (4 competent, one landing at that q): gain per use vs price');
+  const crew = { n: 4, skill: 'competent' };
+  for (const q of [0, 3, 6, 10]) {
+    const mm = q >= 3 ? MOONS.palamut : MOONS.hamsi;
+    const base = landingOutcome(crew, mm, q, {}, 'clear'), haul = base.value * base.eff;
+    let vs = 0, qs2 = 0, dg = 0; const K = 400;
+    for (let i = 0; i < K; i++) { const mp = addAffix(rollMap('SH' + i, q), 'SHA' + i, q), rw = rewardOf(mp.a), fx = effectsOf(mp.a); vs += rw.val; qs2 += rw.qty; dg += (fx.dangerMul || 1); }
+    const mapGain = haul * (vs / K / 100 + qs2 / K / 100 * 0.6);
+    const ore = Math.min(MN.valueCap, W8K.orePerMin * W8K.mineMin.competent), oreLoss = haul * W8K.mineMin.competent / REAL_DAY_MIN / crew.n;
+    console.log(`q${pad(q, 2)} day haul ~${pad(fmt(haul), 5)} | Sector Map (${W8K.mapPrice}): +${fmt(mapGain)} (val +${fmt(vs / K)}% qty +${fmt(qs2 / K)}%, danger x${fmt(dg / K, 2)}) | Pickaxe day: ore ${fmt(ore)} - lost hauling ${fmt(oreLoss)} = ${fmt(ore - oreLoss)} (one-off 45; Steel 140 / Drill 380 only dig faster) | job day: ${fmt(FJ.power.cr * (1 + 0.15 * q))} cr + crate vs -${fmt(haul * W8K.jobDivert)} hauling`);
+  }
+}
+
+if (MODES_ONLY) { console.log(`TFG economy sim (modes only) runs/crew=${RUNS} seed=${SEED}`); modeComparison(); w8Report(); process.exit(0); }
 
 // ---------------------------------------------------------------- run everything
 
@@ -432,6 +565,7 @@ for (const s of summary) console.log(`${s.label.padEnd(13)} | ${pad(s.p10, 4)} $
 }
 
 modeComparison();
+w8Report();
 
 if (CSV) {
   console.log('\ncrew,p10,p50,p90,mean,hours,xph');

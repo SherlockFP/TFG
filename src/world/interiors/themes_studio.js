@@ -153,7 +153,7 @@ export const MUSEUM = {
       banned_wing: { floor: 'st_gfloor', wall: 'st_redacted', ceil: 'metal_dark', lamp: 'ceiling_lamp', lampColor: 0xff9088, center: ['st:glass_case'], wall_: ['st:art_frame', 'st:art_frame', 'st:stanchion'], clutter: [], posters: 0 },
       archive: { floor: 'concrete_dark', wall: 'st_redacted', ceil: 'metal_dark', lamp: 'ceiling_lamp', lampColor: 0xff8070, rows: 'shelf_metal', wall_: ['filing_cabinet', 'shelf_metal'], clutter: ['cardboard_boxes'], posters: 0 },
       restoration: { floor: 'concrete', wall: 'st_gallery', ceil: 'metal_dark', lamp: 'fluorescent', lampColor: 0xe8f0ff, center: ['table'], wall_: ['shelf_metal', 'sink', 'cupboard'], clutter: ['cardboard_boxes', 'wet_floor_sign'], posters: 0 },
-      gift_shop: { floor: 'tiles_checker', wall: 'st_gallery', ceil: 'metal_dark', lamp: 'ceiling_lamp', lampColor: C_SPOT, center: ['table', 'table'], wall_: ['vending_machine', 'shelf_metal', 'sell_counter'], clutter: ['cardboard_boxes'], posters: 1 },
+      gift_shop: { floor: 'tiles_checker', wall: 'st_gallery', ceil: 'metal_dark', lamp: 'ceiling_lamp', lampColor: C_SPOT, center: ['table', 'table'], wall_: ['vending_machine', 'shelf_metal', 'cupboard'], clutter: ['cardboard_boxes'], posters: 1 },
       generator: GEN,
       vault: { ...VAULT, floor: 'st_gfloor' },
       nest: { floor: 'st_gfloor', wall: 'st_gallery', ceil: 'metal_dark', lamp: null, wall_: [], clutter: ['cobweb', 'hanging_chains'], webs: true },
