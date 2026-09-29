@@ -8,10 +8,12 @@ const SIDES = {
   bottom: 'position:fixed;left:50%;bottom:92px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:none;z-index:6',
   left: 'position:fixed;left:14px;bottom:170px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;pointer-events:none;z-index:6;max-width:300px',
 };
+import { startLayout } from './docklayout.js';   // wave 8: one layout manager (stacking + priority) for docks and banners
 const docks = {};
 
 function dockEl(side) {
   if (docks[side]?.isConnected) return docks[side];
+  startLayout(docks);
   const d = document.createElement('div');
   d.className = 'hud-dock hud-dock-' + side;
   d.style.cssText = SIDES[side] || SIDES.right;

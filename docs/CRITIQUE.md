@@ -285,3 +285,5 @@ The interior loop finally has jobs (8 types, main + side) and three new labyrint
 
 ## Wave 8 - studio (docs/wave8/studio.md)
 Copy and consistency pass; browser not run: the six new 64x96 posters and the pictogram achievement cards have not been looked at, the Algorithm still leans on "content / engagement" in nearly every line, and about 370 keys per language are still untranslated in the i18n audit (mostly a11y / cycle3). Placeholder tool models (axe, pickaxe, forge shards) are listed for an art pass.
+## Wave 8 - declutter (docs/wave8/declutter.md)
+Contextual fade is driven by a text signature per widget, so a module that rewrites words every frame stays visible; mirror/VHS captions still use ui3.css tops instead of the layout manager; level-up toast still says [TAB] for the skill tree (it is K); RPS wager Y also casts role skill 1.

@@ -203,7 +203,8 @@ export function installGuide(game) {
     const s = tutCurrent(gs);
     if (!s) return;
     const idx = TUT_STEPS.indexOf(s) + 1;
-    add(T('tut_obj', { n: idx, total: TUT_TOTAL, text: stepObjective(s, lang(), { hasFlashlight: hasFlashlight() }) }), 'main', false, tutStepProgress(gs, s.id) || null);
+    const tutLine = add(T('tut_obj', { n: idx, total: TUT_TOTAL, text: stepObjective(s, lang(), { hasFlashlight: hasFlashlight() }) }), 'main', false, tutStepProgress(gs, s.id) || null);
+    if (tutLine && typeof tutLine === 'object') tutLine.pin = true;   // wave 8: never hidden by the calm HUD cut
     if (S.tutT < 300) add(T('tut_skip_hint'), 'hint');
     void phase;
   });

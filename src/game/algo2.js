@@ -47,7 +47,7 @@ export function installAlgo2(game) {
   const run = () => game.run;
   const a2 = () => { const r = run(); if (!r) return null; return (r.a2 = r.a2 || { ghosts: {}, patch: 0, want: 0 }); };
   const enabled = () => game.config?.algo2 !== false;
-  const feedOn = () => game.settings?.a2Feed !== false;
+  const feedOn = () => game.settings?.a2Feed === true;   // wave 8 declutter: the fake chat is opt-in (Settings > HUD)
   const moonOf = () => MOONS[run()?.moon];
   const facOf = () => game.world?.facility || null;
   function inFacilityDay() { const r = run(); return !!r && r.phase === 'moon' && !!facOf() && !moonOf()?.company && !moonOf()?.home; }

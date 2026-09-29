@@ -19,6 +19,7 @@ const add = (s) => logs.set(s, (logs.get(s) || 0) + 1);
 p.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') add(m.type() + ': ' + m.text().slice(0, 400)); });
 p.on('pageerror', (e) => add('pageerror: ' + String(e.stack || e.message).slice(0, 800)));
 await p.exposeFunction('__shot', async (name) => { await p.screenshot({ path: `${shotDir}/${name}.png` }); return true; });
+await p.exposeFunction('__view', async (w, h) => { await p.setViewportSize({ width: w, height: h }); return true; });
 await p.goto(`http://127.0.0.1:${port}${url}`);
 await p.waitForFunction(() => window.kefal?.game, null, { timeout: 120000 }).catch(() => add('TIMEOUT: kefal.game never appeared'));
 await p.waitForTimeout(wait);
