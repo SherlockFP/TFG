@@ -37,6 +37,7 @@ import { UI as GUIDE_UI, pick as guidePick } from '../game/guide_data.js';   // 
 import { resetTutorial as guideResetTutorial } from '../game/guide_core.js';   // [guide]
 import { x as obx } from '../game/onboard_text.js';   // [onboard] Settings: unlock everything / skip Hiring Day
 import { soundPackSection } from './soundpack_ui.js';   // [sfx] Settings > Audio > Sound pack
+import { hudDensitySelect } from './hudcalm_ui.js';   // [hudcalm] Settings > HUD > density
 import { syncArtdir } from './artdir.js';   // [artdir] html.tfg-artdir / ad-calm from settings
 
 // [profile] tiny avatar icon (16x16 thumbnail) for chat / lists
@@ -115,6 +116,7 @@ export class UI {
     syncArtdir(s);   // [artdir]
     this.root.classList.toggle('no-cross', s.showCrosshair === false);
     this.root.classList.toggle('no-objectives', s.showObjectives === false);
+    document.documentElement.dataset.hud = ['minimal', 'full'].includes(s.hudDensity) ? s.hudDensity : 'standard';   // [hudcalm]
     peekCharPreview()?.set({ reduceMotion: !!s.reduceMotion });
   }
   // quick CRT "channel switch" flicker on a panel (tab changes)
@@ -853,10 +855,12 @@ export class UI {
           check(t('Head bob'), 'headBob', null, true),
           check(t('Avatars above name tags'), 'tagAvatars', t("small picture over teammates' heads"), true),   // [profile]
           section(t('HUD')),
+          row(t('HUD density'), hudDensitySelect(s, apply)),   // [hudcalm] wave 8
+          el('div', { class: 'dim note' }, t('Standard: only health, hotbar, compass, objective and threat stay on screen; everything else shows when it changes. Hold Tab for the full status. Full: everything, always.')),
           check(t('Objective tracker'), 'showObjectives', null, true),
           check(t('Crosshair'), 'showCrosshair', null, true),
           check(t('Loading screen tips'), 'loadingTips', null, true),
-          check(t('Live stream chat feed'), 'a2Feed', t('fake viewers react to your stunts (cosmetic)'), true),   // [algo2]
+          check(t('Live stream chat feed'), 'a2Feed', t('fake viewers react to your stunts (cosmetic)'), false),   // [algo2]
           check(guidePick(GUIDE_UI.set_tips, getLang()), 'guideTips', guidePick(GUIDE_UI.set_tips_note, getLang()), true),   // [guide]
           row(guidePick(GUIDE_UI.set_replay, getLang()), this.button(guidePick(GUIDE_UI.set_replay, getLang()), () => {   // [guide]
             const gd = this.app.game?.guide;

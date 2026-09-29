@@ -263,3 +263,5 @@ The game now has an identity kit (wordmark, seal, the Algorithm's eye; amber = C
 Palettes are tuned by simulation, not by eye (tests check delta-E under CVD matrices), but nobody colour-blind has played it; baked creature-model eye colours are still red; pad buttons are not rebindable; mouse capture still needs one click.
 ## Wave 7 - perf2
 Low preset is unverified against the 60 percent draw-call target (instanced decor thinning cuts triangles, not calls); module-added ship props (workbench, arcade table...) still unmerged; Rapier wasm (4.3 MB) dominates first load.
+## Wave 8 - declutter (docs/wave8/declutter.md)
+Contextual fade is driven by a text signature per widget, so a module that rewrites words every frame stays visible; mirror/VHS captions still use ui3.css tops instead of the layout manager; level-up toast still says [TAB] for the skill tree (it is K); RPS wager Y also casts role skill 1.

@@ -106,6 +106,7 @@ import { installForge } from './forge.js';
 import { installMusic } from './music.js';
 import { installFeel } from './feel.js';   // wave 7: game feel (hitstop, class sounds, muzzle flash, death topple, heartbeat)
 import { installScore } from './score.js';   // wave 7: adaptive score
+import { installHudCalm } from './hudcalm.js';   // wave 8: calm HUD (density setting, contextual widgets, hold-Tab status)
 import { installSfx } from './sfx.js';   // wave 4: creature voices + footsteps + biome beds (docs/wave4/sfx.md)
 
 
@@ -521,6 +522,7 @@ export class Game extends Emitter {
 
     this.useModule('onboard', installOnboard);   // [slot:onboard] wave 5: Hiring Day + staged unlocks (installed last: wraps hostLever / terminalCommand / objectives.compute)
     this.useModule('score', installScore);   // wave 7: adaptive procedural music + the Algorithm's jingle (docs/wave7/score.md)
+    this.useModule('hudcalm', installHudCalm);   // wave 8: calm HUD (docs/wave8/declutter.md)
 
 
   }

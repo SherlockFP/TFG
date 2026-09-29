@@ -103,7 +103,7 @@ export const DEFAULT_KEYS = {
 export const ACTION_NAMES = {
   forward: 'Move forward', back: 'Move back', left: 'Strafe left', right: 'Strafe right', jump: 'Jump', crouch: 'Crouch', sprint: 'Sprint',
   interact: 'Interact / pick up', drop: 'Drop item', flashlight: 'Flashlight', ptt: 'Push to talk', chat: 'Chat', emote1: 'Quick emote 1',
-  emote2: 'Quick emote 2', menu: 'Character sheet', throwItem: 'Throw item', ping: 'Ping', sneak: 'Sneak (quiet)',
+  emote2: 'Quick emote 2', menu: 'Full status (hold)', throwItem: 'Throw item', ping: 'Ping', sneak: 'Sneak (quiet)',
   reload: 'Reload / rotate', emoteWheel: 'Emote wheel (hold)', daily: 'Daily rewards', roleSkill1: 'Role skill 1', roleSkill2: 'Role skill 2',
   hotbar1: 'Hotbar slot 1', hotbar2: 'Hotbar slot 2', hotbar3: 'Hotbar slot 3', hotbar4: 'Hotbar slot 4',
   inventory: 'Inventory', skillTree: 'Skill tree', record: 'Service record', pets: 'Pets', magicWheel: 'Spell wheel (hold)', radio: 'Walkie-talkie',

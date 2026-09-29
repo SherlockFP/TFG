@@ -20,7 +20,7 @@ export class Objectives {
   compute() {
     const g = this.game, run = g.run || {}, p = g.player;
     const out = [];
-    const add = (text, kind = 'main', done = false, progress = null) => out.push({ text, kind, done, progress });
+    const add = (text, kind = 'main', done = false, progress = null) => { const o = { text, kind, done, progress }; out.push(o); return o; };
     const moon = MOONS[run.moon];
     let shipValue = 0;
     for (const it of g.items.inShipItems()) if (isSellable(it.def) && !it.soulbound) shipValue += it.value;
@@ -101,7 +101,7 @@ export class Objectives {
     try { g.mods?.emit('objectives', add, g, run.phase); } catch (e) { console.warn('objectives hook', e); }   // wave-1 modules add lines here
     for (const b of (g.profile.bounties || []).slice(0, out.length >= 6 ? 0 : 2)) add(`${b.done ? '✔ ' : ''}${bountyText(b)} ${b.done ? t('(claim at HQ)') : `${Math.min(b.progress, b.n)}/${b.n}`}`, 'bounty', b.done, b.n ? Math.min(1, b.progress / b.n) : 0);
     // keep the tracker readable: warnings and main goals first, at most 7 lines
-    const rank = (o) => (o.kind === 'warn' ? 0 : o.kind === 'main' ? 1 : o.kind === 'bounty' ? 3 : 2);
+    const rank = (o) => (o.pin ? -1 : o.kind === 'warn' ? 0 : o.kind === 'main' ? 1 : o.kind === 'bounty' ? 3 : 2);   // pin: the tutorial step always makes the calm 2-line cut
     return out.map((o, i) => [o, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).slice(0, 7).map((x) => x[0]);
   }
 
@@ -116,7 +116,10 @@ export class Objectives {
     this.t -= dt;
     if (this.t > 0) return;
     this.t = 0.5;
-    const list = this.compute();
+    const all = this.compute();
+    this.full = all;   // [hudcalm] the Tab status card shows every line; the HUD keeps 1 (Minimal) / 2 (Standard) / 7 (Full)
+    const dens = document.documentElement.dataset.hud;
+    const list = dens === 'full' ? all : all.slice(0, dens === 'minimal' ? 1 : 2);
     const html = list.map((o) => `<div class="obj ${o.kind}${o.done ? ' done' : ''}"><span class="obj-dot">${o.done ? '✔' : o.kind === 'warn' ? '!' : '◆'}</span>${escapeHtml(o.text)}${o.progress !== null && !o.done ? `<div class="obj-bar"><div style="width:${Math.round(o.progress * 100)}%"></div></div>` : ''}</div>`).join('');
     if (html !== this.last) { this.el.innerHTML = html; this.last = html; }
     const hidden = this.game.ui.hud?.el.classList.contains('hidden');
