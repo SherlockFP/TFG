@@ -188,7 +188,7 @@ H.svst({ op: 'label', id: 'ship0', col: '#000000' }, 'me');
 ok(structs().find((s) => s.id === 'ship0').col === S.CRATE_COLORS[0], 'colour must be from the palette');
 // far away / bad requests
 sent.length = 0;
-player.pos.set(6, 0, -3);
+player.pos.set(-6, 0, -3);   // [wave5] far from the crate (it moved to the cargo +x wall)
 H.svst({ op: 'put', id: 'ship0', it: mkItem('comp_wood').id }, 'me');
 ok(structs().find((s) => s.id === 'ship0').it.length === 0 && sent.some(([t2, d]) => t2 === 'svfx' && d.k === 'err'), 'too far from the crate: refused with a message');
 player.pos.set(crate.x, 0, crate.z - 1);

@@ -16,6 +16,7 @@ import { createBoothPlayer } from './arcade_booths.js';
 import { createRpsHost, RPS } from './arcade_rps.js';
 import { createRpsClient } from './arcade_rps_ui.js';
 import * as A from './arcade_core.js';
+import { SPOTS as SHIP_SPOTS } from '../world/shiplayout.js';
 
 HOST_ONLY.add('ar');
 
@@ -82,7 +83,7 @@ const RU = {
 
 const PY = -1.25;   // pier / pad ground height (company + homeworld)
 const SITES = {
-  ship: { place: 'ship', pos: [4.4, 0, -2.5], rotY: Math.PI / 2 },
+  ship: { place: 'ship', pos: [SHIP_SPOTS.chess.x, 0, SHIP_SPOTS.chess.z], rotY: SHIP_SPOTS.chess.ry },   // [wave5] world/shiplayout.js (it stood inside the workbench)
   hq: { place: 'company', pos: [-8.5, PY, 8], rotY: 0 },
   home: { place: 'home', pos: [-9.5, PY, 6], rotY: Math.PI / 2 },
 };

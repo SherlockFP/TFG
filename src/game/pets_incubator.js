@@ -40,9 +40,9 @@ export function installIncubator(game, api) {
     const egg = add(new THREE.SphereGeometry(0.13, 12, 10), eggMat, x, 0.9, 0);
     egg.scale.set(1, 1.3, 1); egg.visible = false;
     const barMat = M_(new THREE.MeshLambertMaterial({ color: 0x66ff99, emissive: 0x114422 }));
-    const bar = add(new THREE.BoxGeometry(0.36, 0.04, 0.02), barMat, x, 0.5, -0.32);
+    const bar = add(new THREE.BoxGeometry(0.36, 0.04, 0.02), barMat, x, 0.5, 0.325);   // [wave5] front face (local +z faces into the ship; at -0.32 the bars were on the wall side)
     bar.scale.x = 0.001;
-    const back = add(new THREE.BoxGeometry(0.38, 0.06, 0.015), M_(new THREE.MeshLambertMaterial({ color: 0x111418 })), x, 0.5, -0.31);
+    const back = add(new THREE.BoxGeometry(0.38, 0.06, 0.015), M_(new THREE.MeshLambertMaterial({ color: 0x111418 })), x, 0.5, 0.315);
     void back;
     slots.push({ egg, eggMat, bar, x });
   }

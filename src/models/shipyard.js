@@ -538,10 +538,20 @@ export function buildPaint(paint, name) {
   const mStripe = new THREE.MeshLambertMaterial({ map: stripeTex }), mBand = new THREE.MeshLambertMaterial({ map: bandTex }), mRoof = new THREE.MeshLambertMaterial({ map: roofTex });
   disp.push(mStripe, mBand, mRoof);
   const pl = (w, hh, mat, x, y, z, ry) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, hh), mat); m.position.set(x, y, z); m.rotation.y = ry; group.add(m); disp.push(m.geometry); return m; };
+  // [wave5] the stripe / band are cut around the door opening, the clerestory windows (+z) and the N1 / N2 doorways (-z): they used to run straight
+  // across them, so a painted ship looked closed from outside and the windows were painted over
+  const DOOR = { x0: 1.5, x1: 3.7 }, WIN = [[-6.3, -4.9], [-3.75, -2.55], [-1.0, 0.2]];
+  const cut = (segs, a, b) => segs.flatMap(([p, q]) => (b <= p || a >= q ? [[p, q]] : [[p, Math.max(p, a)], [Math.min(q, b), q]])).filter(([p, q]) => q - p > 0.05);
+  const run = (mat, y, hh, z, ry, holes) => {
+    let segs = [[S.x0, S.x1]];
+    for (const [a, b] of holes) segs = cut(segs, a, b);
+    for (const [a, b] of segs) { const m = pl(b - a, hh, mat, (a + b) / 2, y, z, ry); if (mat.map) { m.geometry.attributes.uv.array.forEach((v, i, arr) => { if (i % 2 === 0) arr[i] = (a + v * (b - a) - S.x0) / (S.x1 - S.x0); }); } }
+  };
+  const gapsN = Object.values(CORE_GAPS).filter((g) => g.wall === '-z').map((g) => [g.c - g.w / 2, g.c + g.w / 2]);
   for (const sg of [1, -1]) {
     const z = sg * (S.z1 + 0.05), ry = sg > 0 ? 0 : Math.PI;
-    pl(S.x1 - S.x0, 0.5, mStripe, 0, 2.6, z, ry);
-    pl(S.x1 - S.x0, 0.6, mBand, 0, 0.42, z, ry);
+    run(mStripe, 2.6, 0.5, z, ry, sg > 0 ? [[DOOR.x0, DOOR.x1], ...WIN] : gapsN);
+    run(mBand, 0.42, 0.6, z, ry, sg > 0 ? [[DOOR.x0, DOOR.x1]] : gapsN);
     // name plate above the door line
     const plate = textPlane(3.6, 0.5, 288, 40, (c, w, hh) => { c.fillStyle = '#12151a'; c.fillRect(0, 0, w, hh); c.strokeStyle = h1; c.lineWidth = 3; c.strokeRect(2, 2, w - 4, hh - 4); c.fillStyle = '#e8e0cc'; c.font = 'bold 26px monospace'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(String(name || 'KC-07'), w / 2, hh / 2 + 2); });
     plate.mesh.position.set(-2.4, 3.3, sg * (S.z1 + 0.06)); plate.mesh.rotation.y = ry; group.add(plate.mesh); disp.push(plate.mesh.geometry, plate.mesh.material, plate.tex);

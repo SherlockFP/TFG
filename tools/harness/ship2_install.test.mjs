@@ -2,6 +2,7 @@
 // shipfaults hooks, defence mounts + power budget, planters, shop entries, dispose.   node tools/harness/ship2_install.test.mjs
 import './ship2_env.mjs';
 import assert from 'node:assert/strict';
+import * as L from '../../src/world/shiplayout.js';
 let CLOCK = 1000;
 Object.defineProperty(globalThis, 'performance', { value: { now: () => CLOCK }, configurable: true });
 const THREE = await import('three');
@@ -240,7 +241,7 @@ ok('mount repair with the wrench raises the defence hp', () => {
 
 // ---------------------------------------------------------------------------------------------- planters
 ok('planter: plant, water, grow over game days, harvest hydro apples, persists in the profile', () => {
-  game.player.pos.set(-0.85, 0, -2.6);
+  { const ph = L.PLANTER_SLOTS.find((q) => q.id === 'planterHub'); game.player.pos.set(ph.x, 0, ph.z + 0.7); }   // [wave5] the pot moved (world/shiplayout.js)
   req(game, { op: 'pl', id: 'planterHub', sub: 'plant' }); assert.equal(game.run.s2.pl.planterHub.pl, 1);
   req(game, { op: 'pl', id: 'planterHub', sub: 'water' }); assert.equal(game.run.s2.pl.planterHub.w, 1);
   for (let d = 3; d <= 9; d++) { game.run.day = d; game.run.phase = 'takeoff'; game.mods.emit('phase', 'orbit', game); game.run.phase = 'moon'; }

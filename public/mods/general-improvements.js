@@ -88,7 +88,8 @@ KefalAPI.defineMod({
       const tex = new THREE.CanvasTexture(c);
       tex.minFilter = THREE.NearestFilter; tex.magFilter = THREE.NearestFilter; tex.generateMipmaps = false; tex.colorSpace = THREE.SRGBColorSpace;
       const g = new THREE.Group();
-      g.position.set(S.door.x, S.door.height + 0.42, S.z1 - 0.22);
+      const sp = game.ship?.layout?.mods?.lootBoard;   // [wave5] world/shiplayout.js MOD_SPOTS: flush on the wall above the door (it floated 0.15 m off it)
+      if (sp) g.position.set(sp.x, sp.y, sp.z); else g.position.set(S.door.x, S.door.height + 0.42, S.z1 - 0.07);
       g.rotation.y = Math.PI;                    // face into the ship
       const back = new THREE.Mesh(new THREE.BoxGeometry(1.72, 0.56, 0.08), new THREE.MeshLambertMaterial({ color: 0x141414 }));
       back.position.z = -0.03; g.add(back);

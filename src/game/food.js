@@ -628,13 +628,14 @@ export function installFood(game) {
   function placeTable() {
     F.tableTries++;
     const ship = game.ship?.group;
-    for (const [x, z] of TABLE_SPOTS) {
-      if (boxOccupied(game.physics, x, 0.9, z, 0.95, 0.85, 1.15, G.STATIC | G.DOOR)) continue;
+    for (const [x, z, ry = 0] of TABLE_SPOTS) {
+      const q = Math.round(ry / (Math.PI / 2)) & 1;   // [wave5] quarter turns: ry = PI / 2 puts the stools along x (world/shiplayout.js TABLE_SPOTS)
+      if (boxOccupied(game.physics, x, 0.9, z, q ? 1.15 : 0.95, 0.85, q ? 0.95 : 1.15, G.STATIC | G.DOOR)) continue;
       const model = createTable();
-      model.position.set(x, 0, z);
+      model.position.set(x, 0, z); model.rotation.y = ry;
       (ship || game.scene).add(model);
-      const cols = [];
-      for (const [cx, cy, cz, hx, hy, hz] of model.userData.colliders) { try { cols.push(game.physics.addStaticBox(x + cx, cy, z + cz, hx, hy, hz, 0, G.STATIC, { kind: 'static' })); } catch { /* physics optional */ } }
+      const cols = [], c = Math.cos(ry), sn = Math.sin(ry);
+      for (const [cx, cy, cz, hx, hy, hz] of model.userData.colliders) { try { cols.push(game.physics.addStaticBox(x + cx * c + cz * sn, cy, z - cx * sn + cz * c, q ? hz : hx, hy, q ? hx : hz, 0, G.STATIC, { kind: 'static' })); } catch { /* physics optional */ } }
       F.table = { x, z, model, cols, pos: new THREE.Vector3(x, 0, z) };
       return;
     }

@@ -24,10 +24,13 @@ KefalAPI.defineMod({
     const THREE = api.THREE;
     const [RW, RH] = String(cfg.resolution || '160x120').split('x').map((n) => Math.max(64, Math.min(320, Number(n) || 160)));
     const FPS = Math.max(2, Math.min(15, Number(cfg.fps) || 6));
-    const MON_POS = new THREE.Vector3(-5.55, 2.72, -1.15);   // hanging above the lever, facing into the ship
+    // [wave5] spot from world/shiplayout.js MOD_SPOTS (game.ship.layout.mods): over the monitor bank, clear of the cockpit window
+    const MON_POS = new THREE.Vector3(-5.6, 2.75, -2.55);
     let mon = null;       // { group, rt, cam, over, overCtx, overTex, frameT, overT, sel, lastName }
 
     function build(game) {
+      const sp = game.ship?.layout?.mods?.crewMonitor;
+      if (sp) MON_POS.set(sp.x, sp.y, sp.z);
       const g = new THREE.Group();
       g.position.copy(MON_POS);
       g.rotation.y = Math.PI / 2;                 // local +Z -> world +X (into the ship)
@@ -46,9 +49,10 @@ KefalAPI.defineMod({
       const over = new THREE.Mesh(new THREE.PlaneGeometry(W, H), new THREE.MeshBasicMaterial({ map: overTex, transparent: true, fog: false, toneMapped: false, depthWrite: false }));
       over.position.z = 0.04; tilt.add(over);
       // two rods to the ceiling
+      const ceil = (api.SHIP?.h || 3.4) - MON_POS.y, rodY0 = H / 2 + 0.02, rodL = Math.max(0.05, ceil - rodY0);   // rods end at the ceiling (they used to poke 0.25 m through it)
       for (const x of [-0.3, 0.3]) {
-        const rod = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.6, 0.035), dark);
-        rod.position.set(x, H / 2 + 0.28, -0.14); g.add(rod);
+        const rod = new THREE.Mesh(new THREE.BoxGeometry(0.035, rodL, 0.035), dark);
+        rod.position.set(x, rodY0 + rodL / 2, -0.14); g.add(rod);
       }
       game.ship.group.add(g);
       const cam = new THREE.PerspectiveCamera(78, RW / RH, 0.18, 55);
