@@ -90,7 +90,6 @@ export function buildShip({ physics, lightPool, scene }) {
 
   // --- exterior hull (slightly larger box, faces outward) ---
   const E = 0.25, ex0 = S.x0 - E, ex1 = S.x1 + E, ez0 = S.z0 - E, ez1 = S.z1 + E, eh = S.h + 0.45;
-<<<<<<< HEAD
   // [ux] the +z outer plate has a real door opening now (it used to be one solid plate, so the ship looked CLOSED from outside even with the door open)
   gb.vrect('metal_plate', ex0, ez1, dL, ez1, -0.6, eh, 0.35);          // +z outer, left of the door (faces +z) -> direction +x gives +z normal
   gb.vrect('metal_plate', dR, ez1, ex1, ez1, -0.6, eh, 0.35);          // right of the door
@@ -99,13 +98,8 @@ export function buildShip({ physics, lightPool, scene }) {
   gb.vrect('metal_dark', dL, ez1, dL, S.z1, 0, S.door.height, 0.5);    // jamb (faces +x): hull thickness between the inner wall and the outer plate
   gb.vrect('metal_dark', dR, S.z1, dR, ez1, 0, S.door.height, 0.5);    // jamb (faces -x)
   gb.hrect('metal_dark', dL, S.z1, dR, ez1, S.door.height, false, 0.5); // lintel underside
-  gb.vrect('metal_plate', ex1, ez0, ex0, ez0, -0.6, eh, 0.35);         // -z outer
-  gb.vrect('metal_plate', ex1, ez1, ex1, ez0, -0.6, eh, 0.35);         // +x outer
-=======
-  gb.vrect('metal_plate', ex0, ez1, ex1, ez1, -0.6, eh, 0.35);         // +z outer (faces +z) -> direction +x gives +z normal
   gapWall(gb, 'metal_plate', 'x', ez0, ex1, ex0, -0.6, eh, 0.35, gapsZ);   // -z outer (hardpoint gaps N1 / N2)
   gapWall(gb, 'metal_plate', 'z', ex1, ez1, ez0, -0.6, eh, 0.35, gapsX);   // +x outer (hardpoint gap R1)
->>>>>>> worktree-agent-a7f5d06a40e8f9f95
   gb.vrect('metal_plate', ex0, ez0, ex0, ez1, -0.6, eh, 0.35);         // -x outer (window cut handled by overlay glass)
   gb.hrect('metal_dark', ex0, ez0, ex1, ez1, eh, true, 0.35);          // roof
   gb.hrect('metal_dark', ex0, ez0, ex1, ez1, -0.6, false, 0.35);       // belly
