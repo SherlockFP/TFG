@@ -22,7 +22,7 @@ HOST_ONLY.add('hwmsg');
 
 // ---------------------------------------------------------------------------------------------- moon + biome (registered once, every peer)
 BIOMES.homeworld = {
-  name: 'Homeworld', ground: 'rock', ground2: 'concrete_dark', rock: 'rock', sky: 0x2a3f6a, fog: 0x32466f, fogDensity: 0.009, night: 0x0a1030, sun: 0xffe2b8,
+  name: 'Homeworld', ground: 'rock', ground2: 'concrete_dark', rock: 'rock', sky: 0x5a3a7a, fog: 0x5a3a70, fogDensity: 0.0065, night: 0x1a0c34, sun: 0xffb070,   // [home3] permanent violet dusk: the Algorithm's stream hour, unlike any moon
   height: 0, rough: 0, planet: 0x6fa8ff, fx: 'sparkle', noBushes: true, step: 'concrete', trees: null,
 };
 if (!MOONS.home) {
