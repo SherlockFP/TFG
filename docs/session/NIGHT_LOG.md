@@ -10,4 +10,5 @@ Loop rule: 2-3 Sonnet agents at a time (1 browser/QA agent max) → merge with t
 | 1 | econ8 | merged f77d20f: sim models all wave-8 income; median 7 quotas (pre-w8 7-8); side income 8.9 %; Level Fun loot 2→1.6, Sector Map 110→200; museum door blockers fixed. |
 | 1 | QA night1 | running |
 | 2 | feedcams2 (core verb depth, Opus architect — owner: run it like a studio, Opus when needed, mostly Sonnet) | running |
-| 2 | rewardviz (sale split by source, fee warnings, ore counter, value chips) | running |
+| 2 | rewardviz | merged de6693a: day summary 'income by source' block, lever job-fee confirm, ORE n/240, diner till toast, +% VALUE / CURSED scan chips, reward pop ≥100. (Hit the usage limit once; resumed.) |
+| 3 | fixbundle (key conflicts Y/B/M, downed medic/medkit revive + edge arrow, duplicate tax row, mapmods TR names, wave-8 death lines) | running |
