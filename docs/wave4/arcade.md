@@ -47,3 +47,8 @@ In game (headless Chromium, software GL): see the end of this file.
 - Booth rounds are client-authoritative (the host clamps and caps but cannot see the throws): fine for a co-op game, not competitive-proof.
 - Ring toss was not built (cans only); no cosmetic tickets (credits with a daily cap instead).
 - Piece glyphs use the system font's chess symbols (forced text presentation); if a system lacks them, the board falls back to a serif.
+
+## In-game check (headless Chromium, software GL, `tools/harness/wave4_arcade.js`)
+- `#ship` mode RAN (twice, no page errors): sit White, add the normal AI as Black, an illegal move is refused, e2e4 accepted, the AI answers ~1 s later, 10 plies played through the real host path, the overlay opens with 64 squares + 32 pieces. Screenshot looked right (board, seats, resign / stand up, move log, last-move highlight).
+- `#hq` mode (smoke landing on a moon + takeoff, HQ pier, all three carnival booths through the real request path with fees / payouts, RPS client driven by fake host events, screenshot of the carnival) and `#dama` were WRITTEN but NOT RUN: the shared browser queue was too long (the lead batches browser checks). First thing to do after merge: `--url '/?autohost=local&code=T1&name=Tester#hq'` and look at the carnival screenshot (booth placement / scale / sign text are unseen).
+- Not tested with two real peers: RPS challenge / accept over the network, table snapshots to a second client, booth `go` / `res` on a client.
