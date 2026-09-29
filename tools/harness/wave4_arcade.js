@@ -1,7 +1,8 @@
 // wave4 arcade check (body for tools/harness/headless.mjs). Usage:
 //   flock /tmp/tfg-browser.lock node tools/harness/headless.mjs --port 5185 --script tools/harness/wave4_arcade.js --shot /tmp/arcade.png --wait 4000
-// Set `mode` below (or pass ?mode via window.__arMode before): 'ship' = chess on the ship table + panel, 'dama' = dama panel, 'hq' = HQ pier tables + carnival corner.
-const mode = window.__arMode || 'ship';
+// Mode = the URL hash (--url '/?autohost=local&code=T1&name=Tester#hq'), or ?armode=..., default 'ship':
+//   ship = chess vs AI on the ship table + panel, dama = same with dama, hq = smoke landing + HQ pier: every carnival booth played through the real host path + RPS client driven by fake host events.
+const mode = (location.hash || '').slice(1) || new URLSearchParams(location.search).get('armode') || 'ship';
 const g = kefal.game, out = { mode }, errs = [];
 addEventListener('error', (e) => errs.push(e.message));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
