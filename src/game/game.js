@@ -144,6 +144,7 @@ import { installTrade } from './trade.js';
 import { installBoardGame } from './boardgame.js';   // [boardgame]
 
 
+import { installLockpick2 } from './lockpick2.js';   // wave 5: tiered timing-click lockpicking (docs/wave5/lockpick2.md)
 import { installSecureLoot } from './secureloot.js';   // wave 2: secured containers + breaching tools
 
 
@@ -384,6 +385,7 @@ export class Game extends Emitter {
 
 
     this.useModule('secureloot', installSecureLoot);
+    this.useModule('lockpick2', installLockpick2);   // wave 5: swaps the 'lockpick' minigame (after secureloot)
 
 
     this.useModule('maps2', installMaps2);

@@ -1,0 +1,33 @@
+// LOCKPICK 2 translations (Turkish + Russian). English strings are the keys (see core/i18n.js). Data only.
+export const TR_LOCKPICK2 = {
+  'LOCKPICK': 'MAYMUNCUK', 'B&E TOOLKIT': 'HIRSIZ ALETLERİ',
+  '[SPACE] / [CLICK] when the marker is in the green   [ESC] quit': '[BOŞLUK] / [TIK] işaretçi yeşildeyken   [ESC] çık',
+  'Hold still: the drill does the work   [ESC] quit': 'Sabit dur: işi matkap yapar   [ESC] çık',
+  '{tier} LOCK - PIN {n}/{m}': '{tier} KİLİT - PİM {n}/{m}',
+  'Simple': 'Basit', 'Standard': 'Standart', 'Security': 'Güvenlik', 'Vault': 'Kasa', 'Algorithm': 'Algoritma',
+  'UNLOCKED': 'AÇILDI', 'PICK SNAPPED': 'MAYMUNCUK KIRILDI', 'TIME UP': 'SÜRE DOLDU', 'SNAP!': 'KIRILDI!', 'PIN DROPPED': 'PİM DÜŞTÜ', 'MISS': 'ISKA',
+  'HELPER HOLDS A PIN': 'YARDIMCI BİR PİMİ TUTUYOR', 'PIN ORDER SHUFFLED': 'PİM SIRASI DEĞİŞTİ', 'DRILLING': 'DELİNİYOR', 'TIMER BYPASSED': 'SAYAÇ ATLANDI',
+  'PICK': 'ALET', 'SKILL': 'BECERİ', 'SILENT': 'SESSİZ', 'CLICK IN THE GREEN!': 'YEŞİLDE TIKLA!',
+  'Titanium Pick': 'Titanyum Maymuncuk', 'Electronic Bypasser': 'Elektronik Kırıcı',
+  'A hardened pick: 15% wider timing window, forgives one more miss and clicks quieter. 9 uses.': 'Sertleştirilmiş maymuncuk: %15 daha geniş zamanlama penceresi, bir ıskayı daha affeder, daha sessiz tıklar. 9 kullanım.',
+  'Skips the vault and algorithm timers and opens wide, but it buzzes LOUD (creatures hear it). 4 uses.': 'Kasa ve algoritma sayaçlarını atlar, geniş açılır ama ÇOK gürültülü vızıldar (yaratıklar duyar). 4 kullanım.',
+  'Hold the pins [hold E]': 'Pimleri tut [E basılı]', 'HOLDING THE PINS': 'PİMLER TUTULUYOR', 'A teammate is picking - your help makes the lock faster': 'Bir takım arkadaşın kilit açıyor - yardımın kilidi hızlandırır',
+  '+{xp} Lockpicking XP': '+{xp} Maymuncukçuluk XP', 'Lockpicking level {n}!': 'Maymuncukçuluk seviye {n}!',
+  'Wider timing window': 'Daha geniş zamanlama penceresi', 'Auto-seats 1 pin': '1 pimi otomatik oturtur', 'Silent picking (no noise)': 'Sessiz açma (gürültü yok)', 'One-click Simple locks': 'Tek tıkla Basit kilitler',
+};
+export const RU_LOCKPICK2 = {
+  'LOCKPICK': 'ВЗЛОМ', 'B&E TOOLKIT': 'НАБОР ВЗЛОМЩИКА',
+  '[SPACE] / [CLICK] when the marker is in the green   [ESC] quit': '[ПРОБЕЛ] / [КЛИК], когда маркер в зелёной зоне   [ESC] выход',
+  'Hold still: the drill does the work   [ESC] quit': 'Стойте: дрель всё сделает   [ESC] выход',
+  '{tier} LOCK - PIN {n}/{m}': 'ЗАМОК: {tier} - ШТИФТ {n}/{m}',
+  'Simple': 'Простой', 'Standard': 'Обычный', 'Security': 'Охранный', 'Vault': 'Сейфовый', 'Algorithm': 'Алгоритма',
+  'UNLOCKED': 'ОТКРЫТО', 'PICK SNAPPED': 'ОТМЫЧКА СЛОМАНА', 'TIME UP': 'ВРЕМЯ ВЫШЛО', 'SNAP!': 'ХРУСТ!', 'PIN DROPPED': 'ШТИФТ УПАЛ', 'MISS': 'МИМО',
+  'HELPER HOLDS A PIN': 'НАПАРНИК ДЕРЖИТ ШТИФТ', 'PIN ORDER SHUFFLED': 'ПОРЯДОК ШТИФТОВ СМЕНИЛСЯ', 'DRILLING': 'СВЕРЛЕНИЕ', 'TIMER BYPASSED': 'ТАЙМЕР ОБОЙДЁН',
+  'PICK': 'ИНСТР.', 'SKILL': 'НАВЫК', 'SILENT': 'ТИХО', 'CLICK IN THE GREEN!': 'КЛИК В ЗЕЛЁНОЙ ЗОНЕ!',
+  'Titanium Pick': 'Титановая отмычка', 'Electronic Bypasser': 'Электронный взломщик',
+  'A hardened pick: 15% wider timing window, forgives one more miss and clicks quieter. 9 uses.': 'Закалённая отмычка: окно тайминга шире на 15%, прощает ещё один промах, щёлкает тише. 9 использований.',
+  'Skips the vault and algorithm timers and opens wide, but it buzzes LOUD (creatures hear it). 4 uses.': 'Обходит таймеры сейфа и Алгоритма и открывает широкое окно, но жужжит ГРОМКО (существа слышат). 4 использования.',
+  'Hold the pins [hold E]': 'Держать штифты [удерживай E]', 'HOLDING THE PINS': 'ШТИФТЫ ДЕРЖАТСЯ', 'A teammate is picking - your help makes the lock faster': 'Напарник вскрывает замок - ваша помощь ускоряет взлом',
+  '+{xp} Lockpicking XP': '+{xp} опыта взлома', 'Lockpicking level {n}!': 'Взлом: уровень {n}!',
+  'Wider timing window': 'Шире окно тайминга', 'Auto-seats 1 pin': 'Сам ставит 1 штифт', 'Silent picking (no noise)': 'Тихий взлом (без шума)', 'One-click Simple locks': 'Простые замки в один клик',
+};

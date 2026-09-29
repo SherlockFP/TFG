@@ -207,3 +207,6 @@ Honest limits: panels whose JS builds layout with inline styles (a few dock widg
 First time the Mini-Skeld was actually looked at: it was a pile-up (trophy wall over the mirror / kiosk / windows, stove in a doorway, chess table inside the workbench, planter inside the kiosk, door leaf through the wall, dotted wall seams, hidden hazard strip). Now one layout file, zero overlaps in node and in the browser, readable zones (cockpit / galley counter / mess / services wall / engine / cargo) and fewer draw calls in the wide views. Still honest: nothing was pressed by hand (E prompts at the new spots), ship props are not merged, the hanging helmet-cam box is plain.
 ## Wave 5 - harvest2 (docs/wave5/harvest2.md)
 Trees and rocks are now chopped by swinging (axe/pickaxe x2, weapons x0.6, fists x0.3) with host-validated damage and wobble/fx. Honest: never played in a browser; fists take ~50 hits per tree; tool models are placeholders; ore veins, crates and chests still use the old interactions.
+
+## Wave 5 - lockpick 2 (docs/wave5/lockpick2.md)
+Lockpicking is now a 1.5 s timing click on Simple locks and scales to timed / shuffling Algorithm locks; balance is tuned by numbers and a bot only (no human feel test, no real 2-player test), tools use charges not the durability module, and the two new picks have no models of their own.
