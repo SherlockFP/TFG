@@ -746,7 +746,7 @@ export const actionMethods = {
     if (best) {
       const v = best.view;
       this.net.request('hit', { cid: v.id, dmg: Math.round(h.dmg), crit: h.crit, stun: h.stun, kb: h.knock || 1 });
-      this.hitstopT = h.crit ? 0.11 : 0.065;
+      this.hitstopT = Math.max(this.hitstopT || 0, this.feel?.hitstop(h.dmg, { crit: h.crit }) ?? (h.crit ? 0.11 : 0.065));   // wave 7: 40-90 ms by damage
       if (h.afx) applyAffixEffects(this, h.afx, v);
       this.sfx(v.maxHp === null && v.type !== 'mimicdoor' ? 'hit_metal' : 'hit_flesh', 0.9);
       this.engine.shake(0.15);

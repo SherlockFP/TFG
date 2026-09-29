@@ -160,7 +160,7 @@ function installMelee(g, K) {
     g.nextSwing = g.time + dur * 0.72;
     const w = def.weight || 5, wf = clamp(0.6 + w / 12, 0.6, 2);
     const dirSign = /L$/.test(atk.arc) ? -1 : 1;
-    K.snd(kind === 'h' ? 'cb_whoosh_h' : 'cb_whoosh', null, 0.55, clamp(1.25 - w * 0.03, 0.75, 1.25) + (Math.random() - 0.5) * 0.08);
+    if (!g.feel?.swing(classOf(def), kind, w)) K.snd(kind === 'h' ? 'cb_whoosh_h' : 'cb_whoosh', null, 0.55, clamp(1.25 - w * 0.03, 0.75, 1.25) + (Math.random() - 0.5) * 0.08);
     g.engine.punch?.(-0.004 * wf, 0.01 * wf * dirSign, -0.012 * wf * dirSign);
   }
 
@@ -208,11 +208,16 @@ function installMelee(g, K) {
         if (it.affix) { const r = applyAffixes(it.affix, { dmg: def.dmg, crit: c, cd: def.cd, stun: 0 }); applyAffixEffects(g, r, v); }
       }
       g.net.request('cbhit', { w: it.id, k: a.kind, s: a.step, c: +a.charge.toFixed(2), mul: +mulBase.toFixed(2), ex: a.tired ? 1 : 0, hits });
-      g.hitstopT = Math.max(g.hitstopT || 0, (0.035 + w * 0.004) * (heavy ? 1.6 : 1) * (crit ? 1.3 : 1) + (bs ? 0.02 : 0));
-      g.engine.shake(0.08 * wf * (heavy ? 1.6 : 1));
-      g.engine.punch?.(0.012 * wf, 0, 0);
-      g.viewModel?.impact?.(metal ? 'metal' : 'flesh', clamp(0.7 + wf * 0.35, 0.8, 1.5));
-      g.sfx(metal ? 'hit_metal' : 'hit_flesh', 0.9);
+      if (g.feel) {   // wave 7 (feel.js): hitstop 40-90 ms by damage, class kick, class impact sound; balance untouched
+        g.feel.meleeHit({ cls: classOf(def), dmg: (def.dmg || 5) * mulBase, heavy, crit, backstab: bs, metal, pos: list[0]?.v?.pos?.clone?.().setY((list[0].v.pos.y || 0) + 1) });
+        g.viewModel?.impact?.(metal ? 'metal' : 'flesh', clamp(0.7 + wf * 0.35, 0.8, 1.5));
+      } else {
+        g.hitstopT = Math.max(g.hitstopT || 0, (0.035 + w * 0.004) * (heavy ? 1.6 : 1) * (crit ? 1.3 : 1) + (bs ? 0.02 : 0));
+        g.engine.shake(0.08 * wf * (heavy ? 1.6 : 1));
+        g.engine.punch?.(0.012 * wf, 0, 0);
+        g.viewModel?.impact?.(metal ? 'metal' : 'flesh', clamp(0.7 + wf * 0.35, 0.8, 1.5));
+        g.sfx(metal ? 'hit_metal' : 'hit_flesh', 0.9);
+      }
       return;
     }
     // miss: wall / big item, like the stock swing
@@ -225,7 +230,7 @@ function installMelee(g, K) {
       if (im?.body && im.isSimulatedHere()) im.body.applyImpulse({ x: fwd.x * 3 * atk.kb, y: 1.5, z: fwd.z * 3 * atk.kb }, true);
       g.sfx('hit_metal', 0.6); g.viewModel?.impact?.('metal', 0.8);
     } else if (wall) {
-      g.viewModel?.impact?.('wall', 1.1); g.engine.punch?.(0.012, 0, 0.01); g.sfx('hit_wall', 0.5, 0.9 + Math.random() * 0.2);
+      g.viewModel?.impact?.('wall', 1.1); g.engine.punch?.(0.012, 0, 0.01); if (!g.feel?.wallHit(classOf(def))) g.sfx('hit_wall', 0.5, 0.9 + Math.random() * 0.2);
       if (wall.point && g.particles) g.particles.burst(new THREE.Vector3(wall.point.x, wall.point.y, wall.point.z), 'sparks', fwd.clone().negate(), 0.6);
       g.net.request('noise', { p: [wall.point.x, wall.point.y, wall.point.z], loud: 0.4 });
     }
