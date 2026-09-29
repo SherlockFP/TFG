@@ -523,6 +523,7 @@ export function installResto(game) {
   function bindNet(net) { if (!net || boundNet === net) return; boundNet?.off?.('msg:rsmsg', onMsg); boundNet?.off?.('msg:rsx', onSnap); boundNet = net; net.on('msg:rsmsg', onMsg); net.on('msg:rsx', onSnap); }
 
   function openPanel() {
+    if (game.onboard?.deny?.('restaurant')) return;   // [hubgate] unlocks at quota 3
     if (!onHome() || disposed) return;
     closePanel();
     const ctl = createRestoPanel(game.ui, game, api);
@@ -539,7 +540,7 @@ export function installResto(game) {
   offs.push(mods.on('phase', (ph, g) => { if (g !== game || disposed) return; if (ph !== 'moon' && ph !== 'landing') { closePanel(); clearViews(); snap = { sh: [0, 0], c: [], p: [], d: [], cl: 100, ck: [] }; snapCust = []; } }));
   offs.push(mods.on('mapLoaded', (w, g) => { if (g === game) clearViews(); }));
   offs.push(mods.on('moonPopulated', (g) => { if (!g || g === game) { try { seedIngredients(); } catch (e) { console.warn('[rs] seed', e); } } }));
-  offs.push(mods.on('interactables', (list, g) => { if (g !== game || disposed || !onHome()) return; try { interactables(list); } catch (e) { console.warn('[rs] interactables', e); } }));
+  offs.push(mods.on('interactables', (list, g) => { if (g !== game || disposed || !onHome() || game.onboard?.locked?.('restaurant')) return; try { interactables(list); } catch (e) { console.warn('[rs] interactables', e); } }));
   let padT = 0, errs = 0;
   offs.push(mods.on('update', (dt, g) => {
     if (g !== game || disposed) return;
