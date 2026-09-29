@@ -7,5 +7,7 @@ Loop rule: 2-3 Sonnet agents at a time (1 browser/QA agent max) → merge with t
 | # | Batch | Result |
 |---|---|---|
 | 1 | perf4 (landing hitch + oscillator warnings) | merged 8b6fdd6: landing built by a sliced job queue (`game.landQ`, report via `landQ.report()`), shader prewarm, oscillator freq clamp. Unmeasured in browser. |
-| 1 | QA night1, econ8 | running |
+| 1 | econ8 | merged f77d20f: sim models all wave-8 income; median 7 quotas (pre-w8 7-8); side income 8.9 %; Level Fun loot 2→1.6, Sector Map 110→200; museum door blockers fixed. |
+| 1 | QA night1 | running |
 | 2 | feedcams2 (core verb depth, Opus architect — owner: run it like a studio, Opus when needed, mostly Sonnet) | running |
+| 2 | rewardviz (sale split by source, fee warnings, ore counter, value chips) | running |
