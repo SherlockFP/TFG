@@ -2,6 +2,7 @@
 // occlusion lowpass, music/ambience crossfades. Sounds come from the procedural sfxlib
 // (rendered lazily to AudioBuffers) and optionally from external files (ext assets).
 import * as THREE from 'three';
+import { policyFor, Gate, jitter, distanceCutoff, BUS_TRIM } from './mixpolicy.js';   // [atmos] loudness trims, cooldowns, variation
 
 let sfxlib = null;
 
@@ -40,6 +41,9 @@ export class AudioManager {
     this.occlTimer = 0;
     this.score = null;             // [score] adaptive music engine (src/audio/score.js), attached in init()
     this.pack = null;              // [sfx] SoundPack (src/audio/soundpack.js), attached in init()
+    this.gate = new Gate();        // [atmos] same-sound cooldowns (mixpolicy.js)
+    this.ambTrim = null;           // [atmos] per ambience layer multiplier ({base: 0.6, ...}) while the procedural beds run
+    this.ducks = {};
   }
 
   async init() {
@@ -51,12 +55,15 @@ export class AudioManager {
     this.comp = ctx.createDynamicsCompressor();
     this.comp.threshold.value = -14; this.comp.knee.value = 12; this.comp.ratio.value = 5;
     this.comp.attack.value = 0.004; this.comp.release.value = 0.2;
-    this.master.connect(this.comp).connect(ctx.destination);
+    // [atmos] gentle high shelf: the procedural library is bright (clicks, hisses, crickets) and fatiguing over a session
+    this.tone = ctx.createBiquadFilter(); this.tone.type = 'highshelf'; this.tone.frequency.value = 6500; this.tone.gain.value = -3;
+    this.master.connect(this.tone).connect(this.comp).connect(ctx.destination);
     this.buses = {};
     for (const b of ['sfx', 'music', 'voice', 'ui', 'amb']) {
       const g = ctx.createGain();
-      g.connect(this.master);
-      this.buses[b] = g;
+      const dk = ctx.createGain();   // [atmos] duck stage (see duck()): music / ui / ambience dip under creature cues
+      g.connect(dk).connect(this.master);
+      this.buses[b] = g; this.ducks[b] = dk;
     }
     // reverb send
     this.reverb = ctx.createConvolver();
@@ -137,12 +144,23 @@ export class AudioManager {
   applyVolumes() {
     if (!this.ctx) return;
     const s = this.settings;
-    this.master.gain.value = s.masterVolume;
-    this.buses.sfx.gain.value = s.sfxVolume;
-    this.buses.amb.gain.value = s.sfxVolume * 0.9;
-    this.buses.ui.gain.value = s.sfxVolume;
-    this.buses.music.gain.value = s.musicVolume;
-    this.buses.voice.gain.value = s.voiceVolume;
+    const v = (x, d) => (Number.isFinite(x) ? x : d);   // NaN guard: a broken settings value must not silence / blast a bus
+    this.master.gain.value = v(s.masterVolume, 0.8);
+    this.buses.sfx.gain.value = v(s.sfxVolume, 0.9) * BUS_TRIM.sfx;
+    this.buses.amb.gain.value = v(s.ambienceVolume, 0.8) * 0.85 * BUS_TRIM.amb;   // [atmos] own slider (was sfxVolume * 0.9)
+    this.buses.ui.gain.value = v(s.sfxVolume, 0.9) * BUS_TRIM.ui;
+    this.buses.music.gain.value = v(s.musicVolume, 0.6) * BUS_TRIM.music;
+    this.buses.voice.gain.value = v(s.voiceVolume, 1) * BUS_TRIM.voice;
+  }
+
+  /** [atmos] dip music / ui / ambience for `hold` seconds so creature cues stay readable. amount 0..1 = how much to cut. */
+  duck(amount = 0.4, hold = 1.2, buses = ['music', 'ui', 'amb']) {
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime, lvl = Math.max(0.1, 1 - (Number.isFinite(amount) ? amount : 0.4));
+    for (const b of buses) {
+      const g = this.ducks[b]?.gain; if (!g) continue;
+      try { g.cancelScheduledValues(t); g.setTargetAtTime(lvl, t, 0.05); g.setTargetAtTime(1, t + hold, 0.7); } catch { /* ignore */ }
+    }
   }
 
   setEnvironment(env) {
@@ -229,21 +247,30 @@ export class AudioManager {
       return null;
     }
     const ctx = this.ctx;
+    // [atmos] mix policy: same-sound voice cap + cooldown (no stacking blips), loudness trim, random pitch / volume variation
+    const pol = opts.loop || opts.raw ? null : policyFor(name);
+    if (pol) {
+      let same = 0;
+      for (const o of this.handles) if (o.pkey === pol.key && !o.loop) same++;
+      if (same >= pol.max || !this.gate.allow(pol.key, ctx.currentTime, pol.cool)) return null;
+    }
     const src = ctx.createBufferSource();
     src.buffer = buf;
     src.loop = !!opts.loop;
-    const pitch = Number.isFinite(opts.pitch) && opts.pitch > 0 ? opts.pitch : 1;   // a NaN pitch (e.g. from a creature voice) used to throw
+    let pitch = Number.isFinite(opts.pitch) && opts.pitch > 0 ? opts.pitch : 1;   // a NaN pitch (e.g. from a creature voice) used to throw
+    if (pol?.vary) pitch *= jitter(pol.vary[0], Math.random());
     src.playbackRate.value = pitch;
     const gain = ctx.createGain();
-    let baseVol = (opts.volume ?? 1) * (this.meta(name).vol ?? 1);
+    let baseVol = (opts.volume ?? 1) * (this.meta(name).vol ?? 1) * (pol ? pol.gain * (pol.vary ? jitter(pol.vary[1], Math.random()) : 1) : 1);
     if (!Number.isFinite(baseVol)) baseVol = 0;
     gain.gain.value = baseVol;
     let node = src;
     let lowpass = null;
-    if (opts.occlude || opts.lowpass) {
+    const lpBase = Math.min(opts.lowpass || 20000, pol?.lp || 20000);
+    if (opts.occlude || opts.lowpass || pol?.lp || opts.pos || opts.follow) {   // [atmos] positional sounds also get a distance low-pass in update()
       lowpass = ctx.createBiquadFilter();
       lowpass.type = 'lowpass';
-      lowpass.frequency.value = opts.lowpass || 20000;
+      lowpass.frequency.value = lpBase;
       node.connect(lowpass); node = lowpass;
     }
     node.connect(gain);
@@ -272,7 +299,7 @@ export class AudioManager {
     const when = ctx.currentTime + (opts.delay || 0);
     src.start(when, opts.offset || 0);
     const h = {
-      name, src, gain, panner, lowpass, loop: src.loop, follow: opts.follow || null, occlude: !!opts.occlude,
+      name, src, gain, panner, lowpass, lpBase, pkey: pol ? pol.key : null, cut: lpBase, loop: src.loop, follow: opts.follow || null, occlude: !!opts.occlude,
       baseVol, occl: 0,
       stopped: false,
       stop: (fade = 0.08) => {
@@ -308,6 +335,7 @@ export class AudioManager {
 
   setAmbience(layer, name, volume = 0.5, fade = 2) {
     if (!this.ctx) return;
+    if (this.ambTrim && name) volume *= this.ambTrim[layer] ?? 1;   // [atmos] the loop beds sit lower under the procedural ambience
     this.wantedAmb = this.wantedAmb || new Map();
     this.wantedAmb.set(layer, name);
     const cur = this.ambience.get(layer);
@@ -359,11 +387,15 @@ export class AudioManager {
     if (doOccl) this.occlTimer = 0.15;
     for (const h of this.handles) {
       if (h.follow) { h.follow.getWorldPosition(tmp); h.setPos(tmp); }
-      if (doOccl && h.occlude && h.lowpass && this.occluder && h.panner) {
-        const p = { x: h.panner.positionX.value, y: h.panner.positionY.value, z: h.panner.positionZ.value };
-        const o = this.occluder(p);
-        h.occl = o;
-        h.lowpass.frequency.setTargetAtTime(o > 0.5 ? 700 : o > 0 ? 2200 : 18000, t, 0.08);
+      if (doOccl && h.lowpass && h.panner) {
+        const px = h.panner.positionX.value, py = h.panner.positionY.value, pz = h.panner.positionZ.value;
+        let f = distanceCutoff(Math.hypot(px - this.listenerPos.x, py - this.listenerPos.y, pz - this.listenerPos.z), h.lpBase);   // [atmos] far = duller
+        if (h.occlude && this.occluder) {
+          const o = this.occluder({ x: px, y: py, z: pz });
+          h.occl = o;
+          f = Math.min(f, o > 0.5 ? 700 : o > 0 ? 2200 : 18000);
+        }
+        if (Math.abs(f - h.cut) > h.cut * 0.06) { h.cut = f; h.lowpass.frequency.setTargetAtTime(f, t, 0.08); }
       }
     }
   }

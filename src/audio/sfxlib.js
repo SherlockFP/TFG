@@ -1384,11 +1384,12 @@ def('ambience_facility', { dur: 30, loop: true, vol: 0.5, warm: 4, xf: 0.3 }, c 
     const air = D.svf(pn, c.sr, 'bp', 1800, 0.6); D.add(dst, air, 0.12);
   });
   const ev = [c.buf(), c.buf()], r = c.rng;
-  for (let k = 0; k < 20; k++) put(c, ev, D.svf(thud(c, { f0: 70, f1: 40, len: 0.4, click: 0, body: 0.6, lp: 200 }), c.sr, 'lp', 220), k * 1.5, 0.22, -0.5);
-  for (let k = 0; k < 20; k++) put(c, ev, D.svf(nburst(c, { len: 0.25, f: 700, q: 1, t60: 0.2, a: 0.05 }), c.sr, 'lp', 900), k * 1.5 + 0.55, 0.05, -0.5);
+  // [atmos] was a metronome (thud + burst every 1.5 s, twenty times per loop = the most irritating pulse in the game); now a few
+  // irregular far knocks and quieter creaks (game/atmos.js layers the random pipes / creaks / doors on top)
+  for (const k of [2.3, 9.1, 16.4, 23.7]) put(c, ev, D.svf(thud(c, { f0: 70, f1: 40, len: 0.4, click: 0, body: 0.6, lp: 200 }), c.sr, 'lp', 220), k, 0.12, -0.5);
   for (const [t, p] of [[6, 0.6], [17.2, -0.7], [25.4, 0.2]]) {
     const cr = creak(c, { len: r.range(1.2, 2), rate: [[0, 16], [0.5, 32], [1, 20]], res: [210, 460, 820], q: 9 });
-    put(c, ev, D.svf(cr, c.sr, 'lp', 900), t, 0.35, p);
+    put(c, ev, D.svf(cr, c.sr, 'lp', 900), t, 0.2, p);
   }
   for (const [t, p, f] of [[11.3, -0.4, 150], [22.5, 0.7, 110]]) {
     const m = metal(c, { f, count: 10, t60: 1.0, bright: 0.3, len: 1.3 }); D.svf(m, c.sr, 'lp', 700);

@@ -246,7 +246,7 @@ import { installCosm5 } from './cosm5.js';   // wave 4: cosmetics drop (suits/ha
 // [import:crdirector]
 // [import:facjobs]
 // [import:lcmonsters]
-// [import:atmos]
+import { installAtmos } from './atmos.js';   // [import:atmos]
 // [import:arcade2]
 
 
@@ -518,7 +518,7 @@ export class Game extends Emitter {
     // [slot:crdirector]
     // [slot:facjobs]
     // [slot:lcmonsters]
-    // [slot:atmos]
+    this.useModule('atmos', installAtmos);   // [slot:atmos]
     // [slot:arcade2]
 
 
