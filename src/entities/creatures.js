@@ -120,6 +120,7 @@ export class CreatureView {
   constructor(mgr, d) {
     this.mgr = mgr;
     this.id = d.id; this.type = d.ty;
+    this.spawnData = d;   // kept for host migration (game/hostmig.js rebuilds a HostCreature from it)
     this.def = CREATURES[this.type] || { name: this.type, radius: 0.5, height: 1.5 };
     // behaviour variant + affix: shown through the display name (scan labels), tint, scale and a floor ring
     this.variant = variantOf(this.type, d.vr);
@@ -536,7 +537,7 @@ export class CreatureManager {
   hostSpawn(type, pos, opts = {}) {
     const def = CREATURES[type];
     if (!def) return null;
-    const id = 'c' + (this.nextId++);
+    const id = opts.id || ('c' + (this.nextId++));   // opts.id: host migration re-creates a creature under its old id
     // host rolls (Math.random is fine: creatures are host-authoritative, not world generation)
     if (opts.variant === undefined && !def.hazard && !def.boss && !def.custom) {
       const list = VARIANTS[type];
