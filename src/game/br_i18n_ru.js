@@ -10,6 +10,7 @@ export const BR_RU = {
   'The wallpaper is humming.': 'Обои гудят.',
   'It is open. Someone went through.': 'Открыто. Кто-то прошёл насквозь.',
   'Take the EXIT [E]': 'Выйти через ВЫХОД [E]',
+  'EXIT (locked)': 'ВЫХОД (заперт)',
   'Back to the facility entrance': 'Назад ко входу в комплекс',
   'EXIT': 'ВЫХОД',
   'EXIT {d} m': 'ВЫХОД {d} м',

@@ -42,6 +42,7 @@ const SPOT_CHANCE = 0.35;
 const FALL_Y = -150, FALL_CHANCE = 0.5;
 const LOST_CAUSE = 'br_lost';
 const FOG_COL = new THREE.Color(0xa8955a), FOG_DENSITY = 0.034;
+const _fogTmp = new THREE.Color();
 // [registered id from the brcreatures module, existing fallback]
 const HUNTERS = [['br_smiler', 'lurker'], ['br_hound', 'hound'], ['br_partygoer', 'mannequin']];
 
@@ -105,10 +106,11 @@ export function installBackrooms(game) {
     const fac = game.world.facility, r = run();
     if (!fac || !r || game.world.company) return;
     const rng = new RNG(((r.seed >>> 0) ^ 0xb4c7f00d ^ Math.imul((r.day | 0) + 1, 0x9e3779b1)) >>> 0);
-    const chance = MOONS[r.moon]?.brGlitch ?? SPOT_CHANCE;
+    const chance = game.w3?.spotChance ? game.w3.spotChance(r, MOONS[r.moon]?.brGlitch) : (MOONS[r.moon]?.brGlitch ?? SPOT_CHANCE);   // [worlds3] 100 % day 1 / every 3rd day
     S.spotRoll = rng.next();
     if (S.spotRoll >= chance) return;
-    const cands = (fac.wallSpots || []).filter((s) => (s.dist ?? 9) >= 2);
+    let cands = (fac.wallSpots || []).filter((s) => (s.dist ?? 9) >= 2);
+    if (!cands.length) cands = fac.wallSpots || [];   // [worlds3] a guaranteed door must not fail on a tiny facility
     if (!cands.length) return;
     const s = cands[Math.floor(rng.next() * cands.length)];
     const normal = new THREE.Vector3(Math.sin(s.rotY), 0, Math.cos(s.rotY));
@@ -207,7 +209,7 @@ export function installBackrooms(game) {
     eng.shake(0.8); eng.punch?.(-0.09, 0, (Math.random() - 0.5) * 0.08);
     p.landVel = (p.landVel || 0) + 2.2;
     try { game.footstep(p.pos, 0.8, true); } catch { /* ignore */ }
-    game.ui.hud?.bigText(t('LEVEL 0'), t('You noclipped out of reality.'));
+    game.ui.hud?.bigText(game.w3?.title?.() || t('LEVEL 0'), t('You noclipped out of reality.'));
   }
   function endCine(ok, why) {
     const p = game.player, eng = game.engine;
@@ -274,7 +276,7 @@ export function installBackrooms(game) {
     if (!b.k) {
       b.n = (b.n | 0) + 1;
       b.k = pocketKey(r.seed, r.day, b.n);
-      b.m = []; b.hunt = 0;
+      b.m = []; b.hunt = 0; b.th = reason === 'fall' ? 0 : (game.w3?.doorTheme?.() || 0); b.lk = 0;   // [worlds3] themed pocket
       Object.assign(S.host, { t0: game.time, warned: false, nextSpawn: 0, emptyT: 0, cleanT: 1 });
       S.host.spawned.clear(); S.host.outT.clear();
       ensurePocket(b.k);
@@ -336,7 +338,7 @@ export function installBackrooms(game) {
     list.push('br_polaroid'); if (Math.random() < 0.4) list.push('br_polaroid');
     const tbl = (SCRAP_TABLE.backrooms || []).filter(([id]) => ITEMS[id] && !BR_ITEMS.includes(id) && id !== ALMOND);
     for (let i = 0; i < 3 && tbl.length; i++) list.push(weightedPick(tbl));
-    const valueMul = 1 + (r.quotaIndex | 0) * 0.12;
+    const valueMul = (1 + (r.quotaIndex | 0) * 0.12) * (game.w3?.lootHook?.(list, br()?.th, pk, spots) ?? 1);   // [worlds3] themed loot table
     let n = 0;
     const put = (type, s) => { if (!s || !ITEMS[type]) return; game.items.hostSpawn(type, new THREE.Vector3(s.x, pk.y + 0.35, s.z), { valueMul }); n++; };
     // the valuable ones wait in the dark
@@ -348,6 +350,7 @@ export function installBackrooms(game) {
     return n;
   }
   function pickHunter() {
+    { const ov = game.w3?.pickHunter?.(br()?.th); if (ov) return ov; }   // [worlds3] per-world hunters
     const reg = HUNTERS.filter(([id]) => CREATURES[id]).map(([id]) => id);
     const pool = reg.length ? reg : HUNTERS.map(([, f]) => f).filter((id) => CREATURES[id]);
     // weighted: Smilers and Pale Hounds are the pocket's hunters, the Partygoer (a Level Fun native) only strays in now and then
@@ -406,14 +409,15 @@ export function installBackrooms(game) {
     S.host.emptyT = 0;
     if (r.phase !== 'moon') return;
     const age = game.time - S.host.t0;
-    if (age > WARN_AT && !S.host.warned) { S.host.warned = true; game.net.broadcast('brfx', { k: 'warn' }); }
-    if (age > HUNT_AFTER) {
+    const huntAfter = game.w3?.huntAfter?.() ?? HUNT_AFTER;   // [worlds3] Level Fun: the party starts early
+    if (age > Math.min(WARN_AT, huntAfter - 20) && !S.host.warned) { S.host.warned = true; game.net.broadcast('brfx', { k: 'warn' }); }
+    if (age > huntAfter) {
       if (!b.hunt) { b.hunt = 1; game.broadcastRun(['br']); game.net.broadcast('brfx', { k: 'hunt' }); S.host.nextSpawn = 0; }
       S.host.nextSpawn -= dt;
       if (S.host.nextSpawn <= 0) {
-        S.host.nextSpawn = 32 + Math.random() * 20;
+        { const he = game.w3?.huntEvery?.(); S.host.nextSpawn = he ? he[0] + Math.random() * (he[1] - he[0]) : 32 + Math.random() * 20; }
         for (const id of [...S.host.spawned]) { const c = game.creatures.host.get(id); if (!c || c.dead) S.host.spawned.delete(id); }
-        const cap = Math.min(5, 1 + b.m.length + Math.floor((age - HUNT_AFTER) / 150));
+        const cap = Math.min(5, 1 + b.m.length + Math.floor((age - huntAfter) / 150) + (game.w3?.huntCap?.() ?? 0));
         if (S.host.spawned.size < cap) hostSpawnHunter(b.m);
       }
     }
@@ -443,13 +447,14 @@ export function installBackrooms(game) {
     }
     const k = pk.lightAt(cam.x, cam.z) * (pk.lightLevel ?? 1);
     S.lk += (k - S.lk) * Math.min(1, dt * 3);
-    S.fog.fog = FOG_COL.clone().multiplyScalar(0.18 + 0.82 * S.lk).getHex();
-    S.fog.density = FOG_DENSITY * (1.25 - 0.25 * S.lk);
+    const lk3 = game.w3?.look?.();   // [worlds3] themed pocket palette (null = Level 0 yellow)
+    S.fog.fog = (lk3 ? _fogTmp.set(lk3.fog) : _fogTmp.copy(FOG_COL)).multiplyScalar(0.18 + 0.82 * S.lk).getHex();
+    S.fog.density = (lk3?.dens ?? FOG_DENSITY) * (1.25 - 0.25 * S.lk);
     env.interiorFog = S.fog;
     // non-baked things (creatures, items, crewmates) get a flat warm fill that follows the local light
     L.hemi.intensity = 0.04 + 0.55 * S.lk;
-    L.hemi.color.setRGB(1, 0.94, 0.78); L.hemi.groundColor.setRGB(0.36, 0.3, 0.14);
-    L.ambient.intensity = 0.02 + 0.12 * S.lk; L.ambient.color.setRGB(1, 0.92, 0.7);
+    if (lk3) { L.hemi.color.setRGB(...lk3.hemi); L.hemi.groundColor.setRGB(...lk3.hemiG); } else { L.hemi.color.setRGB(1, 0.94, 0.78); L.hemi.groundColor.setRGB(0.36, 0.3, 0.14); }
+    L.ambient.intensity = 0.02 + 0.12 * S.lk; if (lk3) L.ambient.color.setRGB(...lk3.amb); else L.ambient.color.setRGB(1, 0.92, 0.7);
     S.vhs?.update(dt, game.time - (S.enteredAt || game.time));
   }
   function pocketAmbience() {
@@ -474,8 +479,8 @@ export function installBackrooms(game) {
     const blink = Math.floor(game.time * 2) % 2 === 0;
     const hunting = !!b?.hunt, lost = S.lostT >= 0;
     const html = `<div style="background:linear-gradient(270deg,rgba(40,32,6,0),rgba(40,32,6,0.66));padding:6px 30px 7px 12px;text-align:left;font-family:monospace">
-      <div style="font:700 26px/1 monospace;letter-spacing:6px;color:#ffe27a;text-shadow:0 0 10px rgba(255,210,80,0.55),2px 2px 0 #000">${t('LEVEL 0')}</div>
-      <div style="font:13px/1.35 monospace;color:#e9dca8;opacity:0.85">${t('"The Lobby"')} · ${t('∞ sq mi')}</div>
+      <div style="font:700 26px/1 monospace;letter-spacing:6px;color:#ffe27a;text-shadow:0 0 10px rgba(255,210,80,0.55),2px 2px 0 #000">${game.w3?.title?.() || t('LEVEL 0')}</div>
+      <div style="font:13px/1.35 monospace;color:#e9dca8;opacity:0.85">${game.w3?.sub?.() || t('"The Lobby"')} · ${t('∞ sq mi')}</div>
       <div style="font:700 14px/1.4 monospace;color:${walkie && blink ? '#ff5a4a' : '#b8a67a'}">⌁ ${t('NO SIGNAL')}</div>
       <div style="font:700 13px/1.4 monospace;color:${lost ? '#ff3a2a' : hunting ? (blink ? '#ff5a4a' : '#ff9a5a') : '#9fb89a'}">${lost ? t('THE SHIP HAS LEFT') : hunting ? t('ENTITIES: HUNTING') : t('ENTITIES: DORMANT')}</div>
     </div>`;
@@ -638,12 +643,13 @@ export function installBackrooms(game) {
     if (p.dead || S.cine) return;
     if (S.pocket && posInPocket(p.pos)) {
       const ex = S.pocket.exit;
-      out.push({ pos: ex.interact, r: 0.9, reach: 2.6, label: t('Take the EXIT [E]'), sub: t('Back to the facility entrance'), action: () => exitPocket() });
+      const lock = game.w3?.exitLock?.();   // [worlds3] Ward 13: the EXIT is locked until the ward key is picked up
+      out.push({ pos: ex.interact, r: 0.9, reach: 2.6, label: lock ? t('EXIT (locked)') : t('Take the EXIT [E]'), sub: lock || t('Back to the facility entrance'), action: () => { if (lock) { game.ui.toast(lock, 'bad'); game.sfx?.('door_locked', 0.6); } else exitPocket(); } });
       return;
     }
     const s = S.spot;
     if (s && p.indoor && spotState() !== 'sealed' && p.pos.distanceTo(s.pos) < 4) {
-      out.push({ pos: s.pos.clone().setY(s.pos.y + 1.2), r: 0.9, reach: 2.4, label: t('Touch the wall [E]'), sub: spotState() === 'open' ? t('It is open. Someone went through.') : t('The wallpaper is humming.'), action: () => startNoclip('spot') });
+      out.push({ pos: s.pos.clone().setY(s.pos.y + 1.2), r: 0.9, reach: 2.4, label: game.w3?.doorLabel?.() || t('Touch the wall [E]'), sub: game.w3?.doorSub ? game.w3.doorSub(spotState() === 'open') : (spotState() === 'open' ? t('It is open. Someone went through.') : t('The wallpaper is humming.')), action: () => startNoclip('spot') });
     }
   });
   on('useItem', (it, hk) => {
@@ -745,6 +751,7 @@ const TR = {
   'The wallpaper is humming.': 'Duvar kâğıdı vızıldıyor.',
   'It is open. Someone went through.': 'Açık. Biri içinden geçti.',
   'Take the EXIT [E]': "ÇIKIŞ'tan geç [E]",
+  'EXIT (locked)': 'ÇIKIŞ (kilitli)',
   'Back to the facility entrance': 'Tesis girişine dönüş',
   'EXIT': 'ÇIKIŞ',
   'EXIT {d} m': 'ÇIKIŞ {d} m',

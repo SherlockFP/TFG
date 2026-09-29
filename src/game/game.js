@@ -242,7 +242,7 @@ import { installCosm5 } from './cosm5.js';   // wave 4: cosmetics drop (suits/ha
 // [import:ui2]
 // [import:nvgear]
 // [import:mapmods]
-// [import:worlds3]
+import { installWorlds3 } from './worlds3.js';   // wave 8: wrong door + alternate Backrooms worlds + facility size/dressing (docs/wave8/worlds3.md)
 
 
 
@@ -509,7 +509,7 @@ export class Game extends Emitter {
     // [slot:ui2]
     // [slot:nvgear]
     // [slot:mapmods]
-    // [slot:worlds3]
+    this.useModule('worlds3', installWorlds3);
 
 
 
