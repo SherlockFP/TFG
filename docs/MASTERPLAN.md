@@ -391,6 +391,8 @@ büyük gemi = daha çok SIEGE hedef yüzeyi. Böylece "her şeyi al" değil "ek
 lore panosu, decon, fault istasyonları) **anchor registry** (`game.ship.anchors`) üzerinden yerleşir, sabit koordinat
 yok; modül kurulumu host-authoritative, run save'e yazılır, late join senkron.
 
+**Durum (2026-09-29):** wave-3 `shipyard` modülü yapıldı (12 modül, 8 yuva, Frame Console, parça düşüşleri, boya + isim plakası, profil kalıcılığı); ayrıntı + eksikler `docs/wave3/shipyard.md`. Yapılmayanlar: -x burun yuvası, mobilya yerleştirme modu, fraksiyon ödülleri.
+
 ## 14. SECTOR CYCLE — 3 gün + BOSS (ana döngü, tasarım)
 
 ```

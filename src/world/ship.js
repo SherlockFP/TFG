@@ -5,14 +5,43 @@ import { GeoBuilder, levelMaterial } from './geobuilder.js';
 import { createProp } from '../models/props.js';
 import { G } from '../physics/physics.js';
 import { boxOccupied } from './doorsafe.js';
+import { CORE_GAPS } from './hardpoints.js';
 
 export const SHIP = {
   x0: -7, x1: 7, z0: -3.5, z1: 3.5, h: 3.4,
   door: { x: 2.6, width: 2.2, height: 2.6 },     // door on +z wall
 };
 
+/** extra "aboard" volumes {x0,x1,z0,z1,y0,y1}: installed shipyard rooms, the roof deck, the lift (game/shipyard.js keeps this list in sync) */
+export const SHIP_EXTRA = [];
+
 export function insideShip(p, margin = 0) {
-  return p.x > SHIP.x0 - margin && p.x < SHIP.x1 + margin && p.z > SHIP.z0 - margin && p.z < SHIP.z1 + margin && p.y > -0.8 && p.y < SHIP.h + 0.5;
+  if (p.x > SHIP.x0 - margin && p.x < SHIP.x1 + margin && p.z > SHIP.z0 - margin && p.z < SHIP.z1 + margin && p.y > -0.8 && p.y < SHIP.h + 0.5) return true;
+  for (let i = 0; i < SHIP_EXTRA.length; i++) {
+    const v = SHIP_EXTRA[i];
+    if (p.x > v.x0 - margin && p.x < v.x1 + margin && p.z > v.z0 - margin && p.z < v.z1 + margin && p.y > v.y0 && p.y < v.y1) return true;
+  }
+  return false;
+}
+
+/** Vertical wall along one axis with doorway gaps. ax 'z': wall at x=fixed running z a0->a1; ax 'x': wall at z=fixed running x a0->a1.
+ * gaps: [{c, w, h}] (centre, width, height). ySill: when y0 < 0 the gap gets a sill from y0 up to 0. */
+export function gapWall(gb, key, ax, fixed, a0, a1, y0, y1, uv, gaps, color) {
+  const dir = Math.sign(a1 - a0) || 1;
+  const list = gaps.map((g) => ({ s: dir > 0 ? g.c - g.w / 2 : g.c + g.w / 2, e: dir > 0 ? g.c + g.w / 2 : g.c - g.w / 2, h: g.h })).sort((p, q) => (p.s - q.s) * dir);
+  const seg = (p, q, ya, yb) => {
+    if (Math.abs(q - p) < 1e-4 || yb - ya < 1e-4) return;
+    if (ax === 'z') gb.vrect(key, fixed, p, fixed, q, ya, yb, uv, color, Math.abs(p - a0));
+    else gb.vrect(key, p, fixed, q, fixed, ya, yb, uv, color, Math.abs(p - a0));
+  };
+  let cur = a0;
+  for (const g of list) {
+    seg(cur, g.s, y0, y1);
+    if (y0 < 0) seg(g.s, g.e, y0, 0);
+    seg(g.s, g.e, g.h, y1);
+    cur = g.e;
+  }
+  seg(cur, a1, y0, y1);
 }
 
 /** The doorway itself (between the door leaf and the outer hull, incl. the first step): counts as aboard when the ship lifts off. */
@@ -40,10 +69,11 @@ export function buildShip({ physics, lightPool, scene }) {
   // --- interior surfaces ---
   gb.hrect('ship_floor', S.x0, S.z0, S.x1, S.z1, 0, true, 0.5);
   gb.hrect('ship_ceiling', S.x0, S.z0, S.x1, S.z1, S.h, false, 0.5);
-  // back wall (+x), faces -x
-  gb.vrect('ship_wall', S.x1, S.z0, S.x1, S.z1, 0, S.h, 0.5);
-  // -z wall faces +z
-  gb.vrect('ship_wall', S.x0, S.z0, S.x1, S.z0, 0, S.h, 0.5);
+  // back wall (+x), faces -x; hardpoint doorway gap R1 (sealed by ship.hardpoints.R1 until a module is installed)
+  const gapsX = [CORE_GAPS.R1], gapsZ = [CORE_GAPS.N1, CORE_GAPS.N2];
+  gapWall(gb, 'ship_wall', 'z', S.x1, S.z0, S.z1, 0, S.h, 0.5, gapsX);
+  // -z wall faces +z; hardpoint doorway gaps N1 / N2
+  gapWall(gb, 'ship_wall', 'x', S.z0, S.x0, S.x1, 0, S.h, 0.5, gapsZ);
   // +z wall with door gap, faces -z
   const dL = S.door.x - S.door.width / 2, dR = S.door.x + S.door.width / 2;
   gb.vrect('ship_wall', S.x1, S.z1, dR, S.z1, 0, S.h, 0.5);
@@ -60,6 +90,7 @@ export function buildShip({ physics, lightPool, scene }) {
 
   // --- exterior hull (slightly larger box, faces outward) ---
   const E = 0.25, ex0 = S.x0 - E, ex1 = S.x1 + E, ez0 = S.z0 - E, ez1 = S.z1 + E, eh = S.h + 0.45;
+<<<<<<< HEAD
   // [ux] the +z outer plate has a real door opening now (it used to be one solid plate, so the ship looked CLOSED from outside even with the door open)
   gb.vrect('metal_plate', ex0, ez1, dL, ez1, -0.6, eh, 0.35);          // +z outer, left of the door (faces +z) -> direction +x gives +z normal
   gb.vrect('metal_plate', dR, ez1, ex1, ez1, -0.6, eh, 0.35);          // right of the door
@@ -70,6 +101,11 @@ export function buildShip({ physics, lightPool, scene }) {
   gb.hrect('metal_dark', dL, S.z1, dR, ez1, S.door.height, false, 0.5); // lintel underside
   gb.vrect('metal_plate', ex1, ez0, ex0, ez0, -0.6, eh, 0.35);         // -z outer
   gb.vrect('metal_plate', ex1, ez1, ex1, ez0, -0.6, eh, 0.35);         // +x outer
+=======
+  gb.vrect('metal_plate', ex0, ez1, ex1, ez1, -0.6, eh, 0.35);         // +z outer (faces +z) -> direction +x gives +z normal
+  gapWall(gb, 'metal_plate', 'x', ez0, ex1, ex0, -0.6, eh, 0.35, gapsZ);   // -z outer (hardpoint gaps N1 / N2)
+  gapWall(gb, 'metal_plate', 'z', ex1, ez1, ez0, -0.6, eh, 0.35, gapsX);   // +x outer (hardpoint gap R1)
+>>>>>>> worktree-agent-a7f5d06a40e8f9f95
   gb.vrect('metal_plate', ex0, ez0, ex0, ez1, -0.6, eh, 0.35);         // -x outer (window cut handled by overlay glass)
   gb.hrect('metal_dark', ex0, ez0, ex1, ez1, eh, true, 0.35);          // roof
   gb.hrect('metal_dark', ex0, ez0, ex1, ez1, -0.6, false, 0.35);       // belly
@@ -162,9 +198,16 @@ export function buildShip({ physics, lightPool, scene }) {
   // --- colliders ---
   box(0, -0.25, 0, S.x1 - S.x0 + 1, 0.5, S.z1 - S.z0 + 1);                      // floor
   box(0, S.h + 0.25, 0, S.x1 - S.x0 + 1, 0.5, S.z1 - S.z0 + 1);                 // ceiling
-  box(S.x1 + 0.15, S.h / 2, 0, 0.3, S.h, S.z1 - S.z0 + 0.6);                    // back
+  // back (+x) and -z walls: split around the hardpoint gaps (lintel boxes stay above them)
+  const colWall = (ax, fixed, thick, lo, hi, gaps) => {
+    const put = (a, b, y0, y1) => { if (b - a < 1e-3 || y1 - y0 < 1e-3) return; ax === 'z' ? box(fixed, (y0 + y1) / 2, (a + b) / 2, thick, y1 - y0, b - a) : box((a + b) / 2, (y0 + y1) / 2, fixed, b - a, y1 - y0, thick); };
+    let cur = lo;
+    for (const g of [...gaps].sort((p, q) => p.c - q.c)) { put(cur, g.c - g.w / 2, 0, S.h); put(g.c - g.w / 2, g.c + g.w / 2, g.h, S.h); cur = g.c + g.w / 2; }
+    put(cur, hi, 0, S.h);
+  };
+  colWall('z', S.x1 + 0.15, 0.3, -(S.z1 - S.z0 + 0.6) / 2, (S.z1 - S.z0 + 0.6) / 2, gapsX);      // back
   box(S.x0 - 0.15, S.h / 2, 0, 0.3, S.h, S.z1 - S.z0 + 0.6);                    // front (window: solid)
-  box(0, S.h / 2, S.z0 - 0.15, S.x1 - S.x0 + 0.6, S.h, 0.3);                    // -z
+  colWall('x', S.z0 - 0.15, 0.3, -(S.x1 - S.x0 + 0.6) / 2, (S.x1 - S.x0 + 0.6) / 2, gapsZ);   // -z
   box((S.x1 + dR) / 2, S.h / 2, S.z1 + 0.15, S.x1 - dR, S.h, 0.3);             // +z right of door
   box((dL + S.x0) / 2, S.h / 2, S.z1 + 0.15, dL - S.x0, S.h, 0.3);             // +z left of door
   box(S.door.x, (S.h + S.door.height) / 2, S.z1 + 0.15, S.door.width, S.h - S.door.height, 0.3);
@@ -270,6 +313,29 @@ export function buildShip({ physics, lightPool, scene }) {
   const flood = lightPool.add({ pos: new THREE.Vector3(S.x1 - 1.5, eh + 1.2, S.z1 + 1.5), color: 0xfff0cc, intensity: 2.2, distance: 34, group: 'flood', enabled: false });
   emitters.push(flood);
 
+  // --- hardpoint seals: plain wall blocks that fill the doorway gaps (core walls) until a shipyard module is installed there
+  const hardpoints = {};
+  const sealMat = levelMaterial('ship_wall'), openMat = new THREE.MeshBasicMaterial({ visible: false });   // (an opened seal stays a mesh in the group so panel-placement code still sees the doorway as occupied)
+  for (const [id, g] of Object.entries(CORE_GAPS)) {
+    const px = g.wall === '+x';
+    const sx = px ? 0.25 : g.w + 0.01, sy = g.h, sz = px ? g.w + 0.01 : 0.25;
+    const cx = px ? S.x1 + 0.125 : g.c, cz = px ? g.c : S.z0 - 0.125;
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), sealMat);
+    mesh.position.set(cx, sy / 2, cz);
+    group.add(mesh);
+    const hp = {
+      id, gap: g, seal: mesh, collider: physics.addStaticBox(cx, sy / 2, cz, sx / 2, sy / 2, sz / 2, 0, G.STATIC), open: false,
+      setOpen(v) {
+        v = !!v;
+        if (v === this.open) return;
+        this.open = v; mesh.material = v ? openMat : sealMat;
+        if (v) { if (this.collider) { physics.removeCollider(this.collider); this.collider = null; } }
+        else if (!this.collider) this.collider = physics.addStaticBox(cx, sy / 2, cz, sx / 2, sy / 2, sz / 2, 0, G.STATIC);
+      },
+    };
+    hardpoints[id] = hp;
+  }
+
   scene.add(group);
 
   // interaction points (world positions)
@@ -298,7 +364,7 @@ export function buildShip({ physics, lightPool, scene }) {
   ];
 
   return {
-    group, colliders, emitters, door, anchors, points, spawns, flood,
+    group, colliders, emitters, door, anchors, points, spawns, flood, hardpoints,
     doorOutside: new THREE.Vector3(S.door.x, -0.9, S.z1 + 2.2),
   };
 }

@@ -201,7 +201,7 @@ export class Terminal {
         if (run.phase !== 'orbit') { this.print(t('Routing is only possible while in orbit.'), 'err'); return; }
         if (moon.id === run.moon) { this.print(tf('Already routed to {name}.', { name: moon.name })); return; }
         this.pending = { op: 'route', moon: moon.id };
-        const rcost = g.config?.freeTravel ? 0 : moon.cost;
+        const rcost = g.shipyard?.routeFee ? g.shipyard.routeFee(moon, !!g.config?.freeTravel) : (g.config?.freeTravel ? 0 : moon.cost);   // [shipyard] +5 % per module
         this.print(`${tf('Route the autopilot to {name}?', { name: moon.name })} ${rcost ? tf('It will cost ▮{c}.', { c: rcost }) : t('Free travel.')}\n${this.moonInfo(moon, run, true)}\n${tf('Your credits: ▮{c}', { c: run.credits })}${run.credits < rcost ? '  ' + t('(NOT ENOUGH)') : ''}\n\n${t('Type CONFIRM or DENY.')}`);
         return;
       }
@@ -401,7 +401,7 @@ export class Terminal {
         if (m.stale) { reply('That server went dark with the old sector. Type SECTOR.', true); return; }
         if (run.daysLeft <= 0 && !m.company) { reply('Deadline reached: only 0-Algorithm HQ is available.', true); return; }
         // Free travel (host option, on by default): every moon/server is reachable without credits.
-        const cost = g.config?.freeTravel ? 0 : m.cost;
+        const cost = g.shipyard?.routeFee ? g.shipyard.routeFee(m, !!g.config?.freeTravel) : (g.config?.freeTravel ? 0 : m.cost);   // [shipyard] +5 % per module
         if (run.credits < cost) { reply('Insufficient credits: {@m} costs ▮{cost}, you have ▮{c}.\nSell scrap at 0-Algorithm HQ (ROUTE HQ) or pick a FREE moon.', true, { m: m.$name || m.name, cost, c: run.credits }); return; }
         run.credits -= cost;
         run.moon = m.id;

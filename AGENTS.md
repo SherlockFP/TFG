@@ -324,6 +324,11 @@ Secured containers in facilities (glass case, wall / floor safe, cage / locker, 
 
 ### 5.15 Wave 3 - UX batch (docs/wave3/ux.md; build + node tests only, NOT browser-verified)
 Unified panel CSS + emoji strip, roles panel layout, pointer-lock re-capture fallback, no FP hands in menu, behind-the-shoulder emote camera, per-weapon melee grips, ship hull door opening, 12 new suits, role skill cooldowns 300 s / revive 600 s (no passive HP regen exists - verified).
+### 5.15 Wave 3 - SHIPYARD (module `shipyard`, docs/wave3/shipyard.md; node-tested + builds, NOT run in a browser)
+Starter Pod core untouched, 12 modules (Cargo Bay, Garage, Engine Room, Hangar, Workshop, Med Bay, Lab, Bunk Room, Trophy Hall, Lounge, roof Observation Deck + service lift, roof Turret Hardpoint) Mk I-III on 8 sockets (`src/world/hardpoints.js`),
+doorways cut into the core walls (seals in `world/ship.js`, `ship.hardpoints`, `SHIP_EXTRA` feeds `insideShip`). Bought with credits (terminal `SHIPYARD`) or built free from ship parts (Hull Plate / Bulkhead / Engine Coil / Hardpoint Bracket: chests, bosses, siege, extraction) fed to the Frame Console (core cabin, +z wall).
+State = host profile (`profile.shipyard`, survives fired runs) mirrored in `run.sy`; paint / pattern / theme / name plate; weight = route cost +5 % per module + landing Threat + wider siege hull. Rules `src/game/shipyard_core.js`, models `src/models/shipyard.js`, panel `src/ui/panels/shipyard.js`, tests `tools/harness/shipyard*.test.mjs`.
+Gaps: no -x (nose) hardpoint, no furniture placement mode / decals / faction unlocks, never seen in a renderer (see the Unverified list in the doc).
 
 ### 5.5 Smoke test (paste in the browser console on `?autohost=local&code=T1&name=Tester`, after ~4 s)
 ```js
