@@ -195,6 +195,21 @@ import { installWorlds2 } from './worlds2.js';   // wave 3: Soviet raids + twin-
 // [import:checkup]
 
 
+// [import:homeworld2]
+
+
+// [import:guide]
+
+
+// [import:ship2]
+
+
+// [import:ui2]
+
+
+// [import:stealth]
+
+
 
 export class Game extends Emitter {
   constructor({ engine, audio, settings, profile, ui, input, mods }) {
@@ -391,6 +406,21 @@ export class Game extends Emitter {
 
 
     // [slot:checkup]
+
+
+    // [slot:homeworld2]
+
+
+    // [slot:guide]
+
+
+    // [slot:ship2]
+
+
+    // [slot:ui2]
+
+
+    // [slot:stealth]
 
 
   }
