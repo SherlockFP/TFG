@@ -9,3 +9,10 @@ COMMON RULES (wave 4, repo TFG — browser co-op horror/RPG extraction game, Vit
 - When done: write docs/wave4/<name>.md (what, how to test, knobs, known gaps), add a short §5.16 entry in AGENTS.md and a line in docs/CRITIQUE.md, then `git add -A && git commit` on your worktree branch (message ends with the two trailer lines:
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01AFt3mbxtTU1FfiT1N1A1YL). Do NOT push. Report back: commit hash, what was done, what is left, net message types you added.
+
+LEAN MODE (token budget — mandatory, ponytail-style):
+- Before writing code ask: does this need to exist? Can an existing module/function/three.js feature do it? Reuse > extend > write new. Smallest diff that solves the task.
+- Read only what you need: Grep for symbols first, then Read with offset/limit around the hit. Never read whole large files (>400 lines) or generated/vendor files. Don't re-read files you already read.
+- Don't dump long command output: pipe tests/builds through `| tail -5`, grep for FAIL/error; never cat large logs or JSON.
+- No exploratory browser runs; at most the ONE allowed short run at the end.
+- Keep the final report SHORT (≤ 25 lines): commit hash, what was built (bullets), net types, tests run, what is NOT verified. No file-by-file prose.
