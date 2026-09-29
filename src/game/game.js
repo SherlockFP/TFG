@@ -248,10 +248,11 @@ import { installMapmods } from './mapmods.js';
 import { installWorlds3 } from './worlds3.js';   // wave 8: wrong door + alternate Backrooms worlds + facility size/dressing (docs/wave8/worlds3.md)
 // [import:crdirector]
 import { installFacjobs } from './facjobs.js';
-// [import:lcmonsters]
+import { installLcmonsters } from './lcmonsters.js';
 import { installAtmos } from './atmos.js';   // [import:atmos]
 import { installArcade2 } from './arcade2.js';
 // [import:resto]
+// [import:facjobs]
 // [import:arcade2]
 // [import:mapmods]
 import { installRepomaps } from './repomaps.js';   // [import:repomaps] wave 8: themed interiors (Influencer Mansion, Content Academy, Cold Storage Data Station, Museum of Deleted Content) (docs/wave8/repomaps.md)
@@ -525,10 +526,11 @@ export class Game extends Emitter {
     this.useModule('worlds3', installWorlds3);
     // [slot:crdirector]
     this.useModule('facjobs', installFacjobs);
-    // [slot:lcmonsters]
+    this.useModule('lcmonsters', installLcmonsters);
     this.useModule('atmos', installAtmos);   // [slot:atmos]
     this.useModule('arcade2', installArcade2);
     // [slot:resto]
+    // [slot:facjobs]
     // [slot:arcade2]
     // [slot:mapmods]
     this.useModule('repomaps', installRepomaps);   // [slot:repomaps]

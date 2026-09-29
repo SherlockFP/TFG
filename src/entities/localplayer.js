@@ -218,6 +218,7 @@ export class LocalPlayer {
     const len = Math.hypot(mx, mz);
     if (len > 0) { mx /= len; mz /= len; }
     const sin = Math.sin(this.yaw), cos = Math.cos(this.yaw);
+    if (this.game.lmMove?.invert) { mx = -mx; mz = -mz; }   // [lcmonsters] Twisted Curse: inverted controls for a few seconds
     const wishX = mx * cos + mz * sin;
     const wishZ = -mx * sin + mz * cos;
 
@@ -242,7 +243,7 @@ export class LocalPlayer {
     this.sprinting = wantSprint && this.stamina > 0;
     // Snappier than the old 3.9/6.6 but still LC-paced so creatures stay threatening.
     let speed = this.sneak ? 2.1 : this.crouch ? 2.6 : this.sprinting ? 8.2 : 5.0;
-    speed *= weightMul * s.speedMul * (this.speedBoost > 0 ? 1.25 : 1) * (this.slowT > 0 ? 0.35 : 1);
+    speed *= weightMul * s.speedMul * (this.speedBoost > 0 ? 1.25 : 1) * (this.slowT > 0 ? 0.35 : 1) * (this.game.lmMove?.speedMul ?? 1);   // [lcmonsters] Heavy Curse
     if (this.game.grab?.item) speed *= 0.88;
     if (bodyCarry) speed *= 0.85;   // on top of the 90 lb weight penalty: a slow, heavy trudge (~2.9 m/s), never frozen
     if (this.game.weatherMud && !this.indoor && !this.inShip) speed *= 0.92;
