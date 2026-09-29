@@ -8,6 +8,7 @@ import { installTasks } from './tasks.js';
 import { installEcho } from './echo.js';
 import { openWardrobe, makeWardrobeButton } from '../ui/panels/wardrobe.js';
 import { t, addTranslations } from '../core/i18n.js';
+import { SPOTS } from '../world/shiplayout.js';
 
 addTranslations({
   'GOAL!': 'GOL!', 'Kick the ball [LMB / E]': 'Topa vur [SOL TIK / E]', 'ALL TASKS DONE': 'TÜM GÖREVLER TAMAM', 'Team bonus is paid at day end': 'Takım ödülü gün sonunda ödenir',
@@ -15,7 +16,7 @@ addTranslations({
   '{name} finished a task ({d}/{n})': '{name} bir görevi bitirdi ({d}/{n})',
 });
 
-const MIRROR_POS = new THREE.Vector3(-3.2, 1.3, 3.22);   // in front of the ship mirror (shipfeatures.js MIRROR, +z wall)
+const MIRROR_POS = new THREE.Vector3(SPOTS.mirror.x, 1.3, 3.22);   // in front of the ship mirror (shipfeatures.js MIRROR, +z wall)
 
 /** Symbiote Sample: a jar with something black that looks back */
 function createSymbioteModel(T = THREE) {

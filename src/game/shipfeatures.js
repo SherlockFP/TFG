@@ -26,6 +26,7 @@ import { SHIP, insideShip } from '../world/ship.js';
 import { createAvatar } from '../models/avatar.js';
 import { suitColor } from '../entities/remote.js';
 import { t, tf, t as _t } from '../core/i18n.js';
+import { SPOTS } from '../world/shiplayout.js';
 
 const S = SHIP;
 const ROOF_Y = S.h + 0.45;                 // matches ship.js (eh)
@@ -48,10 +49,10 @@ const C_HORN = 0x9aa0a6, C_PAD = 0x1d2327, C_GLASS = 0x1c2328;
 // ---- placement (inside SHIP bounds; clear of terminal, lever, door, arcade and ship.spawns) ----
 // +z wall is free between the terminal (x <= -5.9) and the door (x >= 1.5); -z wall is free between the
 // coffee machine (x <= -0.63) and the arcade (x >= 0.85).
-const HORN_BTN = { x: -5.25, y: 1.4 };                                 // +z wall, right of the terminal
+const HORN_BTN = { x: SPOTS.horn.x, y: SPOTS.horn.y };                                 // +z wall, right of the terminal
 const HORN_SPEAKER = new THREE.Vector3(-3.5, ROOF_Y + 0.35, 0);        // roof (sound origin)
-const MIRROR = { x: -3.2, y: 1.27, w: 1.0, h: 1.7, range: 7 };        // +z wall, bottom 0.42 m, top 2.12 m
-const TP_BTN = { x: 0.1, y: 1.3 };                                     // -z wall
+const MIRROR = { x: SPOTS.mirror.x, y: SPOTS.mirror.y, w: 1.0, h: 1.7, range: 7 };        // +z wall, bottom 0.42 m, top 2.12 m
+const TP_BTN = { x: SPOTS.tp.x, y: SPOTS.tp.y };                                     // -z wall
 const DISCO = { x: 2.0, z: 0.0, cord: 0.3, r: 0.22 };                  // hangs between the centre and aft ceiling lights
 // Floodlight: the roof guard rail (ship.js) runs along z = HULL_Z1 - 0.1 with its top bar at ROOF_Y + 0.9 +- 0.03,
 // just in front of the lamp. The head sits high enough that the lens and bezel clear it (lens bottom ~ROOF_Y+1.15).

@@ -4,6 +4,7 @@
 // Design: no hunger meter. Every consumable is optional, gives a temporary buff (through the anomaly buff registry / left buff bar,
 // there is no second buff system) plus social fun: cheers, sharing a cake, eating at the ship table, drunk stacking with slurred chat.
 import { RNG } from '../core/rng.js';
+import { TABLE_SPOTS as SHIP_TABLE_SPOTS } from '../world/shiplayout.js';
 
 export const FOOD_SHOP = 'food';
 
@@ -251,7 +252,7 @@ export function planFoodSpots(spots, seed) {
   return { machines, cake };
 }
 /** Ship table candidates, in order of preference (the first free one is used). The ship is x -7..7, z -3.5..3.5. */
-export const TABLE_SPOTS = [[-4.4, -0.9], [-4.3, 0.9], [5.0, -1.0], [-3.0, -1.1], [0.9, -1.0]];
+export const TABLE_SPOTS = SHIP_TABLE_SPOTS;   // [ship2] world/shiplayout.js
 
 // ------------------------------------------------------------------------------------------------ item sell / loot helpers
 /** { theme: [[id, weight], ...] } built from FOODS[].loot (added to the scrap tables). */

@@ -6,6 +6,8 @@ import { createProp } from '../models/props.js';
 import { G } from '../physics/physics.js';
 import { boxOccupied } from './doorsafe.js';
 import { CORE_GAPS } from './hardpoints.js';
+import { SPOTS, SPAWNS, LAMPS, WINDOWS_Z, PAD } from './shiplayout.js';
+import { buildShipDeco, holedWall } from './shipdeco.js';
 
 export const SHIP = {
   x0: -7, x1: 7, z0: -3.5, z1: 3.5, h: 3.4,
@@ -17,6 +19,8 @@ export const SHIP_EXTRA = [];
 
 export function insideShip(p, margin = 0) {
   if (p.x > SHIP.x0 - margin && p.x < SHIP.x1 + margin && p.z > SHIP.z0 - margin && p.z < SHIP.z1 + margin && p.y > -0.8 && p.y < SHIP.h + 0.5) return true;
+  // [ship2] the roof (defence mounts, reached by the roof ladder) counts as aboard: nobody is 'left behind' standing on the hull
+  if (p.y >= SHIP.h + 0.3 && p.y < SHIP.h + 4.5 && p.x > SHIP.x0 - 0.25 && p.x < SHIP.x1 + 0.25 && p.z > SHIP.z0 - 0.25 && p.z < SHIP.z1 + 0.25) return true;
   for (let i = 0; i < SHIP_EXTRA.length; i++) {
     const v = SHIP_EXTRA[i];
     if (p.x > v.x0 - margin && p.x < v.x1 + margin && p.z > v.z0 - margin && p.z < v.z1 + margin && p.y > v.y0 && p.y < v.y1) return true;
@@ -77,7 +81,7 @@ export function buildShip({ physics, lightPool, scene }) {
   // +z wall with door gap, faces -z
   const dL = S.door.x - S.door.width / 2, dR = S.door.x + S.door.width / 2;
   gb.vrect('ship_wall', S.x1, S.z1, dR, S.z1, 0, S.h, 0.5);
-  gb.vrect('ship_wall', dL, S.z1, S.x0, S.z1, 0, S.h, 0.5);
+  holedWall(gb, 'ship_wall', S.z1, dL, S.x0, 0, S.h, 0.5, WINDOWS_Z);   // [ship2] clerestory windows (holes through both hull plates)
   gb.vrect('ship_wall', dR, S.z1, dL, S.z1, S.door.height, S.h, 0.5);
   // front wall (-x) with window, faces +x
   const wz0 = -2.4, wz1 = 2.4, wy0 = 1.15, wy1 = 2.75;
@@ -91,7 +95,13 @@ export function buildShip({ physics, lightPool, scene }) {
   // --- exterior hull (slightly larger box, faces outward) ---
   const E = 0.25, ex0 = S.x0 - E, ex1 = S.x1 + E, ez0 = S.z0 - E, ez1 = S.z1 + E, eh = S.h + 0.45;
   // [ux] the +z outer plate has a real door opening now (it used to be one solid plate, so the ship looked CLOSED from outside even with the door open)
-  gb.vrect('metal_plate', ex0, ez1, dL, ez1, -0.6, eh, 0.35);          // +z outer, left of the door (faces +z) -> direction +x gives +z normal
+  holedWall(gb, 'metal_plate', ez1, ex0, dL, -0.6, eh, 0.35, WINDOWS_Z); // +z outer, left of the door (faces +z) -> direction +x gives +z normal ([ship2] window holes)
+  for (const w of WINDOWS_Z) {                                          // window tunnel through the hull skin
+    gb.hrect('metal_dark', w.x0, S.z1, w.x1, ez1, w.y0, true, 0.5);
+    gb.hrect('metal_dark', w.x0, S.z1, w.x1, ez1, w.y1, false, 0.5);
+    gb.vrect('metal_dark', w.x0, ez1, w.x0, S.z1, w.y0, w.y1, 0.5);
+    gb.vrect('metal_dark', w.x1, S.z1, w.x1, ez1, w.y0, w.y1, 0.5);
+  }
   gb.vrect('metal_plate', dR, ez1, ex1, ez1, -0.6, eh, 0.35);          // right of the door
   gb.vrect('metal_plate', dL, ez1, dR, ez1, S.door.height, eh, 0.35);  // above the door
   gb.vrect('metal_plate', dL, ez1, dR, ez1, -0.6, 0, 0.35);            // below the sill
@@ -104,8 +114,7 @@ export function buildShip({ physics, lightPool, scene }) {
   gb.hrect('metal_dark', ex0, ez0, ex1, ez1, eh, true, 0.35);          // roof
   gb.hrect('metal_dark', ex0, ez0, ex1, ez1, -0.6, false, 0.35);       // belly
   // nose (a low "chin" under the cockpit window so the view stays clear)
-  gb.box('metal_plate', ex0 - 1.0, 0.2, 0, 2.0, 1.6, 5.6, 0.35);
-  gb.box('hazard_stripes', ex0 - 1.95, 0.95, 0, 0.1, 0.1, 5.6, 0.6);
+  // [ship2] the nose is a rounded half-dome (built below); the old chin box only stays as its collider
   // thrusters
   for (const zz of [-2.2, 2.2]) gb.box('metal_dark', ex1 - 1.5, -1.0, zz, 2.2, 0.8, 1.4, 0.4);
   // landing legs
@@ -130,7 +139,10 @@ export function buildShip({ physics, lightPool, scene }) {
   const stripeMat = new THREE.MeshLambertMaterial({ color: 0xc8581c });
   for (const zz of [ez0 - 0.02, ez1 + 0.02]) {
     // [ux] the +z stripe stops at the door opening
-    const segs = zz > 0 ? [[ex0, dL], [dR, ex1]] : [[ex0, ex1]];
+    let segs = zz > 0 ? [[ex0, dL], [dR, ex1]] : [[ex0, ex1]];
+    if (zz > 0) {   // [ship2] the stripe must not cross the clerestory windows
+      for (const w of WINDOWS_Z) segs = segs.flatMap(([p, q]) => (w.x1 <= p || w.x0 >= q ? [[p, q]] : [[p, Math.max(p, w.x0)], [Math.min(q, w.x1), q]])).filter(([p, q]) => q - p > 0.05);
+    }
     for (const [a, b] of segs) {
       const stripe = new THREE.Mesh(new THREE.PlaneGeometry(b - a, 0.5), stripeMat);
       stripe.position.set((a + b) / 2, 2.6, zz);
@@ -187,6 +199,20 @@ export function buildShip({ physics, lightPool, scene }) {
   for (const zz of [-0.8, 0.8]) {
     const bar = new THREE.Mesh(new THREE.BoxGeometry(0.08, wy1 - wy0, 0.1), barMat);
     bar.position.set(S.x0, (wy0 + wy1) / 2, zz); group.add(bar);
+  }
+  // [ship2] clerestory glass in the +z wall + the rounded nose dome under the cockpit window
+  const glassMat2 = glass.material.clone(); glassMat2.side = THREE.DoubleSide;
+  for (const w of WINDOWS_Z) {
+    const g2 = new THREE.Mesh(new THREE.PlaneGeometry(w.x1 - w.x0, w.y1 - w.y0), glassMat2);
+    g2.position.set((w.x0 + w.x1) / 2, (w.y0 + w.y1) / 2, S.z1 + 0.12); g2.rotation.y = Math.PI; group.add(g2);
+  }
+  {
+    const ng = new THREE.SphereGeometry(1, 22, 12, -Math.PI / 2, Math.PI);
+    const uvs = ng.attributes.uv; for (let i = 0; i < uvs.count; i++) uvs.setXY(i, uvs.getX(i) * 4, uvs.getY(i) * 3);
+    const nose = new THREE.Mesh(ng, levelMaterial('metal_plate'));
+    nose.scale.set(1.8, 1.0, 2.7); nose.position.set(ex0, 0.1, 0); nose.name = 'ship2_nose'; group.add(nose);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(1, 0.05, 6, 24), new THREE.MeshLambertMaterial({ color: 0xe07a1c }));   // orange band around the nose
+    ring.rotation.y = Math.PI / 2; ring.scale.set(2.7, 1.0, 1.0); ring.position.set(ex0 - 0.9, 0.1, 0); ring.scale.set(2.65, 0.95, 1); group.add(ring);
   }
 
   // --- colliders ---
@@ -281,18 +307,19 @@ export function buildShip({ physics, lightPool, scene }) {
     if (name) anchors[name] = o;
     return o;
   };
-  put('terminal', S.x0 + 0.75, 0, 2.55, Math.PI / 2, 'terminal');
-  put('monitor_bank', S.x0 + 0.55, 0, -2.45, Math.PI / 2, 'monitors');
-  put('lever', S.x0 + 1.1, 0, 0.9, Math.PI / 2, 'lever');
-  put('cupboard', S.x1 - 0.55, 0, -2.3, -Math.PI / 2, 'cupboard');
-  put('bunkbed', S.x1 - 1.4, 0, 2.6, Math.PI, 'bunks');
-  put('arcade_cabinet', 1.2, 0, S.z0 + 0.5, 0, 'arcade');
-  put('charging_station', -2.6, 1.0, S.z0 + 0.12, 0, 'charger');
-  put('suit_rack', S.x1 - 0.5, 0, 0.3, -Math.PI / 2, 'suits');
-  put('coffee_machine', -1.0, 0, S.z0 + 0.4, 0, 'coffee');
-  put('quota_screen', -3.6, 1.9, S.z0 + 0.06, 0, 'quota');
-  put('door_panel', S.door.x + S.door.width / 2 + 0.55, 1.2, S.z1 - 0.06, Math.PI, 'doorPanel');
-  put('ship_light', -4, S.h, 0, 0); put('ship_light', 0, S.h, 0, 0); put('ship_light', 4, S.h, 0, 0);
+  const sp = SPOTS;   // [ship2] every fixture position lives in world/shiplayout.js (overlap-checked in tools/harness/ship2_overlap.test.mjs)
+  put('terminal', sp.terminal.x, 0, sp.terminal.z, sp.terminal.ry, 'terminal');
+  put('monitor_bank', sp.monitors.x, 0, sp.monitors.z, sp.monitors.ry, 'monitors');
+  put('lever', sp.lever.x, 0, sp.lever.z, sp.lever.ry, 'lever');
+  put('cupboard', sp.cupboard.x, 0, sp.cupboard.z, sp.cupboard.ry, 'cupboard');
+  put('bunkbed', sp.bunks.x, 0, sp.bunks.z, sp.bunks.ry, 'bunks');
+  put('arcade_cabinet', sp.arcade.x, 0, sp.arcade.z, sp.arcade.ry, 'arcade');
+  put('charging_station', sp.charger.x, sp.charger.y, sp.charger.z, sp.charger.ry, 'charger');
+  put('suit_rack', sp.suits.x, 0, sp.suits.z, sp.suits.ry, 'suits');
+  put('coffee_machine', sp.coffee.x, 0, sp.coffee.z, sp.coffee.ry, 'coffee');
+  put('quota_screen', sp.quota.x, sp.quota.y, sp.quota.z, sp.quota.ry, 'quota');
+  put('door_panel', sp.doorPanel.x, sp.doorPanel.y, sp.doorPanel.z, sp.doorPanel.ry, 'doorPanel');
+  for (const [lx, lz] of LAMPS) put('ship_light', lx, S.h, lz, 0);
   // fix hanging lights to ceiling
   group.children.filter((c) => c.userData?.lights && c.position.y === S.h).forEach((c) => {
     const bb = new THREE.Box3().setFromObject(c); c.position.y = S.h - (bb.max.y - bb.min.y); c.updateMatrixWorld(true);
@@ -300,7 +327,7 @@ export function buildShip({ physics, lightPool, scene }) {
   // re-anchor emitted light positions after the fix
   emitters.forEach((e) => { if (e.pos.y > S.h - 0.05) e.pos.y = S.h - 0.4; });
   if (!emitters.length) {
-    for (const x of [-4, 0, 4]) emitters.push(lightPool.add({ pos: new THREE.Vector3(x, S.h - 0.4, 0), color: 0xffe2b8, intensity: 1, distance: 9, group: 'ship' }));
+    for (const [x, z] of LAMPS) emitters.push(lightPool.add({ pos: new THREE.Vector3(x, S.h - 0.4, z), color: 0xffe2b8, intensity: 1, distance: 9, group: 'ship' }));
   }
 
   // floodlight on the roof (for night): emitter toggled by game
@@ -330,6 +357,10 @@ export function buildShip({ physics, lightPool, scene }) {
     hardpoints[id] = hp;
   }
 
+  // [ship2] partitions / floor tints / signs / crates / reactor (merged meshes); colliders + light emitters join the ship's own lists
+  const deco = buildShipDeco({ physics, lightPool, group });
+  colliders.push(...deco.colliders); emitters.push(...deco.emitters);
+
   scene.add(group);
 
   // interaction points (world positions)
@@ -352,13 +383,11 @@ export function buildShip({ physics, lightPool, scene }) {
     bunks: ip(anchors.bunks, 0.8, 0.5),
   };
   // spawn points inside
-  const spawns = [
-    new THREE.Vector3(-3, 0.05, 0), new THREE.Vector3(-1.5, 0.05, 1.2), new THREE.Vector3(0, 0.05, -1.0), new THREE.Vector3(1.5, 0.05, 1.0),
-    new THREE.Vector3(3, 0.05, -1.2), new THREE.Vector3(-2.2, 0.05, -1.5), new THREE.Vector3(2.4, 0.05, 1.6), new THREE.Vector3(4, 0.05, 0.2),
-  ];
+  const spawns = SPAWNS.map(([x, z]) => new THREE.Vector3(x, 0.05, z));   // [ship2] spawns[2] = teleporter pad (shiplayout PAD)
 
   return {
     group, colliders, emitters, door, anchors, points, spawns, flood, hardpoints,
+    layout: { obstacles: deco.obstacles, spots: SPOTS, pad: PAD }, deco,   // [ship2] obstacles = AABBs {min,max} of partitions / signs / crates for the fault-panel placer
     doorOutside: new THREE.Vector3(S.door.x, -0.9, S.z1 + 2.2),
   };
 }

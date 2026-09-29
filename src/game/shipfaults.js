@@ -27,6 +27,10 @@ export const FAULTS = {
   jam: { name: 'Thruster Jam', hint: 'Hit it 3 times with a melee weapon', mode: 'hit', need: 3, easy: true },
 };
 export const FAULT_IDS = Object.keys(FAULTS);
+/** [ship2] outside-hull fault category. NOT in the random pool (FAULTS stays the 6 inside faults): begin() appends it when game.ship2.outerFaultWanted() (quota >= 1 with a hull breach or a critical hull);
+ *  it is fixed from OUTSIDE by the ship2 repair minigame (hold E + timing ring), which calls faults.fixOuter(). Its HUD line is the normal checklist line. */
+export const OUTER_FAULTS = { hullx: { name: 'Outer Hull Breach', hint: 'Seal the breach from OUTSIDE: Welding Torch (or Wrench + Repair Kit)', mode: 'outer', easy: false, outer: true } };
+const FL = new Proxy(FAULTS, { get: (tg, k) => tg[k] || OUTER_FAULTS[k] });
 export const MIDNIGHT_S = 45;        // autopilot: faults auto-resolve (with a penalty) after this
 export const PRESSURE_S = 75;        // lever mode: countdown that starts when creatures are near the ship
 export const LAUNCH_S = 3;           // "ignition in 3"
@@ -157,7 +161,7 @@ export function installShipFaults(game, ctx = {}) {
   const bcast = () => { game.net.broadcast('g2', snapshot()); F.snapT = 2.5; };
 
   function collectObstacles() {
-    const out = [WINDOW_BOX];
+    const out = [WINDOW_BOX, ...(game.ship?.layout?.obstacles || [])];   // [ship2] partitions, signs, crates, reactor, window frames
     const b = new THREE.Box3();
     const grp = game.ship?.group;
     if (!grp) return out;
@@ -183,6 +187,7 @@ export function installShipFaults(game, ctx = {}) {
     };
     types.forEach((ty, i) => {
       const f = { id: 'f' + i, ty, done: false, prog: 0, hits: 0, code: ty === 'nav' ? makeCode() : null, st: [] };
+      if (ty === 'hullx') { f.st.push({ k: 'main', ...(game.ship2?.outerStation?.() || { x: 0, y: 1.2, z: 3.9, ry: 0 }), free: true }); list.push(f); return; }   // [ship2]
       const main = put(ty);
       f.st.push(main);
       if (ty === 'nav') f.st.push(put('navd', { pose: main, d: 3.4 }));
@@ -193,7 +198,8 @@ export function installShipFaults(game, ctx = {}) {
   function begin(reason, only = null) {   // `only`: force the fault types (tests / debug)
     const run = game.run, q = run.quotaIndex | 0;
     const th = threat(), hull = softHull();
-    const types = Array.isArray(only) && only.length ? only.filter((x) => FAULTS[x]) : pickFaults(rollFaultCount(q, th, hull), q);
+    const types = Array.isArray(only) && only.length ? only.filter((x) => FL[x]) : pickFaults(rollFaultCount(q, th, hull), q);
+    if (!only && game.ship2?.outerFaultWanted?.() && !types.includes('hullx')) types.push('hullx');   // [ship2] outside hull breach
     F.act = true; F.why = reason; F.list = place(types); F.launchAt = null; F.near = 0; F.calm = 0; F.pT = 0; F.starts.clear(); F.hitCd.clear();
     F.dl = reason === 'midnight' ? (game.time || 0) + MIDNIGHT_S : null;
     const hp = F.list.find((f) => f.ty === 'hull');
@@ -229,7 +235,7 @@ export function installShipFaults(game, ctx = {}) {
     if (f.done) return;
     f.done = true; f.prog = 1;
     const q = game.run?.quotaIndex | 0;
-    if (by) game.net.broadcast('xp', { to: by, xp: 30 + q * 8, coin: 4, reason: `Ship fault: ${FAULTS[f.ty].name}` });
+    if (by) game.net.broadcast('xp', { to: by, xp: 30 + q * 8, coin: 4, reason: `Ship fault: ${FL[f.ty].name}` });
     game.net.broadcast('g2', { k: 'fixed', i: f.id, ty: f.ty, by });
     game.mods?.emit('tfg:faultFixed', f.ty, by, game);
     if (F.list.every((x) => x.done)) {
@@ -245,11 +251,11 @@ export function installShipFaults(game, ctx = {}) {
       if (penaltyKind(scrap.length > 0) === 'scrap') {
         const it = scrap[Math.floor(Math.random() * scrap.length)];
         game.net.broadcast('it', { e: 'rm', id: it.id });
-        sys(`The ${it.def.name} (▮${it.value}) was sucked out through the ${FAULTS[f.ty].name}!`, 'bad');
+        sys(`The ${it.def.name} (▮${it.value}) was sucked out through the ${FL[f.ty].name}!`, 'bad');
         F.penalties.push({ ty: f.ty, kind: 'scrap', item: it.type, value: it.value });
       } else {
         for (const p of game.aiPlayers()) if (!p.dead && p.inShip) game.hostHurtPlayer(p.id, 14, 'shipfault', null, null);
-        sys(`Hull stress from the ${FAULTS[f.ty].name}: everybody aboard is hurt.`, 'bad');
+        sys(`Hull stress from the ${FL[f.ty].name}: everybody aboard is hurt.`, 'bad');
         F.penalties.push({ ty: f.ty, kind: 'damage' });
       }
       try { game.siege?.damageHull?.(0.06); } catch { /* soft */ }
@@ -292,8 +298,8 @@ export function installShipFaults(game, ctx = {}) {
     if (!F.act || F.launchAt != null) return;
     const f = F.list.find((x) => x.id === String(d.fid));
     const pl = game.aiPlayerById(from);
-    if (!f || f.done || !nearStation(pl, f)) return;
-    const spec = FAULTS[f.ty], now = game.time || 0, key = from + ':' + f.id;
+    if (!f || f.done || f.ty === 'hullx' || !nearStation(pl, f)) return;   // [ship2] the outer fault is completed only by the ship2 repair session
+    const spec = FL[f.ty], now = game.time || 0, key = from + ':' + f.id;
     if (d.op === 'start') { F.starts.set(key, now); return; }
     if (d.op === 'jam') {
       if (f.ty !== 'jam' || now - (F.hitCd.get(key) || -9) < 0.28) return;
@@ -339,7 +345,7 @@ export function installShipFaults(game, ctx = {}) {
 
   // ================================================================ CLIENT (every peer, host included)
   function ensureStation(cf, s) {
-    if (s.model || !game.ship?.group) return;
+    if (s.model || !game.ship?.group || cf.ty === 'hullx') return;   // [ship2] hullx has no interior station
     try {
       s.model = createFaultStation(s.k === 'aux' ? 'navd' : cf.ty);
       s.model.root.traverse((o) => { o.userData.g2 = true; });
@@ -381,7 +387,7 @@ export function installShipFaults(game, ctx = {}) {
     if (d.k === 'faults') applySnap(d);
     else if (d.k === 'clear') clearClient();
     else if (d.k === 'fixed') {
-      const nm = FAULTS[d.ty]?.name || d.ty;
+      const nm = FL[d.ty]?.name || d.ty;
       toast(`✔ ${t(nm)} — ${d.by ? game.playerName(d.by) : ''}`, 'good');
       game.audio?.ui?.('ui_quota_met', 0.4);
     } else if (d.k === 'hit') {
@@ -409,7 +415,7 @@ export function installShipFaults(game, ctx = {}) {
   }
   function use(cf, s) {
     if (!inShipNow() || game.minigame || C.launchAt != null) return;
-    const spec = FAULTS[cf.ty], mul = apt()?.repairMul?.(me()) || 1;
+    const spec = FL[cf.ty], mul = apt()?.repairMul?.(me()) || 1;
     game.net.request('g2', { op: 'start', fid: cf.id });
     switch (spec.mode) {
       case 'valve': startHold(cf, spec.hold / mul, t(spec.name), () => mini('g2valve', { difficulty: diff(0.3) }, cf)); break;
@@ -433,7 +439,8 @@ export function installShipFaults(game, ctx = {}) {
     const cam = game.camera.position;
     for (const cf of C.faults.values()) {
       if (cf.done) continue;
-      const spec = FAULTS[cf.ty];
+      const spec = FL[cf.ty];
+      if (cf.ty === 'hullx') continue;   // [ship2] outside fault: no interior station, ship2 supplies the interactables
       for (const s of cf.st) {
         const pos = new THREE.Vector3(s.x + Math.sin(s.ry) * 0.5, s.y, s.z + Math.cos(s.ry) * 0.5);
         if (pos.distanceTo(cam) > 7) continue;
@@ -452,7 +459,7 @@ export function installShipFaults(game, ctx = {}) {
     if (g !== game || !C.act) return;
     const all = [...C.faults.values()], done = all.filter((f) => f.done).length, n = all.length;
     add(`${t('PRE-FLIGHT FAULTS')} ${done}/${n}`, 'main', done === n && n > 0, n ? done / n : 0);
-    for (const f of all) add(`${f.done ? '✔' : '◇'} ${t(FAULTS[f.ty].name)}${f.done ? '' : ' — ' + t(FAULTS[f.ty].hint)}`, 'sub', f.done);
+    for (const f of all) add(`${f.done ? '✔' : '◇'} ${t(FL[f.ty].name)}${f.done ? '' : ' — ' + t(FL[f.ty].hint)}`, 'sub', f.done);
     const now = game.time || 0;
     if (C.launchAt != null) add(tf('PRE-FLIGHT COMPLETE - ignition in {n}', { n: Math.max(0, Math.ceil(C.launchAt - now)) }), 'hint');
     else if (C.dlAt != null) add(`${tf('PURGE IN {n}s', { n: Math.max(0, Math.ceil(C.dlAt - now)) })}${C.near ? ` · ${C.near} ${t('creatures near the ship')}` : ''}`, 'warn');
@@ -496,7 +503,7 @@ export function installShipFaults(game, ctx = {}) {
     for (const cf of C.faults.values()) {
       cf.hitT = Math.max(0, cf.hitT - dt);
       for (const s of cf.st) {
-        s.model?.update(dt, time, { done: cf.done, hits: cf.hits, need: FAULTS[cf.ty].need, code: cf.code, prog: cf.prog, hitT: cf.hitT });
+        s.model?.update(dt, time, { done: cf.done, hits: cf.hits, need: FL[cf.ty].need, code: cf.code, prog: cf.prog, hitT: cf.hitT });
         if (s.light) s.light.intensity = cf.done ? 0 : 0.25 + 1.5 * Math.max(0, Math.sin(time * 8));
       }
     }
@@ -523,6 +530,9 @@ export function installShipFaults(game, ctx = {}) {
     /** debug / tests: complete every fault right now (host) */
     fixAll(by) { for (const f of F.list) fixed(f, by || game.selfId); },
     faultOf: (id) => F.list.find((f) => f.id === id),
+    /** [ship2] the outside hull repair finished: complete the hullx fault (if one is active) */
+    fixOuter(by) { const f = F.list.find((x) => x.ty === 'hullx' && !x.done); if (f) fixed(f, by); return !!f; },
+    hasOuter: () => F.list.some((x) => x.ty === 'hullx' && !x.done),
     clientFaults: () => [...C.faults.values()],
     dispose() {
       st.disposed = true;

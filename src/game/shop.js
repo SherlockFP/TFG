@@ -20,6 +20,7 @@ import { addTranslations, t, tf } from '../core/i18n.js';
 import { CRUISER } from '../entities/cruiser.js';
 import { createWeaponContext, installWeapons } from './weapons.js';
 import { installDeck } from './deck.js';
+import { dropPoint, SPOTS } from '../world/shiplayout.js';
 
 export const CATEGORIES = [
   { id: 'weapons', name: 'Weapons' }, { id: 'tools', name: 'Tools' }, { id: 'bags', name: 'Bags' }, { id: 'consumables', name: 'Consumables' },
@@ -259,7 +260,7 @@ export function installShop(game) {
   const ship = () => g.ship;
   function deliver(id, n) {
     for (let i = 0; i < n; i++) {
-      const pos = { x: 4.5 + Math.random() * 1.5, y: 1.2 + i * 0.25, z: -2 + Math.random() * 1.2 };
+      const pos = dropPoint(i);   // [ship2] the loot bay (world/shiplayout.js)
       g.items.hostSpawn(id, pos, { value: 0 });
     }
     void ship;
@@ -352,7 +353,7 @@ export function installShop(game) {
   });
 
   // ---------------------------------------------------------------- kiosks (ship + HQ counter) and their prompts
-  const S = { x: -2.2, z: 3.02 };
+  const S = { x: SPOTS.kiosk.x, z: SPOTS.kiosk.z };   // [ship2] shiplayout
   let shipKiosk = null;
   try {
     shipKiosk = buildKiosk();

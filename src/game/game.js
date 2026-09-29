@@ -113,6 +113,7 @@ import { installGameplay2 } from './gameplay2.js';
 
 // [import:shipyard]
 import { installShipyard } from './shipyard.js';
+import { installShip2 } from './ship2.js';   // [ship2]
 
 
 import { installSkeletons } from './skeletons.js';
@@ -208,7 +209,6 @@ import { installCosm5 } from './cosm5.js';   // wave 4: cosmetics drop (suits/ha
 
 
 
-// [import:ship2]
 
 
 // [import:ui2]
@@ -414,6 +414,9 @@ export class Game extends Emitter {
     this.useModule('stealth', installStealth);
 
 
+    this.useModule('ship2', installShip2);   // [ship2] (after gameplay2 / shipyard / siege / food / worlds2: it wraps hostFinishTakeoff and reads game.deployables)
+
+
     // [slot:ux]
     this.useModule('hostmig', installHostMig);
 
@@ -445,7 +448,6 @@ export class Game extends Emitter {
 
 
 
-    // [slot:ship2]
 
 
     // [slot:ui2]

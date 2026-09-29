@@ -60,3 +60,5 @@ Never seen in a renderer: module interiors (prop placement, scale of the reactor
 * The ux agent plans "health regen only from food"; the Med Bay bed is a deliberate exception (cooldown-gated, needs the module).
 
 **UPDATE (wave 4 polish4, docs/wave4/polish4.md):** furniture placement mode (terminal FURNITURE), decals (terminal DECAL) and Workshop craft luck are implemented (`profile.shipyard.deco`, `rpg.bonus` wrap). Still missing: faction unlocks, Trophy Hall artifacts, second vehicle slot, wall furniture.
+## Wave 4 note (ship2)
+The core cabin was redesigned as a small Mini-Skeld (docs/wave4/ship2.md): props moved (the "no existing prop moved" claim above is historical) and partitions were added, but the doorway gaps R1 / N1 / N2, `CORE_GAPS`, `SOCKETS`, the seals and `gapWall` are unchanged and the walkway in front of each doorway is enforced by `tools/harness/ship2_overlap.test.mjs` (`shiplayout.AISLES`). Fixture positions now live in `src/world/shiplayout.js`. The roof counts as aboard in `insideShip()`; roof defence mounts + a ladder sit on the tail half of the roof, clear of the DECK / TURRET sockets.
