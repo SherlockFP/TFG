@@ -114,6 +114,7 @@ import { installGameplay2 } from './gameplay2.js';
 // [import:shipyard]
 import { installShipyard } from './shipyard.js';
 import { installShip2 } from './ship2.js';   // [ship2]
+import { installShipdeck } from './shipdeck.js';   // [shipdeck]
 
 
 import { installSkeletons } from './skeletons.js';
@@ -358,6 +359,7 @@ export class Game extends Emitter {
 
     // [slot:shipyard]
     this.useModule('shipyard', installShipyard);
+    this.useModule('shipdeck', installShipdeck);   // [shipdeck] Upper Deck (reads shipyard state)
 
 
     this.useModule('skeletons', installSkeletons);

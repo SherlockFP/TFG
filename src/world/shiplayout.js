@@ -16,6 +16,7 @@
 // SHIPYARD ATTACHMENT POINTS (documented in docs/wave4/ship2.md, data in world/hardpoints.js): the core keeps the three doorway gaps
 // R1 (+x wall, z -1.125), N1 (-z wall, x -5.4) and N2 (-z wall, x 2.25). Rooms grow OUTSIDE those doorways; nothing in this layout may fill the
 // walkway in front of them (checked by the overlap test: `aisles` + the 0.9 m walker in `ACCESS`).
+import { planStairs } from './stairs.js';
 const PI = Math.PI;
 
 export const SHELL = { x0: -7, x1: 7, z0: -3.5, z1: 3.5, h: 3.4, doorX: 2.6, doorW: 2.2, doorH: 2.6 };
@@ -51,7 +52,7 @@ export const SPOTS = {
   decon: { x: 0.86, z: 2.88 },                       // decon shower / med corner
   doorPanel: { x: 3.98, y: 1.2, z: SHELL.z1 - 0.06, ry: PI },
   // ---- hub centre = MESS: food table + chess table, trophy wall on the cockpit bulkhead (hub side)
-  chess: { x: -2.55, z: 1.2, ry: PI / 2 },          // arcade chess / draughts table (stools along x)
+  chess: { x: -2.25, z: 1.0, ry: PI / 2 },          // arcade chess / draughts table (stools along x)
   trophy: { x: -4.0 + PT / 2 + 0.01, z: 2.27, y: 1.62, cols: 6, rows: 2, dz: 0.38, dy: 0.5 },   // cycle3 trophy wall: face x, centre z / y, pitch, plaque scale
   // ---- engine room (orange)
   bench: { x: 4.55, z: SHELL.z0 + 0.39 + 0.03 },     // crafting workbench (wave 5: 0.1 m aft so the way in under the arch stays >= 0.9 m)
@@ -70,9 +71,9 @@ export function dropPoint(i = 0, rand = Math.random) { const c = SPOTS.cargo; re
 /** food table candidates [x, z, ry], first free one wins (food.js). ry = PI / 2 puts the stools along x. */
 export const TABLE_SPOTS = [[-2.3, -1.2, PI / 2], [1.95, -0.3, PI / 2], [-2.3, -1.2, 0]];
 export const PAD = { x: 0, z: -1.0, r: 0.68 };      // teleporter pad = spawns[2]
-export const DISCO = { x: 2.0, z: 0.0 };
+export const DISCO = { x: -0.6, z: 0.5 };   // wave 5 shipdeck: was (2, 0), which is inside the stairwell now
 /** ceiling lamps (world x, z) */
-export const LAMPS = [[-5.4, 0], [-1.6, 0], [1.3, 0], [5.0, -2.6], [5.2, 1.0]];
+export const LAMPS = [[-5.4, 0], [-1.6, 0], [1.8, 2.0], [5.0, -2.6], [5.2, 1.0]];   // wave 5 shipdeck: the third lamp left the stairwell (x 0.8..2.8, z -1.6..1.3)
 /** decor with a collider (crates in the cargo corner, planters). h = height, w/d footprint. */
 export const DECOR = [
   { id: 'crateA', x: 6.72, z: 3.2, w: 0.5, d: 0.5, h: 0.5 },
@@ -166,6 +167,7 @@ export function fixtureBoxes(S = SPOTS, opts = {}) {
     const T = S.trophy, P = TROPHY_PLAQUE, hz = ((T.cols - 1) * T.dz + P.w) / 2, hy = ((T.rows - 1) * T.dy + P.h) / 2;
     out.push({ id: 'trophyWall', x0: T.x - 0.01, x1: T.x + 0.09, z0: T.z - hz, z1: T.z + hz, y0: T.y - hy, y1: T.y + hy, kind: 'wall' });
   }
+  if (opts.deck) { const b = deckStairs().block; out.push(box('deckStair', (b.x0 + b.x1) / 2, (b.z0 + b.z1) / 2, (b.x1 - b.x0) / 2, (b.z1 - b.z0) / 2, 0, S.h, { kind: 'solid' })); }   // [shipdeck] the stair housing (once the deck is bought)
   for (const [i, t] of (opts.tables || [TABLE_SPOTS[0]]).entries()) out.push(aabb('table' + i, DIMS.table, t[0], t[1], t[2] || 0, 0, DIMS.table.h, { kind: 'solid' }));
   for (const d of opts.decor || DECOR) out.push(box(d.id, d.x, d.z, d.w / 2, d.d / 2, d.y || 0, (d.y || 0) + d.h, { kind: 'solid' }));
   if (!opts.noMods) {
@@ -210,7 +212,7 @@ export const ACCESS = [
   { id: 'door', x: 2.6, z: 2.9 }, { id: 'doorPanel', x: 3.95, z: 2.9 }, { id: 'stove', x: -3.25, z: -2.3 }, { id: 'brew', x: -2.05, z: -2.3 }, { id: 'coffee', x: -1.1, z: -2.3 },
   { id: 'charger', x: -0.35, z: -2.8 }, { id: 'arcade', x: 0.95, z: -2.1 }, { id: 'tpPad', x: 0, z: -1.0 },
   { id: 'mirror', x: -3.2, z: 2.9 }, { id: 'kiosk', x: -1.75, z: 2.35 }, { id: 'incubator', x: -0.38, z: 2.2 }, { id: 'decon', x: 0.86, z: 1.8 },
-  { id: 'trophies', x: -3.3, z: 2.4 }, { id: 'chess', x: -2.55, z: 0.2 }, { id: 'table', x: -2.3, z: -0.1 },
+  { id: 'trophies', x: -3.3, z: 2.4 }, { id: 'chess', x: -2.25, z: 0.05 }, { id: 'table', x: -2.3, z: -0.1 },
   { id: 'bench', x: 4.55, z: -2.25 }, { id: 'reactor', x: 5.3, z: -2.3 }, { id: 'svPlanter', x: -5.85, z: 0.0 }, { id: 'planterCargo', x: 3.65, z: -0.5 },
   { id: 'planterHub', x: -4.5, z: -2.3 }, { id: 'lootBay', x: 5.05, z: 0.3 }, { id: 'suits', x: 5.8, z: 0.3 }, { id: 'cupboard', x: 5.84, z: 2.4 },
   { id: 'bunks', x: 4.65, z: 1.0 }, { id: 'crate', x: 5.8, z: 1.75 },
@@ -260,7 +262,7 @@ export const WINDOWS_Z = [
 ];
 
 /** ship spawn points (metres, y = 0.05); the teleporter pad is spawns[2] */
-export const SPAWNS = [[-3.0, 0.15], [-0.8, 1.3], [PAD.x, PAD.z], [1.4, 0.9], [2.4, -1.0], [-1.4, 0.15], [2.4, 1.9], [4.0, 0.3]];
+export const SPAWNS = [[-3.0, 0.15], [-0.8, 1.3], [PAD.x, PAD.z], [1.6, 1.9], [-1.0, -2.1], [-1.4, 0.15], [2.4, 1.95], [4.0, 0.3]];   // wave 5 shipdeck: two spawns left the stairwell
 
 /** every static solid of the layout as AABBs for the overlap test / fault-panel obstacles: partitions + posts + fixtures */
 export function solidBoxes(S = SPOTS, opts = {}) {
@@ -282,3 +284,75 @@ export const LEGACY_SPOTS = {
 export const LEGACY_TABLES = [[-4.4, -0.9]];
 export const LEGACY_LAMPS = [[-4, 0], [0, 0], [4, 0]];
 export const LEGACY_SPAWNS = [[-3, 0], [-1.5, 1.2], [0, -1.0], [1.5, 1.0], [3, -1.2], [-2.2, -1.5], [2.4, 1.6], [4, 0.2]];
+
+// ---------------------------------------------------------------------------------------------- UPPER DECK (wave 5 shipdeck, docs/wave5/shipdeck.md)
+// A second floor on the roof over the hub (x -0.5..4.0, z -3.3..3.3, floor top y 4.0), reached from INSIDE: a U-shaped stair in the hub (lane A climbs north to
+// a platform, lane B climbs back south) that rises through a hatch (the "well": an opening in the ceiling, the roof plate and the deck floor). Until the
+// deck is bought the well is closed by a lid (ship.js `deckHatch`). Everything below is pure data so the overlap test and the walk test see what the game builds.
+export const WELL = { x0: 0.85, x1: 2.95, z0: -1.5, z1: 1.3 };
+export const DECK = { y: 4.0, slab: 0.15, x0: -0.5, x1: 4.0, z0: -3.3, z1: 3.3, wall: 0.12, h: 2.6, rail: 1.1 };
+const LANE = 1.0, DIVIDER = 0.1, MID_Y = 1.975, RUN = 1.9;
+let _stairs = null;
+/** the two flights (planStairs plans, world coordinates) + the turning platform */
+export function deckStairs() {
+  if (_stairs) return _stairs;
+  const bz = WELL.z1 - RUN;
+  const a = planStairs({ x: WELL.x0 + LANE / 2, z: WELL.z1, y: 0, dir: 'z-', width: LANE, rise: MID_Y, run: RUN, n: 10, landing: 0, tag: 'deckA' });
+  const b = planStairs({ x: WELL.x1 - LANE / 2, z: bz, y: MID_Y, dir: 'z+', width: LANE, rise: DECK.y - MID_Y, run: RUN, n: 10, baseY: 0, landing: 0, tag: 'deckB' });
+  _stairs = { a, b, laneW: LANE, dividerX0: WELL.x0 + LANE, dividerX1: WELL.x0 + LANE + DIVIDER, platform: { x0: WELL.x0, x1: WELL.x1, z0: WELL.z0, z1: bz, y: MID_Y },
+    block: { x0: WELL.x0 - 0.1, x1: WELL.x1 + 0.1, z0: WELL.z0 - 0.1, z1: WELL.z1 }, inAt: { x: WELL.x0 + LANE / 2, z: WELL.z1 + 0.5 }, outAt: { x: WELL.x1 - LANE / 2, z: WELL.z1 + 0.5 } };
+  return _stairs;
+}
+/** rectangles [x0, z0, x1, z1] that tile a plate without the well (ceiling collider, deck slab) */
+export function withoutWell(x0, z0, x1, z1) { const W = WELL; return [[x0, z0, W.x0, z1], [W.x1, z0, x1, z1], [W.x0, z0, W.x1, W.z0], [W.x0, W.z1, W.x1, z1]]; }
+
+export const DECK_ROOMS = ['bunk', 'store', 'turret', 'lounge'];
+/** room height (collider) per type; the slots hug the north / south cabin wall; `face` = the way you face to use them (+1 = south, -1 = north) */
+export const DECK_ROOM_H = { bunk: 1.6, store: 1.9, turret: 1.15, lounge: 0.9 };
+export const DECK_SLOTS = [
+  { x0: -0.3, x1: 1.8, z0: -3.14, z1: -2.59, face: 1 }, { x0: 1.95, x1: 3.85, z0: -3.14, z1: -2.59, face: 1 },
+  { x0: -0.3, x1: 1.8, z0: 2.28, z1: 3.14, face: -1 }, { x0: 1.95, x1: 3.85, z0: 2.28, z1: 3.14, face: -1 },
+];
+/** number of usable room slots per deck tier (Mk2 = 2, Mk3 = 4) */
+export const deckSlots = (t) => (t >= 3 ? 4 : t >= 2 ? 2 : 0);
+export const slotSpot = (i) => { const s = DECK_SLOTS[i]; return { x: (s.x0 + s.x1) / 2, z: s.face > 0 ? s.z1 + 0.47 : s.z0 - 0.47 }; };
+/** the extra roof mount that Mk III adds (ship2 mounts; the plate sits in the west strip of the deck, under the dome) */
+export const DECK_MOUNT = { id: 'M6', x: 0.25, z: 0, y: DECK.y, label: 'DECK' };
+/** standing spots on the deck floor the overlap test must reach with a 0.9 m walker (start = the top of lane B) */
+export const DECK_ACCESS = (t = 3) => [
+  ...(t >= 2 ? DECK_SLOTS.slice(0, deckSlots(t)).map((_, i) => ({ id: 'slot' + i, ...slotSpot(i) })) : []),
+  ...(t >= 3 ? [{ id: 'mountM6', x: DECK_MOUNT.x - 0.1, z: DECK_MOUNT.z - 0.9 }, { id: 'mountM6s', x: DECK_MOUNT.x - 0.1, z: DECK_MOUNT.z + 0.9 }] : []),
+  { id: 'wellRim', x: 0.2, z: 0 }, { id: 'stairExit', ...deckStairs().outAt },
+];
+
+const cbox = (id, x0, x1, z0, z1, y0, y1, extra) => ({ id, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, cz: (z0 + z1) / 2, sx: x1 - x0, sy: y1 - y0, sz: z1 - z0, ...extra });
+/** every static collider the deck adds, as {id, cx, cy, cz, sx, sy, sz, q?} (centre + full size): game/shipdeck.js hands them to physics.addStaticBox */
+export function deckColliders(t = 1, rooms = []) {
+  if (t < 1) return [];
+  const St = deckStairs(), W = WELL, D = DECK, out = [];
+  for (const [k, p] of [['A', St.a], ['B', St.b]]) {
+    out.push({ id: 'ramp' + k, ...p.ramp });
+    p.boxes.forEach((b, i) => out.push({ id: 'skirt' + k + i, ...b }));
+  }
+  const bz = St.platform.z1;
+  out.push(cbox('platform', W.x0, W.x1, W.z0, bz, 0, MID_Y));
+  out.push(cbox('divider', St.dividerX0, St.dividerX1, bz, W.z1, 0, D.y + D.rail));
+  out.push(cbox('houseN', W.x0 - 0.1, W.x1 + 0.1, W.z0 - 0.1, W.z0, 0, 3.4), cbox('houseW', W.x0 - 0.1, W.x0, W.z0, W.z1, 0, 3.4), cbox('houseE', W.x1, W.x1 + 0.1, W.z0, W.z1, 0, 3.4));
+  withoutWell(D.x0, D.z0, D.x1, D.z1).forEach(([x0, z0, x1, z1], i) => out.push(cbox('slab' + i, x0, x1, z0, z1, D.y - D.slab, D.y)));
+  // rails round the well (open only where lane B comes out) + the deck edge (rails at Mk I, cabin walls from Mk II)
+  const r = 0.04, top = D.y + D.rail;
+  out.push(cbox('rimW', W.x0 - r, W.x0 + r, W.z0 - r, W.z1, D.y, top), cbox('rimN', W.x0 - r, W.x1 + r, W.z0 - r, W.z0 + r, D.y, top), cbox('rimE', W.x1 - r, W.x1 + r, W.z0 - r, W.z1, D.y, top),
+    cbox('rimS', W.x0 - r, St.dividerX1, W.z1 - r, W.z1 + r, D.y, top));
+  const th = t >= 2 ? D.wall : 0.08, y1 = t >= 2 ? D.y + D.h : top;
+  out.push(cbox('edgeN', D.x0, D.x1, D.z0, D.z0 + th, D.y, y1), cbox('edgeS', D.x0, D.x1, D.z1 - th, D.z1, D.y, y1), cbox('edgeW', D.x0, D.x0 + th, D.z0, D.z1, D.y, y1), cbox('edgeE', D.x1 - th, D.x1, D.z0, D.z1, D.y, y1));
+  if (t >= 2) for (let i = 0; i < deckSlots(t); i++) { const rm = rooms[i], s = DECK_SLOTS[i]; if (rm && DECK_ROOM_H[rm]) out.push(cbox('room' + i, s.x0, s.x1, s.z0, s.z1, D.y, D.y + DECK_ROOM_H[rm], { room: rm })); }
+  return out;
+}
+/** deck-floor fixtures as world AABBs for the overlap test (rooms + rails + cabin walls; the mount plate is walkable, not a solid) */
+export function deckFixtures(t = 3, rooms = DECK_ROOMS) {
+  return deckColliders(t, rooms).filter((c) => /^(room|rim|edge)/.test(c.id)).map((c) => ({ id: c.id, x0: c.cx - c.sx / 2, x1: c.cx + c.sx / 2, z0: c.cz - c.sz / 2, z1: c.cz + c.sz / 2, y0: c.cy - c.sy / 2, y1: c.cy + c.sy / 2, kind: /^room/.test(c.id) ? 'solid' : 'wall' }));
+}
+
+// the foot of lane A must stay reachable from the airlock (hub walkway) and free of fixtures
+AISLES.push({ id: 'deckStairIn', x0: WELL.x0, x1: WELL.x0 + LANE, z0: WELL.z1, z1: WELL.z1 + 0.6, y0: 0.05, y1: 2.2 });
+ACCESS.push({ id: 'deckStairIn', ...deckStairs().inAt });

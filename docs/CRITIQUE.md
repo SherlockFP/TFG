@@ -223,3 +223,6 @@ The new core loop exists end to end in code (partition, capture, fortify, capped
 
 ## Wave 5 - aimchase (docs/wave5/aimchase.md)
 NPC shooters now telegraph (laser, white lock, fire at the locked point) and creatures obey one speed table (sustained < sprint, short bursts, fatigue, door hesitation); only node-tested, laser/vignette look and difficulty feel are unverified in a browser.
+
+## Wave 5 - shipdeck (docs/wave5/shipdeck.md)
+The ship now has a proper upper floor (stair in the hub, hatch, deck, rooms, dome) that visibly changes with every tier and is proven climbable with the real controller in node; but it was never seen in a browser (the shared lock was busy; script `wave5_shipdeck.js` is ready), never hand-played or tried by two players. Room effects are tiny numbers (cosmetic-first), the U-stair block takes a good bite out of the hub floor (the chess table, a lamp, the disco ball moved), the roof turret socket and mounts moved aft, and creatures do not know the deck exists. `ship2_install` "repair" test is flaky (random hull slot), unrelated.

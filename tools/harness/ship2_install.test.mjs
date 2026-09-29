@@ -103,7 +103,7 @@ ok('installs, attaches run.s2 (hull) with mounts + planters, publishes hullDamag
 ok('client builds the roof mount plates + ladder + planter slots on the real ship', () => {
   tick(game, 8);
   const c = s2.client();
-  assert.equal(c.mountViews, 5); assert.ok(ship.group.getObjectByName('ship2_ladder')); assert.equal(s2.planterSlots().length, 2);
+  assert.equal(c.mountViews, 6); assert.ok(ship.group.getObjectByName('ship2_ladder')); assert.equal(s2.planterSlots().length, 2);
 });
 ok('no damage while the ship is not landed; landing rolls, storms hurt', () => {
   assert.equal(s2.damage('event'), null);

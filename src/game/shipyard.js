@@ -686,7 +686,7 @@ export function installShipyard(game) {
     lastReq.set(from, tt);
     const s = game.profile.shipyard, wallet = { cr: game.run.credits };
     const op = d.op;
-    const structural = op === 'install' || op === 'upgrade' || op === 'sell' || op === 'move';
+    const structural = op === 'install' || op === 'upgrade' || op === 'sell' || op === 'move' || op === 'deckup' || op === 'deckroom';   // [shipdeck]
     if (structural || op === 'paint' || op === 'name') {
       if (!aboard(from)) return err(from, 'You need to be aboard the ship.');
       if (shipBusy()) return err(from, 'Shipyard work needs the ship in orbit or docked at HQ.');
@@ -707,6 +707,14 @@ export function installShipyard(game) {
         if (r.ok) msg = { k: 'ok', what: 'upgrade', id: r.id, t: r.t, by: from };
         break;
       }
+      case 'deckup': {   // [shipdeck] Upper Deck Mk I-III (credits, or ship parts at the Frame Console)
+        const via = d.via === 'parts' ? 'parts' : 'credits';
+        if (via === 'parts' && !atConsole(from)) return err(from, 'Stand at the Frame Console to use ship parts.');
+        r = Y.tryDeckUp(s, wallet, via);
+        if (r.ok) msg = { k: 'ok', what: 'deckup', t: r.t, by: from };
+        break;
+      }
+      case 'deckroom': r = Y.tryDeckRoom(s, wallet, d.slot, typeof d.room === 'string' ? d.room : null); if (r.ok) msg = { k: 'ok', what: 'deckroom', room: r.room, by: from }; break;
       case 'sell': r = Y.trySell(s, wallet, String(d.id)); if (r.ok) msg = { k: 'ok', what: 'sell', id: r.id, n: r.refund, by: from }; break;
       case 'move': r = Y.tryMove(s, wallet, String(d.id), String(d.to)); if (r.ok) msg = { k: 'ok', what: 'move', id: r.id, by: from }; break;
       case 'deposit': {
@@ -800,6 +808,11 @@ export function installShipyard(game) {
     switch (m.k) {
       case 'err': toast(t(m.why), 'bad'); termPrint(t(m.why), 'err'); game.audio?.play?.('ui_error', { volume: 0.5, bus: 'ui' }); break;
       case 'ok': {
+        if (m.what === 'deckup' || m.what === 'deckroom') {   // [shipdeck]
+          const txt = m.what === 'deckup' ? tf('Upper Deck upgraded to {mk}', { mk: MK(m.t) }) : m.room ? tf('Deck room set: {name}', { name: t(Y.DECK_INFO[m.room]?.name || m.room) }) : t('Deck room cleared');
+          toast(txt, 'good'); if (m.by === game.selfId) { termPrint(txt); game.audio?.play?.('ui_confirm', { volume: 0.6, bus: 'ui' }); }
+          break;
+        }
         if (m.by !== game.selfId) { if (m.what === 'install' || m.what === 'upgrade') toast(tf(m.what === 'install' ? '{name} installed: {mk}' : '{name} upgraded to {mk}', { name: name(m.id), mk: MK(m.t) }), 'good'); break; }
         const txt = m.what === 'install' ? tf('{name} installed: {mk}', { name: name(m.id), mk: MK(m.t) }) : m.what === 'upgrade' ? tf('{name} upgraded to {mk}', { name: name(m.id), mk: MK(m.t) })
           : m.what === 'sell' ? tf('{name} removed (+▮{n})', { name: name(m.id), n: m.n }) : m.what === 'move' ? tf('{name} moved', { name: name(m.id) }) : m.what === 'deposit' ? tf('Ship parts stored: {n}', { n: m.n }) : t('The hull is repainted.');

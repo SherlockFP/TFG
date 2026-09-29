@@ -3,6 +3,7 @@
 // profile (profile.shipyard, survives fired runs) and is mirrored into run.sy for every peer / late joiner:
 //   { v, m: { <socket>: { id, t } }, parts: { plate, bulk, coil, brk }, paint: { c1, c2, pat }, theme, name, day: { <playerId>: dayNumber } }
 import { SOCKETS, SOCKET_IDS, WALL_T } from '../world/hardpoints.js';
+import { DECK_ROOMS, deckSlots } from '../world/shiplayout.js';   // [shipdeck] Upper Deck rules live here, geometry in world/shiplayout.js
 import { blankDeco, sanitizeDeco } from './polish4_core.js';   // [polish4] decals + furniture ride along in the ship state
 
 export const VERSION = 1;
@@ -92,7 +93,7 @@ export function sanitizeName(n) {
 
 // ---------------------------------------------------------------------------------------------- state
 export function blankState() {
-  return { v: VERSION, m: {}, parts: { plate: 0, bulk: 0, coil: 0, brk: 0 }, paint: { c1: 'orange', c2: 'slate', pat: 'stripes' }, theme: 'steel', name: DEFAULT_NAME, day: {}, deco: blankDeco() };
+  return { v: VERSION, m: {}, parts: { plate: 0, bulk: 0, coil: 0, brk: 0 }, paint: { c1: 'orange', c2: 'slate', pat: 'stripes' }, theme: 'steel', name: DEFAULT_NAME, day: {}, deco: blankDeco(), deck: blankDeck() };
 }
 const int = (v, lo, hi, d = 0) => { v = Math.floor(Number(v)); return Number.isFinite(v) ? Math.max(lo, Math.min(hi, v)) : d; };
 export function sanitize(raw) {
@@ -113,8 +114,58 @@ export function sanitize(raw) {
   s.theme = THEME_IDS.includes(raw.theme) ? raw.theme : 'steel';
   s.name = sanitizeName(raw.name);
   s.deco = sanitizeDeco(raw.deco);
+  s.deck = sanitizeDeck(raw.deck);
   if (raw.day && typeof raw.day === 'object') for (const [k, v] of Object.entries(raw.day).slice(0, 16)) if (Number.isFinite(v)) s.day[String(k).slice(0, 32)] = int(v, 0, 1e6);
   return s;
+}
+
+// ---------------------------------------------------------------------------------------------- UPPER DECK (wave 5 shipdeck)
+// state.deck = { t: 0..3, rooms: [slot0..slot3] } - Mk I bare deck (stair + hatch), Mk II two rooms the crew picks, Mk III dome + 4 slots + one extra roof mount.
+export const DECK_MAX = 3;
+export const DECK_CR = [0, 450, 800, 1500];
+export const DECK_ROOM_CR = 120;
+export const DECK_INFO = {
+  bunk: { name: 'Bunk Room', tip: 'Cots and a night lamp. +60 s of Rested buff if the Bunk module is built.' },
+  store: { name: 'Storage', tip: 'Shelves and crates. +6 rack slots if the Cargo Bay is built.' },
+  turret: { name: 'Turret Control', tip: 'Gunnery console. Roof turret fires 10% faster if the Turret Hardpoint is built.' },
+  lounge: { name: 'Observation Lounge', tip: 'Sofa and a warm lamp. Jam sessions pay 10% more if the Lounge is built.' },
+};
+export const deckPartCost = (t) => (t === 1 ? { plate: 6, bulk: 4, coil: 1, brk: 1 } : t === 2 ? { plate: 8, bulk: 6, coil: 2, brk: 1 } : t === 3 ? { plate: 12, bulk: 8, coil: 4, brk: 2 } : null);
+export function blankDeck() { return { t: 0, rooms: [null, null, null, null] }; }
+export function sanitizeDeck(raw) {
+  const t = int(raw?.t, 0, DECK_MAX), n = deckSlots(t), seen = new Set();
+  const rooms = [0, 1, 2, 3].map((i) => { const r = raw?.rooms?.[i]; if (i >= n || !DECK_ROOMS.includes(r) || seen.has(r)) return null; seen.add(r); return r; });
+  return { t, rooms };
+}
+export const deckHas = (s, room) => !!s.deck?.rooms?.includes(room);
+export function deckQuote(s) {
+  const cur = s.deck?.t || 0, to = cur + 1;
+  if (to > DECK_MAX) return { cur, to: null, maxed: true };
+  return { cur, to, cr: DECK_CR[to], parts: deckPartCost(to), install: cur === 0 };
+}
+export function tryDeckUp(s, wallet, via = 'credits') {
+  const q = deckQuote(s);
+  if (q.maxed) return fail('Already Mk III.');
+  const bad = canPay(s, wallet, q.cr, q.parts, via);
+  if (bad) return fail(bad);
+  pay(s, wallet, q.cr, q.parts, via);
+  s.deck = sanitizeDeck({ t: q.to, rooms: s.deck.rooms });
+  return { ok: true, t: q.to, via };
+}
+/** put `room` (or null = empty) into deck slot `slot`; a room can stand in one slot only (moving it swaps the empty slot) */
+export function tryDeckRoom(s, wallet, slot, room) {
+  slot = Math.floor(Number(slot));
+  if (!(slot >= 0 && slot < deckSlots(s.deck.t))) return fail('That deck slot is not built yet.');
+  if (room !== null && !DECK_ROOMS.includes(room)) return fail('Unknown room.');
+  if (s.deck.rooms[slot] === room) return fail('Nothing changed.');
+  const cost = room === null ? 0 : DECK_ROOM_CR;
+  if (wallet.cr < cost) return fail('Not enough credits.');
+  wallet.cr -= cost;
+  const rooms = [...s.deck.rooms];
+  if (room !== null) { const at = rooms.indexOf(room); if (at >= 0) rooms[at] = null; }
+  rooms[slot] = room;
+  s.deck = sanitizeDeck({ t: s.deck.t, rooms });
+  return { ok: true, slot, room, cr: cost };
 }
 
 export const socketOf = (s, id) => SOCKET_IDS.find((k) => s.m[k]?.id === id) || null;
@@ -142,6 +193,14 @@ export function effects(s) {
     scanMul: pick([1, 1.25, 1.4, 1.6], T('obs')),
     turret: T('turret'), turretDmg: pick([0, 6, 9, 12], T('turret')), turretRange: pick([0, 22, 26, 30], T('turret')), turretBarrels: pick([0, 1, 1, 2], T('turret')), turretRate: pick([0, 2.2, 2.6, 3], T('turret')),
   };
+  // [shipdeck] Upper Deck rooms: small bonuses that only count when the matching module is built (nothing changes without a deck)
+  e.deck = s.deck?.t || 0;
+  if (e.deck >= 2) {
+    if (deckHas(s, 'turret') && e.turret) e.turretRate = +(e.turretRate * 1.1).toFixed(3);
+    if (deckHas(s, 'store') && e.cargoSlots) e.cargoSlots += 6;
+    if (deckHas(s, 'bunk') && e.restSec) e.restSec += 60;
+    if (deckHas(s, 'lounge') && e.jamMul > 1) e.jamMul = +(e.jamMul + 0.1).toFixed(2);
+  }
   return e;
 }
 /** route / landing cost multiplier: +5 % per module, reduced by the Engine Room */

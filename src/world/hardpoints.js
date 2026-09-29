@@ -26,7 +26,7 @@ export const SOCKETS = {
   N3: { kind: 'chain', dir: [0, -1], room: { x0: -7.9, x1: -2.9, z0: -13.5, z1: -9.0 }, aisle: -5.4, parent: 'N1', group: 'north', label: 'NORTH 3' },
   N4: { kind: 'chain', dir: [0, -1], room: { x0: 0.0, x1: 4.5, z0: -13.5, z1: -9.0 }, aisle: 2.25, parent: 'N2', group: 'north', label: 'NORTH 4' },
   DECK: { kind: 'roof', room: { x0: -6.6, x1: -0.6, z0: -3.2, z1: 3.2 }, group: 'roof', label: 'DECK' },
-  TURRET: { kind: 'roof', room: { x0: 1.4, x1: 4.2, z0: -1.6, z1: 1.6 }, group: 'roof', label: 'ROOF' },
+  TURRET: { kind: 'roof', room: { x0: 4.15, x1: 6.95, z0: -1.6, z1: 1.6 }, group: 'roof', label: 'ROOF' },
 };
 export const SOCKET_IDS = Object.keys(SOCKETS);
 /** width of the doorway that joins a chained room to its parent (through the parent room's far wall) */

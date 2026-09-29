@@ -72,7 +72,9 @@ export function installShip2(game, ctx = {}) {
   }
   const integ = () => C.integrity(hull), tier = () => C.tierOf(integ());
   const engineTier = () => { try { const y = game.shipyard; return Number(y?.core?.tierOf?.(y.state(), 'engine')) || 0; } catch { return 0; } };   // Engine Room Mk I-III = +1 power slot each
-  const slots = () => C.powerSlots(quota(), engineTier(), tier());
+  const deckTier = () => { try { return Number(game.shipdeck?.tier?.()) || 0; } catch { return 0; } };   // [shipdeck] Upper Deck Mk III: +1 power slot and the extra mount M6
+  const mountOn = (m) => !m.deck || deckTier() >= m.deck;
+  const slots = () => C.powerSlots(quota(), engineTier(), tier(), deckTier());
   function publish(save = true) {
     if (!host() || !game.run) return;
     const on = [...C.poweredMounts(mounts, slots())];
@@ -243,7 +245,7 @@ export function installShip2(game, ctx = {}) {
   function ensureDeps() {
     const D = game.deployables; if (!D || phaseNow() !== 'moon') return;
     for (const m of C.MOUNTS) {
-      const r = mounts[m.id]; if (!r) continue;
+      const r = mounts[m.id]; if (!r || !mountOn(m)) continue;
       const id = H.deps.get(m.id);
       const have = id && D.get(id);
       if (have && !have.dead) continue;
@@ -251,7 +253,7 @@ export function installShip2(game, ctx = {}) {
         delete mounts[m.id]; H.deps.delete(m.id); H.depAge.delete(m.id); publish(); continue;
       }
       if (id) continue;
-      const dep = D.debugPlace(r.ty, m.x, m.z, Math.atan2(m.x, m.z), r.tr || null, C.MOUNT_Y);
+      const dep = D.debugPlace(r.ty, m.x, m.z, Math.atan2(m.x, m.z), r.tr || null, C.mountY(m));
       if (dep) { if (Number.isFinite(r.hp) && r.hp > 0) dep.hp = Math.min(dep.maxHp, r.hp); H.deps.set(m.id, dep.id); H.depAge.set(m.id, game.time || 0); }
     }
   }
@@ -276,7 +278,7 @@ export function installShip2(game, ctx = {}) {
     if (!enabled()) return;
     const m = mountOf(String(d.m || '')), it = game.items.get(String(d.item || ''));
     const reply = (msg) => game.net.sendTo(from, 's2msg', { k: 'err', msg });
-    if (!m || !it || it.holder !== from) return;
+    if (!m || !it || it.holder !== from || !mountOn(m)) return;
     if (!landed()) return reply('Only while the ship is landed.');
     const type = it.def?.deploy;
     if (!type || !C.MOUNT_TYPES.includes(type)) return reply('That kit cannot be mounted on the ship.');
@@ -287,7 +289,7 @@ export function installShip2(game, ctx = {}) {
     mounts[m.id] = { ty: type, tr: it.tier || null, hp: null };
     publish();
     ensureDeps();
-    game.net.broadcast('fx', { k: 'snd', s: 'lockpick_success', p: [m.x, C.MOUNT_Y + 0.5, m.z], v: 0.7 });
+    game.net.broadcast('fx', { k: 'snd', s: 'lockpick_success', p: [m.x, C.mountY(m) + 0.5, m.z], v: 0.7 });
     game.net.sendTo(from, 's2msg', { k: 'mounted', type });
   }
 
@@ -416,11 +418,12 @@ export function installShip2(game, ctx = {}) {
   const mountViews = new Map();
   function buildMounts() {
     const g = shipGroup(); if (!g || mountViews.size) return;
-    for (const m of C.MOUNTS) { const mm = MD.createMountModel(); mm.root.position.set(m.x, C.MOUNT_Y, m.z); g.add(mm.root); mountViews.set(m.id, mm); }
+    for (const m of C.MOUNTS) { const mm = MD.createMountModel(); mm.root.position.set(m.x, C.mountY(m), m.z); g.add(mm.root); mountViews.set(m.id, mm); }
   }
   function syncMounts() {
     buildMounts();
     const s = cState();
+    for (const m of C.MOUNTS) { const v = mountViews.get(m.id); if (v) v.root.visible = mountOn(m); }
     for (const m of C.MOUNTS) mountViews.get(m.id)?.setState(!s.mt[m.id] ? 'free' : s.on.has(m.id) ? 'on' : 'off');
   }
   // ---- planters (the pots are static deco; the plants grow here)
@@ -510,7 +513,7 @@ export function installShip2(game, ctx = {}) {
 
   const targetPos = (tg) => {
     if (tg.startsWith('h:')) { const sp = C.spotById({ sp: cState().sp }, tg.slice(2)); const sl = sp && C.slotById(sp.s); return sl ? V.set(sl.x + sl.n[0] * 0.5, sl.y, sl.z + sl.n[2] * 0.5) : null; }
-    const m = mountOf(tg.slice(2)); return m ? V.set(m.x, C.MOUNT_Y + 0.6, m.z) : null;
+    const m = mountOf(tg.slice(2)); return m ? V.set(m.x, C.mountY(m) + 0.6, m.z) : null;
   };
   const toolName = (tool) => t(tool === 'wrench' ? 'Wrench' : tool === 'torch' ? 'Welding Torch' : 'Repair Kit');
 
@@ -540,14 +543,15 @@ export function installShip2(game, ctx = {}) {
       list.push({ pos: new THREE.Vector3(LADDER.roofX + 0.25, C.MOUNT_Y + 0.7, LADDER.roofZ + 0.3), r: 1.0, reach: 3.2, noLos: true, label: t('Climb down [E]'), action: () => climb(false) });
       const kit = heldKit(), ht = heldTool();
       for (const m of C.MOUNTS) {
-        const pos = new THREE.Vector3(m.x, C.MOUNT_Y + 0.6, m.z);
+        if (!mountOn(m)) continue;
+        const pos = new THREE.Vector3(m.x, C.mountY(m) + 0.6, m.z);
         if (pos.distanceTo(cam) > 6) continue;
         const cur = s.mt[m.id];
         if (!cur) {
           list.push({ pos, r: 0.8, reach: 3.4, noLos: true, label: kit ? tf('Mount {n} [E]', { n: t(kit.def.name) }) : `${t('Defence mount')} ${m.label}`, sub: kit ? tf('Power {a}/{b}', { a: [...s.on].length, b: s.ps }) : t('Hold a turret, tesla, floodlight, sensor or drone kit and press E.'), action: () => { if (kit) game.net.request('s2req', { op: 'mount', m: m.id, item: kit.id }); else toast(t('Hold a turret, tesla, floodlight, sensor or drone kit and press E.'), 'info'); } });
         } else if (ht) {
           const dep = (() => { try { return game.deployables?.list?.().find((d) => Math.hypot(d.pos.x - m.x, d.pos.z - m.z) < 0.6 && d.pos.y > 3); } catch { return null; } })();
-          if (dep && dep.hp < dep.maxHp * 0.98) list.push({ pos: new THREE.Vector3(m.x, C.MOUNT_Y + 1.0, m.z), r: 0.9, reach: 3.4, noLos: true, label: tf('Repair {n} ({tool}) [hold E]', { n: t(dep.def.name), tool: toolName(ht.tool) }), sub: `${Math.round(dep.hp)}/${dep.maxHp} HP`, action: () => startRepair(tgtMount(m.id), heldTool()) });
+          if (dep && dep.hp < dep.maxHp * 0.98) list.push({ pos: new THREE.Vector3(m.x, C.mountY(m) + 1.0, m.z), r: 0.9, reach: 3.4, noLos: true, label: tf('Repair {n} ({tool}) [hold E]', { n: t(dep.def.name), tool: toolName(ht.tool) }), sub: `${Math.round(dep.hp)}/${dep.maxHp} HP`, action: () => startRepair(tgtMount(m.id), heldTool()) });
         }
       }
     }
