@@ -89,10 +89,8 @@ function section(S, site, R, out, k, sx, nSec, breachSide) {
   // ---- stairs: full-column steps, one flight per storey
   for (let f = 0; f < nF; f++) {
     const lane = laneOf(f), dir = dirOf(f), base = L(y0, f);
-    for (let i = 0; i < NSTEP; i++) {
-      const z = dir > 0 ? -CORE + STEP_D * (i + 0.5) : CORE - STEP_D * (i + 0.5), h = STEP_H * (i + 1);
-      S.solid('concrete', x0 + lane, base, z, LANE_W, h, STEP_D, { uv: 0.6, tint: 0.9, bottom: false });
-    }
+    // visual steps + ONE inclined ramp collider (world/stairs.js): stepped colliders stalled the autostep against the stairwell walls
+    S.stairs({ key: 'concrete', x: x0 + lane, z: dir > 0 ? -CORE : CORE, y: base, dir: dir > 0 ? 'z+' : 'z-', width: LANE_W, rise: STEP_H * NSTEP, run: STEP_D * NSTEP, n: NSTEP, tag: 'soviet' });
   }
   // ---- slabs per level (ground = foundation top): roof and floors, minus the stair headroom cut
   for (let lv = 1; lv <= nF; lv++) {

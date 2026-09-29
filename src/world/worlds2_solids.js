@@ -4,6 +4,7 @@
 // Nothing here depends on optional GLB models or Math.random: placement / layout is seeded by the caller.
 import * as THREE from 'three';
 import { GeoBuilder, levelMaterial } from './geobuilder.js';
+import { planStairs, rampWorld } from './stairs.js';
 
 // material keys -> level texture (tinted through vertex colours, so every key is ONE material for the whole map)
 export const W2_MATS = {
@@ -90,6 +91,19 @@ export class Solids {
   solid(key, lx, y0, lz, sx, sy, sz, o = {}) {
     this.vis(key, lx, y0, lz, sx, sy, sz, o);
     if (o.col !== false) this.col(lx, y0, lz, sx, sy, sz);
+  }
+  /**
+   * A straight stair flight (world/stairs.js): visual step columns (no collider) + ONE inclined ramp collider, flat landings
+   * and a few skirt boxes. o = planStairs options ({ x, z, y, dir:'x+'|'x-'|'z+'|'z-', width, rise, run, n, baseY, ... }) + { key, uv, tint }.
+   */
+  stairs(o) {
+    const plan = planStairs(o);
+    for (const s of plan.steps) this.vis(o.key || 'concrete', s.cx, s.y0, s.cz, s.sx, s.top - s.y0, s.sz, { uv: o.uv ?? 0.6, tint: o.tint ?? 0.9, bottom: false });
+    for (const b of plan.boxes) this.col(b.cx, b.cy - b.sy / 2, b.cz, b.sx, b.sy, b.sz);
+    const r = rampWorld(plan, this);
+    this.B.addBox(r.x, r.y, r.z, r.sx, r.sy, r.sz, r.q);
+    this.B.boxes++;
+    return plan;
   }
   /** a slab from a [x0,x1,z0,z1] rectangle whose TOP is at `top` */
   slab(key, r, top, th, o = {}) { this.solid(key, (r[0] + r[1]) / 2, top - th, (r[2] + r[3]) / 2, r[1] - r[0], th, r[3] - r[2], o); }

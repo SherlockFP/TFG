@@ -18,6 +18,7 @@ import { GeoBuilder, levelMaterial } from './geobuilder.js';
 import { getBasicMaterial, makeCanvasTexture } from '../render/textures.js';
 import { createAnyProp } from './propfactory.js';
 import { EXT_PRELOAD } from './extmodels.js';
+import { planStairs, rampWorld } from './stairs.js';
 
 const TAU = Math.PI * 2;
 export const PLAYER = { jumpV: 6.2, g: 19.6, walk: 5.0, sprint: 8.2 };
@@ -57,7 +58,7 @@ class FrameGeo extends GeoBuilder {
 const rot2 = (x, z, r) => { const c = Math.cos(r), s = Math.sin(r); return [x * c + z * s, -x * s + z * c]; };
 
 // ============================================================================ solids (visual box + collider)
-class Solids {
+export class Solids {
   constructor(B) { this.B = B; this.x = 0; this.z = 0; this.rot = 0; this.R = null; this.tint = 1; }
   frame(x, z, rot) { this.x = x; this.z = z; this.rot = rot; this.B.gb.M.makeRotationY(rot).setPosition(x, 0, z); }
   w(lx, lz) { const [a, b] = rot2(lx, lz, this.rot); return [this.x + a, this.z + b]; }
@@ -88,6 +89,16 @@ class Solids {
   solid(key, lx, y0, lz, sx, sy, sz, o = {}) {
     this.vis(key, lx, y0, lz, sx, sy, sz, o);
     if (o.col !== false) this.col(lx, y0, lz, sx, sy, sz);
+  }
+  /** straight stair flight (world/stairs.js): visual steps (no collider) + ONE inclined ramp collider + landings / skirts */
+  stairs(o) {
+    const plan = planStairs(o);
+    for (const s of plan.steps) this.vis(o.key || 'concrete', s.cx, s.y0, s.cz, s.sx, s.top - s.y0, s.sz, { uv: 0.6, tint: o.tint ?? 0.95, bottom: false });
+    for (const b of plan.boxes) this.col(b.cx, b.cy - b.sy / 2, b.cz, b.sx, b.sy, b.sz);
+    const r = rampWorld(plan, this);
+    this.B.addBox(r.x, r.y, r.z, r.sx, r.sy, r.sz, r.q);
+    this.B.boxes++;
+    return plan;
   }
   /** register a chest at local (lx, lz) facing local yaw `yawL` */
   chest(out, id, lx, lz, y, yawL, tier, kind, landmark) {
@@ -235,7 +246,7 @@ function pickChestTier(R, kind, tier, depth) {
   return x < 0.3 ? 'iron' : 'wood';
 }
 
-function buildTower(S, site, R, out, tier, depth) {
+export function buildTower(S, site, R, out, tier, depth) {
   const nFl = site.flights, y0 = site.y0, Htop = y0 + 3 * nFl;
   const P = 3.25, C = 2.6, LS = 1.7, STEP = (2 * C - LS) / 10;
   S.frame(site.x, site.z, site.rot);
@@ -251,9 +262,9 @@ function buildTower(S, site, R, out, tier, depth) {
     const [dx, dz] = dirs[k % 4], [cx, cz] = corners[k % 4];
     const hk = y0 + 3 * k;
     const outSign = dx ? Math.sign(cz) : Math.sign(cx);
+    S.stairs({ key: 'metal', x: cx + dx * LS / 2, z: cz + dz * LS / 2, y: hk, dir: dx > 0 ? 'x+' : dx < 0 ? 'x-' : dz > 0 ? 'z+' : 'z-', width: 1.4, rise: 3.0, run: 10 * STEP, n: 10, tag: 'tower' });
     for (let i = 0; i < 10; i++) {
-      const along = LS / 2 + STEP * (i + 0.5), px = cx + dx * along, pz = cz + dz * along, top = hk + 0.3 * (i + 1);
-      S.solid('metal', px, top - 0.3, pz, dx ? STEP : 1.4, 0.3, dz ? STEP : 1.4, { uv: 0.6, tint: 0.95 });
+      const top = hk + 0.3 * (i + 1);
       if (i % 2 === 1) {
         const rc = cx + dx * (LS / 2 + STEP * i), rz = cz + dz * (LS / 2 + STEP * i);
         for (const sgn of [1, -1]) {
@@ -319,7 +330,7 @@ function wallRects(len, h, openings) {
   return rects.filter((r) => r[1] - r[0] > 0.05 && r[3] - r[2] > 0.05);
 }
 
-function buildRuin(S, site, R, out, tier, depth) {
+export function buildRuin(S, site, R, out, tier, depth) {
   const nF = site.floors, y0 = site.y0, FH = 3.0, W = 11.0, D = 9.0, T = 0.4;
   const L = (i) => y0 + FH * i;
   S.frame(site.x, site.z, site.rot);
@@ -328,10 +339,7 @@ function buildRuin(S, site, R, out, tier, depth) {
   const Z0 = -2.6, Z1 = 0.6, ST = 0.32, laneA = -4.375, laneB = -2.925, LW = 1.45;
   const flights = [{ lane: laneA, dir: 1, base: L(0) }, { lane: laneB, dir: -1, base: L(1) }];
   if (nF === 3) flights.push({ lane: laneA, dir: 1, base: L(2) });
-  for (const f of flights) for (let i = 0; i < 10; i++) {
-    const z = f.dir > 0 ? Z0 + ST * (i + 0.5) : Z1 - ST * (i + 0.5), top = f.base + 0.3 * (i + 1);
-    S.solid('concrete', f.lane, top - 0.3, z, LW, 0.3, ST, { uv: 0.6, tint: 0.9 });
-  }
+  for (const f of flights) S.stairs({ key: 'concrete', x: f.lane, z: f.dir > 0 ? Z0 : Z1, y: f.base, dir: f.dir > 0 ? 'z+' : 'z-', width: LW, rise: 3.0, run: 10 * ST, n: 10, tint: 0.9, tag: 'ruin' });
   // slabs per level as tile runs (stair cut-outs + a few holes)
   const NX = 10, NZ = 8, X0 = -5.3, Z0s = -4.3, TX = (2 * 5.3) / NX, TZ = (2 * 4.3) / NZ;
   const cut = (lv) => {

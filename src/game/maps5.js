@@ -20,6 +20,7 @@ import { registerMaps5Creatures, M5_TYPES } from './maps5_creatures.js';
 import { M5_CREATURE_MODELS, M5_ITEM_MODELS } from '../models/maps5_models.js';
 import { TR, RU } from './maps5_text.js';
 import * as CORE from './maps5_core.js';
+import { ladderStep } from '../world/stairs.js';
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const flat = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
@@ -132,18 +133,11 @@ export function installMaps5(game) {
     try {
       const L = infoNow()?.archive?.ladder;
       if (L && !this.dead && !this.inShip && !this.frozen && !this.indoor) {
-        const dx = this.pos.x - L.x, dz = this.pos.z - L.z;
-        const inVol = Math.hypot(dx, dz) < L.r && this.pos.y > L.y0 - 0.25 && this.pos.y < L.top;
-        if (inVol) {
-          const up = input.isDown('forward') || input.isDown('jump'), down = input.isDown('back') || input.isDown('crouch');
-          const fx = -Math.sin(this.yaw), fz = -Math.cos(this.yaw);
-          if (!S.climb && up && fx * L.face.x + fz * L.face.z > 0.35) { S.climb = true; S.stats.climbs++; }
-          if (S.climb) {
-            this.vel.y = (up ? CLIMB_SPEED : down ? -CLIMB_SPEED : 0) + 19.6 * Math.min(dt, 1 / 20);   // cancels this frame's gravity: net = the climb speed
-            this.minVelY = 0; this.fallStartY = null; this.airT = 0;
-            if (down && this.grounded && this.pos.y < L.y0 + 0.3) S.climb = false;
-          }
-        } else S.climb = false;
+        // shared ladder rules (world/stairs.js ladderStep): grab facing the ladder, climb at CLIMB_SPEED, let go at the foot / outside the volume
+        const r = ladderStep(L, { climbing: S.climb }, { pos: this.pos, yaw: this.yaw, up: input.isDown('forward') || input.isDown('jump'), down: input.isDown('back') || input.isDown('crouch'), grounded: this.grounded }, CLIMB_SPEED, dt);
+        if (r.climbing && !S.climb) S.stats.climbs++;
+        S.climb = r.climbing;
+        if (r.vy !== null) { this.vel.y = r.vy; this.minVelY = 0; this.fallStartY = null; this.airT = 0; }
       } else S.climb = false;
     } catch (e) { S.climb = false; if (!S.warned) { S.warned = true; console.warn('[maps5] ladder', e); } }
     return origUpdate.call(this, dt, input);
