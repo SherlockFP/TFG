@@ -221,6 +221,8 @@ export function buildRooms2(ctx) {
   };
   const flat = (key, x, z, sx, sz, y, hex) => gb.hrect(key, x - sx / 2, z - sz / 2, x + sx / 2, z + sz / 2, y, true, 0.5, col3(hex));
 
+  const boxFree = (x0, z0, x1, z1) => !(ctx.propBoxes || []).some((b) => x0 < b[2] + 0.1 && x1 > b[0] - 0.1 && z0 < b[3] + 0.1 && z1 > b[1] - 0.1);   // [geomfix] no new furniture inside an existing prop
+
   // per-room scene helper ---------------------------------------------------------------------------------
   function scene(r) {
     const rc = K.roomRect(r);
@@ -229,7 +231,7 @@ export function buildRooms2(ctx) {
     S.doors = r.linkKeys.map((k) => linkInfo(L, K, r, k));
     S.walls = rng.shuffle(K.perimeter(r).filter((e) => !K.edgeBusy(e.x, e.z, e.d) && !K.cellHasDoorway(e.x, e.z)));
     S.clear = (x, z, hw, hd, gap = 1.9) => x - hw >= rc.x0 + 0.35 && x + hw <= rc.x1 - 0.35 && z - hd >= rc.z0 + 0.35 && z + hd <= rc.z1 - 0.35
-      && navClear(ctx.nav, x - hw, z - hd, x + hw, z + hd, 0.12) && S.doors.every((d) => Math.hypot(d.x - x, d.z - z) > gap + Math.min(hw, hd) * 0.5);
+      && navClear(ctx.nav, x - hw, z - hd, x + hw, z + hd, 0.12) && boxFree(x - hw, z - hd, x + hw, z + hd) && S.doors.every((d) => Math.hypot(d.x - x, d.z - z) > gap + Math.min(hw, hd) * 0.5);
     S.near = (tx, tz, hw, hd, gap) => {
       for (const rad of [0, 0.7, 1.4, 2.1, 2.8]) for (let a = 0; a < (rad ? 8 : 1); a++) {
         const x = tx + Math.cos(a * 0.785) * rad, z = tz + Math.sin(a * 0.785) * rad;
@@ -491,7 +493,7 @@ export function buildRooms2(ctx) {
         const [px, pz] = K.wallPoint(w.x, w.z, w.d, rng.float(-1.0, 1.0), d0 / 2 + 0.3);
         const hw = Math.max(w0, d0) / 2;
         if (px - hw < S.rc.x0 + 0.2 || px + hw > S.rc.x1 - 0.2 || pz - hw < S.rc.z0 + 0.2 || pz + hw > S.rc.z1 - 0.2) continue;   // [finish] was 0.4: nothing ever fit (footprint edge sits 0.3 m from the wall)
-        if (!navClear(ctx.nav, px - hw, pz - hw, px + hw, pz + hw, 0.1) || S.doors.some((d) => Math.hypot(d.x - px, d.z - pz) < 1.9)) continue;
+        if (!navClear(ctx.nav, px - hw, pz - hw, px + hw, pz + hw, 0.1) || !boxFree(px - hw, pz - hw, px + hw, pz + hw) || S.doors.some((d) => Math.hypot(d.x - px, d.z - pz) < 1.9)) continue;
         const fo = ctx.placeProp(id, px, Y, pz, WALL_ROT[w.d], { ...opts });
         if (fo) { placed++; const kind = { 'm2:drawer_cab': 'drawer', 'm2:pc': 'pc', 'm2:radio': 'radio', 'm2:phone': 'phone' }[id]; if (kind) out.spots.push({ k: kind, room: r.id, x: px, y: Y + 0.9, z: pz, obj: fo }); break; }   // [finish] stateful furniture (src/game/maps2_furniture.js)
       }

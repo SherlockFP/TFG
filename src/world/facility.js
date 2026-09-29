@@ -928,6 +928,7 @@ export function buildFacility(layout, { physics, lightPool }) {
 
   // ---------- props ----------
   const nav = new NavGrid(L, 1);
+  const propBoxes = [];   // [x0, z0, x1, z1] of every solid floor prop (the 1 m nav grid alone misses small props)
   const placeProp = (id, x, y, z, rotY, opts = {}) => {
     let obj;
     try { obj = createProp(id, { seed: rng.int(0, 99999), variant: rng.int(0, 3), ...opts }); } catch (e) { console.warn('prop', id, e); return null; }
@@ -952,7 +953,7 @@ export function buildFacility(layout, { physics, lightPool }) {
         continue;
       }
       addBox(px, py, pz, sx, sy, sz, G.STATIC, { kind: 'prop', id });
-      if (sy > 0.3 && py - sy / 2 < Y + 1.2 && py + sy / 2 > Y + 0.2) nav.blockBox(px - sx / 2, pz - sz / 2, px + sx / 2, pz + sz / 2, 0.15);
+      if (sy > 0.3 && py - sy / 2 < Y + 1.2 && py + sy / 2 > Y + 0.2) { nav.blockBox(px - sx / 2, pz - sz / 2, px + sx / 2, pz + sz / 2, 0.15); propBoxes.push([px - sx / 2, pz - sz / 2, px + sx / 2, pz + sz / 2]); }   // [geomfix] exact footprints for later furniture passes
     }
     for (const l of obj.userData.lights || []) {
       const p = new THREE.Vector3(...l.p).applyMatrix4(obj.matrixWorld);
@@ -1045,6 +1046,10 @@ export function buildFacility(layout, { physics, lightPool }) {
       const off = depth / 2 + 0.06;
       const px = ecx + inward[0] * off, pz = ecz + inward[1] * off;
       const wallMounted = id === 'fuse_box' || id === 'pipe_vertical';
+      if (!wallMounted) {   // [geomfix] corner cells offer two wall slots: never stand a second cabinet / bed inside the first
+        const hx = (s.d % 2 === 0 ? sz.z : sz.x) / 2, hz = (s.d % 2 === 0 ? sz.x : sz.z) / 2;
+        if (propBoxes.some((b) => px - hx < b[2] - 0.05 && px + hx > b[0] + 0.05 && pz - hz < b[3] - 0.05 && pz + hz > b[1] + 0.05)) continue;
+      }
       const obj = placeProp(id, px, Y + (wallMounted && id === 'fuse_box' ? 1.1 : 0), pz, rot);
       if (obj && id === 'fuse_box') {
         interactables.push({ type: 'fuse', obj, pos: new THREE.Vector3(px, Y + 1.5, pz), id: 'fuse' + interactables.length });
@@ -1373,7 +1378,7 @@ export function buildFacility(layout, { physics, lightPool }) {
   }
   // theme decoration (src/world/interiors/*.js): pillars, water channels, cable trays, pools ...
   const themeCtx = {
-    layout: L, group, lightPool, addBox, placeProp, nav, Y, CELL: C, levelMaterial, GeoBuilder, emitters,
+    layout: L, group, lightPool, addBox, placeProp, propBoxes, nav, Y, CELL: C, levelMaterial, GeoBuilder, emitters,
     zones: setPieces.zones, scrapSpots, darkCells, setPieces,
   };
   if (typeof def.decorate === 'function') def.decorate({ ...themeCtx, rng: new RNG((L.seed ^ 0x7de1c0) >>> 0) });
