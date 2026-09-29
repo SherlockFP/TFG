@@ -29,7 +29,7 @@ export const isGeneratedId = (id) => GEN_RE.test(String(id || ''));
 // ------------------------------------------------------------------ interiors
 export const INTERIOR_NAMES = {
   factory: 'Data Center', mansion: 'Haunted Homepage', mineshaft: 'Deep Web Mine',
-  office: 'Corporate Intranet', backrooms: 'The Backrooms', serverfarm: 'Cloud Storage', sewer: 'The Comment Sewer', hospital: 'Telehealth Clinic', metro: 'The Packet Subway', greenhouse: 'Link Rot Greenhouse',   // [labyrinths] same as interiors/index.js INTERIOR_NAMES
+  office: 'Corporate Intranet', backrooms: 'The Backrooms', serverfarm: 'Cloud Storage', sewer: 'The Comment Sewer', hospital: 'Telehealth Clinic', metro: 'The Packet Subway', greenhouse: 'Link Rot Greenhouse', prison: 'Banhammer Penitentiary', tower: 'The Ivory Tower',   // [labyrinths] same as interiors/index.js INTERIOR_NAMES
 };
 const BASE_INTERIORS = new Set(['factory', 'mansion', 'mineshaft']);
 const INTERIOR_W = { factory: 9, mansion: 7, mineshaft: 6, office: 8, backrooms: 8, serverfarm: 8, sewer: 7, hospital: 7 };   // metro / greenhouse: swapped in by labInterior() (own hash stream)
@@ -100,7 +100,8 @@ const INTERIOR_DESC = {
   factory: 'Inside: a cramped data center.', mansion: 'Inside: a haunted personal homepage.', mineshaft: 'Inside: a crypto mine dug deep under the surface.',
   office: 'Inside: an abandoned content farm office block.', backrooms: 'Inside: endless yellow rooms. Do not noclip.',
   serverfarm: 'Inside: rows of screaming server racks.', sewer: 'Inside: the undernet sewers. Mind the slop.', hospital: 'Inside: a dead clinic. The machines still beep.',
-  metro: 'Inside: a dead subway. Ghost trains still run the tunnel.', greenhouse: 'Inside: a feral hydroponics greenhouse. Vines and spores.',   // [labyrinths]
+  metro: 'Inside: a dead subway. Ghost trains still run the tunnel.', greenhouse: 'Inside: a feral hydroponics greenhouse. Vines and spores.',
+  prison: 'Inside: a three-tier penitentiary. Lockdown slams the cell doors.', tower: 'Inside: a tower with an elevator shaft. The lower floors pay more.',   // [labyrinths]
 };
 
 // ------------------------------------------------------------------ modifiers (all effects are real: they only change moon def fields

@@ -3,6 +3,7 @@
 // it before the lever is pulled and every peer builds the same layout archetype without a network message.
 import { RNG, hashString } from '../core/rng.js';
 import { ARCHS, archOpts } from '../world/facility_arch.js';
+import { LAB_IDS } from './labyrinths_core.js';   // [labyrinths] theme-owned layouts
 
 /** id -> { arch (preferred layout), main, side, n (goal count), cr / cl (full credits / clout at quota 0), tier (guaranteed crate), color } */
 export const JOBS = {
@@ -46,7 +47,7 @@ export function rollJobs(runId, day, moonId, quotaIndex = 0) {
 
 /** layoutOpts for a moon on this run (merged over nothing: jobMoon() moons have none). null = classic layout. */
 export function layoutOptsFor(moon, run) {
-  if (!jobMoon(moon) || !run || run.moon == null || ['metro', 'greenhouse'].includes(moon.interior)) return null;   // [labyrinths] theme-owned layouts
+  if (!jobMoon(moon) || !run || run.moon == null || LAB_IDS.includes(moon.interior)) return null;   // [labyrinths] theme-owned layouts
   const r = rollJobs(run.runId ?? 'x', run.day ?? 1, run.moon, run.quotaIndex | 0);
   return r.arch ? archOpts(r.arch) : null;
 }

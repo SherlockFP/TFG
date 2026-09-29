@@ -30,7 +30,7 @@ BIOMES.twinsun = {
 // days-in-run factor), squads of `n` (+ days), factions picked from the list. `cantina`: an NPC outpost is built (twin-sun decor).
 {
   registerMoon({
-    id: SOVIET_MOON, name: '1991-Runet Panelka', short: 'Panelka', tier: 3, cost: 520, biome: 'soviet', interior: 'office', size: 1.5,
+    id: SOVIET_MOON, name: '1991-Runet Panelka', short: 'Panelka', tier: 3, cost: 520, biome: 'soviet', interior: 'tower', size: 1.5,   // [labyrinths] was office
     desc: 'A grey district of brutalist panel blocks, rusted playgrounds and propaganda billboards, buried in snow and fog. '
       + 'Enter the stairwells for loot. Armed squads RAID your position every few minutes.',
     weather: ['foggy', 'foggy', 'stormy', 'clear', 'eclipsed'], scrapCount: [18, 24], scrapMul: 1.5, power: 8, outdoorPower: 5, landmarkBonus: 1,

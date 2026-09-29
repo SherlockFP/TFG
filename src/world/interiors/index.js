@@ -27,6 +27,7 @@ import { SEWER } from './sewer.js';
 import { HOSPITAL } from './hospital.js';
 import { STUDIO_THEMES } from './themes_studio.js';   // [repomaps] wave 8: influencer / academy / colddata / museum
 import { METRO, GREENHOUSE } from './lab_themes.js';   // [labyrinths]
+import { PRISON, TOWER } from './lab_vertical.js';   // [labyrinths]
 import { themeAmbience } from '../../audio/extassets.js';
 import { addTranslations } from '../../core/i18n.js';
 
@@ -45,7 +46,7 @@ export const INTERIORS = {
   sewer: SEWER,
   hospital: HOSPITAL,
   ...STUDIO_THEMES,   // [repomaps]
-  metro: METRO, greenhouse: GREENHOUSE,   // [labyrinths]
+  metro: METRO, greenhouse: GREENHOUSE, prison: PRISON, tower: TOWER,   // [labyrinths]
 };
 export const THEMES_BY_ID = INTERIORS;
 export const INTERIOR_THEMES = Object.freeze(Object.keys(INTERIORS));
@@ -65,9 +66,11 @@ addTranslations({
   'Rack after rack of rotting data, cooled to 18 degrees. The fans never stop.': 'Sıra sıra çürüyen veri, 18 dereceye soğutulmuş. Fanlar hiç durmaz.',
   'Where every deleted comment drains to. Mind the sludge.': 'Silinen her yorumun aktığı yer. Çamura dikkat.',
   'Symptoms searched: all of them. The doctor will see you now.': 'Aranan belirtiler: hepsi. Doktor sizi şimdi görecek.',
-  'The Packet Subway': 'Paket Metrosu', 'Link Rot Greenhouse': 'Bağlantı Çürümesi Serası',   // [labyrinths]
+  'The Packet Subway': 'Paket Metrosu', 'Link Rot Greenhouse': 'Bağlantı Çürümesi Serası', 'Banhammer Penitentiary': 'Ban Çekici Cezaevi', 'The Ivory Tower': 'Fildişi Kule',   // [labyrinths]
   'Ghost trains still run the old routes. When the horn sounds, get into an alcove.': 'Hayalet trenler eski hatlarda hâlâ koşuyor. Korna çalınca bir girintiye gir.',
   'Hydroponics gone feral. Cut the vines for shortcuts, hold your breath in the spores.': 'Vahşileşmiş hidroponik. Kısayol için sarmaşığı kes, sporlarda nefesini tut.',
+  'Every banned account ends up here. When the alarm sounds, the cell doors slam shut.': 'Yasaklanan her hesap buraya düşer. Alarm çalınca hücre kapıları çarparak kapanır.',
+  'A corporate skyscraper with a hole in the middle. Ride the elevator down: the lower the floor, the richer the loot.': 'Ortasında delik olan bir şirket gökdeleni. Asansörle in: kat ne kadar aşağıdaysa ganimet o kadar zengin.',
   'Cut the laser grid power [E]': 'Lazer ızgarasının gücünü kes [E]',
   'Laser grid (offline)': 'Lazer ızgarası (kapalı)',
   'Rebooting in': 'Yeniden başlatma:',

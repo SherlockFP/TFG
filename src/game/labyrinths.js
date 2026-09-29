@@ -7,10 +7,16 @@
 //   greenhouse  VINE WALLS: a melee weapon swing at a vine (game.resolveMelee is wrapped) sends 'labreq' {op:'cut', id}; the host validates reach and
 //               broadcasts {k:'cut', id}; collider, mesh and nav block go away for everyone (late joiners ask {op:'sync'}). SPORE VENTS: a seeded puff
 //               grows around every pod on a 16 s cycle; standing in one fades in a blur overlay (backdrop-filter) + coughing.
+//   prison      LOCKDOWN: the host rolls a gap (70-110 s, first 45-70 s) and broadcasts {k:'lock'}; after a 3 s siren every cell gate slams shut for 20 s
+//               (instanced bars + a collider per gate, skipped where the local player stands; the nav cell behind each gate is closed too).
+//   tower       ELEVATOR: 4 call panels + 4 floor buttons in the cab (interactables); the host validates and broadcasts {k:'elev', from, to, n}; every peer
+//               animates the cab from the same message, a rider inside the cab is carried by per-frame teleports, gates close behind / open at the
+//               destination, rides of 2+ levels can STALL for 3 s (power_down + a loud noise at the shaft top: the ride back up is louder than the way down).
 // Net: 'labreq' client -> host, 'labfx' host -> everyone. Never adds THREE lights.
 import * as THREE from 'three';
 import { t } from '../core/i18n.js';
 import { HOST_ONLY } from '../net/session.js';
+import { G } from '../physics/physics.js';
 import { MOONS } from './moons.js';
 import * as K from './labyrinths_core.js';
 import './labyrinths_i18n.js';
@@ -22,7 +28,7 @@ export function installLabyrinths(game) {
   if (!mods) return null;
   const offs = [];
   let disposed = false, boundNet = null, overlay = null, coughT = 0, clock = 0, syncAsked = null;
-  const S = { fac: null, n: 0, next: 0, train: null, spore: 0 };
+  const S = { fac: null, n: 0, next: 0, train: null, spore: 0, lock: null, lockN: 0, lockNext: 0, elev: { at: 0, moving: false, n: 0, t: 0 } };
   const run = () => game.run;
   const host = () => !!game.isHost;
   const fac = () => game.world?.facility || null;
@@ -37,6 +43,8 @@ export function installLabyrinths(game) {
     if (!L || !d) return;
     if (d.k === 'train' && L.id === 'metro') startTrain(d.dir < 0 ? -1 : 1);
     else if (d.k === 'cut' && L.id === 'greenhouse') applyCut(L, d.id);
+    else if (d.k === 'lock' && L.id === 'prison') startLock();
+    else if (d.k === 'elev' && L.id === 'tower') startElev(d);
     else if (d.k === 'state' && L.id === 'greenhouse') for (const id of d.cut || []) applyCut(L, id, true);
   }
   function posOf(id) {
@@ -51,6 +59,11 @@ export function installLabyrinths(game) {
       const p = posOf(from);
       if (!v || v.cut || !p || Math.hypot(p.x - v.x, p.z - v.z) > K.VINE.reach + 3.5) return;
       fx({ k: 'cut', id: v.id });
+    } else if (d.op === 'elev' && L.id === 'tower') {
+      const to = d.to | 0;
+      if (S.elev.moving || to < 0 || to >= K.ELEV.levels || to === S.elev.at) return;
+      const ride = K.elevRide(run()?.seed ?? 0, S.elev.n, S.elev.at, to);
+      fx({ k: 'elev', from: S.elev.at, to, n: S.elev.n, dur: ride.dur, stall: ride.stall });
     } else if (d.op === 'sync' && L.id === 'greenhouse') {
       const cut = L.vines.filter((v) => v.cut).map((v) => v.id);
       if (cut.length) { try { game.net.sendTo(from, 'labfx', { k: 'state', cut }); } catch { /* peer gone */ } }
@@ -173,6 +186,104 @@ export function installLabyrinths(game) {
     if (k > 0.3) { coughT -= dt; if (coughT <= 0) { coughT = 1.6; try { game.sfx?.('breath_heavy', 0.4); } catch { /* audio optional */ } if (!S.sporeToast) { S.sporeToast = true; toast(t('Spores! Your vision blurs.'), 'warn'); } } }
   }
 
+  // ------------------------------------------------------------------------------------------------ prison: lockdown
+  const gateCols = [];
+  function setGates(L, closed) {
+    const p = game.player, navw = fac()?.nav;
+    for (const c of gateCols.splice(0)) { try { game.physics?.removeCollider(c.col); } catch { /* gone */ } if (navw && c.ni >= 0) navw.walk[c.ni] = c.prev; }
+    L.gates.forEach((g, i) => {
+      L.inst.setMatrixAt(i, closed ? L.openM[i] : L.zeroM);
+      if (!closed) return;
+      const near = p && Math.abs(p.pos.y - g.y) < 2.5 && Math.hypot(p.pos.x - g.x, p.pos.z - g.z) < 0.9;
+      if (!near) {
+        const hx = g.axis === 'x' ? 0.6 : 0.05, hz = g.axis === 'x' ? 0.05 : 0.6;
+        try { gateCols.push({ col: game.physics.addStaticBox(g.x, g.y + 1.15, g.z, hx, 1.15, hz, 0, G.STATIC, { kind: 'static' }), ni: -1 }); } catch { /* physics optional */ }
+      }
+      if (navw) {   // close the nav cell in front of the gate's inner side: creatures cannot walk into a locked cell
+        const [gx, gz] = navw.toGrid(g.x + (g.axis === 'z' ? (g.x < L.rc.x0 + 6 ? -0.9 : 0.9) : 0), g.z + (g.axis === 'x' ? (g.z < L.rc.z0 + 6 ? -0.9 : 0.9) : 0));
+        if (navw.inside(gx, gz)) { const ni = gz * navw.w + gx; gateCols.push({ col: null, ni, prev: navw.walk[ni] }); navw.walk[ni] = 0; }
+      }
+    });
+    L.inst.instanceMatrix.needsUpdate = true;
+  }
+  function startLock() { S.lock = { t: 0, on: false, siren: 0 }; }
+  function tickPrison(dt, L) {
+    if (host()) {
+      S.lockNext -= dt;
+      if (!S.lock && S.lockNext <= 0) { fx({ k: 'lock' }); S.lockN++; S.lockNext = K.lockGap(run()?.seed ?? 0, S.lockN) + K.LOCK.sec + K.LOCK.warn; }
+    }
+    const lk = S.lock;
+    if (!lk) { L.alarm.color.setHex(0x2a0000); return; }
+    lk.t += dt;
+    L.alarm.color.setHex(Math.sin(lk.t * 8) > 0 ? 0xff2a1a : 0x300000);
+    lk.siren -= dt;
+    if (lk.t < K.LOCK.warn + K.LOCK.sec && lk.siren <= 0) { lk.siren = 2.4; try { game.sfx?.('ship_alarm', 0.55); } catch { /* audio optional */ } }
+    if (!lk.on && lk.t >= K.LOCK.warn) { lk.on = true; setGates(L, true); try { game.sfx?.('blast_door', 0.8); } catch { /* audio optional */ } toast(t('LOCKDOWN - the cell doors slam shut for 20 s'), 'warn'); }
+    if (lk.t >= K.LOCK.warn + K.LOCK.sec) { setGates(L, false); S.lock = null; L.alarm.color.setHex(0x2a0000); try { game.sfx?.('door_open', 0.6); } catch { /* audio optional */ } }
+    else if (lk.t < 0.3 && !lk.warned) { lk.warned = true; toast(t('LOCKDOWN INBOUND - get out of the cells!'), 'warn'); }
+  }
+
+  // ------------------------------------------------------------------------------------------------ tower: elevator
+  const gateColT = new Map();
+  function gateSet(L, level, closed) {
+    const g = L.gates[level], key = level;
+    g.mesh.visible = closed; g.ind.color.setHex(closed ? 0xff3322 : 0x33ff66);
+    const cur = gateColT.get(key) ?? g.col;
+    if (closed && !cur) {
+      const p = game.player;
+      const near = p && Math.abs(p.pos.y - g.y) < 2.5 && Math.hypot(p.pos.x - g.x, p.pos.z - g.z) < 0.9;
+      if (!near) { try { gateColT.set(key, game.physics.addStaticBox(g.x, g.y + g.sy / 2, g.z, g.sx / 2, g.sy / 2, g.sz / 2, 0, G.STATIC, { kind: 'static' })); } catch { /* physics optional */ } }
+    } else if (!closed && cur) { try { game.physics?.removeCollider(cur); } catch { /* gone */ } gateColT.set(key, null); if (g.col === cur) g.col = null; }
+  }
+  function startElev(d) {
+    const L = lab(), E = S.elev;
+    if (!L || L.id !== 'tower' || E.moving) return;
+    E.moving = true; E.t = 0; E.from = d.from | 0; E.to = d.to | 0; E.ride = { dur: d.dur, stall: d.stall || 0 }; E.n = (d.n | 0) + 1; E.rider = false; E.stalled = false;
+    gateSet(L, E.from, true);
+    const p = game.player;
+    if (p && !p.dead && Math.abs(p.pos.x - L.cx) < 1.9 && Math.abs(p.pos.z - L.cz) < 1.9 && Math.abs(p.pos.y - L.ys[E.from]) < 1.6) E.rider = true;
+    try { game.sfx?.('lever_pull', 0.6); } catch { /* audio optional */ }
+  }
+  function tickTower(dt, L) {
+    const E = S.elev, p = game.player;
+    if (!E.moving) return;
+    E.t += dt;
+    const total = E.ride.dur + E.ride.stall, pr = K.elevProgress(E.ride, Math.min(E.t, total));
+    const y = L.ys[E.from] + (L.ys[E.to] - L.ys[E.from]) * pr;
+    L.cab.position.y = y;
+    if (E.ride.stall && !E.stalled && E.t >= E.ride.dur / 2) {
+      E.stalled = true; try { game.sfx?.('power_down', 0.8); } catch { /* audio optional */ }
+      if (E.rider) { toast(t('The elevator stalls...'), 'warn'); try { game.net.request('noise', { p: [L.cx, L.ys[0] + 1, L.cz], loud: 0.9 }); } catch { /* net closing */ } }
+    }
+    L.cabLamp.color.setHex(E.stalled && E.t < E.ride.dur / 2 + E.ride.stall && Math.sin(E.t * 14) > 0 ? 0x223344 : 0xdff4ff);
+    if (E.rider && p && !p.dead) {
+      const hx = Math.max(L.cx - 1.3, Math.min(L.cx + 1.3, p.pos.x)), hz = Math.max(L.cz - 1.3, Math.min(L.cz + 1.3, p.pos.z));
+      p.teleport(new V3(hx, y + 0.03, hz));
+    }
+    if (E.t >= total) {
+      E.moving = false; E.at = E.to; L.cab.position.y = L.ys[E.to];
+      gateSet(L, E.to, false); L.cabLamp.color.setHex(0xdff4ff);
+      try { game.sfx?.('bell_ding', 0.7); } catch { /* audio optional */ }
+    }
+  }
+  offs.push(mods.on('interactables', (out, g) => {
+    if (g !== game || disposed) return;
+    const L = lab(), p = game.player;
+    if (!L || L.id !== 'tower' || !p || p.dead || run()?.phase !== 'moon') return;
+    const E = S.elev, req = (to) => { try { game.net.request('labreq', { op: 'elev', to }); } catch { /* net closing */ } };
+    if (E.moving) return;
+    for (let k = 0; k < K.ELEV.levels; k++) {
+      if (k === E.at || Math.abs(p.pos.y - L.ys[k]) > 2.5 || Math.hypot(p.pos.x - L.cx, p.pos.z - L.cz) > 9) continue;
+      out.push({ pos: new V3(L.cx + 1.6, L.ys[k] + 1.2, L.cz + L.shaft + 0.5), r: 0.6, reach: 2.4, label: () => t('Call the elevator [E]'), sub: () => t('Floor') + ' ' + K.ELEV.labels[k], action: () => req(k) });
+    }
+    if (Math.abs(p.pos.x - L.cx) < 1.9 && Math.abs(p.pos.z - L.cz) < 1.9 && Math.abs(p.pos.y - L.ys[E.at]) < 1.6) {
+      for (let k = 0; k < K.ELEV.levels; k++) {
+        if (k === E.at) continue;
+        out.push({ pos: new V3(L.cx + (k - 1.5) * 0.4, L.ys[E.at] + 1.3, L.cz - 1.55), r: 0.16, reach: 2.6, label: () => t('Floor') + ' ' + K.ELEV.labels[k] + ' [E]', sub: () => (k > E.at ? t('Down') : t('Up')), action: () => req(k) });
+      }
+    }
+  }));
+
   // ------------------------------------------------------------------------------------------------ landing card row
   function briefRow() {
     const r = run();
@@ -192,11 +303,16 @@ export function installLabyrinths(game) {
     briefRow();
     const F = fac(), L = F?.lab || null;
     if (F !== S.fac) {   // a new facility: reset the per-day state (the first train comes 40-60 s after the day starts)
+      for (const c of gateCols.splice(0)) { try { game.physics?.removeCollider(c.col); } catch { /* gone */ } }
+      for (const c of gateColT.values()) { try { game.physics?.removeCollider(c); } catch { /* gone */ } }
+      gateColT.clear(); S.lock = null; S.lockN = 0; S.lockNext = K.lockGap(run()?.seed ?? 0, 0); S.elev = { at: 0, moving: false, n: 0, t: 0 };
       S.fac = F; S.train = null; S.n = 0; S.next = K.trainGap(run()?.seed ?? 0, 0); S.sporeToast = false; syncAsked = null;
       if (overlay) { overlay.style.opacity = '0'; overlay.style.backdropFilter = 'none'; }
     }
     if (!L || run()?.phase !== 'moon') { if (overlay) overlay.style.opacity = '0'; return; }
     if (L.id === 'metro') tickMetro(dt, L);
+    else if (L.id === 'prison') tickPrison(dt, L);
+    else if (L.id === 'tower') tickTower(dt, L);
     else if (L.id === 'greenhouse') {
       if (!syncAsked && !host()) { syncAsked = true; try { game.net.request('labreq', { op: 'sync' }); } catch { /* net closing */ } }
       tickGreenhouse(dt, L);
@@ -211,6 +327,8 @@ export function installLabyrinths(game) {
       for (const off of offs) { try { off(); } catch { /* ignore */ } }
       try { boundNet?.off?.('msg:labfx', onFx); } catch { /* ignore */ }
       if (game.resolveMelee && origMelee) game.resolveMelee = origMelee;
+      for (const c of gateCols.splice(0)) { try { game.physics?.removeCollider(c.col); } catch { /* gone */ } }
+      for (const c of gateColT.values()) { try { game.physics?.removeCollider(c); } catch { /* gone */ } }
       overlay?.remove(); overlay = null;
     },
   };
