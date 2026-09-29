@@ -147,3 +147,7 @@ The 3-day + boss loop is now real (gate -> core with wings, a labyrinth and a ca
 Proven by numbers only: node tests drive the REAL host.js flow, the real CreatureManager and real layouts (soft-lock fuzz, weekly lock, all 8 themes); nothing was seen in a browser.
 Risks: boss models and telegraph readability, the maze / arena look and lighting, whether a labyrinth is fun with creatures in it (it is a spanning tree + few loops), keystone / raid numbers (design values), 2-player sync of `run.cycle` and `cyx`,
 the arena auto-open (720 s) as the only fallback for lost cards, Legacy Bot sector (outdoor boss, no cards) never seen, `shrines` mutator unwired, no Trophy Hall / CASE entry / first-kill cosmetic yet.
+
+## Wave 4 - GUIDE: the Algorithm as advisor + optional tutorial (module `guide`, docs/wave4/guide.md)
+The terminal has ~40 commands and ~30 hotkeys/systems that new players never find; now The Algorithm nudges about things not yet used (context + cooldown, mutable), `GUIDE` lists and explains everything in EN/TR/RU, and a skippable 7-step onboarding runs through the objectives tracker.
+Risks: tip tone/frequency is a guess (tune `COOLDOWN_S`, `MAX_PER_SESSION`), usage detection of remapped keys / daily-rewards UI is heuristic, tips share the intercom box with the villain lines (they wait while it is busy), the sell step needs an HQ trip, nothing seen with a real 2-player crew.

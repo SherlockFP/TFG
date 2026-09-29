@@ -23,6 +23,8 @@ import { profilePanel, applyProfileName } from './panels/profile.js';   // [prof
 import { NAME_REASONS, NAME_MAX } from '../core/profilename.js';   // [profile]
 import { avatarCanvas, avatarDataUrl, fromWire, defaultAvatar } from './avatarpic.js';   // [profile]
 import { avatarOfPeer } from '../game/profilesync.js';   // [profile]
+import { UI as GUIDE_UI, pick as guidePick } from '../game/guide_data.js';   // [guide]
+import { resetTutorial as guideResetTutorial } from '../game/guide_core.js';   // [guide]
 
 // [profile] tiny avatar icon (16x16 thumbnail) for chat / lists
 const avIcon = (av, px = 16) => { const c = avatarCanvas(av, px, { thumb: true }); c.style.marginRight = '4px'; return c; };
@@ -806,7 +808,13 @@ export class UI {
           section(t('HUD')),
           check(t('Objective tracker'), 'showObjectives', null, true),
           check(t('Crosshair'), 'showCrosshair', null, true),
-          check(t('Loading screen tips'), 'loadingTips', null, true));
+          check(t('Loading screen tips'), 'loadingTips', null, true),
+          check(guidePick(GUIDE_UI.set_tips, getLang()), 'guideTips', guidePick(GUIDE_UI.set_tips_note, getLang()), true),   // [guide]
+          row(guidePick(GUIDE_UI.set_replay, getLang()), this.button(guidePick(GUIDE_UI.set_replay, getLang()), () => {   // [guide]
+            const gd = this.app.game?.guide;
+            if (gd?.restartTutorial) { gd.restartTutorial(); this.toast(guidePick(GUIDE_UI.set_replay_now, getLang()), 'good'); }
+            else { guideResetTutorial(this.app.profile); saveProfile(this.app.profile); this.toast(guidePick(GUIDE_UI.set_replay_done, getLang()), 'good'); }
+          }, 'small')));
       }
       const cp = el('div', { class: 'cp-body' }, tabs, body,
         el('div', { class: 'menu-row' }, inGame ? this.button(t('Close'), () => this.closePanel(), 'back') : this.backButton(() => this.showMenu('title'))));

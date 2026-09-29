@@ -163,6 +163,7 @@ import { installWorlds2 } from './worlds2.js';   // wave 3: Soviet raids + twin-
 
 
 // [import:ux]
+import { installGuide } from './guide.js';   // wave 4: Algorithm advisor + first-landing tutorial (docs/wave4/guide.md)
 
 
 
@@ -331,6 +332,7 @@ export class Game extends Emitter {
 
 
     // [slot:ux]
+    this.useModule('guide', installGuide);   // [guide] installed last: wraps the terminal / ALGO command of the modules above
 
 
   }
