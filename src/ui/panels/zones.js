@@ -31,6 +31,37 @@ const CSS = `.overlay .menu-frame.zn{width:min(1040px,97vw);max-height:92vh}
 .zn .zn-def.off{opacity:.45}`;
 let cssDone = false;
 
+/**
+ * The sector map of one moon (top-down, ship in the middle, zone dots). Shared by the panel canvas (250 px) and the ship CRT (zones2: ~100 px), hence `size` scales everything.
+ * mo = snapshot moon row, S = snapshot, selZ = highlighted zone id, opts = { hits: [] (filled with dot positions), me: {x, z} (live player dot) }
+ */
+export function drawSectorMap(g, size, mo, S, selZ, opts = {}) {
+  const k = size / 250, W = size, H = size, R = 118 * k, sc = R / 125, px1 = (v) => Math.max(1, Math.round(v * k));
+  g.fillStyle = '#05070a'; g.fillRect(0, 0, W, H);
+  g.strokeStyle = 'rgba(255,190,90,.16)'; g.lineWidth = 1;
+  for (const r of [40, 80, 120]) { g.beginPath(); g.arc(W / 2, H / 2, r * sc, 0, 7); g.stroke(); }
+  g.beginPath(); g.moveTo(W / 2, 4 * k); g.lineTo(W / 2, H - 4 * k); g.moveTo(4 * k, H / 2); g.lineTo(W - 4 * k, H / 2); g.stroke();
+  g.fillStyle = '#f0b040'; g.fillRect(W / 2 - 5 * k, H / 2 - 3 * k, 10 * k, 6 * k);   // the ship
+  let wi = 0;
+  for (const q of mo.zones) {
+    let x, y;
+    if (q.core) { x = q.core.x; y = q.core.z; }
+    else if (q.kind === 'field') { x = Math.cos(q.ang) * q.dist; y = Math.sin(q.ang) * q.dist; }
+    else { const a = 0.9 + wi++ * 1.7 + (q.wing === 'entrance' ? 0 : 0.5); x = Math.cos(a) * 92; y = Math.sin(a) * 92; }
+    if (q.core?.in) { const a = 0.9 + wi++ * 1.7 + (q.wing === 'entrance' ? 0 : 0.5); x = Math.cos(a) * 92; y = Math.sin(a) * 92; }   // interior cores live under the map: drawn on the wing ring
+    const px = W / 2 + x * sc, py = H / 2 + y * sc, rr = 9 * k;
+    g.beginPath(); g.arc(px, py, rr, 0, 7);
+    if (q.s === 'own') { g.fillStyle = S.col; g.fill(); } else if (q.s === 'inf') { g.fillStyle = '#ff3a4a'; g.fill(); } else { g.strokeStyle = q.s === 'locked' ? '#4a4f58' : '#9aa4b0'; g.lineWidth = px1(2); g.stroke(); }
+    if (q.kind === 'wing') { g.strokeStyle = '#000'; g.lineWidth = 1; g.strokeRect(px - 4 * k, py - 4 * k, 8 * k, 8 * k); }
+    if (q.pending) { g.strokeStyle = '#ff5a3a'; g.lineWidth = px1(2); g.beginPath(); g.arc(px, py, rr + 4 * k, 0, 7); g.stroke(); }
+    if (selZ === q.id) { g.strokeStyle = '#fff'; g.lineWidth = px1(2); g.beginPath(); g.arc(px, py, 13 * k, 0, 7); g.stroke(); }
+    g.fillStyle = '#000'; g.font = `bold ${Math.max(7, Math.round(12 * k))}px sans-serif`; g.textAlign = 'center'; g.fillText(q.id, px, py + 4 * k);
+    opts.hits?.push({ x: px, y: py, z: q.id });
+  }
+  if (opts.me) { g.fillStyle = '#7dff7d'; g.fillRect(W / 2 + opts.me.x * sc - 2 * k, H / 2 + opts.me.z * sc - 2 * k, Math.max(2, 4 * k), Math.max(2, 4 * k)); }
+  if (size >= 200) { g.fillStyle = 'rgba(255,190,90,.6)'; g.font = '11px monospace'; g.textAlign = 'left'; g.fillText(mo.away ? t('ARCHIVED') : mo.here && mo.zones.some((q) => q.core) ? t('LIVE') : t('SCHEMATIC'), 5, 12); }
+}
+
 export function createZonesPanel(game, api) {
   if (!cssDone && typeof document !== 'undefined') { cssDone = true; const s = document.createElement('style'); s.id = 'tfg-zones-panel'; s.textContent = CSS; document.head.appendChild(s); }
   const ui = game.ui;
@@ -48,36 +79,15 @@ export function createZonesPanel(game, api) {
   }
   function drawMap(cv, S) {
     const mo = S.moons.find((m) => m.id === sel?.m); if (!mo) return;
-    const W = cv.width = 250, H = cv.height = 250, g = cv.getContext('2d'), R = 118, sc = R / 125;
-    g.fillStyle = '#05070a'; g.fillRect(0, 0, W, H);
-    g.strokeStyle = 'rgba(255,190,90,.16)'; g.lineWidth = 1;
-    for (const r of [40, 80, 120]) { g.beginPath(); g.arc(W / 2, H / 2, r * sc, 0, 7); g.stroke(); }
-    g.beginPath(); g.moveTo(W / 2, 4); g.lineTo(W / 2, H - 4); g.moveTo(4, H / 2); g.lineTo(W - 4, H / 2); g.stroke();
-    g.fillStyle = '#f0b040'; g.fillRect(W / 2 - 5, H / 2 - 3, 10, 6);   // the ship
+    cv.width = 250; cv.height = 250;
     canvasHits = [];
-    let wi = 0;
-    for (const q of mo.zones) {
-      let x, y;
-      if (q.core) { x = q.core.x; y = q.core.z; }
-      else if (q.kind === 'field') { x = Math.cos(q.ang) * q.dist; y = Math.sin(q.ang) * q.dist; }
-      else { const a = 0.9 + wi++ * 1.7 + (q.wing === 'entrance' ? 0 : 0.5); x = Math.cos(a) * 92; y = Math.sin(a) * 92; }
-      const px = W / 2 + x * sc, py = H / 2 + y * sc;
-      g.beginPath(); g.arc(px, py, 9, 0, 7);
-      if (q.s === 'own') { g.fillStyle = S.col; g.fill(); } else if (q.s === 'inf') { g.fillStyle = '#ff3a4a'; g.fill(); } else { g.strokeStyle = q.s === 'locked' ? '#4a4f58' : '#9aa4b0'; g.lineWidth = 2; g.stroke(); }
-      if (q.kind === 'wing') { g.strokeStyle = '#000'; g.lineWidth = 1; g.strokeRect(px - 4, py - 4, 8, 8); }
-      if (sel.z === q.id) { g.strokeStyle = '#fff'; g.lineWidth = 2; g.beginPath(); g.arc(px, py, 13, 0, 7); g.stroke(); }
-      g.fillStyle = '#000'; g.font = 'bold 12px sans-serif'; g.textAlign = 'center'; g.fillText(q.id, px, py + 4);
-      canvasHits.push({ x: px, y: py, z: q.id });
-    }
-    if (mo.here && game.player?.pos) { const p = game.player.pos; g.fillStyle = '#7dff7d'; g.fillRect(W / 2 + p.x * sc - 2, H / 2 + p.z * sc - 2, 4, 4); }
-    g.fillStyle = 'rgba(255,190,90,.6)'; g.font = '11px monospace'; g.textAlign = 'left';
-    g.fillText(mo.here && mo.zones.some((q) => q.core) ? t('LIVE') : t('SCHEMATIC'), 5, 12);
+    drawSectorMap(cv.getContext('2d'), 250, mo, S, sel.z, { hits: canvasHits, me: mo.here ? game.player?.pos : null });
   }
   function detail(S) {
     const mo = S.moons.find((m) => m.id === sel?.m), q = mo?.zones.find((z) => z.id === sel?.z);
     const box = el('div', { class: 'zn-box' });
     if (!q) return box;
-    box.append(el('div', { class: 'big' }, `${t(q.name)}  `, el('span', { class: 'tfg-tag' }, stateTag(q))), el('div', { class: 'dim' }, `${mo.name} - ${q.kind === 'wing' ? t('facility wing') : t('open sector')} - ${t('threat')} ${q.threat}`));
+    box.append(el('div', { class: 'big' }, `${t(q.name)}  `, el('span', { class: 'tfg-tag' }, stateTag(q))), el('div', { class: 'dim' }, `${mo.name}${mo.away ? ' (' + t('out of range: archived') + ')' : ''} - ${q.kind === 'wing' ? t('facility wing') : t('open sector')} - ${t('threat')} ${q.threat}`));
     const inHere = S.inZone && S.inZone.m === mo.id && S.inZone.z === q.id;
     if (q.s === 'free' || q.s === 'inf') box.append(el('div', {}, tf('Beacon: {c}. Land, clear the area around the relay, stand at the core and press E.', { c: money(q.cost) }), q.s === 'inf' ? ' ' + t('(recapture: half price)') : ''));
     if (q.s === 'locked') box.append(el('div', { class: 'bad' }, t('Opens in a later quota.')));
@@ -89,7 +99,8 @@ export function createZonesPanel(game, api) {
       const upRow = el('div', { class: 'zn-def' }, el('span', {}, `${t('Zone level')} ${st.up | 0}/${api.ZN.maxUp}  (${q.used}/${q.slots} ${t('slots')})`), el('span'), el('span'), (st.up | 0) < api.ZN.maxUp ? el('button', { class: 'btn small', onclick: () => api.up(mo.id, q.id) }, `${t('UPGRADE')} ${money(upCost)}`) : el('span', { class: 'dim' }, t('MAX')));
       box.append(el('div', { class: 'cp-sec' }, t('FORTIFY')), upRow);
       if (!inHere) box.append(el('div', { class: 'dim' }, t('Stand inside this zone to build or sell defences.')));
-      for (const id of api.DEF_IDS) {
+      if (q.interior) box.append(el('div', { class: 'dim' }, t('Facility wing: traps on the corridors, always armed, they only hurt creatures.')));
+      for (const id of api.defsFor(q.interior)) {
         const d = api.DEFS[id], n = (st.d || {})[id] | 0, okQ = api.unlocked(id);
         const can = inHere && okQ && q.used < q.slots && S.credits >= d.cost;
         const row = el('div', { class: 'zn-def' + (okQ ? '' : ' off') },
@@ -98,13 +109,32 @@ export function createZonesPanel(game, api) {
           n ? el('button', { class: 'btn small', disabled: inHere ? null : true, onclick: () => api.sell(q.id, id) }, t('SELL')) : el('span'));
         box.append(row);
       }
+      if (!q.interior && q.walls) {   // zones2: walls / gates on the snap grid, placed where you look
+        const W = api.WALL, w = q.walls, can = inHere && mo.here;
+        box.append(el('div', { class: 'cp-sec' }, `${t('WALLS')}  ${w.n}/${w.cap}  (${w.gates} ${t('gates')})`));
+        if (can) box.append(el('div', { class: 'dim' }, t('Look at the ground you want to wall off, then press the button. Raiders walk round walls and funnel through gates.')));
+        const btn = (label, cost, fn) => el('button', { class: 'btn small', disabled: can && S.credits >= cost ? null : true, onclick: fn }, `${label} ${money(cost)}`);
+        box.append(el('div', { class: 'zn-def' }, el('span', {}, t(W.names[0])), el('span'), btn(t('PLACE'), W.cost[0], () => api.wall(q.id, 1, false)), btn('x4', W.cost[0] * 4, () => api.wall(q.id, 4, false))));
+        box.append(el('div', { class: 'zn-def' }, el('span', {}, t(W.names[1])), el('span'), btn(t('PLACE'), W.cost[1], () => api.wall(q.id, 1, true)), btn(t('LINE'), W.cost[0] * 3 + W.cost[1], () => api.wall(q.id, 4, true))));
+        box.append(el('div', { class: 'zn-def' }, el('span', { class: 'dim' }, t('Remove the nearest piece (50% back)')), el('span'), el('span'), el('button', { class: 'btn small', disabled: can && w.n ? null : true, onclick: () => api.wallSell(q.id) }, t('SELL'))));
+      }
+      {   // zones2: the extractor (homeworld2 miner rules)
+        const M = api.MINER, mn = q.mn, b = q.mnBonus;
+        box.append(el('div', { class: 'cp-sec' }, t('EXTRACTOR')));
+        const purity = mn ? [t('impure node'), t('normal node'), t('pure node')][mn.p | 0] : '';
+        box.append(el('div', {}, mn ? `Mk${mn.l}  -  ${purity}  -  +${money(b.credits)}/${t('day')} + ${b.mat} ${t('material')}  -  ${t('upkeep')} ${money(3 + 2 * mn.l)}` : t('None. Digs a node inside the zone: more income (inside the daily cap) and a biome material.')));
+        const can = inHere && q.mnOk && q.mnCost > 0 && S.credits >= q.mnCost;
+        box.append(el('div', { class: 'zn-def' + (q.mnOk ? '' : ' off') }, el('span', {}, mn ? (mn.l < M.maxLv ? t('Upgrade the extractor') : t('Maximum Mk')) : t('Build an extractor')), el('span', { class: 'dim' }, q.mnOk ? '' : t('LATER')),
+          mn && mn.l >= M.maxLv ? el('span', { class: 'dim' }, t('MAX')) : el('button', { class: 'btn small', disabled: can ? null : true, onclick: () => api.mine(q.id) }, `${mn ? t('UPGRADE') : t('BUILD')} ${money(q.mnCost)}`),
+          mn ? el('button', { class: 'btn small', disabled: inHere ? null : true, onclick: () => api.mineSell(q.id) }, t('SELL')) : el('span')));
+      }
     }
     return box;
   }
   function render(force) {
     const S = api.snapshot();
     pickDefault(S);
-    const sig = JSON.stringify([S.moons.map((m) => m.zones.map((q) => [q.s, q.income, q.def, q.used, q.slots, q.pending, q.core?.x, q.st?.up, q.st?.dry])), sel, S.credits, S.inZone, S.income.credits, S.owned, S.pend.length]);
+    const sig = JSON.stringify([S.moons.map((m) => m.zones.map((q) => [q.s, q.income, q.def, q.used, q.slots, q.pending, q.core?.x, q.st?.up, q.st?.dry, q.mn?.l, q.walls?.n])), sel, S.credits, S.inZone, S.income.credits, S.owned, S.pend.length]);
     if (!force && sig === lastSig) return;
     lastSig = sig;
     body.innerHTML = '';

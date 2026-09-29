@@ -5,6 +5,8 @@
 //   4. INCOME   each day every owned zone pays credits + biome material, hard-capped (25 % of the quota), minus defence upkeep; capped offline catch-up
 //   5. ATTACK   at day end the Algorithm votes 1-2 owned zones (never before quota 2). Crew on that moon at dusk -> live defence (siege waves); else auto-resolve
 //   6. MAP      terminal `ZONES` + the sector-map panel (src/ui/panels/zones.js)
+//   v2 (wave 6, zones2.js / zones2_core.js): interior facility wings (relay inside, horror traps), validated wall / gate pieces + ring placer, extractor per zone, raiders path around
+//   barricades, upkeep ammo, generated-sector archive, ship CRT sector map. Docs: docs/wave6/zones2.md
 // Net (all 'zn*'): 'znreq' client -> host {op}, 'znx' host -> everyone {k} (state 1 Hz: cores, clear timers, planting, live defence). State: run.zn (synced + saved).
 // Host-authoritative: the host owns run.zn, the creatures, the credits. Clients render + send requests.
 import * as THREE from 'three';
@@ -15,6 +17,8 @@ import { HOST_ONLY } from '../net/session.js';
 import { saveProfile } from '../core/save.js';
 import { generateVoyageMoon, isVoyageId } from './voyage_core.js';
 import * as Z from './zones_core.js';
+import * as Q from './zones2_core.js';
+import { installZones2 } from './zones2.js';
 import { TR, RU } from './zones_i18n.js';
 import { createZonesPanel } from '../ui/panels/zones.js';
 
@@ -51,7 +55,9 @@ export function installZones(game) {
   // ------------------------------------------------------------------------------------------ state helpers (run.zn)
   const zn = () => { const r = run(); if (!r) return null; r.zn = Z.ensureState(r.zn, runKey()); return r.zn; };
   const pushZn = (...extra) => { if (host()) game.broadcastRun(['zn', ...extra]); };
-  const moonDef = (id) => MOONS[id] || (isVoyageId(id) ? generateVoyageMoon(id) : null);
+  const realMoon = (id) => MOONS[id] || (isVoyageId(id) ? generateVoyageMoon(id) : null);
+  // zones2: a generated-sector moon that rotated out (or went stale) is answered from the compact archive, so its owned zones keep paying
+  const moonDef = (id) => { const m = realMoon(id); return !m || m.stale ? (Q.archivedMoon(run()?.zn, id) || m) : m; };
   const moonName = (id) => moonDef(id)?.name || id;
   const isActive = (id) => Z.zonesEligible(moonDef(id));
   const spec = (id) => { const m = moonDef(id); return m && Z.zonesEligible(m) ? Z.zoneSpec(m, runKey()) : null; };
@@ -71,16 +77,19 @@ export function installZones(game) {
   };
   const coreOf = (id) => S.cores.find((c) => c.id === id) || null;
   const me = () => game.player;
+  let X2 = null;   // installed below (zones2.js), needs the helpers of this file
 
   // ============================================================================================ HOST: cores (placed per landing on the real terrain)
   function hostComputeCores() {
     const r = run(), m = moonDef(r.moon), ter = game.world?.terrain;
-    if (!Z.zonesEligible(m) || !ter?.plan) { S.cores = []; S.coresKey = ''; return; }
+    if (!Z.zonesEligible(m) || m.arch || !ter?.plan) { S.cores = []; S.coresKey = ''; return; }
     const key = `${r.seed}:${r.moon}`;
     if (S.coresKey === key && S.cores.length) return;
     const sp = Z.zoneSpec(m, runKey());
     const placed = Z.placeCores(sp, ter.plan, Z.coreProbe(ter), ter.playHalf, runKey());
     S.cores = placed.filter((c) => c.x !== null).map((c) => ({ id: c.id, x: c.x, z: c.z, y: ter.heightAt(c.x, c.z) }));
+    // zones2: wing zones whose facility has a valid spot get their relay INSIDE the wing (the others keep the outdoor annex relay)
+    for (const ic of X2.interiorCores()) { const k = S.cores.findIndex((c) => c.id === ic.id); if (k >= 0) S.cores[k] = ic; else S.cores.push(ic); }
     S.coresKey = key;
     S.host.clearT = {}; S.host.plant = null;
     game.later(() => { try { materialize(); } catch (e) { console.warn('[zones] materialize', e); } }, 2500);
@@ -94,7 +103,7 @@ export function installZones(game) {
     for (const c of list.values()) if (hostile(c) && flat(c.pos, core) < R && Math.abs(c.pos.y - core.y) < 14) return true;
     return false;
   }
-  const playersNear = (core, R) => game.aiPlayers().filter((p) => !p.dead && !p.inShip && flat(p.pos, core) < R);
+  const playersNear = (core, R, dy = core.in ? 6 : 16) => game.aiPlayers().filter((p) => !p.dead && !p.inShip && flat(p.pos, core) < R && Math.abs(p.pos.y - (core.y ?? p.pos.y)) < dy);
   function stateCtx(zid, from) {
     const r = run(), core = S.cores.find((c) => c.id === zid), m = r.moon, zone = zoneOf(m, zid), st = Z.getZ(zn(), m, zid);
     const p = from != null ? game.aiPlayerById(from) : null;
@@ -106,7 +115,7 @@ export function installZones(game) {
     if (S.host.plant) { replyTo(from, 'A beacon is already being planted.', true); return; }
     const owned = ownedCount();
     const cost = Z.captureCost(moonDef(m), zone, owned, st?.s === 'inf');
-    const res = Z.canCapture({ phase: r.phase, moonId: m, currentMoon: r.moon, dist: flat(p.pos, core), quotaIndex: qi(), minQ: zone.minQ, credits: r.credits, cost, owned, st, clearT: S.host.clearT[zid] || 0, hostileNear: hostileNear(core), dead: p.dead });
+    const res = Z.canCapture({ phase: r.phase, moonId: m, currentMoon: r.moon, dist: X2.sameLevel(p.pos, core) ? flat(p.pos, core) : 999, quotaIndex: qi(), minQ: zone.minQ, credits: r.credits, cost, owned, st, clearT: S.host.clearT[zid] || 0, hostileNear: hostileNear(core), dead: p.dead });
     if (!res.ok) { game.net.sendTo(from, 'znx', { k: 'deny', why: res.why }); return; }
     S.host.plant = { z: zid, by: from, t: 0, cost, m };
     znx({ k: 'plant', z: zid, p: 0 });
@@ -117,7 +126,7 @@ export function installZones(game) {
     if (!pl) return;
     const core = S.cores.find((c) => c.id === pl.z), p = game.aiPlayerById(pl.by), r = run();
     const cancel = (why) => { S.host.plant = null; znx({ k: 'plant', z: pl.z, p: -1 }); if (why) game.net.sendTo(pl.by, 'znx', { k: 'deny', why }); };
-    if (!core || !p || p.dead || flat(p.pos, core) > ZN.plantR + 1.5) { cancel('Beacon cancelled: stay next to the core.'); return; }
+    if (!core || !p || p.dead || flat(p.pos, core) > ZN.plantR + 1.5 || !X2.sameLevel(p.pos, core)) { cancel('Beacon cancelled: stay next to the core.'); return; }
     if (hostileNear(core)) { cancel('Beacon cancelled: hostiles near the core.'); return; }
     if (r.credits < pl.cost) { cancel('Not enough credits for a beacon.'); return; }
     pl.t += dt;
@@ -130,6 +139,7 @@ export function installZones(game) {
     r.credits -= pl.cost;
     Z.setZ(z, pl.m, pl.z, { s: 'own', d: old?.d && old.s === 'inf' ? old.d : {}, up: old?.up | 0, since: r.day | 0 });
     z.stat.cap = (z.stat.cap | 0) + 1;
+    X2.archiveSync();
     bumpProfile('captured');
     pushZn('credits');
     znx({ k: 'taken', z: pl.z, m: pl.m });
@@ -140,51 +150,58 @@ export function installZones(game) {
     materialize();
   }
 
-  // ============================================================================================ HOST: defences (existing deployables through debugPlace)
-  const RING_OUT = new Set(['barr_wood', 'barr_metal', 'spikes', 'mine']);
+  // ============================================================================================ HOST: defences (existing deployables on validated spots; interior wings: horror traps)
   function expandDefs(st) { const out = []; for (const id of Z.DEF_IDS) for (let i = 0; i < (st?.d?.[id] | 0); i++) out.push(id); return out; }
   function clearZoneDeps(key) {
     const D = game.deployables, ids = S.host.deps.get(key) || [];
     for (const id of ids) { try { D?.destroy?.(id, 'clear'); } catch { /* gone */ } }
     S.host.deps.delete(key);
   }
+  /** rebuild one zone's defences for this landing; returns { placed, skipped } (skipped = stored defences that found no valid spot / corridor) */
   function materializeZone(m, zid) {
-    const D = game.deployables, core = S.cores.find((c) => c.id === zid), st = Z.getZ(zn(), m, zid);
+    const core = S.cores.find((c) => c.id === zid), st = Z.getZ(zn(), m, zid);
     const key = `${m}:${zid}`;
     clearZoneDeps(key);
-    if (!D?.debugPlace || !core || st?.s !== 'own') return;
-    const list = expandDefs(st), ids = [], ter = game.world?.terrain;
-    const base = (hashString(key + runKey()) % 628) / 100;
-    list.forEach((def, k) => {
-      const a = base + k * 2.399, out = RING_OUT.has(def), rad = out ? 9.5 + (k % 3) * 1.4 : 4.5 + (k % 3) * 1.3;
-      const x = core.x + Math.cos(a) * rad, zz = core.z + Math.sin(a) * rad;
-      if (ter && Math.hypot(x, zz) < 13) return;   // never on the ship pad
-      const dep = D.debugPlace(def, x, zz, a + Math.PI, null, null);
-      if (dep) { ids.push(dep.id); if (st.dry && dep.def?.supply) dep.res = 0; }
-    });
-    S.host.deps.set(key, ids);
+    S.host.skip = S.host.skip || {};
+    if (!core || st?.s !== 'own') { if (core?.in) X2.materializeInterior(m, zid, st, core); S.host.skip[key] = 0; return { placed: 0, skipped: 0 }; }
+    const res = core.in ? X2.materializeInterior(m, zid, st, core) : X2.placeRing(key, core, expandDefs(st), st);
+    if (!core.in) S.host.deps.set(key, res.ids);
+    S.host.skip[key] = res.skipped;   // stored defences that found no valid spot / corridor on THIS landing (a build must not add to it)
+    return res;
   }
   function materialize() {
     if (!host() || run()?.phase !== 'moon') return;
     const m = run().moon;
+    X2.hostRefreshWalls();   // walls first: the ring placer keeps clear of them
     for (const c of S.cores) if (Z.getZ(zn(), m, c.id)?.s === 'own') materializeZone(m, c.id);
   }
+  /** is this player standing "in" the zone (interior wings: inside the wing; outdoors: within the ring, same level)? */
+  const inZoneOf = (p, core) => (core.in ? X2.inWing(p.pos, core) : flat(p.pos, core) <= ZN.zoneR && X2.sameLevel(p.pos, core));
   function hostBuild(d, from) {
     const r = run(), p = game.aiPlayerById(from), m = r.moon, core = S.cores.find((c) => c.id === d.z);
     if (!p || !core || r.phase !== 'moon') return;
     const st = Z.getZ(zn(), m, d.z);
-    const res = Z.canBuild({ def: d.def, st, dist: flat(p.pos, core), quotaIndex: qi(), credits: r.credits });
+    const res = Z.canBuild({ def: d.def, st, dist: inZoneOf(p, core) ? 0 : 999, quotaIndex: qi(), credits: r.credits, interior: !!core.in });
     if (!res.ok) { game.net.sendTo(from, 'znx', { k: 'deny', why: res.why }); return; }
+    const before = { ...(st.d || {}) }, prevSkip = S.host.skip?.[`${m}:${d.z}`] | 0;
     r.credits -= Z.DEFS[d.def].cost;
-    st.d = { ...(st.d || {}), [d.def]: ((st.d || {})[d.def] | 0) + 1 };
+    st.d = { ...before, [d.def]: (before[d.def] | 0) + 1 };
+    const out = materializeZone(m, d.z);
+    // zones2: a defence that finds no valid spot / corridor is refused (nothing is charged) and the zone is put back as it was
+    if (out.skipped > prevSkip) {
+      r.credits += Z.DEFS[d.def].cost;
+      st.d = before;
+      materializeZone(m, d.z);
+      game.net.sendTo(from, 'znx', { k: 'deny', why: core.in ? 'No valid corridor left in this wing.' : 'No valid spot for this defence here.' });
+      return;
+    }
     pushZn('credits');
-    materializeZone(m, d.z);
     game.net.broadcast('fx', { k: 'snd', s: 'lockpick_success', p: [core.x, core.y + 1, core.z], v: 0.7 });
   }
   function hostSell(d, from) {
     const r = run(), p = game.aiPlayerById(from), m = r.moon, core = S.cores.find((c) => c.id === d.z);
     const st = Z.getZ(zn(), m, d.z);
-    if (!p || !core || !st || st.s !== 'own' || !Z.DEFS[d.def] || !(st.d?.[d.def] > 0) || flat(p.pos, core) > ZN.zoneR) return;
+    if (!p || !core || !st || st.s !== 'own' || !Z.DEFS[d.def] || !(st.d?.[d.def] > 0) || !inZoneOf(p, core)) return;
     st.d[d.def] -= 1; if (st.d[d.def] <= 0) delete st.d[d.def];
     r.credits += Math.floor(Z.DEFS[d.def].cost * 0.5);
     pushZn('credits');
@@ -216,10 +233,11 @@ export function installZones(game) {
     }
     // 2. income + upkeep of everything still owned on a reachable moon
     const own = Z.listZones(z, isActive).filter((e) => e.active && e.st.s === 'own');
-    const rows = own.map((e) => Z.zoneIncome(moonDef(e.m), zoneOf(e.m, e.z), e.st));
+    const rows = own.flatMap((e) => Z.incomeRows(moonDef(e.m), zoneOf(e.m, e.z), e.st));
     const inc = Z.capIncome(rows, r.quota);
     const up = Z.payUpkeep(r.credits + inc.credits, own.map((e) => ({ key: zoneKey(e), st: e.st })));
-    for (const e of own) e.st.dry = up.dry.includes(zoneKey(e)) ? 1 : 0;
+    for (const e of own) { e.st.dry = up.dry.includes(zoneKey(e)) ? 1 : 0; e.st.am = up.frac[zoneKey(e)] ?? 1; }   // am = the ammo the day's upkeep bought (1 = full)
+    X2.archiveSync();
     r.credits = Math.max(0, r.credits + inc.credits - up.paid);
     z.stat.earned = (z.stat.earned | 0) + inc.credits;
     z.rep = { day: r.day | 0, income: inc.credits, gross: inc.gross, capped: inc.capped, upkeep: up.paid, dry: up.dry.length, n: own.length };
@@ -281,7 +299,7 @@ export function installZones(game) {
     if (!days) return;
     const own = Z.listZones(z, isActive).filter((e) => e.active && e.st.s === 'own');
     if (!own.length) return;
-    const cr = Z.offlineIncome(days, own.map((e) => Z.zoneIncome(moonDef(e.m), zoneOf(e.m, e.z), e.st)), r.quota);
+    const cr = Z.offlineIncome(days, own.flatMap((e) => Z.incomeRows(moonDef(e.m), zoneOf(e.m, e.z), e.st)), r.quota);
     if (cr <= 0) return;
     r.credits += cr; z.stat.earned = (z.stat.earned | 0) + cr;
     pushZn('credits');
@@ -296,6 +314,7 @@ export function installZones(game) {
     const dry = st.dry ? 0.4 : 1;
     const L = { m: pe.m, z: pe.z, zone, core, wave: 0, W: lw.W, plan: lw.waves, phase: 'prep', t: 12, queue: [], members: new Map(), acc: 0, waveT: 0, hp: ZN.coreHp + ZN.coreHpUp * (st.up | 0), hpMax: ZN.coreHp + ZN.coreHpUp * (st.up | 0), rng: new RNG(hashString(`${runKey()}:live:${r.day}:${pe.z}`)), dry, sync: 0 };
     S.host.live = L;
+    X2.liveBegin(L);
     znx({ k: 'banner', main: 'COUNTER-ATTACK', sub: '{z} is under attack! Defend the core.', v: { z: zone.name } });
     game.net.broadcast('fx', { k: 'snd', s: 'ship_alarm', p: [core.x, core.y + 2, core.z], v: 0.8 });
     algo('live', { z: zone.name, m: moonName(pe.m) });
@@ -308,56 +327,26 @@ export function installZones(game) {
     for (let i = L.queue.length - 1; i > 0; i--) { const j = L.rng.int(0, i); [L.queue[i], L.queue[j]] = [L.queue[j], L.queue[i]]; }
     if (wp.boss) L.queue.push({ type: 'sg_boss', level: Math.min(4, crewSize()) });
     const lim = (game.world?.terrain?.playHalf || 130) - 8, a0 = L.rng.float(0, Math.PI * 2);
+    const pts = X2.spawnPoints(L, L.queue.length);   // interior wing: raiders come out of the far corridors
     L.queue.forEach((e, i) => {
+      if (pts?.length) { const q = pts[i % pts.length]; e.x = q.x; e.z = q.z; return; }
       const a = a0 + (i % 3) * 2.1 + L.rng.float(-0.4, 0.4), d = L.rng.float(44, 58);
       e.x = Math.max(-lim, Math.min(lim, L.core.x + Math.cos(a) * d)); e.z = Math.max(-lim, Math.min(lim, L.core.z + Math.sin(a) * d));
     });
     znx({ k: 'banner', main: 'WAVE {n}', sub: '{z}', v: { n, z: L.zone.name } });
   }
   function liveSpawn(L, e) {
-    const y = game.world?.terrain?.heightAt?.(e.x, e.z) ?? 0;
-    const c = game.creatures.hostSpawn(e.type, new THREE.Vector3(e.x, y, e.z), { level: e.level, zone: 'out', state: 'run', affix: null, variant: null });
+    const y = L.int ? L.core.y : game.world?.terrain?.heightAt?.(e.x, e.z) ?? 0;
+    const c = game.creatures.hostSpawn(e.type, new THREE.Vector3(e.x, y, e.z), { level: e.level, zone: L.int ? 'in' : 'out', state: 'run', affix: null, variant: null });
     if (!c) return;
     c.data.zl = 1; c.data.tt = 0; c.data.tg = null;
     L.members.set(c.id, true);
   }
-  function raiderTarget(L, c, S_) {
-    const near = playersNear(c.pos, 14).sort((a, b) => flat(a.pos, c.pos) - flat(b.pos, c.pos))[0];
-    if (near) return { k: 'p', id: near.id };
-    const dep = game.deployables?.nearest?.(c.pos.x, c.pos.z, S_.deps ? 14 : 11, null);
-    if (dep) return { k: 'd', id: dep.id };
-    return { k: 'c' };
-  }
-  function raiderStep(L, c, dt) {
-    const S_ = SG[c.type]; if (!S_ || c.stunT > 0) return;
-    const M = game.creatures, D = game.deployables;
-    const doAttack = (fn) => { if (c.age < 1) return; if (c.state !== 'attack') c.setState('attack'); if (c.cooldown <= 0) { c.cooldown = S_.cd; fn(); } };
-    c.data.tt -= dt;
-    if (c.data.tt <= 0) { c.data.tt = 0.4 + Math.random() * 0.2; c.data.tg = raiderTarget(L, c, S_); }
-    if (c.state === 'attack' && c.t < 0.4) return;
-    const tg = c.data.tg || { k: 'c' };
-    let tx, tz, reach = S_.reach, act = null;
-    if (tg.k === 'p') {
-      const p = game.aiPlayerById(tg.id);
-      if (!p || p.dead || p.inShip) { c.data.tg = null; c.data.tt = 0; return; }
-      tx = p.pos.x; tz = p.pos.z; act = () => M.attack(c, p, Math.round(c.dmg), 'siege');
-    } else if (tg.k === 'd') {
-      const dep = D?.get?.(tg.id);
-      if (!dep || dep.dead) { c.data.tg = null; c.data.tt = 0; return; }
-      tx = dep.pos.x; tz = dep.pos.z; reach += Math.max(dep.def.hx, dep.def.hz) * 0.7; act = () => D.damage(dep, S_.dep * (1 + 0.1 * ((c.level || 1) - 1)));
-    } else { tx = L.core.x; tz = L.core.z; reach += 1.6; act = () => { L.hp -= S_.hull * S_.cd * 12 * (1 + 0.1 * ((c.level || 1) - 1)); }; }
-    const dx = tx - c.pos.x, dz = tz - c.pos.z, d = Math.hypot(dx, dz) || 1;
-    if (d <= reach) { c.yaw = Math.atan2(dx, dz); doAttack(act); return; }
-    c.setState('run');
-    let speed = M.speedMul(c, S_.run); if (c.slowT > 0) speed *= c.slowMul || 0.55;
-    c.pos.x += (dx / d) * speed * dt; c.pos.z += (dz / d) * speed * dt;
-    const ter = game.world?.terrain; if (ter) c.pos.y = ter.heightAt(c.pos.x, c.pos.z);
-    c.yaw = Math.atan2(dx, dz);
-  }
+  const raiderStep = (L, c, dt) => X2.raiderStep(L, c, dt);   // zones2: flow field around barricades / walls, interior cell flow, wall chewing
   function liveEnd(L, win) {
     for (const id of L.members.keys()) { const c = game.creatures.host.get(id); if (c && !c.dead) game.creatures.kill(c, null, { silent: true }); }
     L.members.clear();
-    S.host.live = null;
+    S.host.live = null; X2.liveEnd();
     const out = [];
     settle(L.m, L.z, win, Math.round(Z.wavePowerMean(L.zone.threat, qi(), crewSize()) * ZN.winBonusMul), true, out);
     for (const line of out) say(line.k, line.v, line.kind);
@@ -377,6 +366,7 @@ export function installZones(game) {
     if (L.phase === 'prep') { L.t -= dt; if (L.t <= 0) liveBeginWave(L, 1); }
     else if (L.phase === 'wave') {
       L.waveT += dt; L.acc += dt * 3;
+      X2.ammoTick(L, dt);
       while (L.acc >= 1 && L.queue.length && L.members.size < 24) { L.acc -= 1; liveSpawn(L, L.queue.shift()); }
       if (!L.queue.length) L.acc = Math.min(L.acc, 1);
       for (const id of [...L.members.keys()]) {
@@ -400,7 +390,7 @@ export function installZones(game) {
     const L = S.host.live; if (!L) return;
     // the crew left mid-fight: the built defences finish the job on their own
     for (const id of L.members.keys()) { const c = game.creatures?.host?.get(id); if (c && !c.dead) game.creatures.kill(c, null, { silent: true }); }
-    L.members.clear(); S.host.live = null;
+    L.members.clear(); S.host.live = null; X2.liveEnd();
     znx({ k: 'live', on: false });
   }
 
@@ -417,7 +407,7 @@ export function installZones(game) {
       for (const c of S.cores) {
         const st = Z.getZ(z, r.moon, c.id);
         if (st?.s === 'own') continue;
-        const near = playersNear(c, 45).length > 0;
+        const near = playersNear(c, c.in ? 60 : 45).length > 0;
         S.host.clearT[c.id] = near ? Z.stepClear(S.host.clearT[c.id], step, hostileNear(c)) : 0;
       }
     }
@@ -426,7 +416,7 @@ export function installZones(game) {
     S.host.sendT -= dt;
     if (S.host.sendT <= 0) {
       S.host.sendT = 1;
-      znx({ k: 'st', moon: r.moon, cores: S.cores.map((c) => [c.id, c.x, Math.round(c.y * 10) / 10, c.z]), clr: S.host.clearT, pl: S.host.plant ? { z: S.host.plant.z, p: S.host.plant.t / ZN.plantSec } : null });
+      znx({ k: 'st', moon: r.moon, cores: S.cores.map((c) => [c.id, c.x, Math.round(c.y * 10) / 10, c.z, c.in ? 1 : 0, c.w | 0]), clr: S.host.clearT, pl: S.host.plant ? { z: S.host.plant.z, p: S.host.plant.t / ZN.plantSec } : null });
     }
   }
 
@@ -441,7 +431,7 @@ export function installZones(game) {
           case 'build': hostBuild({ z: String(d.z || ''), def: String(d.def || '') }, from); break;
           case 'sell': hostSell({ z: String(d.z || ''), def: String(d.def || '') }, from); break;
           case 'up': hostUp({ m: String(d.m || ''), z: String(d.z || '') }, from); break;
-          default: break;
+          default: X2.hostOp(d.op, d, from); break;
         }
       } catch (e) { console.error('[zones] znreq', e); }
     });
@@ -453,7 +443,7 @@ export function installZones(game) {
     if (disposed || !m) return;
     switch (m.k) {
       case 'st':
-        if (m.moon === run()?.moon) { if (!host()) { S.cores = (m.cores || []).map(([id, x, y, z]) => ({ id, x, y, z })); S.stMoon = m.moon; } S.clr = m.clr || {}; S.plant = m.pl || null; }
+        if (m.moon === run()?.moon) { if (!host()) { S.cores = (m.cores || []).map(([id, x, y, z, i, w]) => (i ? { id, x, y, z, in: 1, w } : { id, x, y, z })); S.stMoon = m.moon; } S.clr = m.clr || {}; S.plant = m.pl || null; }
         break;
       case 'plant': S.plant = m.p >= 0 ? { z: m.z, p: m.p } : null; break;
       case 'deny': game.ui?.toast?.(t(m.why || 'Not possible.'), 'warn'); game.sfx?.('ui_click', 0.4); break;
@@ -461,7 +451,7 @@ export function installZones(game) {
       case 'banner': game.ui?.hud?.bigText?.(tf(m.main, m.v || {}), m.sub ? tf(m.sub, m.v || {}) : ''); game.sfx?.('ship_alarm', 0.3); break;
       case 'live': S.live = m.on ? m : null; break;
       case 'algo': { const line = tf(Z.pickLine(m.kind, m.seed), m.v || {}); if (game.lore?.say) game.lore.say(line); else game.ui?.toast?.(line, 'info'); break; }
-      default: break;
+      default: X2.onMsg(m); break;
     }
   }
   const onZnxMsg = (m, from) => { if (from === game.selfId || from === game.net?.hostId) onZnx(m); };
@@ -479,7 +469,7 @@ export function installZones(game) {
     for (const v of S.views.values()) { v.g.removeFromParent(); v.g.traverse((o) => { o.geometry?.dispose?.(); o.material?.dispose?.(); }); }
     S.views.clear(); S.viewKey = '';
   }
-  function makeView(core, col, kind) {
+  function makeView(core, col, kind, mn) {
     const g = new THREE.Group(); g.position.set(core.x, core.y, core.z);
     const c = new THREE.Color(col);
     const dark = new THREE.MeshLambertMaterial({ color: 0x2c3036, flatShading: true });
@@ -488,10 +478,11 @@ export function installZones(game) {
     const dish = new THREE.Mesh(new THREE.ConeGeometry(0.7, 0.4, 8, 1, true), dark); dish.position.y = 3.2; dish.rotation.x = Math.PI; dish.material.side = THREE.DoubleSide; g.add(dish);
     const lamp = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.28, 0.28), glow); lamp.position.y = 3.65; g.add(lamp);
     const parts = { dish, lamp, glow };
-    const h = kind === 'own' ? 60 : kind === 'inf' ? 26 : 9, op = kind === 'own' ? 0.3 : kind === 'inf' ? 0.32 : 0.1;
+    const inside = !!core.in;   // zones2: a relay inside a facility wing: short light column, small floor ring (the ceiling is 3-4 m up)
+    const h = inside ? 3 : kind === 'own' ? 60 : kind === 'inf' ? 26 : 9, op = kind === 'own' ? 0.3 : kind === 'inf' ? 0.32 : 0.1;
     const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, h, 8, 1, true), new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: op, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
     pillar.position.y = 3.6 + h / 2; g.add(pillar); parts.pillar = pillar; parts.op = op;
-    const ter = game.world?.terrain, R = ZN.zoneR, N = 72, pos = [], idx = [];
+    const ter = inside ? null : game.world?.terrain, R = inside ? 3.4 : ZN.zoneR, N = inside ? 36 : 72, pos = [], idx = [];
     for (let i = 0; i < N; i++) {
       const a = (i / N) * Math.PI * 2, ca = Math.cos(a), sa = Math.sin(a);
       for (const rr of [R - 0.45, R]) { const wx = core.x + ca * rr, wz = core.z + sa * rr; pos.push(ca * rr, (ter ? ter.heightAt(wx, wz) : core.y) - core.y + 0.28, sa * rr); }
@@ -500,6 +491,14 @@ export function installZones(game) {
     const rg = new THREE.BufferGeometry(); rg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); rg.setIndex(idx);
     const ring = new THREE.Mesh(rg, new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: kind === 'free' ? 0.0 : 0.2, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
     ring.frustumCulled = false; g.add(ring); parts.ring = ring;
+    if (mn) {   // zones2: the extractor rig next to the pylon (drill head spins, one crew-colour lamp per Mk level)
+      const rig = new THREE.Group(); rig.position.set(1.9, 0, 0.6); g.add(rig);
+      const base = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.5, 1.1), dark); base.position.y = 0.25; rig.add(base);
+      const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 1.8, 6), dark); mast.position.y = 1.3; rig.add(mast);
+      const drill = new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.7, 6), glow); drill.position.y = 0.55; drill.rotation.x = Math.PI; rig.add(drill);
+      for (let i = 0; i < (mn.l | 0); i++) { const l = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.16, 0.16), glow); l.position.set(-0.3 + i * 0.3, 2.3, 0); rig.add(l); }
+      parts.drill = drill;
+    }
     g.userData.parts = parts;
     return g;
   }
@@ -507,12 +506,12 @@ export function installZones(game) {
     const r = run();
     if (!r || r.phase !== 'moon' || !S.cores.length) { if (S.views.size) disposeViews(); return; }
     const z = r.zn, col = Z.crewColor(z);
-    const sig = S.cores.map((c) => `${c.id}${c.x}${Z.getZ(z, r.moon, c.id)?.s || '-'}`).join('|') + col + r.moon + r.seed;
+    const sig = S.cores.map((c) => `${c.id}${c.x}${c.in ? 'i' : ''}${Z.getZ(z, r.moon, c.id)?.s || '-'}${Z.getZ(z, r.moon, c.id)?.mn?.l || 0}`).join('|') + col + r.moon + r.seed;
     if (!force && sig === S.viewKey) return;
     disposeViews(); S.viewKey = sig;
     for (const c of S.cores) {
-      const s = Z.getZ(z, r.moon, c.id)?.s || 'free';
-      const g = makeView(c, s === 'own' ? col : s === 'inf' ? '#ff3a4a' : '#9aa4b0', s);
+      const st = Z.getZ(z, r.moon, c.id), s = st?.s || 'free';
+      const g = makeView(c, s === 'own' ? col : s === 'inf' ? '#ff3a4a' : '#9aa4b0', s, s === 'own' ? st.mn : null);
       game.scene.add(g); S.views.set(c.id, { g, kind: s });
     }
   }
@@ -520,6 +519,7 @@ export function installZones(game) {
     for (const v of S.views.values()) {
       const p = v.g.userData.parts; if (!p) continue;
       p.dish.rotation.y = tt * 0.8;
+      if (p.drill) p.drill.rotation.y = tt * 5;
       const fl = v.kind === 'inf' ? (Math.sin(tt * 19) > 0.2 ? 1 : 0.35) : 0.85 + 0.15 * Math.sin(tt * 3);
       p.pillar.material.opacity = p.op * fl;
       p.lamp.visible = v.kind === 'own' || Math.sin(tt * 4) > 0;
@@ -528,6 +528,7 @@ export function installZones(game) {
 
   // ============================================================================================ CLIENT: interactables, plant bar, objectives
   function plantBar(txt, frac) {
+    if (typeof document === 'undefined') return;
     if (!txt) { if (S.barEl) S.barEl.style.display = 'none'; return; }
     if (!S.barEl) { S.barEl = document.createElement('div'); S.barEl.className = 'zn-bar'; S.barEl.innerHTML = '<span></span><i><b></b></i>'; document.body.appendChild(S.barEl); }
     S.barEl.style.display = 'block'; S.barEl.firstChild.textContent = txt; S.barEl.querySelector('b').style.width = Math.round(frac * 100) + '%';
@@ -535,10 +536,10 @@ export function installZones(game) {
   on('interactables', (out, g) => {
     if (g !== game || disposed || !enabled()) return;
     const r = run();
-    if (r?.phase !== 'moon' || me().indoor || me().dead || !S.cores.length) return;
+    if (r?.phase !== 'moon' || me().dead || !S.cores.length) return;
     const p = me().pos;
     for (const c of S.cores) {
-      if (flat(p, c) > 30) continue;
+      if (flat(p, c) > 30 || !X2.sameLevel(p, c)) continue;   // zones2: interior relays only for people inside the facility
       const st = Z.getZ(r.zn, r.moon, c.id), zone = zoneOf(r.moon, c.id);
       if (!zone) continue;
       const pos = new THREE.Vector3(c.x, c.y + 1.4, c.z), name = t(zone.name);
@@ -573,19 +574,24 @@ export function installZones(game) {
         const st = Z.getZ(z, id, q.id), s = st ? st.s : (qi() < q.minQ ? 'locked' : 'free');
         const core = here ? coreOf(q.id) : null;
         return { id: q.id, name: q.name, kind: q.kind, ang: q.ang, dist: q.dist, wing: q.wing, threat: q.threat, s, st, minQ: q.minQ,
-          income: s === 'own' ? Z.zoneIncome(m, q, st).credits : 0, upkeep: Z.upkeepOf(st), def: st ? Z.defencePower(st, !!st.dry) : 0, slots: Z.slotsOf(st), used: Z.defCount(st),
+          income: s === 'own' ? Z.incomeTotal(Z.zoneIncome(m, q, st)) : 0, upkeep: Z.upkeepOf(st), def: st ? Z.defencePower(st, !!st.dry) : 0, slots: Z.slotsOf(st), used: Z.defCount(st),
+          interior: q.kind === 'wing' && (core ? !!core.in : !!m.interior), walls: s === 'own' ? { n: Z.wallCount(st), cap: Z.wallCap(st), gates: (st.w || []).filter((w) => w[0] === 1).length } : null,
+          mn: s === 'own' ? st.mn || null : null, mnBonus: s === 'own' && st.mn ? Z.minerBonus(m, st.mn) : null, mnCost: s === 'own' ? (st.mn ? (st.mn.l < Z.MINER.maxLv ? Z.minerUpCost(st.mn.l) : 0) : Z.minerCost(1)) : 0, mnOk: qi() >= Z.MINER.minQ,
           cost: Z.captureCost(m, q, ownedCount(), s === 'inf'), pending: !!(z?.pend || []).find((p) => p.m === id && p.z === q.id), core: core ? { x: core.x, z: core.z } : null,
           odds: st && s === 'own' ? Math.round(Z.winChance(Z.defencePower(st, !!st.dry), q.threat, qi(), crewSize()) * 100) : null };
       });
-      return { id, name: m.name, tier: m.tier | 0, biome: m.biome, here, zones, owned: zones.filter((q) => q.s === 'own').length };
+      return { id, name: m.name, tier: m.tier | 0, biome: m.biome, here, away: !!m.arch, zones, owned: zones.filter((q) => q.s === 'own').length };
     });
     const own = Z.listZones(z, isActive).filter((e) => e.active && e.st.s === 'own');
-    const inc = Z.capIncome(own.map((e) => Z.zoneIncome(moonDef(e.m), zoneOf(e.m, e.z), e.st)), r?.quota | 0);
-    const inZone = (() => { const m = mineNow(); if (!m) return null; const p = me()?.pos; for (const c of S.cores) if (p && flat(p, c) <= ZN.zoneR) return { m, z: c.id }; return null; })();
+    const inc = Z.capIncome(own.flatMap((e) => Z.incomeRows(moonDef(e.m), zoneOf(e.m, e.z), e.st)), r?.quota | 0);
+    const inZone = (() => { const m = mineNow(); if (!m) return null; const p = me()?.pos; for (const c of S.cores) if (p && (c.in ? X2.inWing(p, c) : flat(p, c) <= ZN.zoneR && X2.sameLevel(p, c))) return { m, z: c.id }; return null; })();
     return { moons: rows, col: Z.crewColor(z), credits: r?.credits | 0, qi: qi(), income: inc, upkeep: own.reduce((a, e) => a + Z.upkeepOf(e.st), 0), maxOwned: Z.maxOwned(qi()), owned: own.length, inZone, rep: z?.rep || null, pend: z?.pend || [], stat: z?.stat || {}, mat: (m) => Z.matOf(moonDef(m)) };
   }
   const panelApi = {
-    snapshot, DEFS: Z.DEFS, DEF_IDS: Z.DEF_IDS, ZN,
+    snapshot, DEFS: Z.DEFS, DEF_IDS: Z.DEF_IDS, defsFor: Z.defsFor, WALL: Z.WALL, MINER: Z.MINER, ZN,
+    // zones2: walls / gates go where the player looks (host validates), the extractor sits next to the relay
+    wall: (z, n, gate) => { const p = me(), fy = p.yaw + Math.PI, d = 4.5; askHost('wall', { z, n, gate: gate ? 1 : 0, wx: p.pos.x + Math.sin(fy) * d, wz: p.pos.z + Math.cos(fy) * d, fy }); },
+    wallSell: (z) => askHost('wsell', { z }), mine: (z) => askHost('mine', { z }), mineSell: (z) => askHost('msell', { z }),
     build: (z, def) => askHost('build', { z, def }), sell: (z, def) => askHost('sell', { z, def }), up: (m, z) => askHost('up', { m, z }),
     unlocked: (id) => qi() >= Z.DEFS[id].minQ,
   };
@@ -620,6 +626,8 @@ export function installZones(game) {
   }
   registerCommands();
 
+  // ============================================================================================ zones2 (interior wings, walls, extractor, raiders, CRT): shares this module's state through X
+  X2 = installZones2({ game, Z, Q, ZN, S, flat, run, zn, runKey, qi, spec, moonDef, realMoon, coreOf, znx, pushZn, snapshot, zoneName, playersNear, host: S.host });
   // ============================================================================================ events
   let tt = 0;
   on('update', (dt, g) => {
@@ -632,9 +640,10 @@ export function installZones(game) {
       if (S.plant) plantBar(tf('PLANTING BEACON: {z}', { z: zoneName(r.moon, S.plant.z) }), S.plant.p);
       else plantBar(null);
     } else { if (S.views.size) disposeViews(); plantBar(null); if (S.cores.length) { S.cores = []; S.clr = {}; S.plant = null; S.live = null; } }
+    try { X2.update(dt); } catch (e) { if (!S._w3) { S._w3 = 1; console.warn('[zones2] update', e); } }
     if (host()) { try { hostTick(dt); } catch (e) { if (!S._w2) { S._w2 = 1; console.warn('[zones] tick', e); } } }
   });
-  on('mapLoaded', () => { S.cores = []; S.coresKey = ''; S.stMoon = ''; S.clr = {}; S.plant = null; S.live = null; S.host.deps.clear(); disposeViews(); });
+  on('mapLoaded', () => { X2.onLanding(); S.cores = []; S.coresKey = ''; S.stMoon = ''; S.clr = {}; S.plant = null; S.live = null; S.host.deps.clear(); disposeViews(); });
   on('phase', (ph, g) => {
     if (g !== game || disposed) return;
     if (ph !== 'moon') { closePanel(); if (host()) { liveAbort(); S.host.plant = null; S.host.deps.clear(); S.coresKey = ''; if (zn()) zn().rt = Date.now(); } }
@@ -644,7 +653,7 @@ export function installZones(game) {
 
   return {
     core: Z, state: zn, snapshot, cores: () => S.cores, open: openPanel, dayTick, hostComputeCores, materialize, live: () => S.host.live,
-    zoneSpec: spec, moonDef,
+    zoneSpec: spec, moonDef, x2: () => X2,
     dispose() {
       disposed = true;
       for (const o of offs.splice(0)) { try { o?.(); } catch { /* ignore */ } }
@@ -653,7 +662,7 @@ export function installZones(game) {
       try { boundNet?.off?.('msg:znx', onZnxMsg); } catch { /* ignore */ }
       for (const n of cmdNames) mods.commands?.delete(n);
       closePanel(); disposeViews(); S.barEl?.remove(); S.barEl = null;
-      liveAbort();
+      liveAbort(); X2.dispose();
     },
   };
 }

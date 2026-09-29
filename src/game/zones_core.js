@@ -4,6 +4,8 @@
 import { RNG, hashString } from '../core/rng.js';
 import { siegePower, planWave, SG } from './siege_core.js';
 import * as DC from './defense_core.js';
+import { TRAPS } from './horror_core.js';
+import { MK_SPEED, MK_COST, PURITY } from './homeworld2_core.js';   // zones2: the miner uses homeworld2's Mk / purity tables
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 export const ZN = {
@@ -26,10 +28,52 @@ export const ZN = {
   winBonusMul: 2.2,
 };
 
-// ------------------------------------------------------------------ defences (built with EXISTING deployable kinds; the numbers live in defense_core.js)
-export const DEFS = DC.zoneDefs();
-export const DEF_IDS = Object.keys(DEFS);
+// ------------------------------------------------------------------ defences (outdoor numbers live in defense_core.js; zones2 adds interior trap defs)
+export const DEFS = { ...DC.zoneDefs() };
+export const DEF_IDS = Object.keys(DEFS);   // OUTDOOR defences (the sector-map list); interior wings use TRAP_DEF_IDS
+// zones2: interior wings are fortified with the horror TRAP types (laser grid, crusher, spikes, live floor, flame vent) on corridor cells. Permanently armed while the
+// zone is paid for (upkeep), they only hurt creatures (never the crew). cost ~2.2x the pay-to-arm price: a trap is a one-off purchase here, not a per-strike fee.
+const TRAP_POWER = { crusher: 12, spikes: 8, electric: 11, flame: 12, laser: 15 };
+const TRAP_MINQ = { crusher: 0, spikes: 0, electric: 1, flame: 1, laser: 1 };
+export const TRAP_DEF_IDS = [];
+for (const id of ['spikes', 'crusher', 'electric', 'flame', 'laser']) {
+  const T = TRAPS[id], k = 't_' + id;
+  DEFS[k] = { name: T.name, cost: Math.round((T.price * 2.2) / 5) * 5, upkeep: Math.max(2, Math.round(T.price / 14)), power: TRAP_POWER[id], minQ: TRAP_MINQ[id], in: 1, trap: id };
+  TRAP_DEF_IDS.push(k);
+}
+export const ALL_DEF_IDS = [...DEF_IDS, ...TRAP_DEF_IDS];
+export const defsFor = (interior) => (interior ? TRAP_DEF_IDS : DEF_IDS);
 export const BASE_DEF = DC.BASE_DEF;   // the core defends itself a little
+
+// zones2: outdoor wall / gate pieces (homeworld2 style snap grid: FC = 1.5 m fine cells, a piece is 3 m = 2 cells long). State: st.w = [[kind 0 wall | 1 gate, gx, gz, rot 0 | 1], ...]
+// with (gx, gz) in fine cells RELATIVE TO THE CORE (the terrain differs per landing, the offsets persist; pieces that no longer fit are skipped for that landing).
+export const WALL = {
+  fc: 1.5, len: 3, thick: 0.5, h: 2.2, gateW: 2.0,
+  cost: { 0: 14, 1: 40 }, sell: 0.5, power: { 0: 0.5, 1: 1.2 }, powerMax: 10, upkeepGate: 1,
+  baseCap: 12, capPerUp: 6, hp: { 0: 260, 1: 160 }, flowCost: { 0: 25, 1: 6 },
+  minCore: 3.4, shipKeep: 3.2, maxSlope: 0.9, maxReach: 11, coreClear: 2.6,
+  names: ['Zone Wall', 'Zone Gate'],
+};
+export const wallCap = (st) => WALL.baseCap + WALL.capPerUp * (st?.up | 0);
+export const wallCount = (st) => (st?.w || []).length;
+export const wallPower = (st) => Math.min(WALL.powerMax, (st?.w || []).reduce((a, w) => a + (WALL.power[w[0]] || 0), 0));
+export const wallUpkeep = (st) => (st?.w || []).reduce((a, w) => a + (w[0] === 1 ? WALL.upkeepGate : 0), 0);
+
+// zones2: optional extractor per zone (homeworld2 miner rules: Mk1-3 = speed x1 / 1.5 / 2.2 for cost x1 / 1.9 / 3.6, node purity impure / normal / pure = x0.5 / 1 / 1.6).
+// State: st.mn = { l: 1..3, p: purity 0..2 }. It adds credits INSIDE the daily cap plus a biome material (and a little material cap of its own).
+export const MINER = { cost: 220, minQ: 1, maxLv: 3, credits: 6, creditsPerTier: 4, sell: 0.5, matCapPer: 2, matCapMax: 12 };
+export const minerCost = (lv) => Math.round(MINER.cost * MK_COST[Math.max(0, Math.min(2, lv - 1))]);
+export const minerUpCost = (lv) => minerCost(lv + 1) - minerCost(lv);
+export const minerUpkeep = (mn) => (mn ? 3 + 2 * (mn.l | 0) : 0);
+export function minerPurity(runKey, moonId, zoneId) {
+  const r = new RNG(hashString(`${runKey}:zn:node:${moonId}:${zoneId}`)).next();
+  return r < 0.25 ? 0 : r < 0.75 ? 1 : 2;
+}
+export function minerBonus(moon, mn) {
+  if (!mn) return null;
+  const l = clamp(mn.l | 0, 1, MINER.maxLv), p = clamp(mn.p | 0, 0, 2), tier = (moon?.tier | 0) || 1;
+  return { credits: Math.round((MINER.credits + MINER.creditsPerTier * tier) * PURITY[p] * MK_SPEED[l - 1]), mat: l >= 3 ? 2 : 1, matId: matOf(moon), mn: 1 };
+}
 
 // ------------------------------------------------------------------ eligibility + zone partition
 export function zonesEligible(moon) {
@@ -148,8 +192,11 @@ export function zoneIncome(moon, zone, st) {
   const tier = moon.tier | 0 || 1;
   const credits = Math.round((10 + 7 * tier) * (1 + 0.15 * (zone.rank | 0)) * (1 + 0.25 * up));
   const mat = tier >= 3 || up >= 2 ? 2 : 1;
-  return { credits, mat, matId: matOf(moon) };
+  return { credits, mat, matId: matOf(moon), mn: minerBonus(moon, st?.mn) };
 }
+/** the rows the daily cap works on: the zone itself + its extractor (if any) */
+export const incomeRows = (moon, zone, st) => { const i = zoneIncome(moon, zone, st); return i.mn ? [i, i.mn] : [i]; };
+export const incomeTotal = (i) => i.credits + (i.mn ? i.mn.credits : 0);
 export const dailyCap = (quota) => Math.max(ZN.incomeCapMin, Math.round((quota | 0) * ZN.incomeCapMul));
 /** rows = [{credits, mat, matId}] -> capped totals (the cap scales credits down proportionally, materials to matCapPerDay) */
 export function capIncome(rows, quota) {
@@ -158,24 +205,28 @@ export function capIncome(rows, quota) {
   const k = gross > cap ? cap / gross : 1;
   const credits = Math.floor(gross * k);
   const mats = {};
-  let left = ZN.matCapPerDay;
+  let left = ZN.matCapPerDay + Math.min(MINER.matCapMax - ZN.matCapPerDay, MINER.matCapPer * rows.filter((r) => r.mn).length);
   for (const r of rows) { const q = Math.min(left, r.mat | 0); if (q > 0) { mats[r.matId] = (mats[r.matId] || 0) + q; left -= q; } }
   return { gross, credits, cap, capped: gross > cap, mats };
 }
-export const upkeepOf = (st) => Object.entries(st?.d || {}).reduce((a, [k, n]) => a + (DEFS[k]?.upkeep || 0) * (n | 0), 0);
+export const upkeepOf = (st) => Object.entries(st?.d || {}).reduce((a, [k, n]) => a + (DEFS[k]?.upkeep || 0) * (n | 0), 0) + wallUpkeep(st) + minerUpkeep(st?.mn);
 /** pay upkeep for zones in order out of `funds`; zones that cannot be paid go dry (defences at 40 % power, turrets start empty) */
 export function payUpkeep(funds, rows) {
   let left = Math.max(0, funds | 0), paid = 0;
-  const dry = [];
+  const dry = [], frac = {};   // frac = how much of the day's upkeep (= ammo) a zone got (1 when paid in full; unpaid zones get what is left, without spending it)
   for (const r of rows) {
     const c = upkeepOf(r.st);
-    if (c <= 0) continue;
-    if (left >= c) { left -= c; paid += c; } else dry.push(r.key);
+    if (c <= 0) { frac[r.key] = 1; continue; }
+    if (left >= c) { left -= c; paid += c; frac[r.key] = 1; } else { dry.push(r.key); frac[r.key] = clamp(left / c, 0, 0.5); }
   }
-  return { paid, dry, left };
+  return { paid, dry, left, frac };
 }
 export function defencePower(st, dry = false, moonUps = 0) {
-  return DC.defencePower(st?.d, { dry, ups: (st?.up | 0) + moonUps });
+  let p = BASE_DEF;
+  for (const [k, n] of Object.entries(st?.d || {})) p += (DEFS[k]?.power || 0) * (n | 0);
+  p += wallPower(st);
+  p *= dry ? 0.4 : 1;
+  return Math.round(p * (1 + 0.1 * clamp((st?.up | 0) + moonUps, 0, 6)) * 10) / 10;
 }
 export const offlineDays = (elapsedSec) => {
   const o = ZN.offline;
@@ -205,6 +256,7 @@ export function canBuild(c) {
   const def = DEFS[c.def];
   if (!def) return { ok: false, why: 'Unknown defence.' };
   if (c.st?.s !== 'own') return { ok: false, why: 'Capture the zone first.' };
+  if (!!def.in !== !!c.interior) return { ok: false, why: def.in ? 'Traps only work inside a facility wing.' : 'Not for a facility wing: build traps there.' };
   if (c.dist > ZN.zoneR) return { ok: false, why: 'Stand inside the zone.' };
   if ((c.quotaIndex | 0) < def.minQ) return { ok: false, why: 'Not unlocked yet (later quota).' };
   if (defCount(c.st) >= slotsOf(c.st)) return { ok: false, why: 'No free defence slot: upgrade the zone.' };
