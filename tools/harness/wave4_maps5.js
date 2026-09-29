@@ -14,6 +14,7 @@ const grab = (label) => {
   out.views[label] = { ...g.engine.sceneStats };
 };
 async function land(moon) {
+  if (g.run.phase !== 'orbit') { g.player.teleport(new T.Vector3(0, 1, 0)); g.player.inShip = true; g.hostBeginTakeoff('lever'); g.hostFinishTakeoff(); for (let i = 0; i < 6; i++) { kefal.tick(10, 1 / 30, false); await sleep(5); } }   // must be in orbit before the next lever
   g.run.daysLeft = 3; g.run.moon = moon; g.player.inShip = true; g.hostLever(g.selfId); g.hostFinishLanding();
   for (let i = 0; i < 20; i++) { kefal.tick(10, 1 / 30, false); await sleep(5); }
 }
@@ -34,6 +35,7 @@ out.notes.push('hamsi landed in ' + Math.round(tm() - t0) + ' ms');
 t0 = tm();
 await land('m5est');
 out.notes.push('m5est landed in ' + Math.round(tm() - t0) + ' ms; maps5 module: ' + !!g.maps5);
+if (!g.world.outdoor?.decor) return { diag: { moon: g.run.moon, phase: g.run.phase, moonId: g.world.moonId, biome: g.env?.biome?.decor, outdoor: !!g.world.outdoor, notes: out.notes, errs } };
 const ei = g.world.outdoor.decor.info, h = ei.hedge, a = ei.archive;
 out.estate = { kind: ei.kind, counts: ei.counts, hedgeColliders: h?.colliders, archiveColliders: a?.colliders, zones: ei.zones.map((z) => z.id), prizes: ei.prizes.length, loot: ei.loot.length,
   creatures: states(['m5warden', 'm5sleeper']), m5items: [...g.items.all()].map((i) => i.type).filter((ty) => ty && ty.startsWith('m5_')), landedMoon: g.run.moon };

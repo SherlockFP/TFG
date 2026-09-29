@@ -343,7 +343,7 @@ export function installAlgo1(game) {
     if (r.phase === 'orbit') {
       S.orbitT += dt;
       const key = `${r.runId ?? 'x'}:${r.day}`;
-      if (S.orbitT > 4 && S.votedKey !== key && !S.hv && !MOONS[r.moon]?.company) hostOpenVote();
+      if (S.orbitT > 4 && S.votedKey !== key && !S.hv && !MOONS[r.moon]?.company && !game.onboard?.active?.() && !game.minigame) hostOpenVote();   // [qa] never during Hiring Day or a minigame
     }
     K.decayViewers(S.viewers, dt);
     S.viewT += dt;

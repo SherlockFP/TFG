@@ -19,7 +19,7 @@ void view;
 const table = g.engine.scene.getObjectByName('arcade_table');
 const proj = (sq) => {
   const f = sq & 7, r = sq >> 3, p = new THREE.Vector3((f - 3.5) * 0.1, 0.815, (3.5 - r) * 0.1);
-  table.localToWorld(p); p.project(g.camera);
+  table.updateWorldMatrix(true, false); g.camera.updateMatrixWorld(true); table.localToWorld(p); p.project(g.camera);   // (no render happened yet: refresh the matrices)
   const rc = g.engine.canvas.getBoundingClientRect();
   return { x: rc.left + (p.x + 1) / 2 * rc.width, y: rc.top + (1 - p.y) / 2 * rc.height };
 };
