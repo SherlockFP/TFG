@@ -8,6 +8,7 @@ import { levelTexture } from './geobuilder.js';
 import { G } from '../physics/physics.js';
 import { CELL, GRID_MIN, GRID_MAX, PAD_CLEAR } from '../game/homeworld_core.js';
 import { createConsoleModel } from '../models/homeworld.js';
+import { buildHomeDecor } from './homeworld_decor.js';   // [home3] Off-Grid Claim look
 
 export const HOME_Y = -1.25;       // ground height (same as the flat ship zone of every moon)
 export const HOME_HALF = 58;       // walkable half extent (m)
@@ -38,7 +39,7 @@ function makeTerrain(HALF = HOME_HALF) {
   };
 }
 
-export function buildHomeworldMap(seed, moon, { physics, lightPool, biome }) {
+export function buildHomeworldMap(seed, moon, { physics, lightPool, biome, profile }) {
   const HALF = moon?.plateauHalf || HOME_HALF, ghostMap = !!moon?.ghost;   // [h2] the ghost-raid arena is a bigger plateau (homeworld2_ghost.js)
   const group = new THREE.Group();
   group.name = 'homeworld';
@@ -109,14 +110,20 @@ export function buildHomeworldMap(seed, moon, { physics, lightPool, biome }) {
     emitters.push(em); lightPool.add(em);
   }
 
+  // [home3] the Off-Grid Claim: skyline, outpost dressing, drones (world/homeworld_decor.js; footprints planned off the build grid). Not on the ghost-raid arena.
+  const decor = ghostMap ? null : buildHomeDecor(seed, { HOME_Y, LAYER, flatLayer, HALF, add, lightPool, profile });
+  if (decor) group.add(decor.group);
+
   const mainExit = { pos: CONSOLE_POS.clone().add(new THREE.Vector3(0, 1.4, 0)), spawn: CONSOLE_POS.clone().add(new THREE.Vector3(0, 0.05, 2)), yaw: 0 };
   let t = 0;
   return {
     group, colliders, emitters, terrain, plan: terrain.plan, interactables: [], ponds: [], mainExit, fireExits: [], outdoorScrapSpots: [], entranceObj: null,
     outposts: null, decor: null, landmarks: null, harvest: { trees: [], rocks: [] }, avoid: () => true, ownMats,
     home: { grid, consolePos: CONSOLE_POS, groundY: HOME_Y, padR: PAD_R },
-    update(dt) { t += dt; glowMat.color.setScalar(0.85 + 0.15 * Math.sin(t * 2.2)); },
+    update(dt, game) { t += dt; glowMat.color.setScalar(0.85 + 0.15 * Math.sin(t * 2.2)); decor?.update(dt, game); },
+    decor,
     dispose(physicsRef) {
+      decor?.dispose();
       for (const c of colliders) physicsRef.removeCollider(c);
       for (const em of emitters) lightPool.remove(em);
       for (const g of disposables) g.dispose();

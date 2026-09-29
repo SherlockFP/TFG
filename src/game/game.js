@@ -768,7 +768,7 @@ export class Game extends Emitter {
       this.env.setMoon(BIOMES.pier, run.weather || 'clear', 'company');
       this.companyNpc();
     } else if (moon.customMap) {   // [hw] homeworld: own outdoor map, no facility
-      const outdoor = moon.customMap(run.seed, moon, { physics: this.physics, lightPool: this.lights, biome: BIOMES[moon.biome] });
+      const outdoor = moon.customMap(run.seed, moon, { physics: this.physics, lightPool: this.lights, biome: BIOMES[moon.biome], profile: this.profile });
       this.world.outdoor = outdoor; this.world.terrain = outdoor.terrain;
       this.scene.add(outdoor.group);
       this.world.mapGroup = outdoor.group;
