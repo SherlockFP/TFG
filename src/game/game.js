@@ -245,7 +245,7 @@ import { installNvgear } from './nvgear.js';   // [import:nvgear] wave 8: buyabl
 import { installMapmods } from './mapmods.js';
 // [import:worlds3]
 // [import:crdirector]
-// [import:facjobs]
+import { installFacjobs } from './facjobs.js';
 // [import:lcmonsters]
 // [import:atmos]
 import { installArcade2 } from './arcade2.js';
@@ -519,7 +519,7 @@ export class Game extends Emitter {
     this.useModule('mapmods', installMapmods);
     // [slot:worlds3]
     // [slot:crdirector]
-    // [slot:facjobs]
+    this.useModule('facjobs', installFacjobs);
     // [slot:lcmonsters]
     // [slot:atmos]
     this.useModule('arcade2', installArcade2);
@@ -820,7 +820,7 @@ export class Game extends Emitter {
       this.world.outdoor = outdoor; this.world.terrain = outdoor.terrain;
       this.scene.add(outdoor.group);
       this.world.mapGroup = outdoor.group;
-      const layout = generateLayout(run.seed, moon.interior, moon.size, moon.layoutOpts);   // [cycle] Sector Core / Raid / Keystone moons carry layoutOpts
+      const layout = generateLayout(run.seed, moon.interior, moon.size, moon.layoutOpts || this.facjobs?.layoutOpts?.(moon, run) || undefined);   // [cycle] Sector Core / Raid / Keystone moons carry layoutOpts
       const fac = buildFacility(layout, { physics: this.physics, lightPool: this.lights });
       this.world.facility = fac;
       this.env.interiorFog = fac.atmosphere || null;   // per-theme indoor haze (backrooms yellow, sewer green, server farm blue)

@@ -16,6 +16,7 @@ import { buildFacilitySystems, planChestSpots } from './interiors/facsys.js';
 import { planMaps2, buildRooms2, installRoomStyles2 } from './rooms2.js';   // [maps2]
 import { planVarietyRooms, planVarietyFeatures, shortcutInfo, buildVariety, installVarietyStyles } from './facility_variety.js';   // [stealth] wave 4 variety
 import { carveMaze } from './mazegen.js';
+import { planArch } from './facility_arch.js';   // [facjobs] atrium / ring layout archetypes
 
 // Interior theme registry (ids: factory, mansion, mineshaft, office, backrooms, serverfarm, sewer, hospital).
 export { INTERIORS, INTERIOR_THEMES, INTERIOR_NAMES, getInterior, isInteriorTheme };
@@ -51,8 +52,11 @@ export function generateLayout(seed, theme = 'factory', size = 1, opts = null) {
   if (!isInteriorTheme(theme)) theme = 'factory';
   size = Math.min(MAX_FACILITY_SIZE, Math.max(0.5, Number(size) || 1));
   const R = layoutRules(theme);
-  const O = opts && typeof opts === 'object' ? opts : {};
+  const O = opts && typeof opts === 'object' ? { ...opts } : {};
   if (O.plan === 'wings' && R.plan === 'rooms') R.plan = 'wings';
+  if (O.arch && !(R.plan === 'rooms' && theme !== 'mineshaft')) O.arch = null;   // [facjobs] archetypes only reshape plain room themes (opts is a private copy below)
+  if (O.arch === 'atrium' || O.arch === 'ring') R.plan = 'wings';
+  if (O.loops != null) R.loops = O.loops;
   if (O.roomMul > 0) R.roomMul = (R.roomMul || 1) * O.roomMul;
   const legacy = theme === 'factory' || theme === 'mansion' || theme === 'mineshaft';
   const rng = new RNG((seed ^ 0x51f0a3) >>> 0);
@@ -117,8 +121,12 @@ export function generateLayout(seed, theme = 'factory', size = 1, opts = null) {
   // entrance room at the south edge
   const ent = addRoom(Math.floor(W / 2) - 1, H - 5, 3, 3, 'entrance');
 
+  // [facjobs] archetype spines (atrium / ring): drawn before any other room so everything else keeps clear of them
+  const spines = [];
+  const archDone = O.arch ? planArch({ arch: O.arch, W, H, ent, cells, idx, canPlace, addRoom, line, spines, nodes }) : false;
+
   // landmark hub: a big, tall, readable room near the middle (always for themes that ask, else big maps)
-  if (R.hub && (R.hubAlways || size >= 1.6)) {
+  if (!archDone && R.hub && (R.hubAlways || size >= 1.6)) {
     const { w, h } = R.hub;
     for (let a = 0; a < 60; a++) {
       const x = Math.round(W / 2 - w / 2 + rng.int(-Math.floor(W / 5), Math.floor(W / 5)));
@@ -141,8 +149,7 @@ export function generateLayout(seed, theme = 'factory', size = 1, opts = null) {
   const VAR = planVarietyRooms({ seed, theme, size, O, W, H, canPlace, addRoom, mazeRooms });
 
   // wing plan (office, hospital): one or two long spine corridors first, rooms hang off them
-  const spines = [];
-  if (R.plan === 'wings') {
+  if (R.plan === 'wings' && !archDone) {
     const zc = Math.round(H * 0.4 + rng.int(-2, 2));
     const x0 = 2 + rng.int(0, 2), x1 = W - 3 - rng.int(0, 2);
     let ok = true;
@@ -239,12 +246,12 @@ export function generateLayout(seed, theme = 'factory', size = 1, opts = null) {
   for (const [a, b] of edges) carve(nodes[a].cx, nodes[a].cz, nodes[b].cx, nodes[b].cz);
 
   // dead-end closets off corridors
-  for (let i = 0; i < 6 + size * 4; i++) {
+  for (let i = 0, nCl = Math.round((6 + size * 4) * (O.deadMul || 1)); i < nCl; i++) {
     const x = rng.int(2, W - 3), z = rng.int(2, H - 6);
     if (cells[idx(x, z)] !== 2) continue;
     const d = rng.int(0, 3);
     const dx = [1, 0, -1, 0][d], dz = [0, 1, 0, -1][d];
-    let cx = x, cz = z, len = rng.int(2, 4), ok = true;
+    let cx = x, cz = z, len = rng.int(2, O.deadMul > 1 ? 6 : 4), ok = true;
     const path = [];
     for (let k = 0; k < len; k++) {
       cx += dx; cz += dz;
