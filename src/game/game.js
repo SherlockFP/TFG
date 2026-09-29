@@ -248,7 +248,7 @@ import { installNvgear } from './nvgear.js';   // [import:nvgear] wave 8: buyabl
 // [import:lcmonsters]
 // [import:atmos]
 // [import:arcade2]
-// [import:resto]
+import { installResto } from './resto.js';   // [import:resto] wave 8: alien restaurant tycoon on the homeworld
 
 
 
@@ -521,7 +521,7 @@ export class Game extends Emitter {
     // [slot:lcmonsters]
     // [slot:atmos]
     // [slot:arcade2]
-    // [slot:resto]
+    this.useModule('resto', installResto);   // [slot:resto]
 
 
 
