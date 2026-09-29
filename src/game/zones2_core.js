@@ -296,6 +296,20 @@ export function fitWalls(ctx, list) {
   }
   return { kept, dropped };
 }
+/** [links] ghost mode: first point below the terrain along a ray (eye + dir * d), or null within maxD. ter.heightAt(x, z). */
+export function aimGround(ter, eye, dir, maxD = 12, step = 0.5) {
+  if (!ter || !eye || !dir) return null;
+  for (let d = step; d <= maxD; d += step) {
+    const x = eye.x + dir.x * d, z = eye.z + dir.z * d, h = ter.heightAt(x, z);
+    if (eye.y + dir.y * d <= h) return { x, z, y: h };
+  }
+  return null;
+}
+/** [links] the piece a ghost at `aim` would place (grid-snapped, relative to the core); kind 1 = gate */
+export const ghostPiece = (core, aim, rot, gate) => { const sn = snapPiece(core, aim.x, aim.z, rot); return [gate ? 1 : 0, sn.gx, sn.gz, sn.r]; };
+/** [links] the znreq 'wall' aim fields that make the host snap to exactly this piece (n = 1) */
+export const ghostRequest = (core, p) => { const b = pieceBox(core, p); return { wx: b.x, wz: b.z, fy: p[3] ? Math.PI / 2 : 0 }; };
+
 /** line of n pieces perpendicular to the facing, centred where the player aims (2 grid units = one piece length apart) */
 export function wallLine(core, wx, wz, yaw, n, gate = -1) {
   const fx = Math.sin(yaw), fz = Math.cos(yaw), r = Math.abs(fx) > Math.abs(fz) ? 1 : 0;   // facing mostly along x -> the wall runs along z

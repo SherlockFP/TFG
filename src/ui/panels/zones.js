@@ -116,6 +116,7 @@ export function createZonesPanel(game, api) {
         const btn = (label, cost, fn) => el('button', { class: 'btn small', disabled: can && S.credits >= cost ? null : true, onclick: fn }, `${label} ${money(cost)}`);
         box.append(el('div', { class: 'zn-def' }, el('span', {}, t(W.names[0])), el('span'), btn(t('PLACE'), W.cost[0], () => api.wall(q.id, 1, false)), btn('x4', W.cost[0] * 4, () => api.wall(q.id, 4, false))));
         box.append(el('div', { class: 'zn-def' }, el('span', {}, t(W.names[1])), el('span'), btn(t('PLACE'), W.cost[1], () => api.wall(q.id, 1, true)), btn(t('LINE'), W.cost[0] * 3 + W.cost[1], () => api.wall(q.id, 4, true))));
+        if (can) box.append(el('div', { class: 'zn-def' }, el('span', {}, t('Ghost mode (aim, R rotates, click places)')), el('span'), btn(t('GHOST WALL'), W.cost[0], () => api.ghost(q.id, false)), btn(t('GHOST GATE'), W.cost[1], () => api.ghost(q.id, true))));
         box.append(el('div', { class: 'zn-def' }, el('span', { class: 'dim' }, t('Remove the nearest piece (50% back)')), el('span'), el('span'), el('button', { class: 'btn small', disabled: can && w.n ? null : true, onclick: () => api.wallSell(q.id) }, t('SELL'))));
       }
       {   // zones2: the extractor (homeworld2 miner rules)

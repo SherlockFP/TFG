@@ -7,6 +7,8 @@ import { t, tf } from '../../core/i18n.js';
 import { saveSettings } from '../../core/save.js';
 import { avatarCanvas, fromWire, defaultAvatar, avatarOfProfile } from '../avatarpic.js';
 import { HUB } from '../../net/hub_core.js';
+import { trendFor, isoWeekKey } from '../../game/story_core.js';
+import { CREATURES } from '../../game/creatures.js';
 import '../../net/hub_i18n.js';
 
 const STYLE_ID = 'tfg-hub-style';
@@ -120,7 +122,7 @@ export function hubPanel(ui, { inGame = false } = {}) {
     status.replaceChildren(el('i', { class: st }), txt);
   }
   function renderTabs() {
-    const defs = [['online', t('ONLINE')], ['lobbies', t('LOBBIES')], ['friends', t('FRIENDS')]];
+    const defs = [['online', t('ONLINE')], ['lobbies', t('LOBBIES')], ['friends', t('FRIENDS')], ['board', t('HUB')]];
     tabs.replaceChildren(...defs.map(([id, label]) => {
       const n = id === 'friends' ? hub.totalUnread() : 0;
       const b = ui.button(label + (n ? ` (${n})` : ''), () => { tab = id; ui.hubTab = id; renderAll(); }, 'chip' + (tab === id ? ' sel' : ''));
@@ -134,6 +136,13 @@ export function hubPanel(ui, { inGame = false } = {}) {
       const on = hub.online();
       if (!on.length) rows.push(el('div', { class: 'hub-empty' }, hub.status === 'error' ? t('Could not reach the hub network. The game works fine without it.') : t('Nobody else is here yet. Presence beacons arrive every ~10 s.')));
       for (const e of on) rows.push(row(e.id + '|' + e.peerId, e.n, e, `${stTxt(e)} · ${tf('Lv.{n}', { n: e.lv || 1 })}`));
+    } else if (tab === 'board') {
+      const tr = trendFor(isoWeekKey(Date.now()));
+      rows.push(el('div', { class: 'hub-sub' }, `${t('TRENDING THIS WEEK')} (${tr.week}): ${t(CREATURES[tr.type]?.name || tr.type)} #${tr.type}`));
+      rows.push(el('div', { class: 'hub-sub' }, t('CREW ZONE LEADERBOARD')));
+      const zb = hub.zoneBoard();
+      if (!zb.length) rows.push(el('div', { class: 'hub-empty' }, t('No crew has claimed a zone yet. Hosts share zones owned / income / defences held in their beacon.')));
+      zb.forEach((e, i) => rows.push(el('div', { class: 'hub-row' + (e.me ? ' sel' : '') }, el('div', { class: 'hub-nm' }, `${i + 1}. ${e.n}`), el('div', { class: 'hub-sub' }, tf('{z} zones · ▮{i}/day · {h} defences held', { z: e.zs[0], i: e.zs[1], h: e.zs[2] })))));
     } else if (tab === 'lobbies') {
       const ls = hub.lobbies();
       if (!ls.length) rows.push(el('div', { class: 'hub-empty' }, t('No public lobbies shared through the hub right now. The JOIN GAME browser may still list some.')));

@@ -335,6 +335,7 @@ export function installVoyage(game) {
     if (m.comps) { const R = new RNG(seed ^ 0xc0de); const ids = COMPONENT_IDS.filter((id) => ITEMS[id] && !ITEMS[id].keyItem); for (let i = 0; i < m.comps && ids.length; i++) game.items.hostSpawn(R.pick(ids), SHIP_DROP()); }
     for (const p of playersNow()) if (!p.dead) game.net.broadcast('xp', { to: p.id, xp: m.xp, coin: 5 + m.tier * 4, reason: 'Mission complete' }, true);
     vyx({ k: 'mstate', st: 'done', type: m.type, pay: m.pay });
+    try { mods.emit('tfg:voyage', { k: 'done', type: m.type, patron: m.patron || V.missionPatron(m.type), pay: m.pay }, game); } catch { /* [story] optional */ }
     say('MISSION COMPLETE: {@name}  +▮{pay}. Loot delivered to the ship.', { name: V.MISSION_TYPES[m.type].name, pay: m.pay }, 'good');
     const H = S.host;
     if (H && m.type === 'heist') { vyx({ k: 'vault' }); }
@@ -850,7 +851,7 @@ export function installVoyage(game) {
     const lines = [t('MISSION BOARD') + '  ' + tf('(day {d})', { d: run()?.day | 0 }), t('Pay is credits + loot. TAKE <n> accepts a job, DROPJOB cancels it.'), ''];
     (m.offers || []).forEach((o, i) => {
       const spec = V.MISSION_TYPES[o.type];
-      lines.push(`[${i + 1}] ${t(spec.name)}  ▮${o.pay}  ${t('loot')}: ${o.loot}${o.comps ? ' +' + o.comps + ' ' + t('parts') : ''}   T${o.tier}`);
+      lines.push(`[${i + 1}] ${t(spec.name)}${o.patron ? ' <' + t(o.patron === 'company' ? 'COMPANY' : 'ALGORITHM') + '>' : ''}  ▮${o.pay}  ${t('loot')}: ${o.loot}${o.comps ? ' +' + o.comps + ' ' + t('parts') : ''}   T${o.tier}`);
       lines.push(`    ${t('Where')}: ${moonName(o.moon)}${V.isVoyageId(o.moon) ? '  [' + t('SIGNAL') + ']' : ''}`);
       lines.push(`    ${brief(o)}`);
     });

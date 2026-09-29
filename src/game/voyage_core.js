@@ -198,6 +198,9 @@ export const MISSION_TYPES = {
   photo:    { pay: 70,  xp: 75,  goal: 1, sites: 0, w: 9,  name: 'Photograph a Rare Creature', brief: 'A shy rare creature roams here. Take a photo of it with the Instant Camera from under 30 m.' },
 };
 export const MISSION_IDS = Object.keys(MISSION_TYPES);
+/** [story] which patron a job type works for (Company = logistics / property, Algorithm = content / spectacle) */
+export const MISSION_PATRON = { blackbox: 'company', relay: 'company', drone: 'company', defend: 'company', hunt: 'company', rescue: 'algorithm', survey: 'algorithm', heist: 'algorithm', photo: 'algorithm' };
+export const missionPatron = (type) => MISSION_PATRON[type] || null;
 export const HOLD_TYPES = new Set(['defend', 'heist']);
 export const TOWER_PANELS = 3;
 
@@ -207,7 +210,7 @@ const xpFor = (type, tier, qi) => Math.round(MISSION_TYPES[type].xp * (1 + 0.2 *
 /** One offer for a destination moon id. `tier` = that moon's tier. */
 export function makeOffer(R, type, moonId, tier, qi) {
   const spec = MISSION_TYPES[type];
-  const o = { id: `${type}:${moonId}:${Math.floor(R.next() * 1e6).toString(36)}`, type, moon: moonId, tier, pay: payFor(type, tier, qi), xp: xpFor(type, tier, qi) };
+  const o = { id: `${type}:${moonId}:${Math.floor(R.next() * 1e6).toString(36)}`, type, patron: missionPatron(type), moon: moonId, tier, pay: payFor(type, tier, qi), xp: xpFor(type, tier, qi) };
   if (type === 'survey') o.n = clamp(3 + Math.floor(tier / 2) + (R.chance(0.4) ? 1 : 0), 3, 6);
   else if (type === 'defend') o.n = clamp(120 + tier * 20 + R.int(0, 30), 120, 240);      // seconds
   else if (type === 'heist') o.n = clamp(30 + tier * 5 + R.int(0, 10), 30, 60);          // seconds of cracking
@@ -241,7 +244,7 @@ export function boardFor(runKey, day, quotaIndex, moons, signalIds = null) {
 
 // ---- mission state machine (pure). m = { id, type, moon, tier, n, pay, xp, loot, comps, st, p } ; st: accepted | active | done | failed
 export function newMission(offer, day = 0) {
-  return { id: offer.id, type: offer.type, moon: offer.moon, tier: offer.tier, n: offer.n, pay: offer.pay, xp: offer.xp, loot: offer.loot, comps: offer.comps, day, st: 'accepted', p: {} };
+  return { id: offer.id, type: offer.type, patron: offer.patron || missionPatron(offer.type), moon: offer.moon, tier: offer.tier, n: offer.n, pay: offer.pay, xp: offer.xp, loot: offer.loot, comps: offer.comps, day, st: 'accepted', p: {} };
 }
 const cp = (m) => ({ ...m, p: { ...m.p, panels: m.p.panels ? m.p.panels.slice() : undefined, reads: m.p.reads ? m.p.reads.slice() : undefined } });
 /** progress fraction 0..1 for the HUD */

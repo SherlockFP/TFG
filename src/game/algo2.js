@@ -108,7 +108,8 @@ export function installAlgo2(game) {
         break;
       }
       case 'gh': {
-        S.liveView = (m.list || []).map((g) => ({ a: g.a, track: K.unpackTrack(g.tr), label: tf('GHOST: {name}', { name: g.n }), loot: g.loot | 0 }));
+        const clampGhost = (tr, a) => { try { return K.clampTrack(tr, a, facOf()?.nav); } catch { return tr; } };
+        S.liveView = (m.list || []).map((g) => ({ a: g.a, track: clampGhost(K.unpackTrack(g.tr), g.a), label: tf('GHOST: {name}', { name: g.n }), loot: g.loot | 0 }));
         view.setGhosts(S.liveView);
         if (S.liveView.length) chat('ghost');
         break;

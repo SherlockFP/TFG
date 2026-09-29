@@ -11,6 +11,7 @@ import { hashString } from '../core/rng.js';
 import { TRAPS, newTrap, stepTrap, trapDamageTo, laserFrac, sweepHit, zoneCoords, trapZoneOf } from './horror_core.js';
 import { TrapView } from './horror_traps.js';
 import { drawSectorMap } from '../ui/panels/zones.js';
+import { mats as H2MATS } from '../models/homeworld2.js';
 import { t } from '../core/i18n.js';
 
 const AMMO_KINDS = new Set(['turret', 'tesla', 'shield', 'flood']);
@@ -542,8 +543,62 @@ export function installZones2(X) {
 
   // ============================================================================================ per-frame + messages
   let lastCam = null;
+  // ============================================================================================ [links] wall ghost / drag mode (client only; the host still validates every piece)
+  const GH = { on: false, z: '', gate: 0, r: 0, rSet: false, root: null, ok: false, hint: null, key: '' };
+  function ghostHint(text, bad) {
+    if (!text) { GH.hint?.remove(); GH.hint = null; return; }
+    if (!GH.hint) { GH.hint = document.createElement('div'); GH.hint.style.cssText = "position:fixed;left:50%;bottom:120px;transform:translateX(-50%);z-index:30;font:22px var(--font,'VT323',monospace);background:rgba(6,14,22,.86);border:1px solid #3fa8d8;padding:4px 14px;pointer-events:none;max-width:90vw;text-align:center"; document.body.appendChild(GH.hint); }
+    GH.hint.textContent = text; GH.hint.style.color = bad ? '#ff8a7a' : '#d8f4ff'; GH.hint.style.borderColor = bad ? '#a83a2a' : '#3fa8d8';
+  }
+  function ghostStop() {
+    if (GH.root) { GH.root.removeFromParent(); GH.root.traverse((o) => o.geometry?.dispose?.()); GH.root = null; }
+    ghostHint(null); GH.on = false; GH.key = '';
+  }
+  function ghostBuild(gate) {
+    const g = new THREE.Group(), m = (x, y, z) => { const b = new THREE.Mesh(new THREE.BoxGeometry(x, y, z), H2MATS.GH.ok); b.frustumCulled = false; return b; };
+    if (!gate) g.add(m(W.len, W.h, W.thick));
+    else for (const sd of [-1, 1]) { const b = m(0.6, W.h, 0.7); b.position.x = sd * (W.len / 2 - 0.3); g.add(b); }
+    return g;
+  }
+  function ghostStart(zid, gate) {
+    ghostStop();
+    const core = outdoorCoreOf(zid);
+    if (!core || !game.scene) return false;
+    GH.on = true; GH.z = zid; GH.gate = gate ? 1 : 0;
+    GH.r = 0; GH.rSet = false; GH.root = ghostBuild(GH.gate); game.scene.add(GH.root);
+    return true;
+  }
+  function ghostUpdate() {
+    if (!GH.on) return;
+    const r = run(), inp = game.input, core = outdoorCoreOf(GH.z), me = game.player, ter = terrain();
+    if (r?.phase !== 'moon' || !core || !ter || !me || me.dead || game.ui?.panelOpen) return ghostStop();
+    if (inp?.mouseClicked?.(2)) return ghostStop();
+    if (inp?.codePressed?.('KeyR')) { GH.r = GH.r ? 0 : 1; GH.rSet = true; }
+    const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(game.camera.quaternion);
+    if (!GH.rSet) GH.r = Math.abs(fwd.x) > Math.abs(fwd.z) ? 1 : 0;   // default: the wall runs across where you look
+    const aim = Q.aimGround(ter, game.camera.position, fwd, W.maxReach - 0.5);
+    if (!aim) { GH.root.visible = false; ghostHint(t('Aim at the ground'), true); return; }
+    const piece = Q.ghostPiece(core, aim, GH.r, GH.gate), b = Q.pieceBox(core, piece);
+    GH.root.visible = true;
+    GH.root.position.set(b.x, ter.heightAt(b.x, b.z) + W.h / 2, b.z); GH.root.rotation.y = b.yaw;
+    const st = Z.getZ(X.zn(), r.moon, GH.z), have = A.wl[GH.z] || [];
+    const key = `${piece.join()}|${r.credits}|${have.length}|${A.ver}`;
+    if (key !== GH.key) {
+      GH.key = key;
+      let why = '';
+      if (st?.s !== 'own') why = 'Capture the zone first.';
+      else if (flat(me.pos, core) > ZN.zoneR || !sameLevel(me.pos, core)) why = 'Stand inside the zone.';
+      else if (r.credits < W.cost[piece[0]]) why = 'Not enough credits.';
+      else { const v = Q.validateWall({ ...wallCtx(core, have, true), cap: Z.wallCap(st) }, piece); if (!v.ok) why = v.why; }
+      GH.ok = !why;
+      for (const o of GH.root.children) o.material = GH.ok ? H2MATS.GH.ok : H2MATS.GH.bad;
+      ghostHint(GH.ok ? `${t(GH.gate ? 'Gate' : 'Wall')} ▮${W.cost[piece[0]]} · [LMB] ${t('place')} · [R] ${t('rotate')} · [RMB] ${t('leave')}` : t(why), !GH.ok);
+    }
+    if (GH.ok && inp?.mouseClicked?.(0)) { X.askHost?.('wall', { z: GH.z, n: 1, gate: GH.gate, ...Q.ghostRequest(core, piece) }); GH.key = ''; }
+  }
   function update(dt) {
     if (disposed) return;
+    try { ghostUpdate(); } catch (e) { ghostStop(); console.warn('[zones2] ghost', e); }
     crtInstall();
     const r = run();
     if (r?.phase !== 'moon') { if (A.views.size) disposeTrapViews(); if (A.wMesh || A.wCols.length) dropWalls(); if (A.wlJson !== '{}') setWl({}); return; }
@@ -575,11 +630,11 @@ export function installZones2(X) {
     disposed = true;
     for (const r of restores.reverse()) { try { r(); } catch { /* ignore */ } }
     restores.length = 0;
-    disposeTrapViews(); A.group?.removeFromParent(); A.group = null; dropWalls();
+    disposeTrapViews(); A.group?.removeFromParent(); A.group = null; dropWalls(); ghostStop();
   }
   return {
     interior, interiorCores, inWing, sameLevel, materializeInterior, placeRing, hostRefreshWalls, hostOp, liveBegin, liveEnd, spawnPoints, raiderStep, ammoTick, ammoReserve,
-    archiveSync, update, onMsg, onLanding, dispose, crtDraw, wallCtx,
+    ghost: { start: ghostStart, stop: ghostStop, state: GH }, archiveSync, update, onMsg, onLanding, dispose, crtDraw, wallCtx,
     walls: () => A.wl, traps: () => [...traps().values()], views: () => A.views, state: A,
   };
 }

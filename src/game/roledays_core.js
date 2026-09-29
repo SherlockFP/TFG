@@ -6,7 +6,7 @@ export const T = { fromQuota: 2, chance: 0.25, cooldown: 1, casual: 'casual', fa
 
 /** id -> { team, pref (roles that get the card first), holder (flags of the holder / of everyone on solo cards), rest (flags of the others), coins } */
 export const CARDS = {
-  navigator: { team: true, pref: ['occultist', 'scout'], coins: 60, holder: { noWeapon: true }, rest: { noCompass: true },
+  navigator: { team: true, pref: ['occultist', 'scout'], coins: 60, holder: { noWeapon: true, minimap: true }, rest: { noCompass: true },
     name: 'Navigator Protocol', line: 'Navigator: the only one with the compass, but cannot hold weapons.', short: 'Only the Navigator sees the compass. The Navigator cannot hold weapons.' },
   carrier: { team: true, pref: ['hauler', 'enforcer'], coins: 70, holder: { mute: true, nightVision: true }, rest: {},
     name: 'Silent Carrier', line: 'Carrier: sees in the dark, cannot speak: pings and emotes only.', short: 'The Carrier sees in the dark but cannot speak (voice and chat muted). Ping and emote.' },
@@ -72,6 +72,21 @@ export const canPickup = (a, id, def) => {
   if (f.noBig && scrap && (def.hands | 0) >= 2) return false;
   return true;
 };
+/** [links] the navigator sees the facility minimap (a purchasable ship upgrade can grant it to everybody: see roledays.js addMinimapGrant) */
+export const showMinimap = (a, id) => !!flagsOf(a, id).minimap;
+/** [links] bake a nav grid (nav = { w, h, res, ox, oz, walk: Uint8Array }) into a <= maxPx square-ish bitmap: { w, h, f, data } (data 1 = walkable, f = source cells per pixel) */
+export function bakeGrid(nav, maxPx = 128) {
+  if (!nav?.walk || !(nav.w > 0) || !(nav.h > 0)) return null;
+  const f = Math.max(1, Math.ceil(Math.max(nav.w, nav.h) / maxPx)), w = Math.ceil(nav.w / f), h = Math.ceil(nav.h / f), data = new Uint8Array(w * h);
+  for (let z = 0; z < nav.h; z++) for (let x = 0; x < nav.w; x++) if (nav.walk[z * nav.w + x]) data[Math.floor(z / f) * w + Math.floor(x / f)] = 1;
+  return { w, h, f, data };
+}
+/** [links] world (x, z) -> pixel on the baked map; `inside` false = off the map (px / py clamped to the border, for the ship marker) */
+export function mapPoint(bake, nav, x, z) {
+  const gx = (x - nav.ox) / nav.res / bake.f, gz = (z - nav.oz) / nav.res / bake.f;
+  const inside = gx >= 0 && gz >= 0 && gx < bake.w && gz < bake.h;
+  return { px: Math.max(0, Math.min(bake.w - 1, gx)), py: Math.max(0, Math.min(bake.h - 1, gz)), inside };
+}
 export const canOpenDoor = (a, id) => !flagsOf(a, id).noDoors;
 export const canSpeak = (a, id) => !flagsOf(a, id).mute;
 export const showCompass = (a, id) => !flagsOf(a, id).noCompass;

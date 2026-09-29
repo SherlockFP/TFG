@@ -135,6 +135,17 @@ export function installStory(game) {
     pushSt();
   });
 
+  on('tfg:voyage', (d, g) => {
+    if (g && g !== game) return;
+    if (!host() || !enabled() || !d || d.k !== 'done' || !d.patron) return;
+    const s = st(); if (!s) return;
+    const m = C.applyMission(s, d.patron);
+    if (!m) return;
+    const pf = prof(); if (pf) pf.jobs[d.patron] = (pf.jobs[d.patron] | 0) + 1;
+    announceMove(m, 'Voyage mission');
+    pushSt();
+  });
+
   // ------------------------------------------------------------------------------------------ jobs (host)
   const partyAlive = () => Math.max(1, game.aiPlayers?.().filter((p) => !p.dead).length || 1);
   const zoneNameOf = (m, z) => { try { return game.zones?.zoneSpec?.(m)?.zones?.find((q) => q.id === z)?.name || z; } catch { return z; } };
@@ -588,6 +599,9 @@ export function installStory(game) {
 
   // shared board text: tag the existing contract offers (the ship board / CONTRACTS read offer.patron)
   return {
+    /** rows for the ship contract board panel (client side): the day's patron jobs */
+    jobRows() { const v = view(); return { active: v.job ? { ...jobText(v.job), patron: v.job.patron } : null, rows: (v.offers || []).map((o, i) => ({ i, ...jobText(o), patron: o.patron, credits: o.pay?.credits | 0, xp: o.pay?.xp | 0, shift: o.shift, taken: !!o.taken })) }; },
+    takeJob: (i) => askHost('job', { i: i | 0 }),
     core: C, state: st, effA, trend, items: ITEM_DEFS.map((d) => d.id), genOffers, hostJob, hostQuit, hostChoose, checkAct, dayEnd, statusText, jobsText, refreshTrend,
     dispose() {
       disposed = true;

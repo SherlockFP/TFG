@@ -52,12 +52,18 @@ export function validateBeacon(d) {
   const n = cleanName(d.n);
   if (!id || !n || n.length < 2 || isSlur(n)) return null;
   const out = { id, n, av: cleanAv(d.av), st: STATUSES.includes(d.st) ? d.st : 'menu', v: typeof d.v === 'string' ? d.v.slice(0, 12) : '', lv: int(d.lv, 0, 999) };
+  // [links] crew zone stats of a hosting crew: [zones owned, income per day, defences held]; three tiny ints
+  if (Array.isArray(d.zs) && d.zs.length === 3) { const z = d.zs.map((x) => int(x, 0, 99999)); if (z[0] || z[2]) out.zs = z; }
   const l = d.lb;
   if (l && typeof l === 'object') {
     const code = cleanLobbyCode(l.c);
     if (code) out.lb = { c: code, n: cleanText(String(l.n ?? ''), HUB.LOBBY_NAME_MAX), p: int(l.p, 0, 64), m: int(l.m, 1, 64, 4), k: l.k ? 1 : 0, s: STRATEGIES.includes(l.s) ? l.s : 'nostr' };
   }
   return out;
+}
+/** Crew zone leaderboard: entries carrying `zs`, best first (zones owned, then income, then defences held). */
+export function zoneRank(list, max = 10) {
+  return (list || []).filter((e) => e && e.zs).sort((a, b) => (b.zs[0] - a.zs[0]) || (b.zs[1] - a.zs[1]) || (b.zs[2] - a.zs[2]) || String(a.n).localeCompare(String(b.n))).slice(0, max);
 }
 /** Direct message body -> { text } or null. */
 export function validateDm(d) {

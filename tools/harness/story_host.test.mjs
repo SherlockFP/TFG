@@ -138,6 +138,11 @@ S().a = 0; S().claimed = {};
   mods.emit('tfg:contract', { id: 'z2', state: 'paid', faction: 'darkweb' }, game); ok(rewards.length === 1, 'no second claim');
   ok(game.lore.factionRep('Algorithm favour') === Math.round(S().a * 10) / 10 && game.lore.factionRep('algorithm') === 5, 'lore.factionRep answers the pseudo-faction and passes others through'); }
 
+// ---------------------------------------------------------------- [links] finished voyage missions move the meter like contracts
+{ const a0 = S().a, d0 = S().done.company, j0 = profile.story.jobs.company; mods.emit('tfg:voyage', { k: 'done', type: 'relay', patron: 'company' }, game);
+  ok(S().a < a0 && S().done.company === d0 + 1 && profile.story.jobs.company === j0 + 1, 'voyage Company mission shifts toward the Company');
+  const a1 = S().a; mods.emit('tfg:voyage', { k: 'done', type: 'rescue', patron: 'algorithm' }, game); ok(S().a > a1, 'voyage Algorithm mission shifts toward the Algorithm');
+  const a2 = S().a; mods.emit('tfg:voyage', { k: 'failed', type: 'rescue', patron: 'algorithm' }, game); mods.emit('tfg:voyage', { k: 'done', type: 'x' }, game); ok(S().a === a2, 'failed / untagged voyage missions ignored'); }
 // ---------------------------------------------------------------- creature consequences
 S().a = 60; cyState.sector = 1; run.quotaIndex = 1;
 { const scut = { id: 'c1', type: 'scuttler', def: CREATURES.scuttler }, mod = { id: 'c2', type: 'moderator', def: CREATURES.moderator }, boss = { id: 'c3', type: 'scuttler', def: { boss: true } };

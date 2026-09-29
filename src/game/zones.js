@@ -591,6 +591,7 @@ export function installZones(game) {
     snapshot, DEFS: Z.DEFS, DEF_IDS: Z.DEF_IDS, defsFor: Z.defsFor, WALL: Z.WALL, MINER: Z.MINER, ZN,
     // zones2: walls / gates go where the player looks (host validates), the extractor sits next to the relay
     wall: (z, n, gate) => { const p = me(), fy = p.yaw + Math.PI, d = 4.5; askHost('wall', { z, n, gate: gate ? 1 : 0, wx: p.pos.x + Math.sin(fy) * d, wz: p.pos.z + Math.cos(fy) * d, fy }); },
+    ghost: (z, gate) => { closePanel(); game.ui?.closePanel?.(); X2?.ghost?.start(z, gate); },
     wallSell: (z) => askHost('wsell', { z }), mine: (z) => askHost('mine', { z }), mineSell: (z) => askHost('msell', { z }),
     build: (z, def) => askHost('build', { z, def }), sell: (z, def) => askHost('sell', { z, def }), up: (m, z) => askHost('up', { m, z }),
     unlocked: (id) => qi() >= Z.DEFS[id].minQ,
@@ -627,7 +628,7 @@ export function installZones(game) {
   registerCommands();
 
   // ============================================================================================ zones2 (interior wings, walls, extractor, raiders, CRT): shares this module's state through X
-  X2 = installZones2({ game, Z, Q, ZN, S, flat, run, zn, runKey, qi, spec, moonDef, realMoon, coreOf, znx, pushZn, snapshot, zoneName, playersNear, host: S.host });
+  X2 = installZones2({ askHost, game, Z, Q, ZN, S, flat, run, zn, runKey, qi, spec, moonDef, realMoon, coreOf, znx, pushZn, snapshot, zoneName, playersNear, host: S.host });
   // ============================================================================================ events
   let tt = 0;
   on('update', (dt, g) => {

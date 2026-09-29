@@ -86,6 +86,10 @@ export const hubTexts = [
   ['Radio: no such crewmate.', 'Telsiz: böyle bir ekip arkadaşı yok.', 'Рация: нет такого напарника.'],
   ['Radio tuned to {name}.', 'Telsiz {name} kişisine ayarlandı.', 'Рация настроена на {name}.'],
   ['... static ... (turn your walkie-talkie on)', '... cızırtı ... (telsizini aç)', '... помехи ... (включи рацию)'],
+  ['TRENDING THIS WEEK', 'BU HAFTANIN TRENDİ', 'В ТРЕНДЕ НА ЭТОЙ НЕДЕЛЕ'],
+  ['CREW ZONE LEADERBOARD', 'EKİP BÖLGE SIRALAMASI', 'РЕЙТИНГ ЗОН ЭКИПАЖЕЙ'],
+  ['No crew has claimed a zone yet. Hosts share zones owned / income / defences held in their beacon.', 'Henüz bölge alan ekip yok. Ev sahipleri sahip olunan bölge / gelir / tutulan savunma bilgisini sinyalde paylaşır.', 'Пока ни один экипаж не занял зону. Хосты передают число зон / доход / отбитые атаки в маяке.'],
+  ['{z} zones · ▮{i}/day · {h} defences held', '{z} bölge · ▮{i}/gün · {h} savunma tutuldu', '{z} зон · ▮{i}/день · отбито атак: {h}'],
 ];
 
 const TR = {}, RU = {};

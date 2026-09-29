@@ -16,6 +16,7 @@ export const ROWS = [
   ['JOB {@res}: {@title}. {@patron} is disappointed. The other one is intrigued.', 'İŞ {@res}: {@title}. {@patron} hayal kırıklığına uğradı. Diğeri ilgilendi.', 'ЗАДАНИЕ: {@res} — {@title}. {@patron} разочарован. Другой заинтригован.'],
   ['DROPPED', 'BIRAKILDI', 'ОТМЕНЕНО'], ['FAILED', 'BAŞARISIZ', 'ПРОВАЛЕНО'],
   ['Contract paid', 'Sözleşme ödendi', 'Контракт оплачен'],
+  ['Voyage mission', 'Sefer görevi', 'Задание рейса'],
   ['The Algorithm cannot find your zones. It does not know you exist. It has stopped attacking them.', 'Algoritma bölgelerini bulamıyor. Var olduğunu bilmiyor. Onlara saldırmayı bıraktı.', 'Алгоритм не может найти ваши зоны. Он не знает, что вы существуете. Он перестал их атаковать.'],
   ['THREAT: the Algorithm targets {z} on {m} too. It likes you. It wants more of you on screen.', 'TEHDİT: Algoritma {m} üzerindeki {z} bölgesini de hedef aldı. Seni seviyor. Ekranda daha çok seni istiyor.', 'УГРОЗА: Алгоритм нацелился и на {z} ({m}). Вы ему нравитесь. Он хочет видеть вас на экране чаще.'],
   ['The Company filed an injunction: the attack on {z} is postponed. Indefinitely. Terms and conditions apply.', 'Şirket ihtiyati tedbir aldı: {z} saldırısı ertelendi. Süresiz. Şartlar ve koşullar geçerlidir.', 'Компания добилась судебного запрета: атака на {z} отложена. Бессрочно. Действуют правила и условия.'],
