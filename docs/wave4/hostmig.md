@@ -1,5 +1,7 @@
 # Wave 4 - HOST MIGRATION (module `hostmig`)
 
+Real-game run (2 tabs, LocalTransport, host `net.leave()` on a landed moon): dialog text OK, Continue -> client `isHost`, epoch 1, `hostData` rebuilt, saveSlot `mig`, clock advances, creature host map == views, no pageerrors (only the usual 403 font/asset console errors of the sandbox). The old host's held items drop at the world origin when its avatar was already removed by the bye path.
+
 Status: node-tested (`tools/harness/hostmig.test.mjs`: 3-4 real `Session` objects over an in-memory mesh + fake games) and driven once in the real
 game with two tabs (`tools/harness/wave4_hostmig_mp.mjs`, LocalTransport). NOT tested over real WebRTC / real internet.
 
@@ -23,7 +25,7 @@ When the host quits (bye) or crashes (transport drops, no bye) the crew no longe
    drops the old host as a leaver (`hostOnPlayerLeave`: its held items fall, latched leeches release, `pleft`), re-broadcasts every run field
    (`gs`, `_runSent` reset) and restarts the delta-row keyframes. Followers `net.migrateTo(claimant)`, drop the old avatar, re-apply item
    physics authority (`owner || hostId` is now the new host), toast, and emit the mods event.
-4. mods event **`hostMigrated`** `(game, { oldHostId, newHostId, epoch, self, degraded })` on every peer (also `game.emit('hostMigrated', info)`).
+4. mods event **`hostMigrated`** `(game, { oldHostId, newHostId, epoch, self, degraded, creatures })` (`creatures` = number of creatures re-created, successor only) on every peer (also `game.emit('hostMigrated', info)`).
 
 ## What is restored (and from where)
 

@@ -169,7 +169,7 @@ const done = (games) => { for (const g of games) g.destroy(); };
   ok(A.saveSlot === 'mig', 'migrated run saves to its own slot');
   ok(A.leaves.join() === 'H', 'old host treated as a leaver (its items are dropped)');
   ok(B.run.extraField.deep[1] === 2 && B.run.credits === 130, 'run state intact on the follower');
-  ok(A.mods.log.length === 1 && A.mods.log[0].self && A.mods.log[0].epoch === 1 && B.mods.log.length === 1 && !B.mods.log[0].self && B.mods.log[0].newHostId === 'A', 'mods event hostMigrated on both');
+  ok(A.mods.log.length === 1 && A.mods.log[0].self && A.mods.log[0].epoch === 1 && A.mods.log[0].creatures === 3 && B.mods.log.length === 1 && !B.mods.log[0].self && B.mods.log[0].newHostId === 'A', 'mods event hostMigrated on both');
   ok(!A.net.players.has('H') && !B.net.players.has('H'), 'old host removed from both rosters');
   // the new host is a real host: it can spawn (no id clash) and the follower sees it; hmx flows again
   const c = A.creatures.hostSpawn('lurker', { x: 0, y: 1, z: 0 }, {});

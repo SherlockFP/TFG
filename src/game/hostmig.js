@@ -241,7 +241,8 @@ export function installHostMig(game) {
       game.saveSlot = 'mig';   // never overwrite one of this player's own save slots with the crew's run
       game.opts = { ...(game.opts || {}), host: true, lobbyName: S.x?.ln || game.opts?.lobbyName };
     } catch (e) { degraded.push('hostData'); console.warn('[hostmig] hostData', e); }
-    try { rebuildCreatures(degraded); } catch (e) { degraded.push('creatures'); console.warn('[hostmig] creatures', e); }
+    let restored = 0;
+    try { restored = rebuildCreatures(degraded); } catch (e) { degraded.push('creatures'); console.warn('[hostmig] creatures', e); }
     try {
       let mx = 0;
       for (const it of game.items.all()) { const m = /^i([0-9a-z]+?)[0-9a-z]$/.exec(it.id || ''); if (m) mx = Math.max(mx, parseInt(m[1], 36) || 0); }
@@ -262,7 +263,7 @@ export function installHostMig(game) {
     try { game.hostAnnounce?.(); } catch { /* lobby browser only */ }
     game.ui?.toast?.(t('You are the new host. The crew continues.'), 'good');
     if (degraded.length) game.ui?.toast?.(tf('Host migration: some systems were reset ({list}).', { list: degraded.join(', ') }), 'info');
-    announce({ oldHostId: old, newHostId: net.selfId, epoch, self: true, degraded });
+    announce({ oldHostId: old, newHostId: net.selfId, epoch, self: true, degraded, creatures: restored });
   }
 
   // remove the old host's avatar / voice on this peer
