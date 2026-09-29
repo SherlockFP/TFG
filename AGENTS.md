@@ -679,3 +679,7 @@ Owner: "sounds are annoying, improve interior / labyrinth ambience". Audit of al
 
 ### 5.22 Wave 8 - MENUFIX (docs/wave8/menufix.md)
 Menu-room look dead after standing: `leaveGame` left `input.enabled=false` (fixed + menuroom re-asserts), `Input.lock()` now pointer-lock first then fullscreen (fullscreen ate the user activation), menu click also re-locks while standing. Wave 5-7 node tests all green.
+
+### 5.23 Wave 8 - WORLDS3 (module `worlds3`, docs/wave8/worlds3.md; node: worlds3.test.mjs + br_pocket/br_i18n; build ok; NOT browser-run)
+Backrooms made findable: flickering yellow WRONG DOOR frame on the glitch spot (100 % day 1 / every 3rd day, ~48 % overall; caption + Algorithm line + distance hint; terminal `BACKROOMS`), six themed pockets behind it (Level 0, Poolrooms, Data Center, Endless Hotel, Level Fun, Ward 13) each with palette/loot/hunters + one signature rule, facility size classes (small/medium/large) and purposeful room dressing, exit safety net. Hooks: `game.w3.*` (guarded, ~12 lines in backrooms.js). Net: `w3fx` (dark / unlock), `run.br.th` + `run.br.lk`.
+

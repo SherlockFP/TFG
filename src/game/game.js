@@ -245,7 +245,7 @@ import { installCosm5 } from './cosm5.js';   // wave 4: cosmetics drop (suits/ha
 // [import:ui2]
 import { installNvgear } from './nvgear.js';   // [import:nvgear] wave 8: buyable night-vision goggles + timed ship charger
 import { installMapmods } from './mapmods.js';
-// [import:worlds3]
+import { installWorlds3 } from './worlds3.js';   // wave 8: wrong door + alternate Backrooms worlds + facility size/dressing (docs/wave8/worlds3.md)
 // [import:crdirector]
 import { installFacjobs } from './facjobs.js';
 // [import:lcmonsters]
@@ -253,6 +253,7 @@ import { installAtmos } from './atmos.js';   // [import:atmos]
 import { installArcade2 } from './arcade2.js';
 // [import:resto]
 // [import:arcade2]
+// [import:mapmods]
 
 
 
@@ -520,7 +521,7 @@ export class Game extends Emitter {
     // [slot:ui2]
     this.useModule('nvgear', installNvgear);   // [slot:nvgear]
     this.useModule('mapmods', installMapmods);
-    // [slot:worlds3]
+    this.useModule('worlds3', installWorlds3);
     // [slot:crdirector]
     this.useModule('facjobs', installFacjobs);
     // [slot:lcmonsters]
@@ -528,6 +529,7 @@ export class Game extends Emitter {
     this.useModule('arcade2', installArcade2);
     // [slot:resto]
     // [slot:arcade2]
+    // [slot:mapmods]
 
 
 
