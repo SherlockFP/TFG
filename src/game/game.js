@@ -179,6 +179,7 @@ import { installMaps5 } from './maps5.js';   // [import:maps5] wave 4: Estate 9 
 import { installAlgo1 } from './algo1.js';   // [import:algo1] wave 5: The Algorithm learns you + morning rule vote + LIVE viewers (docs/wave5/algo1.md)
 import { installHardmode } from './hardmode.js';   // [import:hardmode] wave 5: Casual / Standard / Hard difficulty rules (docs/wave5/hardmode.md)
 import { installOnboard } from './onboard.js';   // [import:onboard] wave 5: Hiring Day first-time start + staged unlocks (docs/wave5/onboard.md)
+import { installAlgo2 } from './algo2.js';   // [import:algo2] wave 6: live stream hype + ghost replay + glitch exploits (docs/wave6/algo2.md)
 
 import { installAimtell } from './aimtell.js';   // wave 5: telegraphed NPC aim laser (docs/wave5/aimchase.md)
 import { installChase } from './chase.js';       // wave 5: chase tension vignette / pulse
@@ -424,6 +425,7 @@ export class Game extends Emitter {
     this.useModule('maps5', installMaps5);   // [slot:maps5]
     this.useModule('algo1', installAlgo1);   // [slot:algo1]
     this.useModule('hardmode', installHardmode);   // [slot:hardmode]
+    this.useModule('algo2', installAlgo2);   // [slot:algo2]
 
     this.useModule('polish4', installPolish4);   // [polish4]
     this.useModule('aimtell', installAimtell);   // wave 5
