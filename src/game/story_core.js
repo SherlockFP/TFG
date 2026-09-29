@@ -20,6 +20,7 @@ export const AL = {
   creatureAt: 50,       // pacify / hunt
   zoneAt: 50,           // counter-attack frequency
   contractShift: { company: 6, algorithm: 8, chain: 3 },
+  missionShift: { company: 4, algorithm: 5 },   // a finished voyage mission (smaller than a contract)
   abandonShift: 3,      // an abandoned / failed directive nudges you toward the other patron
 };
 export const patronSign = (p) => (p === 'company' ? -1 : 1);
@@ -261,6 +262,13 @@ export function applyContract(s, faction, chain = null) {
   if (!p) return null;
   s.done[p] = (s.done[p] | 0) + 1;
   return moveState(s, patronSign(p) * (AL.contractShift[p] + (chain !== null && chain !== undefined ? AL.contractShift.chain : 0)));
+}
+
+/** a finished voyage mission for `patron`: counts as a done job, moves the meter */
+export function applyMission(s, patron) {
+  if (!PATRONS.includes(patron)) return null;
+  s.done[patron] = (s.done[patron] | 0) + 1;
+  return moveState(s, patronSign(patron) * AL.missionShift[patron]);
 }
 
 // ------------------------------------------------------------------------------------------------ intercom tone

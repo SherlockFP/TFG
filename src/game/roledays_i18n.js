@@ -2,6 +2,7 @@
 import { addTranslations } from '../core/i18n.js';
 
 const TR = {
+  'EXIT': 'ÇIKIŞ', 'SHIP': 'GEMİ',
   'Navigator Protocol': 'Navigatör Protokolü', 'Silent Carrier': 'Sessiz Taşıyıcı', 'Swift Scout': 'Çevik Gözcü', 'Mechanic Only': 'Sadece Tamirci', 'Blind Medic': 'Kör Sağlıkçı',
   'Pacifist Feed': 'Barışçıl Yayın', 'Fog Walker': 'Sis Yürüyücüsü', 'Light Fingers': 'Hafif Eller',
   'Navigator: the only one with the compass, but cannot hold weapons.': 'Navigatör: pusulası olan tek kişi, ama silah tutamaz.',
@@ -30,6 +31,7 @@ const TR = {
   'Constraint met. The feed adores you. Do not let it go to your head.': 'Kısıtı tamamladınız. Yayın sizi seviyor. Şımarmayın.',
 };
 const RU = {
+  'EXIT': 'ВЫХОД', 'SHIP': 'КОРАБЛЬ',
   'Navigator Protocol': 'Протокол навигатора', 'Silent Carrier': 'Молчаливый носильщик', 'Swift Scout': 'Быстрый разведчик', 'Mechanic Only': 'Только механик', 'Blind Medic': 'Слепой медик',
   'Pacifist Feed': 'Пацифистский эфир', 'Fog Walker': 'Ходящий в тумане', 'Light Fingers': 'Лёгкие руки',
   'Navigator: the only one with the compass, but cannot hold weapons.': 'Навигатор: единственный с компасом, но не может держать оружие.',

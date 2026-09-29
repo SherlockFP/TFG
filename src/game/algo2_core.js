@@ -114,6 +114,32 @@ export function sampleAt(track, u, hz = GHOST.hz) {
   const sp = Math.hypot(b[0] - a[0], b[2] - a[2]) * hz;
   return { x: a[0] + (b[0] - a[0]) * k, y: a[1] + (b[1] - a[1]) * k, z: a[2] + (b[2] - a[2]) * k, yaw: lerpA(a[3], b[3], k), speed: sp };
 }
+/**
+ * [links] clamp an unpacked ghost track (relative to the death anchor) to walkable cells so a replay never walks through walls (the recorded layout differs from
+ * this landing's). nav = { walkableAt(x, z), nearestWalkable(gx, gz, r), toGrid, toWorld }. Walks back from the anchor; a sample that is off the grid or whose step
+ * from the previous kept sample crosses a wall is snapped to the nearest walkable cell (then re-checked) or holds the previous position.
+ */
+export function clampTrack(track, anchor, nav, snapR = 3) {
+  if (!nav || !track?.length) return track;
+  const ax = anchor[0], az = anchor[2];
+  const clear = (x0, z0, x1, z1) => { const n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, z1 - z0) / 0.4)); for (let i = 1; i < n; i++) { const k = i / n; if (!nav.walkableAt(x0 + (x1 - x0) * k, z0 + (z1 - z0) * k)) return false; } return true; };
+  const out = new Array(track.length);
+  const last = track.length - 1;
+  let px = ax + track[last][0], pz = az + track[last][2];      // the anchor itself is a real spot
+  out[last] = track[last].slice();
+  for (let i = last - 1; i >= 0; i--) {
+    const q = track[i];
+    let x = ax + q[0], z = az + q[2];
+    if (!nav.walkableAt(x, z) && nav.nearestWalkable && nav.toGrid && nav.toWorld) {
+      const g = nav.nearestWalkable(...nav.toGrid(x, z), snapR);
+      if (g) { const w = nav.toWorld(g[0], g[1]); x = w.x; z = w.z; }
+    }
+    if (!nav.walkableAt(x, z) || !clear(px, pz, x, z)) { x = px; z = pz; }
+    out[i] = [x - ax, q[1], z - az, q[3]];
+    px = x; pz = z;
+  }
+  return out;
+}
 /** where in the loop are we: the track plays for `len` s then the ghost holds (fading) for GHOST.hold s. -> { u, alpha, holding } */
 export function ghostLoop(t, len, hold = GHOST.hold) {
   const cyc = len + hold, m = ((t % cyc) + cyc) % cyc;

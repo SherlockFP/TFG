@@ -32,6 +32,7 @@ export const TR = {
   'Passive income capped for today. The Company does not pay for idleness.': 'Pasif gelir bugün için tavanda. Şirket tembelliğe ödeme yapmaz.',
   'Live event: {z} is under attack. Viewer count rising.': 'Canlı yayın: {z} saldırı altında. İzleyici sayısı artıyor.',
   'You planted a beacon on {z}. I have logged it. I log everything.': '{z} üzerine işaret diktin. Kaydettim. Her şeyi kaydederim.',
+  'Ghost mode (aim, R rotates, click places)': 'Hayalet modu (nişan al, R döndürür, tıkla koy)', 'GHOST WALL': 'HAYALET DUVAR', 'GHOST GATE': 'HAYALET KAPI', 'Gate': 'Kapı', 'Wall': 'Duvar',
 };
 export const RU = {
   'A beacon is already being planted.': 'Маяк уже устанавливается.', 'Beacon cancelled: stay next to the core.': 'Маяк отменён: оставайтесь рядом с ядром.', 'Beacon cancelled: hostiles near the core.': 'Маяк отменён: рядом с ядром враги.',
@@ -66,6 +67,7 @@ export const RU = {
   'Passive income capped for today. The Company does not pay for idleness.': 'Пассивный доход на сегодня исчерпан. Компания не платит за безделье.',
   'Live event: {z} is under attack. Viewer count rising.': 'Прямой эфир: {z} под атакой. Число зрителей растёт.',
   'You planted a beacon on {z}. I have logged it. I log everything.': 'Вы установили маяк в {z}. Я это записал. Я записываю всё.',
+  'Ghost mode (aim, R rotates, click places)': 'Призрак-режим (цель, R поворот, клик ставит)', 'GHOST WALL': 'ПРИЗРАК-СТЕНА', 'GHOST GATE': 'ПРИЗРАК-ВОРОТА', 'Gate': 'Ворота', 'Wall': 'Стена',
 };
 
 // ---- wave 6 (zones2): interior wings, walls / gates, extractor, archive, ship CRT

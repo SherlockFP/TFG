@@ -20,7 +20,7 @@ export function installRoledays(game) {
   const mods = game.mods;
   const offs = [], restores = [];
   let disposed = false, boundNet = null, style = null, dock = null, ov = null;
-  const S = { cur: null, active: false, wasActive: false, rolledKey: null, orbitT: 0, syncT: 0, paid: false, vmuted: false, vprev: false, nv: null, hudWrapped: false, said: false };
+  const S = { mm: null, mmT: 0, mmBake: null, mmNav: null, mmGrants: [], cur: null, active: false, wasActive: false, rolledKey: null, orbitT: 0, syncT: 0, paid: false, vmuted: false, vprev: false, nv: null, hudWrapped: false, said: false };
   const host = () => !!game.isHost;
   const run = () => game.run;
   const me = () => game.selfId;
@@ -143,8 +143,41 @@ export function installRoledays(game) {
       if (U) { S.base = { gamma: U.uGamma.value, vig: U.uVignette.value }; U.uGamma.value = S.base.gamma * 1.55; U.uVignette.value = S.base.vig * 0.45; }
     }
   }
+  // ------------------------------------------------------------ [links] navigator minimap (top-down facility nav grid + ship / entrance markers)
+  const minimapAllowed = () => (!!cur() && K.showMinimap(cur(), me())) || S.mmGrants.some((fn) => { try { return !!fn(); } catch { return false; } });
+  function minimapDraw() {
+    if (typeof document === 'undefined') return;
+    const fac = game.world?.facility, nav = fac?.nav, r = run(), pos = game.player?.pos;
+    const show = r?.phase === 'moon' && !!nav && !!pos && !game.player?.dead && minimapAllowed();
+    if (!show) { if (S.mm) S.mm.wrap.style.display = 'none'; return; }
+    if (S.mmNav !== nav) { S.mmNav = nav; S.mmBake = K.bakeGrid(nav, 128); }
+    const B = S.mmBake; if (!B) return;
+    if (!S.mm) {
+      const wrap = hudDock('right', 'rdmap', 14), cv = document.createElement('canvas');
+      cv.style.cssText = 'display:block;image-rendering:pixelated;background:#0b0c08;border:2px solid #f2c230;box-shadow:0 0 0 2px #12130d;pointer-events:none';
+      wrap.appendChild(cv); S.mm = { wrap, cv };
+    }
+    const { wrap, cv } = S.mm, sc = Math.max(1, Math.floor(180 / Math.max(B.w, B.h)));
+    wrap.style.display = '';
+    if (cv.width !== B.w * sc) { cv.width = B.w * sc; cv.height = B.h * sc; S.mmImg = null; }
+    const c = cv.getContext('2d');
+    if (!S.mmImg || S.mmImg.b !== B) {
+      const img = document.createElement('canvas'); img.width = B.w; img.height = B.h;
+      const ic = img.getContext('2d'), id = ic.createImageData(B.w, B.h);
+      for (let i = 0; i < B.data.length; i++) { const k = i * 4, v = B.data[i]; id.data[k] = v ? 70 : 11; id.data[k + 1] = v ? 74 : 12; id.data[k + 2] = v ? 52 : 8; id.data[k + 3] = 255; }
+      ic.putImageData(id, 0, 0); S.mmImg = { b: B, img };
+    }
+    c.imageSmoothingEnabled = false; c.drawImage(S.mmImg.img, 0, 0, cv.width, cv.height);
+    const dot = (x, z, col, rad, lbl) => { const p = K.mapPoint(B, nav, x, z); c.fillStyle = col; c.beginPath(); c.arc(p.px * sc, p.py * sc, rad, 0, 6.2832); c.fill(); if (lbl) { c.font = '10px sans-serif'; c.fillText(lbl, p.px * sc + rad + 2, p.py * sc + 3); } return p; };
+    const door = fac.mainDoor?.spawn; if (door) dot(door.x, door.z, '#59e06a', 4, t('EXIT'));
+    dot(2.6, 3.75, '#4fb4ff', 4, t('SHIP'));    // the ship stands at the world origin (siege_core DOOR); off the map it sticks to the border
+    for (const p of game.aiPlayers?.() || []) if (p.id !== me() && !p.dead && p.pos) dot(p.pos.x, p.pos.z, '#f2c230', 3);
+    const pp = dot(pos.x, pos.z, '#ffffff', 4), yaw = game.player.yaw || 0;
+    c.strokeStyle = '#fff'; c.lineWidth = 2; c.beginPath(); c.moveTo(pp.px * sc, pp.py * sc); c.lineTo(pp.px * sc - Math.sin(yaw) * 9, pp.py * sc - Math.cos(yaw) * 9); c.stroke();
+  }
   function localFx() {
     wrapHud();
+    if (++S.mmT % 6 === 0) { try { minimapDraw(); } catch (e) { if (!S.mmWarn) { S.mmWarn = 1; console.warn('[roledays] minimap', e); } } }
     const ph = run()?.phase; S.active = !!S.cur && (ph === 'landing' || ph === 'moon');   // derived on every peer, so late joiners enforce too
     vision(cur() ? K.visionFor(cur(), me()) : null);
     const n = game.time || 0; if (n - (S.paintT || 0) > 0.5) { S.paintT = n; paint(); }
@@ -221,6 +254,8 @@ export function installRoledays(game) {
 
   return {
     state: S, K,
+    /** hook for a future purchasable ship upgrade: fn() -> true grants the minimap to this peer */
+    addMinimapGrant(fn) { S.mmGrants.push(fn); return () => { const i = S.mmGrants.indexOf(fn); if (i >= 0) S.mmGrants.splice(i, 1); }; },
     /** debug: force a card for the coming / current day (host) */
     debug: {
       force(card) { const a = K.assign(card, crew(), run()?.day | 0); S.cur = a; if (run()?.phase !== 'orbit') S.active = !!a; bcast(); game.refreshStats?.(); paint(); return a; },
@@ -232,7 +267,7 @@ export function installRoledays(game) {
       for (const o of offs) { try { o?.(); } catch { /* ignore */ } }
       for (const r of restores.reverse()) { try { r(); } catch { /* ignore */ } }
       try { boundNet?.off?.('msg:rds', onMsg); } catch { /* ignore */ }
-      S.cur = null; S.active = false; localFx(); vision(null); dock?.remove(); style?.remove(); dock = style = null;
+      S.cur = null; S.active = false; localFx(); vision(null); dock?.remove(); S.mm?.wrap.remove(); style?.remove(); dock = style = null;
     },
   };
 }

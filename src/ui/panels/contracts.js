@@ -76,7 +76,7 @@ export function createLoreBoard({ game, lore, tab, onClose } = {}) {
   root.addEventListener('keydown', (e) => { const tg = e.target?.tagName; if (tg === 'INPUT' || tg === 'TEXTAREA') e.stopPropagation(); });
   const sfx = (n = 'ui_click', v = 0.5) => { try { game?.audio?.ui?.(n, v); } catch { /* ignore */ } };
   let detail = null, faceT = 0, lastSig = '';
-  const sig = () => { const r = game.run || {}; try { return JSON.stringify([r.contract, r.contracts, r.factions, r.signed, r.chains, r.phase, (game.profile.caseFiles || []).length]); } catch { return ''; } };
+  const sig = () => { const r = game.run || {}; try { return JSON.stringify([r.contract, r.contracts, r.st?.offers, r.st?.job, r.factions, r.signed, r.chains, r.phase, (game.profile.caseFiles || []).length]); } catch { return ''; } };
 
   const render = () => {
     root.replaceChildren();
@@ -157,7 +157,31 @@ export function createLoreBoard({ game, lore, tab, onClose } = {}) {
       grid.appendChild(card);
     });
     body.appendChild(grid);
+    renderPatronJobs(body, run);
     body.appendChild(mk('div', 'lb-secret', `??? ${L('SECRET OBJECTIVE — every day hides one. The Algorithm will tell you when you stumble into it.', 'GİZLİ GÖREV — her gün bir tane saklı. Üstüne düştüğünüzde Algoritma söyleyecek.')}`));
+  }
+
+  /** [links] today's story patron jobs (module story) with take buttons; same rules as the terminal JOB <n> */
+  function renderPatronJobs(body, run) {
+    let J = null;
+    try { J = game.story?.jobRows?.(); } catch { J = null; }
+    if (!J || (!J.rows.length && !J.active)) return;
+    body.appendChild(mk('div', 'lb-k', L('PATRON JOBS', 'PATRON İŞLERİ')));
+    const grid = mk('div', 'lb-offers');
+    if (J.active) body.appendChild(mk('div', 'lb-d', `${L('Active job', 'Aktif iş')}: ${escapeHtml(J.active.title)}`));
+    for (const j of J.rows) {
+      const card = mk('div', 'lb-card' + (j.taken ? ' taken' : ''));
+      card.innerHTML = `<div class="lb-k">${j.patron === 'company' ? L('THE COMPANY', 'ŞİRKET') : L('THE ALGORITHM', 'ALGORİTMA')}</div>`
+        + `<div class="lb-n">${escapeHtml(j.title)}</div><div class="lb-b">${escapeHtml(j.brief)}</div>`
+        + `<div class="lb-r">▮${j.credits} · ${j.xp} XP · ${L('loyalty', 'sadakat')} ${j.patron === 'company' ? '-' : '+'}${j.shift}</div>`;
+      const b = mk('button', 'lb-btn', j.taken ? L('TAKEN', 'ALINDI') : L('TAKE JOB', 'İŞİ AL'));
+      if (j.taken || J.active || run.phase !== 'orbit') b.disabled = true;
+      b.title = run.phase !== 'orbit' ? L('Only in orbit', 'Sadece yörüngede') : '';
+      b.addEventListener('click', (e) => { e.stopPropagation(); if (b.disabled) return; sfx('ui_confirm', 0.6); game.story?.takeJob?.(j.i); });
+      card.appendChild(b);
+      grid.appendChild(card);
+    }
+    body.appendChild(grid);
   }
 
   function renderFactions(body, run) {

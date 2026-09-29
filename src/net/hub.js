@@ -10,7 +10,7 @@ import { liteOf } from '../ui/avatarpic.js';
 import { makeTransport } from './transport.js';
 import { GAME_VERSION } from './lobby.js';
 import {
-  HUB, HUB_ROOM, PresenceTable, RateLimiter, cleanText, validateDm, validateInvite,
+  HUB, HUB_ROOM, PresenceTable, zoneRank, RateLimiter, cleanText, validateDm, validateInvite,
   addFriend, removeFriend, isFriend, sanitizeFriends, sanitizeBlocked, pushHistory, sanitizeHistory,
 } from './hub_core.js';
 
@@ -132,12 +132,30 @@ export class HubService extends Emitter {
     let st = 'menu';
     if (this.ctx === 'run' && g) st = g.run?.phase === 'orbit' || g.run?.phase === 'company' || !g.run ? 'lobby' : 'run';
     const d = { id: p.id, n: p.name, av: liteOf(p), st, v: GAME_VERSION, lv: p.level | 0 };
+    const zs = this.ctx === 'run' && g?.isHost ? this.zoneStats() : null;
+    if (zs) d.zs = zs;
     // a public lobby is only advertised by its host, only while announcing to the lobby browser, and only if the player allows it
     const info = this.ctx === 'run' && g?.isHost ? this.app.lobbyDir?.announceInfo : null;
     if (info && this.shareLobby && g.opts?.isPublic) {
       d.lb = { c: info.code, n: info.name, p: info.players | 0, m: info.max | 0, k: info.locked ? 1 : 0, s: this.app.lobbyDir?.strategy || this._strategy };
     }
     return d;
+  }
+  /** [links] this crew's zone stats [owned, income/day, defences held] (host only), or null */
+  zoneStats() {
+    try {
+      const sn = this.game?.zones?.snapshot?.();
+      if (!sn) return null;
+      const z = [sn.owned | 0, sn.income?.credits | 0, sn.stat?.held | 0];
+      return z[0] || z[2] ? z : null;
+    } catch { return null; }
+  }
+  /** [links] leaderboard rows: everyone online with zone stats plus this crew */
+  zoneBoard() {
+    const rows = this.online().filter((e) => e.zs);
+    const mine = this.ctx === 'run' && this.game?.isHost ? this.zoneStats() : null;
+    if (mine) rows.push({ id: this.profile.id, n: this.profile.name, zs: mine, me: true });
+    return zoneRank(rows);
   }
   _sendBeacon(to) {
     if (!this.transport) return;
