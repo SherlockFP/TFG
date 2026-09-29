@@ -6,6 +6,7 @@
 //   5. FAKE CLOSET outcome rules (open / knock / hook)
 // Everything a peer must agree on (plan, chalk store) is derived from the layout seed or replicated by the host ('hr*' messages).
 import { RNG } from '../core/rng.js';
+import { regTrap } from './defense_core.js';
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 export const CELL = 4;
@@ -22,6 +23,7 @@ export const TRAPS = {
   flame: { id: 'flame', name: 'Flame Vent', price: 70, charges: 3, armSec: 150, tele: 0.85, strike: 1.5, cd: 1.6, tick: 0.25, dmgC: 26, dmgP: 12, len: 2, minLen: 2, weight: 2, blurb: 'Vents along the walls roar into a fire lane. Set them alight.' },
 };
 export const TRAP_IDS = Object.keys(TRAPS);
+for (const id of TRAP_IDS) regTrap(TRAPS[id]);   // [unify] facility-only traps register their stats in the shared defence table (trap_<id>)
 export const TRAP_RULES = {
   maxArmsPerLanding: 3,        // per trap
   priceQuotaStep: 0.09,        // +9 % per sector quota index

@@ -7,7 +7,7 @@
 //   * a wall never closes on the LOCAL player: while you stand within ~0.7 m of a rising wall it waits half-raised (collider off) until you step away.
 //   * nothing here uses Math.random for layout; animation is pure state -> matrices.
 import * as THREE from 'three';
-import { STACKS, wallLattice, edgeCells, stacksOpen, stacksPhaseAt, toWorld, toLocal, cellCentre } from '../game/maps5_core.js';
+import { STACKS, wallLattice, edgeCells, stacksOpen, stacksPhaseAt, toWorld, toLocal, cellCentre } from './mazegen.js';
 import { buildRuns, doorSteps, guard } from './maps5_kit.js';
 import { levelMaterial } from './geobuilder.js';
 

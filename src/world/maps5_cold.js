@@ -4,7 +4,7 @@
 //   * a conveyor line, broken server racks, ice crystals, snow drifts, snowfall and blizzard gusts (terrain.wx.gust drives fog / wind in worldx)
 // decor.info = { kind:'m5cold', stacks, caves[], pods[{x,y,z,open,cave}], zones[], loot[], prizes[], counts }
 import * as THREE from 'three';
-import { planStacks, verifyStacks, STACKS, siteSeed, toWorld, toLocal } from '../game/maps5_core.js';
+import { planStacks, verifyStacks, STACKS, siteSeed, toWorld, toLocal } from './mazegen.js';
 import { registerDecor, DECOR_HELPERS } from './outdoor_biomes.js';
 import { makeBuilder, flush, findSite, placeProps, skyBox, doorSteps, TAU } from './maps5_kit.js';
 import { buildStacks } from './maps5_stacks.js';

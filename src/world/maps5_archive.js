@@ -4,7 +4,7 @@
 //     game/maps5.js) leads from level 0 to a dead-end cell of island A; island B (the Master Ledger, the reward) can only be entered over a bridge
 //   * ladder hole: a deck cell with a rail-protected hatch; the ladder prop stands under it
 //   * everything static: one merged mesh per material key, one collider per straight wall run / slab / rail; no scene lights (emissive strips)
-import { ARCHIVE, wallLattice, cellCentre, toWorld, toLocal, DX, DZ, degree } from '../game/maps5_core.js';
+import { ARCHIVE, wallLattice, cellCentre, toWorld, toLocal, DX, DZ, degree } from './mazegen.js';
 import { buildRuns, doorSteps } from './maps5_kit.js';
 import { rectMinus } from './worlds2_solids.js';
 import * as THREE from 'three';

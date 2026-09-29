@@ -15,6 +15,7 @@ import { xpForLevel, rankOf } from '../game/progression.js';
 import { MOONS, WEATHER } from '../game/moons.js';
 import * as DailyEvents from '../game/dailyEvents.js';
 import { t, getLang, tf } from '../core/i18n.js';
+import { walletRow } from '../game/wallet.js';   // [unify] one wallet row: credits + clout
 import { INTERIOR_NAMES as REG_INTERIOR_NAMES } from '../world/interiors/index.js';
 
 const BODY_SVG = `<svg viewBox="0 0 40 80" class="hud-body"><g fill="currentColor">
@@ -248,7 +249,8 @@ export class HUD {
   }
 
   setCoins(c, delta) {
-    this.$.coins.textContent = '◈ ' + c;
+    this.coinsVal = c;
+    this.$.coins.textContent = walletRow(this.creditsVal || 0, c);   // [unify] ▮ credits · ◈ clout (crew money + personal money; everything else is a material)
     if (delta) { this.$.coins.classList.remove('pulse'); void this.$.coins.offsetWidth; this.$.coins.classList.add('pulse'); }
   }
 
@@ -523,7 +525,7 @@ export class HUD {
     this.$.lvl.textContent = 'Lv.' + prof.level;
     this.$.rank.textContent = rankOf(prof.level) + (prof.skillPoints ? ` (+${prof.skillPoints})` : '');
     this.$.xp.style.width = (prof.xp / xpForLevel(prof.level) * 100) + '%';
-    if (!this.coinsInit) { this.coinsInit = true; this.setCoins(prof.coins); }
+    if (!this.coinsInit || (run.credits ?? 0) !== this.creditsVal) { this.coinsInit = true; this.creditsVal = run.credits ?? 0; this.setCoins(prof.coins); }
     // quota banner (in ship)
     const showQ = p.inShip && !p.dead && run.phase !== 'landing';
     this.$.quota.classList.toggle('hidden', !showQ);

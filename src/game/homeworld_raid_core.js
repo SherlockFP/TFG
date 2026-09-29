@@ -5,6 +5,7 @@
 //   raider   = { id, type, x, z, hp, maxHp, slowT, slowMul }         (view of a host creature)
 //   tower    = sim.def.towers[i] { id, t, lv, x, z, dps, range, chain, slow }   (live defence buildings, hp lives in sim.hp)
 import { SG, planWave } from './siege_core.js';
+import { pickTarget } from './defense_core.js';
 import { RAID, isWall, BUILDINGS, cellCenter } from './homeworld_core.js';
 
 export const SITE = {
@@ -69,11 +70,7 @@ export function pickBuildingTarget(sim, type, x, z) {
 }
 
 // ---------------------------------------------------------------------------------------------------------------- towers
-const near = (raiders, x, z, range, pred) => {
-  let best = null, bd = range;
-  for (const r of raiders) { if (r.hp <= 0 || (pred && !pred(r))) continue; const d = hyp(r.x - x, r.z - z); if (d <= bd) { bd = d; best = r; } }
-  return best;
-};
+const near = (raiders, x, z, range, pred) => pickTarget(raiders, { x, z }, range, { pred });   // [unify] shared targeting (nearest, alive)
 /** one tower step. Returns shots: [{ t, id, ax, ay, az, hits: [{ id, dmg, slow? }], bx, bz }] (visual + damage list, applied by the caller) */
 export function towerStep(sim, tstate, raiders, dt, baseY = 0) {
   const shots = [];
@@ -94,8 +91,7 @@ export function towerStep(sim, tstate, raiders, dt, baseY = 0) {
     }
     if (st.cd > 0) continue;
     if (tw.t === 'sniper') {
-      let best = null;   // strongest in range, never point blank
-      for (const r of raiders) { if (r.hp <= 0) continue; const d = hyp(r.x - tw.x, r.z - tw.z); if (d <= tw.range && d >= SITE.sniperMin && (!best || r.hp > best.hp)) best = r; }
+      const best = pickTarget(raiders, tw, tw.range, { mode: 'strongest', minRange: SITE.sniperMin });   // strongest in range, never point blank
       if (!best) { st.cd = 0.25; continue; }
       const dmg = BUILDINGS.sniper.tw.shot[tw.lv - 1] * (tw.dps / BUILDINGS.sniper.tw.dps[tw.lv - 1]);   // heavy shot, scaled by the power ratio
       st.cd = BUILDINGS.sniper.tw.shot[tw.lv - 1] / BUILDINGS.sniper.tw.dps[tw.lv - 1];

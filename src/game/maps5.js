@@ -19,7 +19,7 @@ import { scrapValueMul } from './progression.js';
 import { registerMaps5Creatures, M5_TYPES } from './maps5_creatures.js';
 import { M5_CREATURE_MODELS, M5_ITEM_MODELS } from '../models/maps5_models.js';
 import { TR, RU } from './maps5_text.js';
-import * as CORE from './maps5_core.js';
+import * as CORE from '../world/mazegen.js';   // [unify] one maze library
 import { ladderStep } from '../world/stairs.js';
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);

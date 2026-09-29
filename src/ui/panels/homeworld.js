@@ -4,6 +4,7 @@
 import { el, escapeHtml } from '../../core/util.js';
 import { t, tf } from '../../core/i18n.js';
 import * as H from '../../game/homeworld_core.js';
+import { classify, walletRowOf } from '../../game/wallet.js';   // [unify] two currencies + materials
 
 const CSS = `
 .overlay .menu-frame.hwp{width:min(1100px,96vw);height:min(86vh,720px)}
@@ -83,11 +84,12 @@ export function createHomeworldPanel(ui, game, hw, opts = {}) {
   }
   function renderRes() {
     const st = S(); resEl.innerHTML = '';
-    sub.innerHTML = `<b>▮${f0(wallet())}</b> · ${st.b.length} ${t('buildings')}`;
+    sub.innerHTML = `<b>${escapeHtml(walletRowOf(game))}</b> · ${st.b.length} ${t('buildings')}`;   // [unify] the one wallet row
     for (const k of H.RES_KEYS) {
       const cap = H.capOf(st, k), v = st.s[k], full = v >= cap - 1e-9;
       const label = k === 's1' ? t('Scrap Shard') : k === 's2' ? t('Circuit Core') : k === 's3' ? t('Data Crystal') : k === 's4' ? t('Ecto Core') : k === 'meals' ? t('Meals') : k === 'parts' ? t('Components') : k === 'clout' ? 'Clout' : t('Credits');
-      resEl.appendChild(el('div', { class: 'hw-chip' + (full ? ' full' : ''), html: `${H.RES_ICON[k].length === 1 ? H.RES_ICON[k] : ''} ${f0(v)}/${f0(cap)}<br><small>${escapeHtml(label)}</small><i><b style="width:${Math.min(100, (v / cap) * 100)}%"></b></i>` }));
+      const isMat = classify(k) === 'material';   // [unify] shards / components / meals are materials, not money
+      resEl.appendChild(el('div', { class: 'hw-chip' + (full ? ' full' : '') + (isMat ? ' mat' : ''), title: isMat ? t('Materials: crafting only, not money') : '', html: `${H.RES_ICON[k].length === 1 ? H.RES_ICON[k] : ''} ${f0(v)}/${f0(cap)}<br><small>${escapeHtml(label)}</small><i><b style="width:${Math.min(100, (v / cap) * 100)}%"></b></i>` }));
     }
   }
 

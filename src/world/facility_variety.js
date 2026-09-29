@@ -17,7 +17,7 @@
 import * as THREE from 'three';
 import { RNG } from '../core/rng.js';
 import { layoutKit, navClear, surfacePlane, SPECIAL_ROOMS, WALL_ROT } from './interiors/common.js';
-import { pickMazeStyle } from './maze_styles.js';
+import { pickMazeStyle } from './mazegen.js';
 
 export const LIM_TYPES = ['lim_office', 'lim_pool', 'lim_halls'];
 for (const ty of LIM_TYPES) SPECIAL_ROOMS.add(ty);   // facsys / hazards / setpieces / maps2 leave these rooms alone (props are placed here)

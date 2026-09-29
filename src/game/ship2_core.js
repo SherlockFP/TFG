@@ -5,6 +5,7 @@
 //   * DEFENCE MOUNTS on the roof + ship power budget; PLANTERS that grow a little tree over game days.
 // Early game is gentle (MASTERPLAN section 19): quota 0 = at most 2 dents, no effects at all; quota 1 = tier 2 at most.
 import { DECK_MOUNT } from '../world/shiplayout.js';   // [shipdeck]
+import { mountTypes, getDef } from './defense_core.js';
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 
 // ---------------------------------------------------------------------------------------------- hull spots
@@ -213,7 +214,7 @@ export const MOUNTS = [
 export const mountY = (m) => m?.y ?? MOUNT_Y;
 export const MOUNT_Y = 3.9;      // roof surface (ship.js eh)
 /** deployable kits that can be mounted: the ship powers them (no battery / fuel) except the ammo-fed MK1 */
-export const MOUNT_TYPES = ['turret1', 'turret2', 'turret3', 'tesla', 'flood', 'drone', 'sensor'];
+export const MOUNT_TYPES = mountTypes();   // [unify] the kits flagged `mount` in defense_core.js
 /** power slots the ship can feed: 1 in quota 0, 2 later, +1 per Engine Room tier (0..3), -1 while the hull is critical; min 1 */
 export function powerSlots(quota = 0, engineTier = 0, hullTier = 0, deckTier = 0) {
   return Math.max(1, ((quota | 0) <= 0 ? 1 : 2) + clamp(engineTier | 0, 0, 3) + (deckTier >= 3 ? 1 : 0) - (hullTier >= 3 ? 1 : 0));   // [shipdeck] Upper Deck Mk III feeds one more
@@ -229,7 +230,7 @@ export function poweredMounts(mounts, slots) {
   const on = new Set(); let n = 0;
   for (const mt of MOUNTS) {
     const r = mounts?.[mt.id]; if (!r) continue;
-    if (r.ty === 'turret1') { on.add(mt.id); continue; }
+    if (getDef(r.ty)?.ammo) { on.add(mt.id); continue; }   // ammo-fed kits (MK1) use no power slot
     if (n < slots) { on.add(mt.id); n++; }
   }
   return on;

@@ -9,6 +9,7 @@
 // State (host profile.homeworld2, layout mirrored to clients by ops):  { v, seed, n, p:[{i,t,x,z,r,l,...}], ms, wv, st, pvp, g }
 import { RNG } from '../core/rng.js';
 import * as H from './homeworld_core.js';
+import { towerStats } from './defense_core.js';
 
 // ---------------------------------------------------------------------------------------------- grid
 export const FC = 1.5;                       // metres per fine cell
@@ -780,7 +781,7 @@ export function ghostDefense(g) {
   const sentries = [], walls = [];
   for (const [t, x, z, r, l] of g.b) {
     const d = H.BUILDINGS[t], c = H.cellCenter({ x, z }, d);
-    if (d.tw) sentries.push({ t, lv: l, x: c.x, z: c.z, hp: Math.round(d.hp[l - 1] * 0.5), range: Math.min(d.tw.range[l - 1], t === 'sniper' ? 42 : 24), dps: Math.round(d.tw.dps[l - 1] * 0.2 * 10) / 10, shot: d.tw.shot ? Math.round(d.tw.shot[l - 1] * 0.2) : 0 });
+    if (d.tw) { const ts = towerStats(d, l); sentries.push({ t, lv: l, x: c.x, z: c.z, hp: Math.round(d.hp[l - 1] * 0.5), range: Math.min(ts.range, t === 'sniper' ? 42 : 24), dps: Math.round(ts.dps * 0.2 * 10) / 10, shot: d.tw.shot ? Math.round(d.tw.shot[l - 1] * 0.2) : 0 }); }   // [unify] shared tower stat read
     else if (H.isWall(t)) walls.push({ t, x: c.x, z: c.z, gate: t === 'gate' });
   }
   const guards = Math.max(2, Math.min(9, Math.round(g.value / 700) + g.tier));
