@@ -113,11 +113,13 @@ function clearOfArms(pts, q, pos, hand, caps, iters = 60) {
 
 // [ux] per-weapon grip rotations (Euler XYZ, rad; model -Z = blade / head direction): pitch tips the weapon up-forward, a little yaw
 // points it across the view, NO roll (the old shared roll of 0.3 made blades and bats sit crooked). Unknown melee -> GRIP_MELEE_DEFAULT.
-export const GRIP_MELEE_DEFAULT = [0.7, 0.24, 0];
+export const GRIP_MELEE_DEFAULT = [0.95, -0.14, 0];
+// [vm] the hand now rests lower-right, so weapons stand up more (pitch) and lean slightly OUTWARD (negative yaw = tip to the right);
+// the old positive yaw leaned every blade across the screen centre.
 export const GRIP_MELEE = {
-  knife: [0.5, 0.2, 0], twindaggers: [0.5, 0.25, 0], machete: [0.7, 0.25, 0], katana: [0.78, 0.26, 0], longsword: [0.72, 0.22, 0],
-  bat: [0.86, 0.22, 0], nailbat: [0.86, 0.22, 0], pipe: [0.8, 0.2, 0], crowbar: [0.8, 0.2, 0], shovel: [0.8, 0.2, 0], stopsign: [0.55, 0.2, 0],
-  spear: [0.55, 0.15, 0], waraxe: [0.78, 0.2, 0], greatsword: [0.76, 0.2, 0], warhammer: [0.76, 0.2, 0], sledge: [0.76, 0.2, 0],
+  knife: [0.62, -0.1, 0], twindaggers: [0.62, -0.1, 0], machete: [0.9, -0.14, 0], katana: [0.98, -0.14, 0], longsword: [0.95, -0.12, 0],
+  bat: [1.02, -0.14, 0], nailbat: [1.02, -0.14, 0], pipe: [0.98, -0.14, 0], crowbar: [0.98, -0.14, 0], shovel: [1.0, -0.12, 0], stopsign: [0.8, -0.1, 0],
+  spear: [0.62, -0.06, 0], waraxe: [0.98, -0.12, 0], greatsword: [0.76, 0.2, 0], warhammer: [0.76, 0.2, 0], sledge: [0.76, 0.2, 0],   // two-handers keep the two-hand stance (unchanged)
 };
 const meleeQuat = (id) => { const g = GRIP_MELEE[id] || GRIP_MELEE_DEFAULT; return qFromEuler(g[0], g[1], g[2]); };
 
@@ -184,6 +186,9 @@ export function fitGrip(geom, def, id = '') {
   } else {
     if (geom.hasGrip && !(cls === 'scrap')) {
       G = geom.origin.clone();                               // tools: origin = grip
+      // melee: choke up towards the butt so at most a few cm stick out below the fist (a long butt used to hit the sleeve and the
+      // arm solver then shoved the whole weapon out of the hand)
+      if (cls === 'melee') { const butt = geom.box.max.z - G.z; if (butt > 0.035) G.z += butt - 0.035; }
     } else if (cls === 'long2h' || cls === 'melee') {
       G = V(rc.x, rc.y, rb.max.z - 0.18 * rs.z);             // unknown model: grip near the back end
       G.applyQuaternion(q.clone().invert());

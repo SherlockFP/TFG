@@ -711,9 +711,11 @@ const _X = new THREE.Vector3(1, 0, 0), _Z = new THREE.Vector3(0, 0, 1);
 const _v1 = new THREE.Vector3(), _v2 = new THREE.Vector3(), IKO = {};   // [fpbody] IKO: IK scratch
 export const VM_REST = {
   //            base pos (x mirrored per side)   sh rot x, y (mirrored), z (mirrored), elbow
-  onehand: { p: [0.24, -0.34, 0.06], r: [0.2, 0.1, 0.0], el: 0.18 },
+  // one hand: shoulder low and back, elbow bent ~58 deg -> the hand rests in the lower-right of the view (NDC ~0.36, -0.62) about 0.45 m
+  // out instead of reaching 0.55 m towards the screen centre (owner: items looked "far away" and crooked)
+  onehand: { p: [0.26, -0.42, 0.08], r: [-0.062, -0.072, 0.332], el: 0.904 },
   twohand: { p: [0.25, -0.33, 0.04], r: [0.22, 0.3, -0.25], el: 0.3 },
-  none: { p: [0.24, -0.34, 0.06], r: [0.2, 0.1, 0.0], el: 0.18 },
+  none: { p: [0.26, -0.42, 0.08], r: [-0.062, -0.072, 0.332], el: 0.904 },
 };
 
 // Pose deltas from the rest pose: x/y/z shoulder rotation, e elbow, px/py/pz arm position,
