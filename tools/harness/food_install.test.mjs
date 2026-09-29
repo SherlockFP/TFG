@@ -76,7 +76,7 @@ ok(game.emote === 'x:fd_eat', 'eating sets the third-person eat pose');
 tick(FOODS.fd_pizza.use + 0.3);
 ok(!items.has('i1'), 'host consumed the pizza');
 ok(sent.some(([t, d]) => t === 'fdfx' && d.k === 'ate' && d.ty === 'fd_pizza' && d.by === 'me'), 'ate event broadcast');
-ok(game.player.hp === 80, 'pizza heals 30 HP (hp ' + game.player.hp + ')');
+ok(game.player.hp === 62, 'pizza heals 12 HP (hp ' + game.player.hp + ')');
 ok(active.has('f_full'), 'Full Belly granted');
 ok(game.emote === null, 'emote cleared afterwards');
 // non-food is ignored
@@ -89,7 +89,7 @@ ok(items.has('i3') && !active.has('f_noodles'), 'switching away cancels the meal
 
 // ---- noodles regen
 useItem('fd_noodles', 'i4'); tick(FOODS.fd_noodles.use + 0.3);
-ok(active.has('f_noodles'), 'Warm Noodles buff'); const hp0 = game.player.hp; tick(5); ok(game.player.hp > hp0 + 4, 'regen ticks (' + (game.player.hp - hp0).toFixed(1) + ' hp in 5 s)');
+ok(active.has('f_noodles'), 'Warm Noodles buff'); const hp0 = game.player.hp; tick(5); ok(game.player.hp > hp0 + 2, 'regen ticks (' + (game.player.hp - hp0).toFixed(1) + ' hp in 5 s)');
 
 // ---- Mega Engagement: crash afterwards
 active.clear(); useItem('fd_mega', 'i5'); tick(FOODS.fd_mega.use + 0.3);

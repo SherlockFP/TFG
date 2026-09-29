@@ -147,3 +147,7 @@ The 3-day + boss loop is now real (gate -> core with wings, a labyrinth and a ca
 Proven by numbers only: node tests drive the REAL host.js flow, the real CreatureManager and real layouts (soft-lock fuzz, weekly lock, all 8 themes); nothing was seen in a browser.
 Risks: boss models and telegraph readability, the maze / arena look and lighting, whether a labyrinth is fun with creatures in it (it is a spanning tree + few loops), keystone / raid numbers (design values), 2-player sync of `run.cycle` and `cyx`,
 the arena auto-open (720 s) as the only fallback for lost cards, Legacy Bot sector (outdoor boss, no cards) never seen, `shrines` mutator unwired, no Trophy Hall / CASE entry / first-kill cosmetic yet.
+
+## Wave 4 - survival (foraging / farming / cooking / storage)
+Proven by node tests only (recipe + quality maths, growth timing, storage transfer + persistence, hunger drain, host handlers on a stub game); nothing was seen in a browser. Risks: stove / crate / planter default positions next to shipyard rooms, the drag-and-drop panel at 1280x720, plant models and glow, cooking needle feel (zones 50 / 72 / 86 %), whether hunger + warmth stay unannoying, heal balance of a perfect 3-ingredient stew (~80 HP) against the medkit. Left out: ship2 / homeworld2 planters (API only), seed shop, plants in facilities, secure-crate lock.
+

@@ -279,6 +279,7 @@ export function installFood(game) {
     if (ty === 'fd_mega') { F.megaEnd = now() + 60; F.wasMega = true; }
     if (!note && fd.hp) toast(`${t(fd.name)}: +${fd.hp} HP`, 'good');
     else if (!note && fd.stam) toast(`${t(fd.name)}: +${fd.stam}`, 'good');
+    game.mods?.emit('tfg:ate', ty, fd);   // [survival] packaged snacks feed the hunger meter a little
   }
 
   // ---------------------------------------------------------------- net: host side
