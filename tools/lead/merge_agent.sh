@@ -10,7 +10,7 @@ for f in $(git diff --name-only --diff-filter=U); do case $f in *.md) python3 $S
 # drop leftover empty placeholders for this module if the module is wired
 if grep -q "useModule('$N'" src/game/game.js; then sed -i "/^\/\/ \[import:$N\]\$/d; /^    \/\/ \[slot:$N\]\$/d" src/game/game.js; fi
 git add -A
-git diff --cached --quiet || git commit -qm "Merge $N (wave 4)
+git diff --cached --quiet || git commit -qm "Merge $N
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01AFt3mbxtTU1FfiT1N1A1YL"
