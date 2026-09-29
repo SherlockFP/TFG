@@ -394,7 +394,7 @@ export class Game extends Emitter {
   installNetHandlers() {
     const net = this.net;
     installProfileSync(this, net);   // [profile] nickname / avatar sync ('pf')
-    net.on('playerJoin', (id, info) => this.hostOnPlayerJoin(id, info));
+    net.on('playerJoin', (id, info, resume) => this.hostOnPlayerJoin(id, info, resume));
     net.on('peerHello', () => {});
     net.on('peerLeave', (id, p) => {
       if (this.isHost) this.hostOnPlayerLeave(id);
@@ -402,7 +402,18 @@ export class Game extends Emitter {
       if (r) { this.ui.toast(tf('{name} left the ship.', { name: r.name })); r.dispose(); this.remotes.delete(id); }
       this.voice.removePeer(id);
     });
-    net.on('hostLeft', () => this.emit('fatal', 'The host has left. Session ended.'));
+    net.on('hostLeft', (why) => this.emit('fatal', t(why === 'timeout' ? 'Lost connection to the host (network problem, could not reconnect). Session ended.' : 'The host has left. Session ended.')));
+    // connection loss is not a leave: the player record / avatar / items stay for ~45 s while the link is re-established
+    net.on('peerLost', (id, p) => {
+      if (id === net.hostId && !net.isHost) this.ui.toast(t('Connection to the host lost - trying to reconnect...'), 'bad');
+      else this.ui.toast(tf('{name}: connection lost, waiting for them to come back...', { name: p?.name || this.remotes.get(id)?.name || '?' }), 'bad');
+      this.voice.removePeer(id);
+    });
+    net.on('peerResume', (id, info) => {
+      if (id === net.hostId && !net.isHost) this.ui.toast(t('Reconnected to the host.'), 'good');
+      else this.ui.toast(tf('{name} reconnected.', { name: info?.name || this.remotes.get(id)?.name || '?' }), 'good');
+    });
+    net.on('peerStall', (id, idle) => { if (id === net.hostId && !net.isHost) this.ui.toast(t('Network unstable: no data from the host...'), 'bad'); });
     net.on('error', (e) => {
       // Trystero reports a wrong lobby password as a join error; without this the joiner waits 25 s for a misleading timeout
       const msg = String(e?.error || e || '');
@@ -472,12 +483,16 @@ export class Game extends Emitter {
   onWelcome(d) {
     clearTimeout(this.joinTimeout);
     clearTimeout(this._pwErrTimer);
-    this.ui.toast(t('Connected! Welcome aboard.'));
+    const resume = !!d.resume && !!this.run;   // reconnect after a dropped link: resync the world, keep our position and inventory
+    if (!resume) this.ui.toast(t('Connected! Welcome aboard.'));
     this.config = { ...this.config, ...(d.config || {}) };
     for (const p of d.players || []) if (p.id !== this.selfId) { const r = this.ensureRemote(p.id, p); if (p.dead) r.setDead(true); if (p.st) r.applyState(p.st); }
     this.applyRunState(d.run, true);
     this.loadMapFor(d.run, true);
-    this.items.clearAll();
+    if (resume) {
+      for (const it of [...this.items.all()]) if (it.holder !== this.selfId) this.items.onEvent({ e: 'rm', id: it.id });   // stale copies; what we carry stays
+      this.creatures.clearAll();
+    } else this.items.clearAll();
     // creatures first: items carried by a creature ('c:<id>' holder) attach to its view on spawn
     for (const c of d.creatures || []) this.creatures.onEvent(c);
     for (const it of d.items || []) this.items.onEvent({ e: 'sp', ...it });
@@ -486,6 +501,7 @@ export class Game extends Emitter {
     for (const dr of d.doors || []) this.onDoor(dr);
     this.setPower(d.run.powerOn !== false, false);
     this.ship.door.setOpen(!!d.shipDoor);
+    if (resume) { this.ui.toast(t('Reconnected - world state resynced.'), 'good'); return; }
     this.spawnInShip();
     if (d.run.phase === 'moon' || d.run.phase === 'company') this.requestLoadout();
     this.tutorialHint(d.run.phase);
@@ -900,7 +916,20 @@ export class Game extends Emitter {
   }
 
   // ------------------------------------------------------------------ main loop
+  // One broken stage must never take the whole frame down: an exception before netSend() used to stop this player's
+  // state/heartbeat broadcast (peers saw them freeze and "drop") or the host's creature/clock sync. Errors are throttled.
+  guard(tag, fn) {
+    try { fn(); } catch (e) {
+      const now = performance.now(), g = (this._guardT ||= {});
+      if (!(now - (g[tag] || 0) < 5000)) { g[tag] = now; console.error('[update:' + tag + ']', e); }
+    }
+  }
+
   update(dt) {
+    try { this.updateFrame(dt); } finally { this.guard('netSend', () => this.netSend(dt)); }   // netSend ALWAYS runs, exactly once per frame
+  }
+
+  updateFrame(dt) {
     // hitstop: a few frames of near-freeze on a confirmed melee hit (local only)
     if (this.hitstopT > 0) { this.hitstopT -= dt; dt *= 0.12; }
     this.particles?.update(dt);
@@ -948,15 +977,15 @@ export class Game extends Emitter {
 
     // physics
     this.physics.step(dt, (fdt) => this.grab?.physicsStep(fdt));
-    this.items.update(dt);
-    this.cruiser?.update(dt);
+    this.guard('items', () => this.items.update(dt));
+    this.guard('cruiser', () => this.cruiser?.update(dt));
 
     // remotes
-    for (const r of this.remotes.values()) r.update(dt);
+    for (const r of this.remotes.values()) this.guard('remote', () => r.update(dt));
     // creatures
-    if (this.isHost) this.hostUpdate(dt);
-    this.creatures.update(dt);
-    if (this.director) { if (this.isHost) this.director.hostUpdate(dt); this.director.update(dt); }
+    if (this.isHost) this.guard('hostUpdate', () => this.hostUpdate(dt));
+    this.guard('creatures', () => this.creatures.update(dt));
+    if (this.director) this.guard('director', () => { if (this.isHost) this.director.hostUpdate(dt); this.director.update(dt); });
     // ship & map animation
     this.ship.door.update(dt);
     this.shipFeatures?.update(dt);
@@ -969,11 +998,10 @@ export class Game extends Emitter {
     if (this.run) this.env.timeMin = this.run.time ?? 480;
     this.env.update(dt, this.camera.position, { onLightning: () => this.onLightning() });
     this.lights.update(dt, this.camera.position);
-    this.voice.update(dt, input);
-    this.audio.update(dt, this.camera);
-    this.updateCompanyVisuals(dt);
-    this.updateViewModel(dt);
-    this.netSend(dt);
+    this.guard('voice', () => this.voice.update(dt, input));
+    this.guard('audio', () => this.audio.update(dt, this.camera));
+    this.guard('companyVis', () => this.updateCompanyVisuals(dt));
+    this.guard('viewModel', () => this.updateViewModel(dt));
     this.mods?.emit('update', dt, this);
     this.ui.hud?.update(dt, this);
     this.pings?.update(dt);

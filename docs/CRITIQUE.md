@@ -126,3 +126,5 @@ Noclip pocket + Backrooms entities + liminal overlay/photos are integrated but w
 ## avatar2 (wave 3)
 - New rounded body is ~2.7x the triangles of the classic avatar (2.4k vs 0.9k) per player; fine for 4 players, watch the Doppel horde.
 - Proportions/grips/first-person body were tuned by numbers only (no browser run): needs a visual pass.
+## Net drops (wave 3)
+Reconnect/resume, rejoin, TURN and backpressure are only exercised against a fake transport and BroadcastChannel. Never seen over real WebRTC: check `peerLost`/`peerResume` with Wi-Fi off for 10-30 s, that a resumed client keeps its held item and is not teleported, and that the 45 s ghost avatar of a crashed tab (no `bye`) is acceptable. No TURN server is configured by default.

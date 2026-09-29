@@ -399,6 +399,12 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
 `docs/REVIEW_WAVE1.md` reviewer report for the wave-1 merge (scores, dead stats, HUD collisions, top-10 fixes; run `tools/harness/wave1_day.js` first, it was written but not executed) ·
 `docs/wave1/*.md` per-module notes · `docs/wave2/*.md` wave-2 modules (anomaly, forge, skeletons).  `docs/wave3/*.md` wave-3 modules (backrooms2).
 
+### 5.15 Wave 3 - NET (docs/wave3/net.md; node-tested + one local mp2 run, NOT tested over real WebRTC)
+- "Friends drop after a while": transport leave is now a 45 s grace (`peerLost` -> `peerResume`, same player/items), app heartbeat + stall/zombie
+  detection, `transport.rejoin()`, 12 KB packet cap, per-peer backpressure (drops `ps/cs/is/sgs`), optional TURN (`VITE_TURN_*` / `localStorage['tfg.turn']`),
+  `Game.update` always runs `netSend` (unguarded stage exceptions used to silence a player), hidden-tab catch-up. NETSTATS shows reconnects.
+- Tools: `tools/harness/net_session.test.mjs`, `tools/harness/net_collisions.mjs` (0 real handler collisions). Host migration still missing.
+
 ### 5.14 Session handoff (2026-09-28 night, lead) — READ THIS FIRST
 - Branch `claude/focused-hawking-32j4um` (pushed) holds everything merged; **`main` (live on Render) was NOT updated** —
   playtest the branch first, then merge to main.

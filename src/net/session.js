@@ -13,6 +13,19 @@ export const HOST_ONLY = new Set(['welcome', 'gs', 'phase', 'it', 'cev', 'cs', '
 // Feature modules may add their own types: game.net.relayTypes.add('myType').
 const RELAY_TYPES = ['ps', 'pst', 'pinfo', 'itst', 'is', 'chat', 'fx', 'modmsg', 'ping'];
 
+// Connection-loss policy (tuned for real-internet WebRTC; see docs/wave3/net.md)
+export const NET = {
+  LOST_GRACE_MS: 45000,   // a transport "peer left" is NOT a leave for this long: the same peer id usually re-appears (ICE restart / Trystero re-announce)
+  HB_MS: 2000,            // app-level heartbeat (independent of the game loop, keeps flowing from throttled hidden tabs)
+  STALL_MS: 20000,        // no packet from a linked peer for this long -> 'peerStall' warning
+  DEAD_MS: 75000,         // ...and this long -> the link is a zombie: rejoin the room (client) / drop the peer (host)
+  REJOIN_AFTER_MS: 10000, // a lost peer that has not come back after this long -> force a fresh signalling announce
+  REJOIN_EVERY_MS: 20000,
+  PACKET_CAP: 12000,      // batched packets are split above ~12 KB (a single bigger message goes alone; Trystero chunks at 16 KB)
+};
+// Latest-wins state streams: dropped (never queued) for a peer whose datachannel is backed up. Keyframes heal them.
+const DROPPABLE = new Set(['ps', 'cs', 'is', 'sgs']);
+
 export class Session extends Emitter {
   constructor({ strategy, isHost, code, password, profile, maxPlayers = 4 }) {
     super();
@@ -29,7 +42,11 @@ export class Session extends Emitter {
     this.handlers = new Map();    // host request handlers: action -> fn(data, from)
     this.msgHandlers = new Map(); // message type -> fn(data, from)
     this.connected = false;
-    this.stats = { sent: 0, recv: 0, bytesOut: 0, bytesIn: 0, relayed: 0, packetsOut: 0, packetsIn: 0, byType: {} };
+    this.stats = { sent: 0, recv: 0, bytesOut: 0, bytesIn: 0, relayed: 0, packetsOut: 0, packetsIn: 0, byType: {}, lost: 0, reconnects: 0, rejoins: 0, dropped: 0, splits: 0, stalls: 0, graceExpired: 0 };
+    this.lost = new Map();        // peerId -> { t, timer }: transport says gone, still inside the grace window (player/items/avatar kept)
+    this.byes = new Set();        // peers that announced a deliberate leave
+    this.lastSeen = new Map();    // peerId -> performance.now() of the last packet (any type, heartbeats included)
+    this._stalled = new Set();
     this.measureBytes = false;    // NETSTATS turns this on (JSON length per packet costs a little CPU)
     this._outq = [];              // outgoing messages of this task: [{ m, to }], flushed as one packet per peer
     this._flushPending = false;
@@ -69,20 +86,16 @@ export class Session extends Emitter {
     t.onStream = (stream, id) => this.emit('stream', stream, id);
     t.onError = (e) => this.emit('error', e);
     t.onPeerJoin = (id) => {
+      this.byes.delete(id);
+      this.lastSeen.set(id, performance.now());
       this.emit('peerConnect', id);
       this.reportLinks();
       // everybody introduces themselves to new peers
       t.send({ t: 'hello', d: { ...this.helloData, ver: GAME_VERSION, host: this.isHost } }, id);
     };
-    t.onPeerLeave = (id) => {
-      const p = this.players.get(id);
-      this.players.delete(id);
-      this.peerLinks.delete(id);
-      this.reportLinks();
-      this.emit('peerLeave', id, p);
-      if (!this.isHost && id === this.hostId) this.emit('hostLeft');
-    };
+    t.onPeerLeave = (id, deliberate) => this.peerGone(id, !!deliberate || this.byes.has(id));
     this.helloData = helloData;
+    this._startWatch();
     await t.join('game-' + this.code, this.password);
     this.selfId = t.selfId;
     if (this.isHost) {
@@ -93,10 +106,92 @@ export class Session extends Emitter {
     return this;
   }
 
+  // ------------------------------------------------------------------ connection loss / resume
+  // The transport says a peer is gone. Unless it announced a leave ('bye'), keep its player record for a grace window:
+  // a WebRTC link that dropped (ICE 'disconnected' > 5 s, NAT rebind, sleep) is normally re-discovered and the same
+  // peer id comes back with a fresh 'hello' -> peerResume, nothing lost. Only when the window expires does it become
+  // the old hard leave (peerLeave: items dropped, avatar removed, slot freed / 'hostLeft').
+  peerGone(id, deliberate) {
+    this.byes.delete(id);
+    const known = this.players.has(id) || id === this.hostId;
+    if (deliberate || !known || this.leaving) { this.finalizeLeave(id); return; }
+    if (this.lost.has(id)) return;
+    this.stats.lost++;
+    const timer = setTimeout(() => { if (this.lost.has(id)) { this.stats.graceExpired++; this.finalizeLeave(id, 'timeout'); } }, NET.LOST_GRACE_MS);
+    this.lost.set(id, { t: performance.now(), timer });
+    this.peerLinks.delete(id);
+    this.reportLinks();
+    this.emit('peerLost', id, this.players.get(id), NET.LOST_GRACE_MS);
+  }
+  finalizeLeave(id, why) {
+    const L = this.lost.get(id);
+    if (L) clearTimeout(L.timer);
+    this.lost.delete(id);
+    this.lastSeen.delete(id); this._stalled.delete(id);
+    const p = this.players.get(id);
+    this.players.delete(id);
+    this.peerLinks.delete(id);
+    this.reportLinks();
+    this.emit('peerLeave', id, p);
+    if (!this.isHost && id === this.hostId) this.emit('hostLeft', why || 'left');
+  }
+  // same person came back under a NEW peer id (page reload): free the ghost's slot right away
+  _replaceGhost(pid, newId) {
+    if (!pid) return;
+    for (const id of [...this.lost.keys()]) if (id !== newId && this.players.get(id)?.pid === pid) this.finalizeLeave(id, 'replaced');
+  }
+
+  _startWatch() {
+    if (this._watch) return;
+    this._watch = setInterval(() => { try { this._tick(); } catch (e) { console.error('net watch', e); } }, NET.HB_MS);
+    this._watch.unref?.();
+    if (typeof window !== 'undefined') {
+      this._onUnload = () => { try { this.flush(); this.transport?.send({ t: 'bye' }); } catch { /* ignore */ } };
+      window.addEventListener('beforeunload', this._onUnload, true);
+      window.addEventListener('pagehide', this._onUnload, true);
+    }
+  }
+  _tick() {
+    const t = this.transport;
+    if (!t) return;
+    const now = performance.now();
+    if (t.peers.size) t.send({ t: 'hb' });
+    for (const id of [...t.peers]) {
+      const last = this.lastSeen.get(id) ?? (this.lastSeen.set(id, now), now);
+      const idle = now - last;
+      if (idle < 5000) this._stalled.delete(id);
+      else if (idle > NET.STALL_MS && !this._stalled.has(id)) { this._stalled.add(id); this.stats.stalls++; this.emit('peerStall', id, idle); }
+      if (idle > NET.DEAD_MS) {
+        // the transport still calls it connected but nothing arrives: zombie link
+        this.lastSeen.set(id, now);
+        if (this.isHost) { t.peers.delete(id); this.peerGone(id, true); }
+        else if (id === this.hostId) { this.peerGone(id, false); this._rejoin(); }
+      }
+    }
+    // joiner that never got its welcome (snapshot chunks can be dropped after a 10 s datachannel stall): ask again, the host re-welcomes
+    if (!this.isHost && !this.connected && this.hostId && t.peers.has(this.hostId) && (this._hellos || 0) < 4) {
+      this._helloT ??= now;
+      if (now - this._helloT > 8000 * ((this._hellos || 0) + 1)) { this._hellos = (this._hellos || 0) + 1; t.send({ t: 'hello', d: { ...this.helloData, ver: GAME_VERSION, host: false } }, this.hostId); }
+    }
+    for (const [id, L] of this.lost) {
+      if (now - L.t < NET.REJOIN_AFTER_MS) continue;
+      if ((!this.isHost && id === this.hostId) || !t.peers.size) this._rejoin();
+    }
+  }
+  _rejoin() {
+    const t = this.transport;
+    const now = performance.now();
+    if (!t?.rejoin || this.leaving || now - (this._lastRejoin ?? -1e9) < NET.REJOIN_EVERY_MS) return;
+    this._lastRejoin = now;
+    this.stats.rejoins++;
+    t.rejoin().then((ok) => { if (ok) this.emit('rejoined'); }).catch(() => {});
+  }
+
   // message dispatch
   receive(m, from, inner = false) {
     if (!m || typeof m !== 'object') return;
     if (!inner) {
+      this.lastSeen.set(from, performance.now());
       this.stats.packetsIn++;
       if (this.measureBytes) { try { this.stats.bytesIn += JSON.stringify(m).length; } catch { /* ignore */ } }
     }
@@ -107,21 +202,28 @@ export class Session extends Emitter {
       return;
     }
     this.stats.recv++;
+    if (t === 'hb') return;
+    if (t === 'bye') { this.byes.add(from); if (this.lost.has(from)) this.finalizeLeave(from); return; }
     if (t === 'hello') {
       if (!d || typeof d !== 'object') return;
       if (d.ver !== GAME_VERSION) { if (this.isHost) this.transport.send({ t: 'reject', d: { reason: 'Version mismatch (host ' + GAME_VERSION + ')' } }, from); return; }
+      this.byes.delete(from);
       if (d.host && !this.isHost && !this.connected) this.hostId = from;   // once welcomed, nobody else can claim host
-      if (this.isHost) {
-        if (this.players.size >= this.maxPlayers && !this.players.has(from)) {
-          this.transport.send({ t: 'reject', d: { reason: 'Lobby is full' } }, from);
-          return;
-        }
-        this.players.set(from, { id: from, ...d });
-        this.emit('playerJoin', from, d);
-      } else {
-        this.players.set(from, { id: from, ...d });
-        this.emit('peerHello', from, d);
+      // a hello from a peer we already know (lost inside the grace window, or a re-established link Trystero swapped in
+      // silently) is a RESUME: same player record, the host re-sends the world snapshot instead of running a fresh join
+      const L = this.lost.get(from);
+      if (L) { clearTimeout(L.timer); this.lost.delete(from); }
+      const resume = !!L || this.players.has(from);
+      this._replaceGhost(d.pid, from);
+      if (this.isHost && this.players.size >= this.maxPlayers && !this.players.has(from)) {
+        this.transport.send({ t: 'reject', d: { reason: 'Lobby is full' } }, from);
+        return;
       }
+      if (resume) this.stats.reconnects++;
+      this.players.set(from, { id: from, ...d });
+      if (resume) this.emit('peerResume', from, d);
+      if (this.isHost) this.emit('playerJoin', from, d, resume);
+      else this.emit('peerHello', from, d);
       return;
     }
     if (t === 'reject') { if (!this.isHost && (!this.hostId || from === this.hostId)) this.emit('rejected', d?.reason || 'Rejected'); return; }
@@ -219,21 +321,41 @@ export class Session extends Emitter {
     const q = this._outq;
     if (!q.length || !this.transport) { q.length = 0; return; }
     this._outq = [];
-    const pack = (list) => (list.length === 1 ? list[0] : { t: '_b', d: list });
+    const tr = this.transport;
+    const sizes = new Map();
+    const sizeOf = (m) => { let n = sizes.get(m); if (n === undefined) { try { n = JSON.stringify(m).length; } catch { n = 0; } sizes.set(m, n); } return n; };
+    // split a per-peer message list into packets of <= PACKET_CAP (one oversized message goes alone)
+    const packs = (list) => {
+      if (list.length === 1) return [list[0]];
+      const out = []; let cur = [], n = 0;
+      for (const m of list) {
+        const z = sizeOf(m);
+        if (cur.length && n + z > NET.PACKET_CAP) { out.push(cur.length === 1 ? cur[0] : { t: '_b', d: cur }); cur = []; n = 0; }
+        cur.push(m); n += z;
+      }
+      if (cur.length) out.push(cur.length === 1 ? cur[0] : { t: '_b', d: cur });
+      if (out.length > 1) this.stats.splits++;
+      return out;
+    };
     const put = (m, to) => {
       this.stats.packetsOut++;
-      if (this.measureBytes) { try { this.stats.bytesOut += JSON.stringify(m).length * (to ? 1 : Math.max(1, this.transport.peers.size)); } catch { /* ignore */ } }
-      this.transport.send(m, to || undefined);
+      if (this.measureBytes) { try { this.stats.bytesOut += JSON.stringify(m).length * (to ? 1 : Math.max(1, tr.peers.size)); } catch { /* ignore */ } }
+      tr.send(m, to || undefined);
     };
-    if (q.every((e) => !e.to)) { put(pack(q.map((e) => e.m))); return; }
-    // mixed targets: build each peer's ordered list (broadcasts go to everyone, directed ones to their peer)
+    const peers = [...tr.peers];
+    const slow = peers.some((p) => tr.congested?.(p));
+    if (!slow && q.every((e) => !e.to)) { for (const pk of packs(q.map((e) => e.m))) put(pk); return; }
+    // per-peer lists (broadcasts go to everyone, directed ones to their peer); a backed-up peer is not fed latest-wins state
     const per = new Map();
-    const peers = [...this.transport.peers];
     for (const e of q) {
       const targets = e.to ? [e.to] : peers;
-      for (const p of targets) { let a = per.get(p); if (!a) per.set(p, a = []); a.push(e.m); }
+      for (const p of targets) {
+        if (!tr.peers.has(p)) { this.stats.dropped++; continue; }          // lost / gone: nothing to send to
+        if (DROPPABLE.has(e.m.t) && tr.congested?.(p)) { this.stats.dropped++; continue; }
+        let a = per.get(p); if (!a) per.set(p, a = []); a.push(e.m);
+      }
     }
-    for (const [p, list] of per) put(pack(list), p);
+    for (const [p, list] of per) for (const pk of packs(list)) put(pk, p);
   }
   receiveLocal(t, d) {
     const h = this.msgHandlers.get(t);
@@ -246,7 +368,16 @@ export class Session extends Emitter {
   removeStream(s) { this.transport.removeStream(s); }
   peerIds() { return [...this.transport.peers]; }
   playerCount() { return this.players.size; }
-  leave() { clearTimeout(this._linksT); try { this.flush(); } catch { /* ignore */ } this.transport.leave(); this.clear(); }
+  leave() {
+    this.leaving = true;
+    clearTimeout(this._linksT);
+    try { this.flush(); this.transport.send({ t: 'bye' }); } catch { /* ignore */ }
+    clearInterval(this._watch); this._watch = null;
+    for (const L of this.lost.values()) clearTimeout(L.timer);
+    this.lost.clear();
+    if (typeof window !== 'undefined' && this._onUnload) { window.removeEventListener('beforeunload', this._onUnload, true); window.removeEventListener('pagehide', this._onUnload, true); }
+    this.transport.leave(); this.clear();
+  }
 }
 
 function rowChanged(a, b, eps) {
