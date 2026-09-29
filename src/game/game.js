@@ -159,6 +159,7 @@ import { installPets } from './pets.js';
 import { installCycle } from './cycle.js';   // [cycle] inert: rules only, see docs/wave2/cycle.md
 
 
+import { installSocial } from './social.js';   // [social] wave 4: phone + walkie text radio (hub lives on the App: net/hub.js)
 import { installWorlds2 } from './worlds2.js';   // wave 3: Soviet raids + twin-sun planet + plasma blade + fauna + loot pacing (docs/wave3/worlds2.md)
 
 
@@ -328,6 +329,9 @@ export class Game extends Emitter {
 
 
     this.useModule('worlds2', installWorlds2);   // [worlds2]
+
+
+    this.useModule('social', installSocial);   // [social]
 
 
     // [slot:ux]

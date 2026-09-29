@@ -20,6 +20,7 @@ import { decorateSkills } from './panels/passivetree.js';
 import { createShopPanel } from './panels/shop.js';
 import { getCharPreview, peekCharPreview, CharPreview } from './charpreview.js';
 import { profilePanel, applyProfileName } from './panels/profile.js';   // [profile]
+import { hubPanel } from './panels/hub.js';   // [social]
 import { NAME_REASONS, NAME_MAX } from '../core/profilename.js';   // [profile]
 import { avatarCanvas, avatarDataUrl, fromWire, defaultAvatar } from './avatarpic.js';   // [profile]
 import { avatarOfPeer } from '../game/profilesync.js';   // [profile]
@@ -419,7 +420,7 @@ export class UI {
     this.menuEl.innerHTML = '';
     this.currentScreen = screen;
     this.menuOpts = opts;
-    const labels = { host: t('HOST GAME'), browser: t('JOIN GAME'), profile: t('PROFILE'), character: t('CHARACTER'), mods: t('MODS'), settings: t('SETTINGS'), howto: t('HOW TO PLAY') };
+    const labels = { host: t('HOST GAME'), browser: t('JOIN GAME'), profile: t('PROFILE'), hub: t('SOCIAL HUB'), character: t('CHARACTER'), mods: t('MODS'), settings: t('SETTINGS'), howto: t('HOW TO PLAY') };
     this.app.menu?.setMode?.(screen === 'title' ? 'title' : 'sub', labels[screen] || '');
     this.menuEl.classList.toggle('over-crt', screen !== 'title');
     const fn = this['screen_' + screen];
@@ -576,6 +577,12 @@ export class UI {
     const p = profilePanel(this, { inGame: false });
     this.menuEl.appendChild(p);
     this.focusFirst(p, 'input');
+  }
+
+  screen_hub() {   // [social]
+    const p = hubPanel(this, { inGame: false });
+    this.menuEl.appendChild(p);
+    this.focusFirst(p, '.hub-row, .hub-tabs .btn');
   }
 
   screen_character() {
@@ -806,7 +813,10 @@ export class UI {
           section(t('HUD')),
           check(t('Objective tracker'), 'showObjectives', null, true),
           check(t('Crosshair'), 'showCrosshair', null, true),
-          check(t('Loading screen tips'), 'loadingTips', null, true));
+          check(t('Loading screen tips'), 'loadingTips', null, true),
+          section(t('Social hub')),   // [social]
+          check(t('Join the hub network (players, friends, messages)'), 'hubEnabled', t('only your nickname, avatar, level and status are broadcast'), true),
+          check(t('Stay in the hub during a run'), 'hubInRun', t('lets the ship phone show messages and invites'), true));
       }
       const cp = el('div', { class: 'cp-body' }, tabs, body,
         el('div', { class: 'menu-row' }, inGame ? this.button(t('Close'), () => this.closePanel(), 'back') : this.backButton(() => this.showMenu('title'))));

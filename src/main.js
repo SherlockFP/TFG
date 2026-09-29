@@ -16,6 +16,8 @@ import { buildShip } from './world/ship.js';
 import { UI } from './ui/ui.js';
 import { ModManager } from './mods/modapi.js';
 import { LobbyDirectory } from './net/lobby.js';
+import { installHub } from './net/hub.js';   // [social]
+import { createHubNotifier } from './ui/panels/hub.js';   // [social]
 import { Game } from './game/game.js';
 import { setClassicAvatar } from './models/avatar.js';   // [avatar2]
 import { ShipScreens } from './game/screens.js';
@@ -110,6 +112,7 @@ class App {
     this.ui.showMenu('title');
     this.bindKeys();
     this.booted = true;
+    try { installHub(this); this.hubNotifier = createHubNotifier(this); } catch (e) { console.warn('[social] hub', e); }   // [social] optional, never blocks the game
     if (this.audio.ctx && !this.game) this.startMenuAudio();
     requestAnimationFrame((t) => this.loop(t));
     this.hiddenLast = performance.now();
@@ -175,6 +178,7 @@ class App {
     setClassicAvatar(!!this.settings.classicAvatar);   // [avatar2]
     this.audio.applyVolumes();
     this.game?.refreshStats();
+    try { this.hub?.sync(); } catch { /* [social] optional */ }
   }
 
   // ------------------------------------------------------------------ lobby browser

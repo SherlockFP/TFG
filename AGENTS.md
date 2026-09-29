@@ -454,3 +454,11 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
 - Wrappers on the host.js flow live in `src/game/cycle.js` (`hostEvaluateQuota / hostLever / hostSetPhase / hostPopulateMoon / hostBeginTakeoff / hostFinishTakeoff / hostUpdate`, `applyRunState`, `onPhase`, the `unlock` handler). Net: `cyx`, `cyreq`. State: `run.cycle`.
 - Tests: `node tools/harness/cycle.test.mjs`, `cycle2_plan.test.mjs`, `cycle2_bosses.test.mjs`, `cycle2_flow.test.mjs` (real host flow + fuzz + soft-lock proof), `cycle2_i18n.test.mjs`.
 - First job when a browser is available: land on a core of every interior, watch the 3 new boss fights (name card, HP bar, rings), open the arena with cards, run a keystone and a raid with 2 tabs.
+
+### 5.16 Wave 4 - SOCIAL hub (module `social` + App-level hub service `src/net/hub.js`; docs/wave4/social.md; node-tested + 2-3 headless pages on the local transport, NOT tested over real WebRTC)
+- Serverless "hub": separate Trystero room `tfg-hub-v1` (`kefal.hub`, lives on the App so it works in the menu). Tiny presence beacons every 10 s (nick, avatar thumb, level, status, public lobby if you host one and allow it),
+  stale after 30 s, opt-out in Settings > Gameplay ("Social hub"), never throws into the game. Main menu item **HUB**: ONLINE / LOBBIES (Join through `ui.joinLobby`) / FRIENDS, DM window, ADD FRIEND, INVITE
+  (lobby code, never the password), BLOCK. Friends = `profile.friends` (stable id + nick), last 50 DM lines per friend in `localStorage['tfg.social.dm.v1']`.
+- In a run: ship phone HUD notice for DMs / invites / radio (`/r`, `/w`, `/invite`, `/accept`, `/decline`, `/hub`) and a private walkie text radio (`/rad`, key ` , `/tune`). Rate limits + `textContent` everywhere.
+- Net types: hub room `sop sobye sodm soinv`; game session `sorad` (direct send). Tests: `tools/harness/social.test.mjs`, `tools/harness/wave4_social.mjs`.
+- Gaps: identities are self-declared (no signatures), full-mesh room scales to dozens only, no friend-request handshake, no offline DMs, no 3D hub, radio is text (walkie voice already existed).
