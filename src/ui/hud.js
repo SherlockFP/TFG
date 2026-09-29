@@ -263,7 +263,7 @@ export class HUD {
     while (this.$.xpfeed.children.length > 5) this.$.xpfeed.firstChild.remove();
   }
   levelUp(level, rank) {
-    this.bigText(t('LEVEL UP!') + ' ' + level, tf('{rank} · +1 {t} [TAB]', { rank, t: t('skill point') }));
+    this.bigText(t('LEVEL UP!') + ' ' + level, tf('{rank} · +1 {t} [K]', { rank, t: t('skill point') }));
     this.$.lvl.parentElement.classList.remove('pulse'); void this.$.lvl.offsetWidth; this.$.lvl.parentElement.classList.add('pulse');
   }
 

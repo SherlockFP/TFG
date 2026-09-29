@@ -278,7 +278,7 @@ export default {
   "Mod error: {message}": "Ошибка мода: {message}",
   "CAM-01 · LIVE": "КАМ-01 · В ЭФИРЕ",
   "+{xp} XP": "+{xp} XP",
-  "{rank} · +1 {t} [TAB]": "{rank} · +1 {t} [TAB]",
+  "{rank} · +1 {t} [K]": "{rank} · +1 {t} [K]",
   "▮{carried} {t} · {wShown} lb · {usedCells}/{n}": "▮{carried} {t} · {wShown} фнт · {usedCells}/{n}",
   "+{xp} XP{n}": "+{xp} XP{n}",
   "CONFIRM ◈{cost}?": "ПОДТВЕРДИТЬ ◈{cost}?",

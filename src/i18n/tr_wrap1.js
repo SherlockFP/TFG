@@ -278,7 +278,7 @@ export default {
   "Mod error: {message}": "Mod hatası: {message}",
   "CAM-01 · LIVE": "KAM-01 · CANLI",
   "+{xp} XP": "+{xp} XP",
-  "{rank} · +1 {t} [TAB]": "{rank} · +1 {t} [TAB]",
+  "{rank} · +1 {t} [K]": "{rank} · +1 {t} [K]",
   "▮{carried} {t} · {wShown} lb · {usedCells}/{n}": "▮{carried} {t} · {wShown} lb · {usedCells}/{n}",
   "+{xp} XP{n}": "+{xp} XP{n}",
   "CONFIRM ◈{cost}?": "ONAYLA ◈{cost}?",

@@ -157,7 +157,7 @@ export function installDaily(game) {
   // ------------------------------------------------------------------------------------------ level-up fanfare
   offs.push(mods.on('levelUp', (level, g) => {
     if (g && g !== game) return;
-    const lines = [t('+1 skill point [TAB]')];
+    const lines = [t('+1 skill point [K]')];
     const d = C.ensureDaily(profile);
     const key = (profile.prestige?.stars || 0) * 1000 + level;
     if (level % 5 === 0 && key > (d.stats.lvlCrate || 0)) {
