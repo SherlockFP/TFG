@@ -28,3 +28,5 @@ v1 (done): everything above. Later: facility-interior wings (cores inside the fa
 
 ## Known gaps
 Never looked at in a browser (pillar / ring look, panel layout at 1280x720, interact prompts). The headless run timed out waiting for the shared browser lock. Deployables placed through `debugPlace` skip the placement validation (slope / overlap), so a ring position on a rock can clip. i18n audit lists the module's strings as missing because they are registered through a filtered `addTranslations` (false positives, same as voyage).
+
+**Update (wave 6):** the v1 gaps listed above (interior wings, wall pieces, placement validation, miners, sector archive, raider pathing, ship CRT) are addressed in docs/wave6/zones2.md.

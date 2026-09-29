@@ -286,7 +286,7 @@ export function reachableCells(L) {
 const edgeOpen = (L, x, z, d) => L.open.has(L.edgeKey(x, z, d));
 const edgeDoor = (L, x, z, d) => L.edgeInfo.has(L.edgeKey(x, z, d));
 /** straight hallway pieces: open exactly on two opposite edges, walls on the other two, no door on either open edge */
-function straightAxis(L, x, z) {
+export function straightAxis(L, x, z) {
   const o = [0, 1, 2, 3].map((d) => edgeOpen(L, x, z, d));
   const nOpen = o.filter(Boolean).length;
   if (nOpen !== 2) return null;

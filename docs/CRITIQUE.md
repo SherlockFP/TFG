@@ -223,3 +223,6 @@ The new core loop exists end to end in code (partition, capture, fortify, capped
 
 ## Wave 5 - aimchase (docs/wave5/aimchase.md)
 NPC shooters now telegraph (laser, white lock, fire at the locked point) and creatures obey one speed table (sustained < sprint, short bursts, fatigue, door hesitation); only node-tested, laser/vignette look and difficulty feel are unverified in a browser.
+
+## Wave 6 - ZONES 2 (docs/wave6/zones2.md)
+The five v1 gaps are closed in code (interior wings with horror traps, validated walls / gates + ring placer, extractors + archive, raiders that path round barricades + upkeep ammo, ship CRT map) and the rules are heavily node-tested, but it has never been hand-played: the trap lanes in real corridors, wall look / collision feel, the relay inside a wing, panel layout with the new rows and the CRT page are unseen. Balance numbers (trap cost x2.2, extractor payback, wall hp vs brute dps) are paper numbers. Walls are placed "where you look" with a button, no ghost / drag mode.

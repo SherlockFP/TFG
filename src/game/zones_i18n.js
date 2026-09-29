@@ -67,3 +67,33 @@ export const RU = {
   'Live event: {z} is under attack. Viewer count rising.': 'Прямой эфир: {z} под атакой. Число зрителей растёт.',
   'You planted a beacon on {z}. I have logged it. I log everything.': 'Вы установили маяк в {z}. Я это записал. Я записываю всё.',
 };
+
+// ---- wave 6 (zones2): interior wings, walls / gates, extractor, archive, ship CRT
+Object.assign(TR, {
+  'Laser Grid': 'Lazer Izgarası', 'Ceiling Crusher': 'Tavan Ezici', 'Spike Floor': 'Çivili Zemin', 'Live Floor': 'Akımlı Zemin', 'Flame Vent': 'Alev Bacası', 'Zone Wall': 'Bölge Duvarı', 'Zone Gate': 'Bölge Kapısı',
+  'No valid corridor left in this wing.': 'Bu kanatta uygun koridor kalmadı.', 'No valid spot for this defence here.': 'Bu savunma için burada uygun yer yok.',
+  'Traps only work inside a facility wing.': 'Tuzaklar sadece tesis kanadının içinde çalışır.', 'Not for a facility wing: build traps there.': 'Tesis kanadı için değil: orada tuzak kur.',
+  'Not a valid piece.': 'Geçersiz parça.', 'Too close to the core.': 'Çekirdeğe çok yakın.', 'Outside the zone.': 'Bölgenin dışında.', 'Too close to another core.': 'Başka bir çekirdeğe çok yakın.', 'Outside the map.': 'Haritanın dışında.',
+  'Too close to the ship.': 'Gemiye çok yakın.', 'Keep the ship door clear.': 'Gemi kapısını boş bırak.', 'Water: nothing stands here.': 'Su: burada hiçbir şey durmaz.', 'Unsafe ground.': 'Güvensiz zemin.', 'Too steep or uneven.': 'Çok dik veya engebeli.',
+  'Blocked by a rock or tree.': 'Kaya veya ağaç engel oluyor.', 'Too close to another defence.': 'Başka bir savunmaya çok yakın.', 'Already a piece here.': 'Burada zaten bir parça var.', 'Blocked by something.': 'Bir şey engel oluyor.',
+  'No free wall slots: upgrade the zone.': 'Boş duvar yuvası yok: bölgeyi yükselt.', 'Blocked by a wall.': 'Duvar engel oluyor.', 'Too far.': 'Çok uzak.', 'Someone is in the way.': 'Biri yolda duruyor.', 'No wall piece within reach.': 'Erişimde duvar parçası yok.',
+  'Facility wing: traps on the corridors, always armed, they only hurt creatures.': 'Tesis kanadı: koridorlarda tuzaklar, hep hazır, sadece yaratıklara zarar verir.',
+  'WALLS': 'DUVARLAR', 'gates': 'kapı', 'Look at the ground you want to wall off, then press the button. Raiders walk round walls and funnel through gates.': 'Duvarla kapatmak istediğin zemine bak, sonra düğmeye bas. Saldırganlar duvarları dolanır, kapılardan geçer.',
+  'PLACE': 'KOY', 'LINE': 'HAT', 'Remove the nearest piece (50% back)': 'En yakın parçayı kaldır (%50 iade)', 'EXTRACTOR': 'MADEN ÇIKARICI', 'impure node': 'düşük saflık', 'normal node': 'normal damar', 'pure node': 'saf damar',
+  'None. Digs a node inside the zone: more income (inside the daily cap) and a biome material.': 'Yok. Bölgede bir damar kazar: daha çok gelir (günlük tavanın içinde) ve bir biyom malzemesi.',
+  'Upgrade the extractor': 'Çıkarıcıyı yükselt', 'Maximum Mk': 'En yüksek Mk', 'Build an extractor': 'Çıkarıcı kur', 'out of range: archived': 'menzil dışı: arşivde', 'ARCHIVED': 'ARŞİV',
+});
+Object.assign(RU, {
+  'Laser Grid': 'Лазерная решётка', 'Ceiling Crusher': 'Потолочный пресс', 'Spike Floor': 'Шипастый пол', 'Live Floor': 'Пол под током', 'Flame Vent': 'Огненная решётка', 'Zone Wall': 'Стена зоны', 'Zone Gate': 'Ворота зоны',
+  'No valid corridor left in this wing.': 'В этом крыле не осталось подходящего коридора.', 'No valid spot for this defence here.': 'Для этой защиты здесь нет подходящего места.',
+  'Traps only work inside a facility wing.': 'Ловушки работают только внутри крыла комплекса.', 'Not for a facility wing: build traps there.': 'Не для крыла комплекса: стройте там ловушки.',
+  'Not a valid piece.': 'Недопустимый элемент.', 'Too close to the core.': 'Слишком близко к ядру.', 'Outside the zone.': 'Вне зоны.', 'Too close to another core.': 'Слишком близко к другому ядру.', 'Outside the map.': 'Вне карты.',
+  'Too close to the ship.': 'Слишком близко к кораблю.', 'Keep the ship door clear.': 'Не загораживайте дверь корабля.', 'Water: nothing stands here.': 'Вода: здесь ничего не стоит.', 'Unsafe ground.': 'Опасная почва.', 'Too steep or uneven.': 'Слишком круто или неровно.',
+  'Blocked by a rock or tree.': 'Мешает камень или дерево.', 'Too close to another defence.': 'Слишком близко к другой защите.', 'Already a piece here.': 'Здесь уже есть элемент.', 'Blocked by something.': 'Что-то мешает.',
+  'No free wall slots: upgrade the zone.': 'Нет свободных мест для стен: улучшите зону.', 'Blocked by a wall.': 'Мешает стена.', 'Too far.': 'Слишком далеко.', 'Someone is in the way.': 'Кто-то мешает.', 'No wall piece within reach.': 'Нет элемента стены в пределах досягаемости.',
+  'Facility wing: traps on the corridors, always armed, they only hurt creatures.': 'Крыло комплекса: ловушки в коридорах, всегда заряжены, вредят только существам.',
+  'WALLS': 'СТЕНЫ', 'gates': 'ворот', 'Look at the ground you want to wall off, then press the button. Raiders walk round walls and funnel through gates.': 'Посмотрите на землю, которую хотите перегородить, и нажмите кнопку. Рейдеры обходят стены и идут через ворота.',
+  'PLACE': 'ПОСТАВИТЬ', 'LINE': 'ЛИНИЯ', 'Remove the nearest piece (50% back)': 'Убрать ближайший элемент (50% назад)', 'EXTRACTOR': 'ДОБЫТЧИК', 'impure node': 'бедная жила', 'normal node': 'обычная жила', 'pure node': 'богатая жила',
+  'None. Digs a node inside the zone: more income (inside the daily cap) and a biome material.': 'Нет. Добывает жилу в зоне: больше дохода (в пределах дневного лимита) и материал биома.',
+  'Upgrade the extractor': 'Улучшить добытчик', 'Maximum Mk': 'Максимальный Mk', 'Build an extractor': 'Построить добытчик', 'out of range: archived': 'вне зоны: в архиве', 'ARCHIVED': 'АРХИВ',
+});
