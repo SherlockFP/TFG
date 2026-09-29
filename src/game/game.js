@@ -254,6 +254,7 @@ import { installArcade2 } from './arcade2.js';
 // [import:feedcams]
 import { installDowned } from './downed.js';   // [import:downed] wave 8: 0 HP = downed, crew revives (docs/wave8/downed.md)
 // [import:hubgate]
+// [import:soul]
 // [import:mapmods]
 // [import:worlds3]
 // [import:facjobs]
@@ -537,6 +538,7 @@ export class Game extends Emitter {
     // [slot:feedcams]
     this.useModule('downed', installDowned);   // [slot:downed]
     // [slot:hubgate]
+    // [slot:soul]
     // [slot:mapmods]
     // [slot:worlds3]
     // [slot:facjobs]
