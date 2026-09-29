@@ -248,6 +248,7 @@ import { installMapmods } from './mapmods.js';
 import { installWorlds3 } from './worlds3.js';   // wave 8: wrong door + alternate Backrooms worlds + facility size/dressing (docs/wave8/worlds3.md)
 // [import:crdirector]
 import { installFacjobs } from './facjobs.js';
+import { installLabyrinths } from './labyrinths.js';   // [labyrinths] metro ghost train + greenhouse vines / spores (docs/wave8/labyrinths.md)
 // [import:lcmonsters]
 import { installAtmos } from './atmos.js';   // [import:atmos]
 import { installArcade2 } from './arcade2.js';
@@ -524,6 +525,7 @@ export class Game extends Emitter {
     this.useModule('worlds3', installWorlds3);
     // [slot:crdirector]
     this.useModule('facjobs', installFacjobs);
+    this.useModule('labyrinths', installLabyrinths);   // [labyrinths]
     // [slot:lcmonsters]
     this.useModule('atmos', installAtmos);   // [slot:atmos]
     this.useModule('arcade2', installArcade2);

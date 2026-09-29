@@ -458,7 +458,7 @@ export function installFacjobs(game) {
     const row = (k, v) => { const d = document.createElement('div'); d.className = 'fj-row'; const a = document.createElement('span'); a.textContent = k; const b = document.createElement('b'); b.textContent = v; d.append(a, b); grid.appendChild(d); };
     row(t('JOB'), title(roll.main));
     if (roll.side) row(t('SIDE'), title(roll.side));
-    row(t('LAYOUT'), roll.arch ? t(ARCH_NAME[roll.arch]) : t('Classic'));
+    row(t('LAYOUT'), roll.arch && !['metro', 'greenhouse'].includes(MOONS[r.moon]?.interior) ? t(ARCH_NAME[roll.arch]) : t('Classic'));   // [labyrinths]
   }
 
   offs.push(mods.on('update', (dt, g) => {
