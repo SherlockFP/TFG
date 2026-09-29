@@ -123,7 +123,7 @@ export class ShipScreens {
     for (const v of g.creatures.views.values()) {
       if (v.state === 'dead' || v.type === 'web' || v.type === 'mimicdoor') continue;
       if (Math.abs(v.pos.y - tpos.y) > 30) continue;
-      if (v.type === 'sandkefal' && v.state === 'hidden') continue;
+      if ((v.type === 'sandkefal' || v.type === 'dunemaw') && v.state === 'hidden') continue;
       const [sx, sy] = toS(v.pos.x, v.pos.z);
       ctx.beginPath(); ctx.arc(sx, sy, v.type === 'giant' ? 4 : 2.2, 0, Math.PI * 2); ctx.fill();
     }

@@ -527,6 +527,18 @@ Sahip: modeller "çok AI duruyor", hafif yuvarlak, Among Us'ımsı ama **çakma 
 - Cezalı sistemler kademeli açılır: Spambomb / rulet / Administrator kota 1+, SIEGE kota 2+, ayna portalı sektör 1+,
   ev gezegeni baskını ≥3 bina. Yeni bir sistem eklerken **bu tabloya uy**: önce ödül, sonra risk.
 - Hedef: ilk 30-45 dakikada oyuncu en az 3 "vay be" loot anı, 1 yeni sistem keşfi ve 0 haksız ölüm yaşasın.
+- **Wave 3 notu (worlds2, 2026-09-29): loot azaldı, zaman baskısı + "zamanla zorlaşma" geldi — bu tabloyu bozmadan.**
+
+| Kural | Değer | Erken oyun (§19) ile ilişki |
+|---|---|---|
+| İç mekân hurda sayısı | `round(rolled x 0.7 + scrapCountBonus(q))` (`BALANCE.lootCountMul`), büyük eşya x0.7, kasa 80 % -> 56 %, dış hurda 3 -> 2 (yaklaşık **-28 %**) | **+3 / +2 erken bonus kesintiden SONRA eklenir, korunur** (kota 0: 12 -> 11 item, eskiden 15) |
+| Tesis çürümesi | 14:00 / 16:30 / 19:00 / 21:30'da toplanmamış loot değeri x0.92 (toplam x0.716), gemiye girmiş / secured loot etkilenmez | Gün 1-3'te de vardır ama yumuşaktır: yaratık baskısı artmaz |
+| Kilitlenme | 19:00 ve 22:00'de `facilitysys.force('lockdown')` (içeride ekip varsa) | erken gün istisnası yok, sadece 30 sn |
+| Gün geç saat baskısı | spawn bütçesi x(1 + 0.30 x late), spawn hızı x(1 + 0.35 x late), **2. günden itibaren** | gün 1'de yok |
+| Günler içinde zorlaşma | `run.day` 4'e kadar **x1.0**; sonra gün başına spawn +3.5 % (üst sınır x1.7), hp +1.5 % (x1.4), hasar +1 % (x1.3), hız +0.4 % (x1.1) | Kota 0-1 öğrenme dönemi (gün 1-3) tamamen dokunulmaz |
+| Baskın (Sovyet ayı) | ilk baskın 170 sn, sonra ~250 sn (günle kısalır, min 110 sn), 3 + gün/4 kişilik tim (max 6) | tier 3 ay, erken oyunda rota maliyeti 520 |
+
+Ayrıntı ve ölçümler: `docs/wave3/worlds2.md` §4. Yeni bir zorluk sistemi eklerken burayı da güncelle.
 
 ### 14.2 SONSUZ MOD ("THE DEEP FEED") — 3 sektör döngüsünden sonra
 - **Açılış:** 3 Sector Core boss'u yenildikten sonra The Algorithm "PATCH 1.0 — ENDLESS CONTENT" ilan eder; run sonsuz
