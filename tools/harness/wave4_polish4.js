@@ -8,8 +8,8 @@ const tick = async (n = 10) => { for (let i = 0; i < n; i++) { kefal.tick(4, 1 /
 out.module = !!g.polish4 && !!g.pets && !!g.shipyard;
 
 // ---- start loadout: nobody starts with a flashlight (buy it: store price 15)
-out.startHeld = g.items.all().filter((it) => it.holder === g.selfId).map((it) => it.type);
-out.flashOnShip = g.items.all().filter((it) => /flashlight/.test(it.type)).length;
+out.startHeld = [...g.items.all()].filter((it) => it.holder === g.selfId).map((it) => it.type);
+out.flashOnShip = [...g.items.all()].filter((it) => /flashlight/.test(it.type)).length;
 
 // ---- land on the twin-sun desert (real cantina aliens, buried dune maws, outdoor squads)
 g.run.daysLeft = 3; g.run.moon = 'w2sun'; g.player.inShip = true; g.hostLever(g.selfId); g.hostFinishLanding();
@@ -20,7 +20,7 @@ out.landed = { phase: g.run.phase, moon: g.run.moon, npcs: [...g.creatures.host.
 const p4 = g.polish4;
 out.eggDrop = p4.forceEgg('pet_egg_common', V3(0.5, 1.2, 0));
 await tick(8);
-const egg = g.items.all().find((it) => it.type === 'pet_egg_common');
+const egg = [...g.items.all()].find((it) => it.type === 'pet_egg_common');
 out.eggItem = !!egg;
 if (egg) {
   g.player.inShip = true;
@@ -60,9 +60,9 @@ g.player.inShip = true; g.player.teleport(V3(0, 1, 0));
 g.run.credits = 500;
 const ph0 = g.run.phase;
 p4.hostAct({ op: 'decal', id: 'star' }, g.selfId);
-p4.hostAct({ op: 'place', id: 'plant', x: 2.6, z: -1.6, r: 1 }, g.selfId);
-p4.hostAct({ op: 'place', id: 'rug', x: 0, z: 0, r: 0 }, g.selfId);
-p4.hostAct({ op: 'place', id: 'plant', x: 2.7, z: -1.6, r: 0 }, g.selfId);   // overlaps the first plant: refused
+g.time += 1; p4.hostAct({ op: 'place', id: 'plant', x: 2.6, z: -1.6, r: 1 }, g.selfId);
+g.time += 1; p4.hostAct({ op: 'place', id: 'rug', x: 0, z: 0, r: 0 }, g.selfId);
+g.time += 1; p4.hostAct({ op: 'place', id: 'plant', x: 2.7, z: -1.6, r: 0 }, g.selfId);   // overlaps the first plant: refused
 await tick(6);
 p4.syncDeco(true);
 out.phase = ph0;
@@ -77,16 +77,14 @@ if (npc) {
   const offers = p4.offersFor(npc.id);
   out.offers = offers.map((o) => `${o.kind}:${o.item}:${o.price || o.min}`);
   g.run.credits = 900;
-  const before = g.items.all().length;
+  const before = [...g.items.all()].length;
   const buy = offers.find((o) => o.kind === 'buy');
   p4.hostBarter({ npc: npc.id, i: buy.i }, g.selfId);
   await tick(4);
-  out.barter = { credits: g.run.credits, spent: 900 - g.run.credits, price: buy.price, newItems: g.items.all().length - before };
+  out.barter = { credits: g.run.credits, spent: 900 - g.run.credits, price: buy.price, newItems: [...g.items.all()].length - before };
   const nv = g.creatures.views.get(npc.id);
   out.npcViewFound = !!nv;
 }
-out.stats = { ...p4.state.stats };
-
 // ---- dune maw: buried maws take no damage (real one from the desert population)
 const maw = [...M.host.values()].find((c) => c.type === 'dunemaw' && !c.dead);
 if (maw) {
@@ -125,5 +123,6 @@ try {
   out.panelBox = box ? [Math.round(box.width), Math.round(box.height), Math.round(box.top)] : null;
 } catch (e) { out.panelErr = String(e.stack || e).slice(0, 300); }
 
+out.stats = { ...p4.state.stats };
 out.errs = errs;
 return out;

@@ -37,7 +37,7 @@ const CSS = `
 .pt-stage canvas{width:100%;height:100%;display:block}.pt-stage .pt-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:.5;font-size:20px}
 .pt-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
 .pt-name{font-size:30px;color:#fff0dc;line-height:1}.pt-sub{font-size:18px;opacity:.8;line-height:1.05}
-.pt-meter{display:grid;grid-template-columns:78px 1fr 92px;gap:8px;align-items:center;font-size:18px}.pt-meter b{font-weight:normal;opacity:.75;text-align:right;font-size:16px}
+.pt-meter{display:grid;grid-template-columns:96px 1fr 104px;white-space:nowrap;gap:8px;align-items:center;font-size:18px}.pt-meter b{font-weight:normal;opacity:.75;text-align:right;font-size:16px}
 .pt-chips{display:flex;gap:6px;flex-wrap:wrap}.pt-chip{border:1px solid rgba(255,138,61,.4);background:rgba(0,0,0,.35);padding:0 8px;font-size:19px}
 .pt-actions{display:flex;gap:6px;flex-wrap:wrap}.pt-actions .pt-btn{font-size:20px;padding:2px 12px}
 .pt-scroll{display:grid;grid-template-columns:1fr 1fr;gap:12px;min-height:0}
