@@ -253,7 +253,7 @@ import { installAtmos } from './atmos.js';   // [import:atmos]
 import { installArcade2 } from './arcade2.js';
 // [import:feedcams]
 import { installDowned } from './downed.js';   // [import:downed] wave 8: 0 HP = downed, crew revives (docs/wave8/downed.md)
-// [import:hubgate]
+import { installHubgate } from './hubgate.js';   // [import:hubgate]
 // [import:soul]
 // [import:mapmods]
 // [import:worlds3]
@@ -537,7 +537,7 @@ export class Game extends Emitter {
     this.useModule('arcade2', installArcade2);
     // [slot:feedcams]
     this.useModule('downed', installDowned);   // [slot:downed]
-    // [slot:hubgate]
+    this.useModule('hubgate', installHubgate);   // [slot:hubgate] wave 8: Hub door, unlock cards, Quick Shift
     // [slot:soul]
     // [slot:mapmods]
     // [slot:worlds3]

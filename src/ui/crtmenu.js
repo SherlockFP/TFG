@@ -202,7 +202,7 @@ export class CRTMenu {
     const runs = listRuns().filter((r) => r.data);
     const items = [];
     if (runs.length) items.push({ id: 'continue', label: t('CONTINUE') });
-    items.push({ id: 'host', label: t('HOST GAME') }, { id: 'browser', label: t('JOIN GAME') }, { id: 'daily', label: t('DAILY') }, { id: 'profile', label: t('PROFILE') }, { id: 'hub', label: t('HUB') }, { id: 'character', label: t('CHARACTER') },
+    items.push({ id: 'host', label: t('HOST GAME') }, { id: 'quick', label: t('QUICK SHIFT') }, { id: 'browser', label: t('JOIN GAME') }, { id: 'daily', label: t('DAILY') }, { id: 'profile', label: t('PROFILE') }, { id: 'hub', label: t('HUB') }, { id: 'character', label: t('CHARACTER') },
       { id: 'mods', label: t('MODS') }, { id: 'settings', label: t('SETTINGS') }, { id: 'howto', label: t('HOW TO PLAY') });
     this.items = items;
     this.sel = Math.min(this.sel, items.length - 1);
@@ -415,6 +415,11 @@ export class CRTMenu {
     if (it.id === 'continue') {
       const run = listRuns().filter((r) => r.data).sort((a, b) => (b.data.savedAt || 0) - (a.data.savedAt || 0))[0];
       this.app.ui.showMenu('host', { slot: run?.slot });
+      return;
+    }
+    if (it.id === 'quick') {   // [hubgate] one day, one moon, straight from the menu (no slot, no save); friends join by the code in the toast
+      const s = this.app.settings || {};
+      this.app.hostGame({ lobbyName: `${this.app.profile?.name || 'Crew'}'s quick shift`, isPublic: false, password: '', maxPlayers: 4, difficulty: s.difficulty, strategy: s.netStrategy || 'nostr', slot: 0, runData: null, quick: true });
       return;
     }
     this.app.ui.showMenu(it.id);

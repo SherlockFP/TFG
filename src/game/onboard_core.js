@@ -113,6 +113,7 @@ export function shouldRun(ctx) {
   if (ctx.settings && ctx.settings.skipHiringDay) return { run: false, why: 'setting', mark: null };
   if (o && o.s === 'done') return { run: false, why: 'done', mark: null };
   if (o && o.s === 'skip') return { run: false, why: 'flag', mark: null };
+  if (ctx.quick) return { run: false, why: 'quick', mark: null };   // QUICK SHIFT (hubgate): straight to work, Hiring Day stays for the campaign
   if (ctx.devAuto) return { run: false, why: 'dev', mark: null };
   if (isVeteran(p)) return { run: false, why: 'veteran', mark: 'skip' };
   if (!ctx.isHost) return { run: false, why: 'joined', mark: 'skip' };
@@ -134,12 +135,14 @@ export function remarkFor(f) {
 }
 
 // ------------------------------------------------------------------------------------------------ staged unlocks (MASTERPLAN 23.1)
-/** q = quotas the crew has met, boss = first sector boss killed */
+/** q = quotas the crew has met, boss = first sector boss killed.  Wave 8 (hubgate): the side systems open one by one behind the ship's Hub door
+ *  (docs/wave8/hubgate.md). What each id switches off lives in hubgate_core.js (SYSTEMS). */
 export const UNLOCKS = [
-  { id: 'forge', q: 1 },
-  { id: 'pets', q: 2 },
-  { id: 'voyage', q: 2 },
-  { id: 'homeworld', q: 3 },
+  { id: 'shop', q: 1 }, { id: 'tree', q: 1 },
+  { id: 'arcade', q: 2 }, { id: 'pets', q: 2 },
+  { id: 'homeworld', q: 3 }, { id: 'farming', q: 3 }, { id: 'restaurant', q: 3 },
+  { id: 'forge', q: 4 }, { id: 'zones', q: 4 },
+  { id: 'voyage', q: 5 }, { id: 'season', q: 5 },
   { id: 'gates', boss: true },
 ];
 export const UNLOCK_IDS = UNLOCKS.map((u) => u.id);
@@ -163,6 +166,7 @@ export function decideMode(p) {
 /** pure progress of a run: quotas met + first boss */
 export function progressOf(run, u) {
   const r = run || {};
+  if (r.quick) return { q: 0, boss: false };   // QUICK SHIFT (hubgate) never advances the ladder
   const cy = r.cycle || {};
   const boss = !!(cy.firstKills && Object.keys(cy.firstKills).length) || (cy.sector | 0) > 0 || (cy.cores | 0) > 0 || !!cy.bossDead;
   return { q: Math.max(0, r.quotaIndex | 0), boss };

@@ -348,7 +348,7 @@ export function installAlgo1(game) {
       if (S.orbitT > 4 && S.votedKey !== key && !S.hv && !MOONS[r.moon]?.company && !game.onboard?.active?.() && !game.minigame) {
         // wave 8 (owner: "morning rules should be rare"): seeded ~20% of days, never two days in a row
         let hh = 2166136261; for (let i = 0; i < key.length; i++) hh = Math.imul(hh ^ key.charCodeAt(i), 16777619);
-        const rare = ((hh >>> 0) % 100) < VOTE_CHANCE && S.lastVoteDay !== r.day - 1;
+        const rare = (r.day | 0) > 2 && !r.quick && ((hh >>> 0) % 100) < VOTE_CHANCE && S.lastVoteDay !== r.day - 1;
         if (rare) { S.lastVoteDay = r.day; hostOpenVote(); } else S.votedKey = key;
       }   // [qa] never during Hiring Day or a minigame
     }

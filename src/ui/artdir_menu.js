@@ -10,7 +10,7 @@ import './artdir_i18n.js';
 
 const F = (px) => `700 ${px}px "TFG Plate", "TFG Plate Cyr", "Arial Narrow", Impact, sans-serif`;
 const V = (px) => `${px}px "TFG Credit", VT323, "TFG Cyr VT", monospace`;
-const COL_LEFT = new Set(['continue', 'host', 'browser', 'daily']);
+const COL_LEFT = new Set(['continue', 'host', 'quick', 'browser', 'daily']);
 const MODE_GLYPH = { host: 'van', browser: 'web', daily: 'calendar', profile: 'user', hub: 'building', character: 'mask', mods: 'gear', settings: 'gear', howto: 'help' };
 export const MEMOS = [
   'MEMO 07-A: YOUR ENGAGEMENT IS MONITORED FOR YOUR OWN SAFETY.',
