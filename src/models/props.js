@@ -23,6 +23,7 @@
 import * as THREE from 'three';
 import { getMaterial, getBasicMaterial, getTexture, seededRandom, hashString } from '../render/textures.js';
 import { ModelKit } from './items.js';
+import { planStairs } from '../world/stairs.js';
 
 const { Kit, G, xf, boxUV, scaleUV, swapUV, planarUV, anchor, PI, HP, TAU } = ModelKit;
 const { box, cyl, cone, sph, hemi, tor, plane, circ } = G;
@@ -717,8 +718,11 @@ PROPS.stairs_metal = (k, c) => {
   for (let i = 0; i < N; i++) {
     const top = (i + 1) * rise, zc = z0 - (i + 0.5) * run;
     k.add(tread, box(W - 0.1, 0.04, run + 0.01), [0, top - 0.02, zc], null, null, 1);
-    col(c, 0, top / 2, zc, W, top, run);
   }
+  // colliders: ONE inclined ramp (+ skirt boxes under it) instead of 15 stepped boxes (world/stairs.js: steps stalled against the rail colliders)
+  const sp = planStairs({ x: 0, z: z0, y: 0, dir: 'z-', width: W, rise: N * rise, run: N * run, n: N, landing: 0, tag: 'stairs_metal' });
+  for (const b of sp.boxes) col(c, b.cx, b.cy, b.cz, b.sx, b.sy, b.sz);
+  c.colliders.push({ c: [sp.ramp.cx, sp.ramp.cy, sp.ramp.cz], s: [sp.ramp.sx, sp.ramp.sy, sp.ramp.sz], q: [sp.ramp.q.x, sp.ramp.q.y, sp.ramp.q.z, sp.ramp.q.w].map((v) => Math.round(v * 1e6) / 1e6), ramp: true });
   for (const sx of [-1, 1]) {
     const x = sx * (W / 2 - 0.03);
     k.beam(fr, [x, 0.02, z0], [x, 3.0 - 0.1, z0 - 5 + 0.1], 0.06, 0.3);
@@ -730,6 +734,7 @@ PROPS.stairs_metal = (k, c) => {
     k.beam(rail, [x, rise + 0.5, z0 - 0.5 * run], [x, N * rise + 0.5, z0 - (N - 0.5) * run], 0.03);
   }
   c.extra.topHeight = 3;
+  c.extra.stairs = { rise: 3, run: 5, w: W, stepRun: run, zTop: z0 - 5, cx: 0 };   // measured by world/setpieces.js (the collider is an inclined ramp now)
 };
 PROPS.cobweb = (k) => {
   k.add(L('cobweb'), plane(1.4, 1.4), [0, 0.7, 0]);

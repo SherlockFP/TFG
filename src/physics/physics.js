@@ -38,7 +38,8 @@ export class Physics {
       .setTranslation(x, y, z)
       .setCollisionGroups(groups(member, 0xffff))
       .setFriction(0.8);
-    if (rotY) {
+    if (rotY && typeof rotY === 'object') desc.setRotation(rotY);   // full quaternion {x,y,z,w}: inclined stair ramps (world/stairs.js)
+    else if (rotY) {
       const s = Math.sin(rotY / 2), c = Math.cos(rotY / 2);
       desc.setRotation({ x: 0, y: s, z: 0, w: c });
     }

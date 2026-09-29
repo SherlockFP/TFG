@@ -144,7 +144,7 @@ function cantina(C, S, R, s, out) {
 }
 
 // ---------------------------------------------------------------------------------------------------------- sand crawler wreck
-function crawler(C, S, R, s, rot, out) {
+export function crawler(C, S, R, s, rot, out) {
   const y0 = s.y0, yLo = s.yLo, D = 1.4;              // deck height above the sand
   S.frame(s.x, s.z, rot);
   S.solid('rust', 0, yLo - 1.0, 0, 15.2, y0 - yLo + 1.0 + 0.7, 7.6, { tint: 0.8, color: SAND2, uv: 0.3 });          // half-buried in the dune
@@ -164,10 +164,8 @@ function crawler(C, S, R, s, rot, out) {
   const roof = rectMinus([-6.6, 6.6, -2.7, 2.7], [[-1.0, 3.6, -1.6, 0.9]]);                                            // breach in the roof
   for (const r of roof) S.slab('rust', r, hy + H + 0.25, 0.25, { tint: 0.8 });
   // ramp at the rear door
-  for (let j = 1; j <= 6; j++) {
-    const top = D + 0.25 - 0.275 * j, x = -6.6 - 0.3 - 0.55 * j;
-    S.solid('rust', x, y0 - 1.0, 0.0, 0.55, Math.max(0.1, top + 1.0), 2.2, { tint: 0.8, bottom: false });
-  }
+  // (world/stairs.js: visual steps + one inclined ramp collider, ending flush with the door sill at deck height)
+  S.stairs({ key: 'rust', x: -10.475, z: 0, y: y0 - 0.4, baseY: y0 - 1.0, dir: 'x+', width: 2.2, rise: fy + 0.25 - (y0 - 0.4), run: 3.3, n: 7, tint: 0.8, tag: 'crawler' });
   // contents: crates, a dead console, cables
   for (const [x, z, sz] of [[-4.2, 1.6, 1.0], [-3.2, -1.6, 0.9], [4.6, 1.5, 1.1], [-1.0, -1.8, 0.8]]) S.solid(R.chance(0.5) ? 'wood' : 'dark', x, hy, z, sz, sz * 0.9, sz, { tint: 0.8 });
   S.solid('dark', 5.7, hy, 0, 0.8, 1.1, 3.4, { tint: 0.55 });
