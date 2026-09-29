@@ -6,7 +6,7 @@ import { createProp } from '../models/props.js';
 import { G } from '../physics/physics.js';
 import { boxOccupied } from './doorsafe.js';
 import { CORE_GAPS } from './hardpoints.js';
-import { SPOTS, SPAWNS, LAMPS, WINDOWS_Z, PAD, MOD_SPOTS } from './shiplayout.js';
+import { SPOTS, SPAWNS, LAMPS, WINDOWS_Z, PAD, MOD_SPOTS, WELL, withoutWell } from './shiplayout.js';
 import { buildShipDeco, gridWall } from './shipdeco.js';
 
 export const SHIP = {
@@ -60,7 +60,7 @@ export function buildShip({ physics, lightPool, scene }) {
 
   // --- interior surfaces ---
   // [wave5] the floor is built by shipdeco.js (per-room tinted, no second coplanar layer)
-  gb.hrect('ship_ceiling', S.x0, S.z0, S.x1, S.z1, S.h, false, 0.5);
+  for (const [x0, z0, x1, z1] of withoutWell(S.x0, S.z0, S.x1, S.z1)) gb.hrect('ship_ceiling', x0, z0, x1, z1, S.h, false, 0.5);   // [shipdeck] the ceiling has the stairwell hatch (closed by a lid until the Upper Deck is bought)
   // back wall (+x), faces -x; hardpoint doorway gap R1 (sealed by ship.hardpoints.R1 until a module is installed)
   const gapsX = [CORE_GAPS.R1], gapsZ = [CORE_GAPS.N1, CORE_GAPS.N2];
   gapWall(gb, 'ship_wall', 'z', S.x1, S.z0, S.z1, 0, S.h, 0.5, gapsX);
@@ -91,7 +91,8 @@ export function buildShip({ physics, lightPool, scene }) {
   gapWall(gb, 'metal_plate', 'x', ez0, ex1, ex0, -0.6, eh, 0.35, gapsZ);   // -z outer (hardpoint gaps N1 / N2)
   gapWall(gb, 'metal_plate', 'z', ex1, ez1, ez0, -0.6, eh, 0.35, gapsX);   // +x outer (hardpoint gap R1)
   gb.vrect('metal_plate', ex0, ez0, ex0, ez1, -0.6, eh, 0.35);         // -x outer (window cut handled by overlay glass)
-  gb.hrect('metal_dark', ex0, ez0, ex1, ez1, eh, true, 0.35);          // roof
+  for (const [x0, z0, x1, z1] of withoutWell(ex0, ez0, ex1, ez1)) gb.hrect('metal_dark', x0, z0, x1, z1, eh, true, 0.35);   // roof (with the hatch)
+  { const W = WELL; for (const [a0, b0, a1, b1] of [[W.x0, W.z0, W.x1, W.z0], [W.x1, W.z1, W.x0, W.z1], [W.x0, W.z1, W.x0, W.z0], [W.x1, W.z0, W.x1, W.z1]]) gb.vrect('metal_dark', a0, b0, a1, b1, S.h, eh, 0.35); }   // hatch shaft walls (face inward)
   gb.hrect('metal_dark', ex0, ez0, ex1, ez1, -0.6, false, 0.35);       // belly
   // nose (a low "chin" under the cockpit window so the view stays clear)
   // [ship2] the nose is a rounded half-dome (built below); the old chin box only stays as its collider
@@ -110,7 +111,7 @@ export function buildShip({ physics, lightPool, scene }) {
     box(S.door.x, sy - 0.1, sz, S.door.width + 0.4, 0.2, 0.5);
   }
   // antenna + light on roof
-  gb.box('metal_dark', S.x1 - 2, eh + 0.9, -2, 0.08, 1.8, 0.08, 0.5);
+  gb.box('metal_dark', S.x0 + 0.15, eh + 0.9, S.z0 + 0.1, 0.08, 1.8, 0.08, 0.5);   // [shipdeck] moved to the nose corner (the tail roof holds the mounts)
 
   const mesh = gb.build((key) => levelMaterial(key, key === 'metal_grate' ? { side: THREE.DoubleSide, alphaTest: 0.5 } : {}));
   group.add(mesh);
@@ -150,7 +151,7 @@ export function buildShip({ physics, lightPool, scene }) {
   const navG = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.2), new THREE.MeshBasicMaterial({ color: 0x20ff40 }));
   navG.position.set(ex0 + 0.3, eh + 0.1, ez1 + 0.1);
   const navW = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.15), new THREE.MeshBasicMaterial({ color: 0xffffff }));
-  navW.position.set(S.x1 - 2, eh + 1.85, -2);
+  navW.position.set(S.x0 + 0.15, eh + 1.85, S.z0 + 0.1);
   group.add(navR, navG, navW);
   const railMat = new THREE.MeshLambertMaterial({ color: 0x3a3a38 });
   for (const zz of [ez0 + 0.1, ez1 - 0.1]) {
@@ -197,7 +198,7 @@ export function buildShip({ physics, lightPool, scene }) {
 
   // --- colliders ---
   box(0, -0.25, 0, S.x1 - S.x0 + 1, 0.5, S.z1 - S.z0 + 1);                      // floor
-  box(0, S.h + 0.25, 0, S.x1 - S.x0 + 1, 0.5, S.z1 - S.z0 + 1);                 // ceiling
+  for (const [x0, z0, x1, z1] of withoutWell(-7.5, -4, 7.5, 4)) box((x0 + x1) / 2, S.h + 0.25, (z0 + z1) / 2, x1 - x0, 0.5, z1 - z0);   // ceiling (+ roof) with the stairwell hatch
   // back (+x) and -z walls: split around the hardpoint gaps (lintel boxes stay above them)
   const colWall = (ax, fixed, thick, lo, hi, gaps) => {
     const put = (a, b, y0, y1) => { if (b - a < 1e-3 || y1 - y0 < 1e-3) return; ax === 'z' ? box(fixed, (y0 + y1) / 2, (a + b) / 2, thick, y1 - y0, b - a) : box((a + b) / 2, (y0 + y1) / 2, fixed, b - a, y1 - y0, thick); };
@@ -213,6 +214,19 @@ export function buildShip({ physics, lightPool, scene }) {
   box(S.door.x, (S.h + S.door.height) / 2, S.z1 + 0.15, S.door.width, S.h - S.door.height, 0.3);
   box(ex0 - 1.0, 0.2, 0, 2.0, 1.6, 5.6);                                          // nose
   box(0, -0.9, 0, ex1 - ex0, 0.6, ez1 - ez0);                                     // belly
+
+  // [shipdeck] the hatch lid: closes the stairwell (visual + collider) until the shipyard's Upper Deck is bought (game/shipdeck.js opens it)
+  const deckHatch = (() => {
+    const W = WELL, cx = (W.x0 + W.x1) / 2, cz = (W.z0 + W.z1) / 2, sx = W.x1 - W.x0, sz = W.z1 - W.z0;
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(sx, eh - S.h, sz), levelMaterial('metal_dark'));
+    mesh.position.set(cx, (S.h + eh) / 2, cz); mesh.name = 'ship_deck_hatch'; group.add(mesh);
+    const add = () => physics.addStaticBox(cx, S.h + 0.25, cz, sx / 2, 0.25, sz / 2, 0, G.STATIC);
+    const h = { mesh, collider: add(), open: false, setOpen(v) {
+      v = !!v; if (v === this.open) return; this.open = v; mesh.visible = !v;
+      if (v) { if (this.collider) { physics.removeCollider(this.collider); this.collider = null; } } else if (!this.collider) this.collider = add();
+    } };
+    return h;
+  })();
 
   // --- door leaf (sliding along +x) ---
   const leafMat = levelMaterial('door_metal');
@@ -368,7 +382,7 @@ export function buildShip({ physics, lightPool, scene }) {
   const spawns = SPAWNS.map(([x, z]) => new THREE.Vector3(x, 0.05, z));   // [ship2] spawns[2] = teleporter pad (shiplayout PAD)
 
   return {
-    group, colliders, emitters, door, anchors, points, spawns, flood, hardpoints,
+    group, colliders, emitters, door, anchors, points, spawns, flood, hardpoints, deckHatch,
     layout: { obstacles: deco.obstacles, spots: SPOTS, pad: PAD, mods: MOD_SPOTS }, deco,   // [ship2] obstacles = AABBs {min,max} of partitions / signs / crates for the fault-panel placer
     doorOutside: new THREE.Vector3(S.door.x, -0.9, S.z1 + 2.2),
   };

@@ -213,3 +213,6 @@ Lockpicking is now a 1.5 s timing click on Simple locks and scales to timed / sh
 
 ## Wave 5 - stairs (docs/wave5/stairs.md)
 Every stair builder (Soviet blocks, towers, ruins, crawler ramp, mansion staircase, catwalk stairs) now uses one inclined ramp collider instead of stepped boxes; the old boxes stalled the autostep when the player pushed into a wall or rail, which is the normal way to climb a stairwell. Proven in node with the real Rapier controller (walk / sprint / sideways push), but nobody has climbed them by hand in a browser yet; ramp climbing is slightly slower than flat walking and other players' feet clip into the visual treads by up to ~0.15 m.
+
+## Wave 5 - shipdeck (docs/wave5/shipdeck.md)
+The ship now has a proper upper floor (stair in the hub, hatch, deck, rooms, dome) that visibly changes with every tier and is proven climbable with the real controller in node; but it was only looked at in one short headless tour (swiftshader), never hand-played or tried by two players. Room effects are tiny numbers (cosmetic-first), the U-stair block takes a good bite out of the hub floor (the chess table, a lamp, the disco ball moved), the roof turret socket and mounts moved aft, and creatures do not know the deck exists. `ship2_install` "repair" test is flaky (random hull slot), unrelated.

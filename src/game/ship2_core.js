@@ -4,6 +4,7 @@
 //   * OUTSIDE REPAIR: hold E next to a spot with a Wrench / Welding Torch / Repair Kit. A timing ring (needle over a green and a red arc) decides the speed.
 //   * DEFENCE MOUNTS on the roof + ship power budget; PLANTERS that grow a little tree over game days.
 // Early game is gentle (MASTERPLAN section 19): quota 0 = at most 2 dents, no effects at all; quota 1 = tier 2 at most.
+import { DECK_MOUNT } from '../world/shiplayout.js';   // [shipdeck]
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 
 // ---------------------------------------------------------------------------------------------- hull spots
@@ -203,15 +204,19 @@ export const outerFaultDone = (st) => !hasBreach(st) && tierOf(integrity(st)) < 
 
 // ---------------------------------------------------------------------------------------------- defence mounts + ship power budget
 export const MOUNTS = [
-  { id: 'M1', x: 5.9, z: -2.5, label: 'TAIL N' }, { id: 'M2', x: 6.2, z: 2.0, label: 'TAIL S' }, { id: 'M3', x: 5.2, z: -0.2, label: 'TAIL C' },
-  { id: 'M4', x: 2.8, z: -2.7, label: 'MID N' }, { id: 'M5', x: 2.8, z: 2.7, label: 'MID S' },
+  // [shipdeck] M3 / M4 / M5 moved aft (the Upper Deck now stands at x -0.5..4.0 and the turret socket at x 4.15..6.95); ids are unchanged so saved mounts keep working
+  { id: 'M1', x: 5.6, z: -2.45, label: 'TAIL N' }, { id: 'M2', x: 5.9, z: 2.6, label: 'TAIL S' }, { id: 'M3', x: 6.6, z: -2.9, label: 'TAIL C' },
+  { id: 'M4', x: 4.6, z: -2.9, label: 'MID N' }, { id: 'M5', x: 4.6, z: 2.9, label: 'MID S' },
+  // [shipdeck] Upper Deck Mk III: one extra slot on the deck floor, under the observation dome (only usable at deck Mk III)
+  { id: 'M6', x: DECK_MOUNT.x, z: DECK_MOUNT.z, y: DECK_MOUNT.y, deck: 3, label: 'DECK' },
 ];
+export const mountY = (m) => m?.y ?? MOUNT_Y;
 export const MOUNT_Y = 3.9;      // roof surface (ship.js eh)
 /** deployable kits that can be mounted: the ship powers them (no battery / fuel) except the ammo-fed MK1 */
 export const MOUNT_TYPES = ['turret1', 'turret2', 'turret3', 'tesla', 'flood', 'drone', 'sensor'];
 /** power slots the ship can feed: 1 in quota 0, 2 later, +1 per Engine Room tier (0..3), -1 while the hull is critical; min 1 */
-export function powerSlots(quota = 0, engineTier = 0, hullTier = 0) {
-  return Math.max(1, ((quota | 0) <= 0 ? 1 : 2) + clamp(engineTier | 0, 0, 3) - (hullTier >= 3 ? 1 : 0));
+export function powerSlots(quota = 0, engineTier = 0, hullTier = 0, deckTier = 0) {
+  return Math.max(1, ((quota | 0) <= 0 ? 1 : 2) + clamp(engineTier | 0, 0, 3) + (deckTier >= 3 ? 1 : 0) - (hullTier >= 3 ? 1 : 0));   // [shipdeck] Upper Deck Mk III feeds one more
 }
 export function sanitizeMounts(m) {
   const out = {};

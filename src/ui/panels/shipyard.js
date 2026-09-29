@@ -7,6 +7,7 @@ import { t, tf } from '../../core/i18n.js';
 import { iconHTML } from '../icons.js';
 import * as Y from '../../game/shipyard_core.js';
 import { SOCKETS, SOCKET_IDS } from '../../world/hardpoints.js';
+import { renderDeckTab } from './shipdeck_tab.js';   // [shipdeck]
 
 const CSS = `
 .overlay .menu-frame.shipyard{width:min(1100px,96vw);height:min(86vh,720px)}
@@ -58,7 +59,7 @@ const fmt = (n) => Math.round(n).toLocaleString('en-US');
 
 export function createShipyardPanel(ui, game, sy, opts = {}) {
   ensureCss();
-  let tab = ['modules', 'frame', 'hull', 'status'].includes(opts.tab) ? opts.tab : 'modules';
+  let tab = ['modules', 'upper', 'frame', 'hull', 'status'].includes(opts.tab) ? opts.tab : 'modules';
   let sel = null, selSock = null, moving = false, lastKey = '';
   const draft = { c1: null, c2: null, pat: null, theme: null, name: null };
   const wrap = ui.panel('wide shipyard');
@@ -83,7 +84,7 @@ export function createShipyardPanel(ui, game, sy, opts = {}) {
   // ------------------------------------------------------------------ tabs
   function renderTabs() {
     tabsEl.innerHTML = '';
-    for (const [id, label] of [['modules', 'MODULES'], ['frame', 'FRAME'], ['hull', 'HULL'], ['status', 'STATUS']]) {
+    for (const [id, label] of [['modules', 'MODULES'], ['upper', 'UPPER DECK'], ['frame', 'FRAME'], ['hull', 'HULL'], ['status', 'STATUS']]) {
       tabsEl.appendChild(ui.button(t(label), () => { tab = id; sfx('ui_click'); full(); }, tab === id ? 'tab sel' : 'tab'));
     }
   }
@@ -268,7 +269,8 @@ export function createShipyardPanel(ui, game, sy, opts = {}) {
 
   function full() {
     setSub(); renderTabs();
-    if (tab === 'modules') renderModules(); else if (tab === 'frame') renderFrame(); else if (tab === 'hull') renderHull(); else renderStatus();
+    main.style.gridTemplateColumns = '';
+    if (tab === 'modules') renderModules(); else if (tab === 'upper') renderDeckTab({ main, ui, sy, S, cr, sfx }); else if (tab === 'frame') renderFrame(); else if (tab === 'hull') renderHull(); else renderStatus();
   }
 
   // live refresh (credits / parts / state can change while open)
@@ -278,7 +280,7 @@ export function createShipyardPanel(ui, game, sy, opts = {}) {
     if (key === lastKey) return;
     lastKey = key;
     setSub();
-    if (tab === 'modules') { renderList(); renderDetail(); } else if (tab === 'frame') renderFrame(); else if (tab === 'status') renderStatus();
+    if (tab === 'modules') { renderList(); renderDetail(); } else if (tab === 'upper') renderDeckTab({ main, ui, sy, S, cr, sfx }); else if (tab === 'frame') renderFrame(); else if (tab === 'status') renderStatus();
     else if (tab === 'hull' && !document.activeElement?.classList?.contains('sy-in')) renderHull();
   }, 400);
 

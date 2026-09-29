@@ -4,7 +4,7 @@
 // vs each other, the hull shell, the partitions, the doorway aisles, the spawn points and the room signs / windows, plus a 0.9 m walker flood fill
 // from the airlock that must reach the standing spot of every interactable (shiplayout ACCESS).
 // Prints three reports: LEGACY (pre ship2), WAVE 4 (ship2 + where the other wave-4 modules really put their fixtures, measured in the browser)
-// and NOW (world/shiplayout.js).   node tools/harness/ship2_overlap.test.mjs   (--verbose lists every problem)
+// and NOW (world/shiplayout.js). Wave 5 shipdeck: floor 1 now includes the Upper Deck stair housing, plus floor-2 checks (rooms, walkways, stair, hatch).   node tools/harness/ship2_overlap.test.mjs   (--verbose lists every problem)
 import './ship2_env.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -56,10 +56,10 @@ export function walk(solids, access = L.ACCESS, r = 0.45, step = 0.025) {
 }
 
 /** all problems of one layout: { pairs, walls, aisles, spawns, signs, walk, list } */
-export function analyse({ spots, tables, lamps, spawns, partitions = [], decor, signs = [], aisles = L.AISLES, extra = [], noMods = false, access = null }) {
+export function analyse({ spots, tables, lamps, spawns, partitions = [], decor, signs = [], aisles = L.AISLES, extra = [], noMods = false, access = null, deck = false }) {
   const solids = [
     ...partitions.map((p) => ({ ...p, kind: 'wall' })),
-    ...L.fixtureBoxes(spots, { tables, decor, noMods }),
+    ...L.fixtureBoxes(spots, { tables, decor, noMods, deck }),
     ...extra,
     ...lamps.map(([x, z], i) => ({ id: 'lamp' + i, x0: x - 0.3, x1: x + 0.3, z0: z - 0.3, z1: z + 0.3, y0: S.h - 0.1, y1: S.h, kind: 'lamp' })),
   ];
@@ -128,7 +128,7 @@ const wave4 = { spots: W4_SPOTS, tables: [[-1.9, -0.4, 0]], lamps: [[-5.4, 0], [
   partitions: oldPartitions(-1.85), decor: W4_DECOR, signs: W4_SIGNS, extra: W4_EXTRA, noMods: true, access: W4_ACCESS,
   aisles: L.AISLES.map((a) => (a.id === 'engineDoor' ? { ...a } : a)) };
 delete W4_SPOTS.trophy;
-const now = { spots: L.SPOTS, tables: [L.TABLE_SPOTS[0]], lamps: L.LAMPS, spawns: L.SPAWNS, partitions: L.PARTITIONS, decor: L.DECOR, signs: L.SIGNS, access: L.ACCESS };
+const now = { deck: true, spots: L.SPOTS, tables: [L.TABLE_SPOTS[0]], lamps: L.LAMPS, spawns: L.SPAWNS, partitions: L.PARTITIONS, decor: L.DECOR, signs: L.SIGNS, access: L.ACCESS };
 const B = analyse(legacy), W = analyse(wave4), A = analyse(now);
 
 console.log(`\nLEGACY (pre ship2):   ${line(B)}`);
@@ -236,4 +236,77 @@ if (ship) {
     assert.ok(meshes < 260, 'meshes ' + meshes);
   });
 }
+// ---------------------------------------------------------------------------------- UPPER DECK (wave 5 shipdeck): floor 1 with the stair, floor 2, the stair itself
+const { checkStairs, LIMITS } = await import('../../src/world/stairs.js');
+const DK = L.DECK, WL = L.WELL, ST = L.deckStairs();
+ok('deck: hub floor WITHOUT the deck is still clean (the well is just floor), and WITH the stair housing (already covered by NOW) too', () => {
+  const r = analyse({ ...now, deck: false }); assert.equal(total(r), 0, r.list.join('; '));
+});
+ok('deck: both flights pass planStairs checks (slope <= 47 deg, riser, width >= 0.9 m walker) and meet the platform / deck floor flush', () => {
+  for (const p of [ST.a, ST.b]) { assert.deepEqual(checkStairs(p), [], p.tag); assert.ok(p.width >= 0.9, p.tag + ' width'); assert.ok(p.slopeDeg <= LIMITS.maxSlopeDeg, p.tag + ' slope'); }
+  assert.ok(Math.abs(ST.a.y + ST.a.rise - ST.platform.y) < 1e-6, 'A ends at the platform height');
+  assert.ok(Math.abs(ST.b.y - ST.platform.y) < 1e-6 && Math.abs(ST.b.y + ST.b.rise - DK.y) < 1e-6, 'B starts at the platform and ends at the deck floor');
+  assert.ok(Math.abs((ST.a.z - ST.a.run) - ST.b.z) < 1e-6 && Math.abs((ST.b.z + ST.b.run) - WL.z1) < 1e-6, 'B starts where A ends and comes out at the well edge');
+  assert.ok(ST.platform.z1 - ST.platform.z0 >= 0.9 && ST.platform.x1 - ST.platform.x0 >= 1.8, 'turning platform is >= 0.9 m deep');
+  assert.ok(ST.b.x - ST.b.width / 2 >= ST.dividerX1 - 1e-6 && ST.a.x + ST.a.width / 2 <= ST.dividerX0 + 1e-6, 'lanes are separated by the divider');
+});
+ok('deck: head clearance - wherever a climbing capsule (0.34 r, 1.8 m) is above the ceiling / the roof plate, it is inside the hatch opening', () => {
+  const r = LIMITS.radius, inWell = (x, z) => x - r >= WL.x0 - 1e-6 && x + r <= WL.x1 + 1e-6 && z - r >= WL.z0 - 1e-6 && z + r <= WL.z1 + r + 1e-6;
+  for (const p of [ST.a, ST.b]) for (let a = 0; a <= p.run + 1e-9; a += 0.05) {
+    const x = p.x, z = p.z + p.dir[1] * a, y = p.y + p.rise * a / p.run;
+    if (y + LIMITS.height > L.SHELL.h - 0.02) assert.ok(inWell(x, z), `${p.tag} at ${a.toFixed(2)} m (y ${y.toFixed(2)}) head hits the ceiling`);
+  }
+});
+ok('deck: the ceiling collider pieces + the well tile the whole roof area exactly (no gap to fall through, no overlap)', () => {
+  const full = 15 * 8; let area = 0; for (const [x0, z0, x1, z1] of L.withoutWell(-7.5, -4, 7.5, 4)) area += (x1 - x0) * (z1 - z0);
+  assert.ok(Math.abs(area + (WL.x1 - WL.x0) * (WL.z1 - WL.z0) - full) < 1e-9);
+  area = 0; for (const [x0, z0, x1, z1] of L.withoutWell(DK.x0, DK.z0, DK.x1, DK.z1)) area += (x1 - x0) * (z1 - z0);
+  assert.ok(Math.abs(area + (WL.x1 - WL.x0) * (WL.z1 - WL.z0) - (DK.x1 - DK.x0) * (DK.z1 - DK.z0)) < 1e-9, 'deck slab');
+  assert.ok(WL.x0 > DK.x0 && WL.x1 < DK.x1 && WL.z0 > DK.z0 && WL.z1 < DK.z1, 'well inside the deck');
+});
+/** floor-2 walker: r = 0.45 flood fill over the deck footprint from the top of lane B */
+function walkDeck(solids, access, r = 0.45, step = 0.025) {
+  const nx = Math.round((DK.x1 - DK.x0) / step), nz = Math.round((DK.z1 - DK.z0) / step), free = new Uint8Array(nx * nz);
+  for (let i = 0; i < nx; i++) for (let k = 0; k < nz; k++) {
+    const x = DK.x0 + (i + 0.5) * step, z = DK.z0 + (k + 0.5) * step; let f = 1;
+    for (const a of solids) if (x > a.x0 - r && x < a.x1 + r && z > a.z0 - r && z < a.z1 + r) { f = 0; break; }
+    free[i * nz + k] = f;
+  }
+  const idx = (x, z) => [Math.floor((x - DK.x0) / step), Math.floor((z - DK.z0) / step)], seen = new Uint8Array(nx * nz), q = [];
+  const [si, sk] = idx(ST.outAt.x, ST.outAt.z);
+  if (free[si * nz + sk]) { seen[si * nz + sk] = 1; q.push(si * nz + sk); }
+  while (q.length) { const c = q.pop(), i = Math.floor(c / nz), k = c % nz; for (const [di, dk] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const a = i + di, b = k + dk; if (a < 0 || b < 0 || a >= nx || b >= nz) continue; const n = a * nz + b; if (free[n] && !seen[n]) { seen[n] = 1; q.push(n); } } }
+  const missing = [];
+  for (const p of access) { const [ci, ck] = idx(p.x, p.z); if (!(ci >= 0 && ck >= 0 && ci < nx && ck < nz && seen[ci * nz + ck])) missing.push(p.id); }
+  return { missing, start: !!free[si * nz + sk] };
+}
+const deckSolids = (t, rooms) => [...L.deckFixtures(t, rooms).filter((a) => !/^edge/.test(a.id)), { id: 'well', x0: WL.x0, x1: WL.x1, z0: WL.z0, z1: WL.z1, y0: DK.y, y1: DK.y + 1.1, kind: 'wall' },
+  { id: 'wallN', x0: DK.x0, x1: DK.x1, z0: DK.z0 - 1, z1: DK.z0 + DK.wall, y0: 0, y1: 9 }, { id: 'wallS', x0: DK.x0, x1: DK.x1, z0: DK.z1 - DK.wall, z1: DK.z1 + 1, y0: 0, y1: 9 },
+  { id: 'wallW', x0: DK.x0 - 1, x1: DK.x0 + DK.wall, z0: DK.z0, z1: DK.z1, y0: 0, y1: 9 }, { id: 'wallE', x0: DK.x1 - DK.wall, x1: DK.x1 + 1, z0: DK.z0, z1: DK.z1, y0: 0, y1: 9 }];
+for (const [t, rooms] of [[2, ['bunk', 'store', null, null]], [2, ['turret', null, 'lounge', null]], [3, L.DECK_ROOMS], [3, ['lounge', 'turret', 'store', 'bunk']], [3, [null, null, null, null]]]) {
+  ok(`deck floor (Mk ${t}, ${rooms.map((r) => r || '-').join('/')}): 0 overlaps, rooms inside the cabin, every standing spot + the stair exit reachable with a 0.9 m walker`, () => {
+    const fx = L.deckFixtures(t, rooms), probs = [];
+    for (let i = 0; i < fx.length; i++) for (let j = i + 1; j < fx.length; j++) { const a = fx[i], b = fx[j]; if (/^(rim|edge)/.test(a.id) && /^(rim|edge)/.test(b.id)) continue; if (hit(a, b)) probs.push(`overlap ${a.id} x ${b.id}`); }
+    for (const a of fx.filter((q) => /^room/.test(q.id))) {
+      if (a.x0 < DK.x0 + DK.wall - EPS || a.x1 > DK.x1 - DK.wall + EPS || a.z0 < DK.z0 + DK.wall - EPS || a.z1 > DK.z1 - DK.wall + EPS) probs.push(`${a.id} pokes through the cabin wall`);
+      if (a.y1 > DK.y + DK.h - 0.3) probs.push(`${a.id} too tall`);
+      if (!(a.x1 <= WL.x0 + EPS || a.x0 >= WL.x1 - EPS || a.z1 <= WL.z0 + EPS || a.z0 >= WL.z1 - EPS)) probs.push(`${a.id} over the well`);
+    }
+    const w = walkDeck(deckSolids(t, rooms), L.DECK_ACCESS(t)); if (!w.start) probs.push('stair exit blocked'); for (const m of w.missing) probs.push('unreachable with a 0.9 m walkway: ' + m);
+    assert.deepEqual(probs, []);
+  });
+}
+ok('deck: the extra Mk III mount plate (ship2 M6) stands on the deck inside the cabin, clear of the rooms and the well rail', () => {
+  const M = L.DECK_MOUNT, R = 0.55;
+  assert.ok(M.x - R >= DK.x0 + DK.wall - 0.01 && M.x + R <= WL.x0 - 0.04 && Math.abs(M.z) + R <= DK.z1 - DK.wall && M.y === DK.y);
+  for (const a of L.deckFixtures(3).filter((q) => /^room/.test(q.id))) assert.ok(M.x + R <= a.x0 || M.x - R >= a.x1 || M.z + R <= a.z0 || M.z - R >= a.z1, 'mount vs ' + a.id);
+});
+ok('deck: colliders exist for the slab, rails, both ramps (with a quaternion) and every chosen room; none at tier 0', () => {
+  assert.equal(L.deckColliders(0).length, 0);
+  const c1 = L.deckColliders(1), c3 = L.deckColliders(3, L.DECK_ROOMS);
+  assert.equal(c1.filter((c) => c.q).length, 2, 'two ramps'); assert.ok(c1.some((c) => /^slab/.test(c.id)) && c1.some((c) => /^rim/.test(c.id)) && c1.some((c) => c.id === 'platform'));
+  assert.equal(c1.filter((c) => /^room/.test(c.id)).length, 0); assert.equal(c3.filter((c) => /^room/.test(c.id)).length, 4);
+  assert.ok(c3.length < 45, 'collider count ' + c3.length);
+});
+
 console.log(`\nship2 overlap: ${pass} passed, ${fail} failed`);

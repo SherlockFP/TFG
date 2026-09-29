@@ -207,7 +207,39 @@ ok('late join: a client with only run.sy renders the same ship', () => {
   assert.equal(Y.count(c.state()), Y.count(game.run.sy)); assert.ok(shipB.hardpoints.R1.open); assert.ok(c.socketBuilt('cargo'));
   c.dispose(); assert.equal(shipB.hardpoints.R1.open, false);
 });
+// ---- [shipdeck] Upper Deck: host-authoritative purchase through syact, the mirrored state drives the deck module on every peer
+const { installShipdeck } = await import('../../src/game/shipdeck.js');
+game.shipyard = sy; const sd = installShipdeck(game); game.shipdeck = sd;
+ok('deck: bought through syact (deckup / deckroom), the hatch opens, deck meshes + colliders appear, rooms need Mk II, all state is in profile.shipyard.deck', () => {
+  game.run.credits = 9000; const D0 = physics.cols.size; at(0, 0.05, 0);
+  assert.equal(ship.deckHatch.open, false); assert.equal(sd.tier(), 0);
+  const cr0 = game.run.credits;
+  act('deckup', { via: 'credits' }); tick(game, 2);
+  assert.equal(game.run.credits, cr0 - 450); assert.equal(game.profile.shipyard.deck.t, 1); assert.equal(sd.tier(), 1);
+  assert.equal(ship.deckHatch.open, true); assert.equal(ship.deckHatch.collider, null); assert.ok(ship.group.getObjectByName('ship_upper_deck'));
+  assert.ok(physics.cols.size >= D0 + 20, 'deck colliders ' + (physics.cols.size - D0));
+  act('deckroom', { slot: 0, room: 'bunk' }); assert.match(lastErr(), /slot|built/i);
+  act('deckup', { via: 'credits' }); act('deckup', { via: 'credits' }); tick(game, 2);
+  assert.equal(sd.tier(), 3);
+  act('deckroom', { slot: 3, room: 'lounge' }); act('deckroom', { slot: 0, room: 'turret' }); tick(game, 2);
+  assert.deepEqual(game.profile.shipyard.deck.rooms, ['turret', null, null, 'lounge']); assert.deepEqual(sd.rooms(), ['turret', null, null, 'lounge']);
+  assert.ok(ship.group.getObjectByName('deck_glass') && ship.group.getObjectByName('deck_glow'), 'dome glass + emissive');
+  let n = 0; ship.group.getObjectByName('ship_upper_deck').traverse((o) => { if (o.isMesh) n++; }); assert.ok(n <= 8, 'deck draw calls ' + n);
+  const before = physics.cols.size; act('deckroom', { slot: 3, room: null }); assert.deepEqual(game.profile.shipyard.deck.rooms, ['turret', null, null, null]); assert.ok(physics.cols.size < before);
+  assert.equal(Y.effects(game.profile.shipyard).deck, 3);
+});
+ok('deck: refused while the ship is landed, and at the max tier', () => {
+  game.run.phase = 'moon'; act('deckroom', { slot: 1, room: 'store' }); assert.match(lastErr(), /orbit/); game.run.phase = 'orbit';
+  const cr = game.run.credits; act('deckup', { via: 'credits' }); assert.match(lastErr(), /Mk III/); assert.equal(game.run.credits, cr);
+});
+ok('deck: a late joiner (fresh module on a fresh ship, only run.sy) builds the same deck', () => {
+  const shipC = buildShip({ physics, lightPool, scene: new THREE.Scene() });
+  const gC = { ...game, ship: shipC, isHost: false, selfId: 'C', profile: {}, run: { ...game.run, sy: JSON.parse(JSON.stringify(game.profile.shipyard)) }, shipyard: { state: () => Y.sanitize(game.run.sy) } };
+  const c = installShipdeck(gC); tick(gC, 2);
+  assert.equal(c.tier(), 3); assert.equal(shipC.deckHatch.open, true); assert.ok(shipC.group.getObjectByName('ship_upper_deck')); c.dispose(); assert.equal(shipC.deckHatch.open, false);
+});
 ok('dispose restores the shared globals', () => {
+  sd.dispose(); assert.equal(ship.deckHatch.open, false);
   sy.dispose();
   assert.equal(SHIP_EXTRA.length, 0); assert.equal(HULL.x1, 7.6); assert.equal(CRUISER.dockRadius, 38);
   for (const hp of Object.values(ship.hardpoints)) assert.equal(hp.open, false);

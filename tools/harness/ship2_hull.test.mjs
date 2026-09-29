@@ -2,6 +2,8 @@
 import './ship2_env.mjs';
 import assert from 'node:assert/strict';
 import * as C from '../../src/game/ship2_core.js';
+import * as LY from '../../src/world/shiplayout.js';
+import { SOCKETS as SOCK } from '../../src/world/hardpoints.js';
 
 let pass = 0, fail = 0;
 const ok = (name, fn) => { try { fn(); pass++; console.log('  ok   ' + name); } catch (e) { fail++; process.exitCode = 1; console.log('  FAIL ' + name + '\n       ' + (e.stack || e.message).split('\n').slice(0, 5).join('\n       ')); } };
@@ -97,15 +99,15 @@ ok('hold session: holding E completes in about `need` seconds, letting go decays
   const e = { need: 9, prog: 3, seed: 0, t: 0.5 * C.RING.period - 0.02, down: true }; const oe = C.stepSession(e, 0.02, true); assert.equal(oe.shock, false); assert.ok(e.prog > 3);
 });
 ok('power budget: 1 slot in quota 0, 2 later, +engine tier, -1 when critical; MK1 is ammo fed and uses none', () => {
-  assert.equal(C.powerSlots(0, 0, 0), 1); assert.equal(C.powerSlots(2, 0, 0), 2); assert.equal(C.powerSlots(2, 3, 0), 5); assert.equal(C.powerSlots(2, 0, 3), 1); assert.equal(C.powerSlots(0, 0, 3), 1);
+  assert.equal(C.powerSlots(0, 0, 0), 1); assert.equal(C.powerSlots(2, 0, 0), 2); assert.equal(C.powerSlots(2, 3, 0), 5); assert.equal(C.powerSlots(2, 0, 3), 1); assert.equal(C.powerSlots(0, 0, 3), 1); assert.equal(C.powerSlots(2, 0, 0, 3), 3, 'deck Mk III = +1');
   const m = { M1: { ty: 'turret2' }, M2: { ty: 'tesla' }, M3: { ty: 'turret1' }, M4: { ty: 'turret3' } };
   const on = C.poweredMounts(m, 2); assert.deepEqual([...on].sort(), ['M1', 'M2', 'M3']);
   assert.deepEqual([...C.poweredMounts(m, 1)].sort(), ['M1', 'M3']);
-  assert.equal(C.MOUNTS.length, 5); assert.deepEqual(Object.keys(C.sanitizeMounts({ M1: { ty: 'turret2' }, M9: { ty: 'turret2' }, M2: { ty: 'lava' } })), ['M1']);
+  assert.equal(C.MOUNTS.length, 6); assert.ok(C.MOUNTS.find((m) => m.id === 'M6' && m.deck === 3 && m.y === 4), 'M6 = the Upper Deck Mk III mount'); assert.deepEqual(Object.keys(C.sanitizeMounts({ M1: { ty: 'turret2' }, M9: { ty: 'turret2' }, M2: { ty: 'lava' } })), ['M1']);
 });
 ok('mount points sit on the roof, away from the shipyard deck / turret sockets and the antenna', () => {
-  for (const m of C.MOUNTS) { assert.ok(Math.abs(m.x) < 7 && Math.abs(m.z) < 3.4); const inDeck = m.x > -6.6 && m.x < -0.6 && Math.abs(m.z) < 3.2, inTur = m.x > 1.4 && m.x < 4.2 && Math.abs(m.z) < 1.6; assert.ok(!inDeck && !inTur, 'mount ' + m.id + ' collides with a shipyard roof socket'); assert.ok(Math.hypot(m.x - 5, m.z + 2) > 0.7, 'antenna'); }
-  for (let i = 0; i < C.MOUNTS.length; i++) for (let j = i + 1; j < C.MOUNTS.length; j++) assert.ok(Math.hypot(C.MOUNTS[i].x - C.MOUNTS[j].x, C.MOUNTS[i].z - C.MOUNTS[j].z) > 1.6);
+  for (const m of C.MOUNTS.filter((q) => !q.deck)) { assert.ok(Math.abs(m.x) < 7 && Math.abs(m.z) < 3.4); const R = (id) => SOCK[id].room, inDeck = m.x - 0.55 < R('DECK').x1 && m.x + 0.55 > R('DECK').x0 && Math.abs(m.z) < 3.2, inTur = m.x + 0.55 > R('TURRET').x0 && m.x - 0.55 < R('TURRET').x1 && Math.abs(m.z) - 0.55 < 1.6, inUp = m.x - 0.55 < LY.DECK.x1 && m.x + 0.55 > LY.DECK.x0; assert.ok(!inDeck && !inTur && !inUp, 'mount ' + m.id + ' collides with a shipyard roof socket / the Upper Deck'); assert.ok(Math.hypot(m.x + 6.85, m.z + 3.4) > 0.7, 'antenna'); }
+  for (let i = 0; i < C.MOUNTS.length; i++) for (let j = i + 1; j < C.MOUNTS.length; j++) assert.ok(Math.hypot(C.MOUNTS[i].x - C.MOUNTS[j].x, C.MOUNTS[i].z - C.MOUNTS[j].z) > 1.05, 'mount plates (r 0.55) must not overlap');
 });
 ok('planter: seed -> sprout -> sapling -> tree -> fruit over game days, water speeds it up, harvest regrows', () => {
   let p = C.plantIt(C.freshPlanter(), 'r:1'); assert.equal(C.stageOf(p.pts), 0);

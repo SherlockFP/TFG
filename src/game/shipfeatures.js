@@ -26,7 +26,7 @@ import { SHIP, insideShip } from '../world/ship.js';
 import { createAvatar } from '../models/avatar.js';
 import { suitColor } from '../entities/remote.js';
 import { t, tf, t as _t } from '../core/i18n.js';
-import { SPOTS } from '../world/shiplayout.js';
+import { SPOTS, DISCO as DISCO_SPOT } from '../world/shiplayout.js';
 
 const S = SHIP;
 const ROOF_Y = S.h + 0.45;                 // matches ship.js (eh)
@@ -53,7 +53,7 @@ const HORN_BTN = { x: SPOTS.horn.x, y: SPOTS.horn.y };                          
 const HORN_SPEAKER = new THREE.Vector3(-3.5, ROOF_Y + 0.35, 0);        // roof (sound origin)
 const MIRROR = { x: SPOTS.mirror.x, y: SPOTS.mirror.y, w: 1.0, h: 1.7, range: 7 };        // +z wall, bottom 0.42 m, top 2.12 m
 const TP_BTN = { x: SPOTS.tp.x, y: SPOTS.tp.y };                                     // -z wall
-const DISCO = { x: 2.0, z: 0.0, cord: 0.3, r: 0.22 };                  // hangs between the centre and aft ceiling lights
+const DISCO = { x: DISCO_SPOT.x, z: DISCO_SPOT.z, cord: 0.3, r: 0.22 };                  // hangs between the centre and aft ceiling lights
 // Floodlight: the roof guard rail (ship.js) runs along z = HULL_Z1 - 0.1 with its top bar at ROOF_Y + 0.9 +- 0.03,
 // just in front of the lamp. The head sits high enough that the lens and bezel clear it (lens bottom ~ROOF_Y+1.15).
 const FLOOD_LAMP = new THREE.Vector3(S.x1 - 1.5, ROOF_Y, HULL_Z1 - 0.3);
