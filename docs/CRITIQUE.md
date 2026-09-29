@@ -265,3 +265,5 @@ Palettes are tuned by simulation, not by eye (tests check delta-E under CVD matr
 Low preset is unverified against the 60 percent draw-call target (instanced decor thinning cuts triangles, not calls); module-added ship props (workbench, arcade table...) still unmerged; Rapier wasm (4.3 MB) dominates first load.
 ## Wave 8 - balance (docs/wave8/balance.md)
 One-shots are gone except telegraphed hazards from quota 4, but the sim's solo shovel player still dies 40-60 % on mid quotas from attrition alone (no healing/dodge model); the 0.4 s wind-up gate is untested in a live browser and relies on behaviours setting an attack state as the visible tell.
+## Wave 8 - mining (docs/wave8/mining.md)
+Never seen in a browser: collider feel (0.5 m stair steps on the domes), indoor slab vs facility props / loot, overlap with zone cores, visual balance of vertex-colour rock. Digging is single-cell and slow with hands by design; no rubble bodies after a cave-in, dig log lives in memory only.

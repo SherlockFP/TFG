@@ -53,6 +53,7 @@ import { installFacilitySystems } from './facilitysys.js';
 
 import { installBalance } from './balance.js';
 import { installBalanceRules } from './balance_rules.js';   // wave 8 balance
+import { installMining } from './mining.js';   // wave 8: voxel mining (docs/wave8/mining.md)
 import { doorwayBusy } from '../world/doorsafe.js';
 
 import { installMagic } from './magic.js';
@@ -318,6 +319,7 @@ export class Game extends Emitter {
 
     this.useModule('balance', installBalance);
     this.useModule('balRules', installBalanceRules);   // wave 8: wind-up gate, grab escape, hit-cap helpers
+    this.useModule('mining', installMining);   // wave 8: diggable rock, ores, cave-ins (mn* messages)
 
     this.useModule('magic', installMagic);
 
