@@ -73,10 +73,10 @@ export const SPOTS = {
 export const SOUL = {
   whiteboard: { x: -3.905, z: -1.95, y: 1.55, w: 1.5, h: 0.95, t: 0.03, ry: PI / 2 },            // hub face, north of the hatch: days / deaths / best haul
   shelf: { x: -3.84, z: -1.95, y: 2.25, w: 1.5, d: 0.16, t: 0.04 },                             // above the whiteboard: crew mugs + the quota plant
-  poster: { x: -4.095, z: -1.9, y: 1.55, w: 0.62, h: 0.86, t: 0.03, ry: -PI / 2 },              // cockpit face: the Company motivational poster
+  poster: { x: -4.095, z: 1.6, y: 1.55, w: 0.62, h: 0.86, t: 0.03, ry: -PI / 2 },              // cockpit face: the Company motivational poster
   notes: [                                                                                       // sticky notes (0.14 m squares)
     { x: -1.1, z: SHELL.z0 + 0.012, y: 1.85, ry: 0, i: 0 },                                     // -z hull, above the coffee machine
-    { x: -4.093, z: -1.3, y: 1.32, ry: -PI / 2, i: 1 },                                          // cockpit face, next to the poster
+    { x: -4.093, z: 2.2, y: 1.32, ry: -PI / 2, i: 1 },                                          // cockpit face, next to the poster
     { x: -3.893, z: -2.85, y: 1.55, ry: PI / 2, i: 2 },                                          // hub face, stuck beside the whiteboard
   ],
   mugs: [{ z: -2.5, i: 0 }, { z: -2.25, i: 1 }, { z: -1.45, i: 2 }],                            // stand on the shelf (x, y derive from it)
