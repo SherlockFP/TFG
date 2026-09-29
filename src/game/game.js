@@ -254,7 +254,7 @@ import { installArcade2 } from './arcade2.js';
 // [import:resto]
 // [import:feedcams]
 // [import:downed]
-// [import:hubgate]
+import { installHubgate } from './hubgate.js';   // [import:hubgate]
 // [import:facjobs]
 // [import:arcade2]
 // [import:mapmods]
@@ -535,7 +535,7 @@ export class Game extends Emitter {
     // [slot:resto]
     // [slot:feedcams]
     // [slot:downed]
-    // [slot:hubgate]
+    this.useModule('hubgate', installHubgate);   // [slot:hubgate] wave 8: Hub door, unlock cards, Quick Shift
     // [slot:facjobs]
     // [slot:arcade2]
     // [slot:mapmods]

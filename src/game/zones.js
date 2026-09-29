@@ -37,7 +37,7 @@ export function installZones(game) {
   let disposed = false, boundNet = null;
   const on = (ev, fn) => { const off = mods.on(ev, fn); if (typeof off === 'function') offs.push(off); };
   const host = () => !!game.isHost;
-  const enabled = () => game.config?.zones !== false;
+  const enabled = () => game.config?.zones !== false && !game.onboard?.locked?.('zones');   // [hubgate] zones open after quota 4
   const run = () => game.run;
   const runKey = () => String(run()?.runId ?? 'legacy');
   if (typeof document !== 'undefined' && !document.getElementById('tfg-zones-style')) { const s = document.createElement('style'); s.id = 'tfg-zones-style'; s.textContent = STYLE; document.head.appendChild(s); }

@@ -54,6 +54,8 @@ export const SPOTS = {
   // ---- hub centre = MESS: food table + chess table, trophy wall on the cockpit bulkhead (hub side)
   chess: { x: -2.25, z: 1.0, ry: PI / 2 },          // arcade chess / draughts table (stools along x)
   trophy: { x: -4.0 + PT / 2 + 0.01, z: 2.27, y: 1.62, cols: 6, rows: 2, dz: 0.38, dy: 0.5 },   // cycle3 trophy wall: face x, centre z / y, pitch, plaque scale
+  // ---- hub door (wave 8 hubgate): a wall door on the cockpit face of the bulkhead, north of the hatch; opens the Hub panel (side systems, unlocked one by one)
+  hubDoor: { x: -4.0 - PT / 2 - 0.035, z: -1.9, ry: -PI / 2, w: 1.1, h: 2.1 },
   // ---- engine room (orange)
   bench: { x: 4.55, z: SHELL.z0 + 0.39 + 0.03 },     // crafting workbench (wave 5: 0.1 m aft so the way in under the arch stays >= 0.9 m)
   reactor: { x: 6.35, z: -2.8 },                     // reactor core (decor + collider)
@@ -159,6 +161,7 @@ export function fixtureBoxes(S = SPOTS, opts = {}) {
   out.push(box('decon', S.decon.x, S.decon.z, 0.6, 0.6, 0, 2.4, { kind: 'solid' }));
   out.push(box('bench', S.bench.x, S.bench.z, 1.16, 0.405, 0, 2.8, { kind: 'solid' }));
   out.push(box('hornPanel', S.horn.x, SHELL.z1 - 0.03, 0.17, 0.03, S.horn.y - 0.25, S.horn.y + 0.25, { kind: 'wall' }));
+  if (S.hubDoor) out.push(box('hubDoor', S.hubDoor.x, S.hubDoor.z, 0.035, S.hubDoor.w / 2, 0, S.hubDoor.h, { kind: 'wall' }));
   out.push(box('mirror', S.mirror.x, SHELL.z1 - 0.03, 0.56, 0.03, S.mirror.y - 0.88, S.mirror.y + 0.88, { kind: 'wall' }));
   out.push(box('tpPanel', S.tp.x, SHELL.z0 + 0.03, 0.17, 0.03, S.tp.y - 0.25, S.tp.y + 0.25, { kind: 'wall' }));
   out.push(box('tpPad', PAD.x, PAD.z, PAD.r, PAD.r, 0, 0.05, { kind: 'floor' }));
@@ -212,7 +215,7 @@ export const ACCESS = [
   { id: 'door', x: 2.6, z: 2.9 }, { id: 'doorPanel', x: 3.95, z: 2.9 }, { id: 'stove', x: -3.25, z: -2.3 }, { id: 'brew', x: -2.05, z: -2.3 }, { id: 'coffee', x: -1.1, z: -2.3 },
   { id: 'charger', x: -0.35, z: -2.8 }, { id: 'arcade', x: 0.95, z: -2.1 }, { id: 'tpPad', x: 0, z: -1.0 },
   { id: 'mirror', x: -3.2, z: 2.9 }, { id: 'kiosk', x: -1.75, z: 2.35 }, { id: 'incubator', x: -0.38, z: 2.2 }, { id: 'decon', x: 0.86, z: 1.8 },
-  { id: 'trophies', x: -3.3, z: 2.4 }, { id: 'chess', x: -2.25, z: 0.05 }, { id: 'table', x: -2.3, z: -0.1 },
+  { id: 'trophies', x: -3.3, z: 2.4 }, { id: 'hubDoor', x: -4.75, z: -1.9 }, { id: 'chess', x: -2.25, z: 0.05 }, { id: 'table', x: -2.3, z: -0.1 },
   { id: 'bench', x: 4.55, z: -2.25 }, { id: 'reactor', x: 5.3, z: -2.3 }, { id: 'svPlanter', x: -5.85, z: 0.0 }, { id: 'planterCargo', x: 3.65, z: -0.5 },
   { id: 'planterHub', x: -4.5, z: -2.3 }, { id: 'lootBay', x: 5.05, z: 0.3 }, { id: 'suits', x: 5.8, z: 0.3 }, { id: 'cupboard', x: 5.84, z: 2.4 },
   { id: 'bunks', x: 4.65, z: 1.0 }, { id: 'crate', x: 5.8, z: 1.75 },

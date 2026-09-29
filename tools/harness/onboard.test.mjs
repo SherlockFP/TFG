@@ -137,12 +137,12 @@ const eq = (a, b, m) => ok(JSON.stringify(a) === JSON.stringify(b), `${m}: got $
   const v = { stats: { days: 5 }, level: 2 };
   eq(K.decideMode(v), 'all', 'veteran keeps everything');
   const u = p.unlocks;
-  const at = (q, boss = false) => Object.fromEntries(K.UNLOCK_IDS.map((id) => [id, K.isOpen(id, u, { q, boss })]));
-  eq(at(0), { forge: false, pets: false, voyage: false, homeworld: false, gates: false }, 'quota 0: everything locked');
-  eq(at(1), { forge: true, pets: false, voyage: false, homeworld: false, gates: false }, 'quota 1: forge');
-  eq(at(2), { forge: true, pets: true, voyage: true, homeworld: false, gates: false }, 'quota 2: pets + voyage');
-  eq(at(3), { forge: true, pets: true, voyage: true, homeworld: true, gates: false }, 'quota 3: homeworld');
-  eq(at(0, true), { forge: false, pets: false, voyage: false, homeworld: false, gates: true }, 'first boss: gates (independent of quotas)');
+  const at = (q, boss = false) => Object.fromEntries(K.UNLOCK_IDS.filter((id) => K.UNLOCKS.find((x) => x.id === id).boss || K.UNLOCKS.find((x) => x.id === id).q <= q + 1).map((id) => [id, K.isOpen(id, u, { q, boss })]));   // hubgate ladder: only the ids up to the next rung are compared
+  eq(at(0), { shop: false, tree: false, gates: false }, 'quota 0: everything locked');
+  eq(at(1), { shop: true, tree: true, arcade: false, pets: false, gates: false }, 'quota 1: store tiers + skill tree');
+  eq(at(2), { shop: true, tree: true, arcade: true, pets: true, homeworld: false, farming: false, restaurant: false, gates: false }, 'quota 2: arcade + pets');
+  eq(at(3), { shop: true, tree: true, arcade: true, pets: true, homeworld: true, farming: true, restaurant: true, forge: false, zones: false, gates: false }, 'quota 3: homeworld + farming + restaurant');
+  eq(at(0, true), { shop: false, tree: false, gates: true }, 'first boss: gates (independent of quotas)');
   ok(K.isOpen('nope', u, { q: 0 }), 'unknown ids are never locked');
   ok(K.isOpen('forge', u, { q: 0 }, true), 'unlockAll opens everything');
   ok(K.isOpen('homeworld', v.unlocks, { q: 0 }), 'mode all opens everything');
@@ -158,21 +158,21 @@ const eq = (a, b, m) => ok(JSON.stringify(a) === JSON.stringify(b), `${m}: got $
   // gifts one per system, only staged profiles, once
   const g = fresh(); K.decideMode(g);
   eq(K.pendingGifts(g.unlocks, { q: 0 }), [], 'nothing to gift at quota 0');
-  eq(K.pendingGifts(g.unlocks, { q: 2 }), ['forge', 'pets', 'voyage'], 'gifts due at quota 2');
-  ok(K.markGiven(g.unlocks, 'forge') && !K.markGiven(g.unlocks, 'forge'), 'gift marked once');
-  eq(K.pendingGifts(g.unlocks, { q: 2 }), ['pets', 'voyage'], 'forge no longer pending');
-  eq(K.pendingGifts(g.unlocks, { q: 3, boss: true }, false), ['pets', 'voyage', 'homeworld', 'gates'], 'the rest at quota 3 + boss');
+  eq(K.pendingGifts(g.unlocks, { q: 2 }), ['shop', 'tree', 'arcade', 'pets'], 'gifts due at quota 2');
+  ok(K.markGiven(g.unlocks, 'shop') && !K.markGiven(g.unlocks, 'shop'), 'gift marked once');
+  eq(K.pendingGifts(g.unlocks, { q: 2 }), ['tree', 'arcade', 'pets'], 'shop no longer pending');
+  eq(K.pendingGifts(g.unlocks, { q: 3, boss: true }, false), ['tree', 'arcade', 'pets', 'homeworld', 'farming', 'restaurant', 'gates'], 'the rest at quota 3 + boss');
   eq(K.pendingGifts(g.unlocks, { q: 3 }, true), [], 'unlockAll: no gifts');
   const vv = { stats: { days: 3 } }; K.decideMode(vv);
   eq(K.pendingGifts(vv.unlocks, { q: 9, boss: true }), [], 'veterans get no staged gifts');
   // JSON round trip + garbage
   const rt = { unlocks: JSON.parse(JSON.stringify(g.unlocks)) }; K.ensureUnlocks(rt);
-  ok(rt.unlocks.mode === 'staged' && rt.unlocks.given.forge, 'unlocks survive JSON');
+  ok(rt.unlocks.mode === 'staged' && rt.unlocks.given.shop, 'unlocks survive JSON');
   const bad = { unlocks: { v: 1, mode: 'x', q: 'a', given: [] } }; const fixed = K.ensureUnlocks(bad);
   ok(fixed.mode === null && fixed.q === 0 && typeof fixed.given === 'object' && !Array.isArray(fixed.given), 'garbage unlocks repaired');
-  eq(K.requirementText('forge'), { q: 1 }, 'requirement forge'); eq(K.requirementText('gates'), { boss: true }, 'requirement gates');
+  eq(K.requirementText('forge'), { q: 4 }, 'requirement forge'); eq(K.requirementText('gates'), { boss: true }, 'requirement gates');
   // the design table
-  eq(K.UNLOCKS.map((x) => [x.id, x.q ?? 'boss']), [['forge', 1], ['pets', 2], ['voyage', 2], ['homeworld', 3], ['gates', 'boss']], 'the MASTERPLAN 23.1 schedule');
+  eq(K.UNLOCKS.map((x) => [x.id, x.q ?? 'boss']), [['shop', 1], ['tree', 1], ['arcade', 2], ['pets', 2], ['homeworld', 3], ['farming', 3], ['restaurant', 3], ['forge', 4], ['zones', 4], ['voyage', 5], ['season', 5], ['gates', 'boss']], 'the hubgate ladder (wave 8)');
 }
 
 // ================================================================================================ 5. text table (EN / TR / RU)
@@ -268,10 +268,10 @@ const eq = (a, b, m) => ok(JSON.stringify(a) === JSON.stringify(b), `${m}: got $
   ok(api.routeBlocked({ id: 'hamsi' }) === null, 'other moons not blocked');
   // quota progress opens things and the Algorithm gifts them one by one
   game.run.quotaIndex = 1; tick(0.6);
-  ok(!api.locked('forge') && api.locked('pets'), 'quota 1 opens the forge');
-  ok(said.some((s) => /FORGE/.test(s)) && toasts.some((x) => /NEW TOY/.test(x[0])), 'the forge is gifted by the Algorithm (line + toast)');
+  ok(!api.locked('shop') && !api.locked('tree') && api.locked('pets'), 'quota 1 opens store tiers + skill tree');
+  ok(said.some((s) => /better stock/.test(s)) && toasts.some((x) => /NEW TOY/.test(x[0])), 'the store tiers are gifted by the Algorithm (line + toast)');
   game.run.quotaIndex = 2; tick(0.6);
-  ok(!api.locked('pets') && !api.locked('voyage') && api.locked('homeworld'), 'quota 2 opens pets + voyage');
+  ok(!api.locked('pets') && !api.locked('arcade') && api.locked('homeworld'), 'quota 2 opens arcade + pets');
   const n1 = said.length; tick(0.6, 3); ok(said.length === n1, 'gifts are spaced (one per 9 s)');
   tick(10, 1); tick(0.6);
   ok(said.filter((s) => /gift/i.test(s)).length >= 2, 'the next gift follows later');

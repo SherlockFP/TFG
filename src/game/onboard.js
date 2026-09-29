@@ -16,6 +16,7 @@ import { wrapMethod } from './dailyEvents.js';
 import * as K from './onboard_core.js';
 import { TEXT, x, xf } from './onboard_text.js';
 import { buildWing, SHUTTER } from './onboard_world.js';
+import { HUB_CMDS, hubOpen } from './hubgate_core.js';   // wave 8: what each locked id switches off
 
 const CSS = `.ob-pa{position:fixed;left:50%;top:clamp(48px,8vh,96px);transform:translateX(-50%);z-index:58;width:min(760px,94vw);background:#12130d;border:2px solid #f2c230;color:#e8e6d0;font:600 15px/1.35 'Bahnschrift','Arial Narrow',Arial,sans-serif;letter-spacing:.03em;box-shadow:0 6px 30px #000c;pointer-events:none;opacity:0;transition:opacity .35s}
 .ob-pa.on{opacity:1}
@@ -25,7 +26,7 @@ const CSS = `.ob-pa{position:fixed;left:50%;top:clamp(48px,8vh,96px);transform:t
 .ob-skip{position:fixed;left:50%;bottom:16%;transform:translateX(-50%);z-index:58;padding:5px 12px;background:#12130d;border:1px solid #f2c230;color:#f2c230;font:700 13px 'Bahnschrift','Arial Narrow',Arial,sans-serif;letter-spacing:.05em;pointer-events:none;display:none}`;
 
 const STEP_SAY = { crouch: 'say.crouch', sprint: 'say.sprint', locker: 'say.locker', flash: 'say.flash', loot: 'say.loot', lock: 'say.lock', hangar: 'say.hangar', terminal: 'say.terminal' };
-const CMD_LOCK = { pets: 'pets', home: 'homeworld', factory: 'homeworld', ghost: 'homeworld', signals: 'voyage', missions: 'voyage', mission: 'voyage', take: 'voyage', dropjob: 'voyage', voyage: 'voyage', warp: 'voyage' };
+const CMD_LOCK = HUB_CMDS;   // terminal word -> unlock id (hubgate_core.js SYSTEMS)
 const SKIP_HOLD = 2.0;
 
 export function installOnboard(game) {
@@ -53,6 +54,8 @@ export function installOnboard(game) {
   function locked(id) {
     const u = U();
     if (!u) return false;
+    const hub = game.hubgate?.remoteHub?.();   // wave 8: a joiner is ruled by the HOST's ladder (run.hub), not by their own profile
+    if (hub) return !hubOpen(id, hub, unlockAll());
     return K.isLockedId(id, u, prog(), unlockAll());
   }
   function lockedVars(id) { const r = K.requirementText(id); return { name: TEXT['u.' + id]?.[0] || id, n: r?.q || 0, boss: !!r?.boss }; }
@@ -79,12 +82,19 @@ export function installOnboard(game) {
       if (w0 === 'moon' && ['random', 'rnd', 'rand'].includes(rest?.[0])) id = 'voyage';
       if (w0 === 'route' && /^(s|~|sig|signal)\s*[1-3]$/.test((rest || []).join(' '))) id = 'voyage';
       if (id && locked(id)) { term?.print?.(lockedText(id, true), 'err'); return true; }
+      if (w0 === 'help' && this.commands?.size) {   // locked commands stay out of the HELP list (the list is built synchronously, printed later)
+        const hid = [...this.commands.keys()].filter((c) => CMD_LOCK[c] && locked(CMD_LOCK[c])).map((c) => [c, this.commands.get(c)]);
+        for (const [c] of hid) this.commands.delete(c);
+        try { return orig.call(this, w0, rest, term); } finally { for (const [c, v] of hid) this.commands.set(c, v); }
+      }
     }
     return orig.call(this, w0, rest, term);
   }));
   function announceGift(id) {
     const name = TEXT['u.' + id]?.[0] || id;
-    toast(xf('gift_toast', { name }), 'good');
+    let carded = false;
+    try { carded = !!game.hubgate?.card?.(id); } catch { /* optional */ }   // wave 8: the unlock card (big banner) replaces the toast
+    if (!carded) toast(xf('gift_toast', { name }), 'good');
     sfx('ui_levelup', 0.6);
     say('gift.' + id);
     S.giftHint = { id, until: T.t + 240 };
@@ -153,7 +163,7 @@ export function installOnboard(game) {
     const forced = q.get('hiringday') === '1' && !!game.isHost;
     const ctx = {
       profile: game.profile, settings: game.settings, isHost: !!game.isHost, hasRunData: !!game.opts?.runData, phase: game.run?.phase, quotaIndex: game.run?.quotaIndex, day: game.run?.day,
-      devAuto: q.has('autohost') || q.has('autojoin'), forced,
+      devAuto: q.has('autohost') || q.has('autojoin'), forced, quick: !!game.run?.quick,
     };
     const r = K.shouldRun(ctx);
     if (r.mark === 'skip') markSkip(r.why);

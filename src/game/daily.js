@@ -247,6 +247,7 @@ export function installDaily(game) {
     if (e.code !== (game.settings?.keys?.daily || 'F2') || e.repeat || disposed || game.destroyed || !game.run || !game.net || e.ctrlKey || e.altKey || e.metaKey) return;
     if (game.input?.isTyping?.() || game.minigame || game.terminal?.active || game.ui?.chatOpen) return;
     if (game.ui?.panelOpen && game.ui.panelOpen !== api._panel?.el) return;
+    if (game.onboard?.deny?.('season')) return;   // [hubgate] daily board + season open after quota 5
     if (game.player?.dead) return;
     e.preventDefault();
     if (api._panel && game.ui.panelOpen === api._panel.el) api.close(); else api.open();

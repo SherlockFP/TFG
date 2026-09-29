@@ -298,6 +298,7 @@ export function installRpg(game) {
     const tg = e.target?.tagName;
     if (tg === 'INPUT' || tg === 'TEXTAREA') return;
     if (game.input?.isTyping?.() || game.minigame || game.terminal?.active || game.ui?.chatOpen) return;
+    if (game.onboard?.deny?.('tree')) return;   // [hubgate] the skill tree opens after quota 1
     if (game.ui?.panelOpen && game.ui.panelOpen !== panelEl) return;
     e.preventDefault();
     toggle();

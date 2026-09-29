@@ -126,7 +126,7 @@ export const trapsBoughtToday = (run) => {
 export const soldToday = (run, id) => (run?.shop && run.shop.d === run.day ? run.shop.sold?.[id] || 0 : 0);
 
 /** Full priced stock for the run: entries + { price, off, deal, eom, qty (null = unlimited), left, soldOut, locked, lockReason }. */
-export function stockFor(run, lore = null) {
+export function stockFor(run, lore = null, tierLock = null) {
   const entries = catalogEntries();
   const deals = dealsFor(run, entries), eom = employeeFor(run, entries), qty = dailyQty(run, entries);
   return entries.map((e) => {
@@ -148,6 +148,7 @@ export function stockFor(run, lore = null) {
       const need = d.minRep ?? -20;
       if (Number.isFinite(rep) && rep < need) { locked = true; lockReason = `${t('Requires')} ${d.faction} ${need}`; }
     }
+    if (!locked && tierLock) { const why = tierLock(e); if (why) { locked = true; lockReason = why; } }
     return { ...e, price, priceBase, off, dealKind: kind, eomQuote: kind === 'eom' ? eom.quote : '', qty: q, left, soldOut: (left !== null && left <= 0) || owned, owned, locked, lockReason };
   });
 }
@@ -219,7 +220,7 @@ export function installShop(game) {
   const lore = () => g.lore || null;
   const api = { panel: null };
 
-  const stock = () => (g.run ? stockFor(g.run, lore()) : []);
+  const stock = () => (g.run ? stockFor(g.run, lore(), g.hubgate?.shopLock) : []);   // [hubgate] rare+ stock opens after quota 1
   const byId = (id) => stock().find((e) => e.id === id) || null;
   Object.assign(api, {
     stock, byId, categories: () => categoryList(),
