@@ -10,6 +10,8 @@ import { itemDef } from '../game/items.js';
 import { slowFactorAt } from '../world/setpieces.js';
 import { weightMul as diffWeightMul } from '../game/difficulty.js';
 import * as FACILITY from '../world/facility.js';
+import { probeLedge, mantlePose, MANTLE } from './mantle.js';
+import { t } from '../core/i18n.js';
 
 const RADIUS = 0.34;
 const HALF_STAND = 0.56;   // capsule half height (cylinder part) -> total 1.8
@@ -122,6 +124,7 @@ export class LocalPlayer {
     this.landVel = 0;          // landing dip spring velocity (landDip = offset, + = down)
     this.stepOff = 0;          // stair smoothing offset
     this.airT = 0; this.jumpBuf = 0; this.jumpedAir = false;
+    this.mantle = null; this.mantleAir = false; this.mantleMsgT = 0;   // [movefix] scripted mantle / vault (mantle.js)
     this.punchA = new THREE.Vector3(); this.punchV = new THREE.Vector3();
     this.strafeRoll = 0; this.shakeT = 0;
     this.hbT = 0;              // heartbeat timer (low HP)
@@ -155,8 +158,9 @@ export class LocalPlayer {
     this.fallStartY = null; this.minVelY = 0;
     this.body.setTranslation({ x: p.x, y: p.y + this.half + RADIUS + 0.02, z: p.z }, true);
     this.body.setNextKinematicTranslation({ x: p.x, y: p.y + this.half + RADIUS + 0.02, z: p.z });
+    this.physics.world.propagateModifiedBodyPositionsToColliders?.();
     if (yaw !== undefined) this.yaw = yaw;
-    this._prevY = p.y; this.stepOff = 0; this.landDip = 0; this.landVel = 0;
+    this._prevY = p.y; this.stepOff = 0; this.landDip = 0; this.landVel = 0; this.mantle = null;
   }
 
   get stats() { return this.game.stats; }
@@ -272,6 +276,21 @@ export class LocalPlayer {
     this.airT = this.grounded ? 0 : this.airT + dt;
     if (this.grounded) this.jumpedAir = false;
     this.jumpBuf = canMove && input.pressed('jump') ? JUMP_BUFFER : Math.max(0, this.jumpBuf - dt);
+    // [movefix] jump facing a ledge / fence: mantle or vault instead of a plain hop (settings.keys 'jump' is the same action)
+    if (this.grounded) this.mantleAir = false;
+    this.mantleMsgT = Math.max(0, this.mantleMsgT - dt);
+    if (!this.mantle && canMove && this.jumpBuf > 0 && !this.crouch && !this.mantleAir && !this.latched && !this.jetting && this.game.settings.mantle !== false && (this.grounded || this.airT < 0.9)) {
+      this.tryMantle(weightMul, bodyCarry);
+    }
+    if (this.mantle) {
+      if (!canMove || this.latched) this.mantle = null;   // stunned / grabbed mid-climb: gravity takes over
+      else {
+        this.hSpeed = 0; this.noise = Math.max(0, this.noise - dt * 1.5);
+        this.stepMantle(dt);
+        this.updateBreathing(dt, weightMul, true); this.updateHeartbeat(dt); this.updateCamera(dt, 0, false);
+        return;
+      }
+    }
     const canJump = this.grounded || (this.airT < COYOTE && !this.jumpedAir && this.vel.y <= 0.5);
     if (canMove && this.jumpBuf > 0 && canJump && !this.crouch && this.stamina > 8) {
       this.vel.y = 6.2 * (s.jumpMul || 1) * (weightMul > 0.7 ? 1 : 0.8);
@@ -313,6 +332,10 @@ export class LocalPlayer {
     // teleport, frames with no physics step would read a stale translation next
     // frame and lose their movement (stutter / slow walking on >60 Hz screens).
     this.body.setTranslation(np, true);
+    // [movefix] ROOT CAUSE of the "bounce in place": Rapier only copies a moved body's position to its collider inside world.step(). On frames
+    // without a physics step (any display > 60 Hz: 2 of 3 frames at 144 Hz) the controller measured from the STALE collider while we added its
+    // correction to the FRESH body position, so every snap-to-ground / depenetration was applied twice (+-4.4 cm ping-pong, grounded flicker).
+    this.physics.world.propagateModifiedBodyPositionsToColliders?.();
     // if we bumped the ceiling, stop rising
     if (this.vel.y > 0 && mv.y < desired.y * 0.5) this.vel.y = 0;
     const realVx = mv.x / Math.max(dt, 1e-4), realVz = mv.z / Math.max(dt, 1e-4);
@@ -374,6 +397,54 @@ export class LocalPlayer {
     this.updateHeartbeat(dt);
 
     this.updateCamera(dt, hs, wasGrounded);
+  }
+
+  // ------------------------------------------------------------------ mantle / vault (mantle.js)
+  tryMantle(weightMul, bodyCarry) {
+    const plan = probeLedge(this.physics, this.pos, this.yaw, { sprint: this.sprinting });
+    if (!plan) return;
+    const cost = plan.kind === 'mantle' ? MANTLE.stamina : MANTLE.vaultStamina;
+    if (this.exhausted || this.stamina < cost + 3) return;
+    if (this.twoHanded() || bodyCarry || this.game.grab?.item || weightMul < MANTLE.heavyMul) {
+      // too much loot to climb: you flop against the wall (the normal jump still happens)
+      if (this.mantleMsgT <= 0) {
+        this.mantleMsgT = 3;
+        this.game.ui?.toast?.(t('Too heavy to climb!'), 'info');
+        this.game.sfx('cloth_rustle', 0.3, 0.8);
+        this.game.engine.punch?.(0.03, 0, 0);
+        this.noise = Math.max(this.noise, 0.3);
+      }
+      return;
+    }
+    this.stamina -= cost;
+    this.staminaDelay = Math.max(this.staminaDelay || 0, 0.9);
+    const sp = Math.hypot(this.vel.x, this.vel.z);
+    plan.t = 0; plan.sprint = this.sprinting; plan.speed = clamp(sp, 0, 8.2);
+    this.mantle = plan; this.mantleAir = true; this.jumpBuf = 0; this.grounded = false; this.jumpedAir = true;
+    this.vel.set(0, 0, 0); this.minVelY = 0; this.fallStartY = null;
+    this.game.sfx(plan.kind === 'mantle' ? 'cloth_rustle' : 'jump', plan.kind === 'mantle' ? 0.35 : 0.3, 0.95 + Math.random() * 0.1);
+    this.noise = Math.max(this.noise, this.sneak ? 0.12 : plan.kind === 'mantle' ? 0.55 : plan.sprint ? 0.6 : 0.4);   // [stealth] climbing is heard
+    this.game.engine.punch?.(0.035, 0, 0);
+  }
+  stepMantle(dt) {
+    const m = this.mantle;
+    m.t += dt;
+    const u = Math.min(1, m.t / m.dur);
+    const q = mantlePose(m, u, this._mp || (this._mp = { x: 0, y: 0, z: 0 }));
+    const np = { x: q.x, y: q.y + 0.02 + this.half + RADIUS, z: q.z };
+    this.body.setNextKinematicTranslation(np);
+    this.body.setTranslation(np, true);
+    this.physics.world.propagateModifiedBodyPositionsToColliders?.();
+    this.pos.set(np.x, np.y - this.half - RADIUS, np.z);
+    if (u < 1) return;
+    // done: standing on the far side. A sprinting vault keeps its momentum, everything else steps out gently.
+    const low = m.sprint && m.H <= MANTLE.vaultH + 0.1;
+    const keep = m.kind === 'vault' ? (m.sprint ? Math.max(m.speed, 5.5) : Math.min(m.speed, 3.5)) : low ? Math.max(m.speed, 5.5) : 0;
+    this.vel.set(m.dirX * keep, m.kind === 'vault' ? 0 : -1, m.dirZ * keep);
+    this.mantle = null; this.grounded = true; this.airT = 0; this.minVelY = 0;
+    this.game.sfx('land_soft', 0.2, 1.2);
+    this.game.engine.punch?.(-0.02, 0, 0);
+    this.landVel += 0.5;
   }
 
   // ------------------------------------------------------------------ camera feel

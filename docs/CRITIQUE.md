@@ -272,3 +272,5 @@ Goggles are buyable + battery-limited, but tuning (85 cr / 90 s) is by feel, not
 Seats are two stool interactables and standing up is ESC / E, but the player body never moves onto the stool and there is no tray of captured pieces on the table (HUD glyph row only); the owner captured-pawn bug was reproduced only in rules tests (rules were already correct), so the real cause was likely UI (seat / turn confusion) and is NOT yet checked in a browser (chess_seats.js unrun).
 ## Wave 8 - geomfix
 Geometry is now audited in node (tools/harness/geomfix.test.mjs) and the worst placement bugs are guarded, but only collider footprints are checked: visual-only overlaps of collider-less clutter, runtime-dropped items and animated props are not, and maps5 interiors / horror pockets keep their own tests.
+## Wave 8 - movefix (docs/wave8/movefix.md)
+The idle-bounce fix (collider sync each frame) and the mantle/vault are verified only in node against real Rapier with synthetic boxes/ramps/stairs; no browser run (lock was jammed), so ledge feel, camera pitch kick, ship-deck/terrain edge cases and the remote-player pose during a mantle are unverified.
