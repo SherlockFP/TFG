@@ -19,6 +19,7 @@ import { angleDiff, clamp } from '../core/util.js';
 import { addTranslations } from '../core/i18n.js';
 import { insideShip } from '../world/ship.js';
 import { G } from '../physics/physics.js';
+import { atReady, atBegin, atStep, atCancel, atShoot, atAiming } from './aimtell.js';   // wave 5: telegraphed aim (aim -> lock -> fire at the locked point)
 
 const rnd = Math.random;
 const V = new THREE.Vector3();
@@ -403,31 +404,13 @@ function findCover(c, M, from) {
 function gunFire(c, M, p, leaderUp) {
   const g = M.game, d = c.data;
   d.ammo = (d.ammo ?? PISTOL_MAG) - 1;
-  c.cooldown = c.type === 'hs_leader' ? 1.3 + rnd() * 0.5 : 0.65 + rnd() * 0.45;
   c.setState('fire'); c.extra = 0;
   const fx = Math.sin(c.yaw), fz = Math.cos(c.yaw);
-  const muzzle = new THREE.Vector3(c.pos.x + fx * 0.5 - fz * 0.12, c.pos.y + 1.42, c.pos.z + fz * 0.5 + fx * 0.12);
-  const chest = p.eye.clone(); chest.y -= 0.45;
-  const los = g.physics.lineOfSight(muzzle, p.eye);
-  const dist = muzzle.distanceTo(chest);
-  const sector = g.run?.quotaIndex || 0;
-  // early game: bad shots. Better with sector, the leader alive and a standing target
-  let acc = 0.32 + 0.06 * sector + (leaderUp ? 0.1 : 0) - Math.min(0.22, M.playerSpeed(p) * 0.045) - dist * 0.011 - (p.crouch ? 0.06 : 0);
-  acc = clamp(acc, 0.15, 0.82);
-  const hit = los && rnd() < acc;
-  let to = chest;
-  if (hit) M.attack(c, p, c.dmg, c.type);
-  else {
-    const dir = chest.clone().sub(muzzle).normalize();
-    const side = new THREE.Vector3(-dir.z, 0, dir.x).multiplyScalar((rnd() < 0.5 ? -1 : 1) * (0.5 + rnd() * 0.9));
-    const aim = chest.clone().add(side).add(new THREE.Vector3(0, (rnd() - 0.4) * 0.8, 0));
-    const ray = aim.sub(muzzle).normalize();
-    const h = g.physics.raycast?.(muzzle, ray, 40, G.STATIC | G.DOOR);
-    to = h?.point ? new THREE.Vector3(h.point.x, h.point.y, h.point.z) : muzzle.clone().addScaledVector(ray, 30);
-  }
-  const r2 = (v) => +v.toFixed(2);
-  g.net.broadcast('fx', { k: 'hshot', id: c.id, a: [r2(muzzle.x), r2(muzzle.y), r2(muzzle.z)], b: [r2(to.x), r2(to.y), r2(to.z)], h: hit ? 1 : 0 });
-  M.noise(c.pos, 2.6);
+  const muzzle = { x: c.pos.x + fx * 0.5 - fz * 0.12, y: c.pos.y + 1.42, z: c.pos.z + fz * 0.5 + fx * 0.12 };
+  // wave 5 (aimtell): the bullet flies to the point locked 0.25 s ago; distance / sprint / cover / early-quota accuracy lives in aimtell_core.js;
+  // the squad leader alive makes the squad a bit sharper, the 2-4 s cooldown is set by aimtell
+  atShoot(c, M, p, { muzzle, dmg: c.dmg, cause: c.type, accMul: leaderUp ? 1.12 : 1 });
+  void g;
 }
 
 export function soldierBehavior(c, dt, M) {
@@ -445,7 +428,7 @@ export function soldierBehavior(c, dt, M) {
   const leaderUp = !!leader && !leader.dead;
   const buff = leaderUp && c.type !== 'hs_leader' ? 1.15 : 1;
   const st = c.state;
-  if (st !== 'aim') c.extra = 0;
+  if (st !== 'aim') { c.extra = 0; if (atAiming(c)) atCancel(c, M); }   // interrupted (hit, fled, reload): drop the aim + release the group slot
   // ---- committed actions
   if (st === 'windup') {
     const p = g.aiPlayerById(c.target);
@@ -464,10 +447,9 @@ export function soldierBehavior(c, dt, M) {
   if (st === 'recover') { if (c.t > 0.7) c.setState('run'); return; }
   if (st === 'aim') {
     const p = g.aiPlayerById(c.target);
-    if (!p || p.dead || p.inShip || p.zone !== c.zone) { c.extra = 0; c.setState('run'); return; }
-    faceTo(c, p.pos.x, p.pos.z, dt, 6);
-    c.extra = p.id;   // laser target for every client
-    if (c.t >= (c.type === 'hs_leader' ? 1.0 : leaderUp ? 0.65 : 0.8)) gunFire(c, M, p, leaderUp);
+    if (!p || p.dead || p.inShip || p.zone !== c.zone) { atCancel(c, M); c.extra = 0; c.setState('run'); return; }
+    const ev = atStep(c, dt, M, p, { face: (q) => faceTo(c, p.pos.x, p.pos.z, q, 6) });   // aim (laser synced through c.extra) -> lock -> fire
+    if (ev === 'fire') gunFire(c, M, p, leaderUp);
     return;
   }
   if (st === 'fire') { if (c.t > 0.25) c.setState('run'); return; }
@@ -537,7 +519,7 @@ export function soldierBehavior(c, dt, M) {
       return;
     }
     if (dist > maxR) { c.setState('run'); M.moveToward(c, tgt.pos, dt, c.def.run * buff); return; }
-    if (c.cooldown <= 0) { c.setState('aim'); c.extra = tgt.id; return; }
+    if (atReady(c, M) && atBegin(c, M, tgt, { state: 'aim', mul: leaderUp && c.type !== 'hs_leader' ? 0.9 : 1 })) return;   // group limit: 1-2 shooters aim at once
     if (c.state !== 'idle') c.setState('idle');
     faceTo(c, tgt.pos.x, tgt.pos.z, dt, 5);
     return;

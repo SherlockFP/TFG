@@ -11,6 +11,7 @@ import { MOONS } from './moons.js';
 import { registerCreature } from './creatures.js';
 import { chaser } from '../entities/creatures.js';
 import { G } from '../physics/physics.js';
+import { atReady, atBegin, atStep, atCancel, atShoot, atAiming } from './aimtell.js';   // wave 5: telegraphed aim
 import { hudDock } from '../ui/dock.js';
 import * as H from './homeworld_core.js';
 import * as X from './homeworld2_core.js';
@@ -41,15 +42,18 @@ const sentryBehavior = (c, dt, M) => {
     if (!g.physics.lineOfSight(eye, p.eye)) continue;
     best = p; bd = dist;
   }
-  if (!best) { if (c.state !== 'idle') c.setState('idle'); return; }
-  c.yaw = Math.atan2(best.pos.x - c.pos.x, best.pos.z - c.pos.z);
-  if (c.state === 'idle' || c.state === 'off') { c.setState('alert'); d.cd = Math.max(d.cd, 0.7); return; }   // 0.7 s warning before the first shot
-  if (c.state === 'alert' && c.t > 0.7) c.setState('fire');
-  if (c.state === 'fire' && d.cd <= 0) {
-    d.cd = d.rate;
+  if (!best) { atCancel(c, M); if (c.state !== 'idle') c.setState('idle'); return; }
+  const faceBest = () => { c.yaw = Math.atan2(best.pos.x - c.pos.x, best.pos.z - c.pos.z); };
+  if (c.state === 'idle' || c.state === 'off') { faceBest(); c.setState('alert'); return; }
+  if (c.state === 'fire') { if (c.t > 0.3) c.setState('alert'); return; }
+  // wave 5 (aimtell): 'alert' = posture, the red laser (0.8-1.4 s, then a white 0.25 s lock with the tower frozen) starts through atBegin;
+  // one shot at the LOCKED point, 2-4 s pause, group limit. d.rate (old fire rate) now scales the damage of the single shot instead.
+  if (!atAiming(c)) { faceBest(); if (atReady(c, M)) atBegin(c, M, best); return; }
+  if (atStep(c, dt, M, best, { face: faceBest }) === 'fire') {
     M.sound?.(c, 'turret_fire', 0.6);
-    M.attack(c, best, d.dmg, 'turret');
-    g.net.broadcast('h2msg', { k: 'gtr', a: [+eye.x.toFixed(1), +eye.y.toFixed(1), +eye.z.toFixed(1)], b: [+best.pos.x.toFixed(1), +(best.pos.y + 1).toFixed(1), +best.pos.z.toFixed(1)], w: d.kind });
+    const r = atShoot(c, M, best, { muzzle: eye, dmg: Math.round(d.dmg * Math.min(4, Math.max(1, 2.5 / Math.max(0.4, d.rate)))), cause: 'turret', fx: false, noise: 1.5 });
+    c.setState('fire');
+    g.net.broadcast('h2msg', { k: 'gtr', a: [+eye.x.toFixed(1), +eye.y.toFixed(1), +eye.z.toFixed(1)], b: r.end.map((x) => +x.toFixed(1)), w: d.kind });
   }
 };
 registerCreature('h2_sentry', { name: 'Ghost Sentry', model: 'turret', hp: 150, dmg: 6, walk: 0, run: 0, power: 0, xp: 25, coin: 0, zone: 'out', radius: 0.55, height: 1.3, noSpawn: true, noHunt: true, noCompDrop: true, ghost: true,

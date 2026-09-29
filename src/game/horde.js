@@ -546,17 +546,8 @@ export function installHorde(game) {
   function soldierView(v) {
     if (!v._hNamed && v.model?.faction) { v._hNamed = true; v.def = { ...v.def, name: `${v.model.faction.short} ${v.def.name}` }; }
     if (!v.model?.setLaser) return;
-    if (v.state !== 'aim' || typeof v.extra !== 'string' || !v.extra) { v.model.setLaser(null); return; }
-    const head = game.playerHeadById(v.extra);
-    if (!head) { v.model.setLaser(null); return; }
-    const to = head.clone(); to.y -= 0.3;
-    const from = v.model.muzzleWorld?.(_hv);
-    if (from) {
-      const dir = to.clone().sub(from); const L = dir.length();
-      const hit = L > 0.1 ? game.physics.raycast(from, dir.normalize(), L, G.STATIC | G.DOOR) : null;
-      if (hit?.point) to.set(hit.point.x, hit.point.y, hit.point.z);
-    }
-    v.model.setLaser(to, clampN((v.stateT || 0) / 0.8, 0, 1));
+    v.model.setLaser(null);   // wave 5: the laser (jitter -> steady -> white lock at the frozen point) is drawn by src/game/aimtell.js for every shooter
+    void _hv;
   }
   function deepfakeRevealed(v) {
     v._hRevealed = true;

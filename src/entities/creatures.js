@@ -11,6 +11,8 @@ import { applyNameTagTitle } from '../game/achievements.js';
 import { ITEMS } from '../game/items.js';
 import { t, addTranslations } from '../core/i18n.js';
 import { creatureTierMul, creatureTierXp } from '../game/enhance.js';   // [forge] creature tiers
+import { atReady, atBegin, atStep, atCancel, atShoot, atAiming } from '../game/aimtell.js';   // wave 5: telegraphed aim (moderator, facility turret)
+import { chaseCfg, chaseSpeed, chaseTurn, doorPause, newChase } from '../game/chase_tuning.js';       // wave 5: burst / fatigue / turning / door hesitation
 
 addTranslations({ 'CROUCH BESIDE IT TO ROCK IT': 'SALLAMAK İÇİN YANINDA ÇÖMEL' });
 
@@ -769,20 +771,24 @@ export class CreatureManager {
     }
   }
   // follow current path; returns true when arrived
-  follow(c, dt, speed, turnRate = 8) {
+  follow(c, dt, speed, turnRate = 8, facingSlow = 0.3) {
     if (!c.path || c.pathIdx >= c.path.length) return true;
     speed = this.speedMul(c, speed);
+    // wave 5 (chase_tuning.js): sustained speed < player sprint, burst -> fatigue -> recovery, wide corners, hesitation at shut doors
+    const cfg = chaseCfg(c.def, c.type), asked = speed;
+    if (cfg) { speed = chaseSpeed(c._ch || (c._ch = newChase()), speed, dt, cfg, this.game.time || 0); [turnRate, facingSlow] = chaseTurn(cfg, asked, turnRate, 0.3); }
+    if (c.hesT > 0) { c.hesT -= dt; return false; }              // standing at a door that was shut in its face
     const wp = c.path[c.pathIdx];
     const dx = wp.x - c.pos.x, dz = wp.z - c.pos.z;
     const d = Math.hypot(dx, dz);
     if (d < 0.35) { c.pathIdx++; return c.pathIdx >= c.path.length; }
     const want = Math.atan2(dx, dz);
     c.yaw += clamp(angleDiff(c.yaw, want), -turnRate * dt, turnRate * dt);
-    const facing = Math.abs(angleDiff(c.yaw, want)) < 1.2 ? 1 : 0.3;
+    const facing = Math.abs(angleDiff(c.yaw, want)) < 1.2 ? 1 : facingSlow;
     const step = Math.min(d, speed * dt * facing);
     const nx = c.pos.x + (dx / d) * step, nz = c.pos.z + (dz / d) * step;
     this.placeAt(c, nx, nz);
-    this.openDoorsNear(c);
+    this.openDoorsNear(c, cfg, asked);
     return false;
   }
   placeAt(c, x, z) {
@@ -804,12 +810,17 @@ export class CreatureManager {
     if (c.repath <= 0 || (!c.path && !c.dest) || (c.dest && Math.hypot(c.dest.x - target.x, c.dest.z - target.z) > 2.5)) this.goTo(c, target.x, target.z);
     return this.follow(c, dt, speed, turnRate);
   }
-  openDoorsNear(c) {
+  openDoorsNear(c, cfg = null, asked = 0) {
     const fac = this.game.world.facility;
     if (!fac || c.zone === 'out') return;
     for (const d of fac.doors) {
       if (d.open || d.locked || d.kind !== 'door') continue;
-      if (d.pos.distanceToSquared(c.pos) < 2.5 * 2.5) this.game.hostSetDoor(d.id, true, true);
+      if (d.pos.distanceToSquared(c.pos) < 2.5 * 2.5) {
+        // wave 5: a chasing creature stops 1-2 s in front of a door that is shut in its face before it opens it (once per closing)
+        if (cfg && c.hesDoor !== d.id) { const pz = doorPause(cfg, asked, Math.random()); if (pz > 0) { c.hesDoor = d.id; c.hesT = pz; return; } }
+        c.hesDoor = null;
+        this.game.hostSetDoor(d.id, true, true);
+      }
     }
   }
   attack(c, p, dmg, cause) {
@@ -1276,21 +1287,33 @@ export const BEHAVIORS = {
       seen = p; break;
     }
     if (!seen) {
+      if (atAiming(c)) atCancel(c, M);
+      c.data.burst = 0;
       if (c.state !== 'idle') c.setState('idle');
       c.extra = Math.sin(c.t * 0.6) * 1.0;
       return;
     }
-    const want = angleDiff(c.yaw, Math.atan2(seen.pos.x - c.pos.x, seen.pos.z - c.pos.z));
-    c.extra += clamp(want - c.extra, -dt * 3, dt * 3);
+    // wave 5 (aimtell): alert = the head tracks you (>= 0.9 s), then the head FREEZES for the 0.25 s lock, then a 3-round burst at the locked point,
+    // then 2-4 s of silence. `extra` is the head yaw here (number), so the aim state is kept host-side (noExtra) and the head itself is the tell.
+    const locked = atAiming(c) && c.data.at?.ph === 'lock';
+    if (!locked && c.state !== 'fire') {
+      const want = angleDiff(c.yaw, Math.atan2(seen.pos.x - c.pos.x, seen.pos.z - c.pos.z));
+      c.extra += clamp(want - c.extra, -dt * 3, dt * 3);
+    }
     if (c.state === 'idle') { c.setState('alert'); return; }
-    if (c.state === 'alert' && c.t > 0.9) c.setState('fire');
+    if (c.state === 'alert') {
+      if (!atAiming(c)) { if (c.t > 0.5 && atReady(c, M)) atBegin(c, M, seen, { noExtra: true }); return; }
+      if (atStep(c, dt, M, seen, { noExtra: true }) === 'fire') { c.setState('fire'); c.data.burst = 3; c.data.shot = 0; }
+      return;
+    }
     if (c.state === 'fire') {
       c.data.shot = (c.data.shot || 0) - dt;
-      if (c.data.shot <= 0) {
-        c.data.shot = 0.14;
+      if (c.data.shot <= 0 && c.data.burst > 0) {
+        c.data.shot = 0.14; c.data.burst--;
         M.sound(c, 'turret_fire', 0.7);
-        if (Math.random() < 0.75) M.attack(c, seen, c.dmg, 'turret');
+        atShoot(c, M, seen, { muzzle: eye, dmg: c.dmg, cause: 'turret', noise: 1.5 });
       }
+      if (c.data.burst <= 0 && c.data.shot <= 0) c.setState('alert');
     }
   },
   mine: (c, dt, M) => {
@@ -1344,10 +1367,14 @@ export const BEHAVIORS = {
     if (d.tid && !tgt) d.tid = null;
     c.target = d.tid || null;
     const st = c.state;
+    if (st !== 'aim' && atAiming(c)) atCancel(c, M);
     if (st === 'aim') {
-      if (!tgt) { c.setState('hunt'); return; }
-      faceTo(c, tgt.pos.x, tgt.pos.z, dt, senior ? 6 : 4.5);
-      if (c.t >= (senior ? 0.75 : 1.0)) moderatorFire(c, M);
+      if (!tgt) { atCancel(c, M); c.setState('hunt'); return; }
+      // wave 5 (aimtell): aim 0.8-1.4 s (the model's red laser follows its facing), 0.25 s lock with the facing FROZEN (white line), then the blast
+      // along the locked facing; group limit + 2-4 s between blasts. Denied slot / cooling down = it keeps its eye on the target and waits.
+      if (!atAiming(c) && !(atReady(c, M) && atBegin(c, M, tgt, { state: 'aim', mul: senior ? 0.9 : 1 }))) { c.setState('hunt'); return; }   // slot denied / cooling down: no laser, keep hunting
+      const ev = atStep(c, dt, M, tgt, { face: (q) => faceTo(c, tgt.pos.x, tgt.pos.z, q, senior ? 6 : 4.5) });
+      if (ev === 'fire') moderatorFire(c, M);
       return;
     }
     if (st === 'fire') { if (c.t > 0.45) c.setState(d.shots <= 0 ? 'reload' : 'hunt'); return; }
@@ -1376,7 +1403,7 @@ export const BEHAVIORS = {
       // it remembers you now: it shoots on sight (moving or not) until it loses you for 20 s
       const dist = tgt.pos.distanceTo(c.pos);
       if (dist < 1.7 && c.cooldown <= 0) { c.cooldown = 1.6; d.kicked = false; faceTo(c, tgt.pos.x, tgt.pos.z, 1, 99); c.setState('kick'); return; }
-      if (d.shots > 0 && c.cooldown <= 0 && M.canSee(c, tgt, 26, 150)) { d.lastSeen = tgt.pos.clone(); d.memT = Math.max(d.memT, 12); c.setState('aim'); return; }
+      if (d.shots > 0 && c.cooldown <= 0 && atReady(c, M) && M.canSee(c, tgt, 26, 150)) { d.lastSeen = tgt.pos.clone(); d.memT = Math.max(d.memT, 12); c.setState('aim'); return; }
       if (st !== 'hunt') c.setState('hunt');
       if (d.lastSeen) { if (M.moveToward(c, d.lastSeen, dt, c.def.run)) d.lastSeen = null; }
       else if (!c.path || M.follow(c, dt, c.def.walk)) M.wander(c, 10);

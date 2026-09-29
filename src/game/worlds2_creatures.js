@@ -13,6 +13,7 @@ import { chaser, STATE_SOUNDS, LOOPS } from '../entities/creatures.js';
 import { registerItem, ITEMS } from './items.js';
 import { angleDiff, clamp } from '../core/util.js';
 import { G } from '../physics/physics.js';
+import { atReady, atBegin, atStep, atCancel, atShoot, atAiming, atLocked } from './aimtell.js';   // wave 5: telegraphed aim
 import { IDENT } from './identify.js';
 import { CREATURE_FLAVOUR } from './components.js';
 import { NO_LOOK } from '../render/tierlooks.js';
@@ -158,6 +159,7 @@ function raiderBehavior(c, dt, M) {
   const players = outdoorsPlayers(c, M);
   if (d.hitAt && d.hitAt > (d.seenHit || 0)) { d.seenHit = d.hitAt; if (d.hitBy) { d.alert = { id: d.hitBy, t: now }; } }
   const st = c.state;
+  if (st !== 'aim' && atAiming(c)) atCancel(c, M);   // wave 5 aimtell: interrupted -> drop the aim + the group slot
   const target = () => players.find((q) => q.id === c.target);
   if (st === 'reload') { d.reload -= dt; if (d.reload <= 0) { d.mag = 5; c.setState('aim'); d.aimT = 0.3; } return; }
   if (st === 'attack') { if (c.t > 0.18) { c.setState('aim'); d.aimT = 0.4; } return; }
@@ -167,24 +169,21 @@ function raiderBehavior(c, dt, M) {
     const dist = flat(p.pos, c.pos), see = M.canSee(c, p, 26, 360);
     d.lost = see ? 0 : d.lost + dt;
     if (d.lost > 4 || dist > 46) { c.target = null; c.setState('idle'); return; }
-    face(c, p.pos.x, p.pos.z, dt, 9);
+    const frozen = atLocked(c);   // wave 5: during the 0.25 s lock it neither turns nor moves (no tracking)
+    if (!frozen) face(c, p.pos.x, p.pos.z, dt, 9);
     // range keeping
-    if (dist < 5.5) { const ax = c.pos.x + (c.pos.x - p.pos.x), az = c.pos.z + (c.pos.z - p.pos.z); M.goTo(c, ax, az); M.follow(c, dt, c.def.run * 0.8); }
+    if (frozen) { /* stand still while the laser is white */ }
+    else if (dist < 5.5) { const ax = c.pos.x + (c.pos.x - p.pos.x), az = c.pos.z + (c.pos.z - p.pos.z); M.goTo(c, ax, az); M.follow(c, dt, c.def.run * 0.8); }
     else if (dist > 15 || !see) M.moveToward(c, p.pos, dt, c.def.run * 0.9);
     if (dist < 1.8 && c.cooldown <= 0) { c.cooldown = 1.2; M.attack(c, p, Math.round(c.dmg * 1.1), 'scavraider'); return; }
     if (!see) { if (c.state !== 'run') c.setState('run'); return; }
     if (c.state !== 'aim') { c.setState('aim'); d.aimT = 0; }
-    d.aimT += dt;
-    if (d.aimT >= 0.85) {
-      d.aimT = 0;
-      const chance = clamp(0.48 + (dist < 8 ? 0.1 : 0) - (p.crouch ? 0.12 : 0) - Math.min(0.3, M.playerSpeed(p) * 0.04) - Math.max(0, dist - 18) * 0.012, 0.08, 0.7);
-      const hit = rnd() < chance;
+    // wave 5 (aimtell): 'aim' is the posture; the laser only shows once atBegin succeeded (group limit 1-2, 2-4 s cooldown between shots)
+    if (!atAiming(c)) { if (atReady(c, M)) atBegin(c, M, p, { state: 'aim' }); return; }
+    const ev = atStep(c, dt, M, p);
+    if (ev === 'fire') {
       const fwd = V.set(Math.sin(c.yaw), 0, Math.cos(c.yaw));
-      const a = [c.pos.x + fwd.x * 0.7, c.pos.y + 1.35, c.pos.z + fwd.z * 0.7];
-      const e = p.eye, b = hit ? [e.x, e.y - 0.3, e.z] : [e.x + (rnd() - 0.5) * 2.4, e.y + (rnd() - 0.6) * 1.6, e.z + (rnd() - 0.5) * 2.4];
-      g.net.broadcast('fx', { k: 'hshot', a: a.map((x) => +x.toFixed(2)), b: b.map((x) => +x.toFixed(2)), h: hit ? 1 : 0 });
-      g.creatures.noise(c.pos, 2);
-      if (hit) M.attack(c, p, c.dmg, 'scavraider');
+      atShoot(c, M, p, { muzzle: { x: c.pos.x + fwd.x * 0.7, y: c.pos.y + 1.35, z: c.pos.z + fwd.z * 0.7 }, dmg: c.dmg, cause: 'scavraider', noise: 2 });
       d.mag--; c.setState('attack');
       if (d.mag <= 0) { d.reload = 2.2; c.setState('reload'); }
     }

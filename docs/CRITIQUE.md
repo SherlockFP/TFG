@@ -213,3 +213,6 @@ Lockpicking is now a 1.5 s timing click on Simple locks and scales to timed / sh
 
 ## Wave 5 - stairs (docs/wave5/stairs.md)
 Every stair builder (Soviet blocks, towers, ruins, crawler ramp, mansion staircase, catwalk stairs) now uses one inclined ramp collider instead of stepped boxes; the old boxes stalled the autostep when the player pushed into a wall or rail, which is the normal way to climb a stairwell. Proven in node with the real Rapier controller (walk / sprint / sideways push), but nobody has climbed them by hand in a browser yet; ramp climbing is slightly slower than flat walking and other players' feet clip into the visual treads by up to ~0.15 m.
+
+## Wave 5 - aimchase (docs/wave5/aimchase.md)
+NPC shooters now telegraph (laser, white lock, fire at the locked point) and creatures obey one speed table (sustained < sprint, short bursts, fatigue, door hesitation); only node-tested, laser/vignette look and difficulty feel are unverified in a browser.
