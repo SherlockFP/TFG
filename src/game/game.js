@@ -196,6 +196,7 @@ import { installSurvival } from './survival.js';   // wave 4: foraging, farming,
 
 import { installVoyage } from './voyage.js';   // wave 4: random moons, signals, warp events, missions, set pieces (docs/wave4/voyage.md)
 import { installZones } from './zones.js';   // [import:zones] wave 5: zone capture, fortify, passive income, counter-attacks, sector map (docs/wave5/zones.md)
+import { installStory } from './story.js';   // [import:story] wave 6: two patrons (Company / Algorithm), allegiance, 3 acts + 3 endings, trend creature (docs/wave6/story.md)
 
 
 // [import:ux]
@@ -449,6 +450,7 @@ export class Game extends Emitter {
 
     this.useModule('voyage', installVoyage);   // [voyage]
     this.useModule('zones', installZones);   // [slot:zones] (after voyage/siege: reads game.deployables, wraps hostFinishTakeoff)
+    this.useModule('story', installStory);   // [slot:story] (after zones / cycle / lore / cosm5 order-independent: everything is looked up lazily)
 
 
     // [slot:ux]

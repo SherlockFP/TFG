@@ -333,13 +333,13 @@ export function installContracts(core) {
     const c = run.contract;
     if (c) {
       const tx = contractText(c, T);
-      out.push(`${t('ACTIVE')}: [${FACTIONS[c.faction].short}] ${tx.title} — ${stateName(c.state, T)} ${c.progress || 0}/${c.n}`, `  ${tx.brief}`, '');
+      out.push(`${t('ACTIVE')}: [${FACTIONS[c.faction].short}]${c.patron ? (c.patron === 'company' ? ' ' + t('<COMPANY>') : ' ' + t('<ALGORITHM>')) : ''} ${tx.title} — ${stateName(c.state, T)} ${c.progress || 0}/${c.n}`, `  ${tx.brief}`, '');
     }
     const offers = run.contracts?.offers || [];
     if (!offers.length) out.push(t('No offers. New ones arrive in orbit.'));
     offers.forEach((o, i) => {
       const tx = contractText(o, T), f = FACTIONS[o.faction];
-      out.push(`${o.taken ? 'x' : i + 1}. [${f.short}] ${tx.title}${o.chain !== null && o.chain !== undefined ? `  ★ ${pickLang(CHAINS[o.faction].name, T)} ${o.chain + 1}/5` : ''}  (${tx.type})`);
+      out.push(`${o.taken ? 'x' : i + 1}. [${f.short}]${o.patron ? (o.patron === 'company' ? ' ' + t('<COMPANY>') : ' ' + t('<ALGORITHM>')) : ''} ${tx.title}${o.chain !== null && o.chain !== undefined ? `  ★ ${pickLang(CHAINS[o.faction].name, T)} ${o.chain + 1}/5` : ''}  (${tx.type})`);
       out.push(`   ${tx.brief}`);
       if (tx.goal !== tx.brief) out.push(`   > ${tx.goal}`);
       out.push(`   ▮${o.reward.credits} · +${o.reward.rep} ${f.short} / ${RIVAL_REP} ${FACTIONS[o.rival].short} · ${o.reward.xp} XP${o.taken ? (t('  [TAKEN]')) : ''}`);
