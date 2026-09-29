@@ -102,7 +102,7 @@ export function createView(game) {
     ghostCount: () => ghosts.length,
     ghostAnchors: () => ghosts.map((g) => g.anchor),
     update(dt, camPos) {
-      time += dt; uT.value = time;
+      time += dt; uT.value = time * (game.settings?.reduceFlash ? 0.2 : 1);   // [a11y] reduce flashing: slower glitch flicker
       for (const e of glitches.values()) if (e.type === 'freeze') e.obj.children[0].rotation.y += dt * 1.6;
       for (const g of ghosts) {
         const dx = camPos.x - g.anchor[0], dz = camPos.z - g.anchor[2];

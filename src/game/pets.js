@@ -220,7 +220,7 @@ export function installPets(game) {
 
   // ------------------------------------------------------------------ key N + terminal
   const onKey = (e) => {
-    if (e.code !== PETS_KEY || e.repeat || S.disposed || game.destroyed || !game.run) return;
+    if (e.code !== (game.settings?.keys?.pets || PETS_KEY) || e.repeat || S.disposed || game.destroyed || !game.run) return;
     if (game.input?.isTyping?.() || game.minigame || game.terminal?.active || game.ui?.chatOpen || game.music?.playing) return;
     const ui = game.ui;
     if (ui?.panelOpen && ui.panelOpen !== S.panelEl) return;

@@ -120,14 +120,14 @@ export const actionMethods = {
     const held = p.heldItem();
     const locked2h = held && itemDef(held.type).hands === 2;
     if (!locked2h && !this.grab.item) {
-      for (let i = 0; i < p.slots.length; i++) if (input.codePressed('Digit' + (i + 1))) this.switchSlot(i);
+      for (let i = 0; i < p.slots.length; i++) if (input.pressed('hotbar' + (i + 1))) this.switchSlot(i);
       if (wheel) this.switchSlot((p.slot + (wheel > 0 ? 1 : -1) + p.slots.length) % p.slots.length);
     }
     if (input.pressed('drop') && held) this.dropHeld(false);
     if (input.pressed('throwItem') && held) this.dropHeld(true);
     if (input.pressed('flashlight')) this.toggleFlashlight();
     if (input.mouseClicked(2)) this.scan();
-    if (input.codePressed('KeyR')) this.reload();
+    if (input.pressed('reload')) this.reload();
 
     // grab beam / item use
     const aimBig = target?.bigItem;

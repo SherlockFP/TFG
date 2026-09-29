@@ -22,6 +22,7 @@ import { createHubNotifier } from './ui/panels/hub.js';   // [social]
 import { Game } from './game/game.js';
 import { setClassicAvatar } from './models/avatar.js';   // [avatar2]
 import { ShipScreens } from './game/screens.js';
+import { applyA11ySettings } from './game/a11y.js';   // [a11y] wave 7
 import { CRTMenu } from './ui/crtmenu.js';
 import { loadExtManifest, registerExtSounds } from './audio/extassets.js';
 import { preloadExtModels, EXT_PRELOAD } from './world/extmodels.js';
@@ -62,6 +63,7 @@ class App {
   constructor() {
     this.settings = loadSettings();
     setClassicAvatar(!!this.settings.classicAvatar);   // [avatar2]
+    applyA11ySettings(this.settings);   // [a11y] palette / UI scale before the first frame
     setLang(this.settings.lang);
     this.profile = loadProfile();
     const devName = new URLSearchParams(location.search).get('name');
@@ -176,6 +178,7 @@ class App {
 
   applySettings() {
     this.engine.applySettings();
+    applyA11ySettings(this.settings);   // [a11y]
     setClassicAvatar(!!this.settings.classicAvatar);   // [avatar2]
     this.audio.applyVolumes();
     this.game?.refreshStats();
@@ -285,6 +288,7 @@ class App {
     this.last = now;
     if (dt > 0.1) dt = 0.1;
     try {
+      this.input.pollPad(dt, !!this.game);   // [a11y] gamepad -> key / mouse state before the sim reads it
       if (this.game) {
         this.game.update(dt);
         this.game.shipScreens?.update(dt);

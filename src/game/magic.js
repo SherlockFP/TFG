@@ -954,13 +954,13 @@ export function installMagic(game) {
     return cast(id, { source: 'key' });
   }
   const onKeyDown = (e) => {
-    if (e.code === 'KeyC' && !e.repeat && !S.wheelOpen && game.input?.enabled !== false && wheelUsable()) { openWheel(); e.preventDefault(); return; }
+    if (e.code === (game.settings?.keys?.magicWheel || 'KeyC') && !e.repeat && !S.wheelOpen && game.input?.enabled !== false && wheelUsable()) { openWheel(); e.preventDefault(); return; }
     if (!S.wheelOpen) return;
     const m = /^Digit([1-8])$/.exec(e.code) || /^Numpad([1-8])$/.exec(e.code);
     if (m) { wheel.setHover(Number(m[1]) - 1); e.preventDefault(); e.stopImmediatePropagation(); }
     else if (e.code === 'Escape') closeWheel(false);
   };
-  const onKeyUp = (e) => { if (e.code === 'KeyC' && S.wheelOpen) closeWheel(true); };
+  const onKeyUp = (e) => { if (e.code === (game.settings?.keys?.magicWheel || 'KeyC') && S.wheelOpen) closeWheel(true); };
   const onMouseMove = (e) => {
     if (!S.wheelOpen) return;
     if (Math.abs(e.movementX) < 400 && Math.abs(e.movementY) < 400) wheel.move(e.movementX, e.movementY);

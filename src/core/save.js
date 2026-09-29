@@ -2,6 +2,7 @@
 import { randomId } from './rng.js';
 import { migrateXpCurve, XP_CURVE_VERSION } from '../game/progression.js';
 import { detectLang } from './i18n.js';
+import { DEFAULT_KEYS, clampFov, clampRange, CB_MODES, UI_SCALE_MIN, UI_SCALE_MAX } from './a11y_core.js';   // [a11y]
 import { sanitizeAvatar } from '../ui/avatarpic.js';   // [profile]
 
 const KEY_SETTINGS = 'kefal.settings.v1';
@@ -20,13 +21,7 @@ function store(key, val) {
   try { localStorage.setItem(key, JSON.stringify(val)); return true; } catch { return false; }
 }
 
-export const DEFAULT_KEYS = {
-  forward: 'KeyW', back: 'KeyS', left: 'KeyA', right: 'KeyD',
-  jump: 'Space', crouch: 'ControlLeft', sprint: 'ShiftLeft',
-  interact: 'KeyE', drop: 'KeyG', flashlight: 'KeyF', ptt: 'KeyV',
-  chat: 'Enter', emote1: 'KeyZ', emote2: 'KeyX', menu: 'Tab', throwItem: 'KeyQ',
-  ping: 'KeyP', sneak: 'AltLeft',   // [stealth]
-};
+export { DEFAULT_KEYS };   // [a11y] defined in a11y_core.js (pure, node-testable); now includes reload / emote wheel / daily / role skills / hotbar / panels
 
 export function defaultSettings() {
   return {
@@ -59,6 +54,13 @@ export function defaultSettings() {
     classicAvatar: false,   // [avatar2] true = old hazmat avatar instead of the rounded "TFG Employee" (applies to newly built models)
     tagAvatars: true,       // [profile] small avatar sprite above remote name tags
     netStrategy: 'nostr',   // nostr | mqtt | torrent | local
+    // [a11y] wave 7 accessibility (src/game/a11y.js)
+    cbMode: 'off',          // off | protanopia | deuteranopia | tritanopia | contrast: remaps the signal colours (tiers, HUD, lasers, zones)
+    uiScale: 1,             // 0.8 - 1.5, scales HUD and panels
+    toggleHold: { sprint: false, crouch: false, aim: false },   // press once to start / again to stop instead of holding
+    shakeScale: 1,          // 0 - 1, camera shake / hurt shake intensity
+    reduceFlash: false,     // caps + rate-limits full-screen flashes, slows Algorithm glitch / strobe flicker
+    padEnabled: true, padLook: 1, padGlyphs: 'auto',   // gamepad play, look speed, glyph set (auto | xbox | ps)
     keys: { ...DEFAULT_KEYS },
   };
 }
@@ -69,6 +71,13 @@ export function loadSettings() {
   const out = { ...d, ...s, keys: { ...d.keys, ...(s.keys || {}) } };
   // migrations
   if ((s.settingsVersion || 1) < 2) { out.voiceMode = 'ptt'; out.settingsVersion = 2; }
+  // [a11y] range checks (a hand-edited / old save must not give a 5 degree or 300 degree FOV)
+  out.fov = clampFov(out.fov);
+  out.uiScale = clampRange(out.uiScale, UI_SCALE_MIN, UI_SCALE_MAX, 1);
+  out.shakeScale = clampRange(out.shakeScale, 0, 1, 1);
+  out.padLook = clampRange(out.padLook, 0.3, 2.5, 1);
+  if (!CB_MODES.includes(out.cbMode)) out.cbMode = 'off';
+  out.toggleHold = { ...d.toggleHold, ...(s.toggleHold && typeof s.toggleHold === 'object' ? s.toggleHold : {}) };
   return out;
 }
 export function saveSettings(s) { store(KEY_SETTINGS, s); }

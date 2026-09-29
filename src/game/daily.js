@@ -244,7 +244,7 @@ export function installDaily(game) {
     },
   };
   const onKey = (e) => {
-    if (e.code !== 'F2' || e.repeat || disposed || game.destroyed || !game.run || !game.net || e.ctrlKey || e.altKey || e.metaKey) return;
+    if (e.code !== (game.settings?.keys?.daily || 'F2') || e.repeat || disposed || game.destroyed || !game.run || !game.net || e.ctrlKey || e.altKey || e.metaKey) return;
     if (game.input?.isTyping?.() || game.minigame || game.terminal?.active || game.ui?.chatOpen) return;
     if (game.ui?.panelOpen && game.ui.panelOpen !== api._panel?.el) return;
     if (game.player?.dead) return;

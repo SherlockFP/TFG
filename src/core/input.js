@@ -1,4 +1,5 @@
-// Keyboard / mouse input with pointer lock, action bindings and per-frame edge detection.
+// Keyboard / mouse / gamepad input with pointer lock, action bindings and per-frame edge detection.
+import { padStep, newPadState, padKind, padTouched, TRIGGER_ON } from './gamepad_core.js';   // [a11y]
 export class Input {
   constructor(canvas, settings) {
     this.canvas = canvas;
@@ -17,8 +18,12 @@ export class Input {
     this.wantLock = false;
     this.onLockChange = null;
     this.onKeyAny = null;         // raw key hook (terminal, chat)
+    this.frame = 0; this.tog = {};              // [a11y] hold-to-toggle state
+    this.padSt = newPadState(); this.usingPad = false; this.padKind = 'xbox'; this.padName = ''; this.padCtx = {};   // [a11y] gamepad
+    this.padLX = 0; this.padLY = 0;
 
     window.addEventListener('keydown', (e) => {
+      if (e.isTrusted !== false) this.usingPad = false;   // [a11y] a real key: prompts show key names again
       if (this.onKeyAny && this.onKeyAny(e) === true) return;
       if (this.isTyping()) return;
       if (!this.down.has(e.code)) this.pressedSet.add(e.code);
@@ -66,14 +71,55 @@ export class Input {
   }
   unlock() { if (document.pointerLockElement) document.exitPointerLock(); }
   key(action) { return this.settings.keys[action] || action; }
-  isDown(action) { return this.enabled && this.down.has(this.key(action)); }
+  isDown(action) {
+    if (this.settings.toggleHold?.[action]) return this.toggled(action, this.down.has(this.key(action)), this.pressedSet.has(this.key(action)));
+    return this.enabled && this.down.has(this.key(action));
+  }
+  // [a11y] hold-to-toggle: a press flips the state (once per frame), losing input control clears it
+  toggled(name, _down, pressed) {
+    const st = this.tog[name] || (this.tog[name] = { on: false, f: -1 });
+    if (!this.enabled) { st.on = false; return false; }
+    if (st.f !== this.frame) { st.f = this.frame; if (pressed) st.on = !st.on; }
+    return st.on;
+  }
   pressed(action) { return this.enabled && this.pressedSet.has(this.key(action)); }
   released(action) { return this.releasedSet.has(this.key(action)); }
   codeDown(code) { return this.enabled && this.down.has(code); }
   codePressed(code) { return this.enabled && this.pressedSet.has(code); }
-  mouseDown(b) { return this.enabled && this.mouseButtons.has(b); }
+  mouseDown(b) {
+    if (b === 2 && this.settings.toggleHold?.aim) return this.toggled('aim', this.mouseButtons.has(2), this.mousePressed.has(2));   // [a11y]
+    return this.enabled && this.mouseButtons.has(b);
+  }
   mouseClicked(b) { return this.enabled && this.mousePressed.has(b); }
   mouseUp(b) { return this.mouseReleased.has(b); }
+  // [a11y] Gamepad: poll once per frame (main.js loop). Buttons press the key their action is bound to; right stick adds to the mouse delta.
+  pollPad(dt, inGame = true) {
+    const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+    let pad = null;
+    for (const p of pads || []) if (p && p.connected) { pad = p; break; }
+    if (!pad || this.settings.padEnabled === false) { if (this.padSt.btn.some(Boolean)) this.padSt = newPadState(); return; }
+    const snap = { buttons: [], axes: [pad.axes[0] || 0, pad.axes[1] || 0, pad.axes[2] || 0, pad.axes[3] || 0] };
+    for (let i = 0; i < 17; i++) { const b = pad.buttons[i]; snap.buttons.push(!!b && (b.pressed || b.value > TRIGGER_ON)); }
+    if (padTouched(snap)) { if (!this.usingPad || this.padName !== pad.id) { this.padName = pad.id; this.padKind = this.settings.padGlyphs && this.settings.padGlyphs !== 'auto' ? this.settings.padGlyphs : padKind(pad.id); } this.usingPad = true; }
+    const live = this.enabled && this.locked;
+    // not in play (menu / panel / unlocked): let go of everything, ui.js pollPad drives the menus
+    const ev = padStep(this.padSt, live ? snap : { buttons: new Array(17).fill(false), axes: [0, 0, 0, 0] }, this.padCtx, { look: this.settings.padLook ?? 1 }, dt);
+    for (const e of ev) {
+      if (e.t === 'action') this.virtualKey(this.key(e.action), e.down);
+      else if (e.t === 'key') this.virtualKey(e.code, e.down);
+      else if (e.t === 'mouse') { if (e.down) { this.mouseButtons.add(e.b); this.mousePressed.add(e.b); } else { this.mouseButtons.delete(e.b); this.mouseReleased.add(e.b); } }
+      else if (e.t === 'wheel') this.wheel += e.d;
+      else if (e.t === 'look') { this.mouseDX += e.dx / (this.settings.sensitivity || 1); this.mouseDY += e.dy / (this.settings.sensitivity || 1); }
+    }
+    // resume from the click-to-play state with A / X (Chrome counts a gamepad press as user activation; otherwise a click is needed)
+    if (inGame && !this.locked && this.enabled && (snap.buttons[0] || snap.buttons[2]) && !this._padLockT) { this._padLockT = 1; this.lock(); setTimeout(() => { this._padLockT = 0; }, 800); }
+  }
+  // a pad button is a real (synthetic) key event for the bound key: hard-coded window key listeners (inventory, tree, daily...) see it too
+  virtualKey(code, down) {
+    if (!code || down === this.down.has(code)) return;
+    try { window.dispatchEvent(new KeyboardEvent(down ? 'keydown' : 'keyup', { code, key: code, bubbles: true, cancelable: true })); }
+    catch { if (down) { this.pressedSet.add(code); this.down.add(code); } else { this.down.delete(code); this.releasedSet.add(code); } }
+  }
   consumeMouse() {
     const s = this.settings.sensitivity * 0.0022;
     const dx = this.mouseDX * s, dy = this.mouseDY * s * (this.settings.invertY ? -1 : 1);
@@ -82,6 +128,7 @@ export class Input {
   }
   consumeWheel() { const w = this.wheel; this.wheel = 0; return this.enabled ? w : 0; }
   endFrame() {
+    this.frame++;
     this.pressedSet.clear(); this.releasedSet.clear();
     this.mousePressed.clear(); this.mouseReleased.clear();
   }

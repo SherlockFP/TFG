@@ -8,6 +8,7 @@
 import * as THREE from 'three';
 import { G } from '../physics/physics.js';
 import * as C from './aimtell_core.js';
+import { sig, onCbMode } from '../core/a11y_core.js';   // [a11y]
 
 const nowOf = (M) => M.game.time || 0;
 const quotaOf = (M) => M.game.run?.quotaIndex || 0;
@@ -95,7 +96,7 @@ const FROM_LOCK_ONLY = new Set(['moderator']);   // its model already draws a re
 export function installAimtell(game) {
   const offs = [];
   const lines = new Map();                        // creature id -> { line, dot, seen }
-  let disposed = false, geo = null, dotGeo = null, matRed = null, matWhite = null;
+  let disposed = false, geo = null, dotGeo = null, matRed = null, matWhite = null, offCb = null;
   const _f = new THREE.Vector3(), _t = new THREE.Vector3(), _d = new THREE.Vector3(), _h = new THREE.Vector3();
   const has = (n) => { try { return !!game.audio?.has?.(n); } catch { return false; } };
   const snd = (names, pos, vol, pitch) => {
@@ -107,7 +108,8 @@ export function installAimtell(game) {
     geo = new THREE.BoxGeometry(1, 1, 1).translate(0, 0, 0.5);
     dotGeo = new THREE.SphereGeometry(1, 6, 4);
     const mk = (col, op) => new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: op, depthWrite: false, blending: THREE.AdditiveBlending, fog: false });
-    matRed = mk('#ff2418', 0.75); matWhite = mk('#ffffff', 1);
+    matRed = mk(sig('aimtell'), 0.75); matWhite = mk('#ffffff', 1);
+    offCb = onCbMode(() => matRed.color.set(sig('aimtell')));   // [a11y]
   }
   function pair(id) {
     let e = lines.get(id);
@@ -177,6 +179,6 @@ export function installAimtell(game) {
   offs.push(game.mods.on('update', (dt, g) => { if (!disposed && g === game) update(dt); }));
   return {
     lineCount: () => lines.size,
-    dispose() { disposed = true; for (const f of offs) { try { f(); } catch { /* ignore */ } } for (const id of [...lines.keys()]) drop(id); geo?.dispose(); dotGeo?.dispose(); matRed?.dispose(); matWhite?.dispose(); },
+    dispose() { disposed = true; for (const f of offs) { try { f(); } catch { /* ignore */ } } for (const id of [...lines.keys()]) drop(id); geo?.dispose(); dotGeo?.dispose(); matRed?.dispose(); matWhite?.dispose(); offCb?.(); },
   };
 }

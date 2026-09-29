@@ -1,6 +1,7 @@
 // Renderer + PSX pipeline: low-res render target, vertex snapping (global shader chunk patch),
 // depth-based outlines, Bayer dithering + color quantization, screen effects.
 import * as THREE from 'three';
+import { flashGate } from './a11y_core.js';   // [a11y]
 import { MIRROR_FS_DECL, MIRROR_FS_UV, MIRROR_FS_GRADE } from '../render/mirrorfx.js';   // [mirror] dimension post look (docs/wave2/mirror.md)
 
 let psxPatched = false;
@@ -283,11 +284,14 @@ export class Engine {
   setRenderHeightOverride(h) { this.overrideH = h || null; this.resize(); }
 
   flash(color = 0xffffff, amount = 0.8) {
+    const gate = flashGate(!!this.settings.reduceFlash, amount, this.time, this._lastFlash ?? -9);   // [a11y] reduce flashing lights
+    if (!gate.ok) return;
+    if (gate.amount > 0) this._lastFlash = this.time;
     this.fx.flashColor.set(color);
-    this.fx.flash = Math.max(this.fx.flash, amount);
+    this.fx.flash = Math.max(this.fx.flash, gate.amount);
   }
-  hurt(amount = 0.6) { this.fx.hurt = Math.min(1, this.fx.hurt + amount); this.fx.shake = Math.max(this.fx.shake, amount * 0.6); }
-  shake(a) { this.fx.shake = Math.max(this.fx.shake, a); }
+  hurt(amount = 0.6) { this.fx.hurt = Math.min(1, this.fx.hurt + amount); this.fx.shake = Math.max(this.fx.shake, amount * 0.6 * (this.settings.shakeScale ?? 1)); }
+  shake(a) { this.fx.shake = Math.max(this.fx.shake, a * (this.settings.shakeScale ?? 1)); }   // [a11y] shake intensity slider
   /** Red wash on the screen edge facing a hit. angle: 0 = in front (top edge), +PI/2 = right, PI = behind. */
   hurtFrom(angle, amount = 0.6) {
     this.fx.hurtDir.set(Math.sin(angle), Math.cos(angle));

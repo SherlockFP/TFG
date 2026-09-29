@@ -6,6 +6,7 @@ import { createCreatureModel } from '../models/creatures.js';
 import { createProp } from '../models/props.js';
 import { SWARM } from '../models/creatures_wave1.js';
 import { G } from '../physics/physics.js';
+import { sigHex } from '../core/a11y_core.js';   // [a11y]
 import { angleDiff, clamp, damp, dampAngle } from '../core/util.js';
 import { insideShip } from '../world/ship.js';
 import { applyNameTagTitle } from '../game/achievements.js';
@@ -88,7 +89,7 @@ function mimicDoorModel() {
   const sign = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.35), new THREE.MeshBasicMaterial({ color: 0x55ff77 }));
   sign.position.set(0, 2.75, 0.02);
   root.add(sign);
-  const eye = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 0.04), new THREE.MeshBasicMaterial({ color: 0xff2020 }));
+  const eye = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 0.04), new THREE.MeshBasicMaterial({ color: sigHex('eye') }));
   eye.position.set(0, 1.2, 0.08);
   eye.visible = false;
   root.add(eye);

@@ -8,7 +8,10 @@ import { t, setLang, getLang, LANGS, tf } from '../core/i18n.js';
 import { HUD, randomTip } from './hud.js';
 import { iconHTML, typeFromName } from './icons.js';
 import { glyph } from './glyphs.js';   // [ui2]
-import { listRuns, loadRun, deleteRun, saveSettings, saveProfile, DEFAULT_KEYS } from '../core/save.js';
+import { listRuns, loadRun, deleteRun, saveSettings, saveProfile } from '../core/save.js';
+import { ACTION_NAMES, KEY_GROUPS, findConflicts, bindKey, resetKeys, CB_MODES, CB_LABELS, PALETTES, FOV_MIN, FOV_MAX, UI_SCALE_MIN, UI_SCALE_MAX } from '../core/a11y_core.js';   // [a11y]
+import { PAD_HELP } from '../core/gamepad_core.js';
+import { markPadActive } from '../game/a11y.js';
 import { SKILLS, SKILL_CAP, xpForLevel, rankOf, derivedStats, MARKET, armorDef, dailyBounties, bountyText } from '../game/progression.js';
 import { ITEMS, RARITY } from '../game/items.js';
 import { MOONS } from '../game/moons.js';
@@ -377,7 +380,7 @@ export class UI {
     }
   }
   padAction(act) {
-    this.padActive = true;
+    this.padActive = true; markPadActive();   // [a11y] bold focus rings while the pad drives the UI
     const g = this.app.game;
     const scope = this.navScope();
     if (!scope) {
@@ -723,7 +726,7 @@ export class UI {
   settingsPanel(inGame) {
     const s = this.app.settings;
     const wrap = this.panel('wide settings');
-    const TABS = ['Video', 'Audio', 'Voice', 'Controls', 'Gameplay'];
+    const TABS = ['Video', 'Audio', 'Voice', 'Controls', 'Gameplay', 'Accessibility'];
     let tab = TABS.includes(this.settingsTab) ? this.settingsTab : 'Video';
     const apply = () => { saveSettings(s); this.app.applySettings(); this.applyUiPrefs(); };
     const slider = (label, key, min, max, step, fmt = (v) => v) => {
@@ -757,7 +760,7 @@ export class UI {
         res.addEventListener('change', () => { s.renderHeight = +res.value; apply(); });
         const jit = el('select', { 'data-nav': 'set:jit' }, ...[['0', 'Off'], ['1', 'Normal'], ['2', 'Strong']].map(([v, n]) => el('option', { value: v, selected: String(s.vertexJitter) === v }, t(n))));
         jit.addEventListener('change', () => { s.vertexJitter = +jit.value; saveSettings(s); this.toast(t('Vertex jitter applies after reload.')); });
-        body.append(section(t('Display')), row(t('Resolution (PSX)'), res), slider(t('Field of view'), 'fov', 55, 100, 1, (v) => v + '°'),
+        body.append(section(t('Display')), row(t('Resolution (PSX)'), res), slider(t('Field of view'), 'fov', FOV_MIN, FOV_MAX, 1, (v) => v + '°'), el('div', { class: 'dim note' }, t('Comfort tip: values above 100 stretch the edges and can cause motion sickness. Try 85-95 with Reduce motion.')),
           section(t('Retro filter')), row(t('Vertex jitter') + ` (${t('reload')})`, jit), check(t('Dithering'), 'dither'), check(t('Outlines'), 'outlines'),
           section(t('Performance')), check(t('Show FPS'), 'showFps'),
           section(t('Character')), check(t('Classic avatar'), 'classicAvatar', t('Applies to new models after reload.')));   // [avatar2]
@@ -808,20 +811,26 @@ export class UI {
       } else if (tab === 'Controls') {
         body.append(section(t('Mouse')), slider(t('Mouse sensitivity'), 'sensitivity', 0.1, 3, 0.05, (v) => v.toFixed(2)), check(t('Invert Y'), 'invertY'));
         body.append(section(t('Key bindings')));
-        const binds = el('div', { class: 'binds' });
+        const conf = findConflicts(s.keys);
         const used = {};
-        for (const [a, c] of Object.entries(s.keys)) (used[c] = used[c] || []).push(a);
-        for (const action of Object.keys(DEFAULT_KEYS)) {
-          const code = s.keys[action];
-          const clash = (used[code] || []).length > 1;
-          const b = this.button(prettyKey(code), () => this.startRebind(action, b, () => { apply(); render(); }), 'small key' + (clash ? ' clash' : ''));
-          b.dataset.nav = 'key:' + action;
-          if (clash) b.title = t('Also used by') + ': ' + used[code].filter((x) => x !== action).map(actionName).join(', ');
-          binds.appendChild(el('div', { class: 'bind-row' + (clash ? ' clash' : '') }, el('span', {}, actionName(action)), b));
+        for (const c of conf) used[c.code] = c.actions;
+        if (conf.length) body.append(el('div', { class: 'a11y-warn', role: 'alert' }, tf('{n} key conflict(s): {list}. Rebind one of them.', { n: conf.length, list: conf.map((c) => prettyKey(c.code) + ' = ' + c.actions.map(actionName).join(' + ')).join('; ') })));
+        for (const [gname, list] of KEY_GROUPS) {
+          body.append(el('div', { class: 'cp-sec' }, t(gname)));
+          const binds = el('div', { class: 'binds' });
+          for (const action of list) {
+            const code = s.keys[action];
+            const clash = (used[code] || []).length > 1;
+            const b = this.button(prettyKey(code), () => this.startRebind(action, b, () => { apply(); render(); }), 'small key' + (clash ? ' clash' : ''));
+            b.dataset.nav = 'key:' + action;
+            if (clash) b.title = t('Also used by') + ': ' + used[code].filter((x) => x !== action).map(actionName).join(', ');
+            binds.appendChild(el('div', { class: 'bind-row' + (clash ? ' clash' : '') }, el('span', {}, actionName(action)), b));
+          }
+          body.append(binds);
         }
-        body.append(binds, el('div', { class: 'menu-row' }, this.button(t('Reset keys'), () => { s.keys = { ...DEFAULT_KEYS }; apply(); render(); this.toast(t('Key bindings reset.')); }, 'small')));
-        body.append(el('div', { class: 'dim note' }, t('Click a key, then press the new key (Esc cancels). A key that is already used swaps with the other action.')));
-        body.append(el('div', { class: 'dim note' }, t('Also: 1-4 / wheel = slots · LMB use / grab · RMB scan · MMB ping · R reload · Esc menu · Gamepad: D-pad / A / B / LB-RB in menus')));
+        body.append(el('div', { class: 'menu-row' }, this.button(t('Reset keys'), () => { s.keys = resetKeys(); apply(); render(); this.toast(t('Key bindings reset to defaults.')); }, 'small')));
+        body.append(el('div', { class: 'dim note' }, t('Click a key, then press the new key (Esc cancels). A key that is already used swaps with the other action; Esc, F5, F11 and F12 are reserved. Glitch exploits and zone beacons use the Interact key.')));
+        body.append(el('div', { class: 'dim note' }, t('Also: wheel = slots · LMB use / grab · RMB scan / block · MMB ping · Esc menu · Gamepad: see Accessibility')));
       } else if (tab === 'Gameplay') {
         const lang = el('select', { 'data-nav': 'set:lang' }, ...LANGS.map((L_) => el('option', { value: L_.id, selected: getLang() === L_.id }, L_.label)));
         lang.addEventListener('change', () => {
@@ -852,6 +861,8 @@ export class UI {
           section(t('Social hub')),   // [social]
           check(t('Join the hub network (players, friends, messages)'), 'hubEnabled', t('only your nickname, avatar, level and status are broadcast'), true),
           check(t('Stay in the hub during a run'), 'hubInRun', t('lets the ship phone show messages and invites'), true));
+      } else if (tab === 'Accessibility') {
+        this.a11yTab(body, s, apply, { slider, check, section, render });
       }
       const cp = el('div', { class: 'cp-body' }, tabs, body,
         el('div', { class: 'menu-row' }, inGame ? this.button(t('Close'), () => this.closePanel(), 'back') : this.backButton(() => this.showMenu('title'))));
@@ -860,6 +871,36 @@ export class UI {
     };
     render();
     return wrap;
+  }
+
+  // [a11y] Accessibility tab: colour vision, size, motion, hold/toggle, gamepad
+  a11yTab(body, s, apply, { slider, check, section, render }) {
+    const mode = el('select', { 'data-nav': 'set:cb' }, ...CB_MODES.map((m) => el('option', { value: m, selected: (s.cbMode || 'off') === m }, t(CB_LABELS[m]))));
+    mode.addEventListener('change', () => { s.cbMode = mode.value; apply(); render(); });
+    const swatch = (label, key) => el('span', { class: 'a11y-sw', style: `--c:${PALETTES[s.cbMode || 'off'][key]}` }, el('i'), label);
+    body.append(section(t('Colour vision')), row(t('Colour mode'), mode),
+      el('div', { class: 'a11y-swatches' }, swatch(t('Common'), 'tier.common'), swatch(t('Uncommon'), 'tier.uncommon'), swatch(t('Rare'), 'tier.rare'), swatch(t('Epic'), 'tier.epic'), swatch(t('Legendary'), 'tier.legendary'), swatch(t('Mythic'), 'tier.mythic'), swatch(t('Danger'), 'danger'), swatch(t('OK'), 'ok'), swatch(t('Warning'), 'warn'), swatch(t('Laser / threat'), 'laser')),
+      el('div', { class: 'dim note' }, t('Recolours item tiers, HUD danger / ok, trap lasers, creature threat lines and zone owners (not a screen filter). Items already on screen update when you reopen the panel.')));
+    body.append(section(t('Size')), slider(t('UI scale'), 'uiScale', UI_SCALE_MIN, UI_SCALE_MAX, 0.05, pct));
+    body.append(section(t('Motion and flashing')),
+      slider(t('Screen shake'), 'shakeScale', 0, 1, 0.05, pct),
+      check(t('Reduce motion'), 'reduceMotion', t('less camera shake, bob and screen warp; calmer menus')),
+      check(t('Reduce flashing lights'), 'reduceFlash', t('caps full-screen flashes, max 3 per second, slower Algorithm glitch flicker')),
+      check(t('Head bob'), 'headBob', null, true));
+    const hold = (label, key) => {
+      const c = el('input', { type: 'checkbox', checked: !!s.toggleHold?.[key] });
+      c.dataset.nav = 'set:toggle_' + key;
+      c.addEventListener('change', () => { s.toggleHold = { ...(s.toggleHold || {}), [key]: c.checked }; apply(); });
+      return el('div', { class: 'form-row' }, el('label', {}, label), c);
+    };
+    body.append(section(t('Hold or toggle')), hold(t('Toggle sprint'), 'sprint'), hold(t('Toggle crouch'), 'crouch'), hold(t('Toggle aim / block (RMB)'), 'aim'),
+      el('div', { class: 'dim note' }, t('On: press once to start, again to stop, instead of holding the key.')));
+    const glyphs = el('select', { 'data-nav': 'set:padGlyphs' }, ...[['auto', 'Auto'], ['xbox', 'Xbox'], ['ps', 'PlayStation']].map(([v, n]) => el('option', { value: v, selected: (s.padGlyphs || 'auto') === v }, t(n))));
+    glyphs.addEventListener('change', () => { s.padGlyphs = glyphs.value; apply(); });
+    body.append(section(t('Gamepad')), check(t('Gamepad in game'), 'padEnabled', t('left stick move, right stick look; menus always work with a pad'), true),
+      slider(t('Pad look speed'), 'padLook', 0.3, 2.5, 0.1, (v) => v.toFixed(1) + 'x'), row(t('Button prompts'), glyphs),
+      el('div', { class: 'a11y-pad-table' }, ...PAD_HELP.map(([k, v]) => el('div', { class: 'bind-row' }, el('span', {}, t(v)), el('span', { class: 'tfg-kbd' }, k)))),
+      el('div', { class: 'dim note' }, t('Click once to capture the mouse, then A or X resumes play. The on-screen prompts switch to pad buttons when you touch the pad and back to keys when you press a key.')));
   }
 
   // Key rebinding: the next key press becomes the binding (Esc cancels). A key that is already bound to
@@ -876,10 +917,12 @@ export class UI {
       e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
       cleanup();
       if (e.code === 'Escape' || !e.code) { this.sfx('ui_click', 0.3); done(); return; }
+      const r = bindKey(s.keys, action, e.code);
+      if (!r.ok) { this.toast(t('That key is reserved and cannot be used.'), 'bad'); done(); return; }
       const prev = s.keys[action];
-      const other = Object.keys(s.keys).find((a) => a !== action && s.keys[a] === e.code);
-      if (other && prev) { s.keys[other] = prev; this.toast(`${actionName(other)} → ${prettyKey(prev)}`, 'info'); }
-      s.keys[action] = e.code;
+      s.keys = r.keys;
+      if (r.swapped) this.toast(tf('{a} took {k} (swapped)', { a: actionName(r.swapped), k: prettyKey(prev) }), 'info');
+      if (r.note) this.toast(tf('{k} is also used by: {n} (not rebindable)', { k: prettyKey(e.code), n: t(r.note) }), 'bad');
       this.sfx('ui_confirm', 0.4);
       done();
     };
@@ -1385,11 +1428,6 @@ export class UI {
 
 function row(label, input) { return el('div', { class: 'form-row' }, el('label', {}, label), input); }
 function pct(v) { return Math.round(v * 100) + '%'; }
-const ACTION_NAMES = {
-  forward: 'Move forward', back: 'Move back', left: 'Strafe left', right: 'Strafe right', jump: 'Jump', crouch: 'Crouch', sprint: 'Sprint',
-  interact: 'Interact / pick up', drop: 'Drop item', flashlight: 'Flashlight', ptt: 'Push to talk', chat: 'Chat', emote1: 'Quick emote 1',
-  emote2: 'Quick emote 2', menu: 'Character sheet', throwItem: 'Throw item', ping: 'Ping', sneak: 'Sneak (quiet)',
-};
 function actionName(a) { return t(ACTION_NAMES[a] || a); }
 function prettyKey(code) {
   return String(code || '—').replace(/^Key/, '').replace(/^Digit/, '').replace(/^Arrow/, '').replace('ShiftLeft', 'L-Shift').replace('ControlLeft', 'L-Ctrl');

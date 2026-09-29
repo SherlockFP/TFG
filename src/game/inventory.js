@@ -637,7 +637,7 @@ export function installInventory(game) {
   // ------------------------------------------------------------------ panel + key
   const panel = new InventoryPanel(game, null);
   const onKey = (e) => {
-    if (e.code !== INVENTORY_KEY || e.repeat || st.disposed || game.destroyed || !game.run || !game.net) return;
+    if (e.code !== (game.settings?.keys?.inventory || INVENTORY_KEY) || e.repeat || st.disposed || game.destroyed || !game.run || !game.net) return;
     if (game.input?.isTyping?.() || game.minigame || game.terminal?.active || game.ui?.chatOpen) return;
     const ui = game.ui;
     if (ui?.panelOpen && ui.panelOpen !== panel.el) return;

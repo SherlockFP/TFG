@@ -294,7 +294,7 @@ export function installRpg(game) {
     open();
   }
   const onKey = (e) => {
-    if (e.code !== TREE_KEY || e.repeat || st.disposed || game.destroyed || !game.run) return;
+    if (e.code !== (game.settings?.keys?.skillTree || TREE_KEY) || e.repeat || st.disposed || game.destroyed || !game.run) return;
     const tg = e.target?.tagName;
     if (tg === 'INPUT' || tg === 'TEXTAREA') return;
     if (game.input?.isTyping?.() || game.minigame || game.terminal?.active || game.ui?.chatOpen) return;

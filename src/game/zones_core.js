@@ -2,6 +2,7 @@
 // Design + knobs: docs/wave5/zones.md (MASTERPLAN §26). Everything that can differ between peers is derived from (runKey, moonId) and, for the
 // exact core positions, from the terrain plan of the current landing (host computes them, clients receive them).
 import { RNG, hashString } from '../core/rng.js';
+import { sig as sigColor } from '../core/a11y_core.js';   // [a11y]
 import { siegePower, planWave, SG } from './siege_core.js';
 import * as DC from './defense_core.js';
 import { TRAPS } from './horror_core.js';
@@ -172,7 +173,7 @@ export function listZones(zn, isActive = () => true) {
   return out;
 }
 export const CREW_COLORS = ['#7fb7ff', '#7dff9a', '#ffb347', '#ff6f91', '#c79bff', '#5fe3d0'];
-export const crewColor = (zn) => CREW_COLORS[((zn?.col || 1) - 1) % CREW_COLORS.length];
+export const crewColor = (zn) => { const i = ((zn?.col || 1) - 1) % CREW_COLORS.length; return sigColor('zone.' + (i + 1), CREW_COLORS[i]); };   // [a11y] palette-aware
 
 // ------------------------------------------------------------------ economy
 export const maxOwned = (qi) => Math.min(12, 3 + 2 * Math.max(0, qi | 0));
