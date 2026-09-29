@@ -147,3 +147,7 @@ The 3-day + boss loop is now real (gate -> core with wings, a labyrinth and a ca
 Proven by numbers only: node tests drive the REAL host.js flow, the real CreatureManager and real layouts (soft-lock fuzz, weekly lock, all 8 themes); nothing was seen in a browser.
 Risks: boss models and telegraph readability, the maze / arena look and lighting, whether a labyrinth is fun with creatures in it (it is a spanning tree + few loops), keystone / raid numbers (design values), 2-player sync of `run.cycle` and `cyx`,
 the arena auto-open (720 s) as the only fallback for lost cards, Legacy Bot sector (outdoor boss, no cards) never seen, `shrines` mutator unwired, no Trophy Hall / CASE entry / first-kill cosmetic yet.
+
+## Wave 4 - maps5: Estate 9 + Cold Storage (module `maps5`, docs/wave4/maps5.md)
+Two hand-authored moons with three real labyrinths (hedge maze, two-level paper archive with a ladder and bridges, shifting server stacks) plus a warden and sleeper creature; the plans are proven solvable over 200 seeds and the REAL box colliders are flood-filled with a 0.4 m body in every stack phase, but nothing was seen in a browser (the headless script is written, not run).
+Weak spots: readability of the shifting walls (amber strips vs the dark hall), hedge / rack texture look, ladder feel (gravity-cancel climb, no sound, remote avatars just float up), warden / sleeper numbers are first guesses, no multiplayer test of the `m5sw` shifts, moons are presets (not in generated sectors).

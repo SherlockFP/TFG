@@ -160,6 +160,7 @@ import { installCycle } from './cycle.js';   // [cycle] inert: rules only, see d
 
 
 import { installWorlds2 } from './worlds2.js';   // wave 3: Soviet raids + twin-sun planet + plasma blade + fauna + loot pacing (docs/wave3/worlds2.md)
+import { installMaps5 } from './maps5.js';   // [import:maps5] wave 4: Estate 9 (hedge maze, paper archive) + Cold Storage (shifting server stacks, cryo caves) (docs/wave4/maps5.md)
 
 
 // [import:ux]
@@ -328,6 +329,7 @@ export class Game extends Emitter {
 
 
     this.useModule('worlds2', installWorlds2);   // [worlds2]
+    this.useModule('maps5', installMaps5);   // [slot:maps5]
 
 
     // [slot:ux]
