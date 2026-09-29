@@ -4,6 +4,8 @@
 //   createCarnival(labels) -> { root, booths, relabel(labels), dispose() }     local: booths open toward +z (players stand at +z), row centred on x = 0
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { createPieceSet } from './chess3d.js';
+import { piecesOf, checkSquare } from '../game/chess3d_map.js';
 
 const TOP_Y = 0.78, SQ = 0.1;
 const mat = (color, o = {}) => new THREE.MeshLambertMaterial({ color, ...o });
@@ -13,37 +15,15 @@ const tex = (c) => { const t = new THREE.CanvasTexture(c); t.magFilter = THREE.N
 const at = (g, x, y, z) => { g.translate(x, y, z); return g; };
 
 // ------------------------------------------------------------------------------------------------ table
-let pieceGeo = null;
-function pieces() {
-  if (pieceGeo) return pieceGeo;
-  const cyl = (r0, r1, h, y) => at(new THREE.CylinderGeometry(r0, r1, h, 8), 0, y + h / 2, 0);
-  const ball = (r, y) => at(new THREE.SphereGeometry(r, 8, 6), 0, y, 0);
-  const box = (w, h, d, y) => at(new THREE.BoxGeometry(w, h, d), 0, y + h / 2, 0);
-  const base = () => cyl(0.036, 0.04, 0.012, 0);
-  const M = (parts) => mergeGeometries(parts.map((g) => g.toNonIndexed()));
-  pieceGeo = {
-    p: M([base(), cyl(0.014, 0.022, 0.04, 0.012), ball(0.019, 0.062)]),
-    r: M([base(), cyl(0.024, 0.028, 0.05, 0.012), box(0.054, 0.014, 0.054, 0.062)]),
-    n: M([base(), cyl(0.02, 0.028, 0.03, 0.012), at(new THREE.ConeGeometry(0.024, 0.052, 6), 0.004, 0.068, 0).rotateZ(-0.35)]),
-    b: M([base(), cyl(0.012, 0.026, 0.05, 0.012), at(new THREE.ConeGeometry(0.016, 0.034, 8), 0, 0.078, 0), ball(0.008, 0.102)]),
-    q: M([base(), cyl(0.014, 0.03, 0.066, 0.012), ball(0.02, 0.09), at(new THREE.ConeGeometry(0.014, 0.024, 6), 0, 0.114, 0)]),
-    k: M([base(), cyl(0.016, 0.03, 0.07, 0.012), box(0.012, 0.03, 0.012, 0.082), box(0.03, 0.01, 0.012, 0.094)]),
-    man: M([cyl(0.04, 0.042, 0.022, 0)]),
-    king: M([cyl(0.04, 0.042, 0.022, 0), cyl(0.04, 0.042, 0.022, 0.024), ball(0.014, 0.056)]),
-  };
-  return pieceGeo;
-}
-const LIGHT = mat(0xe9dcc0), DARK = mat(0x2a1d16);
-
 function boardTexture(kind) {
   const c = canvas(256, 256), x = c.getContext('2d');
   x.fillStyle = '#1b120b'; x.fillRect(0, 0, 256, 256);
   const s = 256 / 8;
-  for (let r = 0; r < 8; r++) for (let f = 0; f < 8; f++) {
-    const light = ((f + r) & 1) === 0;
+  for (let row = 0; row < 8; row++) for (let f = 0; f < 8; f++) {
+    const r = 7 - row, light = ((f + r) & 1) === 0;   // canvas row 0 = rank 8; a1 (f + r even) is a dark square
     x.fillStyle = kind === 'draughts' ? ((f + r) & 1 ? '#d9c79a' : '#cbb887') : (light ? '#b58863' : '#f0d9b5');
-    x.fillRect(f * s, r * s, s, s);
-    if (kind === 'draughts') { x.strokeStyle = 'rgba(60,40,20,.55)'; x.lineWidth = 2; x.strokeRect(f * s + 1, r * s + 1, s - 2, s - 2); }
+    x.fillRect(f * s, row * s, s, s);
+    if (kind === 'draughts') { x.strokeStyle = 'rgba(60,40,20,.55)'; x.lineWidth = 2; x.strokeRect(f * s + 1, row * s + 1, s - 2, s - 2); }
   }
   x.strokeStyle = '#3a2412'; x.lineWidth = 6; x.strokeRect(3, 3, 250, 250);
   return tex(c);
@@ -59,45 +39,28 @@ export function createGameTable() {
   const boardMat = new THREE.MeshLambertMaterial({ map: boardTexture('chess') });
   const board = new THREE.Mesh(new THREE.PlaneGeometry(SQ * 8, SQ * 8), boardMat);
   board.rotation.x = -Math.PI / 2; board.position.y = TOP_Y + 0.002; root.add(board);
-  const pcs = new THREE.Group(); pcs.position.y = TOP_Y + 0.003; root.add(pcs);
+  const set = createPieceSet(); root.add(set.group);
   let kind = 'chess', sig = '';
   const texCache = {};
-  function update(k, pos) {
-    const s = k + '|' + pos;
+  /** k = 'chess' | 'draughts', pos = snapshot position string, o = { last: [from, to], check: bool, turn: 'w'|'b', animate: bool } */
+  function update(k, pos, o = {}) {
+    const s = k + '|' + pos + '|' + (o.last ? o.last.join() : '') + (o.check ? 'c' : '');
     if (s === sig) return;
     sig = s;
-    if (k !== kind) { kind = k; board.material.map = texCache[k] || (texCache[k] = boardTexture(k)); board.material.needsUpdate = true; }
-    pcs.clear();
-    const G = pieces();
-    const place = (m, f, r) => { m.position.set((f - 3.5) * SQ, 0, (3.5 - r) * SQ); pcs.add(m); return m; };
-    if (k === 'draughts') {
-      const [bs] = String(pos).split('|');
-      for (let i = 0; i < 64 && i < bs.length; i++) {
-        const ch = bs[i];
-        if (ch === '.') continue;
-        place(new THREE.Mesh(ch === 'W' || ch === 'B' ? G.king : G.man, ch.toLowerCase() === 'w' ? LIGHT : DARK), i & 7, i >> 3);
-      }
-    } else {
-      const rows = String(pos).split(' ')[0].split('/');
-      for (let i = 0; i < 8; i++) {
-        let f = 0;
-        for (const ch of rows[i] || '') {
-          if (ch >= '1' && ch <= '8') { f += +ch; continue; }
-          const white = ch === ch.toUpperCase();
-          const m = place(new THREE.Mesh(G[ch.toLowerCase()], white ? LIGHT : DARK), f, 7 - i);
-          if (ch.toLowerCase() === 'n') m.rotation.y = white ? Math.PI : 0;   // knights look at the opponent
-          f++;
-        }
-      }
-    }
+    const kindChanged = k !== kind;
+    if (kindChanged) { kind = k; board.material.map = texCache[k] || (texCache[k] = boardTexture(k)); board.material.needsUpdate = true; }
+    const list = piecesOf(k, pos);
+    set.setPieces(list, { animate: !!o.animate && !kindChanged });
+    set.setMarks({ last: o.last || null, check: checkSquare(k, list, o.turn, o.check) });
   }
   update('chess', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
   return {
-    root, update,
+    root, update, pieces: set, tick: (dt) => set.tick(dt),
     dispose() {
+      set.dispose();
       for (const t of Object.values(texCache)) t.dispose();
       board.material.map?.dispose(); board.material.dispose(); board.geometry.dispose();
-      root.traverse((o) => { if (o.isMesh && o.geometry && o !== board && !Object.values(pieceGeo || {}).includes(o.geometry)) { o.geometry.dispose(); } });
+      root.traverse((o) => { if (o.isMesh && o.geometry && o !== board && !o.isInstancedMesh) { o.geometry.dispose(); } });
       root.removeFromParent();
     },
   };

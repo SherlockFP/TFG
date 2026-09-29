@@ -199,6 +199,7 @@ export function createArcadePanel(ui, game, arc, tableId) {
       } else acts.appendChild(ui.button(t('Resign'), () => arc.request('resign', { id: tableId }), 'small danger'));
       acts.appendChild(ui.button(t('Stand up'), () => arc.request('stand', { id: tableId }), 'small'));
     }
+    acts.appendChild(ui.button(t('3D view'), () => arc.setClassic?.(false), 'small'));
     side.appendChild(acts);
     if (!me) side.appendChild(el('div', { class: 'arp-note' }, t('Take a seat to play, or watch. Everyone at the table sees the same board.')));
     else if (!playing && !s.over && (!(s.seats.w || s.ai.w) || !(s.seats.b || s.ai.b))) side.appendChild(el('div', { class: 'arp-note' }, t('Waiting for an opponent. Invite a friend, or pick a computer opponent for the empty seat.')));
