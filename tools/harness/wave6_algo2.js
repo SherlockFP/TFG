@@ -4,8 +4,8 @@ const g = kefal.game, errs = []; addEventListener('error', (e) => errs.push(e.me
 const warns = []; const ow = console.warn; console.warn = (...x) => { warns.push(x.map(String).join(' ').slice(0, 200)); ow(...x); };
 const a = g.algo2, out = { has: !!a, warns };
 if (!a) return { out, errs };
-const tick = async (n) => { for (let i = 0; i < n; i++) { kefal.tick(10, 1 / 30, false); await new Promise((r) => setTimeout(r, 8)); } };
-const land = async (moon) => { g.run.daysLeft = 5; g.run.quotaIndex = 1; g.run.moon = moon; g.player.inShip = true; const prev = g.world?.facility; g.hostLever(g.selfId); for (let n = 0; n < 150 && !(g.world?.facility && g.world.facility !== prev); n++) await tick(2); await tick(4); g.hostFinishLanding(); await tick(24); };
+const tick = async (n) => { for (let i = 0; i < n; i++) { kefal.tick(10, 1 / 30, false); await new Promise((r) => setTimeout(r, 2)); } };
+const land = async (moon) => { g.run.daysLeft = 5; g.run.quotaIndex = 1; g.run.moon = moon; g.player.inShip = true; const prev = g.world?.facility; g.hostLever(g.selfId); for (let n = 0; n < 150 && !(g.world?.facility && g.world.facility !== prev); n++) await tick(2); await tick(4); g.hostFinishLanding(); await tick(8); };
 await land('hamsi');
 const fac = g.world.facility;
 out.fac = !!fac; out.glitches = a.debug.glitches().map((x) => `${x.type}@${x.x.toFixed(0)},${x.z.toFixed(0)}`);
@@ -33,7 +33,7 @@ a.state.hype.h = 70;
 const crates0 = g.profile?.daily?.crates?.length || 0;
 g.spawnInShip(); await tick(3);
 out.pre = { phase: g.run.phase, day: g.run.day, h: a.state.hype.h, aboard: (g.aiPlayers() || []).filter((p) => p.inShip).length };
-g.hostBeginTakeoff('lever'); g.hostFinishTakeoff(); await tick(12);
+g.hostBeginTakeoff('lever'); g.hostFinishTakeoff(); for (let n = 0; n < 60 && g.run.phase !== "orbit"; n++) await tick(2); await tick(2);
 out.post = { phase: g.run.phase, day: g.run.day, a2: JSON.stringify(g.run.a2).slice(0, 120) };
 out.want = g.run.a2?.want; out.cratesDelta = (g.profile?.daily?.crates?.length || 0) - crates0;
 // second landing, same moon: the ghost replays
@@ -41,7 +41,7 @@ await land('hamsi');
 out.land2 = { phase: g.run.phase, day: g.run.day, fac: !!g.world.facility, a2: JSON.stringify(g.run.a2).slice(0, 120) };
 out.ghosts = a.debug.ghosts().length; out.ghostViews = a.view.ghostCount(); out.storeAfter = Object.keys(a.debug.store()?.ghosts || {});
 const anc = a.view.ghostAnchors()[0];
-if (anc) { g.player.teleport(new THREE.Vector3(anc[0] - 4, anc[1] + 0.1, anc[2]), -Math.PI / 2); await tick(20); }
+if (anc) { g.player.teleport(new THREE.Vector3(anc[0] - 4, anc[1] + 0.1, anc[2]), -Math.PI / 2); await tick(6); }
 out.meterAfterLanding = a.debug.patch().meter;
 out.warnsEnd = warns.slice(0, 6); out.hypeEnd = { host: a.state.hype.h, mirror: { ...a.state.hs } };
 return { out, errs };
