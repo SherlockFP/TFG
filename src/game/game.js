@@ -157,6 +157,9 @@ import { installFood } from './food.js';   // wave 2: food & drinks (buffs, booz
 import { installHomeworld } from './homeworld.js';
 
 
+import { installHomeworld2 } from './homeworld2.js';
+
+
 // [import:pets]
 import { installPets } from './pets.js';
 
@@ -204,7 +207,6 @@ import { installCosm5 } from './cosm5.js';   // wave 4: cosmetics drop (suits/ha
 // [import:checkup]
 
 
-// [import:homeworld2]
 
 
 
@@ -387,6 +389,8 @@ export class Game extends Emitter {
     // [slot:homeworld]
     this.useModule('homeworld', installHomeworld);
 
+    this.useModule('homeworld2', installHomeworld2);
+
 
     // [slot:pets]
     this.useModule('pets', installPets);
@@ -443,7 +447,6 @@ export class Game extends Emitter {
     // [slot:checkup]
 
 
-    // [slot:homeworld2]
 
 
 

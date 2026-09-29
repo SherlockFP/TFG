@@ -258,7 +258,7 @@ export function tryRepair(state, wallet, id) {
 
 // ---------------------------------------------------------------------------------------------- storage
 export function capOf(state, k) {
-  let m = 1;
+  let m = 1 + (state.xcap || 0);   // [h2] storage rooms of homeworld2 (transient, recomputed by that module; never persisted)
   for (const b of state.b) if (b.t === 'warehouse' && !wrecked(b)) m += BUILDINGS.warehouse.cap[b.l - 1];
   return Math.floor(BASE_CAP[k] * Math.min(8, m));
 }
