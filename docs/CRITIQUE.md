@@ -147,3 +147,6 @@ The 3-day + boss loop is now real (gate -> core with wings, a labyrinth and a ca
 Proven by numbers only: node tests drive the REAL host.js flow, the real CreatureManager and real layouts (soft-lock fuzz, weekly lock, all 8 themes); nothing was seen in a browser.
 Risks: boss models and telegraph readability, the maze / arena look and lighting, whether a labyrinth is fun with creatures in it (it is a spanning tree + few loops), keystone / raid numbers (design values), 2-player sync of `run.cycle` and `cyx`,
 the arena auto-open (720 s) as the only fallback for lost cards, Legacy Bot sector (outdoor boss, no cards) never seen, `shrines` mutator unwired, no Trophy Hall / CASE entry / first-kill cosmetic yet.
+
+## Wave 4 - arcade: chess, dama, carnival (module `arcade`, docs/wave4/arcade.md)
+Downtime finally has something to do with friends: chess / dama tables (ship, HQ pier, homeworld pad) and a three-booth carnival on the HQ pier. Rules are node-proven (perft, mate, dama captures, prize economy); the feel is not: piece glyphs depend on the system font, the carnival is a small corner that may feel sparse, booth physics are hand-rolled and forgiving, and the client-played rounds are only clamped by the host (fine for co-op, not for leaderboards). No draw offers, clocks or hard AI; carnival only exists on the HQ pier (not on the homeworld).

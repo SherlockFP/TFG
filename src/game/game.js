@@ -94,6 +94,10 @@ import { installSiege } from './siege.js';
 import { installBugfix } from './bugfix.js';
 
 
+// [import:arcade]
+import { installArcade } from './arcade.js';
+
+
 import { installAnomaly } from './anomaly.js';
 
 
@@ -328,6 +332,10 @@ export class Game extends Emitter {
 
 
     this.useModule('worlds2', installWorlds2);   // [worlds2]
+
+
+    // [slot:arcade]
+    this.useModule('arcade', installArcade);
 
 
     // [slot:ux]
