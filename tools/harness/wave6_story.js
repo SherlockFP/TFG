@@ -15,7 +15,7 @@ out.rule = ['scuttler', 'moderator', 'hound'].map((t) => t + ':' + C.creatureRul
 kefal.tick(4, 1 / 30, false);
 await new Promise((r) => setTimeout(r, 700)); kefal.tick(4, 1 / 30, false);
 out.dock = document.querySelector('.st-dock')?.innerText?.replace(/\n+/g, ' | ') || null;
-const cmd = (n) => { const o = []; g.mods.commands.get(n)?.([], { print: (x) => o.push(String(x)), close() {} }); return o.join('\n'); };
+const cmd = (n) => { const o = []; try { (g.mods.commands.get(n)?.fn || g.mods.commands.get(n))?.([], { print: (x) => o.push(String(x)), close() {} }); } catch (e) { o.push('ERR ' + e.message); } return o.join('\n'); };
 out.patron = cmd('patron').split('\n').slice(0, 8).join(' / ');
 out.jobs = cmd('jobs').split('\n').slice(0, 5).join(' / ');
 out.trend = cmd('trend').split('\n')[0];

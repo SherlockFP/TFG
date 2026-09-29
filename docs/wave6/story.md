@@ -1,4 +1,4 @@
-# Wave 6 - STORY: choose a side (module `story`; MASTERPLAN §23.7 + §23.9; node-tested + builds, one short headless run at the end)
+# Wave 6 - STORY: choose a side (module `story`; MASTERPLAN §23.7 + §23.9; node-tested + builds; headless run only partly done, see Known gaps)
 
 Identity line (§21): the Company treats you as disposable staff, the Algorithm treats you as content. Now the crew has to pick which one owns it.
 Installed with `this.useModule('story', installStory)` (`game.story`), off with `config.story = false`. Net prefix `st` (`streq`, `stx`).
@@ -67,6 +67,7 @@ Pay: Company `35 + 18 x qi` credits, Algorithm `90 + 45 x qi` (x1.4 / x1.6 for t
 `story_core.js`: `AL` (away factor, tiers, lean / creature / zone thresholds, contract shifts), `UNLOCKS`, `KIN`, `huntMul`, `ACT_AT`, `E` (ending requirements), `JOBS` (pay / shift / params), `TONE`, `TREND` (levelBonus, extraChance, extraCap, dropChance), `TREND_POOL`. Perk multipliers live in `story.js finishJob` (x1.5).
 
 ## Known gaps
+- Browser: `tools/harness/wave6_story.js` ran once far enough to prove the module installs in the real game (`g.story`, `run.st`, `moveState`, ticks, no page error before the script's own bug: the command map holds `{fn}` objects, fixed in the script afterwards). The corrected re-run never got the shared browser lock (flock timeout twice), so the dock chip, finale overlay, case card and patron tags on the ship board were NOT looked at.
 - Never hand-played and never tried with two real players: numbers (job pay, thresholds, how many jobs an ending takes: 5-12) are paper values. The finale overlay, dock chip and case card were only eyeballed in one headless screenshot at best.
 - Voyage missions (`MISSIONS` / `TAKE`) are not tagged by patron yet (only contracts and the new patron jobs are). The ship board panel shows the patron chip but not the new patron jobs (terminal only: `JOBS`).
 - Heal detection for "boss without healing" only sees consumables used through `useItem` (medkit, food, patron medkits), not campfire / shrine / regen effects.
