@@ -139,18 +139,18 @@ export function installAlgo1(game) {
     const rng = rngFor(0xa15e);
     const cards = K.drawCards(() => rng.next(), r.quotaIndex | 0, st.debt);
     if (cards.length < 2) return;
-    S.vote = { key, cards, votes: new Map(), t: K.T.voteSec, debt: st.debt || null };
+    S.hv = { key, cards, votes: new Map(), t: K.T.voteSec, debt: st.debt || null };
     send({ k: 'open', cards, sec: K.T.voteSec, debt: st.debt || null });
   }
   function hostVote(from, i) {
-    const v = S.vote; if (!v || !v.votes || !(i >= 0 && i < v.cards.length)) return;
+    const v = S.hv; if (!v || !v.votes || !(i >= 0 && i < v.cards.length)) return;
     v.votes.set(String(from), i);
     send({ k: 'tally', c: v.cards.map((_, j) => [...v.votes.values()].filter((x) => x === j).length) });
     const n = (game.aiPlayers?.() || []).filter((p) => !p.dead).length || 1;
     if (v.votes.size >= n) hostCloseVote();
   }
   function hostCloseVote() {
-    const v = S.vote, st = a1(); if (!v || !v.votes || !st) return;
+    const v = S.hv, st = a1(); if (!v || !v.votes || !st) return;
     const rng = rngFor(0xdeb7);
     const res = K.tally(v.votes, v.cards.length, () => rng.next());
     const win = v.cards[res.win];
@@ -159,7 +159,7 @@ export function installAlgo1(game) {
     const half = v.debt || null;                       // yesterday's debt bites at half strength today
     st.debt = newDebt;
     st.today = { win, half, day: run().day };
-    S.vote = null;
+    S.hv = null;   // host tally state is separate from the vote panel (S.vote): the host's own 'open' message used to overwrite it and the vote never closed
     game.broadcastRun?.(['a1']);                        // late joiners / a future host get the debt + today's rule with the run
     send({ k: 'result', win, half, debt: newDebt });
     const line = res.none ? 'Nobody voted. Fine. I choose: {@r}.' : res.tie ? 'A tie. Adorable. I choose: {@r}.' : 'The people have spoken: {@r}.';
@@ -321,7 +321,7 @@ export function installAlgo1(game) {
     if (ph === 'landing') {
       game.refreshStats?.();
       if (host() && enabled()) { const f = fx(); if (f && f.dayLenMul !== 1 && baseDay == null) { baseDay = game.config.dayLengthSec; game.config.dayLengthSec = Math.round((baseDay || 720) * f.dayLenMul); } }
-      if (host() && S.vote) hostCloseVote();          // lever pulled during the vote: close it now
+      if (host() && S.hv) hostCloseVote();          // lever pulled during the vote: close it now
     } else if (ph === 'orbit' || ph === 'fired' || ph === 'takeoff') {
       if (ph !== 'takeoff') { restoreDay(); S.rule = null; S.mercy = 0; game.refreshStats?.(); }
       if (host() && ph === 'orbit') { if (a1()) { a1().today = null; game.broadcastRun?.(['a1']); } chooseFromProfile(); S.orbitT = 0; }
@@ -332,17 +332,18 @@ export function installAlgo1(game) {
   function update(dt) {
     if (disposed) return;
     const r = run();
-    if (S.vote && !host()) { S.vote.left -= dt; if (root && root.style.display !== 'none') { const b = root.querySelector('.h b'); if (b) b.textContent = Math.max(0, Math.ceil(S.vote.left)) + 's'; } }
+    if (S.vote) { S.vote.left -= dt; if (root && root.style.display !== 'none') { const b = root.querySelector('.h b'); if (b) b.textContent = Math.max(0, Math.ceil(S.vote.left)) + 's'; } }
+    if (S.vote && S.vote.left < -6) hideVote();          // safety: never leave the panel stuck if the result message is lost (host left / migrated)
     if (!host() || !r || !enabled()) return;
     if (r.phase === 'moon' && inFacilityDay()) {
       S.trackT += dt;
       if (S.trackT >= 0.5) { const d = S.trackT; S.trackT = 0; try { trackTick(d); } catch (e) { console.warn('[algo1] track', e); } }
     }
-    if (S.vote?.votes) { S.vote.t -= dt; if (S.vote.t <= 0) hostCloseVote(); }
+    if (S.hv) { S.hv.t -= dt; if (S.hv.t <= 0) hostCloseVote(); }
     if (r.phase === 'orbit') {
       S.orbitT += dt;
       const key = `${r.runId ?? 'x'}:${r.day}`;
-      if (S.orbitT > 4 && S.votedKey !== key && !S.vote && !MOONS[r.moon]?.company) hostOpenVote();
+      if (S.orbitT > 4 && S.votedKey !== key && !S.hv && !MOONS[r.moon]?.company) hostOpenVote();
     }
     K.decayViewers(S.viewers, dt);
     S.viewT += dt;
