@@ -339,6 +339,7 @@ export const hostMethods = {
 
   hostFinishLanding() {
     if (this.run.phase !== 'landing') return;
+    this.landQ?.flush();   // [perf4] the queued map build must be complete before the moon is populated
     if (!MOONS[this.run.moon]) { this.run.moon = 'hamsi'; this.broadcastRun(['moon']); this.net.broadcast('sys', sysMsg('Autopilot error: that moon is not installed on this ship. Landing aborted - rerouted to 56K-Dialup.', {}, 'bad')); this.hostSetPhase('orbit'); return; }
     const moon = MOONS[this.run.moon];
     if (moon.company) {

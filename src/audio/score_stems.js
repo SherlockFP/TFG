@@ -31,7 +31,7 @@ function decay(gn, t, peak, dur, att = 0.004) {
   gn.gain.exponentialRampToValueAtTime(0.0001, t + Math.max(att + 0.02, dur));
 }
 function osc(oc, type, f, t, t1, dest, detune = 0) {
-  const o = oc.createOscillator(); o.type = type; o.frequency.value = f; o.detune.value = detune;
+  const o = oc.createOscillator(); o.type = type; o.frequency.value = Math.min(f, oc.sampleRate / 2 - 100); o.detune.value = detune;   // [perf4] never above Nyquist (console.warn per node)
   o.connect(dest); o.start(t); o.stop(t1);
   return o;
 }
