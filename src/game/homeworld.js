@@ -55,7 +55,7 @@ export function installHomeworld(game) {
   const host = () => !!game.isHost;
   const S = () => { const s = game.run?.hw; return s && Array.isArray(s.b) ? s : EMPTY; };
   const st = () => game.profile.homeworld;
-  const onHome = () => !!(MOONS[game.run?.moon]?.home && game.run?.phase === 'moon' && game.world?.outdoor?.home);
+  const onHome = () => !!(MOONS[game.run?.moon]?.home && !MOONS[game.run?.moon]?.ghost && game.run?.phase === 'moon' && game.world?.outdoor?.home);   // [h2] the ghost-raid map is not your base
   const exhibits = () => { try { return Object.values(game.profile.bestiary || {}).filter((e) => (e?.kills | 0) > 0).length; } catch { return 0; } };
   const posOf = (id) => (id === game.selfId ? game.player.pos : game.remotes.get(id)?.pos) || null;
   if (!document.getElementById('tfg-hw-hud-css')) { const s = document.createElement('style'); s.id = 'tfg-hw-hud-css'; s.textContent = CSS; document.head.appendChild(s); }
@@ -149,9 +149,9 @@ export function installHomeworld(game) {
     if (ph !== 'moon') pending = null;
   }
   function raidFrame(extra) { const f = rs.sim.frame(); return { a: 1, w: f.w, W: f.W, r: Math.round(f.raiders * 100), tw: Math.round(f.tw * 100), thr: f.thr, wr: f.wr, ...extra }; }
-  function startRaid() {
+  function startRaid(o) {
     const run = game.run, s = st();
-    rs = { sim: H.makeRaid(s, { seed: (hash(run.runId) ^ Math.imul(run.day || 1, 7919) ^ Math.imul(s.days + 1, 104729)) >>> 0, quotaIndex: run.quotaIndex || 0 }), acc: 0 };
+    rs = { sim: H.makeRaid(s, { seed: (hash(run.runId) ^ Math.imul(run.day || 1, 7919) ^ Math.imul(s.days + 1, 104729) ^ (o?.power ? Math.floor(Date.now() / 1000) : 0)) >>> 0, quotaIndex: run.quotaIndex || 0, power: o?.power }), acc: 0 };   // [h2] o.power: wave strength of homeworld2
     run.hwr = raidFrame({}); game.broadcastRun(['hwr']);
     game.net.broadcast('hwmsg', { k: 'alert' });
   }
@@ -163,6 +163,7 @@ export function installHomeworld(game) {
     run.hwr = { done: 1, kind: res.kind, wr: res.wrecked.length + res.lostWalls.length, cr: stolen.cr, bonus: bonus.cr };
     commit(['credits', 'hwr']);
     game.net.broadcast('hwmsg', { k: 'raid', kind: res.kind, wrecked: res.wrecked.length, walls: res.lostWalls.length, stolen: stolen.cr, bonus: bonus.cr });
+    try { game.homeworld2?.onRaidDone?.(res); } catch (e) { console.warn('[hw] h2 hook', e); }   // [h2] waves of homeworld2 pay extra loot / break machines
     rs = null;
     game.later(() => { if (game.run?.hwr?.done) { game.run.hwr = null; game.broadcastRun(['hwr']); } }, 16000);
   }
@@ -344,7 +345,7 @@ export function installHomeworld(game) {
 
   const api = {
     state: S, req, startPlace, startMove: (id) => { const b = S().b.find((x) => x.i === id); if (b) startPlace(b.t, id, b.r); }, exhibits, open: openPanel, close: closePanel,
-    core: H, get building() { return bm.on; }, get raid() { return rs; }, forceRaid() { if (host() && !rs) startRaid(); },
+    core: H, get building() { return bm.on; }, get raid() { return rs; }, stop: () => stopBuild(), forceRaid(o) { if (host() && !rs) { startRaid(o); return true; } return false; },   // [h2] stop / forceRaid(o) for homeworld2
     dispose() {
       if (disposed) return; disposed = true;
       for (const o of offs) { try { o?.(); } catch { /* ignore */ } }

@@ -152,6 +152,10 @@ import { installFood } from './food.js';   // wave 2: food & drinks (buffs, booz
 import { installHomeworld } from './homeworld.js';
 
 
+// [import:homeworld2]
+import { installHomeworld2 } from './homeworld2.js';
+
+
 // [import:pets]
 import { installPets } from './pets.js';
 
@@ -318,6 +322,9 @@ export class Game extends Emitter {
 
     // [slot:homeworld]
     this.useModule('homeworld', installHomeworld);
+
+    // [slot:homeworld2]
+    this.useModule('homeworld2', installHomeworld2);
 
 
     // [slot:pets]
