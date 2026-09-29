@@ -340,7 +340,7 @@ export function installBackrooms(game) {
     for (let i = 0; i < 3 && tbl.length; i++) list.push(weightedPick(tbl));
     const valueMul = (1 + (r.quotaIndex | 0) * 0.12) * (game.w3?.lootHook?.(list, br()?.th, pk, spots) ?? 1);   // [worlds3] themed loot table
     let n = 0;
-    const put = (type, s) => { if (!s || !ITEMS[type]) return; game.items.hostSpawn(type, new THREE.Vector3(s.x, pk.y + 0.35, s.z), { valueMul }); n++; };
+    const put = (type, s) => { if (!s || !ITEMS[type]) return; const id = game.items.hostSpawn(type, new THREE.Vector3(s.x, pk.y + 0.35, s.z), { valueMul }); n++; try { game.rewardviz?.pocketItem(id); } catch { /* cosmetic */ } };
     // the valuable ones wait in the dark
     const darkFirst = () => { const j = spots.findIndex((s) => s.dark); return spots.splice(j >= 0 ? j : 0, 1)[0]; };
     put('br_exitsign', darkFirst());

@@ -250,6 +250,7 @@ import { installWorlds3 } from './worlds3.js';   // wave 8: wrong door + alterna
 import { installCrdirector } from './crdirector.js';
 import { installFacjobs } from './facjobs.js';
 import { installLcmonsters } from './lcmonsters.js';
+import { installRewardviz } from './rewardviz.js';   // wave 8: reward visibility (docs/wave8/rewardviz.md)
 import { installLabyrinths } from './labyrinths.js';   // [labyrinths] metro ghost train + greenhouse vines / spores (docs/wave8/labyrinths.md)
 // [import:lcmonsters]
 import { installAtmos } from './atmos.js';   // [import:atmos]
@@ -546,6 +547,7 @@ export class Game extends Emitter {
     this.useModule('downed', installDowned);   // [slot:downed]
     this.useModule('hubgate', installHubgate);   // [slot:hubgate] wave 8: Hub door, unlock cards, Quick Shift
     this.useModule('soul', installSoul);   // [slot:soul]
+    this.useModule('rewardviz', installRewardviz);   // wave 8: reward ledger / warnings / pop
     // [slot:mapmods]
     // [slot:worlds3]
     // [slot:resto]

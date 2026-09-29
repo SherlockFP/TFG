@@ -373,7 +373,7 @@ export function installLcmonsters(game) {
       const k = cursed.get(it.id); if (!k || it.state !== 'world') continue;
       it.obj.getWorldPosition(tmp);
       const l = labels.find((q) => q.type === it.type && q.pos && q.pos.distanceToSquared(tmp) < 0.01);
-      if (l) { l.color = '#b58cff'; l.sub = `${l.sub} · ${t('something whispers')}`; }
+      if (l) { l.color = '#b58cff'; l.sub = `${l.sub} · ${tf('CURSED ×{n}', { n: T.curseValueMul })} · ${t('something whispers')}`; }
     }
     for (const v of g.creatures?.views?.values?.() || []) {                     // the Loot Mimic passes for loot on the scanner too
       if (v.type !== 'lm_lootmimic' || v.state === 'dead') continue;

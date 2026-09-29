@@ -211,7 +211,7 @@ export function installMining(game) {
   function drops(cv, i, m, by) {
     const def = MATS[m]?.drop;
     if (!def || !C.oreDropOk(map.tally, m)) return;
-    if (def.val) { map.tally.value += def.val; map.tally.items++; }
+    if (def.val) { map.tally.value += def.val; map.tally.items++; game.net.broadcast('mnd', { k: 'ore', s: map.seed, o: Math.round(map.tally.value), n: Math.round(def.val) }); }   // [rewardviz] ore counter
     cv.vol.center(i, V);
     const p = posOf(by); if (p) { F.set(p.x - V.x, 0, p.z - V.z).normalize().multiplyScalar(0.35); V.add(F); }
     try { game.items.hostSpawn(def.item, V.clone(), { tier: m === M.CRYSTAL ? 'rare' : undefined, linvel: [F.x * 3, 2.2, F.z * 3] }); } catch (e) { console.warn('[mining] drop', e); }
@@ -275,6 +275,7 @@ export function installMining(game) {
   // ---------------------------------------------------------------------------------------------- net (all peers)
   function onMnd(d) {
     if (!map || d.s !== map.seed) return;
+    if (d.k === 'ore') { map.oreSeen = d.o | 0; try { game.rewardviz?.reward('ore', d.n); } catch { /* cosmetic */ } return; }
     if (d.k === 'sync') { for (const [v, arr] of Object.entries(d.l || {})) { const cv = map.vols[v]; if (!cv) continue; map.log[v] = arr.slice(); markDirty(cv, cv.vol.apply(arr)); } return; }
     const cv = map.vols[d.v]; if (!cv) return;
     if (d.k === 'hp') {
@@ -362,7 +363,7 @@ export function installMining(game) {
     const pct = a.cv.pct.get(a.i) || 0;
     a.cv.vol.center(a.i, V);
     if (held?.def?.mn) { list.push({ pos: V.clone(), r: 0.9, reach: 3.4, label: tf('Place {n} [LMB]', { n: t(held.def.name) }), sub: '', action: () => {} }); return; }
-    list.push({ pos: V.clone(), r: 0.9, reach: 3.4, label: `${t(MATS[m].n)}${pct ? ' ' + pct + '%' : ''}`, sub: MATS[m].hp === Infinity ? t('Unbreakable') : t('Hit it (LMB) with a pickaxe'), action: () => {} });
+    list.push({ pos: V.clone(), r: 0.9, reach: 3.4, label: `${t(MATS[m].n)}${pct ? ' ' + pct + '%' : ''}`, sub: MATS[m].hp === Infinity ? t('Unbreakable') : t('Hit it (LMB) with a pickaxe') + (C.isOre(m) ? ' · ' + tf('ORE {a}/{b} today', { a: map.oreSeen ?? Math.round(map.tally.value), b: MN.valueCap }) : ''), action: () => {} });
   }));
 
   offs.push(game.mods.on('mapLoaded', (w, g) => { if (g === game) load(w); }));
