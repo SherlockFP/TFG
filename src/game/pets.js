@@ -1,5 +1,6 @@
 // PET SYSTEM (module `pets`, docs/wave2/pets.md). Installed with `this.useModule('pets', installPets)`.
-// STATE OF THIS FIRST CUT (details in the doc): profile data + rules (pets_core.js), 9 procedural species with 3 evolution stages + shiny + skins
+// [finish] wave 3: pets_sim.js (host brain) + pets_net.js (net, views, marks, carrier) now run fetch / attack / guard / role abilities and show every pet to the crew.
+// STATE OF THE FIRST CUT (details in the doc): profile data + rules (pets_core.js), 9 procedural species with 3 evolution stages + shiny + skins
 // (models/pets.js), the PET panel (N), eggs -> incubator (hatch after N game days), HQ pet shop, capture odds, terminal PETS, and a CLIENT-SIDE
 // follower that shows your active pet next to you. NOT DONE YET: host-simulated fetch / attack / guard / role abilities and net sync of pets to the crew
 // (the rules, stats and ability numbers for them already live in pets_core.js petStats()).
@@ -9,6 +10,8 @@ import { addTranslations, t, tf } from '../core/i18n.js';
 import { createPetModel } from '../models/pets.js';
 import * as C from './pets_core.js';
 import { createPetsPanel } from '../ui/panels/pets.js';
+import { installPetsNet } from './pets_net.js';
+import { installIncubator } from './pets_incubator.js';   // [finish] host sim + net sync
 
 const EGG_ITEM_DEFS = [
   { id: 'pet_egg_common', name: 'Pet Egg (Spotted)', kind: 'tool', weight: 2, hands: 1, price: 120, shop: 'pets', tip: 'Put it in the ship incubator (PET panel, N). Hatches after 2 game days.' },
@@ -121,6 +124,7 @@ export function installPets(game) {
   }
   function rebuildView() {
     if (S.disposed) return;
+    if (S.netOn) { removeView(); api.net?.sendSync?.(true); return; }   // [finish] the host-driven view (pets_net.js) replaces the local follower
     const pet = api.active();
     if (!pet || C.isResting(state(), pet) || !game.run || typeof document === 'undefined') { removeView(); return; }
     const sig = labelOf(pet);
@@ -182,7 +186,7 @@ export function installPets(game) {
   }
   offs.push(mods.on('update', (dt, g) => {
     if (g !== game || S.disposed) return;
-    try { tickDays(dt); if (!S.view && S.hatchT > 4.9) rebuildView(); tickView(dt); } catch (e) { if (!api._warned) { api._warned = true; console.warn('[pets]', e); } }
+    try { tickDays(dt); if (!S.netOn) { if (!S.view && S.hatchT > 4.9) rebuildView(); tickView(dt); } } catch (e) { if (!api._warned) { api._warned = true; console.warn('[pets]', e); } }
   }));
   offs.push(mods.on('phase', (ph, g) => { if (g === game) setTimeout(rebuildView, 400); }));
   offs.push(mods.on('mapLoaded', (w, g) => { if (g === game) rebuildView(); }));
@@ -216,19 +220,22 @@ export function installPets(game) {
     const s = state();
     const line = (p, i) => `${i + 1}) ${p.nm} - ${C.evolutionName(p.sp, C.stageOf(p))} Lv${C.levelOf(p)}${p.sh ? ' *SHINY*' : ''}${p.id === s.active ? ' [ACTIVE]' : ''}${C.isResting(s, p) ? ' (resting)' : ''}`;
     switch ((w || '').toLowerCase()) {
+      case 'mode': { const m = (a[0] || '').toLowerCase(); term.print(api.setMode?.(m) ? `Pet mode: ${m}` : `PETS MODE <${C.MODES.join('|')}> (now: ${api.mode?.()})  keys: O cycle, Shift+O deliver, L command`); return; }
+      case 'dest': { const d = (a[0] || '').toLowerCase() === 'ship' ? 'ship' : 'me'; api.setDest?.(d); term.print(`Fetch delivery: ${d}`); return; }
       case 'open': case 'panel': api.open(); term.print('PET panel: N'); return;
       case 'active': { const p = s.stable[(Number(a[0]) || 0) - 1]; term.print(p ? (api.setActive(p.id).ok ? `${p.nm} is now your active pet.` : 'It is resting.') : 'PETS ACTIVE <number>'); return; }
       case 'name': { const p = s.stable[(Number(a[0]) || 0) - 1]; term.print(p && api.rename(p.id, a.slice(1).join(' ')) ? 'Renamed.' : 'PETS NAME <number> <name>'); return; }
       case 'adopt': { const r = api.buyPet((a[0] || '').toLowerCase()); term.print(r.ok ? `Adopted ${r.pet.nm}.` : (r.err || 'PETS ADOPT <cat|dog|fox|bee|bear> (HQ only)')); return; }
-      default: term.print([`PETS ${s.stable.length}/${C.MAX_STABLE} | eggs incubating: ${s.incubator.length}/${C.INCUBATOR_SLOTS} | panel: N`, ...s.stable.map(line), '>PETS ACTIVE <n> | NAME <n> <name> | ADOPT <species> (HQ) | OPEN']);
+      default: term.print([`PETS ${s.stable.length}/${C.MAX_STABLE} | eggs incubating: ${s.incubator.length}/${C.INCUBATOR_SLOTS} | panel: N`, ...s.stable.map(line), '>PETS ACTIVE <n> | NAME <n> <name> | ADOPT <species> (HQ) | MODE <follow|stay|fetch|guard> | DEST <me|ship> | OPEN']);
     }
   };
   try { window.KefalAPI?.registerCommand?.('pets', cmd, 'your pets: list, set active, rename, adopt (HQ), open the PET panel (N)'); } catch { /* optional */ }
 
   offs.push(mods.on('interactables', (list, g) => {
-    if (g !== game || !game.run || !S.view || !api.active()) return;
-    const p = game.player, v = S.view;
-    if (v.pos.distanceTo(p.pos) > 3.2) return;
+    const v = S.netOn ? api.net?.ownView?.() : S.view;   // [finish]
+    if (g !== game || !game.run || !v || !api.active()) return;
+    const p = game.player;
+    if (v.pos.distanceTo(p.pos) > 3.2 || !v.model.root.visible) return;
     const pet = api.active(), held = p.heldItem?.();
     const treat = held?.type === 'pet_treat';
     list.push({
@@ -238,8 +245,17 @@ export function installPets(game) {
     });
   }));
 
+  // [finish] net + host sim + views + carrier
+  let netPart = null;
+  try { netPart = installPetsNet(game, api, S, { save, say }); S.netOn = true; api.refresh = rebuildView; } catch (e) { console.warn('[pets] net part', e); S.netOn = false; }
+
+  let incubator = null;
+  try { incubator = installIncubator(game, api); } catch (e) { console.warn('[pets] incubator', e); }   // [finish] ship prop
+
   return Object.assign(api, {
     dispose() {
+      try { incubator?.dispose?.(); } catch { /* ignore */ }
+      try { netPart?.dispose?.(); } catch { /* ignore */ }
       S.disposed = true;
       removeView();
       for (const off of offs) { try { off?.(); } catch { /* ignore */ } }

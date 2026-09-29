@@ -277,6 +277,7 @@ mirror copy / zombie fodder waves (cap 50), XP crystals + 3-card level-ups (8 te
 14 optional consumables (`fd_*`, store tab Food) with temporary buffs through the anomaly buff registry, drunk stacking (sway / drift / lag / slur / hiccups / harmless blackout), eat / drink animations, CHEERS!, Party Cake sharing, offer with H, ship mess table (Well Fed), vending machines / fridges. Tests: `tools/harness/food.test.mjs`, `food_install.test.mjs`.
 ### 5.14 Wave 2 - PETS (module `pets`, docs/wave2/pets.md; first cut, node-tested only)
 9 species / 3 evolutions / shiny / skins / eggs+incubator / capture odds / PET panel (N, terminal PETS), profile.pets. NOT done: host-simulated fetch/attack/guard/role abilities + net sync (design in the doc).
+**[finish] wave 3 (docs/wave3/finish.md, node-tested + build only, NOT browser-run):** host-simulated fetch / attack / guard / role abilities (`pets_sim.js` pure + `pets_net.js` glue: net types `ptinfo` / `ptst` / `ptev`, request `pt`), keys O / Shift+O / L, Pet Carrier capture, ship incubator prop (`pets_incubator.js`). Still missing: chest / boss egg drops, pet achievements.
 
 ### 5.11 Wave 2 - HQ FORGE (module `forge`, see docs/wave2/forge.md)
 THE MONETIZER (+1..+9, overclocks), Ascension Altar (tier up, workbench capped at Rare), Shard Exchange, 6 shard items + Backup Drive, weapon glow (+3/+5/+7/+9), creature tiers
@@ -290,6 +291,7 @@ NOT verified: any browser run (window layout, drag & drop, popup, glyph look, re
 ### 5.13 Wave 2 - THE ADMINISTRATOR + THE BOARD (module `boardgame`, docs/wave2/boardgame.md)
 Rare (~4 % per landing, once a day, quota >= 1) tall grey-suit entity; stare at its face for 2 s and you + crew within 10 m are sent to a dice-and-cards board (24-tile ring, 12 turns, LOOT / TRAP / CARD / DUEL / SHORTCUT / EXIT). Fail = most valuable item + 90 % HP. Pure rules `src/game/board_rules.js` + `node tools/harness/board.test.mjs` (PASS). NOT browser-tested (headless run cancelled); hooks marked `[boardgame]` in game.js.
 ### 5.14 Wave 2 - MAPS2 (module `maps2`, docs/wave2/maps2.md) - PARTIAL
+**[finish] wave 3 (docs/wave3/finish.md): challenge rooms are LIVE (`M2_CHALLENGE_ON = true`; physics plate / gamble lever / arena waves / co-op levers + colour code / treasure collapse), Collapse + Migration events, stateful drawers / PCs / radios / phones (`maps2_world|challenge|events|furniture|rules|text2.js`). Fixed a wave-2 bug: the extra furniture was never placed. Not browser-verified.**
 Story rooms (party / last stand / nursery / streamer shrine / flooded break room, readable lore notes), a triangle liminal room, per-room light switches, void windows, extra furniture; retyped from the normal layout with an own RNG fork (`globalThis.__kefalM2Off` disables). Challenge rooms are built but switched off (`M2_CHALLENGE_ON`), events / interactable state / outdoor landmarks NOT done. Node test `tools/harness/maps2.test.mjs`; not seen in a browser.
 ### 5.11 Localization wave (EN / TR / RU) — see docs/wave2/i18n.md
 `core/i18n.js` is multi-language (`t`, `tf` with `{x}` / `{@x}`, `L`, `sysMsg`, `addTranslations(map, lang = 'tr')`, `localizeDeep`);

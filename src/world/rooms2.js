@@ -20,7 +20,7 @@ export const M2_STORY = ['party', 'laststand', 'nursery', 'shrine', 'flooded'];
 export const M2_CHALLENGE = ['physics', 'gamble', 'arena', 'puzzle', 'treasure'];
 export const M2_LIMINAL = ['triangle'];
 /** Challenge rooms are BUILT but their runtime (levers / waves / gambling, src/game/maps2.js) is not finished: off by default. */
-export const M2_CHALLENGE_ON = false;
+export const M2_CHALLENGE_ON = true;   // [finish] runtime shipped in src/game/maps2_challenge.js
 export const M2_IDS = [...M2_STORY, ...M2_CHALLENGE, ...M2_LIMINAL];
 export const M2_TYPES = M2_IDS.map((i) => 'm2_' + i);
 for (const ty of M2_TYPES) SPECIAL_ROOMS.add(ty);   // facsys / hazards / setpieces leave these rooms alone
@@ -133,7 +133,7 @@ export function planMaps2(L) {
     budget--;
   };
   // 1) one challenge room (rare)
-  const pCh = size < 0.8 ? 0.3 : size < 1.5 ? 0.45 : 0.6;
+  const pCh = size < 0.8 ? 0.16 : size < 1.5 ? 0.24 : 0.34;   // [finish] rarer now that the challenge rooms are live
   if (M2_CHALLENGE_ON && budget > 0 && rng.chance(pCh)) {
     const fit = {
       physics: (r) => r.w * r.h >= 6 && Math.min(r.w, r.h) >= 2,
@@ -373,9 +373,9 @@ export function buildRooms2(ctx) {
     const plate = farthest(S, [d0.x, d0.z], 1.15, 1.15);
     const padP = S.near(d0.x + d0.n[0] * 4, d0.z + d0.n[1] * 4, 0.7, 0.7, 2.4);
     if (!plate || !padP) { out.rooms[out.rooms.length - 1].failed = true; return; }
-    S.put('m2:plate', plate.x, plate.z, 0);
+    const plateObj = S.put('m2:plate', plate.x, plate.z, 0);   // [finish] spots carry the prop so the runtime can animate its anchors
     for (const [ox, oz, sx, sz] of [[0, 0.65, 1.4, 0.08], [0, -0.65, 1.4, 0.08], [0.65, 0, 0.08, 1.4], [-0.65, 0, 0.08, 1.4]]) flat('plain', padP[0] + ox, padP[1] + oz, sx, sz, Y + 0.014, 0xffd030);
-    S.spot('plate', plate.x, Y + 0.1, plate.z, { r: 1.05 });
+    S.spot('plate', plate.x, Y + 0.1, plate.z, { r: 1.05, obj: plateObj });
     S.spot('pad', padP[0], Y + 0.3, padP[1]);
     S.sign(['PHYSICS TEST', 'WEIGHT > PLATE']);
     em(plate.x, Y + 2.5, plate.z, 0xff8060, 0.8, 9, 0);
@@ -386,8 +386,8 @@ export function buildRooms2(ctx) {
     if (wi) for (const a of [-1.3, 0, 1.3]) { const [px, pz] = K.wallPoint(S.walls[0].x, S.walls[0].z, S.walls[0].d, a, 0.65); if (S.clear(px, pz, 0.5, 0.45, 1.8)) S.put('slot_machine', px, pz, wi.rot); }
     const lp = S.near(S.cx, S.cz, 0.6, 0.6, 2.0) || [S.cx, S.cz];
     const d0 = S.doors[0];
-    S.put('m2:fate_lever', lp[0], lp[1], d0 ? face(d0.x - lp[0], d0.z - lp[1]) : 0);
-    S.spot('lever', lp[0], Y + 1.3, lp[1], { arm: true });
+    const leverObj = S.put('m2:fate_lever', lp[0], lp[1], d0 ? face(d0.x - lp[0], d0.z - lp[1]) : 0);
+    S.spot('lever', lp[0], Y + 1.3, lp[1], { arm: true, obj: leverObj });
     S.sign(['FATE ROULETTE', 'THE HOUSE WINS?'], { fg: '#ff80ff', bg: '#180418', border: '#ffd030' });
     em(lp[0], Y + 2.4, lp[1], 0xff60ff, 0.9, 10, 0.1);
     em(S.cx, Y + S.h - 0.6, S.cz, 0xffc040, 0.6, 11, 0.2);
@@ -397,7 +397,7 @@ export function buildRooms2(ctx) {
     const d0 = S.doors[0];
     if (d0) { const [px, pz] = K.wallPoint(d0.cell[0], d0.cell[1], d0.d, d0.w / 2 + 1.9, 0.5); if (S.clear(px, pz, 0.7, 0.4, 1.4)) cp = { x: px, z: pz, rot: WALL_ROT[d0.d] }; }
     if (!cp) { const w = S.wall(0, 0, 0.5); if (w) cp = w; }
-    if (cp) { S.put('m2:arena_console', cp.x, cp.z, cp.rot); S.spot('console', cp.x, Y + 1.1, cp.z); }
+    if (cp) { const co = S.put('m2:arena_console', cp.x, cp.z, cp.rot); S.spot('console', cp.x, Y + 1.1, cp.z, { obj: co }); }
     const rad = Math.max(2, Math.min(S.rw, S.rd) / 2 - 1.7);
     let n = 0;
     for (let a = 0; a < 12 && n < 5; a++) {
@@ -418,12 +418,12 @@ export function buildRooms2(ctx) {
     const lev = pts.map((p) => S.near(p[0], p[1], 0.5, 0.5, 1.9));
     const cp = S.wall(0, 0, 0.12);
     if (!lev[0] || !lev[1] || !cp) { out.rooms[out.rooms.length - 1].failed = true; return; }
-    lev.forEach((p, i) => { S.put('m2:lever_pylon', p[0], p[1], face(S.cx - p[0], S.cz - p[1])); S.spot('lever', p[0], Y + 1.35, p[1], { i }); });
-    S.put('m2:color_panel', cp.x, cp.z, cp.rot, {}, 0.9);
+    lev.forEach((p, i) => { const po = S.put('m2:lever_pylon', p[0], p[1], face(S.cx - p[0], S.cz - p[1])); S.spot('lever', p[0], Y + 1.35, p[1], { i, obj: po }); });
+    const panelObj = S.put('m2:color_panel', cp.x, cp.z, cp.rot, {}, 0.9);
     const co = Math.cos(cp.rot), si = Math.sin(cp.rot);
     for (let i = 0; i < 4; i++) { const lx = -0.45 + i * 0.3; S.spot('btn', cp.x + lx * co + 0.09 * si, Y + 1.3, cp.z - lx * si + 0.09 * co, { i }); }
     S.spot('rp', cp.x + 0.09 * si, Y + 1.06, cp.z + 0.09 * co);
-    S.spot('panel', cp.x, Y + 1.4, cp.z, { rot: cp.rot });
+    S.spot('panel', cp.x, Y + 1.4, cp.z, { rot: cp.rot, obj: panelObj });
     S.spot('reward', S.cx, Y, S.cz);
     S.sign(['SYNC CHAMBER', 'TWO LEVERS. ONE SECOND.']);
     em(S.cx, Y + S.h - 0.5, S.cz, 0xd8e8ff, 0.7, 12, 0.05);
@@ -490,9 +490,10 @@ export function buildRooms2(ctx) {
         const [w0, d0] = fp(id);
         const [px, pz] = K.wallPoint(w.x, w.z, w.d, rng.float(-1.0, 1.0), d0 / 2 + 0.3);
         const hw = Math.max(w0, d0) / 2;
-        if (px - hw < S.rc.x0 + 0.4 || px + hw > S.rc.x1 - 0.4 || pz - hw < S.rc.z0 + 0.4 || pz + hw > S.rc.z1 - 0.4) continue;
+        if (px - hw < S.rc.x0 + 0.2 || px + hw > S.rc.x1 - 0.2 || pz - hw < S.rc.z0 + 0.2 || pz + hw > S.rc.z1 - 0.2) continue;   // [finish] was 0.4: nothing ever fit (footprint edge sits 0.3 m from the wall)
         if (!navClear(ctx.nav, px - hw, pz - hw, px + hw, pz + hw, 0.1) || S.doors.some((d) => Math.hypot(d.x - px, d.z - pz) < 1.9)) continue;
-        if (ctx.placeProp(id, px, Y, pz, WALL_ROT[w.d], { ...opts })) { placed++; break; }
+        const fo = ctx.placeProp(id, px, Y, pz, WALL_ROT[w.d], { ...opts });
+        if (fo) { placed++; const kind = { 'm2:drawer_cab': 'drawer', 'm2:pc': 'pc', 'm2:radio': 'radio', 'm2:phone': 'phone' }[id]; if (kind) out.spots.push({ k: kind, room: r.id, x: px, y: Y + 0.9, z: pz, obj: fo }); break; }   // [finish] stateful furniture (src/game/maps2_furniture.js)
       }
     }
     return placed;

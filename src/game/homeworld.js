@@ -16,6 +16,7 @@ import * as H from './homeworld_core.js';
 import { buildHomeworldMap, HOME_Y, CONSOLE_POS } from '../world/homeworld_map.js';
 import { createBuildingModel, createGhost, setWrecked } from '../models/homeworld.js';
 import { createHomeworldPanel } from '../ui/panels/homeworld.js';
+import { installHomeRaid } from './homeworld_raid.js';   // [finish] on-site raid: real raiders + visible tower fire
 
 HOST_ONLY.add('hwmsg');
 
@@ -49,6 +50,7 @@ export function installHomeworld(game) {
   const mods = game.mods, offs = [];
   const views = new Map();
   let disposed = false, vg = null, panel = null, boundNet = null, hintEl = null, raidEl = null, rs = null, pending = null, sig = '', syncT = 0, hudT = 0, lastAct = 0;
+  const raid = installHomeRaid(game, { get views() { return views; }, setWrecked });   // [finish]
   const bm = { on: false, type: null, moveId: 0, rot: 0, ghost: null, x: 0, z: 0, ok: false, key: '' };
   const host = () => !!game.isHost;
   const S = () => { const s = game.run?.hw; return s && Array.isArray(s.b) ? s : EMPTY; };
@@ -166,8 +168,15 @@ export function installHomeworld(game) {
   }
   function hostTick(dt) {
     if (pending && game.run.phase === 'moon' && !MOONS[game.run.moon]?.home && game.time >= pending.at) { pending = null; if (!rs) startRaid(); }
-    if (!rs) return;
-    rs.sim.aid = onHome() ? 1.25 : 1;   // the crew on the homeworld adds firepower
+    if (!rs) { if (raid.active()) raid.killAll(true); return; }
+    rs.sim.aid = 1;
+    // [finish] crew on the homeworld during the raid: the sim becomes the data holder, real raiders + real tower fire (homeworld_raid.js)
+    if (onHome() && !rs.sim.done) {
+      const sec = raid.tick(rs.sim, dt);
+      if (rs.sim.done) finishRaid(); else if (sec) { game.run.hwr = raidFrame({ home: 1 }); game.broadcastRun(['hwr']); }
+      return;
+    }
+    if (raid.active()) raid.leave(rs.sim);   // the crew flew off again: live raiders fold back into the abstract sim
     rs.acc += dt;
     let stepped = false;
     while (rs.acc >= 1 && !rs.sim.done) { rs.acc -= 1; rs.sim.step(1); stepped = true; }
@@ -278,13 +287,16 @@ export function installHomeworld(game) {
     raidEl.classList.toggle('done', !!r.done);
     raidEl.innerHTML = r.done
       ? `<b>${r.kind === 'breached' ? t('HOMEWORLD BREACHED') : t('RAID REPELLED')}</b><br>${r.kind === 'breached' ? `${tf('{n} buildings wrecked', { n: r.wr })} · ▮${r.cr} ${t('stolen')}` : `+▮${r.bonus}`}`
-      : `<b>⚠ ${t('HOMEWORLD UNDER ATTACK')}</b><br>${t('Wave')} ${r.w}/${r.W} · ${t('raiders')} ${r.r}%<i><s style="width:${r.r}%"></s></i>${t('Defences')} ${r.tw}% · ${t('threatened')} ${r.thr} · ${t('wrecked')} ${r.wr}${r.home ? `<br>${t('Crew on site: +25% firepower')}` : `<br><small>${t('Fly home to defend it: lever, ROUTE HOME, lever.')}</small>`}`;
+      : `<b>⚠ ${t('HOMEWORLD UNDER ATTACK')}</b><br>${t('Wave')} ${r.w}/${r.W} · ${t('raiders')} ${r.r}%<i><s style="width:${r.r}%"></s></i>${t('Defences')} ${r.tw}% · ${t('threatened')} ${r.thr} · ${t('wrecked')} ${r.wr}${r.home ? `<br>${t('Crew on site: raiders are real, defend the base!')}` : `<br><small>${t('Fly home to defend it: lever, ROUTE HOME, lever.')}</small>`}`;
   }
   const onMsg = (m, from) => {
     if (disposed || !m || (from !== game.net?.hostId && !host())) return;
     if (m.k === 'err') { game.ui?.toast(t(m.why), 'bad'); return; }
     if (m.k === 'ok') { game.audio?.play?.(m.op === 'sell' ? 'ui_click' : 'ui_buy', { volume: 0.6, bus: 'ui' }); if (m.by === game.selfId && m.op === 'build') game.ui?.toast(`${t(H.BUILDINGS[m.t]?.name || m.t)} ✓`, 'good'); return; }
     if (m.k === 'collect') { game.ui?.toast(`${t('COLLECT')}: ▮${m.cr} · ◈${m.clout}${m.meals ? ` · +${m.meals} medkit` : ''}`, 'good'); return; }
+    if (m.k === 'fx') { raid.onFx(m); return; }   // [finish] tower tracers / arcs / mines
+    if (m.k === 'hp') { raid.onHp(m); return; }
+    if (m.k === 'banner') { game.ui?.hud?.bigText?.(m.main, m.sub || ''); return; }
     if (m.k === 'alert') {
       game.ui?.hud?.bigText('⚠ ' + t('HOMEWORLD UNDER ATTACK'), t('Fly home to defend it: lever, ROUTE HOME, lever.'));
       game.audio?.play?.('ship_alarm', { volume: 0.7 }); return;
@@ -315,6 +327,7 @@ export function installHomeworld(game) {
       syncT -= dt;
       if (syncT <= 0) { syncT = 0.4; const k = s2 ? JSON.stringify(s2.b) : ''; if (k !== sig || (views.size === 0 && s2?.b?.length && onHome())) { sig = k; syncViews(); } panel?.refresh(); }
       hudT -= dt; if (hudT <= 0) { hudT = 0.3; raidHud(); }
+      if (onHome()) raid.update(dt); else raid.clearVisuals();   // [finish]
       buildUpdate();
       if (host() && game.run?.hw) hostTick(dt);
     } catch (e) { console.warn('[hw] update', e); }
@@ -337,6 +350,7 @@ export function installHomeworld(game) {
       for (const o of offs) { try { o?.(); } catch { /* ignore */ } }
       document.removeEventListener('keydown', escKey);
       boundNet?.off?.('msg:hwmsg', onMsg);
+      try { raid.dispose(); } catch { /* ignore */ }   // [finish]
       stopBuild(); clearViews(true); hintEl?.remove(); raidEl?.remove();
     },
   };

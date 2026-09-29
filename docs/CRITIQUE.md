@@ -128,3 +128,6 @@ Noclip pocket + Backrooms entities + liminal overlay/photos are integrated but w
 - Proportions/grips/first-person body were tuned by numbers only (no browser run): needs a visual pass.
 ## Net drops (wave 3)
 Reconnect/resume, rejoin, TURN and backpressure are only exercised against a fake transport and BroadcastChannel. Never seen over real WebRTC: check `peerLost`/`peerResume` with Wi-Fi off for 10-30 s, that a resumed client keeps its held item and is not teleported, and that the 45 s ghost avatar of a crashed tab (no `bye`) is acceptable. No TURN server is configured by default.
+
+## Wave 3 - finish (pets / maps2 / homeworld; docs/wave3/finish.md)
+Node-tested + build only, no browser run. Pets now really fetch / fight / guard and everybody sees them (biggest risk: nav + net glue in `pets_net.js`, never played). maps2 challenge rooms are on: numbers (gamble EV ~46 vs 40, arena sizes, plate weight 60) are paper balance; the treasure-room collapse and Collapse / Migration events need a human to judge the fun / fairness. On-site homeworld raids use real siege creatures + flow field; tower tracers are simple beams. Honest gaps: no pet egg drops from chests / bosses, no pet achievements, Elevator Stop event, raider health bars, NPC workers.

@@ -39,3 +39,5 @@ Net types: `hwact` (request: build/up/sell/move/repair/collect/deposit/withdraw)
 
 ## Not done yet
 On-site real siege with creatures, tower tracers, NPC workers walking, ship CRT raid feed (HUD mini-panel only), Trophy Hall exhibits, browser verification.
+
+**UPDATE (wave 3 [finish]):** the on-site raid (real raiders + flow field + visible tower fire when the crew is home) is built: see docs/wave3/finish.md. Still not done: NPC workers, CRT raid feed, Trophy Hall exhibits.
