@@ -62,7 +62,7 @@ for (let s = 1; s <= 220; s++) {
   ok(specs.filter((p) => p.kind === 'landmark').length >= 1, 'every map has its biome landmark');
   ok(specs.some((p) => p.kind === 'pylon') && specs.some((p) => p.kind === 'billboard') && specs.some((p) => p.kind === 'drone'), 'interactive bits exist');
 }
-for (const k of ['landmark', 'pylon', 'panel', 'drone', 'billboard', 'scar', 'pod', 'rig', 'camp', 'sign']) ok(kindsSeen.has(k), 'kind appears: ' + k);
+for (const k of ['landmark', 'pylon', 'panel', 'drone', 'billboard', 'pod', 'rig', 'camp', 'sign']) ok(kindsSeen.has(k), 'kind appears: ' + k);
 for (const f of C.FAMILIES) ok(famSeen.has(f), 'family appears: ' + f);
 ok(total / 220 > 18 && total / 220 < 60, `content budget per map (${(total / 220).toFixed(1)})`);
 // a map where everything is blocked yields nothing (homeworld-like), and never throws

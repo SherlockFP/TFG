@@ -149,6 +149,7 @@ export class UI {
   openChat() {
     if (this.chatOpen) return;
     this.chatOpen = true;
+    document.body.classList.add('chat-typing');   // wave 8: hide the live-chat feed + hunger HUD while typing (owner)
     this.chatEl.classList.remove('hidden');
     this.chatEl.classList.add('open');
     this.chatIn.classList.remove('hidden');
@@ -157,6 +158,7 @@ export class UI {
   }
   closeChat() {
     this.chatOpen = false;
+    document.body.classList.remove('chat-typing');
     this.chatEl.classList.remove('open');
     this.chatIn.classList.add('hidden');
     this.chatIn.blur();

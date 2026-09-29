@@ -130,7 +130,7 @@ export function planMapArt(o) {
     const s = pathSpot(11, 4.5, 2.4);
     if (s) add('billboard', s.x, s.y, s.z, s.yaw, 4.5, { ad: adPool[i % adPool.length], w: 7.2, hh: 3.6, post: 2.7 });
   }
-  const nScar = 4 + (big ? 3 : 0);
+  const nScar = 0;   // wave 8: glitch scars removed (owner: unreadable walk-through magenta/cyan patches that did not fit the game)
   for (let i = 0; i < nScar; i++) {
     const s = free(6, 34, 118, 3, 40);
     if (!s) continue;

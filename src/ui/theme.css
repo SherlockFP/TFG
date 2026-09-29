@@ -303,3 +303,6 @@ html.tfg-ui .cell-appeal .ca-bar i { box-shadow: none; }
 html.tfg-ui .cell-appeal .ca-keys b { border-radius: 0; font-family: var(--font2); font-weight: 700; box-shadow: none; }
 html.tfg-ui #ui .shop .tabs .btn.tab { font-size: 17px; padding: 2px 8px 1px; letter-spacing: 0.05em; }
 html.tfg-ui #ui .shop .tabs { gap: 2px; }
+
+/* wave 8: while the text chat is open, hide the Algorithm's live-chat feed and the hunger/survival widget */
+body.chat-typing [data-dock-id="a2feed"], body.chat-typing [data-dock-id="survival"] { display: none !important; }
