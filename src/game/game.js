@@ -104,6 +104,7 @@ import { installForge } from './forge.js';
 
 
 import { installMusic } from './music.js';
+import { installFeel } from './feel.js';   // wave 7: game feel (hitstop, class sounds, muzzle flash, death topple, heartbeat)
 import { installSfx } from './sfx.js';   // wave 4: creature voices + footsteps + biome beds (docs/wave4/sfx.md)
 
 
@@ -358,6 +359,7 @@ export class Game extends Emitter {
 
 
     this.useModule('music', installMusic);
+    this.useModule('feel', installFeel);   // [feel] wave 7 (game.feel)
     this.useModule('cvoice', installSfx);   // [sfx] stored as game.cvoice: game.sfx is the core sound-effect FUNCTION and must not be shadowed
 
 
@@ -1116,9 +1118,11 @@ export class Game extends Emitter {
 
   updateFrame(dt) {
     // hitstop: a few frames of near-freeze on a confirmed melee hit (local only)
-    if (this.hitstopT > 0) { this.hitstopT -= dt; dt *= 0.12; }
-    this.particles?.update(dt);
-    this.scanFx?.update(dt);
+    // wave 7: visual/local-only time dilation (feel_core HITSTOP_SCALE). The host sim, physics, timers and net keep the real dt.
+    let vdt = dt;
+    if (this.hitstopT > 0) { this.hitstopT -= dt; vdt = dt * 0.12; }
+    this.particles?.update(vdt);
+    this.scanFx?.update(vdt);
     this.time += dt;
     if (this.scanWave) {
       const w = this.scanWave;
@@ -1143,8 +1147,8 @@ export class Game extends Emitter {
     if (!p.dead) {
       // LocalPlayer caps its step at 1/30 s (no giant collision steps); sub-step long frames (low fps, the 20 Hz
       // hidden-tab loop) so movement, stamina and falls keep real-time speed instead of slowing down.
-      const n = Math.min(3, Math.max(1, Math.ceil(dt * 30 - 1e-3)));
-      for (let i = 0; i < n && !p.dead; i++) p.update(dt / n, input);
+      const n = Math.min(3, Math.max(1, Math.ceil(vdt * 30 - 1e-3)));
+      for (let i = 0; i < n && !p.dead; i++) p.update(vdt / n, input);
     } else this.updateSpectator(dt, input);
     this.emotes.applyCamera();
     p.inShip = insideShip(p.pos);
@@ -1186,7 +1190,7 @@ export class Game extends Emitter {
     this.guard('voice', () => this.voice.update(dt, input));
     this.guard('audio', () => this.audio.update(dt, this.camera));
     this.guard('companyVis', () => this.updateCompanyVisuals(dt));
-    this.guard('viewModel', () => this.updateViewModel(dt));
+    this.guard('viewModel', () => this.updateViewModel(vdt));
     this.mods?.emit('update', dt, this);
     this.ui.hud?.update(dt, this);
     this.pings?.update(dt);

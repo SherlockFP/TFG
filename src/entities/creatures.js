@@ -276,6 +276,7 @@ export class CreatureView {
       if (head) { this.root.updateMatrixWorld(); aim = this.root.worldToLocal(head.clone().add(V.set(0, -0.35, 0))); }
     }
     this.model.update(dt, { state: this.state, speed: Math.min(speed, 14), t: this.stateT, time: game.time, progress: typeof this.extra === 'number' ? this.extra : 0, aim });
+    if (this.state === 'dead') game.feel?.deathPose(this, dt);   // wave 7: topple / bounce / dissolve on top of the model's own pose
     this.hitFlash = Math.max(0, this.hitFlash - dt * 4);
     // 'Hot Take' affix: the corpse blinks and beeps faster and faster until the host detonates it
     if (this.fuseT >= 0) {
