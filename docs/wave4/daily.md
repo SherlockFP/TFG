@@ -42,7 +42,11 @@ one gentle streak with a grace day. Everything is a **personal account reward** 
 ## Test
 - `node tools/harness/daily.test.mjs` - 1300 assertions: streak across dates, grace, reset, comeback, no double claim, clock rewinds / hops, seeded set equality (two players, same date / week),
   reroll rules, quest tracking and claiming, crates (deterministic, tier weights, duplicate protection), season maths + rollover, stash delivery caps, badges.
-- Browser: `flock /tmp/tfg-browser.lock node tools/harness/headless.mjs --port <p> --script tools/harness/wave4_daily.js --shot out.png --wait 4000`.
+- `node tools/harness/daily_svc.test.mjs` - 90 assertions: the service on a plain profile with the real cosmetics catalog / items (menu path without a game).
+- Browser (written, NOT run yet: the shared queue was full - run these first, they are the real verification):
+  - `flock /tmp/tfg-browser.lock node tools/harness/headless.mjs --port <p> --script tools/harness/wave4_daily.js --shot /tmp/daily_login.png --wait 4000` - login claim, events through the real `onReward` / `progress.kill` hooks, first win x2, level-up fanfare, stash delivery to the ship, panel bounds at 1280x720.
+  - `... --script tools/harness/wave4_daily_crate.js --shot /tmp/daily_crate.png` - lands on a moon, builds the menu-path panel without a game, opens a legendary season crate and waits for the reel to land (look at the screenshot: glow, card, COLLECT).
+  - `node tools/harness/headless_menu.mjs --port <p> --script tools/harness/wave4_daily_menu.js --shot /tmp/daily_menu.png` - CRT menu entry with the NEW! badge and the DAILY screen (`headless_menu.mjs` got a `--shot` option).
 
 ## Knobs
 `LOGIN_REWARDS`, `QUEST_REWARD`, `DAILY_POOL` / `WEEKLY_POOL`, `CRATES` (tier window + cosmetic chance), `CRATE_ITEMS`, `CRATE_COIN`, `SEASON_NEED` (300 + 15 per tier; ~15.5k season XP in total),
@@ -53,4 +57,4 @@ one gentle streak with a grace day. Everything is a **personal account reward** 
 - Challenges count kills through `Progress.kill` (own kills only; pet / deployable / grenade kills do not count). Melee = the held item at the kill moment.
 - Season and crates only exist locally, no leaderboard; season rewards do not carry a 3D preview (text card only).
 - The XP feed shows the English reason ("Daily challenge") because `Progress.addXp` reasons double as regex keys.
-- Not tested with 2 real players (the only net path is `dyclaim` / `dymsg`, host + one client).
+- Not tested with 2 real players (the only net path is `dyclaim` / `dymsg`, host + one client). Nothing of the UI has been looked at in a browser yet: check the calendar / season grid at 1280x720 and the reel timing (1.5 s intro + 4.8 s spin).
