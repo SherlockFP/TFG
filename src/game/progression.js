@@ -75,7 +75,7 @@ export const BALANCE = {
   levelPerTier: 0.6,          // creature level per moon tier above 1
   levelPerQuota: 0.25,        // creature level per met quota
   levelCap: 20,               // creature base-level ceiling (normal creatures + bosses)
-  lootCountMul: 0.7,          // wave 3: indoor scrap count x0.7 (owner: "too much loot"); the early-game bonus below is added AFTER, so it stays
+  lootCountMul: 0.6,          // wave 3: x0.7, wave 8: x0.6 (owner: "too much loot"); the early-game bonus below is added AFTER, so it stays
 };
 export function scrapValueMul(q) { return (1 + BALANCE.valuePerQuota * Math.max(0, q | 0)) * lootValueMul(q); }   // [hardmode] x0.8 from quota 3 (difficulty.js; 1 in Casual / quota 0-2)
 /** Indoor scrap count for a moon range [lo, hi] rolled as `base`: base x lootCountMul + the early-game bonus (docs/wave3/worlds2.md). */
