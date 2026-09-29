@@ -454,3 +454,9 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
 - Wrappers on the host.js flow live in `src/game/cycle.js` (`hostEvaluateQuota / hostLever / hostSetPhase / hostPopulateMoon / hostBeginTakeoff / hostFinishTakeoff / hostUpdate`, `applyRunState`, `onPhase`, the `unlock` handler). Net: `cyx`, `cyreq`. State: `run.cycle`.
 - Tests: `node tools/harness/cycle.test.mjs`, `cycle2_plan.test.mjs`, `cycle2_bosses.test.mjs`, `cycle2_flow.test.mjs` (real host flow + fuzz + soft-lock proof), `cycle2_i18n.test.mjs`.
 - First job when a browser is available: land on a core of every interior, watch the 3 new boss fights (name card, HP bar, rings), open the arena with cards, run a keystone and a raid with 2 tabs.
+
+### 5.16 Wave 4 - COSM5: the big cosmetics drop (module `cosm5`, docs/wave4/cosm5.md; node-tested + builds + 2 short headless runs)
+- 59 procedural cosmetics: 14 suits (incl. animated-shader **Glitch**), 19 hats / head items, 10 back items (jetpack, capes, wings, server rack ...), 10 weapon skins (camo, carbon, damascus, bubblegum, circuit, lava, frost, holo, bone, rusted), 6 emotes. Files: `src/game/cosm5*.js`, `src/models/cosm5_models.js`, `src/render/weaponskins.js`.
+- Plugs into the wave-1 wardrobe registries at import (models/cosmetics.js merges the rows like wave 3), emotes.js `EMOTES`, and `ui/panels/wardrobe.js` via `WARDROBE_EXT` (tabs Rotation shop / Weapon skins / Emotes; turntable = charpreview `setProp`). Skins follow the weapon HOLDER (every peer), forge +7 camo has priority.
+- Sources: rotating wardrobe shop (8 daily + 1 weekly, seeded by UTC day), boss trophies (`c5drop`, every crew member), secrets (`RULES`), crate pool: **`cosmeticPool(tier)` / `game.cosm5.reward(key)`** for the daily-reward module. Net: `c5look` (compact code `a.s.h.b.k`), `c5drop`.
+- Test: `node tools/harness/cosm5.test.mjs`. Harness: `tools/harness/wave4_cosm5.js`, `wave4_cosm5_smoke.js`.

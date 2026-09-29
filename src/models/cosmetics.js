@@ -13,6 +13,7 @@
 import * as THREE from 'three';
 import { G, xf, merged, lam, bas, tex, mk, pv, cached, clamp, lerp, TAU, PI } from './modelkit.js';
 import { W3_OUTFITS, W3_BUILDERS } from './cosmetics_wave3.js';   // [ux] wave-3 suits
+import { C5_OUTFITS, C5_SUIT_BUILDERS, C5_BACKS, C5_BACK_BUILDERS, C5_BACK_HIDES, C5_HATS, buildC5Hat } from './cosm5_models.js';   // [cosm5] wave-4 drop
 
 // ------------------------------------------------------------------ registry
 /** @typedef {{id:string,name:string,tier:string,color:string,desc:string,how:string}} OutfitDef */
@@ -31,6 +32,7 @@ export const OUTFITS = [
   { id: 'venom', name: 'Venom Symbiote', tier: 'mythic', color: '#0a0a10', desc: 'We are Venom. Glossy black, a white spider on the chest and a few restless tendrils.', how: 'Bring a Symbiote Sample home, or kill 50 creatures' },
 ];
 OUTFITS.push(...W3_OUTFITS);   // [ux]
+OUTFITS.push(...C5_OUTFITS);   // [cosm5]
 export const OUTFIT_BY_ID = Object.fromEntries(OUTFITS.map((o) => [o.id, o]));
 
 export const FACE_ACCS = [
@@ -47,12 +49,14 @@ export const BACK_ACCS = [
   { id: 'o2tank', name: 'Twin O2 Tanks', tier: 'uncommon', desc: 'Two blue tanks. Twice the air, same problems.', how: 'Survive 10 days on the moons' },
   { id: 'plushie', name: 'Plush Bear', tier: 'rare', desc: 'Emotional support bear.', how: 'Meet your first quota' },
   { id: 'monster', name: 'Tiny Monster', tier: 'epic', desc: 'A small green friend that bobs along.', how: 'Kill 25 creatures' },
+  ...C5_BACKS,   // [cosm5]
 ];
 export const HATS_EXTRA = [
   { id: 'beanie', name: 'Beanie', tier: 'common', desc: 'Warm. Also a pom-pom.', how: 'Reach level 2' },
   { id: 'bucket', name: 'Bucket Hat', tier: 'common', desc: 'Peak 2019 fashion.', how: 'Log in two days in a row' },
   { id: 'headlamp', name: 'Headlamp', tier: 'uncommon', desc: 'Looks bright. Is not a light.', how: 'Repair 3 fuse boxes' },
   { id: 'wizard', name: 'Wizard Hat', tier: 'rare', desc: 'You shall not pass the quota.', how: 'Fill 25% of the Codex' },
+  ...C5_HATS,   // [cosm5]
 ];
 
 /** Every cosmetic as { slot, id, name, tier, desc, how, color? } (suit / hat / face / back). Hats are read from avatar.js HATS. */
@@ -184,7 +188,7 @@ export function buildHatExtra(id) {
       add('a', flat('#43307a'), () => [xf(G.cone(0.13, 0.36, 8), [0, 0.15, 0], [0, 0, 0.08]), xf(G.cyl(0.25, 0.25, 0.018, 10), [0, -0.05, 0])]);
       add('b', flat('#f5d02a'), () => [xf(G.box(0.03, 0.03, 0.03), [0.06, 0.07, 0.11], [0, 0.4, 0.6]), xf(G.box(0.03, 0.03, 0.03), [-0.07, 0.14, 0.08], [0.3, 0.2, 0.7]), xf(G.box(0.028, 0.028, 0.028), [0.02, 0.2, -0.1], [0.5, 0.3, 0.1]), xf(G.cyl(0.135, 0.15, 0.03, 8, true), [0, -0.02, 0])]);
       break;
-    default: break;
+    default: { const h = buildC5Hat(id); if (h) return h; break; }   // [cosm5]
   }
   return g;
 }
@@ -699,3 +703,7 @@ export const BACK_ACC_BY_ID = Object.fromEntries(BACK_ACCS.map((f) => [f.id, f])
 export { spiderTex, venomTex };
 
 Object.assign(BUILDERS, W3_BUILDERS);   // [ux]
+
+Object.assign(BUILDERS, C5_SUIT_BUILDERS);   // [cosm5]
+Object.assign(BACK_BUILDERS, C5_BACK_BUILDERS);
+for (const id of C5_BACK_HIDES) BACK_HIDES_TANK.add(id);

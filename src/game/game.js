@@ -163,6 +163,8 @@ import { installWorlds2 } from './worlds2.js';   // wave 3: Soviet raids + twin-
 
 
 // [import:ux]
+import { installCosm5 } from './cosm5.js';   // wave 4: cosmetics drop (suits/hats/backs/weapon skins/emotes; docs/wave4/cosm5.md)
+// [import:cosm5]
 
 
 
@@ -331,6 +333,7 @@ export class Game extends Emitter {
 
 
     // [slot:ux]
+    this.useModule('cosm5', installCosm5);   // [slot:cosm5]
 
 
   }

@@ -45,7 +45,9 @@ const injectStyle = () => {
   const s = document.createElement('style'); s.id = STYLE_ID; s.textContent = CSS; document.head.appendChild(s);
 };
 
-const TABS = [['suit', 'Suits'], ['hat', 'Hats'], ['face', 'Face'], ['back', 'Back']];
+export const TABS = [['suit', 'Suits'], ['hat', 'Hats'], ['face', 'Face'], ['back', 'Back']];
+/** [cosm5] extra tabs: id -> { label, list(profile), owned(profile,e), equipped(profile,e), equip(ctx,e), buy?(ctx,e), price?(e), progress?(profile,e), select?(ctx,e), preview?(ctx,e), extra?(ctx) -> Element, note?(), equipLabel?() }; plus an optional WARDROBE_EXT.__leave(ctx) run on the classic tabs */
+export const WARDROBE_EXT = {};
 const NONE = { face: { id: 'none', name: 'No accessory', tier: 'common', desc: 'Bare visor.', how: '' }, back: { id: 'none', name: 'No accessory', tier: 'common', desc: 'Standard tank.', how: '' }, hat: { id: 'none', name: 'No hat', tier: 'common', desc: 'Nothing on your helmet.', how: '' } };
 
 /** All wardrobe entries of a slot in display order (owned first is NOT applied: keep a stable grid) */
@@ -95,36 +97,40 @@ export function openWardrobe({ game = null, profile, ui, from = null } = {}) {
     wrap.innerHTML = '';
     wrap.appendChild(el('div', { class: 'cp-head' }, el('span', { class: 'cp-os' }, 'TFG OS //'), el('span', { class: 'menu-title' }, t('WARDROBE')),
       el('span', { class: 'cp-cursor' }, '█'), el('span', { class: 'cp-sub' }, `◈ ${profile.coins} · Lv.${profile.level}`)));
-    const items = listFor(tab);
-    if (!sel || sel.slot !== tab) sel = { slot: tab, id: tab === 'suit' ? tryOn.suit : tryOn[tab] };
+    const X = WARDROBE_EXT[tab] || null;   // [cosm5]
+    const ctx = { game, profile, pv, ui, tryOn, applyTry, render, close };
+    const items = X ? X.list(profile) : listFor(tab);
+    if (!sel || sel.slot !== tab) sel = { slot: tab, id: X ? items[0]?.id : (tab === 'suit' ? tryOn.suit : tryOn[tab]) };
     const cur = items.find((e) => e.id === sel.id) || items[0];
-    const owned = isOwned(cur.slot || tab, cur.id) || cur.id === 'none';
-    const isEq = equippedId(tab) === cur.id;
+    const owned = X ? !!X.owned(profile, cur) : (isOwned(cur.slot || tab, cur.id) || cur.id === 'none');
+    const isEq = X ? !!X.equipped(profile, cur) : equippedId(tab) === cur.id;
     const col = tierColor(cur.tier || 'common');
-    const prog = !owned ? progressOf(profile, cur.key) : null;
+    const prog = !owned ? (X ? X.progress?.(profile, cur) || null : progressOf(profile, cur.key)) : null;
+    const price = X ? (X.price ? X.price(cur) : 0) : cur.price;
+    if (X) X.preview?.(ctx, cur); else WARDROBE_EXT.__leave?.(ctx);
 
     // ---- left column: preview + detail
     const detail = el('div', { class: 'wd-detail' },
-      el('div', { class: 'wd-name', style: { color: col } }, cur.name),
-      el('div', { class: 'wd-tier', style: { color: col } }, `${tierDef(cur.tier || 'common').name} · ${t(tab === 'suit' ? 'Suits' : tab === 'hat' ? 'Hats' : tab === 'face' ? 'Face' : 'Back')}`),
-      el('div', { class: 'wd-desc' }, cur.desc || ''),
+      el('div', { class: 'wd-name', style: { color: col } }, t(cur.name)),
+      el('div', { class: 'wd-tier', style: { color: col } }, `${t(tierDef(cur.tier || 'common').name)} · ${X ? t(X.slotLabel ? X.slotLabel(cur) : X.label) : t(tab === 'suit' ? 'Suits' : tab === 'hat' ? 'Hats' : tab === 'face' ? 'Face' : 'Back')}`),
+      el('div', { class: 'wd-desc' }, t(cur.desc || '')),
       owned ? el('div', { class: 'wd-how ok' }, isEq ? '✔ ' + t('Equipped') : '✔ ' + t('Owned'))
-        : el('div', { class: 'wd-how' }, `🔒 ${t('Unlock')}: ${cur.how || '?'}`),
+        : el('div', { class: 'wd-how' }, `🔒 ${t('Unlock')}: ${t(cur.how || '?')}`),
       prog ? el('div', { class: 'wd-bar' }, el('i', { style: { width: Math.round(Math.min(1, prog[0] / prog[1]) * 100) + '%' } })) : null,
       prog ? el('div', { class: 'wd-note' }, `${Math.min(prog[0], prog[1])} / ${prog[1]}`) : null,
-      !owned && cur.price ? el('div', { class: 'wd-how' }, `◈ ${cur.price}${cur.minLevel > 1 ? ` · Lv.${cur.minLevel}+` : ''}`) : null,
+      !owned && price ? el('div', { class: 'wd-how' }, `◈ ${price}${cur.minLevel > 1 ? ` · Lv.${cur.minLevel}+` : ''}`) : null,
     );
     const actions = el('div', { class: 'wd-actions' });
-    const equipBtn = el('button', { class: 'btn primary' + (owned && !isEq ? '' : ' disabled'), type: 'button', 'data-nav': 'wd:equip' }, t('Equip'));
+    const equipBtn = el('button', { class: 'btn primary' + (owned && (!isEq || X?.alwaysEquippable) ? '' : ' disabled'), type: 'button', 'data-nav': 'wd:equip' }, X?.equipLabel ? X.equipLabel(cur) : t('Equip'));
     equipBtn.addEventListener('click', () => {
-      if (!owned || isEq) return;
-      if (doEquip(tab, cur.id)) { tryOn[tab] = cur.id; ui.sfx?.('ui_confirm', 0.5); render(); }
+      if (!owned || (isEq && !X?.alwaysEquippable)) return;
+      if (X ? X.equip(ctx, cur) : doEquip(tab, cur.id)) { if (!X) tryOn[tab] = cur.id; ui.sfx?.('ui_confirm', 0.5); render(); }
     });
     actions.appendChild(equipBtn);
-    if (!owned && cur.price) {
-      const buyBtn = el('button', { class: 'btn', type: 'button', 'data-nav': 'wd:buy' }, `${t('Buy')} ◈${cur.price}`);
+    if (!owned && price) {
+      const buyBtn = el('button', { class: 'btn', type: 'button', 'data-nav': 'wd:buy' }, `${t('Buy')} ◈${price}`);
       buyBtn.addEventListener('click', () => {
-        const r = doBuy(cur);
+        const r = X ? (X.buy ? X.buy(ctx, cur) : { ok: false }) : doBuy(cur);
         if (r.ok) { ui.sfx?.('ui_buy', 0.7); render(); } else { ui.sfx?.('ui_error', 0.5); ui.toast?.(t(r.why || 'Not enough Clout'), 'bad'); }
       });
       actions.appendChild(buyBtn);
@@ -141,21 +147,22 @@ export function openWardrobe({ game = null, profile, ui, from = null } = {}) {
     const grid = el('div', { class: 'wd-grid' });
     for (const e of items) {
       const slot = tab;
-      const own = e.id === 'none' || isOwned(slot, e.id);
-      const eq = equippedId(slot) === e.id;
-      const p2 = !own ? progressOf(profile, e.key) : null;
+      const own = X ? !!X.owned(profile, e) : (e.id === 'none' || isOwned(slot, e.id));
+      const eq = X ? !!X.equipped(profile, e) : equippedId(slot) === e.id;
+      const p2 = !own ? (X ? X.progress?.(profile, e) || null : progressOf(profile, e.key)) : null;
+      const tp = X && X.price ? X.price(e) : 0;
       const tile = el('div', { class: 'wd-tile' + (sel.id === e.id ? ' sel' : '') + (own ? '' : ' locked'), style: { '--tc': tierColor(e.tier || 'common') }, tabindex: 0, 'data-nav': `wd:${slot}:${e.id}`, title: e.desc || '' },
-        el('div', { class: 'n' }, e.name),
-        el('div', { class: 's' }, own ? (eq ? t('Equipped') : t('Owned')) : (p2 ? `🔒 ${Math.min(p2[0], p2[1])}/${p2[1]}` : '🔒 ' + t('Locked'))),
+        el('div', { class: 'n' }, t(e.name)),
+        el('div', { class: 's' }, own ? (eq ? t('Equipped') : t('Owned')) : (p2 ? `🔒 ${Math.min(p2[0], p2[1])}/${p2[1]}` : tp ? `◈ ${tp}` : '🔒 ' + t('Locked'))),
         e.color ? el('div', { class: 'sw', style: { background: e.color } }) : null,
         eq ? el('div', { class: 'ck' }, '✔') : null);
-      const pick = () => { sel = { slot, id: e.id }; tryOn[slot] = e.id; applyTry(); ui.sfx?.('ui_hover', 0.3); render(); };
+      const pick = () => { sel = { slot, id: e.id }; if (X) X.select?.(ctx, e); else { tryOn[slot] = e.id; applyTry(); } ui.sfx?.('ui_hover', 0.3); render(); };
       tile.addEventListener('click', pick);
       tile.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); pick(); } });
       grid.appendChild(tile);
     }
-    const right = el('div', { class: 'wd-right' }, tabs, grid,
-      el('div', { class: 'wd-note' }, t('Drag to rotate') + ' · ' + (cos ? 'Your look syncs to the whole crew.' : 'Saved to your profile.')));
+    const right = el('div', { class: 'wd-right' }, tabs, X?.extra?.(ctx) || null, grid,
+      el('div', { class: 'wd-note' }, t('Drag to rotate') + ' · ' + (X?.note ? X.note() : (cos ? t('Your look syncs to the whole crew.') : t('Saved to your profile.')))));
     const closeBtn = el('button', { class: 'btn back', type: 'button', 'data-nav': 'wd:close' }, t('Close'));
     closeBtn.addEventListener('click', close);
     wrap.append(el('div', { class: 'cp-body' }, left, right), el('div', { class: 'cp-foot' }, el('span', {}, el('kbd', {}, 'ESC'), ' ' + t('BACK')), closeBtn));
@@ -170,6 +177,7 @@ export function openWardrobe({ game = null, profile, ui, from = null } = {}) {
   const restoreHome = () => {
     if (restored) return;
     restored = true;
+    pv.setProp?.(null); if (pv.emote) pv.play?.('idle');   // [cosm5]
     pv.follow(profile);
     if (home?.isConnected && !pv.el.isConnected) home.insertBefore(pv.el, homeNext && homeNext.parentElement === home ? homeNext : home.firstChild);
     pv.kick();
