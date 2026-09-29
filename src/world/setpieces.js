@@ -120,7 +120,8 @@ function stairDims() {
   try {
     o = createProp('stairs_metal', { seed: 1 });
     const cols = o.userData.colliders || [];
-    if (cols.length) {
+    if (o.userData.stairs) d = { ...o.userData.stairs };   // stairs_metal collides as an inclined ramp (world/stairs.js): its measured dims come from the prop
+    else if (cols.length) {
       let x0 = Infinity, x1 = -Infinity, z0 = Infinity, z1 = -Infinity, y1 = -Infinity, sz = Infinity;
       for (const c of cols) {
         x0 = Math.min(x0, c.c[0] - c.s[0] / 2); x1 = Math.max(x1, c.c[0] + c.s[0] / 2);

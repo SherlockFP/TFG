@@ -1,5 +1,6 @@
-// HARVESTING (wave 1, worldx): outdoor trees and rocks can be chopped / mined. Hold E on one with a melee weapon or tool
-// (chop progress), or simply swing a weapon at it (LMB: game.resolveMelee is wrapped, the original still runs).
+// HARVESTING (wave 1, worldx; reworked in wave 5 "harvest2", docs/wave5/harvest2.md): outdoor trees and rocks are gathered by HITTING them
+// with the held item (LMB swing: game.resolveMelee is wrapped, the original still runs). Axe x2 on trees, pickaxe x2 on rock, weapons x0.6,
+// bare hands x0.3 (rules + host validation in harvest2_core.js). No hold-E any more: E stays for small things (herbs, item pickup).
 // Host-authoritative HP per tree / rock (per map, synced + late-join sync); the tree falls with a simple rotation
 // animation and drops wood, rocks drop scrap metal and now and then a data crystal.
 //
@@ -14,40 +15,66 @@ import * as THREE from 'three';
 import { RNG } from '../core/rng.js';
 import { ITEMS } from './items.js';
 import { G } from '../physics/physics.js';
-import { t } from '../core/i18n.js';
+import { t, addTranslations } from '../core/i18n.js';
+import { registerItem } from './items.js';
+import * as C from './harvest2_core.js';
 
 const MSG_HP = 'wxHp', MSG_FELL = 'wxFell', REQ_HIT = 'wxHit', REQ_SYNC = 'wxHSync';
-const CHOP_EVERY = 0.5;
 const ZERO = new THREE.Matrix4().makeScale(0, 0, 0);
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 
-/** damage multiplier of a held item against 'tree' / 'rock' (0 = cannot harvest with it) */
-export function toolPower(def, kind) {
-  if (!def) return 0;
-  const id = def.id || '';
-  const melee = def.kind === 'weapon' && !def.ranged;
-  const tool = /axe|hatchet|saw|pick|hammer|crowbar|shovel|wrench/.test(id) || melee;
-  if (!tool) return 0;
-  if (kind === 'tree') return /axe|hatchet|saw/.test(id) ? 3 : /machete/.test(id) ? 1.4 : 1;
-  return /pick|sledge|hammer/.test(id) ? 2.6 : /crowbar|shovel/.test(id) ? 0.9 : 0.55;
+/** damage multiplier of a held item against 'tree' / 'rock' (kept for other modules; see harvest2_core.js) */
+export function toolPower(def, kind) { return C.multiplier(C.toolClass(def), kind); }
+const hpFor = (p) => C.hpFor(p.kind, p.scale);
+
+// ---- Axe / Pickaxe: cheap shop tools. kind 'weapon' (melee) so actions.js swings them and durability.js wears them per swing.
+const TOOLS = [
+  { id: 'tool_axe', name: 'Axe', kind: 'weapon', hands: 1, weight: 6, price: 40, dmg: 15, cd: 0.62, reach: 2.2, rarity: 'common', tier: 'common', shop: 'tools', value: [14, 26],
+    blurb: 'Fells trees twice as fast. Wears out with use.' },
+  { id: 'tool_pickaxe', name: 'Pickaxe', kind: 'weapon', hands: 1, weight: 7, price: 45, dmg: 13, cd: 0.7, reach: 2.2, rarity: 'common', tier: 'common', shop: 'tools', value: [16, 28],
+    blurb: 'Cracks rocks and ore twice as fast. Wears out with use.' },
+];
+const TR = {
+  Axe: ['Balta', 'Топор'], Pickaxe: ['Kazma', 'Кирка'],
+  'Fells trees twice as fast. Wears out with use.': ['Ağaçları iki kat hızlı devirir. Kullandıkça yıpranır.', 'Рубит деревья вдвое быстрее. Изнашивается.'],
+  'Cracks rocks and ore twice as fast. Wears out with use.': ['Kaya ve madeni iki kat hızlı kırar. Kullandıkça yıpranır.', 'Дробит камень и руду вдвое быстрее. Изнашивается.'],
+  'Swing at it to chop': ['Kesmek için vur', 'Бейте, чтобы рубить'], 'Swing at it to mine': ['Kırmak için vur', 'Бейте, чтобы добывать'],
+  'Hit it (LMB) - axe: x2': ['Vur (SOL TIK) - balta: x2', 'Бейте (ЛКМ) - топор: x2'], 'Hit it (LMB) - pickaxe: x2': ['Vur (SOL TIK) - kazma: x2', 'Бейте (ЛКМ) - кирка: x2'],
+};
+function toolModel() {
+  return (id) => () => {
+    const g = new THREE.Group(), wood = new THREE.MeshStandardMaterial({ color: 0x7a5230, roughness: 0.9 }), steel = new THREE.MeshStandardMaterial({ color: 0x8a9096, roughness: 0.5, metalness: 0.7 });
+    const h = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.02, 0.62, 6), wood); h.rotation.x = Math.PI / 2; h.position.z = -0.26; g.add(h);
+    if (id === 'tool_axe') { const b = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.13, 0.15), steel); b.position.set(0, 0.03, -0.53); g.add(b); }
+    else { const b = new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.03, 0.44), steel); b.position.set(0, 0.02, -0.5); b.rotation.x = 0.12; g.add(b); }
+    return g;
+  };
 }
-const hpFor = (p) => (p.kind === 'tree' ? 50 + 30 * p.scale : 90 + 50 * p.scale);
 
 export function installHarvest(game, api) {
   const state = new Map();      // id -> { hp, max, fallen }
   const falling = [];           // running fall animations
   let map = null;               // { seed, outdoor, byId }
-  let hold = null;              // { key, id, t, next }
+  const wobbles = [];           // running hit-wobbles { p, t, orig:[Matrix4] }
   let syncAsked = false;
   const lastHit = new Map();    // host: 'from|id' -> time
+  const peerHit = new Map();    // host: 'from' -> time of the last hit request (spam guard)
+  const tr = { tr: {}, ru: {} };
+  for (const [k, [a, b]] of Object.entries(TR)) { tr.tr[k] = a; tr.ru[k] = b; }
+  addTranslations(tr.tr, 'tr'); addTranslations(tr.ru, 'ru');
+  for (const d of TOOLS) {
+    if (!ITEMS[d.id]) registerItem({ ...d });
+    if (game.mods?.itemModels && !game.mods.itemModels.has(d.id)) game.mods.itemModels.set(d.id, toolModel()(d.id));
+  }
   let time = 0;
   const _v = new THREE.Vector3(), _f = new THREE.Vector3();
   const posOf = (from) => (from === game.selfId ? game.player?.pos : game.remotes?.get(from)?.pos);
 
   function clear() {
     for (const f of falling.splice(0)) f.group.removeFromParent();
-    state.clear(); lastHit.clear();
-    map = null; hold = null; syncAsked = false;
+    wobbles.length = 0;
+    state.clear(); lastHit.clear(); peerHit.clear();
+    map = null; syncAsked = false;
   }
   function onMapLoaded(world) {
     clear();
@@ -59,10 +86,46 @@ export function installHarvest(game, api) {
   }
   const st = (p) => { let s = state.get(p.id); if (!s) { const max = hpFor(p); s = { hp: max, max, fallen: false }; state.set(p.id, s); } return s; };
 
+  // ---- hit wobble (all peers): the instanced tree sways around its base / the rock squashes for ~0.3 s ----------------
+  const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _s = new THREE.Matrix4();
+  function endWobble(p) {
+    const i = wobbles.findIndex((w) => w.p === p);
+    if (i < 0) return;
+    const w = wobbles[i];
+    (p.inst || []).forEach(({ mesh, k }, n) => { if (w.orig[n]) { mesh.setMatrixAt(k, w.orig[n]); mesh.instanceMatrix.needsUpdate = true; } });
+    wobbles.splice(i, 1);
+  }
+  function startWobble(p, ang) {
+    const cur = wobbles.find((w) => w.p === p);
+    if (cur) { cur.t = 0; cur.ang = ang; return; }
+    if (!p.inst?.length) return;
+    const orig = p.inst.map(({ mesh, k }) => { const m = new THREE.Matrix4(); mesh.getMatrixAt(k, m); return m; });
+    wobbles.push({ p, t: 0, ang, orig });
+  }
+  function stepWobbles(dt) {
+    for (let i = wobbles.length - 1; i >= 0; i--) {
+      const w = wobbles[i], p = w.p;
+      w.t += dt / 0.35;
+      const a = C.wobble(w.t, p.kind === 'tree' ? 0.06 : 0.08);
+      (p.inst || []).forEach(({ mesh, k }, n) => {
+        const o = w.orig[n]; if (!o) return;
+        if (p.kind === 'tree') {   // rotate about the trunk base, perpendicular to the hit direction
+          _e.set(Math.cos(w.ang) * a, 0, -Math.sin(w.ang) * a); _q.setFromEuler(_e);
+          _m.makeTranslation(p.x, p.y, p.z).multiply(_s.makeRotationFromQuaternion(_q)).multiply(_s.makeTranslation(-p.x, -p.y, -p.z)).multiply(o);
+        } else {                    // rock: squash and stretch around its base
+          _m.makeTranslation(p.x, p.y, p.z).multiply(_s.makeScale(1 + a, 1 - a * 1.2, 1 + a)).multiply(_s.makeTranslation(-p.x, -p.y, -p.z)).multiply(o);
+        }
+        mesh.setMatrixAt(k, w.t >= 1 ? o : _m); mesh.instanceMatrix.needsUpdate = true;
+      });
+      if (w.t >= 1) wobbles.splice(i, 1);
+    }
+  }
+
   // ---- fall (all peers) -------------------------------------------------------------------------------------------
   function fell(p, ang, animate) {
     const s = st(p);
     if (s.fallen) return;
+    endWobble(p);
     s.fallen = true; s.hp = 0; p.fallAng = ang;
     for (const c of p.cols || []) { game.physics.removeCollider(c); const i = map.outdoor.colliders.indexOf(c); if (i >= 0) map.outdoor.colliders.splice(i, 1); }
     p.cols = [];
@@ -117,26 +180,29 @@ export function installHarvest(game, api) {
     const p = map.byId.get(id);
     if (!p) return null;
     const s = st(p);
-    if (s.fallen) return s;
+    if (s.fallen || s.dying) return s;   // dying: the kill is broadcast but has not looped back yet (no double drops)
     s.hp -= clamp(Number(dmg) || 0, 0, 200);
     if (s.hp <= 0) {
+      s.dying = true;
       const ang = Math.atan2(p.x - (posOf(by)?.x ?? 0), p.z - (posOf(by)?.z ?? 0));   // falls away from the chopper
       game.net.broadcast(MSG_FELL, { s: map.seed, id, a: +ang.toFixed(2) });
       drops(p, by);
       game.mods?.emit('tfg:harvested', { id, kind: p.kind, pos: [p.x, p.y, p.z], by });
-    } else game.net.broadcast(MSG_HP, { s: map.seed, id, hp: Math.round(s.hp) });
+    } else game.net.broadcast(MSG_HP, { s: map.seed, id, hp: Math.round(s.hp), a: +Math.atan2(p.x - (posOf(by)?.x ?? 0), p.z - (posOf(by)?.z ?? 0)).toFixed(2) });
     return s;
   }
+  /** client hit request: { s: map seed, id, d: base melee damage of the swing, c: tool class 'axe'|'pick'|'weapon'|'hand' }.
+   *  The host owns the multiplier (harvest2_core.hitDamage) and validates distance + rate. */
   function onHitRequest(d, from) {
-    if (!game.isHost || game.run?.phase !== 'moon' || !map || d.s !== map.seed) return;
+    if (!game.isHost || game.run?.phase !== 'moon' || !map || !d || d.s !== map.seed) return;
     const p = map.byId.get(d.id);
     if (!p) return;
-    const pp = posOf(from);
-    if (!pp || Math.hypot(pp.x - p.x, pp.z - p.z) > 6 || Math.abs(pp.y - p.y) > 6) return;
     const k = from + '|' + d.id;
-    if (time - (lastHit.get(k) ?? -9) < 0.15) return;
-    lastHit.set(k, time);
-    hostHit(d.id, d.d, from);
+    const v = C.validateHit({ now: time, peerLast: peerHit.get(from), pairLast: lastHit.get(k), pos: posOf(from), target: p, fallen: st(p).fallen });
+    if (!v.ok) return;
+    peerHit.set(from, time); lastHit.set(k, time);
+    const cls = ['axe', 'pick', 'weapon', 'hand'].includes(d.c) ? d.c : 'hand';
+    hostHit(d.id, C.hitDamage(d.d, cls, p.kind), from);
   }
   function bindNet(net) {
     net.on_(MSG_HP, (d) => {
@@ -147,7 +213,8 @@ export function installHarvest(game, api) {
       s.hp = d.hp;
       _v.set(p.x, p.y + 1.2, p.z);
       try { game.audio?.at?.(p.kind === 'tree' ? 'hit_wall' : 'hit_metal', _v, 0.55, { refDistance: 4, maxDistance: 50, pitch: 0.9 + Math.random() * 0.2 }); } catch { /* audio optional */ }
-      game.particles?.burst?.(_v, 'landpuff', null, 0.5);
+      game.particles?.burst?.(_v, p.kind === 'tree' ? 'landpuff' : 'sparks', null, 0.5);
+      startWobble(p, d.a || 0);
     });
     net.on_(MSG_FELL, (d) => {
       if (!map || d.s !== map.seed) return;
@@ -164,7 +231,7 @@ export function installHarvest(game, api) {
     });
   }
 
-  // ---- client: prompts, hold-E, swings -------------------------------------------------------------------------------
+  // ---- client: prompt + swings -------------------------------------------------------------------------------
   function aimed() {
     const p = game.player;
     if (!p || p.dead || p.indoor || p.inShip || !map) return null;
@@ -177,46 +244,24 @@ export function installHarvest(game, api) {
     if (!pl || st(pl).fallen) return null;
     return { p: pl, point: hit.point, dist: hit.distance };
   }
-  const bar = (f) => { const n = Math.round(clamp(f, 0, 1) * 10); return '[' + '#'.repeat(n) + '-'.repeat(10 - n) + ']'; };
   function addInteractables(out) {
     const a = aimed();
     if (!a) return;
-    const held = game.player.heldItem?.();
-    const def = held ? ITEMS[held.type] : null;
-    const power = toolPower(def, a.p.kind);
     const nm = a.p.kind === 'tree' ? t('tree') : t('rock');
-    const s = st(a.p), key = 'h:' + a.p.id;
+    const s = st(a.p);
     const pos = new THREE.Vector3(a.point.x, a.point.y, a.point.z);
-    if (power <= 0) { out.push({ pos, r: 0.9, reach: 3.4, label: `${nm[0].toUpperCase() + nm.slice(1)}`, sub: t('Hold a melee weapon or tool (E / swing) to harvest'), action: () => {} }); return; }
-    out.push({
-      pos, r: 0.9, reach: 3.4,
-      label: () => `${a.p.kind === 'tree' ? t('Chop') : t('Mine')} ${nm} ${bar(1 - s.hp / s.max)} [${t('hold E')}]`,
-      sub: a.p.kind === 'tree' ? t('Drops wood') : t('Drops scrap metal, sometimes a crystal'),
-      action: Object.assign(() => { hold = { key, id: a.p.id, t: 0, next: 0 }; }, { __wx: key }),
-    });
+    const pct = Math.round(clamp(1 - s.hp / s.max, 0, 1) * 100);
+    // hint only (no E action): the hit itself is the interaction
+    out.push({ pos, r: 0.9, reach: 3.4, label: `${nm[0].toUpperCase() + nm.slice(1)}${pct ? ' ' + pct + '%' : ''}`,
+      sub: a.p.kind === 'tree' ? t('Hit it (LMB) - axe: x2') : t('Hit it (LMB) - pickaxe: x2'), action: () => {} });
   }
-  function sendHit(id, dmg) { game.net.request(REQ_HIT, { id, s: map.seed, d: Math.round(dmg) }); }
+  function sendHit(id, base, cls) { game.net.request(REQ_HIT, { id, s: map.seed, d: Math.round(base), c: cls }); }
   function update(dt) {
     time += dt;
     if (!map) return;
     if (game.world?.outdoor !== map.outdoor) { clear(); return; }
     if (!syncAsked && !game.isHost && game.net?.connected && game.run?.phase === 'moon') { syncAsked = true; game.net.request(REQ_SYNC, { s: map.seed }); }
-    if (hold) {
-      const tgt = game.interactTarget;
-      const p = map.byId.get(hold.id);
-      if (!game.input?.isDown('interact') || tgt?.action?.__wx !== hold.key || game.player.dead || !p || st(p).fallen) hold = null;
-      else {
-        hold.t += dt;
-        if (hold.t >= hold.next) {
-          hold.next = hold.t + CHOP_EVERY;
-          const held = game.player.heldItem?.(), def = held ? ITEMS[held.type] : null;
-          const dmg = (def?.dmg || 10) * 0.5 * toolPower(def, p.kind);
-          sendHit(p.id, Math.max(3, dmg));
-          game.swingAnim = Math.max(game.swingAnim || 0, 0.6);
-          game.engine?.punch?.(0.012, 0, 0);
-        }
-      }
-    }
+    stepWobbles(dt);
     for (let i = falling.length - 1; i >= 0; i--) {
       const f = falling[i];
       if (f.rock) {
@@ -235,14 +280,18 @@ export function installHarvest(game, api) {
       }
     }
   }
-  /** melee swing hook: a swing that lands on a tree / rock counts as a chop (the original resolveMelee still runs) */
+  /** melee swing hook: a swing that lands on a tree / rock is a harvest hit (the original resolveMelee still runs).
+   *  Any held item works (bare hands x0.3, weapons x0.6, axe / pickaxe x2 on their target); a creature in front of the target wins. */
   function onSwing(h) {
     const a = aimed();
     if (!a || a.dist > (h?.reach || 2.4) + 0.4) return;
     const held = game.player.heldItem?.(), def = held ? ITEMS[held.type] : null;
-    const power = toolPower(def, a.p.kind);
-    if (power <= 0) return;
-    sendHit(a.p.id, Math.max(4, (Number(h?.dmg) || def?.dmg || 10) * power));
+    const cr = game.creatures?.raycast?.(game.camera.position, _f.set(0, 0, -1).applyQuaternion(game.camera.quaternion), a.dist);
+    if (cr) return;
+    const cls = C.toolClass(def);
+    sendHit(a.p.id, Number(h?.dmg) || def?.dmg || 5, cls);
+    game.swingAnim = Math.max(game.swingAnim || 0, 0.6);
+    game.engine?.punch?.(0.012, 0, 0);
   }
 
   const orig = game.resolveMelee;

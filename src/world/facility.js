@@ -808,8 +808,8 @@ export function buildFacility(layout, { physics, lightPool }) {
     if (r < 0) return theme.corridor;
     return theme.rooms[L.rooms[r].type] || theme.rooms.office || Object.values(theme.rooms)[0] || theme.corridor;
   };
-  const addBox = (cx, cy, cz, sx, sy, sz, member = G.STATIC, data) => {
-    const c = physics.addStaticBox(cx, cy, cz, sx / 2, sy / 2, sz / 2, 0, member, data);
+  const addBox = (cx, cy, cz, sx, sy, sz, member = G.STATIC, data, rot = 0) => {
+    const c = physics.addStaticBox(cx, cy, cz, sx / 2, sy / 2, sz / 2, rot, member, data);
     colliders.push(c);
     return c;
   };
@@ -943,8 +943,14 @@ export function buildFacility(layout, { physics, lightPool }) {
     for (const c of opts.visualOnly ? [] : cols) {
       let [cx, cy, cz] = c.c; let [sx, sy, sz] = c.s;
       // rotate center by rotY (multiples of 90deg)
-      for (let k = 0; k < q; k++) { const t = cx; cx = cz; cz = -t; const u = sx; sx = sz; sz = u; }
+      for (let k = 0; k < q; k++) { const t = cx; cx = cz; cz = -t; if (!c.q) { const u = sx; sx = sz; sz = u; } }
       const px = x + cx, py = y + cy, pz = z + cz;
+      if (c.q) {   // inclined ramp collider (stairs_metal): local quaternion c.q composed with the quarter turn; no nav blocking (setpieces reserves the footprint)
+        const h = (q * Math.PI) / 4, a = [0, Math.sin(h), 0, Math.cos(h)], b = c.q;
+        const qq = { x: a[3] * b[0] + a[0] * b[3] + a[1] * b[2] - a[2] * b[1], y: a[3] * b[1] - a[0] * b[2] + a[1] * b[3] + a[2] * b[0], z: a[3] * b[2] + a[0] * b[1] - a[1] * b[0] + a[2] * b[3], w: a[3] * b[3] - a[0] * b[0] - a[1] * b[1] - a[2] * b[2] };
+        addBox(px, py, pz, sx, sy, sz, G.STATIC, { kind: 'prop', id }, qq);
+        continue;
+      }
       addBox(px, py, pz, sx, sy, sz, G.STATIC, { kind: 'prop', id });
       if (sy > 0.3 && py - sy / 2 < Y + 1.2 && py + sy / 2 > Y + 0.2) nav.blockBox(px - sx / 2, pz - sz / 2, px + sx / 2, pz + sz / 2, 0.15);
     }

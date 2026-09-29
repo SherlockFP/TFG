@@ -7,6 +7,7 @@ import { NavGrid } from '../world/nav.js';
 import { createProp } from '../models/props.js';
 import { RNG } from '../core/rng.js';
 import { G } from '../physics/physics.js';
+import { planStairs } from '../world/stairs.js';
 import { TILE, SOLID_PROPS } from './horror_maps.js';
 
 export const POCKET_ORIGIN_X = 8000, POCKET_SLOT = 420;
@@ -112,13 +113,13 @@ export function buildPocket(spec, o) {
   // stairs (visual + colliders): rise over `len` tiles
   const stairMeshes = [];
   for (const s of spec.stairs || []) {
-    const steps = Math.round(s.len * T / 0.5), rise = s.rise / steps, run = 0.5;
-    // 'n' only: climbs towards -z from the bottom edge (z + len) * T
-    for (let i = 0; i < steps; i++) {
-      const zc = wzT(s.z + s.len) - (i + 0.5) * run, xc = wxT(s.x) + (s.w * T) / 2, hy = rise * (i + 1);
-      gb.box('f:wood_planks', xc, Y + hy / 2, zc, s.w * T, hy, run, 0.5, grey(0.62));
-      addBox(xc, Y + hy / 2, zc, s.w * T, hy, run);
-    }
+    // 'n' only: climbs towards -z from the bottom edge (z + len) * T. Visual steps (no collider) + ONE inclined ramp collider (world/stairs.js);
+    // stepped box colliders stalled the autostep whenever the player pressed into the balustrade.
+    const steps = Math.round(s.len * T / 0.5);
+    const plan = planStairs({ x: wxT(s.x) + (s.w * T) / 2, z: wzT(s.z + s.len), y: Y, dir: 'z-', width: s.w * T, rise: s.rise, run: s.len * T, n: steps, tag: 'mansion' });
+    for (const st of plan.steps) gb.box('f:wood_planks', st.cx, (st.y0 + st.top) / 2, st.cz, st.sx, st.top - st.y0, st.sz, 0.5, grey(0.62));
+    for (const b of plan.boxes) addBox(b.cx, b.cy, b.cz, b.sx, b.sy, b.sz);
+    { const r = plan.ramp; colliders.push(physics.addStaticBox(r.cx, r.cy, r.cz, r.sx / 2, r.sy / 2, r.sz / 2, r.q, G.STATIC)); }
     stairMeshes.push(s);
   }
   // shells: ground walls / ceilings / upper slab colliders (row-merged AABBs)

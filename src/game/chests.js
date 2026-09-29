@@ -19,6 +19,7 @@
 // Items are spawned with game.items.hostSpawn(type, pos, { tier, valueMul, linvel }) so they pop out with physics.
 //
 // Events for other modules (game.mods.emit): 'tfg:chestOpened' { id, tier, kind, pos:[x,y,z], by }.
+import { isPickType } from './lockpick2_core.js';   // [lockpick2] titanium pick / bypasser / drill also open chest locks
 import * as THREE from 'three';
 import { RNG, hashString } from '../core/rng.js';
 import { ITEMS, scrapTableFor } from './items.js';
@@ -253,7 +254,7 @@ export function installChests(game, api) {
         const k = held(d.key, (it) => it.type === 'key');
         if (!k) return;
         game.net.broadcast('it', { e: 'rm', id: k.id });
-      } else if (d.pick) { if (!held(d.pick, (it) => it.type === 'lockpick')) return; }
+      } else if (d.pick) { if (!held(d.pick, (it) => isPickType(it.type))) return; }
       else if (d.pry) { if (!held(d.pry, (it) => { const df = it.def || ITEMS[it.type]; return df?.kind === 'weapon' && !df?.ranged; })) return; noisy = true; }
       else if (d.viaEvent) noisy = true;   // crowbar soft-event 'tfg:pry' (the sender is next to the chest, checked above)
       else return;
@@ -289,7 +290,7 @@ export function installChests(game, api) {
   function modeFor(c, held, def) {
     if (!c.T.lock) return 'open';
     if (held?.type === 'key') return 'key';
-    if (held?.type === 'lockpick') return 'pick';
+    if (isPickType(held?.type)) return 'pick';
     if (def && def.kind === 'weapon' && !def.ranged) return 'pry';
     return 'none';
   }
@@ -324,7 +325,7 @@ export function installChests(game, api) {
     const send = (extra) => game.net.request(REQ_OPEN, { id: c.id, s: map.seed, ...extra });
     if (H.mode === 'open') send({});
     else if (H.mode === 'key' && held?.type === 'key') send({ key: held.id });
-    else if ((H.mode === 'pick' && held?.type === 'lockpick') || (H.mode === 'pry' && held)) {
+    else if ((H.mode === 'pick' && isPickType(held?.type)) || (H.mode === 'pry' && held)) {
       const pry = H.mode === 'pry', tool = held;
       game.openMinigame('lockpick', { difficulty: Math.min(0.95, c.T.difficulty + (pry ? 0.2 : 0)) }, (res) => {
         if (res.cancelled) return;

@@ -349,7 +349,7 @@ export function installTasks(game) {
     const def = TASK_TYPES[s.type];
     if (def.mode === 'hold') { hold = { sid: s.id, need: def.hold, t: 0, kind: 'task', last: 0 }; return; }
     const diff = (def.diff || 0.3) + Math.min(0.3, (game.run?.quotaIndex || 0) * 0.04);
-    game.openMinigame(def.mini, { difficulty: diff, noEase: false }, (res) => {
+    game.openMinigame(def.mini, { difficulty: diff, noEase: false, noXp: true }, (res) => {
       if (res?.success) game.net.request('task', { op: 'done', sid: s.id });
       else if (!res?.cancelled) { game.ui?.toast?.('Task failed - try again.', 'bad'); fx(game.audio, 'fun_bad', { volume: 0.5 }); }
     });

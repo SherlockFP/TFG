@@ -84,7 +84,8 @@ ok('twinsun: cantina + crawler + camps', () => {
 // ---- walkability of the stairwells: a 0.5 x 1.7 m body at every step / landing / doorway must not intersect any collider
 ok('soviet: stairwells + doors are walkable (axis-aligned block, 60 seeds)', () => {
   const free = (boxes, x, feet, z, hw = 0.25, lo = 0.46, hi = 1.72) => {
-    for (const [bx, by, bz, sx, sy, sz] of boxes) {
+    for (const [bx, by, bz, sx, sy, sz, rot] of boxes) {
+      if (rot && typeof rot === 'object') continue;   // inclined stair ramp (world/stairs.js): oriented cuboid, walked in tools/harness/stairs.test.mjs
       if (Math.abs(x - bx) < sx / 2 + hw && Math.abs(z - bz) < sz / 2 + hw && feet + hi > by - sy / 2 && feet + lo < by + sy / 2) return false;
     }
     return true;
