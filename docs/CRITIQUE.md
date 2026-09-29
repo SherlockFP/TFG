@@ -257,3 +257,5 @@ The dance list is now big and readable (wheel pages, favourites, search, thumbna
 ## Wave 7 - feel (docs/wave7/feel.md)
 Combat now has weight (hitstop, class sounds, muzzle flash, toppling corpses, heartbeat) but the procedural sound recipes have only been checked numerically, not by ear, and gun kick was left as it was.
 - Wave 7 score: in-game had no music (only stingers); now an adaptive procedural score. Unverified by ear: stem loudness balance, real OfflineAudioContext render time, echo-tail seam. No in-game trigger for the Company shop motif yet.
+## Wave 6 - artdir (docs/wave6/artdir.md)
+The game now has an identity kit (wordmark, seal, the Algorithm's eye; amber = Company, magenta/cyan = Algorithm) and the main menu, panel headers, tabs, tooltips, loading, pause, death and report screens follow it, but it is mostly dressing: the CRT menu text is still small at 720p (2 columns helped), header stamps are decorative and keyed on title text, several panels (trade, homeworld, shipyard, forge) were not re-shot, and the eye only follows a pointer. Whether the stamps and ticker read as charm or clutter after an hour of play is untested.

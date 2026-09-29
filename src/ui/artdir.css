@@ -1,0 +1,148 @@
+/* =====================================================================================================================
+   ARTDIR (wave 6) - visual identity layer. Kit + rules: docs/wave6/artdir.md. Loaded by src/ui/theme.js; JS: src/ui/artdir.js.
+   EVERY rule is scoped to html.tfg-artdir (setting "Art direction"), so removing the class restores the ui2/ui3 look.
+   Motion is CSS only and is switched off by html.ad-calm (= setting "Reduce motion"). No glow, no blur, no emoji.
+   ===================================================================================================================== */
+:root {
+  /* colour system: Company (amber, hazard), terminal (green), Algorithm (magenta, cyan). Ramps: -d dark, base, -h light */
+  --ad-amber-d: #a8531f; --ad-amber: #ff8a3d; --ad-amber-h: #ffb266;
+  --ad-hazard: #ffb800; --ad-hazard-d: #17110a;
+  --ad-term-d: #2f7a3a; --ad-term: #7dff7d; --ad-term-h: #c8ffc8;
+  --ad-mag-d: #8a1f47; --ad-mag: #ff3d7f; --ad-mag-h: #ff8fb4;
+  --ad-cyan: #2affff; --ad-paper: #e9dcc4; --ad-ink: #120800;
+  --ad-seal-bg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23ff8a3d' stroke-opacity='.09' stroke-width='3'%3E%3Cpath d='M30 4H70L96 30V70L70 96H30L4 70V30Z'/%3E%3Ccircle cx='50' cy='50' r='30' stroke-dasharray='3 2'/%3E%3Cpath d='M33 35H67V44H55V69H45V44H33Z' fill='%23ff8a3d' fill-opacity='.09' stroke='none'/%3E%3C/svg%3E");
+  --ad-empty-bg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 40' fill='none' stroke='%23ff8a3d' stroke-opacity='.55' stroke-width='2'%3E%3Cpath d='M4 16h40v22H4z M4 26h12l3 5h10l3-5h12 M14 16V6h20v10' stroke-dasharray='4 2'/%3E%3C/svg%3E");
+}
+.ad-only { display: none; }
+
+/* ---------- identity marks ---------- */
+html.tfg-artdir .ad-wm { display: block; width: 100%; height: auto; overflow: visible; }
+html.tfg-artdir .ad-wm-g1, html.tfg-artdir .ad-wm-g2 { opacity: 0; mix-blend-mode: screen; }
+html.tfg-artdir .ad-wm-g1 { animation: adGlitch 5.5s steps(1) infinite; }
+html.tfg-artdir .ad-wm-g2 { animation: adGlitch 5.5s 0.06s steps(1) infinite reverse; }
+@keyframes adGlitch { 0%, 91%, 100% { opacity: 0; transform: none; } 92% { opacity: 1; transform: translate(-3px, 0); } 94% { opacity: 1; transform: translate(3px, 1px); } 96% { opacity: 0.8; transform: translate(-1px, -1px); } 97% { opacity: 0; } }
+html.tfg-artdir .ad-eye { display: block; color: var(--ad-paper); --ad-eye: var(--ad-mag); animation: adBlink 6.5s steps(1) infinite; transform-origin: 50% 50%; transform-box: fill-box; }
+html.tfg-artdir .ad-eye-look { transform: translate(calc(var(--lx, 0) * 3.6px), calc(var(--ly, 0) * 2.2px)); transition: transform 0.12s linear; }
+html.tfg-artdir .ad-eye-live { animation: adLive 1.3s steps(1) infinite; }
+@keyframes adBlink { 0%, 95.5%, 100% { transform: scaleY(1); } 96.5% { transform: scaleY(0.08); } }
+@keyframes adLive { 50% { opacity: 0.15; } }
+html.tfg-artdir .ad-seal { color: var(--ad-amber); display: block; overflow: visible; }
+html.tfg-artdir .ad-seal-txt { font-family: 'TFG Plate', 'TFG Plate Cyr', 'Arial Narrow', sans-serif; font-weight: 700; }
+html.ad-calm.tfg-artdir .ad-wm-g1, html.ad-calm.tfg-artdir .ad-wm-g2, html.ad-calm.tfg-artdir .ad-eye, html.ad-calm.tfg-artdir .ad-eye-live { animation: none; }
+html.ad-calm.tfg-artdir .ad-eye-look { transform: none; transition: none; }
+
+/* ---------- panel headers: stamped form label + glyph composition ---------- */
+html.tfg-artdir #ui .cp-head { flex-wrap: nowrap; }
+html.tfg-artdir #ui .cp-head .ad-headr { display: flex; align-items: center; gap: 14px; margin-left: auto; min-width: 0; color: var(--ph-dim, var(--t-line-hi)); }
+html.tfg-artdir .ad-stamp { display: flex; flex-direction: column; align-items: center; line-height: 1.02; padding: 1px 9px 0; border: 2px solid var(--ad-amber); color: var(--ad-amber); transform: rotate(-3deg);
+  font-family: var(--font2); font-weight: 700; text-transform: uppercase; opacity: 0.92; white-space: nowrap; }
+html.tfg-artdir .ad-stamp i { font-style: normal; font-size: 12px; letter-spacing: 0.16em; opacity: 0.8; }
+html.tfg-artdir .ad-stamp b { font-size: 19px; letter-spacing: 0.16em; }
+html.tfg-artdir .ad-comp { display: block; height: 38px; width: auto; flex: none; color: var(--ad-paper); opacity: 0.8; }
+html.tfg-artdir .ad-eye-head { width: 34px; height: 34px; flex: none; }
+@media (max-width: 960px) { html.tfg-artdir .ad-comp, html.tfg-artdir .ad-stamp i { display: none; } }
+/* company seal watermark inside every rack panel */
+html.tfg-artdir #ui .crt-panel .cp-body { background: var(--ad-seal-bg) right 14px bottom 10px / 108px no-repeat; }
+
+/* ---------- main-menu sub screens on the same amber palette as in-game panels ---------- */
+html.tfg-artdir #ui .menu-root.over-crt .menu-frame {
+  --ph: #ffd9b8; --ph-hi: #fff3e6; --ph-dim: rgba(255, 190, 140, 0.62); --ph-glow: transparent; --ph-line: rgba(255, 150, 70, 0.26); --ph-sel: rgba(255, 138, 61, 0.12); --ph-bg: #120d08; --ph-ink: #120800; }
+html.tfg-artdir #ui .menu-root.over-crt .menu-frame .cp-head .menu-title { background: var(--ad-amber); }
+html.tfg-artdir #ui .crt-hint { display: none; }
+html.tfg-artdir #ui .version { font-family: var(--font2); font-weight: 700; letter-spacing: 0.12em; font-size: 15px; opacity: 0.6; }
+
+/* ---------- transitions between screens: scanline wipe + slide (skipped with reduce motion) ---------- */
+html.tfg-artdir #ui :is(.menu-root, .overlay) .menu-frame.crt-panel { animation: adWipeIn 0.34s steps(10, end) both; }
+@keyframes adWipeIn { from { clip-path: inset(0 0 100% 0); transform: translateX(18px); filter: brightness(1.7); } to { clip-path: inset(0 0 0 0); transform: none; filter: none; } }
+html.ad-calm.tfg-artdir #ui :is(.menu-root, .overlay) .menu-frame.crt-panel { animation: none; }
+
+/* ---------- tabs: one index-tab language for every panel ---------- */
+html.tfg-artdir #ui .menu-frame .tabs { gap: 3px; border-bottom: 3px solid var(--ph); margin-bottom: 14px; }
+html.tfg-artdir #ui .menu-frame :is(.btn.tab, .tabs > .btn, .chip) { clip-path: polygon(9px 0, calc(100% - 9px) 0, 100% 100%, 0 100%); border: 0; padding: 3px 22px 2px; margin-bottom: 0; background: rgba(255, 255, 255, 0.06); color: var(--ph-dim); border-radius: 0; }
+html.tfg-artdir #ui .menu-frame :is(.btn.tab, .tabs > .btn, .chip):hover { background: rgba(255, 138, 61, 0.22); color: var(--ph-hi); }
+html.tfg-artdir #ui .menu-frame :is(.btn.tab.sel, .tabs > .btn.sel, .chip.sel) { background: var(--ph); color: var(--ph-ink); box-shadow: inset 0 -4px 0 var(--ad-hazard); }
+html.tfg-artdir #ui :is(.pt-tab, .rec-tab, .crp-tab, .lb-tab) { clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 100%, 0 100%); border-radius: 0; }
+
+/* ---------- tooltips: tier-coloured art frame (--tc from tiers.js) ---------- */
+html.tfg-artdir .tinv-tip { border-top-width: 0; background: var(--t-scan), color-mix(in srgb, var(--tc) 7%, #0a0704); }
+html.tfg-artdir .tinv-tip::before { content: ''; position: absolute; inset: 3px; pointer-events: none; z-index: 2; --m: var(--tc);
+  background:
+    linear-gradient(var(--m), var(--m)) top left / 12px 2px no-repeat, linear-gradient(var(--m), var(--m)) top left / 2px 12px no-repeat,
+    linear-gradient(var(--m), var(--m)) top right / 12px 2px no-repeat, linear-gradient(var(--m), var(--m)) top right / 2px 12px no-repeat,
+    linear-gradient(var(--m), var(--m)) bottom left / 12px 2px no-repeat, linear-gradient(var(--m), var(--m)) bottom left / 2px 12px no-repeat,
+    linear-gradient(var(--m), var(--m)) bottom right / 12px 2px no-repeat, linear-gradient(var(--m), var(--m)) bottom right / 2px 12px no-repeat; }
+html.tfg-artdir .tinv-tip .tt-head { background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--tc) 22%, transparent) 0 6px, transparent 6px 12px); border-bottom: 2px solid var(--tc); padding: 10px 12px 8px; }
+html.tfg-artdir .tinv-tip .tt-head .ico { padding: 4px; background: color-mix(in srgb, var(--tc) 16%, #0a0704); outline: 2px solid var(--tc); outline-offset: 2px; margin: 3px; box-sizing: content-box; }
+html.tfg-artdir .pt-tip { border-top-width: 5px; }
+
+/* ---------- empty states: dashed empty tray + drawn icon ---------- */
+html.tfg-artdir :is(.dim.empty, .crp-empty, .dy-empty, .hub-empty) { display: block; padding: 62px 18px 16px; text-align: center; border: 1px dashed var(--ph-line, var(--t-line));
+  background: repeating-linear-gradient(-45deg, rgba(255, 184, 0, 0.045) 0 8px, transparent 8px 16px), var(--ad-empty-bg) center 12px / 44px no-repeat;
+  color: var(--ph-dim, var(--t-line-hi)); font-family: var(--font2); font-weight: 700; letter-spacing: 0.05em; font-size: 19px; }
+html.tfg-artdir .pt-li.empty { border-style: dashed; opacity: 0.7; }
+
+/* ---------- pause menu ---------- */
+html.tfg-artdir #ui .menu-frame.pause .pause-info { display: flex; flex-direction: column; gap: 6px; padding: 10px 14px; margin-bottom: 16px; border: 1px dashed var(--ph-line);
+  background: repeating-linear-gradient(-45deg, rgba(255, 184, 0, 0.06) 0 6px, transparent 6px 12px); }
+html.tfg-artdir #ui .pause-code { display: inline-block; padding: 0 12px; background: var(--ph); color: var(--ph-ink); font-family: var(--font2); font-weight: 700; letter-spacing: 0.32em; font-size: 1.15em; }
+html.tfg-artdir #ui .menu-frame .menu-list { counter-reset: adn; gap: 8px; }
+html.tfg-artdir #ui .menu-frame .menu-list .btn { counter-increment: adn; position: relative; padding-right: 48px; }
+html.tfg-artdir #ui .menu-frame .menu-list .btn::after { content: counter(adn, decimal-leading-zero); position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 0.66em; letter-spacing: 0.1em; opacity: 0.5; }
+html.tfg-artdir #ui .menu-frame .menu-list .btn:hover::after, html.tfg-artdir #ui .menu-frame .menu-list .btn:focus-visible::after { opacity: 1; }
+html.tfg-artdir #ui .menu-frame .menu-list .btn.big { font-size: 26px; padding-top: 6px; padding-bottom: 5px; }
+html.tfg-artdir #ui .menu-frame .menu-list .btn.danger { margin-top: 10px; }
+
+/* ---------- loading screen ---------- */
+html.tfg-artdir #loading { background: var(--t-scan), linear-gradient(rgba(255, 138, 61, 0.03) 1px, transparent 1px) 0 0 / 100% 32px, radial-gradient(ellipse at 50% 42%, #1a0e06 0%, #070402 66%, #020100 100%); }
+html.tfg-artdir #loading .ld-logo, html.tfg-artdir #loading .ld-sub { display: none; }
+html.tfg-artdir .ad-ld-top { display: flex; align-items: center; justify-content: center; gap: clamp(14px, 3vw, 34px); width: 100%; margin-bottom: 6px; }
+html.tfg-artdir .ad-ld-seal, html.tfg-artdir .ad-ld-eye { width: clamp(56px, 8vw, 92px); height: auto; flex: none; }
+html.tfg-artdir .ad-ld-wm { width: clamp(200px, 32vw, 380px); }
+html.tfg-artdir #loading .load-text { display: inline-block; margin-top: 22px; padding: 1px 16px 0; background: var(--ad-amber); color: var(--ad-ink); font-size: 26px; letter-spacing: 0.2em; text-shadow: none; }
+html.tfg-artdir #loading .ld-bar { height: 14px; margin-top: 14px; border: 2px solid var(--t-steel-hi); background: #0a0704; }
+html.tfg-artdir #loading .ld-bar i { top: 2px; bottom: 2px; background: repeating-linear-gradient(90deg, var(--ad-amber) 0 8px, transparent 8px 10px); box-shadow: none; }
+html.tfg-artdir #loading .ld-tip { margin-top: 26px; padding: 10px 18px; text-align: left; border: 1px solid var(--t-line); border-left: 6px solid var(--ad-hazard); background: rgba(0, 0, 0, 0.42); color: var(--ad-paper); }
+html.tfg-artdir #loading .ld-tip b { font-family: var(--font2); font-weight: 700; letter-spacing: 0.16em; font-size: 16px; }
+html.tfg-artdir .ad-ld-art { display: block; position: fixed; left: 0; right: 0; bottom: 0; height: 28vh; color: var(--ad-amber); opacity: 0.34; pointer-events: none; }
+html.tfg-artdir .ad-ld-art .ad-skyline { width: 100%; height: 100%; display: block; }
+html.tfg-artdir .ad-ld-cap { position: absolute; left: 0; right: 0; bottom: 12px; text-align: center; font-family: var(--font2); font-weight: 700; letter-spacing: 0.3em; font-size: 14px; color: var(--ad-paper); }
+
+/* ---------- death screen: TERMINATED stamp ---------- */
+html.tfg-artdir .hud-dead .dead-main, html.tfg-artdir .hud-dead .dead-sub { display: none; }
+html.tfg-artdir .hud-dead .dead-stamp { display: block; width: max-content; max-width: min(760px, 90vw); margin: 0 auto; padding: 6px 30px 10px; transform: rotate(-3deg);
+  border: 6px double var(--t-bad); color: var(--t-bad); background: rgba(24, 3, 2, 0.6); animation: adSlam 0.38s cubic-bezier(0.3, 1.6, 0.5, 1) 0.5s both; }
+html.tfg-artdir .dead-stamp b { display: block; font-family: var(--font2); font-weight: 700; font-size: clamp(40px, 5vw, 72px); letter-spacing: 0.16em; line-height: 1.05; }
+html.tfg-artdir .dead-stamp span { display: block; margin-top: 4px; font-family: var(--font2); font-weight: 700; font-size: clamp(18px, 1.8vw, 26px); letter-spacing: 0.08em; text-transform: uppercase; color: #ffb3a8; }
+@keyframes adSlam { from { opacity: 0; transform: rotate(-3deg) scale(2.6); } to { opacity: 1; transform: rotate(-3deg) scale(1); } }
+html.ad-calm.tfg-artdir .hud-dead .dead-stamp { animation: none; }
+
+/* ---------- day summary / case file ---------- */
+html.tfg-artdir .report { border-radius: 0; border: 2px solid var(--t-steel-hi); box-shadow: var(--t-bezel), var(--t-shadow); background: var(--t-scan), #120d08; overflow: visible; }
+html.tfg-artdir .report::before { content: ''; position: absolute; left: 22px; top: -16px; width: 132px; height: 16px; background: var(--ad-amber); clip-path: polygon(0 100%, 10px 0, calc(100% - 10px) 0, 100% 100%); }
+html.tfg-artdir .report::after { content: ''; position: absolute; left: 0; right: 0; bottom: -7px; height: 7px; background: radial-gradient(circle at 6px 0, transparent 4px, #120d08 4.5px) 0 0 / 12px 7px repeat-x; }
+html.tfg-artdir .rp-head { background: var(--t-stripe) left bottom / 100% 5px no-repeat, var(--ad-amber); padding-bottom: 9px; letter-spacing: 0.1em; text-transform: uppercase; }
+html.tfg-artdir .rp-row { border-bottom: 1px dotted rgba(255, 170, 60, 0.35); }
+html.tfg-artdir .rp-row b { font-size: 24px; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+html.tfg-artdir .rp-foot { padding-top: 8px; border-top: 1px dashed var(--t-line-hi); text-transform: uppercase; letter-spacing: 0.08em; font-family: var(--font2); font-weight: 700; }
+html.tfg-artdir .rp-letter { border: 7px double var(--gc); text-shadow: 0 3px 0 #000; background: rgba(0, 0, 0, 0.5); }
+html.tfg-artdir .rp-quip { font-family: var(--font2); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+html.tfg-artdir .rp-crewlist { border-radius: 0; border: 1px dashed var(--t-line); background: rgba(255, 184, 0, 0.04); }
+
+/* ---------- HUD polish (behind the same settings: reduce motion stops every animation) ---------- */
+html.tfg-artdir .hud .visor::after { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity 0.4s;
+  background: radial-gradient(ellipse 100% 90% at 50% 50%, transparent 58%, rgba(214, 18, 10, 0.5) 100%), linear-gradient(rgba(214, 18, 10, 0.16) 0 5px, transparent 5px calc(100% - 5px), rgba(214, 18, 10, 0.16) 0); }
+html.tfg-artdir .hud.hp-low .visor::after { opacity: 1; animation: adPulse 1.15s ease-in-out infinite; }
+@keyframes adPulse { 0%, 100% { opacity: 0.35; } 40% { opacity: 1; } }
+html.tfg-artdir .hud-health.crit { animation: adBeat 0.85s ease-in-out infinite; transform-origin: 50% 60%; }
+@keyframes adBeat { 0%, 100% { transform: scale(1); opacity: 1; } 30% { transform: scale(1.09); opacity: 0.85; } 60% { transform: scale(1); opacity: 1; } }
+html.tfg-artdir .hud-stam { outline: 1px solid transparent; outline-offset: 2px; transition: outline-color 0.2s; }
+html.tfg-artdir .hud-stam.low { outline-color: var(--t-warn); }
+html.tfg-artdir .hud-stam.low .hud-stam-fill { background-color: var(--t-warn); }
+html.tfg-artdir .hud-stam.exhausted { outline-color: var(--t-bad); animation: adBlink2 0.6s steps(1) infinite; }
+@keyframes adBlink2 { 50% { outline-color: transparent; } }
+/* damage direction: a red chevron wedge on a ring instead of a plain arc (rotation is set inline by HUD.damageDirection) */
+html.tfg-artdir .dmg-arc { left: -120px; top: -120px; width: 240px; height: 240px; border: 0; border-radius: 0;
+  background: conic-gradient(from -26deg, rgba(255, 46, 28, 0.92) 0 52deg, transparent 52deg);
+  -webkit-mask: radial-gradient(circle, transparent 0 66%, #000 67% 76%, transparent 77%); mask: radial-gradient(circle, transparent 0 66%, #000 67% 76%, transparent 77%); }
+html.ad-calm.tfg-artdir .hud.hp-low .visor::after { animation: none; opacity: 0.7; }
+html.ad-calm.tfg-artdir .hud-health.crit, html.ad-calm.tfg-artdir .hud-stam.exhausted { animation: none; }

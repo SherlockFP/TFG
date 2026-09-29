@@ -55,5 +55,31 @@ for (const ch of css) {
   else buf += ch;
 }
 chk(!/box-shadow:\s*0 0 \d+px/.test(css), 'ui3.css adds a glow');
+
+// ---- ARTDIR (wave 6): identity kit, scoped css, no emoji, EN/TR/RU strings, panel kinds
+{
+  const { wordmarkSvg, sealSvg, eyeSvg, compositionSvg } = await import('../../src/ui/logo.js');
+  const { kindOf, formCode } = await import('../../src/ui/artdir.js');
+  const { MEMOS, HINTS } = await import('../../src/ui/artdir_menu.js');
+  const { tIn } = await import('../../src/core/i18n.js');
+  for (const [n, svg] of [['wordmark', wordmarkSvg()], ['seal', sealSvg()], ['eye', eyeSvg({ live: true })], ['composition', compositionSvg(['van', 'planet', 'gear'])]]) {
+    chk(svg.startsWith('<svg') && svg.endsWith('</svg>') && !EM.test(svg), 'artdir svg ' + n);
+  }
+  chk((compositionSvg(['van', 'planet', 'gear']).match(/<path/g) || []).length >= 6, 'composition has its glyphs');
+  chk(kindOf('PAUSED').key === 'pause' && kindOf('DURAKLATILDI').key === 'pause' && kindOf('ПАУЗА').key === 'pause' && kindOf('Shop').key === 'shop', 'panel kinds EN/TR/RU');
+  for (const w of ['SETTINGS', 'PAUSED', 'Shop', 'HOST GAME', 'x', '']) chk(/^TFG-\d\d-[A-H]$/.test(formCode(w)) && formCode(w) === formCode(w), 'form code ' + w + ' ' + formCode(w));
+  const strs = [...MEMOS, ...Object.values(HINTS), 'TERMINATED', 'PLAY', 'OFFICE', 'MEMO', 'APPROVED', 'CLASSIFIED', 'PENDING', 'ON BREAK', 'RESTRICTED', 'ONBOARDING IN PROGRESS', 'Art direction'];
+  for (const k of strs) for (const l of ['tr', 'ru']) chk(tIn(l, k) !== k, `artdir string missing ${l}: ${k}`);
+  chk(MEMOS.every((m) => m.length < 90), 'memo too long for the ticker');
+  chk(/tfg-artdir/.test(rd('src/ui/artdir.js')) && /artdir\.js/.test(rd('src/ui/theme.js')) && /syncArtdir\(s\)/.test(rd('src/ui/ui.js')), 'artdir hooks present');
+  for (const f of ['src/ui/artdir.js', 'src/ui/artdir_menu.js', 'src/ui/logo.js', 'src/ui/artdir.css', 'src/ui/artdir_i18n.js']) chk(!EM.test(rd(f).replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '')), f + ' contains an emoji');
+  const acss = rd('src/ui/artdir.css').replace(/\/\*[\s\S]*?\*\//g, '');
+  let d2 = 0, b2 = '';
+  for (const ch of acss) {
+    if (ch === '{') { if (d2 === 0) { const sel = b2.trim(); if (!sel.startsWith('@')) for (const one of topSplit(sel)) chk(/^(html\.tfg-artdir|html\.ad-calm\.tfg-artdir|:root$|\.ad-only$)/.test(one.trim()), 'artdir.css unscoped: ' + one.trim().slice(0, 70)); } d2++; b2 = ''; }
+    else if (ch === '}') { d2--; b2 = ''; } else b2 += ch;
+  }
+  chk(!/box-shadow:\s*0 0 \d+px|text-shadow:\s*0 0 \d+px|backdrop-filter/.test(acss), 'artdir.css adds a glow / blur');
+}
 console.log(bad ? bad + ' FAILED' : 'ui3 OK');
 process.exit(bad ? 1 : 0);

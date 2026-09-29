@@ -10,6 +10,8 @@ import { listRuns, saveProfile } from '../core/save.js';
 import { MenuRoom } from './menuroom.js';
 import { avatarOfProfile, drawAvatar } from './avatarpic.js';   // [profile]
 import { attention as dailyAttention } from '../game/daily_core.js';   // [daily] NEW! badge on the DAILY entry
+import { isArtdir } from './artdir.js';   // [artdir]
+import { drawArtMenu, disposeArtMenu } from './artdir_menu.js';
 
 export const CRT_VS = `
 varying vec2 vUv;
@@ -214,6 +216,7 @@ export class CRTMenu {
 
   // ------------------------------------------------------------------ drawing
   drawMenu(c, time) {
+    if (!this._adBroken && isArtdir()) { try { drawArtMenu(this, c, time); return; } catch (e) { this._adBroken = true; console.warn('[artdir] menu draw failed, using the plain menu', e); } }   // [artdir]
     const { ctx, canvas } = c;
     const W = canvas.width, H = canvas.height;
     ctx.fillStyle = '#060606'; ctx.fillRect(0, 0, W, H);
@@ -394,7 +397,7 @@ export class CRTMenu {
     if (!hit || !hit.uv || !this.itemRects) return -1;
     const v = 1 - hit.uv.y;
     // account for the barrel curvature roughly (center-weighted), good enough for picking
-    return this.itemRects.findIndex((r) => v >= r.y0 && v <= r.y1);
+    return this.itemRects.findIndex((r) => v >= r.y0 && v <= r.y1 && (r.x0 === undefined || (hit.uv.x >= r.x0 && hit.uv.x <= r.x1)));   // [artdir] 2-column menu has x ranges
   }
   // gamepad (polled by ui.js): D-pad / stick moves, A / Start confirms
   padInput(act) {
@@ -461,6 +464,7 @@ export class CRTMenu {
   }
 
   dispose() {
+    disposeArtMenu(this);   // [artdir]
     this.room?.dispose();
     const canvas = this.engine.canvas;
     canvas.removeEventListener('pointermove', this.onMove);

@@ -1,5 +1,5 @@
 // UI2 screenshot runner: main menu + in-run HUD + panels, ONE browser launch (hold the shared lock once). Usage:
-//   flock /tmp/tfg-browser.lock node tools/harness/ui2_shots.mjs --port 5194 --out DIR [--sizes 1280x720,1920x1080] [--both] [--only menu,hud,inv,shop,roles,panels,ui3]
+//   flock /tmp/tfg-browser.lock node tools/harness/ui2_shots.mjs --port 5194 --out DIR [--sizes 1280x720,1920x1080] [--both] [--only menu,hud,inv,shop,roles,panels,ui3,artdir]
 // UI3 (wave 5): `--only ui3` (in-run HUD overlap states + the remaining panels) toggles class tfg-ui3 instead of tfg-ui: "before_*" = ui3 layer off,
 // "after_*" = on. Every JPEG is re-encoded with a lower quality until it is <= 150 KB. `--ui3-before-big` also writes 1920 "before" panel shots
 // (default: 1920 panel shots are "after" only, to keep docs/ small).
@@ -163,5 +163,86 @@ if (want('ui3')) {
   }
   console.log('UI3 REPORT', JSON.stringify(report, null, 1));
 }
+
+// ARTDIR (wave 6): `--only artdir` = before (html.tfg-artdir removed) / after (on) on the same page state. Menu screens + loading, then in-run
+// pause / tooltip / death / low HP + damage arc / day report / panels. ONE launch, JPEGs <= 150 KB -> DIR/<before|after>_<WxH>_<name>.jpg
+if (want('artdir')) {
+  const setAD = (on) => p.evaluate((o) => document.documentElement.classList.toggle('tfg-artdir', o), on);
+  const names = arg('names', '') ? arg('names').split(',') : null;   // --names a,b re-shoots only those states
+  const both2 = async (name, setup, { settle = 500, mouse = null } = {}) => {
+    if (names && !names.includes(name)) return;
+    for (const st of ['before', 'after']) {
+      await setAD(st === 'after');
+      if (setup) await ev(setup);
+      if (mouse) await p.mouse.move(mouse[0], mouse[1]);
+      await p.waitForTimeout(settle);
+      await snap(st, name);
+      console.log('shot', cur, st, name);
+    }
+    await setAD(true);
+  };
+  await p.goto(`http://127.0.0.1:${port}/`);
+  await p.waitForFunction(() => window.kefal?.menu?.room, null, { timeout: 120000 }).catch(() => logs.push('TIMEOUT menu'));
+  await p.waitForTimeout(1200);
+  await ev(`kefal.menu.room.skipBoot?.(); for(let i=0;i<40;i++) kefal.menu.update(1/30);`);
+  const adFrames = `for(let i=0;i<30;i++) kefal.menu.update(1/30);`;
+  for (const sz of sizes) {
+    await resize(sz);
+    const w = sz[0], h = sz[1];
+    await both2('menu_title', `kefal.ui.showMenu('title'); ${adFrames}`, { mouse: [Math.round(w * 0.3), Math.round(h * 0.55)] });
+    await both2('menu_title_wipe', `kefal.ui.showMenu('host'); kefal.ui.showMenu('title'); for(let i=0;i<7;i++) kefal.menu.update(1/30);`, { settle: 200 });
+    for (const [n, scr] of [['host', 'host'], ['settings', 'settings'], ['character', 'character'], ['profile', 'profile'], ['daily', 'daily'], ['hub', 'hub'], ['howto', 'howto']]) {
+      if (sz !== sizes[0] && !['host', 'settings'].includes(n)) continue;
+      await both2('menu_' + n, `kefal.ui.showMenu('${scr}'); ${adFrames}`, { settle: 1500 });
+    }
+    await ev(`kefal.ui.showMenu('title'); ${adFrames}`);
+    if (sz === sizes[0]) await both2('loading', `kefal.ui.showLoading('Loading... 3/8')`, { settle: 700 });
+    await ev(`kefal.ui.hideLoading()`);
+  }
+  await resize(sizes[0]);
+  // in-run states
+  await p.goto(`http://127.0.0.1:${port}/?autohost=local&code=T1&name=Tester`);
+  await p.waitForFunction(() => window.kefal?.game, null, { timeout: 120000 }).catch(() => logs.push('TIMEOUT game'));
+  await p.waitForTimeout(3500);
+  await ev(`const g=kefal.game; g.run.credits=4200; try{ g.profile.coins=900; g.profile.level=7; }catch{}
+    g.run.daysLeft=3; g.run.moon='hamsi'; g.player.inShip=true; g.hostLever(g.selfId); g.hostFinishLanding();
+    for (let i=0;i<30;i++){ kefal.tick(10,1/30,false); await new Promise(r=>setTimeout(r,10)); }
+    g.player.inShip=false; kefal.tick(20,1/30,false);`);
+  await ev(`const a = kefal; if (!a.__realLoop) { a.__realLoop = a.loop; a.loop = function (now) { requestAnimationFrame((t) => this.loop(t)); this.last = now; this.input?.endFrame?.(); }; }`);
+  const tk = (n = 6) => `kefal.tick(${n}, 1/30, true)`;
+  const closeAll2 = `{ const g0 = kefal.game; g0.ui.closePanel(true); g0.ui.hud.setDead(false); document.querySelectorAll('.report').forEach((x) => x.remove()); g0.player.hp = g0.player.maxHp; }`;
+  await ev(`const g = kefal.game; const { ITEMS } = await import('/src/game/items.js');
+    for (const ty of Object.keys(ITEMS).filter((k) => /flashlight|walkie|shovel|pipe|jetpack/i.test(k)).slice(0, 4)) { try { const r = g.items.hostSpawn(ty, { x: g.player.pos.x, y: g.player.pos.y + 0.5, z: g.player.pos.z }); const it = typeof r === 'string' ? g.items.get(r) : r; if (it) g.pickup(it); } catch {} }
+    kefal.tick(30, 1/30, false);`);
+  for (const sz of sizes) {
+    await resize(sz);
+    const big = sz[0] > 1400;
+    await ev(closeAll2);
+    await both2('pause', `${closeAll2}; kefal.game.ui.openPause(); ${tk()}`);
+    await ev(closeAll2);
+    await both2('death', `${closeAll2}; kefal.game.ui.hud.setDead(true, 'You were crushed by a Thumper.', 'Stay off the road when the fog rolls in.'); ${tk(60)}`, { settle: 1200 });
+    await ev(closeAll2);
+    await both2('hud_lowhp', `${closeAll2}; const g = kefal.game; g.player.hp = g.player.maxHp * 0.2; ${tk()}; g.ui.hud.damageDirection({ x: g.player.pos.x + 4, z: g.player.pos.z + 1 }, g); g.ui.hud.damageDirection({ x: g.player.pos.x - 3, z: g.player.pos.z - 3 }, g); document.querySelectorAll('.dmg-arc').forEach((e) => { const c = e.cloneNode(); c.style.animation = 'none'; c.style.opacity = '1'; e.parentNode.appendChild(c); });`, { settle: 60 });
+    await ev(closeAll2);
+    await both2('report', `${closeAll2}; const g = kefal.game; g.ui.renderDaySummary({ moon: 'HAMSI', day: 4, collected: 380, leftValue: 120, shipValue: 640, kills: 3, deaths: [{ id: 'b', name: 'Dummy', cause: 'left' }], fines: 40, sold: 300, quota: 600, daysLeft: 2,
+      players: [{ id: g.selfId, name: 'Tester', loot: 380, kills: 3, dead: false }, { id: 'b', name: 'Dummy', loot: 0, kills: 0, dead: true }] }, g, [], () => {}); ${tk(8)}`, { settle: 3500 });
+    await ev(closeAll2);
+    if (!big) {
+      await both2('panel_shop', `${closeAll2}; kefal.game.ui.openShop(kefal.game); ${tk()}`);
+      await both2('panel_settings', `${closeAll2}; kefal.game.ui.openPanel(kefal.game.ui.settingsPanel(true)); ${tk()}`);
+      await both2('panel_hub', `${closeAll2}; const h = await import('/src/ui/panels/hub.js'); kefal.game.ui.openPanel(h.hubPanel(kefal.game.ui, { inGame: true })); ${tk()}`);
+      await both2('panel_crafting', `${closeAll2}; kefal.game.crafting?.open?.(); ${tk()}`);
+      await both2('panel_bounties', `${closeAll2}; kefal.game.ui.openBounties(kefal.game); ${tk()}`);
+      await ev(closeAll2);
+      // tier tooltip over the bag
+      await ev(`kefal.game.inventory?.open(); ${tk(8)}`);
+      const box = await ev(`const s = [...document.querySelectorAll('.tinv-slot')].find((x) => x.querySelector('img, .ico, canvas') || x.dataset.id); if (!s) return null; const r = s.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2];`);
+      if (box) { await p.mouse.move(box[0] - 4, box[1]); await p.mouse.move(box[0], box[1]); }
+      await both2('tooltip', ``, { settle: 400 });
+      await ev(`kefal.game.inventory?.close()`);
+    }
+  }
+}
+
 console.log('LOGS', JSON.stringify(logs.slice(0, 30), null, 1));
 await b.close();
