@@ -243,7 +243,7 @@ import { installCosm5 } from './cosm5.js';   // wave 4: cosmetics drop (suits/ha
 // [import:nvgear]
 // [import:mapmods]
 // [import:worlds3]
-// [import:crdirector]
+import { installCrdirector } from './crdirector.js';
 // [import:facjobs]
 
 
@@ -512,7 +512,7 @@ export class Game extends Emitter {
     // [slot:nvgear]
     // [slot:mapmods]
     // [slot:worlds3]
-    // [slot:crdirector]
+    this.useModule('crdirector', installCrdirector);
     // [slot:facjobs]
 
 
