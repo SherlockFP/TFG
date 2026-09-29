@@ -158,7 +158,7 @@ export function createInstances(ctx) {
     const opts = moon.layoutOpts || {};
     const legacy = (kind === 'core' && bossFor(moon.interior, sector).id === 'legacybot') || (kind === 'gate' && !!moon.legacyGate);
     const raidD = kind === 'raid' ? (P.RAID_DIFFS[moon.raidDiff] || P.RAID_DIFFS.normal) : null;
-    const plan = P.planContent(L, { sector, crew, keys: legacy ? 0 : (opts.keys ?? 1), kind, perWing: raidD ? P.raidElites(crew, moon.raidDiff) : undefined });
+    const plan = P.planContent(L, { sector, crew, keys: legacy ? 0 : (opts.keys ?? 1), kind, perWing: raidD ? P.raidElites(crew, moon.raidDiff) : opts.perWing });
     cur = {
       kind, moon, L, plan, sector, crew, bosses: [], finalDead: false, finalType: null, keysUsed: 0, elapsed: 0, recallAt: kind === 'raid' ? 2700 : kind === 'keystone' ? 99999 : TUNE.coreRecallSec,
       diff: moon.raidDiff || null, red: !!ctx.gate?.()?.red, ks: null, rng: rndFor('inst' + kind), threatT: 0, openedByTimer: false, week: cy.inst?.wk || mineWeek(),
@@ -255,6 +255,7 @@ export function createInstances(ctx) {
     cyx({ k: 'chest', p: [+c.pos.x.toFixed(1), +c.pos.y.toFixed(1), +c.pos.z.toFixed(1)] });
   }
   function coreChest(c, sector, gate, first) {
+    if (gate?.chestSpec) { dropChest(c, { ...gate.chestSpec, trophy: c.type }); return; }   // module cycle3: rank / red / hidden gate loot
     const spec = { weapons: 1, minRarity: 'legendary', shards: [['shard_algo', 1 + Math.floor(sector / 2)], ['shard_ecto', 2]], scrap: [['goldbar', 2 + Math.min(3, sector)], ['x_goldbars', 1]], trophy: c.type };
     if (sector >= 2) spec.shards.push(['shard_source', 1]);
     if (first) spec.shards.push(['shard_algo', 1]);
@@ -398,7 +399,7 @@ export function createInstances(ctx) {
     const c = cur;
     if (!c) return null;
     cur = null;
-    const res = { kind: c.kind, success: c.finalDead, reason, level: c.ks?.level, diff: c.diff, boss: c.finalType, crew: c.crew, sector: c.sector };
+    const res = { kind: c.kind, success: c.finalDead, reason, level: c.ks?.level, diff: c.diff, boss: c.finalType, crew: c.crew, sector: c.sector, time: Math.round(c.elapsed) };
     if (c.kind === 'keystone') {
       const ks = c.ks;
       const success = c.finalDead && !ks.expired;

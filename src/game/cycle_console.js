@@ -230,7 +230,7 @@ export function createHostConsole(d) {
     if (phase === 'orbit') {
       if (c.mode === 'classic' && c.stage === 'gate') add(t('SECTOR GATE OPEN: pull the lever to land on the Sector Core (terminal: CORE)'), 'main');
       else if (c.mode === 'classic' && c.stage === 'grace') add(t('GRACE DAY: collect freely - no quota - the gate re-opens after this day'), 'main');
-      else if (c.inst && c.inst.state === 'armed') add(c.inst.kind === 'keystone' ? tf('KEYSTONE +{l} armed: pull the lever', { l: c.inst.level }) : c.inst.kind === 'raid' ? tf('RAID armed ({d}): pull the lever', { d: t(P.RAID_DIFFS[c.inst.diff]?.name || '') }) : t('S-RANK GATE armed: pull the lever'), 'main');
+      else if (c.inst && c.inst.state === 'armed') add(c.inst.kind === 'keystone' ? tf('KEYSTONE +{l} armed: pull the lever', { l: c.inst.level }) : c.inst.kind === 'raid' ? tf('RAID armed ({d}): pull the lever', { d: t(P.RAID_DIFFS[c.inst.diff]?.name || '') }) : c.inst.spec ? tf('GLITCH GATE {r} armed: pull the lever', { r: c.inst.spec.rank }) : t('S-RANK GATE armed: pull the lever'), 'main');
       if (!instRequirements() && !(c.inst && c.inst.state === 'armed')) {
         add(tf('KEYSTONE +{l} available: terminal KEYSTONE', { l: c.ks?.level || P.KS.minLevel }), 'hint');
         add(t('RAID available (1-8 players): terminal RAID'), 'hint');

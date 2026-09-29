@@ -8,7 +8,7 @@ import { MOONS } from './moons.js';
 import { interiorName } from './collection.js';
 import { hashString } from '../core/rng.js';
 import { getLang, t } from '../core/i18n.js';
-import { renderCaseCard } from '../ui/panels/casefile.js';
+import { renderCaseCard, caseTexts } from '../ui/panels/casefile.js';
 
 export const CASE_CAP = 50;
 const tr = () => { try { return getLang() === 'tr'; } catch { return false; } };
@@ -120,6 +120,7 @@ export function installCaseFiles(core) {
     const list = ensureCaseProfile(game.profile);
     const c = n ? list.find((x) => String(x.n) === String(n).replace('#', '')) : list[0];
     if (!c) return t('Case not found. Type CASES.');
+    if (c.kind && caseTexts[c.kind]) return caseTexts[c.kind](c);   // [cycle3] dossiers
     const L = (en, trs) => (T ? trs : t(en));
     const out = [`CASE #${c.n} — ${c.moon} — ${L('DAY', 'GÜN')} ${c.day}${c.interior ? ' — ' + c.interior : ''}`, ''];
     out.push(`${L('Entered', 'Giren')} ${c.entered}, ${L('Returned', 'Dönen')} ${c.returned}, ${L('Value extracted', 'Çıkarılan değer')} ▮${c.value}, ${L('Kills', 'Öldürme')} ${c.kills}`);

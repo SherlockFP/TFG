@@ -24,6 +24,8 @@ export function installCycle(game) {
   registerInstanceItems();
   const restores = [], offs = [];
   let disposed = false, boundNet = null;
+  /** extension points for module 'cycle3' (classic Glitch Gates, trophies): gateDef(inst, runKey) -> moon def, onResult[] = fn(res, moon, inst) before the result is applied */
+  const ext = { gateDef: null, onResult: [] };
   const enabled = () => game.config?.cycle !== false;
   const host = () => !!game.isHost;
   const cy = () => game.run?.cycle || null;
@@ -81,7 +83,7 @@ export function installCycle(game) {
     if (inst) {
       if (inst.kind === 'keystone') want.set(inst.id, () => { const base = MOONS[inst.base]; return base ? P.keystoneMoonDef(base, inst.level, inst.seed) : null; });
       else if (inst.kind === 'raid') want.set(inst.id, () => P.raidMoonDef(runKey(), inst.sector | 0, inst.wk, inst.diff));
-      else if (inst.kind === 'gate') want.set(inst.id, () => { const d = P.coreMoonDef(runKey(), inst.gateSector); return { ...d, id: inst.id, core: false, gate: true, name: `S-RANK GATE ${inst.gateSector + 1}`, short: 'Gate', legacyGate: false }; });
+      else if (inst.kind === 'gate') want.set(inst.id, () => { const x = inst.spec && ext.gateDef ? ext.gateDef(inst, runKey()) : null; if (x) return x; const d = P.coreMoonDef(runKey(), inst.gateSector); return { ...d, id: inst.id, core: false, gate: true, name: `S-RANK GATE ${inst.gateSector + 1}`, short: 'Gate', legacyGate: false }; });
     }
     for (const [id, mk] of want) {
       const key = keyOf(c, id);
@@ -109,7 +111,7 @@ export function installCycle(game) {
   const ctx = {
     game, cy, step, patchCy, patchEndless, banner, say,
     bosses: null,
-    gate: () => cy()?.endless?.gate || null,
+    gate: () => cy()?.endless?.gate || cy()?.inst?.gate || null,
     raidLocked: (diff) => { const r = game.profile?.cycle2?.raid; return !!(r && r.wk === P.weekKey() && r.done?.[diff]); },
     applyKnobs: (k, on) => applyKnobs(k, on),
     onFinalDead: (cur) => {
@@ -217,10 +219,13 @@ export function installCycle(game) {
       const diff = P.RAID_DIFFS[o.diff] ? o.diff : 'normal';
       Object.assign(base, { id: 'raid1', diff, seed: hashString(`${runKey()}:raid:${base.wk}`) >>> 0 });
     } else if (kind === 'gate') {
-      const g = c.endless?.gate;
+      const g = o.gate || c.endless?.gate;
       if (!g) { reply('No gate is open right now.', true); return false; }
-      const gateSector = (c.sector | 0) + (c.endless.depth | 0);
-      Object.assign(base, { id: 'gate' + gateSector, gateSector, seed: hashString(`${runKey()}:gate:${gateSector}`) >>> 0, red: !!g.red });
+      if (o.gate) Object.assign(base, { id: 'cgate' + o.gate.n, gateSector: qiOf(), seed: o.gate.seed, red: !!o.gate.red, gate: o.info, spec: o.gate });   // module cycle3: a classic Glitch Gate
+      else {
+        const gateSector = (c.sector | 0) + (c.endless.depth | 0);
+        Object.assign(base, { id: 'gate' + gateSector, gateSector, seed: hashString(`${runKey()}:gate:${gateSector}`) >>> 0, red: !!g.red });
+      }
     }
     patchCy({ inst: base, live: null, keysUsed: 0 });
     registerMoons();
@@ -402,6 +407,7 @@ export function installCycle(game) {
   function handleInstResult(res, moon) {
     const run = game.run, c = cy();
     if (!res) return;
+    for (const f of ext.onResult) { try { f(res, moon, c?.inst || null); } catch (e) { console.warn('[cycle] result hook', e); } }
     if (res.kind === 'keystone') {
       const level = res.level;
       if (res.success) {
@@ -429,10 +435,11 @@ export function installCycle(game) {
       } else say('The raid was abandoned. The weekly lock is untouched.', {}, 'warn');
       patchCy({ inst: null, live: null });
     } else if (res.kind === 'gate') {
-      if (res.success) say('S-RANK GATE CLEARED.', {}, 'good');
+      const classic = !!c.inst?.spec;
+      if (res.success && !classic) say('S-RANK GATE CLEARED.', {}, 'good');
       const e = c.endless ? { ...c.endless, gate: null } : null;
       patchCy({ inst: null, live: null, endless: e || c.endless });
-      if (res.success) { game.net.broadcast('xp', { xp: 600 + 40 * (c.endless?.depth || 0), coin: 90, reason: 'Gate cleared' }); }
+      if (res.success && !classic) { game.net.broadcast('xp', { xp: 600 + 40 * (c.endless?.depth || 0), coin: 90, reason: 'Gate cleared' }); }
     }
   }
 
@@ -510,7 +517,7 @@ export function installCycle(game) {
   offs.push(game.mods?.on?.('objectives', (add, g, phase) => consoleHost.objectives(add, phase)));
 
   const api = {
-    core: CORE, plan: P, inst, endless, bosses: ctx.bosses,
+    core: CORE, plan: P, inst, endless, bosses: ctx.bosses, ext, arm: (kind, o, reply) => armInstance(kind, o || {}, reply || (() => {})), patchCy, disarm, instRequirements,
     enabled, flag: () => game.config?.cycle !== false, state: cy,
     routeBlocked: (m) => (enabled() && cy() && cy().mode === 'classic' && cy().stage === 'gate' ? 'The Sector Gate is open: the autopilot is locked on the Sector Core (CORE).' : (m && MOONS[m.id]?.instance ? 'That server cannot be routed to manually.' : null)),
     registerMoons,
