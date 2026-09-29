@@ -3,6 +3,7 @@
 // profile (profile.shipyard, survives fired runs) and is mirrored into run.sy for every peer / late joiner:
 //   { v, m: { <socket>: { id, t } }, parts: { plate, bulk, coil, brk }, paint: { c1, c2, pat }, theme, name, day: { <playerId>: dayNumber } }
 import { SOCKETS, SOCKET_IDS, WALL_T } from '../world/hardpoints.js';
+import { blankDeco, sanitizeDeco } from './polish4_core.js';   // [polish4] decals + furniture ride along in the ship state
 
 export const VERSION = 1;
 export const WEIGHT_PER_MODULE = 0.05;          // route cost +5 % per installed module
@@ -91,7 +92,7 @@ export function sanitizeName(n) {
 
 // ---------------------------------------------------------------------------------------------- state
 export function blankState() {
-  return { v: VERSION, m: {}, parts: { plate: 0, bulk: 0, coil: 0, brk: 0 }, paint: { c1: 'orange', c2: 'slate', pat: 'stripes' }, theme: 'steel', name: DEFAULT_NAME, day: {} };
+  return { v: VERSION, m: {}, parts: { plate: 0, bulk: 0, coil: 0, brk: 0 }, paint: { c1: 'orange', c2: 'slate', pat: 'stripes' }, theme: 'steel', name: DEFAULT_NAME, day: {}, deco: blankDeco() };
 }
 const int = (v, lo, hi, d = 0) => { v = Math.floor(Number(v)); return Number.isFinite(v) ? Math.max(lo, Math.min(hi, v)) : d; };
 export function sanitize(raw) {
@@ -111,6 +112,7 @@ export function sanitize(raw) {
   s.paint = { c1: PAINT_IDS.includes(p.c1) ? p.c1 : 'orange', c2: PAINT_IDS.includes(p.c2) ? p.c2 : 'slate', pat: PATTERN_IDS.includes(p.pat) ? p.pat : 'stripes' };
   s.theme = THEME_IDS.includes(raw.theme) ? raw.theme : 'steel';
   s.name = sanitizeName(raw.name);
+  s.deco = sanitizeDeco(raw.deco);
   if (raw.day && typeof raw.day === 'object') for (const [k, v] of Object.entries(raw.day).slice(0, 16)) if (Number.isFinite(v)) s.day[String(k).slice(0, 32)] = int(v, 0, 1e6);
   return s;
 }

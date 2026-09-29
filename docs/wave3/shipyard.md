@@ -58,3 +58,5 @@ Never seen in a renderer: module interiors (prop placement, scale of the reactor
 * Furniture placement mode (ghost preview / rotate), decals / emblems, faction rewards (Archive -> Lab, Bureau -> Turret), Workshop "Forge-lite" (Epic ascension at the workshop), Workshop craft luck (`effects().craftLuck` exists, nothing reads it), Trophy Hall artifacts / CASE photos, Garage second vehicle slot / van repair (the van has no HP), Hangar drop pods, Music Room instruments (Lounge only has the jukebox visual), siege damage scaling by `siegeSurface`.
 * The Trophy Hall shows the local player's bestiary (each client sees their own heads); the guestbook XP uses the host's bestiary size.
 * The ux agent plans "health regen only from food"; the Med Bay bed is a deliberate exception (cooldown-gated, needs the module).
+
+**UPDATE (wave 4 polish4, docs/wave4/polish4.md):** furniture placement mode (terminal FURNITURE), decals (terminal DECAL) and Workshop craft luck are implemented (`profile.shipyard.deco`, `rpg.bonus` wrap). Still missing: faction unlocks, Trophy Hall artifacts, second vehicle slot, wall furniture.

@@ -114,7 +114,13 @@ const WRAPPERS = new Set(['t', 'tf', 'tIn', 'tfIn', 'L', 'LA', 'sysMsg', 'sysTex
 function loadDictObject(obj, target, where, fileSrc, topConsts) {
   // obj: ObjectExpression (or Identifier resolved through topConsts). Returns count added.
   if (!obj) return 0;
-  if (obj.type === 'Identifier') { const r = topConsts.get(obj.name); return r ? loadDictObject(r, target, where, fileSrc, topConsts) : (notes.dynamicDicts.push(where + ' ' + obj.name), 0); }
+  if (obj.type === 'Identifier') {
+    const r = topConsts.get(obj.name);
+    if (r) return loadDictObject(r, target, where, fileSrc, topConsts);
+    const P0 = parsed.find((x) => x.consts === topConsts), im = P0?.imports?.get(obj.name), Q = im && parsed.find((x) => x.r === im.file), c = Q?.consts?.get(im.name);
+    if (c) return loadDictObject(c, target, Q.r, Q.src, Q.consts);   // imported dictionary constant (spread or direct)
+    return (notes.dynamicDicts.push(where + ' ' + obj.name), 0);
+  }
   if (obj.type !== 'ObjectExpression') { notes.dynamicDicts.push(where + ' <' + obj.type + '>'); return 0; }
   let n = 0;
   for (const p of obj.properties) {
@@ -148,6 +154,12 @@ for (const f of allFiles) {
 for (const P of parsed) {
   const consts = topLevelConsts(P.ast);
   P.consts = consts;
+  P.imports = new Map();
+  for (const st of P.ast.body) {
+    if (st.type !== 'ImportDeclaration' || typeof st.source?.value !== 'string' || !st.source.value.startsWith('.')) continue;
+    const file = rel(path.resolve(path.dirname(P.f), st.source.value));
+    for (const sp of st.specifiers || []) if (sp.type === 'ImportSpecifier') P.imports.set(sp.local.name, { file, name: sp.imported?.name ?? sp.imported?.value ?? sp.local.name });
+  }
   const dictFile = isDictFile(P.f);
   const isCore = P.r === 'src/core/i18n.js';
   if (isCore && consts.has('TR')) loadDictObject(consts.get('TR'), TR, P.r, P.src, consts);
@@ -186,7 +198,14 @@ for (const P of parsed) {
       const target = lang === 'ru' ? RU : TR;
       const a = n.arguments[0];
       if (a && a.type === 'CallExpression') notes.dynamicDicts.push(P.r + ':' + lineOf(P.src, n.start) + ' (computed)');
-      else if (a && a.type === 'Identifier') loadDictObject(a, target, P.r, P.src, P.consts);
+      else if (a && a.type === 'Identifier') {
+        // an imported dictionary constant (addTranslations(TR_FOO) with `import { TR_FOO } from './foo_i18n.js'`): follow the import
+        if (!P.consts.has(a.name) && P.imports?.has(a.name)) {
+          const im = P.imports.get(a.name), Q = parsed.find((x) => x.r === im.file);
+          if (Q?.consts) { const c = Q.consts.get(im.name); if (c) loadDictObject(c, target, Q.r, Q.src, Q.consts); else notes.dynamicDicts.push(P.r + ' ' + a.name); }
+          else notes.dynamicDicts.push(P.r + ' ' + a.name);
+        } else loadDictObject(a, target, P.r, P.src, P.consts);
+      }
       else loadDictObject(a, target, P.r, P.src, P.consts);
     }
   });

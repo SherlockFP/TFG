@@ -195,6 +195,7 @@ export class CreatureView {
   // private creatures (Parasocial) are seen and heard only by the player whose id is in `extra`
   get hidden() {
     if (this.private) return this.extra !== this.mgr.game.selfId || this.state === 'hidden';
+    if (this.type === 'dunemaw') return this.state === 'hidden' || this.state === 'rumble';   // buried: cannot be hit / scanned until it erupts
     return false;
   }
   audible() { return !this.private || this.extra === this.mgr.game.selfId; }

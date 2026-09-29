@@ -2,6 +2,7 @@
 // SKINS (collars, hats, colours, seasonal; some from achievements, some for Clout) - SHOP (HQ only). Dark CRT / amber look, self-contained DOM + CSS.
 import { t, tf } from '../../core/i18n.js';
 import * as C from '../../game/pets_core.js';
+import { createPetStudio, petSig } from './pets_studio.js';
 
 const STYLE_ID = 'tfg-pets-style';
 const CSS = `
@@ -22,8 +23,26 @@ const CSS = `
 .pt-btn{font-family:var(--font,monospace);font-size:19px;color:var(--amber,#ff8a3d);background:rgba(255,138,61,.08);border:1px solid var(--amber-dim,#a8531f);padding:1px 9px;cursor:pointer}
 .pt-btn:hover{background:var(--amber,#ff8a3d);color:#150a02}.pt-btn.dis{opacity:.35;pointer-events:none}.pt-btn.sel{background:rgba(255,210,63,.25);border-color:#ffd23f}
 .pt-ab{border-left:3px solid #ffd23f;padding:1px 8px;margin:3px 0;font-size:18px}.pt-ab.off{opacity:.45;border-color:#555}
+.pt-stable{display:grid;grid-template-columns:236px 1fr;gap:12px;min-height:0}
+.pt-list{display:flex;flex-direction:column;gap:5px;overflow:auto;max-height:100%}
+.pt-li{display:flex;gap:8px;align-items:center;padding:4px 6px;border:1px solid rgba(255,138,61,.28);background:rgba(0,0,0,.3);cursor:pointer;min-height:54px}
+.pt-li:hover{border-color:rgba(255,200,90,.6)}.pt-li.sel{border-color:#ffd23f;box-shadow:inset 0 0 14px rgba(255,210,63,.14)}.pt-li.act{background:rgba(255,138,61,.13)}.pt-li.empty{opacity:.45;cursor:default;justify-content:center}
+.pt-port{width:46px;height:46px;flex:none;border:1px solid rgba(255,138,61,.3);background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.pt-port img{width:46px;height:46px;image-rendering:pixelated}
+.pt-li-t{min-width:0;flex:1;line-height:1.05}.pt-li-n{font-size:20px;color:#fff0dc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pt-li-s{font-size:16px;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pt-tag{font-family:var(--font2,monospace);font-size:9px;letter-spacing:1px;padding:1px 5px;border:1px solid currentColor}
+.pt-detail{min-width:0;display:flex;flex-direction:column;gap:8px}
+.pt-top{display:flex;gap:14px;align-items:flex-start}
+.pt-stage{width:210px;height:210px;flex:none;border:1px solid rgba(255,138,61,.35);background:radial-gradient(circle at 50% 40%,rgba(255,180,90,.12),rgba(0,0,0,.55));position:relative}
+.pt-stage canvas{width:100%;height:100%;display:block}.pt-stage .pt-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:.5;font-size:20px}
+.pt-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.pt-name{font-size:30px;color:#fff0dc;line-height:1}.pt-sub{font-size:18px;opacity:.8;line-height:1.05}
+.pt-meter{display:grid;grid-template-columns:78px 1fr 92px;gap:8px;align-items:center;font-size:18px}.pt-meter b{font-weight:normal;opacity:.75;text-align:right;font-size:16px}
+.pt-chips{display:flex;gap:6px;flex-wrap:wrap}.pt-chip{border:1px solid rgba(255,138,61,.4);background:rgba(0,0,0,.35);padding:0 8px;font-size:19px}
+.pt-actions{display:flex;gap:6px;flex-wrap:wrap}.pt-actions .pt-btn{font-size:20px;padding:2px 12px}
+.pt-scroll{display:grid;grid-template-columns:1fr 1fr;gap:12px;min-height:0}
 .pt-note{opacity:.75;font-size:17px}.pt-good{color:#7dff7d}.pt-bad{color:#ff6b5a}.pt-gold{color:#ffd23f}
-@media (max-width:760px){.pt-slots{grid-template-columns:repeat(3,1fr)}.pt-cols{grid-template-columns:1fr}}
+@media (max-width:760px){.pt-slots{grid-template-columns:repeat(3,1fr)}.pt-cols{grid-template-columns:1fr}.pt-stable{grid-template-columns:1fr}.pt-top{flex-direction:column}.pt-scroll{grid-template-columns:1fr}}
 `;
 function ensureStyle() {
   if (typeof document === 'undefined' || document.getElementById(STYLE_ID)) return;
@@ -40,54 +59,79 @@ export function createPetsPanel({ game, api, tab } = {}) {
   const root = mk('div', 'pt');
   root.addEventListener('keydown', (e) => { const tg = e.target?.tagName; if (tg === 'INPUT' || tg === 'TEXTAREA') e.stopPropagation(); });
   let sel = null;
+  const studio = createPetStudio(210);
+  studio.start();
   const sfx = (n = 'ui_click') => { try { game?.audio?.ui?.(n, 0.5); } catch { /* ignore */ } };
   const st = () => api.state();
   const msg = (r) => { if (r && !r.ok && r.err) game?.ui?.toast?.(t(r.err), 'warn'); sfx(r?.ok === false ? 'ui_error' : 'ui_click'); render(); };
 
+  // ---- STABLE: list with portraits (left) | turntable + level / XP / loyalty + actions + abilities (right)
+  const portraits = new Map();
+  function portraitOf(pet) {
+    const k = petSig(pet);
+    if (!portraits.has(k)) portraits.set(k, studio.ok ? studio.portrait(pet, 64) : '');
+    return portraits.get(k);
+  }
   function stableTab(body) {
     const s = st();
     if (!sel || !C.findPet(s, sel)) sel = s.active || s.stable[0]?.id || null;
-    const slots = mk('div', 'pt-slots');
+    const wrap = mk('div', 'pt-stable'), list = mk('div', 'pt-list'), det = mk('div', 'pt-detail');
     for (let i = 0; i < C.MAX_STABLE; i++) {
       const p = s.stable[i];
-      const el = mk('div', 'pt-slot' + (p && p.id === sel ? ' sel' : '') + (p && p.id === s.active ? ' act' : ''));
-      if (p) {
-        el.append(mk('div', '', `${p.nm}${p.sh ? ' ✦' : ''}`), mk('div', 'pt-note', `${t(C.SPECIES[p.sp].name)} ${t('Level')} ${C.levelOf(p)}`));
-        if (C.isResting(s, p)) el.append(mk('div', 'pt-bad', 'zZz'));
-        el.addEventListener('click', () => { sel = p.id; sfx(); render(); });
-      } else el.append(mk('div', 'pt-note', t('Empty')));
-      slots.appendChild(el);
+      if (!p) { const e = mk('div', 'pt-li empty'); e.append(mk('span', 'pt-note', `#${i + 1} ${t('Empty')}`)); list.appendChild(e); continue; }
+      const el = mk('div', 'pt-li' + (p.id === sel ? ' sel' : '') + (p.id === s.active ? ' act' : ''));
+      const port = mk('div', 'pt-port'), url = portraitOf(p);
+      if (url) { const im = document.createElement('img'); im.src = url; im.alt = ''; port.appendChild(im); } else port.textContent = (C.SPECIES[p.sp].name || '?')[0];
+      const tx = mk('div', 'pt-li-t');
+      tx.append(mk('div', 'pt-li-n', `${p.nm}${p.sh ? ' ✦' : ''}`), mk('div', 'pt-li-s', `${t(C.SPECIES[p.sp].name)} · ${t('Level')} ${C.levelOf(p)}`));
+      el.append(port, tx);
+      if (p.id === s.active) { const tg = mk('span', 'pt-tag pt-good', t('Active').toUpperCase()); el.appendChild(tg); }
+      else if (C.isResting(s, p)) el.appendChild(mk('span', 'pt-tag pt-bad', 'zZz'));
+      el.addEventListener('click', () => { sel = p.id; sfx(); render(); });
+      list.appendChild(el);
     }
-    body.appendChild(slots);
+    wrap.append(list, det); body.appendChild(wrap);
     const p = C.findPet(s, sel);
-    if (!p) { body.appendChild(mk('div', 'pt-note', t('Empty') + ' - N'));  return; }
-    const sp = C.SPECIES[p.sp], stt = C.petStats(p), lv = C.levelOf(p), stage = C.stageOf(p);
-    const cols = mk('div', 'pt-cols'), a = mk('div'), b = mk('div');
-    a.append(mk('div', 'pt-h', `${p.nm} - ${t(C.evolutionName(p.sp, stage))}${p.sh ? ' ✦ ' + t('Shiny') : ''}`));
-    const next = lv >= C.MAX_LEVEL ? 1 : (p.xp - C.xpAtLevel(lv)) / C.xpToNext(lv);
-    const r1 = mk('div', 'pt-row'); r1.append(mk('span', '', `${t('Level')} ${lv}`), bar(next)); a.appendChild(r1);
-    const r2 = mk('div', 'pt-row'); r2.append(mk('span', '', `${t('Loyalty')} ${p.ly}`), bar(p.ly / 100)); a.appendChild(r2);
-    a.append(mk('div', 'pt-row', `${t(sp.roleName)} | HP ${stt.maxHp} | ATK ${stt.atk.toFixed(1)} | SPD ${stt.spd.toFixed(1)}`));
-    const tr = C.TRAITS[p.tr];
-    a.append(mk('div', 'pt-row', `${t('Trait')}: ${t(tr.name)} - ${t(tr.desc)}`));
-    a.append(mk('div', 'pt-note', t(sp.desc)));
-    const row = mk('div', 'pt-row');
-    row.append(btn(p.id === s.active ? t('Active') : t('Set active'), () => msg(api.setActive(p.id)), p.id === s.active ? 'sel' : ''),
+    if (!p) { det.appendChild(mk('div', 'pt-note', t('Empty') + ' - N')); return; }
+    const sp = C.SPECIES[p.sp], stt = C.petStats(p), lv = C.levelOf(p), stage = C.stageOf(p), tr = C.TRAITS[p.tr];
+    // top: turntable + facts
+    const top = mk('div', 'pt-top'), stage_ = mk('div', 'pt-stage');
+    if (studio.ok && studio.show(p)) stage_.appendChild(studio.canvas); else stage_.appendChild(mk('div', 'pt-fallback', t(sp.name)));
+    const info = mk('div', 'pt-info');
+    info.append(mk('div', 'pt-name', `${p.nm}${p.sh ? ' ✦' : ''}`), mk('div', 'pt-sub', `${t(C.evolutionName(p.sp, stage))} · ${t(sp.roleName)}${p.sh ? ' · ' + t('Shiny') : ''}`));
+    const need = lv >= C.MAX_LEVEL ? 0 : C.xpToNext(lv), have = lv >= C.MAX_LEVEL ? 0 : Math.max(0, p.xp - C.xpAtLevel(lv));
+    const m1 = mk('div', 'pt-meter'); m1.append(mk('span', '', `${t('Level')} ${lv}`), bar(lv >= C.MAX_LEVEL ? 1 : have / Math.max(1, need)), mk('b', '', lv >= C.MAX_LEVEL ? 'MAX' : `${Math.round(have)}/${Math.round(need)} XP`));
+    const m2 = mk('div', 'pt-meter'); m2.append(mk('span', '', t('Loyalty')), bar(p.ly / 100), mk('b', '', `${Math.round(p.ly)}/100`));
+    info.append(m1, m2);
+    const chips = mk('div', 'pt-chips');
+    chips.append(mk('span', 'pt-chip', `HP ${stt.maxHp}`), mk('span', 'pt-chip', `ATK ${stt.atk.toFixed(1)}`), mk('span', 'pt-chip', `SPD ${stt.spd.toFixed(1)}`));
+    info.append(chips, mk('div', 'pt-sub', `${t('Trait')}: ${t(tr.name)} - ${t(tr.desc)}`));
+    top.append(stage_, info);
+    // actions
+    const act = mk('div', 'pt-actions');
+    const treats = api.treats ? api.treats() : 0;
+    act.append(btn(p.id === s.active ? t('Active') : t('Summon'), () => msg(api.setActive(p.id)), p.id === s.active ? 'sel' : ''),
+      btn(`${t('Feed')} (${treats})`, () => msg(api.feed ? api.feed(p.id) : { ok: false, err: 'You need a Pet Treat.' }), treats > 0 ? '' : 'dis'),
       btn(t('Rename'), () => { const n = window.prompt(t('Rename'), p.nm); if (n) { api.rename(p.id, n); render(); } }),
       btn(t('Release'), () => { if (window.confirm(t('Release') + ' ' + p.nm + '?')) { api.release(p.id); sel = null; render(); } }));
-    a.appendChild(row);
-    if (api.setMode) {   // [finish] behaviour: follow / stay / fetch / guard + delivery (keys O, Shift+O; command L)
-      const mr = mk('div', 'pt-row');
+    det.append(top, act);
+    if (api.setMode) {   // behaviour: follow / stay / fetch / guard + delivery (keys O, Shift+O; command L)
+      const mr = mk('div', 'pt-actions');
+      mr.append(mk('span', 'pt-note', `${t('Pet mode: {m}').replace('{m}', '').trim()} [O]`));
       for (const m of C.MODES) mr.append(btn(t(m), () => { api.setMode(m); sfx(); render(); }, api.mode() === m ? 'sel' : ''));
-      const dr = mk('div', 'pt-row');
+      const dr = mk('div', 'pt-actions');
+      dr.append(mk('span', 'pt-note', `${t('Deliver to: {d}').replace('{d}', '').trim()} [Shift+O]`));
       for (const d of ['me', 'ship']) dr.append(btn(t(d), () => { api.setDest(d); sfx(); render(); }, (s.dest === 'ship' ? 'ship' : 'me') === d ? 'sel' : ''));
-      a.append(mk('div', 'pt-note', t('Pet mode: {m}').replace('{m}', '') + ' [O]'), mr, mk('div', 'pt-note', t('Deliver to: {d}').replace('{d}', '') + ' [Shift+O]  |  L'), dr);
+      det.append(mr, dr);
     }
-    b.append(mk('div', 'pt-h', t('Abilities')));
-    for (const ab of sp.abilities) b.append(mk('div', 'pt-ab' + (lv >= ab.lv ? '' : ' off'), `${t(ab.name)} (${t('Level')} ${ab.lv}) - ${t(ab.desc)}`));
+    // abilities + evolution
+    const cols = mk('div', 'pt-scroll'), a = mk('div'), b = mk('div');
+    a.append(mk('div', 'pt-h', t('Abilities')));
+    for (const ab of sp.abilities) a.append(mk('div', 'pt-ab' + (lv >= ab.lv ? '' : ' off'), `${t(ab.name)} (${t('Level')} ${ab.lv}) - ${t(ab.desc)}`));
     b.append(mk('div', 'pt-h', t('Evolution')));
     for (const e of C.evolutionTree(p.sp)) b.append(mk('div', 'pt-row' + (stage >= e.stage ? ' pt-gold' : ''), `${e.stage >= 1 ? '●' : ''} ${t(e.name)} - ${t('Level')} ${e.lv}`));
-    cols.append(a, b); body.appendChild(cols);
+    b.append(mk('div', 'pt-note', t(sp.desc)));
+    cols.append(a, b); det.appendChild(cols);
   }
 
   function nestTab(body) {
@@ -155,5 +199,5 @@ export function createPetsPanel({ game, api, tab } = {}) {
   }
   render();
   void tf;
-  return { el: root, dispose() { /* nothing to release */ }, render };
+  return { el: root, dispose() { try { studio.dispose(); } catch { /* */ } portraits.clear(); }, render };
 }

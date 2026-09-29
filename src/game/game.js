@@ -161,6 +161,8 @@ import { installCycle } from './cycle.js';   // [cycle] inert: rules only, see d
 
 import { installWorlds2 } from './worlds2.js';   // wave 3: Soviet raids + twin-sun planet + plasma blade + fauna + loot pacing (docs/wave3/worlds2.md)
 
+import { installPolish4 } from './polish4.js';   // wave 4: pet egg drops, ship decals + furniture, cantina barter, maw / squad fixes (docs/wave4/polish4.md)
+
 
 // [import:ux]
 
@@ -328,6 +330,8 @@ export class Game extends Emitter {
 
 
     this.useModule('worlds2', installWorlds2);   // [worlds2]
+
+    this.useModule('polish4', installPolish4);   // [polish4]
 
 
     // [slot:ux]
