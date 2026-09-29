@@ -12,6 +12,7 @@
 import * as THREE from 'three';
 import { registerCreature, CREATURES, EXTRA_SPAWNS, AFFIXES, canSpawnMore } from './creatures.js';
 import { STATE_SOUNDS } from '../entities/creatures.js';
+import { atClaim, atRelease } from './aimtell.js';   // wave 5: shooter group limit
 import { addTranslations, t } from '../core/i18n.js';
 import { angleDiff, clamp } from '../core/util.js';
 import { tierIndex } from './tiers.js';
@@ -158,12 +159,9 @@ function archerFire(c, tgt, M) {
   const g = M.game, S = shared(M), d = c.data;
   const fx = Math.sin(c.yaw), fz = Math.cos(c.yaw);
   _a.set(c.pos.x + fx * 0.35, c.pos.y + 1.4, c.pos.z + fz * 0.35);
-  // lead the target by its measured velocity (weak early), aim at the chest
-  const now = g.time || 0, tp = d.tp;
-  let vx = 0, vz = 0;
-  if (tp && now - tp.t > 0.05) { vx = (tgt.pos.x - tp.x) / (now - tp.t); vz = (tgt.pos.z - tp.z) / (now - tp.t); }
-  const flight = Math.min(1.2, hd(tgt.pos, c.pos) / TUNING.archerSpeed) * archerLead(sectorOf(M));
-  _b.set(tgt.pos.x + vx * flight, tgt.pos.y + (tgt.crouch ? 0.6 : 1.05), tgt.pos.z + vz * flight);
+  // wave 5 (aimtell): the arrow flies to the point LOCKED at 65 % of the draw - no velocity lead, no tracking: sidestepping the arrow works
+  const tp = d.tp;
+  _b.set(tp ? tp.x : tgt.pos.x, tgt.pos.y + (tgt.crouch ? 0.6 : 1.05), tp ? tp.z : tgt.pos.z);
   const v = aimVelocity(_a, _b);
   const pr = { id: ++S.seq, shooter: c.id, x: _a.x, y: _a.y, z: _a.z, vx: v.vx, vy: v.vy, vz: v.vz, t: 0, ty: c.seed % 2, dmg: c.dmg, zone: c.zone };
   S.proj.push(pr);
@@ -175,10 +173,10 @@ BEHAVIORS.skel_archer = function archerBehavior(c, dt, M) {
   if (c.state === 'throw') { if (c.t > 0.4) c.setState('idle'); return; }
   const tgt = acquire(c, dt, M, { sight: 22, fov: 150, hearR: 14, leash: 30, lose: 6 });
   if (c.state === 'draw') {
-    if (!tgt || c.age < 1) { c.setState('idle'); return; }
+    if (!tgt || c.age < 1) { atRelease(c, M); c.setState('idle'); return; }
     // the aim tracks the target until 65 % of the wind-up, then it is locked: that is the dodge window
     if (c.t < d.windup * 0.65) { faceTo(c, tgt.pos.x, tgt.pos.z, dt, 3.4); d.tp = { x: tgt.pos.x, z: tgt.pos.z, t: now }; }
-    if (c.t >= d.windup) { archerFire(c, tgt, M); c.cooldown = archerCooldown(sectorOf(M), rnd()); c.setState('throw'); }
+    if (c.t >= d.windup) { archerFire(c, tgt, M); atRelease(c, M); c.cooldown = archerCooldown(sectorOf(M), rnd()); c.setState('throw'); }
     return;
   }
   if (!tgt) { roam(c, dt, M, 12, 2 + rnd() * 3); if (c.state === 'walk') rattle(c, M, now); return; }
@@ -209,7 +207,7 @@ BEHAVIORS.skel_archer = function archerBehavior(c, dt, M) {
     return;
   }
   faceTo(c, tgt.pos.x, tgt.pos.z, dt, 5);
-  if (c.cooldown <= 0 && c.age >= 1) {
+  if (c.cooldown <= 0 && c.age >= 1 && atClaim(c, M)) {   // wave 5: max 1-2 archers drawing at once (group limit)
     d.windup = archerWindup(sectorOf(M), tierIndex(c.tier || 'common'));
     d.tp = { x: tgt.pos.x, z: tgt.pos.z, t: now };
     c.setState('draw');

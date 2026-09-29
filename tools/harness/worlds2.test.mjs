@@ -147,11 +147,11 @@ await ok('Tusked Beast at night charges without provocation; hitting it makes th
   c2.data.hitAt = W2.g.time + 0.1; c2.data.hitBy = 'p2'; W2.g.time += 0.2; W2.step(c2, 2); p2.pos.set(c2.pos.x + 6, 0, c2.pos.z); W2.step(c2, 4);
   assert.ok(['windup', 'charge'].includes(c2.state), 'provoked: ' + c2.state);
 });
-await ok('Scavenger Raider: aims 0.85 s before shooting, tracer fx, reloads after 5, camp alert, keeps distance', () => {
+await ok('Scavenger Raider: telegraphed aim (wave 5: 0.8-1.4 s + lock, 2-4 s between shots), tracer fx, reloads after 5, camp alert, keeps distance', () => {
   const W = fakeWorld(); const p = W.player('p1', 12, 0); const a = W.mk('scavraider', 0, 0), b = W.mk('scavraider', 4, 3);
   W.step(a, 1); assert.equal(a.state, 'aim'); assert.ok(b.data.alert, 'the camp answers');
   assert.equal(W.g.net.sent.filter(([, d]) => d.k === 'hshot').length, 0, 'no shot during the telegraph');
-  for (let i = 0; i < 400 && a.data.mag > 0 && a.state !== 'reload'; i++) { W.step(a, 1); p.pos.set(12, 0, 0); }
+  for (let i = 0; i < 1600 && a.data.mag > 0 && a.state !== 'reload'; i++) { W.step(a, 1); p.pos.set(12, 0, 0); }
   const shots = W.g.net.sent.filter(([, d]) => d.k === 'hshot');
   assert.ok(shots.length >= 5, 'fired ' + shots.length); assert.equal(a.state, 'reload');
   for (const [, d] of shots) assert.ok(d.a.length === 3 && d.b.length === 3 && (d.h === 0 || d.h === 1));

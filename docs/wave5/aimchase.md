@@ -1,0 +1,22 @@
+# Wave 5: aimchase (telegraphed NPC aim + escapable chases)
+
+Owner: "aimbot gibi olmasin, nereye aim aldigini gorelim, tam ates ederken kacabilelim" and "yaratiklardan kacabilelim, cok hizli kosuyorlar, gerilim versin" (MASTERPLAN 25.9, 25.13).
+
+## Part A: aimtell (`src/game/aimtell_core.js` pure, `src/game/aimtell.js` host helpers + client laser)
+State machine per shooter: idle -> AIM 0.8-1.4 s (thin red emissive laser, jitters then steadies, rising charge beeps, 3D audio) -> LOCK 0.25 s (laser white and frozen, sharp tone = "dodge now") -> FIRE at the LOCKED point (never at the current position) -> cooldown 2-4 s.
+- A shot hurts only if the target's chest is still within 0.9 m (horizontal) / 1.15 m (vertical) of the locked point AND the accuracy roll succeeds. A sprinter covers 2 m in the lock, so sidestepping/sprinting works.
+- Accuracy (`accuracy()`): 0.92 - 0.017 * dist (6 m 0.82, 20 m 0.58, 40 m 0.24), x0.6 sprinting (speed >= 6.4), x0.3 in cover (eye visible, legs blocked), x0.8 crouching, and up to x0.7 / +0.25 s aim / +0.8 s cooldown at quota 0 fading to none at quota 4.
+- Group limit (`AimGroup`, `maxFiring`): 1 shooter aims at once for quota < 2, 2 later. A denied shooter backs off 0.4-0.9 s. Claims expire after 4 s if never released.
+- Sync: no new net message. State `aim` (`alert` for sentries) + the existing creature `extra` string: `"pid"` while aiming, `"pid|x|y|z"` once locked. Every peer draws the laser from that (`installAimtell`, module `game.aimtell`); shots keep using the existing `hshot` fx.
+- Routed shooters: `hs_gunner` / `hs_leader` (creatures_wave1.js), `scavraider` (worlds2_creatures.js; voyage spawns the same type), `moderator` (frozen facing at lock, its own model laser + our white lock line), `h2_sentry` (homeworld2_ghost.js, one shot per cycle, damage scaled by the old rate), facility `turret` (entities/creatures.js: head tracks, freezes at lock, 3-round burst at the locked point; `extra` is the head yaw so no laser line, the head is the tell), `skel_archer` (group limit + arrow flies to the point locked at 65 % of the draw, no velocity lead). The old horde.js soldier laser is disabled in favour of the shared one. Siege towers shoot creatures, not players: untouched. Bosses keep their own scripted rocket lock-on.
+- Knobs: `AIM_T` and `accuracy()` in aimtell_core.js.
+
+## Part B: chase tuning (`src/game/chase_tuning.js`, applied in `CreatureManager.follow()`)
+Single table `TUNING`: sustained 7.0 m/s (< sprint 8.2); fast hunters (def.run or walk > 7.0) get a 2.2 s burst up to 9.4 (jester 9.5/2.6 s, lurker 2.0 s, ...), then 3 s tired at 4.2 m/s (slower than walking), then 6 s at sustained speed, then the burst returns (cycle average ~6.7 m/s). Not running for 1.5 s refills the burst. Fast movers turn at 4.2 rad/s (vs 8) and lose speed to 0.16 when not facing the path (wide corners). A chasing creature stops 1-2 s (0.4-0.8 s for slow ones) when a shut door is in its face, once per closing. Exempt: `boss`, `hazard`, `sandkefal`. `def.run` is still what a behaviour ASKS for; the table decides what it GETS, so creatures registered by any module are covered. The early-sector `balance.speedCap` still applies first.
+Tension (client, `src/game/chase.js`, module `game.chasefx`): screen-edge red-black vignette whose opacity and pulse rate follow the nearest chasing creature (0 beyond 28 m, full at 3 m; pulse interval 1.05 -> 0.42 s, same as the director heartbeat). The director's existing heartbeat sound already scales with chaser distance, so no second sound layer was added.
+
+## Tests
+`node tools/harness/aimchase.test.mjs` (timings, lock, no-tracking, accuracy table, group limit, encoding, every registered non-boss creature not catching a sprinter within 10 s at a 4 m gap, also with real stamina at 8 m, burst/fatigue maths, door pause, tension). `worlds2.test.mjs` raider test updated for the slower fire rate. Also green: skeletons, homeworld2_install, polish4_install, maps5_install, horror_install, cycle2_bosses/flow, gameplay2; `npm run build`.
+
+## Known gaps
+Not run in a browser (lead said skip): laser look, beep balance and vignette strength are unverified by eye. Creatures whose AI moves with `placeAt` directly (not via `follow`) are not capped (mostly short lunges). Only creatures registered by install-time modules were checked through the runtime cap, not enumerated in the test. Turret has no laser line. Moderator keeps two red lasers' worth of look (model + lock line only).

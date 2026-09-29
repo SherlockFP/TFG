@@ -220,3 +220,6 @@ The new core loop exists end to end in code (partition, capture, fortify, capped
 
 ## Wave 5 - chess3d (docs/wave5/chess3d.md)
 3D chess / dama on the table with instanced lathe pieces, drag + click picking, animated moves. Honest limits: never looked at on screen after the last fix (piece silhouettes, camera framing, HUD at 1280x720 unverified); no capture fade, no touch.
+
+## Wave 5 - aimchase (docs/wave5/aimchase.md)
+NPC shooters now telegraph (laser, white lock, fire at the locked point) and creatures obey one speed table (sustained < sprint, short bursts, fatigue, door hesitation); only node-tested, laser/vignette look and difficulty feel are unverified in a browser.
