@@ -63,7 +63,7 @@ export function newCycle() {
 const clone = (c) => ({ ...c, firstKills: { ...(c.firstKills || {}) }, endless: c.endless ? { ...c.endless, mutators: [...(c.endless.mutators || [])] } : null });
 
 /**
- * Events: quotaMet | land | bossKilled | coreEnd{reason: lever|alldead|recall|midnight} | dayEnd | fired | endlessAccept | endlessDecline | load
+ * Events: quotaMet | land | bossKilled | coreEnd{reason: lever|alldead|recall|midnight} | dayEnd | fired | endlessAccept | endlessDecline | endlessExit | load
  * Stage flow (details in docs/wave2/cycle.md):
  *   days --quotaMet--> gate --land--> core --coreEnd(boss dead)--> days (sector+1, chest)
  *                                     core --coreEnd(no kill, 1st)--> grace --dayEnd--> gate
@@ -108,6 +108,9 @@ export function step(cy0, ev) {
       break;
     case 'endlessDecline':
       cy.declined = true; break;
+    case 'endlessExit':   // CASH OUT: back to the classic loop, the cores counter restarts (PATCH 1.0 can be offered again after 3 more cores)
+      if (cy.mode === 'endless') { cy.mode = 'classic'; cy.stage = 'days'; cy.endless = null; cy.cores = 0; cy.declined = false; cy.fails = 0; cy.bossDead = false; fx.push({ k: 'endlessEnd' }); }
+      break;
     case 'load':   // a run loaded from a save can never resume in the middle of a core day: treat it as not started
       if (cy.stage === 'core') { cy.stage = 'gate'; cy.bossDead = false; }
       break;

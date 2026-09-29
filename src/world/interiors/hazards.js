@@ -510,7 +510,7 @@ export function buildHazards(ctx) {
   // ---------------------------------------------------------------------------- breaker rooms
   if (theme !== 'mineshaft') {   // mine walls are buried in rock decoration
     const want = size >= 1.6 ? 2 : 1;
-    const cand = rBreak.shuffle(L.rooms.filter((r) => !SPECIAL_ROOMS.has(r.type) && !r.hub && r.type !== 'nest' && K.roomDist(r) >= 4 && r.w * r.h >= 4));
+    const cand = rBreak.shuffle(L.rooms.filter((r) => !SPECIAL_ROOMS.has(r.type) && !r.arena && !r.maze && !r.hub && r.type !== 'nest' && K.roomDist(r) >= 4 && r.w * r.h >= 4));
     for (const r of cand) {
       if (hz.breakers.length >= want) break;
       const rc = K.roomRect(r);
@@ -612,7 +612,7 @@ export function buildHazards(ctx) {
   if (theme !== 'mineshaft') {
     const want = size >= 1.6 ? 2 : 1;
     const ends = [];
-    for (const r of rVent.shuffle(L.rooms.filter((q) => !SPECIAL_ROOMS.has(q.type) && K.roomDist(q) >= 2))) {
+    for (const r of rVent.shuffle(L.rooms.filter((q) => !SPECIAL_ROOMS.has(q.type) && !q.arena && !q.maze && K.roomDist(q) >= 2))) {
       const rr = rVent.fork('v' + r.id);
       for (const w of rr.shuffle(K.solidWalls(r))) {
         if (K.cellHasDoorway(w.x, w.z)) continue;

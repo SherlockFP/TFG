@@ -39,10 +39,19 @@ function layoutRules(theme) {
 }
 
 export const MAX_FACILITY_SIZE = 2.6;
-export function generateLayout(seed, theme = 'factory', size = 1) {
+// opts (optional, all deterministic; used by Sector Cores / Raids / Keystones, src/game/cycle_plan.js):
+//   plan 'wings'   force the wing plan on themes that use plain rooms (open / wing themes keep theirs)
+//   roomMul n      multiplies the room target          wings n       2-3 wing zones (BFS clusters from far-apart seeds)
+//   labyrinth n    n maze rooms (a big room whose walls are put back as a perfect maze + a few loops)
+//   arena true     a big dead-end room behind ONE locked door (needs `keys` from the mini-bosses) = the boss arena
+// Extra output: layout.wings / wingOf / areas / areaOf (zones: lobby, wing, labyrinth, arena), layout.arena, layout.mazes.
+export function generateLayout(seed, theme = 'factory', size = 1, opts = null) {
   if (!isInteriorTheme(theme)) theme = 'factory';
   size = Math.min(MAX_FACILITY_SIZE, Math.max(0.5, Number(size) || 1));
   const R = layoutRules(theme);
+  const O = opts && typeof opts === 'object' ? opts : {};
+  if (O.plan === 'wings' && R.plan === 'rooms') R.plan = 'wings';
+  if (O.roomMul > 0) R.roomMul = (R.roomMul || 1) * O.roomMul;
   const legacy = theme === 'factory' || theme === 'mansion' || theme === 'mineshaft';
   const rng = new RNG((seed ^ 0x51f0a3) >>> 0);
   const W = Math.round(24 + size * 14);
@@ -113,6 +122,16 @@ export function generateLayout(seed, theme = 'factory', size = 1) {
       const x = Math.round(W / 2 - w / 2 + rng.int(-Math.floor(W / 5), Math.floor(W / 5)));
       const z = Math.round(H * 0.42 - h / 2 + rng.int(-Math.floor(H / 6), Math.floor(H / 6)));
       if (canPlace(x, z, w, h)) { addRoom(x, z, w, h, R.hub.type).hub = true; break; }
+    }
+  }
+
+  // labyrinth rooms (opts.labyrinth): big rooms placed before the random fill, turned into mazes after the corridors exist
+  const mazeRooms = [];
+  for (let m = 0; m < (O.labyrinth | 0); m++) {
+    for (let a = 0; a < 120; a++) {
+      const w = rng.int(6, 7), h = rng.int(5, 6);
+      const x = rng.int(1, W - w - 1), z = rng.int(1, H - h - 7);
+      if (canPlace(x, z, w, h)) { const r = addRoom(x, z, w, h, 'big'); r.maze = true; mazeRooms.push(r); break; }
     }
   }
 
@@ -272,6 +291,35 @@ export function generateLayout(seed, theme = 'factory', size = 1) {
     carve(lx, lz, best.i % W, (best.i / W) | 0);
   }
 
+  // labyrinth: drop every inner opening of a maze room and grow a random spanning tree (+ ~12 % loops) over its cells.
+  // Corridors that used to cross the room stay connected through the maze; the room keeps all its outside links.
+  for (const mr of mazeRooms) {
+    for (let zz = mr.z; zz < mr.z + mr.h; zz++) for (let xx = mr.x; xx < mr.x + mr.w; xx++) {
+      if (xx < mr.x + mr.w - 1) open.delete(edgeKey(xx, zz, 0));
+      if (zz < mr.z + mr.h - 1) open.delete(edgeKey(xx, zz, 1));
+    }
+    const inRoom = (xx, zz) => xx >= mr.x && xx < mr.x + mr.w && zz >= mr.z && zz < mr.z + mr.h;
+    const seenM = new Set([idx(mr.x, mr.z)]);
+    const stackM = [[mr.x, mr.z]];
+    while (stackM.length) {
+      const [cx0, cz0] = stackM[stackM.length - 1];
+      const opts4 = [];
+      for (let d = 0; d < 4; d++) {
+        const nx = cx0 + [1, 0, -1, 0][d], nz = cz0 + [0, 1, 0, -1][d];
+        if (inRoom(nx, nz) && !seenM.has(idx(nx, nz))) opts4.push([nx, nz, d]);
+      }
+      if (!opts4.length) { stackM.pop(); continue; }
+      const [nx, nz, d] = opts4[rng.int(0, opts4.length - 1)];
+      open.add(edgeKey(cx0, cz0, d));
+      seenM.add(idx(nx, nz));
+      stackM.push([nx, nz]);
+    }
+    for (let k = 0; k < Math.round(mr.w * mr.h * 0.12); k++) {
+      const xx = rng.int(mr.x, mr.x + mr.w - 1), zz = rng.int(mr.z, mr.z + mr.h - 1), d = rng.int(0, 1);
+      if (inRoom(xx + (d === 0 ? 1 : 0), zz + (d === 1 ? 1 : 0))) open.add(edgeKey(xx, zz, d));
+    }
+  }
+
   // open plan: put wall runs back inside the open zones (liminal maze), never disconnecting anything
   if (R.plan === 'open') {
     let total = reach().count;
@@ -332,7 +380,7 @@ export function generateLayout(seed, theme = 'factory', size = 1) {
         if (!inb(ox, oz)) continue;
         const c = cells[idx(ox, oz)];
         if (!c) continue;
-        { const ro = roomOf[idx(ox, oz)]; if (ro >= 0 && ['entrance', 'vault', 'generator', 'core'].includes(rooms[ro].type)) continue; }
+        { const ro = roomOf[idx(ox, oz)]; if (ro >= 0 && (['entrance', 'vault', 'generator', 'core', 'arena'].includes(rooms[ro].type) || rooms[ro].maze)) continue; }
         if (distOf[idx(ox, oz)] < 4) continue;
         cand.push({ x, z, ox, oz, ix, iz, dir, dist: distOf[idx(ox, oz)] });
       }
@@ -347,6 +395,9 @@ export function generateLayout(seed, theme = 'factory', size = 1) {
     for (let zz = c.z; zz < c.z + h; zz++) for (let xx = c.x; xx < c.x + w; xx++) if (distOf[idx(xx, zz)] < 0) distOf[idx(xx, zz)] = c.dist + 2;
     return r;
   };
+  // boss arena (opts.arena): the deepest free spot gets a big dead-end room; its only door is locked (mini-boss keys)
+  let arenaRoom = null;
+  if (O.arena) for (const [aw, ah] of [[7, 6], [6, 5], [5, 4], [4, 4], [3, 3]]) { arenaRoom = attach('arena', aw, ah); if (arenaRoom) break; }
   const vaultCount = size >= 2.2 ? 3 : size >= 1.3 ? 2 : 1;
   for (let i = 0; i < vaultCount; i++) attach('vault', 2, 2);
   const genRoom = attach('generator', 2, 2) || rng.pick(rooms.filter((r) => r.type === 'small'));
@@ -354,6 +405,8 @@ export function generateLayout(seed, theme = 'factory', size = 1) {
   // containment chamber (facility systems: the CORE sits here behind a powered containment door)
   const coreRoom = attach('core', 3, 3) || attach('core', 2, 2);
 
+  // the arena is typed like any big room of the theme (its style + props), flagged for the boss code
+  if (arenaRoom) { arenaRoom.arena = true; arenaRoom.type = 'big'; }
   // assign room types
   const types = R.types;
   for (const r of rooms) {
@@ -371,6 +424,7 @@ export function generateLayout(seed, theme = 'factory', size = 1) {
       if (theme === 'mineshaft') h = mineshaftRoomHeight(r.type, rng);
     } else h = R.roomHeight ? R.roomHeight(r.type, rng) : 4.4;
     if (r.type === 'vault' || r.type === 'generator') h = 4;
+    if (r.arena) h = Math.max(h, 6.4);
     if (r.type === 'core') h = 5.2;
     r.height = Math.round(h * 10) / 10;
     for (let zz = r.z; zz < r.z + r.h; zz++) for (let xx = r.x; xx < r.x + r.w; xx++) heightOf[idx(xx, zz)] = r.height;
@@ -393,11 +447,14 @@ export function generateLayout(seed, theme = 'factory', size = 1) {
   }
   const treasureEdges = new Set();
   {
-    const cand = rooms.filter((r) => r.links === 1 && !r.hub && !['entrance', 'vault', 'generator', 'core'].includes(r.type) && r.w * r.h <= 16 && distOf[idx(r.cx, r.cz)] >= 5);
+    const cand = rooms.filter((r) => r.links === 1 && !r.hub && !r.arena && !r.maze && !['entrance', 'vault', 'generator', 'core'].includes(r.type) && r.w * r.h <= 16 && distOf[idx(r.cx, r.cz)] >= 5);
     rng.shuffle(cand);
     const nTreasure = size >= 1.6 ? 2 : 1;
     for (const r of cand.slice(0, nTreasure)) { r.treasure = true; treasureEdges.add(r.linkKeys[0]); }
   }
+
+  const arenaEdges = new Set();
+  if (arenaRoom && arenaRoom.linkKeys.length) arenaEdges.add(arenaRoom.linkKeys[0]);
 
   // ---- edges: doors/arches ----
   const edgeInfo = new Map();
@@ -421,6 +478,8 @@ export function generateLayout(seed, theme = 'factory', size = 1) {
       info = { type: 'contain', width: 3.0, doorH: Math.round(Math.min(3.1, Math.min(heightOf[a], heightOf[b]) - 0.15) * 100) / 100 };
     } else if (special) {
       info = { type: 'vault', width: 2.6, doorH: 2.8 };
+    } else if (arenaEdges.has(key)) {
+      info = { type: 'door', width: 1.35, doorH: 2.35, locked: true, arena: true };
     } else if (treasureEdges.has(key)) {
       info = { type: 'door', width: 1.35, doorH: 2.35, locked: true, treasure: true };
     } else {
@@ -441,7 +500,7 @@ export function generateLayout(seed, theme = 'factory', size = 1) {
 
   // fire exits: far rooms, closed wall facing outward
   const fireExits = [];
-  const farRooms = rooms.filter((r) => !['entrance', 'vault', 'generator', 'core'].includes(r.type) && !r.treasure)
+  const farRooms = rooms.filter((r) => !['entrance', 'vault', 'generator', 'core'].includes(r.type) && !r.treasure && !r.arena)
     .map((r) => ({ r, d: distOf[idx(r.cx, r.cz)] })).sort((a, b) => b.d - a.d);
   const nFire = size >= 2 ? 3 : size >= 1.2 ? 2 : 1;
   const wallOut = (xx, zz) => {
@@ -489,7 +548,7 @@ export function generateLayout(seed, theme = 'factory', size = 1) {
   // containment chamber, treasure rooms) must be reachable from the main entrance or a fire exit that has an outdoor
   // twin. Locked doors on the frontier of the reachable region are unlocked (lowest edge key first) until it holds.
   const outdoorFires = size >= 1.2 ? 2 : 1;   // terrain.js planMoon places this many outdoor fire exits
-  const sealedRoomId = (ri) => ri >= 0 && (rooms[ri].type === 'vault' || rooms[ri].type === 'core' || !!rooms[ri].treasure);
+  const sealedRoomId = (ri) => ri >= 0 && (rooms[ri].type === 'vault' || rooms[ri].type === 'core' || !!rooms[ri].treasure || !!rooms[ri].arena);
   const blocks = (inf) => !!inf && (inf.type === 'vault' || inf.type === 'contain' || (inf.type === 'door' && inf.locked));
   const sources = [idx(ent.cx, ent.cz), ...fireExits.slice(0, outdoorFires).map((f) => idx(f.cellX, f.cellZ))];
   const reachLocked = () => {
@@ -516,18 +575,92 @@ export function generateLayout(seed, theme = 'factory', size = 1) {
     if (!missing) break;
     let best = null;
     for (const inf of doors) {
-      if (inf.type !== 'door' || !inf.locked || inf.treasure || seen[inf.a] === seen[inf.b]) continue;
+      if (inf.type !== 'door' || !inf.locked || inf.treasure || inf.arena || seen[inf.a] === seen[inf.b]) continue;
       if (!best || inf.key < best.key) best = inf;
     }
     if (!best) break;
     best.locked = false; best.unlockedByRule = true; unlockedByRule++;
   }
 
+  // ---- zones (areas): lobby / wings (multi-source BFS clusters over the open edges) / labyrinth / arena ----
+  // Always computed (cheap); wings only when opts.wings asks for them. areaOf[cell] = index into areas (-1 = none).
+  const areas = [{ id: 0, kind: 'lobby', name: 'LOBBY', rooms: [ent.id] }];
+  const areaOf = new Int8Array(W * H).fill(-1);
+  const wings = [];
+  {
+    const isSpecial = (r) => ['entrance', 'vault', 'generator', 'core'].includes(r.type) || !!r.treasure || !!r.arena;
+    const nWings = Math.max(0, Math.min(3, O.wings | 0));
+    const wingCell = new Int8Array(W * H).fill(-1);
+    if (nWings) {
+      let cand = rooms.filter((r) => !isSpecial(r) && r.w * r.h >= 4 && distOf[idx(r.cx, r.cz)] >= 4);
+      if (cand.length < nWings) cand = rooms.filter((r) => !isSpecial(r) && r.w * r.h >= 4 && distOf[idx(r.cx, r.cz)] >= 2);
+      const seeds = [];
+      const dOf = (r) => distOf[idx(r.cx, r.cz)];
+      const deepest = cand.slice().sort((a, b) => dOf(b) - dOf(a) || a.id - b.id)[0];
+      if (deepest) seeds.push(deepest);
+      while (seeds.length < nWings) {
+        let best = null;
+        for (const r of cand) {
+          if (seeds.includes(r)) continue;
+          let d = Infinity;
+          for (const sd of seeds) d = Math.min(d, Math.abs(sd.cx - r.cx) + Math.abs(sd.cz - r.cz));
+          if (!best || d > best.d || (d === best.d && r.id < best.r.id)) best = { r, d };
+        }
+        if (!best) break;
+        seeds.push(best.r);
+      }
+      const queue = [];
+      seeds.forEach((sd, i) => { const c = idx(sd.cx, sd.cz); wingCell[c] = i; queue.push(c); });
+      for (let qh = 0; qh < queue.length; qh++) {
+        const i = queue[qh], x = i % W, z = (i / W) | 0;
+        for (let d = 0; d < 4; d++) {
+          const nx = x + [1, 0, -1, 0][d], nz = z + [0, 1, 0, -1][d];
+          if (!inb(nx, nz)) continue;
+          const j = idx(nx, nz);
+          if (!cells[j] || wingCell[j] >= 0 || !open.has(edgeKey(x, z, d))) continue;
+          wingCell[j] = wingCell[i];
+          queue.push(j);
+        }
+      }
+      seeds.forEach((sd, i) => { wings.push({ id: i, area: areas.length, name: 'WING ' + 'ABC'[i], kind: 'wing', seed: sd.id, rooms: [], keyRoom: null }); areas.push(wings[i]); });
+    }
+    for (let i = 0; i < W * H; i++) {
+      if (!cells[i]) continue;
+      if (wingCell[i] >= 0 && wings[wingCell[i]]) areaOf[i] = wings[wingCell[i]].area;
+      if (distOf[i] >= 0 && distOf[i] <= 2) areaOf[i] = 0;
+    }
+    for (const mr of mazeRooms) {
+      const ai = areas.length;
+      areas.push({ id: ai, area: ai, kind: 'labyrinth', name: 'LABYRINTH', rooms: [mr.id] });
+      for (let zz = mr.z; zz < mr.z + mr.h; zz++) for (let xx = mr.x; xx < mr.x + mr.w; xx++) areaOf[idx(xx, zz)] = ai;
+    }
+    if (arenaRoom) {
+      const ai = areas.length;
+      areas.push({ id: ai, area: ai, kind: 'arena', name: 'BOSS ARENA', rooms: [arenaRoom.id] });
+      for (let zz = arenaRoom.z; zz < arenaRoom.z + arenaRoom.h; zz++) for (let xx = arenaRoom.x; xx < arenaRoom.x + arenaRoom.w; xx++) areaOf[idx(xx, zz)] = ai;
+    }
+    for (const r of rooms) {
+      r.areaIdx = areaOf[idx(r.cx, r.cz)];
+      const w = wings.find((x) => x.area === wingCell[idx(r.cx, r.cz)] + 1 && wingCell[idx(r.cx, r.cz)] >= 0);
+      if (w && !isSpecial(r)) { r.wing = w.id; w.rooms.push(r.id); }
+    }
+    // a wing's key room is its deepest ordinary room; a wing that holds a maze keeps the key in the maze heart
+    for (const w of wings) {
+      const inW = rooms.filter((r) => r.wing === w.id && r.w * r.h >= 4);
+      const maze = inW.find((r) => r.maze);
+      const deep = inW.slice().sort((a, b) => distOf[idx(b.cx, b.cz)] - distOf[idx(a.cx, a.cz)] || a.id - b.id)[0];
+      w.keyRoom = (maze || deep || rooms[w.seed]).id;
+      w.hasMaze = !!maze;
+    }
+  }
+  const keyRooms = wings.slice().sort((a, b) => (b.hasMaze ? 1 : 0) - (a.hasMaze ? 1 : 0) || a.id - b.id).map((w) => w.keyRoom);
+
   const layoutOut = {
     seed, theme, size, w: W, h: H, cell: CELL, cells, roomOf, heightOf, open, rooms, edgeInfo, doors, fireExits,
     entrance: { room: ent, key: entKey }, distOf, edgeKey, idx, corridorH, plan: R.plan, zoneMask, spines,
     ox: -W * CELL / 2, oz: -H * CELL / 2, y: FACILITY_Y,
     core: coreRoom || null, generator: genRoom || null, outdoorFires, entrySources: sources, unlockedByRule,
+    opts: O, arena: arenaRoom || null, mazes: mazeRooms, wings, keyRooms, areas, areaOf,
   };
   try { planMaps2(layoutOut); } catch (e) { layoutOut.m2 = null; console.warn('maps2 plan', e); }   // [maps2] retypes a few rooms (own RNG fork, cells / doors untouched)
   return layoutOut;
@@ -826,7 +959,8 @@ export function buildFacility(layout, { physics, lightPool }) {
 
   // rooms
   for (const r of L.rooms) {
-    const st = theme.rooms[r.type] || theme.rooms.office;
+    let st = theme.rooms[r.type] || theme.rooms.office;
+    if (r.maze) st = { ...st, rows: null, grid: null, center: null, clutter: [], webs: false, wall_: [], reactor: false };   // labyrinth: nothing may block a maze corridor
     const x0 = wx(r.x), z0 = wz(r.z), x1 = wx(r.x + r.w), z1 = wz(r.z + r.h);
     const rcx = (x0 + x1) / 2, rcz = (z0 + z1) / 2;
     // Deep rooms get a readable landmark so navigation is not just an endless sequence of boxes.
@@ -997,10 +1131,11 @@ export function buildFacility(layout, { physics, lightPool }) {
     // scrap spots in room (none in the containment chamber: the CORE is its only prize)
     const spots = r.type === 'core' ? 0 : Math.max(2, Math.round(r.w * r.h * 0.9));
     for (let k = 0; k < spots; k++) {
-      const px = rng.float(x0 + 0.8, x1 - 0.8), pz = rng.float(z0 + 0.8, z1 - 0.8);
+      let px = rng.float(x0 + 0.8, x1 - 0.8), pz = rng.float(z0 + 0.8, z1 - 0.8);
+      if (r.maze) { px = wx(r.x + rng.int(0, r.w - 1)) + C / 2 + rng.float(-1.2, 1.2); pz = wz(r.z + rng.int(0, r.h - 1)) + C / 2 + rng.float(-1.2, 1.2); }   // labyrinth: never inside a maze wall
       scrapSpots.push({ x: px, y: Y, z: pz, room: r.id, type: r.type, dist: L.distOf[L.idx(r.cx, r.cz)] || 0, sealed: r.type === 'vault' || !!r.treasure });
     }
-    if (r.w * r.h >= 6 && !['vault', 'entrance', 'bathroom', 'core'].includes(r.type)) bigSpots.push({ x: rcx + rng.float(-1, 1), y: Y, z: rcz + rng.float(-1, 1), room: r.id, dist: L.distOf[L.idx(r.cx, r.cz)] || 0 });
+    if (r.w * r.h >= 6 && !['vault', 'entrance', 'bathroom', 'core'].includes(r.type)) bigSpots.push({ x: (r.maze ? wx(r.cx) + C / 2 : rcx) + rng.float(-1, 1), y: Y, z: (r.maze ? wz(r.cz) + C / 2 : rcz) + rng.float(-1, 1), room: r.id, dist: L.distOf[L.idx(r.cx, r.cz)] || 0 });
     // vents
     if (r.type !== 'entrance' && r.type !== 'vault' && r.type !== 'core' && wallSlots.length > 2 && rng.chance(0.55)) {
       const s = wallSlots[wallSlots.length - 1];

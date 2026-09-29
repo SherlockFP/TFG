@@ -117,7 +117,7 @@ export function planMaps2(L) {
     const sc = r.w * r.h * 1000 + Math.max(0, L.distOf[L.idx(r.cx, r.cz)] || 0);
     if (sc > bs) { bs = sc; lair = r; }
   }
-  const ordinary = (r) => !SPECIAL_ROOMS.has(r.type) && !r.treasure;
+  const ordinary = (r) => !SPECIAL_ROOMS.has(r.type) && !r.treasure && !r.arena && !r.maze;
   const facUsable = L.rooms.filter((r) => ordinary(r) && r.w * r.h >= 4).length;
   let budget = Math.min(5, Math.max(0, facUsable - 9));   // facsys needs >= 9 ordinary rooms for its panels / notes
   const pool = rng.shuffle(L.rooms.filter((r) => ordinary(r) && !r.hub && r.type !== 'nest' && r !== lair && r.w * r.h >= 4 && r.links >= 1));
@@ -478,7 +478,7 @@ export function buildRooms2(ctx) {
   }
 
   // ------------------------------------------------------------------------------------ interactable furniture
-  const dressRooms = () => rng.shuffle(L.rooms.filter((r) => !r.m2 && !SPECIAL_ROOMS.has(r.type) && !r.treasure && r.type !== 'nest' && r.w * r.h >= 4));
+  const dressRooms = () => rng.shuffle(L.rooms.filter((r) => !r.m2 && !SPECIAL_ROOMS.has(r.type) && !r.treasure && !r.arena && !r.maze && r.type !== 'nest' && r.w * r.h >= 4));
   const sceneLite = (r) => { const rc = K.roomRect(r); return { r, rc, doors: r.linkKeys.map((k) => linkInfo(L, K, r, k)), walls: rng.shuffle(K.perimeter(r).filter((e) => !K.edgeBusy(e.x, e.z, e.d) && !K.cellHasDoorway(e.x, e.z))) }; };
   const fp = (id) => SIZE2[id.replace('m2:', '')] || [0.6, 0.6];
   function furnish(id, count, opts = {}) {

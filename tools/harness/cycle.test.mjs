@@ -133,5 +133,14 @@ const top = C.insertLeaderboard(lb, { score: 1e9, depth: 99, at: 99 });
 ok(lb.length === 20 && lb[0].depth === 24 && top.rank === 1 && top.list.length === 20, 'leaderboard: best first, capped at 20');
 ok(C.scoreOf(10, 3, 5000) > C.scoreOf(9, 3, 5000) && C.scoreOf(5, 4, 0) > C.scoreOf(5, 3, 0), 'score: depth first, cores and sales break ties');
 
+// ---- cash out (wave 3): endlessExit returns to the classic loop, the cores counter restarts, only from endless
+{
+  let c = C.newCycle(); c.cores = 3;
+  c = C.step(c, { t: 'endlessAccept', baseQuota: 1000 }).cy;
+  const r = C.step(c, { t: 'endlessExit' });
+  ok(r.cy.mode === 'classic' && r.cy.stage === 'days' && r.cy.endless === null && r.cy.cores === 0 && r.cy.declined === false && r.fx[0].k === 'endlessEnd', 'endlessExit: back to classic, cores restart');
+  ok(C.step(C.newCycle(), { t: 'endlessExit' }).fx.length === 0, 'endlessExit outside endless does nothing');
+}
+
 console.log(fails ? `\n${fails} FAILED` : '\nall cycle checks passed');
 process.exit(fails ? 1 : 0);

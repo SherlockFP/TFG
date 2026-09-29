@@ -277,6 +277,7 @@ function generateMoon({ runKey, index, k, biome, tier, usedNames, safe, deep }) 
   if (biome === 'soviet') def.raid = { first: 190, every: 270, n: 3, factions: ['bureau', 'algorithm', 'archive', 'darkweb'] };   // wave 3: raid director (game/worlds2.js)
   if (biome === 'twinsun') def.cantina = true;
   if (interior !== wanted) def.wantedInterior = wanted;
+  if (deep && index >= 1) def.layoutOpts = { plan: 'wings', wings: 2, labyrinth: 1, kind: 'deep' };   // [cycle] the deepest server of every sector from sector 2: wings, a labyrinth and named zones (world/facility.js)
   // modifiers
   const M = R.fork('mods');
   const nMods = safe ? (M.chance(0.35) ? 1 : 0) : tier >= 3 ? M.int(0, 2) : (M.chance(0.5) ? 1 : 0);

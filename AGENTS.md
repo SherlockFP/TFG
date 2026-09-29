@@ -445,3 +445,12 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
 ### 5.15 Wave 3 - BACKROOMS2 (modules `backrooms`, `brcreatures`, `liminal`; docs/wave3/backrooms2.md; node-tested + builds, NOT run in a browser)
 - Finished the interrupted noclip pocket realm + entities (Smiler / Pale Hound / Partygoer / Moth) and merged them with the Level 0 overhaul (`brlevels`); slots `backrooms`, `brcreatures`, `liminal` are now installed in `game.js`.
 - New: `game.liminal` (VHS found-footage overlay in the pocket and in backrooms facilities, procedural 5-scene polaroid painter for `br_polaroid`), RU strings (`src/game/br_i18n_ru.js`), weighted pocket hunters. Tests: `tools/harness/br_pocket.test.mjs`, `br_i18n.test.mjs`.
+### 5.15 Wave 3 - cycle2: SECTOR CORE + 3 bosses + KEYSTONE + RAID + ENDLESS glue (module `cycle`, docs/wave3/cycle2.md; node-tested only, NOT run in a browser)
+- Quota met on the last day -> SECTOR GATE OPEN -> land on a generated core (`layoutOpts`: 3 wings, labyrinth, locked arena, elites, key holders that drop
+  ARENA ACCESS CARDS) -> boss chest + next sector; loss = grace day + retry, 2nd loss = shameful exit. Terminal `CORE`, `CYCLE`, `KEYSTONE`, `RAID`, `GATE`, `ENDLESS`, `CASHOUT`
+  (keystone / raid lines in the objectives from sector 2). New bosses: Load Balancer, Middle Manager, Comment Section Hydra + a generic kit engine (surgeon, host, excavator,
+  lobby manager, key holder). Endless mode (meter, patch notes, S-rank gates, cash out, leaderboard) wired to `cycle_core.js`. Default ON (`config.cycle !== false`).
+- `facility.js generateLayout(seed, theme, size, opts)` got wings / labyrinth / arena / zones options (default output identical); the deepest generated server of every sector (2+) uses wings + maze.
+- Wrappers on the host.js flow live in `src/game/cycle.js` (`hostEvaluateQuota / hostLever / hostSetPhase / hostPopulateMoon / hostBeginTakeoff / hostFinishTakeoff / hostUpdate`, `applyRunState`, `onPhase`, the `unlock` handler). Net: `cyx`, `cyreq`. State: `run.cycle`.
+- Tests: `node tools/harness/cycle.test.mjs`, `cycle2_plan.test.mjs`, `cycle2_bosses.test.mjs`, `cycle2_flow.test.mjs` (real host flow + fuzz + soft-lock proof), `cycle2_i18n.test.mjs`.
+- First job when a browser is available: land on a core of every interior, watch the 3 new boss fights (name card, HP bar, rings), open the arena with cards, run a keystone and a raid with 2 tabs.
