@@ -829,6 +829,7 @@ export class UI {
           check(t('Objective tracker'), 'showObjectives', null, true),
           check(t('Crosshair'), 'showCrosshair', null, true),
           check(t('Loading screen tips'), 'loadingTips', null, true),
+          check(t('Live stream chat feed'), 'a2Feed', t('fake viewers react to your stunts (cosmetic)'), true),   // [algo2]
           check(guidePick(GUIDE_UI.set_tips, getLang()), 'guideTips', guidePick(GUIDE_UI.set_tips_note, getLang()), true),   // [guide]
           row(guidePick(GUIDE_UI.set_replay, getLang()), this.button(guidePick(GUIDE_UI.set_replay, getLang()), () => {   // [guide]
             const gd = this.app.game?.guide;

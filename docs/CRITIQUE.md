@@ -223,3 +223,6 @@ The new core loop exists end to end in code (partition, capture, fortify, capped
 
 ## Wave 5 - aimchase (docs/wave5/aimchase.md)
 NPC shooters now telegraph (laser, white lock, fire at the locked point) and creatures obey one speed table (sustained < sprint, short bursts, fatigue, door hesitation); only node-tested, laser/vignette look and difficulty feel are unverified in a browser.
+
+## Wave 6 - algo2 (docs/wave6/algo2.md)
+Live-stream hype (tiers -> Clout + sponsor crate, "wants more show"), ghost replay of a dead player last 10 s, glitch exploits with a patch meter and punishment. Honest limits: node-tested only; the ghost is re-anchored to a spot relative to the entrance because layouts change every landing (a replayed path may cross walls); the "wall" glitch is a paired teleport; dodge detection is heuristic; chat / ghost / glitch visuals never looked at by a human at 1280x720.
