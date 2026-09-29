@@ -64,6 +64,10 @@ export class Input {
   }
   lock() {
     if (this.locked) return;
+    // [ctrlw] fullscreen on play (Settings: fullscreenPlay, default on): lets Keyboard Lock catch Ctrl+W instead of closing the tab
+    if (this.settings.fullscreenPlay !== false && !document.fullscreenElement && document.documentElement.requestFullscreen) {
+      try { document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(() => {}); } catch { /* not allowed */ }
+    }
     try {
       const p = this.canvas.requestPointerLock({ unadjustedMovement: true });
       if (p && p.catch) p.catch(() => { try { const q = this.canvas.requestPointerLock(); if (q && q.catch) q.catch(() => this.onLockFail?.()); } catch { this.onLockFail?.(); } });

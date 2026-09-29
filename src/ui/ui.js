@@ -842,6 +842,8 @@ export class UI {
         body.append(section(t('General')), row(t('Language'), lang),
           section(t('Comfort')),
           check(t('Reduce motion'), 'reduceMotion', t('less camera shake, bob and screen warp; calmer menus')),
+          check(t('Fullscreen when playing'), 'fullscreenPlay', t('stops Ctrl+W (crouch + forward) from closing the tab'), true),   // [ctrlw]
+          check(t('Ask before leaving the page'), 'confirmLeave', null, true),   // [ctrlw]
           check(t('Art direction'), 'artDir', t('Company stamps, memo ticker, animated logo and panel art. Off = plain panels'), true),   // [artdir]
           check(t('Head bob'), 'headBob', null, true),
           check(t('Avatars above name tags'), 'tagAvatars', t("small picture over teammates' heads"), true),   // [profile]

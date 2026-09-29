@@ -171,7 +171,6 @@ export class Session extends Emitter {
     this._watch.unref?.();
     if (typeof window !== 'undefined') {
       this._onUnload = () => { try { this.flush(); this.transport?.send({ t: 'bye' }); } catch { /* ignore */ } };
-      window.addEventListener('beforeunload', this._onUnload, true);
       window.addEventListener('pagehide', this._onUnload, true);
     }
   }
@@ -399,7 +398,7 @@ export class Session extends Emitter {
     clearInterval(this._watch); this._watch = null;
     for (const L of this.lost.values()) clearTimeout(L.timer);
     this.lost.clear();
-    if (typeof window !== 'undefined' && this._onUnload) { window.removeEventListener('beforeunload', this._onUnload, true); window.removeEventListener('pagehide', this._onUnload, true); }
+    if (typeof window !== 'undefined' && this._onUnload) { window.removeEventListener('pagehide', this._onUnload, true); }
     this.transport.leave(); this.clear();
   }
 }

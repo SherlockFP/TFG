@@ -153,7 +153,7 @@ export class LocalTransport extends BaseTransport {
       for (const id of [...this.peers]) if (now - (this.last.get(id) || 0) > 15000) { this.peers.delete(id); this.onPeerLeave?.(id); }
     }, 1000);
     this._unload = () => this.leave();
-    window.addEventListener('beforeunload', this._unload);
+    window.addEventListener('pagehide', this._unload);   // pagehide, not beforeunload: the leave-confirm dialog can be cancelled
     return this;
   }
   send(data, to) { this.ch?.postMessage({ t: 'msg', from: this.selfId, to: to || null, d: data }); }
@@ -167,7 +167,7 @@ export class LocalTransport extends BaseTransport {
     clearInterval(this.hb);
     this.ch.close(); this.ch = null;
     this.peers.clear();
-    window.removeEventListener('beforeunload', this._unload);
+    window.removeEventListener('pagehide', this._unload);
   }
 }
 

@@ -1,3 +1,4 @@
+import { addTranslations } from './core/i18n.js';   // [ctrlw]
 import '@fontsource/vt323';
 import '@fontsource/press-start-2p';
 import './ui/style.css';
@@ -74,6 +75,17 @@ class App {
     this.mods = new ModManager();
     this.ui = new UI(this);
     this.game = null;
+    addTranslations({ 'Fullscreen when playing': 'Oynarken tam ekran', 'stops Ctrl+W (crouch + forward) from closing the tab': 'Ctrl+W (eğil + ileri) sekmeyi kapatmasın', 'Ask before leaving the page': 'Sayfadan çıkmadan önce sor' }, 'tr');
+    addTranslations({ 'Fullscreen when playing': 'Полный экран в игре', 'stops Ctrl+W (crouch + forward) from closing the tab': 'Ctrl+W (присесть + вперёд) не закроет вкладку', 'Ask before leaving the page': 'Спрашивать перед уходом со страницы' }, 'ru');
+    // [ctrlw] Ctrl+W (crouch + forward) closes the tab and browsers don't let a page cancel it. 1) ask before leaving while in a game;
+    // 2) in fullscreen, Keyboard Lock (Chromium) lets the game receive Ctrl+W / Ctrl+T etc. instead of the browser.
+    window.addEventListener('beforeunload', (e) => {
+      if (!this.game || this.game.destroyed || this.settings?.confirmLeave === false) return;
+      e.preventDefault(); e.returnValue = '';
+    });
+    document.addEventListener('fullscreenchange', () => {
+      try { if (document.fullscreenElement) navigator.keyboard?.lock?.(['KeyW', 'KeyT', 'KeyN', 'KeyR', 'KeyQ']).catch?.(() => {}); else navigator.keyboard?.unlock?.(); } catch { /* unsupported */ }
+    });
     this.menu = null;
     this.lobbyDir = null;
     this.last = performance.now();

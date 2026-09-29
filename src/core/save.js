@@ -49,6 +49,8 @@ export function defaultSettings() {
     dither: true,
     outlines: true,
     headBob: true,
+    fullscreenPlay: true,   // [ctrlw] go fullscreen when the game captures the mouse (Keyboard Lock then catches Ctrl+W)
+    confirmLeave: true,     // [ctrlw] ask before closing the tab while in a game
     reduceMotion: false,    // scales camera shake/bob/punch + screen warp down, disables the sprint FOV kick
     showFps: false,
     classicAvatar: false,   // [avatar2] true = old hazmat avatar instead of the rounded "TFG Employee" (applies to newly built models)
