@@ -17,6 +17,6 @@ out.voiceMuted = g.voice?.muted;
 r.debug.force('pacifist'); await tick(3);
 out.speedMul = g.stats.speedMul;
 const coins0 = g.profile.coins;
-g.player.teleport(new THREE.Vector3(0, 1, 0)); g.player.inShip = true; g.hostBeginTakeoff('lever'); g.hostFinishTakeoff(); await tick(10);
+out.phaseBefore = g.run.phase; g.hostSetPhase('takeoff'); await tick(10); out.phaseAfter = g.run.phase;
 out.coinsDelta = g.profile.coins - coins0; out.viewer = viewer; out.curAfter = r.state.cur; out.hudAfter = document.querySelector('.rd-card')?.offsetParent != null;
 return { out, errs };
