@@ -247,3 +247,6 @@ Zombie swarm no longer depends on the horde module and shows extra poses (headle
 
 ## Wave 6 - roledays (docs/wave6/roledays.md)
 Role constraint days turn co-op communication into a rule (8 cards, host-validated door / pick, Clout + hype on completion), but there is no minimap to hide, the medic card is only a limit, and the weapon / chat rules are client-enforced; nobody has played it with two humans yet.
+
+## Wave 6 - mapart (docs/wave6/mapart.md)
+Every outdoor moon now has the same original signature layer (pylons that watch, LIVE panels, drones, glitch scars, ad billboards, crashed pods, camps with journals, tape) plus one landmark per biome family and a horizon silhouette, all seeded and merged (a handful of draw calls, no lights). Judgement: identity and variety come from the family landmarks and the corporate-decay props, which read as TFG rather than LC; the risk is scale / fog (landmarks at 60-108 m sit in dense fog on swamp / forest moons) and that the layer is not yet hand-checked on every generated biome.

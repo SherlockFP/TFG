@@ -250,6 +250,7 @@ import { installGuide } from './guide.js';   // wave 4: Algorithm advisor + firs
 import { installDaily } from './daily.js';   // wave 4: login calendar, daily/weekly challenges, crates, season track (docs/wave4/daily.md)
 
 import { installEggs } from './eggs.js';   // wave 4: easter eggs on moons + menu cell secrets (docs/wave4/eggs.md)
+import { installMapArt } from './mapart.js';   // wave 6: signature layer of every outdoor moon (pylons, billboards, drones, biome landmark) docs/wave6/mapart.md
 
 
 
@@ -507,6 +508,7 @@ export class Game extends Emitter {
     this.useModule('daily', installDaily);
 
     this.useModule('eggs', installEggs);
+    this.useModule('mapart', installMapArt);
 
     this.useModule('onboard', installOnboard);   // [slot:onboard] wave 5: Hiring Day + staged unlocks (installed last: wraps hostLever / terminalCommand / objectives.compute)
 
