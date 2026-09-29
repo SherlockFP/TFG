@@ -80,7 +80,7 @@ export function installFun(game) {
 
   guard('football', installFootball);
   guard('tasks', installTasks);
-  guard('echo', installEcho);
+  // guard('echo', installEcho);   // wave 8 (owner): dead players only spectate - no ghost haunting
 
   // ship mirror + suit rack open the wardrobe
   const offInteract = game.mods.on('interactables', (list, g) => {
