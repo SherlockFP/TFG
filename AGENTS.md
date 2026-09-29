@@ -454,3 +454,7 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
 - Wrappers on the host.js flow live in `src/game/cycle.js` (`hostEvaluateQuota / hostLever / hostSetPhase / hostPopulateMoon / hostBeginTakeoff / hostFinishTakeoff / hostUpdate`, `applyRunState`, `onPhase`, the `unlock` handler). Net: `cyx`, `cyreq`. State: `run.cycle`.
 - Tests: `node tools/harness/cycle.test.mjs`, `cycle2_plan.test.mjs`, `cycle2_bosses.test.mjs`, `cycle2_flow.test.mjs` (real host flow + fuzz + soft-lock proof), `cycle2_i18n.test.mjs`.
 - First job when a browser is available: land on a core of every interior, watch the 3 new boss fights (name card, HP bar, rings), open the arena with cards, run a keystone and a raid with 2 tabs.
+
+### 5.16 Wave 4 - VOYAGE (module `voyage`, docs/wave4/voyage.md; node-tested + builds, NOT run in a browser)
+- `MOON RANDOM` / `SIGNALS` (3 rotating uncharted signals) / random warp at the lever (12 %, crew vote on distress, never in quota 1-2 unless `WARP EARLY`) / `MISSIONS` board with 9 job types / 7 set pieces / 8 new biomes. A voyage moon is a pure function of its id `vy<tier><content>_<seed36>`.
+- Shared edits: `moongen.js` (exports + `generateMoonFromKey`), `terrain.js` (`plan.flats`, `buildVoyageWorld` hook), `game.js` slot. Net: `vyreq`, `vyx`, `vyn`. State `run.vy`. Test: `node tools/harness/voyage.test.mjs`.
