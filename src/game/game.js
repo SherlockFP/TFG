@@ -164,6 +164,9 @@ import { installWorlds2 } from './worlds2.js';   // wave 3: Soviet raids + twin-
 
 // [import:ux]
 
+// [import:eggs]
+import { installEggs } from './eggs.js';   // wave 4: easter eggs on moons + menu cell secrets (docs/wave4/eggs.md)
+
 
 
 export class Game extends Emitter {
@@ -331,6 +334,9 @@ export class Game extends Emitter {
 
 
     // [slot:ux]
+
+    // [slot:eggs]
+    this.useModule('eggs', installEggs);
 
 
   }

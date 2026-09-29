@@ -53,6 +53,7 @@ export const HATS_EXTRA = [
   { id: 'bucket', name: 'Bucket Hat', tier: 'common', desc: 'Peak 2019 fashion.', how: 'Log in two days in a row' },
   { id: 'headlamp', name: 'Headlamp', tier: 'uncommon', desc: 'Looks bright. Is not a light.', how: 'Repair 3 fuse boxes' },
   { id: 'wizard', name: 'Wizard Hat', tier: 'rare', desc: 'You shall not pass the quota.', how: 'Fill 25% of the Codex' },
+  { id: 'crthead', name: 'Retired CRT', tier: 'mythic', desc: 'A tiny monitor with a green smile. It watches the Algorithm for you.', how: 'A secret hidden between Cell 07 and the moons' },   // [eggs] meta-secret reward
 ];
 
 /** Every cosmetic as { slot, id, name, tier, desc, how, color? } (suit / hat / face / back). Hats are read from avatar.js HATS. */
@@ -183,6 +184,10 @@ export function buildHatExtra(id) {
     case 'wizard':
       add('a', flat('#43307a'), () => [xf(G.cone(0.13, 0.36, 8), [0, 0.15, 0], [0, 0, 0.08]), xf(G.cyl(0.25, 0.25, 0.018, 10), [0, -0.05, 0])]);
       add('b', flat('#f5d02a'), () => [xf(G.box(0.03, 0.03, 0.03), [0.06, 0.07, 0.11], [0, 0.4, 0.6]), xf(G.box(0.03, 0.03, 0.03), [-0.07, 0.14, 0.08], [0.3, 0.2, 0.7]), xf(G.box(0.028, 0.028, 0.028), [0.02, 0.2, -0.1], [0.5, 0.3, 0.1]), xf(G.cyl(0.135, 0.15, 0.03, 8, true), [0, -0.02, 0])]);
+      break;
+    case 'crthead':   // [eggs] the meta-secret hat: a little CRT with a green smile
+      add('a', flat('#b9b19a'), () => [xf(G.box(0.2, 0.15, 0.17), [0, 0.02, 0]), xf(G.box(0.12, 0.09, 0.1), [0, 0.02, -0.12])]);
+      add('b', bas('#48ff8a'), () => [xf(G.box(0.03, 0.025, 0.01), [-0.045, 0.045, 0.087]), xf(G.box(0.03, 0.025, 0.01), [0.045, 0.045, 0.087]), xf(G.box(0.1, 0.015, 0.01), [0, -0.005, 0.087])]);
       break;
     default: break;
   }

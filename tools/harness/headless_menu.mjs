@@ -27,6 +27,7 @@ const run = async (label, url, ready, scriptFile) => {
   catch (e) { console.log(label, 'EVAL ERROR', e.message); }
 };
 await run('MENU', arg('url', '/'), () => window.kefal?.menu?.room, arg('script', null));
+if (arg('shot', null)) await p.screenshot({ path: arg('shot') });   // [eggs] optional screenshot of the state the script left behind
 if (arg('url2', null)) await run('GAME', arg('url2'), () => window.kefal?.game, arg('script2', null));
 console.log('LOGS', JSON.stringify(logs.slice(0, 60), null, 1));
 await b.close();

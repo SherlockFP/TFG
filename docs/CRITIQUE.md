@@ -147,3 +147,7 @@ The 3-day + boss loop is now real (gate -> core with wings, a labyrinth and a ca
 Proven by numbers only: node tests drive the REAL host.js flow, the real CreatureManager and real layouts (soft-lock fuzz, weekly lock, all 8 themes); nothing was seen in a browser.
 Risks: boss models and telegraph readability, the maze / arena look and lighting, whether a labyrinth is fun with creatures in it (it is a spanning tree + few loops), keystone / raid numbers (design values), 2-player sync of `run.cycle` and `cyx`,
 the arena auto-open (720 s) as the only fallback for lost cards, Legacy Bot sector (outdoor boss, no cards) never seen, `shrines` mutator unwired, no Trophy Hall / CASE entry / first-kill cosmetic yet.
+
+## Wave 4 - eggs: menu Cell secrets + moon secrets + meta-secret (module `eggs`, docs/wave4/eggs.md)
+The cell is no longer just a set pieces room: 10 hidden props, a "Secrets x/19" counter and a 5-step meta-secret that sends you to the moons and back (ducks, diary, frozen employee) for a title + a hat.
+Risks: props are tiny and placed by numbers (nothing was judged by eye except one menu screenshot), facility spot offsets, the wall-knock timing on a real keyboard, English-only text on the CRT / poster canvases, shrine buff values (design numbers), nothing tested with 2 real players.

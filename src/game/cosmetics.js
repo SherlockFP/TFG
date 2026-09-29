@@ -168,6 +168,7 @@ const RULES = {
   'hat:bucket': { test: (p) => n(p.login?.best) >= 2 },
   'hat:headlamp': { test: (p) => n(st(p).fuses) >= 3, prog: (p) => [n(st(p).fuses), 3] },
   'hat:wizard': { test: (p) => n(p.codex?.pct) >= 25 },
+  'hat:crthead': { test: (p) => !!p.eggs?.meta },   // [eggs] meta-secret: eggs_core.claimMeta
   'face:moustache': { test: (p) => fun(p).tasks >= 1 },
   'face:gasmask': { test: (p) => p.level >= 8 },
   'face:shades': { test: (p) => n(st(p).jackpots) >= 1 },
