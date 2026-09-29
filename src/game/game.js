@@ -252,6 +252,9 @@ import { installLcmonsters } from './lcmonsters.js';
 import { installAtmos } from './atmos.js';   // [import:atmos]
 import { installArcade2 } from './arcade2.js';
 // [import:resto]
+// [import:feedcams]
+// [import:downed]
+// [import:hubgate]
 // [import:facjobs]
 // [import:arcade2]
 // [import:mapmods]
@@ -530,6 +533,9 @@ export class Game extends Emitter {
     this.useModule('atmos', installAtmos);   // [slot:atmos]
     this.useModule('arcade2', installArcade2);
     // [slot:resto]
+    // [slot:feedcams]
+    // [slot:downed]
+    // [slot:hubgate]
     // [slot:facjobs]
     // [slot:arcade2]
     // [slot:mapmods]
