@@ -240,6 +240,9 @@ import { installCosm5 } from './cosm5.js';   // wave 4: cosmetics drop (suits/ha
 
 
 // [import:ui2]
+// [import:nvgear]
+// [import:mapmods]
+// [import:worlds3]
 
 
 
@@ -504,6 +507,9 @@ export class Game extends Emitter {
 
 
     // [slot:ui2]
+    // [slot:nvgear]
+    // [slot:mapmods]
+    // [slot:worlds3]
 
 
 
