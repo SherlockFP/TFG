@@ -74,6 +74,7 @@ const ROWS = [
   ['Follow the drone, keep it alive', 'Dronu takip et, hayatta tut', 'Следуйте за дроном, берегите его'],
   ['Find the notes, then the vault panel', 'Notları, sonra kasa panelini bul', 'Найдите записки, затем панель хранилища'],
   ['Find and photograph the anomaly', 'Anomaliyi bul ve fotoğrafla', 'Найдите и сфотографируйте аномалию'],
+  ['Crew casualty fines: -▮{n} (bodies recovered cost less).', 'Mürettebat kayıp cezası: -▮{n} (cesetleri getirmek daha ucuz).', 'Штраф за потери экипажа: -▮{n} (возврат тел дешевле).'],
 ];
 
 const TR = {}, RU = {};

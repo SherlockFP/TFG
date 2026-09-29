@@ -484,6 +484,7 @@ input[type=range] { accent-color: var(--amber); width: 220px; }
   background: linear-gradient(180deg, rgba(20,14,8,0.96), rgba(10,7,4,0.96)); border: 2px solid var(--amber); box-shadow: 0 0 40px rgba(255,150,40,0.18), inset 0 0 60px rgba(0,0,0,0.6);
   padding: 0 0 12px; font-size: 20px; animation: rpin 0.45s cubic-bezier(.2,1.4,.4,1) both; transition: opacity 0.8s; }
 .report.out { opacity: 0; }
+#ui.cine-open .a1-vote { z-index: 15; }   /* [perf3] the Morning Rules card (z 60) used to cover the end-of-day report (z 16): the report is the payoff, the vote answers on keys 1/2/3 underneath */
 @keyframes rpin { from { opacity: 0; transform: translateX(-50%) translateY(-24px) scale(0.96); } }
 .rp-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; background: var(--amber); color: #120a02; font-family: var(--font2); font-size: 20px; padding: 6px 14px; letter-spacing: 1px; }
 .rp-head span:first-child { white-space: nowrap; }

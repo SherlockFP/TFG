@@ -9,7 +9,7 @@
 
 import * as THREE from 'three';
 
-const SCAN_S = 1.5, SETTLE_S = 2.5;
+const SCAN_S = 5, SETTLE_S = 2.5;   // [perf3] was 1.5: each scan traverses the whole scene (up to ~90 ms on a landed moon = a periodic hitch); the onBeforeRender hook already remembers everything that is drawn
 const TEX_KEYS = ['map', 'emissiveMap', 'alphaMap', 'lightMap', 'aoMap', 'normalMap', 'bumpMap', 'specularMap', 'envMap', 'roughnessMap', 'metalnessMap', 'displacementMap'];
 
 /** add every geometry / texture used by a mesh under `root` to the sets */

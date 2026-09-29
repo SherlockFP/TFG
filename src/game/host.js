@@ -324,6 +324,9 @@ export const hostMethods = {
       this.meta?.weekly?.hostOnLever(run);   // weekly challenge: fixed seed per (week, day, moon) + weekly mutators merged into run.dailyEvent
       this.hostData.dayStats = this.freshDayStats();
       this.hostData.collected = new Set();
+      // [perf3] scrap already lying in the ship when the day starts (unsold from before, bought, dev-spawned) is NOT today's haul: the
+      // 1 Hz collect pass used to book it as "collected today" -> the 'Bring scrap ▮51/▮44' objective read done at 0 scrap
+      for (const it of this.items.inShipItems()) if (isSellable(it.def) && !it.soulbound && !it.collected) { it.collected = true; this.hostData.collected.add(it.id); }
       this.hostData.pressureStage = 0;   // haul pressure is per day
       this.hostData.moonT = 0;
       this.hostData.fuseDone = new Set();   // fuse-box XP is once per player per DAY (new facility), not per session
@@ -411,6 +414,8 @@ export const hostMethods = {
       }
       fines = Math.min(fines, run.credits);
       run.credits -= fines;
+      // [perf3] never a silent deduction: the report shows the Fines row, this also lands in chat (the report can be queued behind another full-screen card)
+      if (fines > 0) this.net.broadcast('sys', sysMsg('Crew casualty fines: -▮{n} (bodies recovered cost less).', { n: fines }, 'bad'));
     }
     // everyone dead -> scrap lost
     if (allDead) {

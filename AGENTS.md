@@ -683,3 +683,6 @@ Menu-room look dead after standing: `leaveGame` left `input.enabled=false` (fixe
 ### 5.23 Wave 8 - WORLDS3 (module `worlds3`, docs/wave8/worlds3.md; node: worlds3.test.mjs + br_pocket/br_i18n; build ok; NOT browser-run)
 Backrooms made findable: flickering yellow WRONG DOOR frame on the glitch spot (100 % day 1 / every 3rd day, ~48 % overall; caption + Algorithm line + distance hint; terminal `BACKROOMS`), six themed pockets behind it (Level 0, Poolrooms, Data Center, Endless Hotel, Level Fun, Ward 13) each with palette/loot/hunters + one signature rule, facility size classes (small/medium/large) and purposeful room dressing, exit safety net. Hooks: `game.w3.*` (guarded, ~12 lines in backrooms.js). Net: `w3fx` (dark / unlock), `run.br.th` + `run.br.lk`.
 
+
+### 5.x Wave 8 - PERF3 hitch hunt (docs/wave8/perf3.md)
+Emitter no per-emit copy, gpusweep scan 1.5->5 s (92 ms traverse), docklayout one read/one write phase, objectives fit skip, lore board 0.4 s; bugs: in-ship scrap no longer counts as today's haul (objective done at 0), casualty fines now a chat line, day report no longer hidden under the Morning-Rules vote. Remaining: 3-5 s synchronous landing (pre-warm/spread), modapi featureOn + fauna 25-60 ms first-use spikes, out-of-range Oscillator warnings.

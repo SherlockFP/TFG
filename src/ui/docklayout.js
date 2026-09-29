@@ -24,14 +24,25 @@ function pinTo(e, prop, px) {
   if (e.style.getPropertyValue(prop) !== v || e.style.getPropertyPriority(prop) !== 'important') e.style.setProperty(prop, v, 'important');
 }
 function unpin(e, prop) { if (e.style.getPropertyValue(prop)) e.style.removeProperty(prop); }
-function clipToFit(d, avail) {
-  const kids = [...d.children];
-  for (const k of kids) k.classList.remove('hud-clip');
-  let i = kids.length - 1;
-  while (i >= 0 && d.scrollHeight > avail + 1) {
-    if (kids[i].offsetHeight > 0) kids[i].classList.add('hud-clip');
-    i--;
+// [perf3] clip planning is read-only: the natural (unclipped) height of every item is remembered (k._hh) while it is visible, so the
+// priority cut never has to strip the classes and re-measure (that was a forced layout per item, every tick).
+function clipPlan(d) {
+  const kids = d.children, n = kids.length, hs = new Array(n);
+  for (let i = 0; i < n; i++) {
+    const k = kids[i];
+    if (k.classList.contains('hud-clip')) hs[i] = k.classList.contains('hc-off') ? 0 : (k._hh || 0);
+    else hs[i] = k._hh = k.offsetHeight;
   }
+  const cs = getComputedStyle(d);
+  return { hs, gap: parseFloat(cs.rowGap) || 0, pad: (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0) };
+}
+function applyClip(d, plan, avail) {
+  const { hs, gap, pad } = plan, kids = d.children;
+  let total = pad, cnt = 0;
+  for (let i = 0; i < hs.length; i++) if (hs[i] > 0) total += hs[i] + (cnt++ ? gap : 0);
+  const cut = new Array(hs.length).fill(false);
+  for (let i = hs.length - 1; i >= 0 && total > avail + 1; i--) if (hs[i] > 0) { total -= hs[i] + (cnt > 1 ? gap : 0); cnt--; cut[i] = true; }
+  for (let j = 0; j < kids.length; j++) if (cut[j] !== kids[j].classList.contains('hud-clip')) kids[j].classList.toggle('hud-clip', cut[j]);
 }
 
 export function layoutDocks(docks) {
@@ -39,68 +50,60 @@ export function layoutDocks(docks) {
   const hud = document.querySelector('.hud');
   if (!hud || hud.classList.contains('hidden')) return;
   const H = innerHeight;
+  // [perf3] ONE read phase (every rect/scrollHeight the pass needs), then ONE write phase. The old pass wrote a style and re-read a rect
+  // per banner/dock (~20 forced synchronous layouts per 250 ms tick on the busy HUD DOM = a periodic hitch).
   const inv = q1('.hud-inv'), tr = q1('.hud-tr'), toasts = q1('.hud-toasts'), xpf = q1('.hud-xpfeed');
-  const invTop = inv ? inv.top : H - 120;
-  // ---- top-centre block: clock / compass / quota (the quota used to sit on the compass tape)
-  const clock = q1('.hud-clock'), comp = q1('.hud-compass'), quota = document.querySelector('.hud-quota');
-  let topY = Math.max(clock ? clock.bottom : 0, comp ? comp.bottom : 0);
-  if (quota && shown(quota)) {
-    if (comp) pinTo(quota, 'top', comp.bottom + 4); else unpin(quota, 'top');
-    topY = Math.max(topY, quota.getBoundingClientRect().bottom);
+  const clock = q1('.hud-clock'), comp = q1('.hud-compass'), quotaEl = document.querySelector('.hud-quota'), quota = quotaEl && shown(quotaEl);
+  const topEls = TOP_BANNERS.map(([sel, mid]) => { const e = document.querySelector(sel); return e ? [sel, mid, e, shown(e)] : null; });
+  const botEls = BOTTOM_BANNERS.map((sel) => { const e = document.querySelector(sel); return e ? [e, shown(e)] : null; });
+  const R = docks.right, L = docks.left, B = docks.bottom;
+  const chatEl = document.querySelector('.chat');
+  let chatTop = null;
+  if (chatEl) {
+    const lines = chatEl.querySelectorAll('.chat-line:not(.old)');
+    chatTop = chatEl.classList.contains('open') ? shown(chatEl) : (lines.length ? shown(lines[0]) : null);
   }
-  // ---- top banners stack under it
+  const obj = L ? q1('.objectives') : null, tl = L ? q1('.hud-tl') : null;
+  const bH = B && shown(B) ? B.offsetHeight : 0;
+  const clipR = R && clipPlan(R), clipL = L && clipPlan(L), clipB = B && clipPlan(B);
+  // ---- compute
+  const invTop = inv ? inv.top : H - 120;
+  let topY = Math.max(clock ? clock.bottom : 0, comp ? comp.bottom : 0);
+  let quotaTop = null;
+  if (quota) { if (comp) { quotaTop = comp.bottom + 4; topY = Math.max(topY, quotaTop + quota.height); } else topY = Math.max(topY, quota.bottom); }
   let y = topY + 10;
-  for (const [sel, mid] of TOP_BANNERS) {
-    const e = document.querySelector(sel), r = shown(e);
-    if (!e) continue;
-    if (!r) { unpin(e, 'top'); continue; }
-    if (sel === '.hud-big') { pinTo(e, 'top', Math.max(y, H * 0.22)); y = Math.max(y, e.getBoundingClientRect().bottom + 8); continue; }
-    pinTo(e, 'top', y + r.height * mid);
+  const topPins = [];
+  for (const it of topEls) {
+    if (!it) continue;
+    const [sel, mid, e, r] = it;
+    if (!r) { topPins.push([e, null]); continue; }
+    if (sel === '.hud-big') { const top = Math.max(y, H * 0.22); topPins.push([e, top]); y = Math.max(y, top + r.height + 8); continue; }
+    topPins.push([e, y + r.height * mid]);
     y += r.height + 8;
   }
-  // ---- right dock
-  const R = docks.right;
-  if (R) {
-    let top = Math.max(tr ? tr.bottom + 10 : 96, xpf ? xpf.bottom + 6 : 0, toasts ? toasts.bottom + 8 : 0);
-    top = Math.min(top, H * 0.5);
-    const avail = Math.max(0, invTop - 12 - top);
-    R.style.top = Math.round(top) + 'px'; R.style.maxHeight = Math.round(avail) + 'px'; R.style.overflow = 'hidden';
-    clipToFit(R, avail);
-  }
-  // ---- left dock: above the objective tracker (grows up from the bottom), lifted over the chat lines that are on screen
-  const L = docks.left;
-  const chatEl = document.querySelector('.chat');
-  let bottom = 100;
-  if (chatEl) {
-    const lines = [...chatEl.querySelectorAll('.chat-line:not(.old)')];
-    const cr = chatEl.classList.contains('open') ? shown(chatEl) : (lines.length ? shown(lines[0]) : null);
-    if (cr) bottom = Math.max(bottom, H - cr.top + 10);
-  }
-  if (L) {
-    const obj = q1('.objectives');
-    const floor = Math.max(obj ? obj.bottom + 8 : 0, (q1('.hud-tl')?.bottom || 0) + 8);
-    const avail = Math.max(0, H - bottom - floor);
-    L.style.bottom = Math.round(bottom) + 'px'; L.style.maxHeight = Math.round(avail) + 'px'; L.style.overflow = 'hidden';
-    clipToFit(L, avail);
-  }
-  // ---- bottom dock + bottom-centre banners
-  const B = docks.bottom;
-  let by = 92;
-  if (B) {
-    const bb = Math.max(92, inv ? H - inv.top + 8 : 92);   // above the hotbar row when the hotbar is up
-    B.style.bottom = Math.round(bb) + 'px';
-    const avail = Math.max(0, H * 0.34);
-    B.style.maxHeight = Math.round(avail) + 'px'; B.style.overflow = 'hidden';
-    clipToFit(B, avail);
-    by = bb + (shown(B) ? B.getBoundingClientRect().height + 8 : 0);
-  }
-  for (const sel of BOTTOM_BANNERS) {
-    const e = document.querySelector(sel), r = shown(e);
-    if (!e) continue;
-    if (!r) { unpin(e, 'bottom'); continue; }
-    pinTo(e, 'bottom', by);
+  const rTop = R ? Math.min(Math.max(tr ? tr.bottom + 10 : 96, xpf ? xpf.bottom + 6 : 0, toasts ? toasts.bottom + 8 : 0), H * 0.5) : 0;
+  const rAvail = Math.max(0, invTop - 12 - rTop);
+  let lBottom = 100;
+  if (chatTop) lBottom = Math.max(lBottom, H - chatTop.top + 10);
+  const lAvail = Math.max(0, H - lBottom - Math.max(obj ? obj.bottom + 8 : 0, (tl?.bottom || 0) + 8));
+  const bb = Math.max(92, inv ? H - inv.top + 8 : 92), bAvail = Math.max(0, H * 0.34);
+  let by = bb + (bH ? Math.min(bH, bAvail) + 8 : 0);
+  if (!B) by = 92;
+  const botPins = [];
+  for (const it of botEls) {
+    if (!it) continue;
+    const [e, r] = it;
+    if (!r) { botPins.push([e, null]); continue; }
+    botPins.push([e, by]);
     by += r.height + 8;
   }
+  // ---- write
+  if (quotaEl) { if (quotaTop !== null) pinTo(quotaEl, 'top', quotaTop); else if (!quota || !comp) unpin(quotaEl, 'top'); }
+  for (const [e, v] of topPins) { if (v === null) unpin(e, 'top'); else pinTo(e, 'top', v); }
+  if (R) { R.style.top = Math.round(rTop) + 'px'; R.style.maxHeight = Math.round(rAvail) + 'px'; R.style.overflow = 'hidden'; applyClip(R, clipR, rAvail); }
+  if (L) { L.style.bottom = Math.round(lBottom) + 'px'; L.style.maxHeight = Math.round(lAvail) + 'px'; L.style.overflow = 'hidden'; applyClip(L, clipL, lAvail); }
+  if (B) { B.style.bottom = Math.round(bb) + 'px'; B.style.maxHeight = Math.round(bAvail) + 'px'; B.style.overflow = 'hidden'; applyClip(B, clipB, bAvail); }
+  for (const [e, v] of botPins) { if (v === null) unpin(e, 'bottom'); else pinTo(e, 'bottom', v); }
 }
 
 /** Called from hudDock(): starts the 4 Hz layout pass (+ the tiny style for clipped items). */
