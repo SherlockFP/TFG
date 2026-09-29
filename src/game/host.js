@@ -382,9 +382,10 @@ export const hostMethods = {
     const aboardNow = (p) => p.inShip || inDoorway(p.pos);
     const aboard = players.filter((p) => !p.dead && aboardNow(p));
     const leftBehind = players.filter((p) => !p.dead && !aboardNow(p));
-    for (const it of [...this.items.all()]) if (it.holder && leftBehind.some((p) => p.id === it.holder)) this.net.broadcast('it', { e: 'rm', id: it.id });
+    const stranded = this.hmStrand?.(leftBehind) || null;   // [hardmode] Set of late players who stay outside alive (hardmode.js); null = they are killed as before
+    for (const it of [...this.items.all()]) if (it.holder && leftBehind.some((p) => p.id === it.holder) && !(stranded?.has(it.holder) && !(isSellable(it.def) && !it.soulbound))) this.net.broadcast('it', { e: 'rm', id: it.id });
     hd.leftBehindIds = new Set(leftBehind.map((p) => p.id));
-    for (const p of leftBehind) this.hostHurtPlayer(p.id, 999, 'left');
+    for (const p of leftBehind) if (!stranded?.has(p.id)) this.hostHurtPlayer(p.id, 999, 'left');
     const allDead = aboard.length === 0 && !moon.company;
     // scrap still lying around on the moon (for the performance grade)
     let leftValue = 0;
@@ -398,7 +399,7 @@ export const hostMethods = {
     for (const it of shipItems) if (isSellable(it.def) && !it.soulbound) shipValue += it.value;
     for (const it of this.items.all()) if (it.holder && aboard.some((p) => p.id === it.holder) && isSellable(it.def) && !it.soulbound) shipValue += it.value;
     // deaths & fines
-    const deaths = hd.dayStats.deaths.filter((dd) => !hd.leftBehindIds.has(dd.id)).concat(leftBehind.map((p) => ({ id: p.id, name: this.playerName(p.id), cause: 'left' })));
+    const deaths = hd.dayStats.deaths.filter((dd) => !hd.leftBehindIds.has(dd.id)).concat(leftBehind.filter((p) => !stranded?.has(p.id)).map((p) => ({ id: p.id, name: this.playerName(p.id), cause: 'left' })));
     let fines = 0;
     if (!moon.company) {
       for (const dd of deaths) {
@@ -466,7 +467,7 @@ export const hostMethods = {
       run.credits += bonus;
       run.quotaIndex += 1;
       const prev = run.quota;
-      run.quota = Math.round(prev + (nextQuota(prev, run.quotaIndex) - prev) * (this.config.quotaMul || 1));
+      run.quota = Math.round(prev + (nextQuota(prev, run.quotaIndex) - prev) * (this.config.quotaMul || 1) * (this.hmGrowth?.(surplus, prev) || 1));   // [hardmode] growth x up to 1.15 for a crew that overshoots
       run.sold = 0;
       run.daysLeft = 3;
       this.broadcastRun(['credits', 'quotaIndex', 'quota', 'sold', 'daysLeft']);

@@ -333,6 +333,56 @@ api.cookStart('stove', stove.id, [mkItem('comp_wood').id]);
 ok(sent.some(([, d]) => d.k === 'err') && api.cookState().st !== 'run', 'non-ingredients are refused');
 api.resetCook();
 
+// ---- [wave5 hardmode] single stove, campfires that only warm, dish stamping for the spoil rule (difficulty.js)
+{
+  const DIFF = await import('../../src/game/difficulty.js');
+  const stamped = [];
+  game.hardmode = { stamp: (id) => stamped.push(id) };
+  game.remotes.set('bob', { pos: new THREE.Vector3(stove.x + 1, 0, stove.z) });
+  player.pos.set(stove.x, 0, stove.z + 1);
+  const errs = () => sent.filter(([t, d]) => t === 'svfx' && d.k === 'err').map(([, d]) => d.why);
+  DIFF.setMode('standard'); DIFF.setQuota(3);
+  api.resetCook(); sent.length = 0;
+  H.svcook({ op: 'start', s: stove.id, ids: [mkItem('sv_meat').id] }, 'me');
+  H.svcook({ op: 'start', s: stove.id, ids: [mkItem('sv_meat', { holder: 'bob' }).id] }, 'bob');
+  ok(errs().includes('The stove is busy.'), 'standard q3: a second cook on the same stove is refused');
+  perfNow += 200000;   // the first session ran out (walked away): the stove is free again
+  sent.length = 0;
+  H.svcook({ op: 'start', s: stove.id, ids: [mkItem('sv_meat', { holder: 'bob' }).id] }, 'bob');
+  ok(!errs().includes('The stove is busy.'), 'a stale session does not block the stove');
+  H.svcook({ op: 'cancel' }, 'bob'); H.svcook({ op: 'cancel' }, 'me');
+  DIFF.setMode('casual');
+  sent.length = 0;
+  H.svcook({ op: 'start', s: stove.id, ids: [mkItem('sv_meat').id] }, 'me');
+  H.svcook({ op: 'start', s: stove.id, ids: [mkItem('sv_meat', { holder: 'bob' }).id] }, 'bob');
+  ok(!errs().includes('The stove is busy.'), 'casual: two cooks at once as before');
+  H.svcook({ op: 'cancel' }, 'bob'); H.svcook({ op: 'cancel' }, 'me');
+  DIFF.setMode('standard'); DIFF.setQuota(1);
+  sent.length = 0;
+  H.svcook({ op: 'start', s: stove.id, ids: [mkItem('sv_meat').id] }, 'me');
+  H.svcook({ op: 'start', s: stove.id, ids: [mkItem('sv_meat', { holder: 'bob' }).id] }, 'bob');
+  ok(!errs().includes('The stove is busy.'), 'quota 1: no single-station rule yet');
+  H.svcook({ op: 'cancel' }, 'bob'); H.svcook({ op: 'cancel' }, 'me');
+  // the finished dish is stamped for the spoil check
+  DIFF.setMode('standard'); DIFF.setQuota(3); api.resetCook(); spawned.length = 0;
+  api.cookStart('stove', stove.id, [mkItem('sv_meat').id, mkItem('sv_p_glowcap').id]);
+  perfNow += api.cookState().dur * 1000 * 0.78; api.cookStop();
+  ok(stamped.length === 1 && spawned.some((sp) => D.isDishId(sp.ty)), 'a cooked dish is stamped with its day (game.hardmode.stamp)');
+  // campfire: Hard = it only warms
+  const fireS = { id: 'fire9', k: 'fire', w: 'moon', x: stove.x, y: 0, z: stove.z, yaw: 0, ver: 1, until: Date.now() + 60000 };
+  game.run['sv:fire9'] = fireS;
+  DIFF.setMode('hard'); sent.length = 0;
+  H.svcook({ op: 'start', s: 'fire9', ids: [mkItem('sv_meat').id] }, 'me');
+  ok(errs().includes('Only the ship stove cooks now.'), 'hard q3: campfires do not cook');
+  DIFF.setMode('standard'); sent.length = 0;
+  H.svcook({ op: 'start', s: 'fire9', ids: [mkItem('sv_meat').id] }, 'me');
+  ok(!errs().includes('Only the ship stove cooks now.'), 'standard: campfires still cook');
+  H.svcook({ op: 'cancel' }, 'me');
+  delete game.run['sv:fire9']; delete game.hardmode; game.remotes.delete('bob');
+  DIFF.setMode('standard'); DIFF.setQuota(0);
+  api.resetCook();
+}
+
 // ---- brewing
 const brew = structs().find((s) => s.k === 'brew');
 player.pos.set(brew.x, 0, brew.z + 1);

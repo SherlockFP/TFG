@@ -19,6 +19,7 @@ import { STRANGE, STRANGE_IDS } from './research.js';
 import { MOONS } from './moons.js';
 import { addTranslations, t, tf } from '../core/i18n.js';
 import { clamp, angleDiff } from '../core/util.js';
+import { ammoMul, drawMul } from './difficulty.js';
 import { HULL, DOOR, distToHull, inBox } from './siege_core.js';
 import { createDeployableModel, createKitModel, createGhost, createRelicModel, staticGeometry, staticMaterial, STATIC_TYPES } from '../models/deployables.js';
 
@@ -504,8 +505,8 @@ export function installDeployables(game, siege) {
     d.tx = c.pos.x; d.ty = ay; d.tz = c.pos.z;
     const ready = Math.abs(angleDiff(d.aim, want)) < 0.14 && d.cd <= 0;
     if (!ready) return;
-    if (def.ammo) { if (d.res < 1) { d.on = false; return; } d.res -= 1; d.on = true; }
-    else { if (!draw(d, def.draw)) { d.on = false; return; } d.on = true; }
+    if (def.ammo) { if (d.res < 1) { d.on = false; return; } d.res = Math.max(0, d.res - ammoMul()); d.on = true; }   // [hardmode] x1.5 / x2 ammo per shot from quota 3
+    else { if (!draw(d, def.draw * drawMul())) { d.on = false; return; } d.on = true; }
     d.cd = 1 / def.rate; d.shots++;
     hurtCreature(d, c, def.dmg * d.mul * (0.9 + Math.random() * 0.2));
   }

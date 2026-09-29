@@ -1,4 +1,9 @@
-// TFG economy / danger / XP-pacing simulator (node tools/sim/economy.mjs [--runs N] [--csv] [--seed S]).
+// TFG economy / danger / XP-pacing simulator (node tools/sim/economy.mjs [--runs N] [--csv] [--seed S] [--mode casual|standard|hard] [--modes-only]).
+//
+// Wave 5 (hardmode): the difficulty table (src/game/difficulty.js, MASTERPLAN 25.4) is part of the model. Sections 1-8 use --mode (default standard); the last section
+// "DIFFICULTY MODES" runs Casual / Standard / Hard side by side. Modelled: loot value curve x0.8 from quota 3 (real scrapValueMul), heavier carry penalty (carry
+// capacity + speed), quota growth x1..1.15 by surplus (real quotaGrowthMul), creature tricks + spoiling food + lock warning as a threat / capacity tax
+// (sim.threatMul / sim.foodCapMul), trap-price upkeep (sim.upkeep x quota per cycle). NOT modelled: forge levels (no forge in the economy), stranding.
 //
 // Monte-Carlo model of whole endless runs. It imports the REAL data and formulas (item values, scrap tables,
 // handcrafted moons, the generated sectors from moongen.js, daily events, quota growth, the BALANCE knobs in
@@ -23,6 +28,7 @@ import { MOONS } from '../../src/game/moons.js';
 import { generateSector, MODIFIERS } from '../../src/game/moongen.js';
 import { DAILY_EVENTS } from '../../src/game/dailyEvents.js';
 import { CREATURES, spawnTable, creatureLevelStats } from '../../src/game/creatures.js';
+import * as DIFF from '../../src/game/difficulty.js';
 import { scaleFor } from '../../src/game/balance_core.js';   // wave-1 balance: sector creature scale + threat (default ON, --no-balance = the old flat numbers)
 import {
   nextQuota, scrapValueMul, scrapCountBonus, indoorPowerMul, outdoorPowerMul, creatureBaseLevel,
@@ -35,6 +41,9 @@ const RUNS = +argv('--runs', 600);
 const SEED = +argv('--seed', 1234567);
 const CSV = args.includes('--csv');
 const BALANCE_ON = !args.includes('--no-balance');
+const MODE = DIFF.norm(argv('--mode', DIFF.DEFAULT_MODE));
+const MODES_ONLY = args.includes('--modes-only');
+DIFF.setMode(MODE);
 const AVG_THREAT = +argv('--avg-threat', 40);   // mean Threat over a landing for a crew that holds loot and stays a while (see docs/wave1/balance.md)
 Object.assign(BALANCE, JSON.parse(argv('--bal', '{}')));   // try knob changes without editing: --bal '{"levelPerQuota":0.5}'
 
@@ -141,11 +150,13 @@ function landingOutcome(crew, m, q, ev, weather) {
   const { value, items } = dayValue(m, q, ev, weather);
   const th = dayThreat(m, q, ev, weather);
   const cap = Math.pow(crew.n, 0.85) * sk.cap * (1 + CAP_GROWTH * q) * (ev.hpMul ? 0.85 + 0.15 * ev.hpMul : 1);
-  const r = th.threat / cap;
+  const dm = DIFF.eff(q);   // wave 5: rules in force at this quota index (casual numbers before quota 3 in every mode)
+  const r = th.threat * dm.sim.threatMul / (cap * dm.sim.foodCapMul);   // creature door / light tricks, lock pressure -> threat; spoiling food -> less sustain
   const timeFrac = clamp((1440 - (ev.startTime || 480)) / 960 / (ev.timeMul || 1), 0.3, 1.3);
-  const carryItems = crew.n * sk.carry * timeFrac;
+  const carryMul = DIFF.weightMul(dm.carry.load, q) / DIFF.weightMul(dm.carry.load, 0, 'casual');   // heavier hauls: slower and fewer items per trip
+  const carryItems = crew.n * sk.carry * timeFrac * carryMul;
   const carryFrac = carryItems >= items ? 1 : Math.pow(carryItems / items, 0.7);   // the best items first
-  const eff = sk.eff / (1 + 0.55 * Math.max(0, r - 0.75)) * (ev.blackout ? 0.92 : 1);
+  const eff = sk.eff / (1 + 0.55 * Math.max(0, r - 0.75)) * (ev.blackout ? 0.92 : 1) * carryMul;
   const wipe = clamp(sk.wipe + 0.16 * Math.pow(Math.max(0, r - 0.8), 1.5), 0, 0.95);
   const deathRate = clamp(0.03 + 0.09 * r, 0, 0.9);           // per player per day (non-wipe days)
   return { value, items, eff: Math.min(eff, carryFrac), wipe, deathRate, r, threat: th, cap };
@@ -200,6 +211,7 @@ function simRun(crew, runKey, stats) {
     credits -= best.cost; current = m.id;
     if (!van && credits > 900 && crew.n >= 3) { credits -= 350; van = true; }
     credits -= 15 * crew.n;                                  // flashlights / batteries / medkits
+    credits -= Math.round(DIFF.eff(q).sim.upkeep * quota);   // wave 5: trap / turret kits get pricier with daily use, turrets eat ammo
     let cycleValue = 0, wipes = 0, deaths = 0, rSum = 0;
     for (let d = 0; d < 3; d++) {
       const e = pickW(DAILY_EVENTS);
@@ -237,19 +249,66 @@ function simRun(crew, runKey, stats) {
     if (sold < quota) break;
     credits += Math.floor((sold - quota) / 5);
     xp += 150 + (q + 1) * 80;
+    const surplusRatio = (sold - quota) / quota;
     q += 1;
-    quota = nextQuota(quota, q, rand);
+    { const nq = nextQuota(quota, q, rand); quota = Math.round(quota + (nq - quota) * DIFF.quotaGrowthMul(surplusRatio, q)); }   // wave 5: growth x1..1.15 for crews that overshoot
     if (q >= 40) break;
   }
   return { quotas: q, perCycle, minutes, xp };
 }
 
-// ---------------------------------------------------------------- run everything
 const pct = (a, p) => { const s = [...a].sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.floor(p * s.length))]; };
 const fmt = (v, n = 0) => (typeof v === 'number' ? v.toFixed(n) : String(v));
 const pad = (s, n) => String(s).padStart(n);
 
-console.log(`TFG economy sim  runs/crew=${RUNS}  seed=${SEED}`);
+// ---------------------------------------------------------------- difficulty modes side by side (wave 5 hardmode)
+function modeComparison() {
+  const CMP_CREWS = [['4 average', 4, 'average'], ['4 competent', 4, 'competent'], ['2 great', 2, 'great']];
+  const N = +argv('--cmp-runs', Math.min(RUNS, 300));
+  const median = (a) => (a.length ? pct(a, 0.5) : null);
+  const out = {};
+  console.log(`\n== DIFFICULTY MODES (Casual = the old numbers / Standard = MASTERPLAN 25.4 / Hard = one notch harder), runs/crew=${N}, same seeds per mode ==`);
+  console.log('rules from quota index ' + DIFF.FROM_QUOTA + ' on; quota 0-2 use the casual numbers in every mode');
+  console.log('\nq   | loot value x (real scrapValueMul) casual/standard/hard | carry speed x @ load 40 | growth x for +60% surplus');
+  for (const q of [0, 1, 2, 3, 4, 6, 8, 10, 14]) {
+    const row = DIFF.MODES.map((m) => { DIFF.setMode(m); return [scrapValueMul(q), DIFF.weightMul(40, q), DIFF.quotaGrowthMul(0.6, q)]; });
+    console.log(`${pad(q, 3)} | ${row.map((r) => fmt(r[0], 3)).join(' / ')} | ${row.map((r) => fmt(r[1], 3)).join(' / ')} | ${row.map((r) => fmt(r[2], 2)).join(' / ')}`);
+  }
+  for (const m of DIFF.MODES) {
+    DIFF.setMode(m);
+    out[m] = {};
+    for (const [label, n, skill] of CMP_CREWS) {
+      const qs = [], hours = [], cycles = [];
+      for (let i = 0; i < N; i++) { rand = mulberry(SEED ^ (n * 7919) ^ skill.length * 104729 ^ Math.imul(i + 1, 2654435761)); /* per-run stream: every mode sees the same dice */ const res = simRun({ n, skill }, 'R' + i, { level: 25 }); qs.push(res.quotas); hours.push(res.minutes / 60); cycles.push(res.perCycle); }
+      const at = (q, f) => median(cycles.map((r) => r.find((c) => c.q === q)).filter(Boolean).map(f));
+      const early = [0, 1, 2].map((q) => at(q, (c) => c.sold / c.quota));
+      out[m][label] = { p10: pct(qs, 0.1), p50: pct(qs, 0.5), p90: pct(qs, 0.9), mean: qs.reduce((a, b) => a + b, 0) / qs.length, hours: hours.reduce((a, b) => a + b, 0) / hours.length,
+        early, quota4: at(4, (c) => c.quota), quota6: at(6, (c) => c.quota), cred3: at(3, (c) => c.credits), cred6: at(6, (c) => c.credits), sold3: at(3, (c) => c.sold / c.quota), sold6: at(6, (c) => c.sold / c.quota),
+        fired: qs.filter((v) => v < 3).length / qs.length };
+    }
+  }
+  DIFF.setMode(MODE);
+  console.log('\ncrew        | mode     | quotas met p10 median p90 mean | run h | sold/quota at q0 q1 q2 (early comfort) | sold/quota q3 q6 | quota at q4 q6 | credits q3 q6 | fired before q3');
+  for (const [label] of CMP_CREWS) {
+    for (const m of DIFF.MODES) {
+      const o = out[m][label];
+      console.log(`${label.padEnd(11)} | ${m.padEnd(8)} | ${pad(o.p10, 4)} ${pad(o.p50, 6)} ${pad(o.p90, 3)} ${pad(fmt(o.mean, 1), 5)} | ${pad(fmt(o.hours, 1), 5)} | ${o.early.map((v) => pad(v == null ? '-' : fmt(v, 1) + 'x', 6)).join(' ')} | ${pad(o.sold3 == null ? '-' : fmt(o.sold3, 1) + 'x', 6)} ${pad(o.sold6 == null ? '-' : fmt(o.sold6, 1) + 'x', 6)} | ${pad(o.quota4 ?? '-', 5)} ${pad(o.quota6 ?? '-', 5)} | ${pad(o.cred3 == null ? '-' : fmt(o.cred3), 6)} ${pad(o.cred6 == null ? '-' : fmt(o.cred6), 6)} | ${fmt(o.fired * 100, 1)}%`);
+    }
+  }
+  // headline: how much each mode shortens / hardens the run of the 4-competent crew, relative to Casual
+  const base = out.casual['4 competent'];
+  console.log('\nheadline (4 competent, vs Casual): ' + ['standard', 'hard'].map((m) => { const o = out[m]['4 competent']; return `${m}: median quotas ${o.p50} (${o.p50 - base.p50 >= 0 ? '+' : ''}${o.p50 - base.p50}), mean ${fmt(o.mean, 1)} (${fmt(o.mean - base.mean, 1)}), run ${fmt(o.hours, 1)} h (${fmt(o.hours - base.hours, 1)} h), quota at q6 ${o.quota6 ?? '-'} (${base.quota6 ?? '-'} casual)`; }).join(' | '));
+  const e = ['casual', 'standard', 'hard'].map((m) => out[m]['4 average'].early.map((v) => (v == null ? 0 : v)));
+  const same = e[0].every((v, i) => Math.abs(v - e[1][i]) < 1e-9 && Math.abs(v - e[2][i]) < 1e-9);
+  console.log(`early comfort check (4 average, sold/quota at q0-2 identical in all modes): ${same ? 'OK' : 'DIFFERS ' + JSON.stringify(e)}`);
+  return out;
+}
+
+if (MODES_ONLY) { console.log(`TFG economy sim (modes only) runs/crew=${RUNS} seed=${SEED}`); modeComparison(); process.exit(0); }
+
+// ---------------------------------------------------------------- run everything
+
+console.log(`TFG economy sim  runs/crew=${RUNS}  seed=${SEED}  mode=${MODE}`);
 console.log(`BALANCE ${JSON.stringify(BALANCE)}`);
 console.log(`scrap table avg value: ${THEMES.map((t) => `${t} ${SCRAP_AVG[t].toFixed(0)}`).join(', ')}`);
 
@@ -371,6 +430,8 @@ for (const s of summary) console.log(`${s.label.padEnd(13)} | ${pad(s.p10, 4)} $
     console.log(`${s.label.padEnd(13)} ~${pad(fmt(s.xph), 5)} XP/h -> Rebirth ~${pad(fmt(h50, 1), 5)} h, Lv.100 ~${pad(fmt(h100, 0), 4)} h`);
   }
 }
+
+modeComparison();
 
 if (CSV) {
   console.log('\ncrew,p10,p50,p90,mean,hours,xph');

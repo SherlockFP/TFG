@@ -8,6 +8,7 @@ import { iconHTML } from '../icons.js';
 import { TIERS, TIER_ORDER, tierColor } from '../../game/tiers.js';
 import { affixDisplayName } from '../../game/loot.js';
 import * as F from '../../game/enhance.js';
+import { forgeDriveCraft } from '../../game/difficulty.js';
 
 const CSS = `
 .overlay .menu-frame.forge{width:min(1080px,96vw);height:min(86vh,700px)}
@@ -170,10 +171,11 @@ export function createForgePanel(ui, game, forge, opts = {}) {
         el('div', { class: 'mid', html: `${rule.n} × <span style="color:${s.color}">${escapeHtml(t(s.name))}</span> <span style="opacity:.6">(${have})</span> → 1 × <span style="color:${to.color}">${escapeHtml(t(to.name))}</span>` }),
         ui.button(t('CONVERT'), () => { if (can) forge.requestExchange({ op: 'up', shard: s.id }); else ui.sfx('ui_error'); }, 'small' + (can ? '' : ' disabled'))));
     }
-    const bc = F.BACKUP_COST, hb = forge.count(bc.id);
+    const bc = F.backupCost(), hb = forge.count(bc.id);   // [hardmode] cost / availability follow the difficulty
+    const canBuild = forgeDriveCraft();
     detEl.appendChild(el('div', { class: 'fg-ex' }, el('div', { class: 'ico', html: iconHTML(F.BACKUP_ID, 'ico') }),
       el('div', { class: 'mid', html: `${escapeHtml(t('Backup Drive'))}: ${bc.n} × ${escapeHtml(shardName(bc.id))} <span style="opacity:.6">(${hb})</span>` }),
-      ui.button(t('BUY'), () => { if (hb >= bc.n) forge.requestExchange({ op: 'backup' }); else ui.sfx('ui_error'); }, 'small' + (hb >= bc.n ? '' : ' disabled'))));
+      ui.button(t('BUY'), () => { if (canBuild && hb >= bc.n) forge.requestExchange({ op: 'backup' }); else ui.sfx('ui_error'); }, 'small' + (canBuild && hb >= bc.n ? '' : ' disabled'))));
     detEl.appendChild(el('div', { class: 'fg-note' }, t('Source Code cannot be traded for. It only drops from Mythic creatures and world bosses.')));
   }
 

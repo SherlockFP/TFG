@@ -17,6 +17,7 @@ import { createMonetizer, createAltar, createExchange, createForgeItemModel, FOR
 import { createForgePanel } from '../ui/panels/forge.js';
 import { TIERS } from './tiers.js';
 import { AFFIXES } from './creatures.js';
+import { forgeDriveCraft } from './difficulty.js';
 
 HOST_ONLY.add('fgit'); HOST_ONLY.add('fgres');   // clients only accept these from the host
 
@@ -257,7 +258,9 @@ export function installForge(game) {
     const at = tmpV.set(0, 0, 0);
     let outId = null, mats = null;
     if (d.op === 'backup') {
-      mats = take(from, F.BACKUP_COST.id, F.BACKUP_COST.n);
+      if (!forgeDriveCraft()) return err(from, 'Backup Drives can not be built on this difficulty. Find them.');   // [hardmode]
+      const bc = F.backupCost();
+      mats = take(from, bc.id, bc.n);
       if (!mats) return err(from, 'Missing shards.');
       outId = F.BACKUP_ID;
     } else {

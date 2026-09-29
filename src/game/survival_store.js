@@ -9,6 +9,7 @@ import { ITEMS } from './items.js';
 import { itemSize, bagRejectReason, buildOcc, fitsAt, findSpot, packLayout, sortCompare, clampInt } from './inventory_core.js';
 import { TIERS } from './tiers.js';
 import { PLANTS } from './survival_data.js';
+import { crateMax } from './difficulty.js';
 
 export const CRATE_TIERS = {
   1: { id: 'wood', name: 'Wooden Crate', cols: 6, rows: 3, item: 'sv_crate1', size: [1.0, 0.7, 0.7] },
@@ -201,7 +202,8 @@ export const structsOf = (list, where) => (list || []).filter((s) => s && s.w ==
 export function placeReject(kind, x, z, existing) {
   if (!Number.isFinite(x) || !Number.isFinite(z)) return 'Nowhere to put it.';
   const same = existing.filter((s) => s.k === kind && !s.fixture).length;
-  if (MAX_STRUCTS[kind] != null && same >= MAX_STRUCTS[kind]) return 'No room for another one here.';
+  const max = kind === 'crate' ? Math.min(MAX_STRUCTS.crate, crateMax()) : MAX_STRUCTS[kind];   // [hardmode] 6 / 5 / 4 crates from quota 3
+  if (max != null && same >= max) return 'No room for another one here.';
   for (const s of existing) if (Math.hypot(s.x - x, s.z - z) < SPACING) return 'Too close to something else.';
   return null;
 }

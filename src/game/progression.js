@@ -4,6 +4,7 @@ import { RNG } from '../core/rng.js';
 import { t } from '../core/i18n.js';
 import { CREATURES } from './creatures.js';
 import { treeBonus, treeFlags, treeSpent } from './passivetree.js';
+import { lootValueMul } from './difficulty.js';
 
 // Level cap (raised from 50 -> 100 in the meta round). REBIRTH_LEVEL is where a Rebirth becomes available:
 // levels past it keep paying skill points, a Rebirth trades the level for a permanent star.
@@ -76,7 +77,7 @@ export const BALANCE = {
   levelCap: 20,               // creature base-level ceiling (normal creatures + bosses)
   lootCountMul: 0.7,          // wave 3: indoor scrap count x0.7 (owner: "too much loot"); the early-game bonus below is added AFTER, so it stays
 };
-export function scrapValueMul(q) { return 1 + BALANCE.valuePerQuota * Math.max(0, q | 0); }
+export function scrapValueMul(q) { return (1 + BALANCE.valuePerQuota * Math.max(0, q | 0)) * lootValueMul(q); }   // [hardmode] x0.8 from quota 3 (difficulty.js; 1 in Casual / quota 0-2)
 /** Indoor scrap count for a moon range [lo, hi] rolled as `base`: base x lootCountMul + the early-game bonus (docs/wave3/worlds2.md). */
 export function scrapCountFor(base, q) { return Math.round(base * BALANCE.lootCountMul + scrapCountBonus(q)); }
 export function scrapCountBonus(q) { const n = Math.max(0, q | 0); return BALANCE.countPerQuota * n + (n === 0 ? 3 : n === 1 ? 2 : 0); }   // early-game: a few extra finds so the first days feel rewarding
