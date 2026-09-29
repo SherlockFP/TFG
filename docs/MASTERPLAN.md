@@ -541,3 +541,14 @@ Sahip: modeller "çok AI duruyor", hafif yuvarlak, Among Us'ımsı ama **çakma 
   güçlendiğini hisseder; Threat/erken konfor kuralları geçerli değil ama "relief günleri" (her 5 derinlikte sakin gün) var.
 - **Çıkış ve ödül:** istediğin zaman **CASH OUT** → derinliğe göre kalıcı ödül (Clout, unvan, prestij yıldızı, özel kozmetik)
   + liderlik tablosu (haftalık/crew). Ölüp kovulursan yarısı.
+
+## 20. Wave 3 programı (2026-09-29, sahibin uzun listesi) — 7 Sonnet ajanı, tarayıcı testi yok
+| Ajan | Kapsam |
+|---|---|
+| **ux** | UI'nin "AI gibi" görünmesi (tek tasarım dili, emoji/kutu azaltma), rol menüsü taşan yazılar, ESC sonrası mouse kilidi, ana menüde el/viewmodel görünmesi, emote'ta arkadan 3. şahıs kamera, beyzbol sopası vb. viewmodel açıları, gemi kapısı dışarıdan kapalı görünme bug'ı, daha çok suit, yetenek CD 5 dk + dirilme 10 dk, **can yenileme sadece yemekle** |
+| **net** | Arkadaşların bir süre sonra düşmesi (Trystero kopma/yeniden bağlanma, heartbeat, host timeout), genel bug taraması + oyun mantığı testleri (node) |
+| **cycle2** | 3 gün + boss döngüsünü bağla (Sector Core, 3 yeni boss), Mythic+ keystone ve raid'i **terminalden kolay erişilebilir** yap, dungeon (tesis içi) sistemini geliştir: kanatlar, labirent bölümleri, zone'lar |
+| **finish** | Yarım kalanları bitir: pet getirme/saldırı (host sim + sync), maps2 challenge odalarını aç, ev gezegeninde gerçek baskın savaşı |
+| **worlds2** | Sovyet binaları/brutalist blok biyomu + baskın olayları, Star Wars esintili gezegen (çöl ikiz güneş, kum/uzay yaratıkları, cantina karakolu) + **ışın kılıcı**, gezegen yaratıkları dışarıdan (yörüngeden/iniş) görünsün, **loot sayısını azalt + zaman baskısı + gün geçtikçe zorlaşma** |
+| **shipyard** | §13 Starter Pod → modüller, gemi parçaları, özelleştirme, çok daha büyük gemi seçenekleri |
+| **backrooms2** | Yarım kalan noclip cep boyutu + Backrooms yaratıkları + liminal görseller (WIP branch'ler: `worktree-wf_fa5fa8a1-dc0-2`, `-3`) |
