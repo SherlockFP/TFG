@@ -415,3 +415,13 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
   2 real players. First job next session: `npm run dev`, play 15 min, run `tools/harness/smoke_land.js` + `tools/harness/mp2.mjs`,
   fix crashes, then merge to `main`.
 - Gotcha learned: never `rm -rf node_modules` inside a worktree whose node_modules is a symlink (it wiped the shared install once).
+
+### 5.15 Wave 3 - cycle2: SECTOR CORE + 3 bosses + KEYSTONE + RAID + ENDLESS glue (module `cycle`, docs/wave3/cycle2.md; node-tested only, NOT run in a browser)
+- Quota met on the last day -> SECTOR GATE OPEN -> land on a generated core (`layoutOpts`: 3 wings, labyrinth, locked arena, elites, key holders that drop
+  ARENA ACCESS CARDS) -> boss chest + next sector; loss = grace day + retry, 2nd loss = shameful exit. Terminal `CORE`, `CYCLE`, `KEYSTONE`, `RAID`, `GATE`, `ENDLESS`, `CASHOUT`
+  (keystone / raid lines in the objectives from sector 2). New bosses: Load Balancer, Middle Manager, Comment Section Hydra + a generic kit engine (surgeon, host, excavator,
+  lobby manager, key holder). Endless mode (meter, patch notes, S-rank gates, cash out, leaderboard) wired to `cycle_core.js`. Default ON (`config.cycle !== false`).
+- `facility.js generateLayout(seed, theme, size, opts)` got wings / labyrinth / arena / zones options (default output identical); the deepest generated server of every sector (2+) uses wings + maze.
+- Wrappers on the host.js flow live in `src/game/cycle.js` (`hostEvaluateQuota / hostLever / hostSetPhase / hostPopulateMoon / hostBeginTakeoff / hostFinishTakeoff / hostUpdate`, `applyRunState`, `onPhase`, the `unlock` handler). Net: `cyx`, `cyreq`. State: `run.cycle`.
+- Tests: `node tools/harness/cycle.test.mjs`, `cycle2_plan.test.mjs`, `cycle2_bosses.test.mjs`, `cycle2_flow.test.mjs` (real host flow + fuzz + soft-lock proof), `cycle2_i18n.test.mjs`.
+- First job when a browser is available: land on a core of every interior, watch the 3 new boss fights (name card, HP bar, rings), open the arena with cards, run a keystone and a raid with 2 tabs.

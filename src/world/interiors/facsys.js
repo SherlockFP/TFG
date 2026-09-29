@@ -38,7 +38,7 @@ const VENT_P = { sewer: 0.6, hospital: 0.5, mineshaft: 0.4, serverfarm: 0.3, fac
 const DXs = [1, 0, -1, 0], DZs = [0, 1, 0, -1];
 
 /** Rooms that are sealed on purpose: vaults, the containment chamber, treasure rooms. */
-export const isSealedRoom = (r) => !!r && (r.type === 'vault' || r.type === 'core' || !!r.treasure);
+export const isSealedRoom = (r) => !!r && (r.type === 'vault' || r.type === 'core' || !!r.treasure || !!r.arena);
 const blocksEdge = (inf) => !!inf && (inf.type === 'vault' || inf.type === 'contain' || (inf.type === 'door' && inf.locked));
 
 export function facilityReach(L, { blockLocked = true, sources = null } = {}) {
@@ -95,7 +95,7 @@ export function planFacilitySystems(L) {
   const gen = L.rooms.find((r) => r.type === 'generator') || null;
   const core = L.rooms.find((r) => r.type === 'core') || null;
   const containKey = core ? [...L.edgeInfo.values()].find((i) => i.type === 'contain')?.key ?? null : null;
-  const usable = L.rooms.filter((r) => !SPECIAL_ROOMS.has(r.type) && !r.treasure && reach[L.idx(r.cx, r.cz)] && r.w * r.h >= 4)
+  const usable = L.rooms.filter((r) => !SPECIAL_ROOMS.has(r.type) && !r.treasure && !r.arena && reach[L.idx(r.cx, r.cz)] && r.w * r.h >= 4)
     .sort((a, b) => a.id - b.id);
   const pool = rng.shuffle(usable.slice());
   const taken = new Set();
@@ -133,7 +133,7 @@ export function planChestSpots(L, nav, vaultSpots = []) {
   const out = [];
   const C = L.cell;
   for (const r of L.rooms) {
-    if (['entrance', 'generator', 'core', 'vault'].includes(r.type) || r.hub) continue;
+    if (['entrance', 'generator', 'core', 'vault'].includes(r.type) || r.hub || r.arena) continue;   // (the boss arena is a dead end too, but no chest before the boss)
     if (!(r.treasure || r.links === 1)) continue;
     const dist = Math.max(0, L.distOf[L.idx(r.cx, r.cz)] || 0);
     if (!r.treasure && dist < 4) continue;
@@ -307,7 +307,7 @@ export function buildFacilitySystems(ctx) {
     return null;
   };
   // try the planned room, then any other usable room (deterministic order)
-  const fallbackRooms = L.rooms.filter((r) => !SPECIAL_ROOMS.has(r.type) && !r.treasure && P.reach[L.idx(r.cx, r.cz)]).map((r) => r.id);
+  const fallbackRooms = L.rooms.filter((r) => !SPECIAL_ROOMS.has(r.type) && !r.treasure && !r.arena && P.reach[L.idx(r.cx, r.cz)]).map((r) => r.id);
   const wallSpotAny = (roomId, w, y0, y1, avoid, depth = 0.45) => {
     const r2 = rng.fork('ws' + roomId);
     if (roomId !== null && roomId !== undefined && !busyRooms.has(roomId)) { const s = wallSpot(roomId, w, y0, y1, r2, depth); if (s) return s; }
@@ -462,7 +462,7 @@ export function buildFacilitySystems(ctx) {
     sys.core = { room: coreRoom.id, spot: new THREE.Vector3(cx, Y + 0.5, cz), ring, ring2, field, fieldMat, emitter };
   } else {
     // no chamber fitted: the core sits on an open pedestal in the deepest reachable room (field-locked)
-    const deep = L.rooms.filter((r) => !SPECIAL_ROOMS.has(r.type) && !r.treasure && P.reach[L.idx(r.cx, r.cz)]).sort((a, b) => (L.distOf[L.idx(b.cx, b.cz)] - L.distOf[L.idx(a.cx, a.cz)]) || a.id - b.id)[0];
+    const deep = L.rooms.filter((r) => !SPECIAL_ROOMS.has(r.type) && !r.treasure && !r.arena && P.reach[L.idx(r.cx, r.cz)]).sort((a, b) => (L.distOf[L.idx(b.cx, b.cz)] - L.distOf[L.idx(a.cx, a.cz)]) || a.id - b.id)[0];
     if (deep) {
       const rc = K.roomRect(deep);
       const cx = (rc.x0 + rc.x1) / 2, cz = (rc.z0 + rc.z1) / 2;

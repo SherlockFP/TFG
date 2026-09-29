@@ -884,7 +884,7 @@ export function buildSetPieces(ctx) {
   // ---------------------------------------------------------------- c) flooded room
   let floodRoom = null;
   {
-    const cand = L.rooms.filter((r) => !SKIP_ROOMS.has(r.type) && !noFlood.has(r.type) && !r.hub && roomDist(r) > 3);
+    const cand = L.rooms.filter((r) => !SKIP_ROOMS.has(r.type) && !noFlood.has(r.type) && !r.hub && !r.arena && !r.maze && roomDist(r) > 3);
     if (cand.length && rFlood.chance(0.65)) {
       floodRoom = rFlood.weighted(cand.map((r) => ({ r, w: FLOOD_W[r.type] ?? 1 }))).r;
       buildFlood(floodRoom);
@@ -974,7 +974,7 @@ export function buildSetPieces(ctx) {
   if (!stairsUsable) console.warn('setpieces: stairs_metal does not fit a', CATWALK_H, 'm deck', ST);
   const QROT = [0, Math.PI / 2, Math.PI, -Math.PI / 2];
   for (const r of L.rooms) {
-    if (SKIP_ROOMS.has(r.type) || !(r.height >= 6) || !stairsUsable) continue;
+    if (SKIP_ROOMS.has(r.type) || r.arena || r.maze || !(r.height >= 6) || !stairsUsable) continue;
     const rc = rCat.fork('r' + r.id);
     if (!rc.chance(r.type === 'storage' ? 0.8 : r.type === 'boiler' ? 0.65 : 0.55)) continue;
     buildCatwalk(r, rc);
@@ -1370,7 +1370,7 @@ export function buildSetPieces(ctx) {
     return true;
   }
   {
-    const cand = rTrail.shuffle(L.rooms.filter((r) => !SKIP_ROOMS.has(r.type) && r !== floodRoom && roomDist(r) > 3));
+    const cand = rTrail.shuffle(L.rooms.filter((r) => !SKIP_ROOMS.has(r.type) && !r.arena && !r.maze && r !== floodRoom && roomDist(r) > 3));
     const want = 1 + ((L.size || 1) >= 1.3 ? 1 : 0) + (rTrail.chance(0.5) ? 1 : 0);
     let made = 0;
     for (const r of cand) { if (made >= want) break; if (buildTrail(r, rTrail.fork('r' + r.id))) made++; }

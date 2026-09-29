@@ -118,3 +118,9 @@ check bubble size / font, leg look when crouching, elbow direction of the IK arm
 
 ## Food & drinks (wave 2, module `food`)
 Added optional buffs + social fun (cheers, cake, table, booze). Unverified in a browser: first-person eat arcs, blur overlay, table / machine placement. Booze courage only touches STATIC; no chat bubbles exist to slur yet.
+
+## Wave 3 - cycle2: Sector Core, 3 new bosses, Keystone, Raid, Endless (module `cycle`, docs/wave3/cycle2.md)
+The 3-day + boss loop is now real (gate -> core with wings, a labyrinth and a card-locked arena -> chest / grace day / shameful exit) and the Mythic+ / raid asks are reachable from the terminal (`KEYSTONE GO`, `RAID GO`, listed in the objectives from sector 2).
+Proven by numbers only: node tests drive the REAL host.js flow, the real CreatureManager and real layouts (soft-lock fuzz, weekly lock, all 8 themes); nothing was seen in a browser.
+Risks: boss models and telegraph readability, the maze / arena look and lighting, whether a labyrinth is fun with creatures in it (it is a spanning tree + few loops), keystone / raid numbers (design values), 2-player sync of `run.cycle` and `cyx`,
+the arena auto-open (720 s) as the only fallback for lost cards, Legacy Bot sector (outdoor boss, no cards) never seen, `shrines` mutator unwired, no Trophy Hall / CASE entry / first-kill cosmetic yet.

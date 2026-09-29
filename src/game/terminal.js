@@ -399,6 +399,7 @@ export class Terminal {
         const m = MOONS[cmd.moon];
         if (!m || run.phase !== 'orbit') { reply('Cannot route now.', true); return; }
         if (m.stale) { reply('That server went dark with the old sector. Type SECTOR.', true); return; }
+        { const blocked = g.cycle?.routeBlocked?.(m); if (blocked) { reply(blocked, true); return; } }   // [cycle] the Sector Gate locks the autopilot
         if (run.daysLeft <= 0 && !m.company) { reply('Deadline reached: only 0-Algorithm HQ is available.', true); return; }
         // Free travel (host option, on by default): every moon/server is reachable without credits.
         const cost = g.config?.freeTravel ? 0 : m.cost;

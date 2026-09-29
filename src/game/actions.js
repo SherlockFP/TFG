@@ -236,6 +236,9 @@ export const actionMethods = {
     if (door.kind === 'vault') return { label: door.locked ? t('Vault (locked) - use the keypad') : t('Vault'), action: () => {} };
     if (door.teleport) return null;
     if (door.locked) {
+      if (door.info?.arena) return held?.type === 'corecard'   // [cycle] the boss arena door only takes the Key Holders' access cards
+        ? { label: t('Insert the access card [E]'), action: () => this.net.request('unlock', { id: door.id, key: held.id }) }
+        : { label: t('Locked'), sub: t('Needs the access cards of the Key Holders'), action: () => this.audio.at('door_locked', door.pos.clone().add(UP), 0.8) };
       if (held?.type === 'key') return { label: t('Unlock door with key [E]'), action: () => this.net.request('unlock', { id: door.id, key: held.id }) };
       if (held?.type === 'lockpick') return { label: t('Pick the lock [E]'), action: () => this.startLockpick(door, held) };
       return { label: t('Locked'), sub: t('Needs a key or lockpicker'), action: () => this.audio.at('door_locked', door.pos.clone().add(UP), 0.8) };
