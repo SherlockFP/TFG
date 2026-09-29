@@ -23,7 +23,7 @@ const ids = D.C5.map((e) => e.id), keys = D.C5.map(D.keyOf);
 ok(new Set(ids).size === ids.length, 'ids unique across slots');
 ok(new Set(keys).size === keys.length, 'keys unique');
 const cnt = (s) => D.bySlot(s).length;
-ok(cnt('suit') >= 12 && cnt('hat') >= 15 && cnt('back') >= 8 && cnt('skin') === 10 && cnt('emote') === 6, `counts suit ${cnt('suit')} hat ${cnt('hat')} back ${cnt('back')} skin ${cnt('skin')} emote ${cnt('emote')}`);
+ok(cnt('suit') >= 20 && cnt('hat') >= 25 && cnt('back') >= 14 && cnt('skin') === 14 && cnt('emote') === 11, `counts suit ${cnt('suit')} hat ${cnt('hat')} back ${cnt('back')} skin ${cnt('skin')} emote ${cnt('emote')}`);
 for (const e of D.C5) {
   ok(TIER_ORDER.includes(e.tier), 'tier ' + e.id);
   ok(['shop', 'crate', 'boss', 'secret'].includes(e.src), 'src ' + e.id);
@@ -38,7 +38,7 @@ for (const e of D.bySlot('suit')) { ok(!!M.C5_SUIT_BUILDERS[e.id], 'suit builder
 for (const e of D.bySlot('hat')) { const h = M.buildC5Hat(e.id); ok(h && h.children.length > 0, 'hat builder ' + e.id); ok(HATS.some((x) => x.id === e.id), 'hat in HATS ' + e.id); }
 for (const e of D.bySlot('back')) { ok(typeof M.C5_BACK_BUILDERS[e.id] === 'function', 'back builder ' + e.id); ok(BACK_ACCS.some((x) => x.id === e.id), 'back registered ' + e.id); }
 for (const e of D.bySlot('skin')) ok(W.SKIN_IDS.includes(e.id), 'skin id ' + e.id);
-ok(W.SKIN_IDS.length === 10 && W.SKIN_IDS.every((s) => D.C5_BY_ID[s]?.slot === 'skin'), 'skin tables agree');
+ok(W.SKIN_IDS.length === 14 && W.SKIN_IDS.every((s) => D.C5_BY_ID[s]?.slot === 'skin'), 'skin tables agree');
 for (const e of D.bySlot('emote')) { const d = EMOTE_BY_ID[e.id]; ok(d && typeof d.fx === 'function' && EMOTES.includes(d), 'emote ' + e.id); ok(!isEmoteUnlocked({ emotes: [] }, e.id), 'emote locked by default ' + e.id); ok(isEmoteUnlocked({ emotes: [e.id] }, e.id), 'emote unlock ' + e.id); }
 for (const id of M.C5_HAT_IDS) ok(D.C5_BY_ID[id]?.slot === 'hat', 'hat builder has data ' + id);
 for (const id of Object.keys(M.C5_SUIT_BUILDERS)) ok(D.C5_BY_ID[id]?.slot === 'suit', 'suit builder has data ' + id);
@@ -174,7 +174,7 @@ const P = () => ({ level: 20, coins: 5000, stats: { sold: 0, quotasMet: 0, creat
   ok(!C.buyOffer(q, 'suit:eoty', { day }).ok, 'not in rotation');
   const poor = P(); poor.coins = 1; ok(C.buyOffer(poor, rot.offers[1].key, { day }).why === 'Not enough Clout', 'poor');
   const low = P(); low.level = 1; const lv = rot.offers.find((x) => x.minLevel > 1); if (lv) ok(/Requires level/.test(C.buyOffer(low, lv.key, { day }).why), 'level gate');
-  const rich = P(); rich.stats = { sold: 25000, quotasMet: 20, creatureKills: 400 }; rich.level = 45; rich.cosm5 = { flags: { glitch: true } };
+  const rich = P(); rich.stats = { sold: 25000, quotasMet: 20, creatureKills: 400 }; rich.level = 45; rich.cosm5 = { flags: { glitch: true, quoted: 9, appraised: 45, raved: 6 } };
   for (const [k, r0] of Object.entries(C.RULES)) { ok(r0.test(rich), 'rule met ' + k); if (k !== 'emote:undo') ok(!r0.test(P()), 'rule not met at start ' + k); }
 }
 for (const k of Object.keys(C.RULES)) ok(!!D.C5_BY_KEY[k], 'rule key resolves ' + k);
