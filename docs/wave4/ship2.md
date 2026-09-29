@@ -4,8 +4,7 @@ Owner: "Gemide bazi seyler ic ice girmis, fixle. Duz default gemiyi gelistir, Am
 Gemiyi disaridan da tamir etme ozelligi ekle: shop'tan mekanik alet (Ingiliz anahtari vs.) satin alalim."
 Follow-ups from the lead: extra rooms (greenhouse / planters), ship defences on hull mount points.
 
-Status: node-tested (`ship2_overlap`, `ship2_hull`, `ship2_install`), `npm run build` clean, ONE short headless run
-(`tools/harness/wave4_ship2.js`, screenshot in the report). Not hand-played, not tested with two real players.
+Status: node-tested (`ship2_overlap`, `ship2_hull`, `ship2_install`), `npm run build` clean. **NO browser run happened** (the shared browser queue was too deep and the session was cut): `tools/harness/wave4_ship2.js` is written but was never executed. Not hand-played, not tested with two real players.
 
 ## 1. Clipping fix (before / after)
 `node tools/harness/ship2_overlap.test.mjs [--verbose]` builds an AABB for every fixture (real prop bounding boxes, module-owned fixtures with their
@@ -83,10 +82,10 @@ World state = `run.s2` via `broadcastRun(['s2', 'hullDamage'])`. No new per-fram
 
 ## 8. Tests
 `node tools/harness/ship2_overlap.test.mjs` (10: before/after report, table candidates, real-ship colliders, aisles), `ship2_hull.test.mjs` (19: state machine, early caps, repair rules, ring, power budget, planter, tools), `ship2_install.test.mjs` (19: shop entries, damage sources, host repair sessions, tool validation, door jam pity, takeoff delay, shipfaults hooks, mounts, planters, dispose). Regression: `shipyard*.test.mjs`, `gameplay2.test.mjs`, `food*.test.mjs`, `pets.test.mjs` pass.
-Browser: `tools/harness/wave4_ship2.js` (land, 4-view collage, damage, wrench repair via the host path, planter).
+Browser (NOT yet run): `flock /tmp/tfg-browser.lock node tools/harness/headless.mjs --port PORT --script tools/harness/wave4_ship2.js --shot out.png --wait 3000` (land, 4-view collage overlay, damage, wrench repair via the host path, planter). First job for the lead's batch: look at the collage, run `smoke_land.js`, walk the ship.
 
 ## 9. Known gaps / honest list
-* Only one short headless run; nothing hand-played. Not verified by eye: the height of the outside hull spots for a player standing on the ground (slots are y 0.1-1.2), the roof ladder feel, rail colliders vs the shipyard deck, partition colours under the PSX shader, sign readability, glass tint.
+* No headless run at all (script `tools/harness/wave4_ship2.js` ready: land, 4-view collage, damage, wrench repair, planter); nothing hand-played. Not verified by eye: the height of the outside hull spots for a player standing on the ground (slots are y 0.1-1.2), the roof ladder feel, rail colliders vs the shipyard deck, partition colours under the PSX shader, sign readability, glass tint.
 * The old ship props are still separate meshes (no merge pass) - draw calls are +18 over the old ship, not lower.
 * "Flak" is not a separate defence: MK3 (triple barrel) fills that role; no new turret AI was written. Tesla / MK2-3 range is the deployables' value.
 * Hull damage is not shown in the terminal (no HULL command yet); the HUD dock + objectives show it.

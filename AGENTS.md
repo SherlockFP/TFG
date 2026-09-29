@@ -369,7 +369,7 @@ How hooks work: the agents returned integration hooks (file / anchor / mode / co
 (labels `build:*`, `fix:*`); `tools/apply_hooks.py` applies them. If you add a module by hand, follow the pattern:
 install in the Game constructor (or after `installNetHandlers`), `update(dt)` in `Game.update`, `dispose()` in `destroy()`.
 
-### 5.16 Wave 4 - SHIP2 (module `ship2`; docs/wave4/ship2.md; node-tested + builds + ONE short headless run, NOT hand-played)
+### 5.16 Wave 4 - SHIP2 (module `ship2`; docs/wave4/ship2.md; node-tested + builds, NO browser run at all)
 - Default ship = "Mini-Skeld": all fixture positions in `src/world/shiplayout.js` (overlap-checked: 5 legacy clips -> 0, `tools/harness/ship2_overlap.test.mjs`), partitions / floor tints / signs / reactor / crates / rounded frames in `src/world/shipdeco.js`, cockpit / hub / engine room / cargo + LOOT BAY (`dropPoint()` for store orders), clerestory windows, rounded nose. Shipyard doorways (R1 / N1 / N2) and the +z door opening untouched; roof is now "aboard" (`insideShip`).
 - Hull damage (dent / leak / spark / breach spots, `run.s2`, rules `src/game/ship2_core.js`) from landings, weather, creatures at the hull, raids, sieges; tiers -> flicker, door jam (`host.js` 1 line -> `ship2.doorJam`), takeoff delay, `OUTER_FAULTS.hullx` pre-flight fault in `shipfaults.js`. Outside repair with Wrench / Welding Torch / Repair Kit (store, Tools): hold E + timing ring, host-owned session. Quota 0 = dents only, no effects.
 - Roof defence mounts (siege deployables via `debugPlace`, ship power budget), roof ladder, hydroponic planters (`ship2.addPlanterSlot` for shipyard rooms), Hydro Apple food.

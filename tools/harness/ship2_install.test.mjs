@@ -27,6 +27,14 @@ if (shopMod) ok('shop: the Company Store catalogue lists the three tools in the 
   for (const id of C.TOOL_IDS) { const e = es.find((x) => x.id === id); assert.ok(e, id + ' listed'); assert.equal(e.cat, 'tools'); assert.equal(e.currency, 'credits'); assert.equal(e.price, ITEMS[id].price); }
 });
 
+const MD = await import('../../src/models/ship2.js');
+ok('models: every spot kind, plant stage, mount plate and the 4 item models build (merged, vertex coloured)', () => {
+  for (const k of C.KIND_IDS) { const m = MD.createSpotModel(k, C.SLOTS[0], 0.2); assert.ok(m.root.children.length >= 1 && m.root.children.length <= 2, k); m.update(0.1, 1); m.dispose(); }
+  for (let st = 0; st <= 4; st++) { const m = MD.createPlantModel(st); assert.equal(m.root.children.length, st < 1 ? 0 : 1); m.dispose(); }
+  const mm = MD.createMountModel(); for (const st of ['free', 'on', 'off', 'dmg']) mm.setState(st); assert.ok(mm.ring); mm.dispose();
+  for (const f of [MD.createWrenchModel, MD.createTorchModel, MD.createRepairKitModel, MD.createFruitModel]) { const g = f(); let n = 0; g.traverse((o) => { if (o.isMesh) n++; }); assert.ok(n >= 1 && n <= 2); }
+});
+
 // ---------------------------------------------------------------------------------------------- fakes
 let colId = 0;
 const physics = { cols: new Set(), addStaticBox() { const c = { id: ++colId }; this.cols.add(c); return c; }, removeCollider(c) { this.cols.delete(c); }, raycast: () => null, world: { intersectionsWithShape() {} } };

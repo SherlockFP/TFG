@@ -139,7 +139,10 @@ export function buildShip({ physics, lightPool, scene }) {
   const stripeMat = new THREE.MeshLambertMaterial({ color: 0xc8581c });
   for (const zz of [ez0 - 0.02, ez1 + 0.02]) {
     // [ux] the +z stripe stops at the door opening
-    const segs = zz > 0 ? [[ex0, dL], [dR, ex1]] : [[ex0, ex1]];
+    let segs = zz > 0 ? [[ex0, dL], [dR, ex1]] : [[ex0, ex1]];
+    if (zz > 0) {   // [ship2] the stripe must not cross the clerestory windows
+      for (const w of WINDOWS_Z) segs = segs.flatMap(([p, q]) => (w.x1 <= p || w.x0 >= q ? [[p, q]] : [[p, Math.max(p, w.x0)], [Math.min(q, w.x1), q]])).filter(([p, q]) => q - p > 0.05);
+    }
     for (const [a, b] of segs) {
       const stripe = new THREE.Mesh(new THREE.PlaneGeometry(b - a, 0.5), stripeMat);
       stripe.position.set((a + b) / 2, 2.6, zz);
