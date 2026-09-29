@@ -2,6 +2,8 @@
 // Imported by src/game/balance.js (game glue) and tools/sim/balance.mjs (node sim), so the sim and the game use
 // the exact same formulas. See docs/wave1/balance.md for the tables and the reasoning.
 
+import { capOne } from './balance_rules.js';
+
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const lerp = (a, b, t) => a + (b - a) * t;
 
@@ -33,21 +35,16 @@ export function sectorScale(q) {
 //  speedCap: absolute creature speed ceiling in m/s (player sprint is 8.2, so sprinting always escapes).
 export const EARLY = [
   { q: 0, hitCap: 0.45, speedCap: 8.0 },
-  { q: 2, hitCap: 0.70, speedCap: 9.5 },
-  { q: 3, hitCap: 0, speedCap: 0 },      // 0 = no cap
+  { q: 2, hitCap: 0.60, speedCap: 9.5 },
+  { q: 3, hitCap: 0.60, speedCap: 0 },   // 0 = no speed cap; the hit cap itself now lives in balance_rules.js (85 % from quota 4)
 ];
 export function earlyRules(q) {
   let r = EARLY[0];
   for (const e of EARLY) if ((q || 0) >= e.q) r = e;
   return r;
 }
-const BASE_HP = 100;
-/** Cap one creature / trap hit (dmg may be 999 = instakill). Returns the damage to apply. */
-export function capHit(dmg, q) {
-  const r = earlyRules(q);
-  if (!r.hitCap) return dmg;
-  return Math.min(dmg, Math.round(BASE_HP * r.hitCap));
-}
+/** Cap one creature / trap hit (dmg may be 999 = instakill). Rules: balance_rules.js (45 % / 60 % / 85 % of a 100 HP bar; ok = telegraphed instakill allowed from quota 4). */
+export function capHit(dmg, q, ok = false) { return capOne(dmg, q, ok); }
 
 // ------------------------------------------------------------------------------------------------ threat -> scale
 // Piecewise-linear over the threat meter (anchors: [threat, value]).

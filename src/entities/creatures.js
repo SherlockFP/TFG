@@ -15,6 +15,7 @@ import { ITEMS } from '../game/items.js';
 import { t, addTranslations } from '../core/i18n.js';
 import { creatureTierMul, creatureTierXp } from '../game/enhance.js';   // [forge] creature tiers
 import { atReady, atBegin, atStep, atCancel, atShoot, atAiming } from '../game/aimtell.js';   // wave 5: telegraphed aim (moderator, facility turret)
+import { isInstakillOk } from '../game/balance_rules.js';   // wave 8: balance rules
 import { chaseCfg, chaseSpeed, chaseTurn, doorPause, newChase } from '../game/chase_tuning.js';       // wave 5: burst / fatigue / turning / door hesitation
 
 addTranslations({ 'CROUCH BESIDE IT TO ROCK IT': 'SALLAMAK İÇİN YANINDA ÇÖMEL' });
@@ -836,8 +837,10 @@ export class CreatureManager {
       }
     }
   }
-  attack(c, p, dmg, cause) {
+  attack(c, p, dmg, cause, _late) {
     if (c.age < 1) return;                                     // spawn grace
+    if (dmg >= 999 && !isInstakillOk(c.type, c.def)) dmg = c.dmg || 70;   // balance_rules: a legacy 'kills you' call is the creature's own hit
+    if (!_late && this.game.balRules?.gate(this, c, p, dmg, cause)) return;   // balance_rules: >= 0.4 s wind-up, grab immunity
     if (dmg >= 999 && this.nearSafeZone(p)) dmg = 70;          // never an instant death at the entrance / ship
     const leech = c.affix ? AFFIXES[c.affix].leech : 0;       // 'Monetized': heals on every hit
     if (leech && c.maxHp && c.hp < c.maxHp) c.hp = Math.min(c.maxHp, c.hp + leech);
@@ -1232,13 +1235,14 @@ export const BEHAVIORS = {
     const players = M.playersFor(c).filter((p) => !p.inShip);
     if (c.state === 'grab') {
       const p = M.game.aiPlayerById(c.target);
+      c.data.ate = 0;
       if (p && !p.dead) M.game.hostHoldPlayer(p.id, c.pos.clone().add(new THREE.Vector3(Math.sin(c.yaw) * 1.5, 5.5, Math.cos(c.yaw) * 1.5)));
-      if (c.t > 1.4) c.setState('eat');
+      if (c.t > 1.8) c.setState('eat');   // 1.8 s held: mash JUMP to break free (balance_rules)
       return;
     }
     if (c.state === 'eat') {
       const p = M.game.aiPlayerById(c.target);
-      if (c.t > 1.4 && p && !p.dead) { M.attack(c, p, 999, 'giant'); }
+      if (c.t > 0.6 && p && !p.dead && !c.data.ate && p.pos.distanceTo(c.pos) < 6) { c.data.ate = 1; M.attack(c, p, 999, 'giant'); }
       if (c.t > 2.5) { c.setState('idle'); c.target = null; }
       return;
     }
@@ -1661,7 +1665,7 @@ export const BEHAVIORS = {
       return;
     }
     if (st === 'tongue') {
-      if (!d.shot && c.t >= 0.3) {
+      if (!d.shot && c.t >= 0.5) {   // 0.5 s tongue wind-up (balance_rules: every attack >= 0.4 s)
         d.shot = true;
         if (v && !v.dead && v.pos.distanceTo(c.pos) < 13 && !M.nearSafeZone(v) && g.physics.lineOfSight(M.eye(c).clone(), v.eye)) {
           d.dmgTaken = 0; d.vpos = v.pos.clone(); d.holdT = 0; d.tickT = 0.6;

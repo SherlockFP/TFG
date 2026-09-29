@@ -13,6 +13,7 @@
 import { CREATURES, spawnTable, canSpawnMore, creatureLevelStats } from '../../src/game/creatures.js';
 import { MOONS } from '../../src/game/moons.js';
 import { indoorPowerMul, creatureBaseLevel } from '../../src/game/progression.js';
+import { isInstakillOk, hitCapFrac } from '../../src/game/balance_rules.js';
 import { scaleFor, sectorScale, threatScale, capHit, earlyRules, ThreatModel, lootLuckFor, levelIndex, LEVELS, RAMP_Q } from '../../src/game/balance_core.js';
 
 const args = process.argv.slice(2);
@@ -35,7 +36,7 @@ if (SECTIONS.has('a')) {
     const s0 = scaleFor(q, 0), s40 = scaleFor(q, 40), s80 = scaleFor(q, 80), e = earlyRules(q);
     console.log(pad(q, 6), pad(f2(s0.hp), 6), pad(f2(s0.dmg), 6), pad(f2(s0.speed), 6), pad(f2(s0.spawn), 6), pad(f2(s0.detect), 7), '|',
       rpad(f2(s40.dmg), 7), rpad(f2(s80.dmg), 7), rpad(f2(s80.speed), 9), rpad(f2(s40.spawn), 9), rpad(f2(s80.spawn), 9), rpad(f2(s80.pace), 8), '|',
-      pad(e.hitCap ? Math.round(e.hitCap * 100) + '%' : '-', 6), pad(e.speedCap ? e.speedCap + ' m/s' : '-', 9), '|', rpad(f2(lootLuckFor(q, 0)), 6), rpad(f2(lootLuckFor(q, 80)), 8));
+      pad(Math.round(hitCapFrac(q) * 100) + '%', 6), pad(e.speedCap ? e.speedCap + ' m/s' : '-', 9), '|', rpad(f2(lootLuckFor(q, 0)), 6), rpad(f2(lootLuckFor(q, 80)), 8));
   }
 }
 
@@ -50,7 +51,7 @@ function cstats(id, q, scaled) {
   const s = scaled ? scaleFor(q, 0, d.hazard ? 'hazard' : 'creature') : { hp: 1, dmg: 1, speed: 1 };
   const hp = st.maxHp == null ? null : Math.round(st.maxHp * s.hp);
   const raw = st.dmg >= 999 ? 999 : Math.round(st.dmg * s.dmg);
-  const dmg = scaled ? capHit(raw, q) : raw;
+  const dmg = scaled ? capHit(raw, q, isInstakillOk(id, d)) : raw;
   let run = d.run * s.speed;
   if (scaled) { const cap = earlyRules(q).speedCap; if (cap) run = Math.min(run, cap); }
   return { hp, dmg, raw, run, ttk: hp == null ? null : hp / shovelDps };

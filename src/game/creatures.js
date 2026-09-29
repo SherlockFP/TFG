@@ -1,6 +1,7 @@
 // Creature stat table (host AI + UI). Mods can add with registerCreature().
 // hp: null = unkillable. power: spawn budget cost. xp/coin: kill rewards at level 1.
 import { localizeFields } from '../core/i18n.js';
+import { normalizeDef } from './balance_rules.js';
 export const CREATURES = {
   scuttler: { name: 'Spam Bot', hp: 30, dmg: 8, walk: 2.2, run: 5.4, power: 0.5, pack: [2, 4], xp: 18, coin: 3, drop: ['drop_scuttler', 0.25], zone: 'in', radius: 0.5, height: 0.6,
     lore: 'Swarms of cheap spam bots. Crunchy. Easy XP for new janitors.' },
@@ -8,9 +9,9 @@ export const CREATURES = {
     lore: 'Hoards content in its nest. Harmless... until you touch its stuff. Yippee!' },
   crawler: { name: 'Web Crawler', hp: 160, dmg: 40, walk: 2.8, run: 11, power: 2, xp: 110, coin: 20, drop: ['drop_crawler', 0.45], zone: 'in', radius: 0.8, height: 1.2,
     lore: 'Indexes everything at terrifying speed, in straight lines. Terrible at corners. Sidestep it.' },
-  lurker: { name: 'Lurker', hp: 220, dmg: 999, walk: 2.4, run: 9.5, power: 3, xp: 260, coin: 45, drop: ['drop_lurker', 0.6], zone: 'in', radius: 0.45, height: 2.2,
+  lurker: { name: 'Lurker', hp: 220, dmg: 70, walk: 2.4, run: 9.5, power: 3, xp: 260, coin: 45, drop: ['drop_lurker', 0.6], zone: 'in', radius: 0.45, height: 2.2,
     lore: 'Reads everything, posts nothing. Stalks you from behind. Look at it and it backs off. Stare too long and it gets angry.' },
-  mannequin: { name: 'NPC', hp: null, dmg: 90, walk: 12, run: 13, power: 1.5, xp: 0, coin: 0, zone: 'in', radius: 0.4, height: 2.0,
+  mannequin: { name: 'NPC', hp: null, dmg: 70, walk: 12, run: 13, power: 1.5, xp: 0, coin: 0, zone: 'in', radius: 0.4, height: 2.0,
     lore: 'Only moves when nobody is looking. Keep eyes on it and back away. Stun it to escape.' },
   sludge: { name: 'AI Slop', hp: null, dmg: 35, walk: 1.1, run: 1.9, power: 1, xp: 0, coin: 0, zone: 'in', radius: 0.9, height: 1.0,
     lore: 'A slow, endless blob of generated content. Cannot be killed. It seems to enjoy music.' },
@@ -26,7 +27,7 @@ export const CREATURES = {
     lore: 'Wears the face of a crewmate and sometimes their voice. If "they" are not answering, run.' },
   hound: { name: 'Troll', hp: 180, dmg: 45, walk: 3.0, run: 11, power: 2, xp: 130, coin: 22, drop: ['drop_hound', 0.5], zone: 'out', radius: 0.8, height: 1.2,
     lore: 'Blind. Hunts by sound: footsteps, horns, voices. Do not feed it. Crouch. Whisper.' },
-  giant: { name: 'Influencer', hp: 600, dmg: 999, walk: 3.0, run: 6.3, power: 3, xp: 520, coin: 90, drop: ['drop_giant', 1], zone: 'out', radius: 1.2, height: 8,
+  giant: { name: 'Influencer', hp: 600, dmg: 85, walk: 3.0, run: 6.3, power: 3, xp: 520, coin: 90, drop: ['drop_giant', 1], zone: 'out', radius: 1.2, height: 8,
     lore: 'Towering and hungry for content. If it sees you, you are in its next video. Break line of sight.' },
   sandkefal: { name: 'The Worm', hp: null, dmg: 999, walk: 8, run: 12, power: 3, xp: 0, coin: 0, zone: 'out', radius: 3, height: 3,
     lore: 'A colossal computer worm beneath the sand. When the ground rumbles, MOVE.' },
@@ -51,7 +52,7 @@ export const CREATURES = {
   ticketswarm: { name: 'Ticket Swarm', hp: 45, dmg: 5, walk: 4.6, run: 6.2, power: 0, xp: 25, coin: 3, zone: 'in', radius: 0.8, height: 1.6, noSpawn: true,
     deathText: 'was buried in unresolved tickets.',
     lore: 'A buzzing cloud of angry support tickets. They burn out after half a minute. Run, or swat them.' },
-  editor: { name: 'The Editor', hp: 260, dmg: 80, walk: 0, run: 0, power: 2, xp: 210, coin: 38, zone: 'in', radius: 0.55, height: 2.4, maxAlive: 2,
+  editor: { name: 'The Editor', hp: 260, dmg: 60, walk: 0, run: 0, power: 2, xp: 210, coin: 38, zone: 'in', radius: 0.55, height: 2.4, maxAlive: 2,
     deathText: 'was cut from the final edit.',
     lore: 'Only moves on the beat. Every drum hit it jumps closer. Between beats it is frozen, listening. '
       + 'If you are next to it on the beat: SNIP. Count the rhythm and keep your distance.' },
@@ -61,7 +62,7 @@ export const CREATURES = {
     deathText: 'forgot to feed their Tamagotchi.',
     lore: 'A crying virtual pet. It wants attention. Crouch next to it to rock it. Neglect it, or hit it, and it grows up very fast... '
       + 'The adult crouches before it lunges: sidestep.' },
-  stalker: { name: 'Parasocial', hp: null, dmg: 999, walk: 2.6, run: 6.2, power: 2.5, xp: 0, coin: 0, zone: 'in', radius: 0.35, height: 1.75, maxAlive: 1,
+  stalker: { name: 'Parasocial', hp: null, dmg: 70, walk: 2.6, run: 6.2, power: 2.5, xp: 0, coin: 0, zone: 'in', radius: 0.35, height: 1.75, maxAlive: 1,
     deathText: 'was loved to death by a Parasocial.',
     lore: 'Your biggest fan. Only YOU can see it. It watches, it giggles, it follows. When the static starts, it is coming: '
       + 'break line of sight, or leave the building. Your crew will think you are crazy.' },
@@ -74,6 +75,8 @@ export const CREATURES = {
     lore: 'Travel in flocks. Cowards alone, brave in a thread. They spread their wings and screech before they pile on a lone janitor. '
       + 'Stand your ground, swing at them, and they scatter.' },
 };
+
+for (const [id, d] of Object.entries(CREATURES)) normalizeDef(id, d);   // balance_rules: no non-allowlisted one-shot numbers
 
 // ---------------------------------------------------------------------------------------------
 // Global spawn weights for the round-3 creatures, merged on top of every moon's own table (moon entries win).
@@ -167,6 +170,7 @@ export function creatureDisplayName(type, variant, affix) {
 
 export function registerCreature(id, def, behavior) {
   CREATURES[id] = localizeFields({ name: id, hp: 100, dmg: 20, walk: 2, run: 5, power: 1, xp: 50, coin: 10, zone: 'in', radius: 0.5, height: 1.5, ...def, custom: true }, ['name', 'lore']);
+  normalizeDef(id, CREATURES[id]);   // balance_rules: 999 -> 90 unless a telegraphed instakill hazard / boss
   if (behavior) CREATURES[id].behavior = behavior;
   return CREATURES[id];
 }

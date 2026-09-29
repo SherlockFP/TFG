@@ -25,6 +25,7 @@ const CASUAL = Object.freeze({
   ammoMul: 1, drawMul: 1,                       // turret ammo per shot / battery draw
   forgeFailFrom: 6, forgeDriveCraft: true, forgeDriveMul: 1,   // a failed attempt at +N (N >= this) loses one level (never breaks); Backup Drive = the protection scroll: craftable at shard cost x mul
   deathNotice: false,
+  dmgMul: 1,                                    // creature damage multiplier (balance_rules.js); Standard = 1, Hard +10 %, both only from FROM_QUOTA
   sim: Object.freeze({ threatMul: 1, foodCapMul: 1, upkeep: 0 }),
 });
 
@@ -41,6 +42,7 @@ const STANDARD = Object.freeze({
   ammoMul: 1.5, drawMul: 1.25,
   forgeFailFrom: 6, forgeDriveCraft: true, forgeDriveMul: 2,
   deathNotice: true,
+  dmgMul: 1,
   sim: Object.freeze({ threatMul: 1.06, foodCapMul: 0.98, upkeep: 0.03 }),
 });
 
@@ -57,6 +59,7 @@ const HARD = Object.freeze({
   ammoMul: 2, drawMul: 1.5,
   forgeFailFrom: 5, forgeDriveCraft: false, forgeDriveMul: 1,
   deathNotice: true,
+  dmgMul: 1.1,
   sim: Object.freeze({ threatMul: 1.12, foodCapMul: 0.96, upkeep: 0.06 }),
 });
 

@@ -52,6 +52,7 @@ import { installInventory } from './inventory.js';
 import { installFacilitySystems } from './facilitysys.js';
 
 import { installBalance } from './balance.js';
+import { installBalanceRules } from './balance_rules.js';   // wave 8 balance
 import { doorwayBusy } from '../world/doorsafe.js';
 
 import { installMagic } from './magic.js';
@@ -316,6 +317,7 @@ export class Game extends Emitter {
     this.useModule('facilitysys', installFacilitySystems);
 
     this.useModule('balance', installBalance);
+    this.useModule('balRules', installBalanceRules);   // wave 8: wind-up gate, grab escape, hit-cap helpers
 
     this.useModule('magic', installMagic);
 
