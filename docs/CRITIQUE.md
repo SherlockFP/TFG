@@ -244,3 +244,6 @@ Live-stream hype (tiers -> Clout + sponsor crate, "wants more show"), ghost repl
 The homeworld stopped looking like a Lethal Company pad in the dark: it is now the crew "Off-Grid Claim" (violet dusk, Company mascot robot + hijacked LIVE tower + logo moon + data aurora on the horizon, scrap outpost with graffiti, kitchen, memorial of the fallen crew, watching drones). Still a first pass by numbers: NEVER looked at in a browser (queue), the layout is authored (not yet player-tuned) and the fence has no colliders.
 ## Wave 5 - zfixperf (docs/wave5/zfixperf.md)
 Zombie swarm no longer depends on the horde module and shows extra poses (headless-verified); GPU leak sweep (`gpusweep`) and outdoor prop merge are in but the geometry plateau and draw-call gain were NOT confirmed in a browser (queue cancelled) - needs QA with wave5_zfixperf_plateau.js.
+
+## Wave 6 - roledays (docs/wave6/roledays.md)
+Role constraint days turn co-op communication into a rule (8 cards, host-validated door / pick, Clout + hype on completion), but there is no minimap to hide, the medic card is only a limit, and the weapon / chat rules are client-enforced; nobody has played it with two humans yet.

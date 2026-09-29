@@ -1,0 +1,22 @@
+// Headless check for roledays: force a card, land, verify enforcement + HUD, take off, verify the bonus. Body of an async fn (window.kefal.game).
+const g = kefal.game, errs = []; addEventListener('error', (e) => errs.push(e.message));
+const r = g.roledays, out = { has: !!r };
+if (!r) return { out, errs };
+const tick = async (n) => { for (let i = 0; i < n; i++) { kefal.tick(10, 1 / 30, false); await new Promise((x) => setTimeout(x, 8)); } };
+g.run.phase = 'orbit'; g.run.quotaIndex = 2; g.run.moon = 'hamsi';
+let viewer = null; g.mods.on('tfg:viewers', (d) => { viewer = d; });
+await tick(5);
+r.debug.force('carrier'); await tick(5);
+out.pendingHud = document.querySelector('.rd-card')?.textContent?.slice(0, 80) || null;
+g.player.inShip = true; g.hostLever(g.selfId); g.hostFinishLanding(); await tick(20);
+out.active = r.state.active; out.cur = r.state.cur;
+out.hud = document.querySelector('.rd-card')?.textContent?.slice(0, 120) || null;
+const chats = []; const send0 = g.net.broadcast; g.net.broadcast = (t, d) => { if (t === 'chat') chats.push(d); return send0.call(g.net, t, d); };
+g.sendChat('hello'); out.chatSent = chats.length; g.net.broadcast = send0;
+out.voiceMuted = g.voice?.muted;
+r.debug.force('pacifist'); await tick(3);
+out.speedMul = g.stats.speedMul;
+const coins0 = g.profile.coins;
+out.phaseBefore = g.run.phase; g.hostSetPhase('takeoff'); await tick(10); out.phaseAfter = g.run.phase;
+out.coinsDelta = g.profile.coins - coins0; out.viewer = viewer; out.curAfter = r.state.cur; out.hudAfter = document.querySelector('.rd-card')?.offsetParent != null;
+return { out, errs };
