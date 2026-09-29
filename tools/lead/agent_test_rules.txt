@@ -4,3 +4,4 @@ UPDATE from lead: the owner now wants you to TEST your work in the real game too
 - Also run tools/harness/smoke_land.js once to prove nothing else broke. Zero new pageerrors required.
 - Save the script as tools/harness/wave4_<module>.js, commit it. Keep runs short; don't loop endlessly.
 - OWNER UPDATE: keep playtests SHORT and FAST. Max 2 headless runs total, each under ~2 minutes, no long loops/waiting. Prefer node tests. The browser lock is shared by ~18 agents — hold it as briefly as possible (never hold it while thinking/editing).
+- OWNER RULE (wave 8, strict): at most ONE new node test file per task (a few focused checks, not dozens), run ONLY the tests of the modules you touched, and at most ONE short headless run. Do not add test harness scripts for every feature. Quota matters more than coverage.
