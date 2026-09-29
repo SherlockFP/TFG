@@ -455,10 +455,10 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
 - Tests: `node tools/harness/cycle.test.mjs`, `cycle2_plan.test.mjs`, `cycle2_bosses.test.mjs`, `cycle2_flow.test.mjs` (real host flow + fuzz + soft-lock proof), `cycle2_i18n.test.mjs`.
 - First job when a browser is available: land on a core of every interior, watch the 3 new boss fights (name card, HP bar, rings), open the arena with cards, run a keystone and a raid with 2 tabs.
 
-### 5.16 Wave 4 - EGGS (module `eggs`; docs/wave4/eggs.md; node-tested + headless-run in the menu and on a moon, NOT hand-played, NOT tested over WebRTC)
+### 5.16 Wave 4 - EGGS (module `eggs`; docs/wave4/eggs.md; node-tested + one headless menu run; the moon script `wave4_eggs.js` was NOT run to completion; NOT hand-played, NOT tested over WebRTC)
 - Main menu: no hands / viewmodel (the strapped-arm rig is no longer attached to the camera; `stripViewModel` already cleared the game viewmodel + FP layer). The Cell got 10 hidden props
   (`src/ui/menueggs.js`: cassette, CRT ch 7, drawer note, mug counter, knock-the-wall hatch, rotating WANTED poster, the phone's private line, the Algorithm's piano tune, duck behind the door, lamp Morse) + a subtle "Secrets x/19".
 - Moons / facilities: rare seeded secrets (`src/game/eggs.js`, `eggs_models.js`): graffiti, shrine (scrap offering -> buff), hidden vending machine, corpse + diary, rubber ducks (counted across runs), frozen statue, payphone, dead-drop bag.
 - Meta-secret THE LAST APPEAL (cassette + CRT + diary + statue + 3 ducks, then look inside the opened hatch): title **Cell 07 Alumnus** + hat **Retired CRT** (`hat:crthead`).
-- State: `profile.eggs` (`eggs_core.js`, repaired on read). Net: `eggreq` (request), `eggst` + `eggfx` (HOST_ONLY). Tests: `node tools/harness/eggs.test.mjs`, `tools/harness/wave4_eggs_menu.js` (headless_menu.mjs, now with `--shot`), `tools/harness/wave4_eggs.js`.
+- State: `profile.eggs` (`eggs_core.js`, repaired on read). Net: `eggreq` (request), `eggst` + `eggfx` (HOST_ONLY). Tests: `node tools/harness/eggs.test.mjs`, `node tools/harness/eggs_install.test.mjs` (stub-game install), `tools/harness/wave4_eggs_menu.js` (headless_menu.mjs, now with `--shot`), `tools/harness/wave4_eggs.js`.
 - Shared files touched (tiny, tagged `[eggs]`): game.js (import + slot), menuroom.js (3 lines), models/cosmetics.js (hat), game/cosmetics.js (unlock rule).

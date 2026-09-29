@@ -47,6 +47,7 @@ Owner asks: "ana menudeki yere icerikler easter egg ekle, normal maplara da" + "
 
 ## Test
 - `node tools/harness/eggs.test.mjs` (4.6k checks: seeded placement over 600 seeds, rarity numbers, profile JSON round trip + garbage repair, the whole meta chain, knock / lamp / poster / phone rules, i18n rows).
+- `node tools/harness/eggs_install.test.mjs` (124 checks: installs the module on a stub game and drives plan -> build -> prompts -> host handlers -> client effects -> profile -> statue head -> late-join sync -> dispose).
 - Browser: `flock /tmp/tfg-browser.lock node tools/harness/headless_menu.mjs --port P --script tools/harness/wave4_eggs_menu.js --shot out.png`
   and `node tools/harness/headless.mjs --port P --script tools/harness/wave4_eggs.js --shot out.png`.
 - By hand: main menu -> mash A / D to break free -> walk: aim at the cassette (floor by the rack), the small CRT (E x7), the table drawer, the mug, the back wall...
@@ -57,7 +58,7 @@ Owner asks: "ana menudeki yere icerikler easter egg ekle, normal maplara da" + "
 `SHRINE_TIERS`, `DUCKS_NEEDED`, `MUG_UNLOCK`, `KNOCK_PATTERN`, `POSTER_*`, `PIANO_TUNE`, `VENDING_POOL` / `STASH_POOL` (ids missing from `ITEMS` are skipped).
 
 ## Known gaps
-- Node + build + short headless runs only; the moon secrets were placed by `debugSpawn` in the browser run, natural spawns are proven by the seeded-plan test (real terrain rejection rates not measured).
+- Node + build + ONE headless menu run (all 10 menu eggs + meta chain + screenshot, ok, 0 errors; the mug / cone tweak after it was not re-run). The moon headless run crashed in my own harness script (fixed) and was not repeated because the browser queue was full; the moon secrets were placed by `debugSpawn` in the browser run, natural spawns are proven by the seeded-plan test (real terrain rejection rates not measured).
 - Facility spot offsets can put a prop against a wall on tiny rooms; props are small and non-blocking except vending / statue / payphone / shrine (static boxes).
 - Egg text on the menu CRT / poster canvases is English only (like the existing menu canvases); all prompts / notes / toasts are EN + TR + RU.
 - 2-player sync (`eggst` / `eggfx`, late join) is code-reviewed, not tested over WebRTC.
