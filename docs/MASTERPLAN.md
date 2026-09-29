@@ -728,6 +728,17 @@ Model politikası aynı (§6): Sonnet varsayılan, ağ/AI/çekirdek işlerde Opu
 - Yeni alet: **Balta** ve **Kazma** mağazada (ucuz); dayanıklılık (durability) düşer.
 - Ajan tablosuna: #11 `harvest2` (Sonnet), `hardmode` ile paralel.
 
+### 25.9 Silahlı NPC'ler: aimbot değil, okunabilir nişan (sahibin isteği)
+- Scavenger, Hooded, hit squad gunner, Soviet raid ve diğer ateş eden yaratıklar (src/game/worlds2*.js, horde.js hs_gunner, voyage pirate vb.) şu an çok sık ve isabetli ateş ediyor → **sniper mantığı**:
+  1. **Nişan alma aşaması (0.8-1.4 sn):** hedefe görünür bir **lazer/nişan çizgisi** (ince kırmızı ışın, emissive, ışık eklemeden) + namlu parlaması ve "şarj" sesi. Çizgi önce titrek, ateşe yaklaştıkça sabitlenir.
+  2. **Kilit anı (0.25 sn):** çizgi parlar/renk değiştirir (kırmızı → beyaz) — oyuncu için "ŞİMDİ kaç" işareti.
+  3. **Ateş:** mermi kilit anındaki noktaya gider (oyuncuyu takip etmez); o anda yana kaçan/eğilen/siper alan oyuncu kurtulur.
+  4. **Bekleme:** atışlar arası 2-4 sn (şarjör/yeniden doldurma), grup halindeyse sırayla ateş (aynı anda en fazla 1-2 atıcı).
+- **İsabet:** mesafeyle düşen yayılma; koşan hedefe ×0.6, siperdekine ×0.3; zorluk/kota ile ölçeklenir (erken oyunda cömert).
+- Ses: nişan sesi 3D, oyuncu arkadan gelen atıcıyı da duyar. Algoritma yaratıkları aynı kuralı glitch görseliyle kullanır.
+- Host-otoriter: nişan başlangıcı/kilit/ateş olayları mevcut creature state senkronuyla (yeni ağır mesaj yok; state + hedef noktası).
+- Ajan tablosuna: #12 `aimtell` (Sonnet), `hardmode` ile paralel; test: node (zamanlama/isabet tabloları) + 1 kısa ekran görüntüsü (nişan çizgisi).
+
 ### 25.7 Ajan tablosu (sıra = öncelik)
 | # | Ajan | Model | Kapsam | Tarayıcı |
 |---|---|---|---|---|
