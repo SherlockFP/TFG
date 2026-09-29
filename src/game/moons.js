@@ -20,8 +20,8 @@ export const MOONS = {
     outdoor: { hound: 6, giant: 3, mimic: 3 },
   },
   palamut: {
-    id: 'palamut', name: '33-Guestbook', short: 'Guestbook', tier: 2, cost: 150, biome: 'snow', interior: 'mansion', size: 1.1,
-    desc: 'A frozen personal homepage manor. Trolls hunt at night.',
+    id: 'palamut', name: '33-Guestbook', short: 'Guestbook', tier: 2, cost: 150, biome: 'snow', interior: 'academy', size: 1.1,   // [repomaps] Content Academy (the guestbook is a yearbook)
+    desc: 'A frozen yearbook page: the Algorithm trains its streamers here. Lecture halls, detention and a library that rearranges itself. Trolls hunt at night.',
     weather: ['clear', 'foggy', 'stormy', 'eclipsed'], scrapCount: [14, 19], scrapMul: 1.25, power: 5, outdoorPower: 4,
     creatures: { scuttler: 14, yoinker: 14, crawler: 14, lurker: 14, mannequin: 10, sludge: 8, spider: 12, leech: 10, jester: 8, screamer: 8, mimic: 6, turret: 4, mine: 6 },
     outdoor: { hound: 12, giant: 5, mimic: 4 },
@@ -41,8 +41,8 @@ export const MOONS = {
     outdoor: { hound: 12, giant: 8, mimic: 6 },
   },
   orkinos: {
-    id: 'orkinos', name: '404-Not Found', short: '404', tier: 4, cost: 900, biome: 'blackforest', interior: 'factory', size: 1.8,
-    desc: 'Black forest under a dead sun. Everything lives here. The best lost content in the sector.',
+    id: 'orkinos', name: '404-Not Found', short: '404', tier: 4, cost: 900, biome: 'blackforest', interior: 'museum', size: 1.8,   // [repomaps] Museum of Deleted Content
+    desc: 'Black forest under a dead sun. Everything lives here, and the Museum of Deleted Content keeps the best of it framed behind laser grids. Do not bump the art.',
     weather: ['eclipsed', 'foggy', 'stormy'], scrapCount: [26, 34], scrapMul: 2.0, power: 9, outdoorPower: 8,
     creatures: { scuttler: 10, yoinker: 8, crawler: 16, lurker: 16, mannequin: 16, sludge: 10, spider: 16, leech: 12, jester: 14, screamer: 14, mimic: 12, turret: 12, mine: 14 },
     outdoor: { hound: 14, giant: 10, sandkefal: 4, mimic: 8 },

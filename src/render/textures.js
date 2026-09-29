@@ -383,6 +383,8 @@ function def(name, w, h, fn, alpha = false) {
   DEFS[name] = { w, h, fn };
   if (alpha) ALPHA.add(name);
 }
+/** [repomaps] external texture registration (src/render/studio_textures.js); a name that already exists is left alone */
+export function registerTexture(name, w, h, fn, alpha = false) { if (!DEFS[name]) def(name, w, h, fn, alpha); }
 
 // ===== concrete / stone
 def('concrete', 64, 64, (p, r) => {

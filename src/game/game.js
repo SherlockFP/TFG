@@ -254,6 +254,7 @@ import { installArcade2 } from './arcade2.js';
 // [import:resto]
 // [import:arcade2]
 // [import:mapmods]
+import { installRepomaps } from './repomaps.js';   // [import:repomaps] wave 8: themed interiors (Influencer Mansion, Content Academy, Cold Storage Data Station, Museum of Deleted Content) (docs/wave8/repomaps.md)
 
 
 
@@ -530,6 +531,7 @@ export class Game extends Emitter {
     // [slot:resto]
     // [slot:arcade2]
     // [slot:mapmods]
+    this.useModule('repomaps', installRepomaps);   // [slot:repomaps]
 
 
 
