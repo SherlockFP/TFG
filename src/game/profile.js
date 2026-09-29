@@ -9,7 +9,7 @@ import { CREATURES } from './creatures.js';
 import { t, tf } from '../core/i18n.js';
 
 // Rewards that are already "final" numbers: never multiplied by stars / mastery / events / crew.
-const FLAT_REASONS = /^(Achievement|Daily login|Codex|Weekly|Rebirth|Bounty|Trade)/i;   // [trade] traded Clout is never multiplied
+const FLAT_REASONS = /^(Achievement|Daily|Season|Codex|Weekly|Rebirth|Bounty|Trade)/i;   // [trade] traded Clout is never multiplied
 const CREW_XP_CAP = 25;       // crew level N gives +N% XP, capped
 
 /**

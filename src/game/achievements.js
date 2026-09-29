@@ -682,6 +682,7 @@ export function installAchievements(game) {
 
   // ---- daily login streak
   function dailyLogin() {
+    if (game.daily) return;   // wave 4: the DAILY module (7-day calendar, claimed by hand) replaces this automatic bonus
     const today = utcDay();
     const lg = profile.login;
     if (lg.day === today) return;
