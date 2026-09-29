@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import { TRAPS, laserFrac } from './horror_core.js';
 import { t } from '../core/i18n.js';
+import { sigHex } from '../core/a11y_core.js';   // [a11y] colour-blind palette
 
 const basic = (c, o = {}) => new THREE.MeshBasicMaterial({ color: c, transparent: o.op != null, opacity: o.op ?? 1, blending: o.add ? THREE.AdditiveBlending : THREE.NormalBlending, depthWrite: !o.add && o.op == null, side: o.side ?? THREE.FrontSide, fog: o.fog !== false });
 const lam = (c) => new THREE.MeshLambertMaterial({ color: c, flatShading: true });
@@ -32,7 +33,7 @@ export class TrapView {
   build() {
     const { len, wid } = this.zone, H = this.ceilH, hl = len / 2, hw = wid / 2;
     const R = this.root;
-    const housing = lam(0x2a2d33), led = basic(0x43d17a), ledR = basic(0xff3a2a);
+    const housing = lam(0x2a2d33), led = basic(sigHex('ok', '#43d17a')), ledR = basic(sigHex('laser', '#ff3a2a'));
     this.led = led; this.ledMats = { led, ledR };
     this.parts = {};
     const P = this.parts;
@@ -40,14 +41,14 @@ export class TrapView {
       // emitter housings on both side walls at both ends + a status LED strip
       for (const sx of [-1, 1]) for (const sz of [-1, 1]) { this.box(R, housing, 0.16, H - 0.1, 0.2, sx * hl, (H - 0.1) / 2 + 0.05, sz * (hw - 0.05)); }
       this.box(R, led, 0.06, 0.06, 0.06, -hl, 1.3, -hw + 0.15); this.box(R, led, 0.06, 0.06, 0.06, hl, 1.3, hw - 0.15);
-      const beamM = basic(0xff2a2a, { add: true, op: 0.9 }); P.beamM = beamM;
+      const beamM = basic(sigHex('laser'), { add: true, op: 0.9 }); P.beamM = beamM;
       P.wall = new THREE.Group(); R.add(P.wall);
       const bars = 9;
       for (let i = 0; i < bars; i++) this.box(P.wall, beamM, 0.05, 0.05, wid - 0.3, 0, 0.25 + i * ((H - 0.5) / (bars - 1)), 0);
       for (let i = 0; i < 6; i++) this.box(P.wall, beamM, 0.05, H - 0.4, 0.05, 0, (H - 0.4) / 2 + 0.2, -hw + 0.4 + i * ((wid - 0.8) / 5));
       P.wall.visible = false;
       // faint standing grid at the far end while armed (telegraph of the danger)
-      const dimM = basic(0xff4a4a, { add: true, op: 0.25 }); P.dimM = dimM;
+      const dimM = basic(sigHex('laserDim'), { add: true, op: 0.25 }); P.dimM = dimM;
       P.grid = new THREE.Group(); R.add(P.grid);
       for (let i = 0; i < 4; i++) this.box(P.grid, dimM, 0.03, 0.03, wid - 0.4, hl - 0.05, 0.6 + i * 0.7, 0);
       P.grid.visible = false;

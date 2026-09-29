@@ -171,7 +171,7 @@ export function installSocial(game) {
     S.hintT += dt;
     if (S.lines.length && S.hintT > 0.25) { S.hintT = 0; paint(); }   // fade + expiry
     const inp = game.input;
-    if (inp?.enabled && inp.locked && !game.player?.dead && inp.codePressed?.(RADIO_KEY) && walkieOn() && !game.ui?.chatOpen) {
+    if (inp?.enabled && inp.locked && !game.player?.dead && inp.codePressed?.(game.settings?.keys?.radio || RADIO_KEY) && walkieOn() && !game.ui?.chatOpen) {
       game.ui.openChat();
       try { game.ui.chatIn.value = '/rad '; } catch { /* ignore */ }
     }

@@ -179,6 +179,7 @@ import { installMaps5 } from './maps5.js';   // [import:maps5] wave 4: Estate 9 
 import { installAlgo1 } from './algo1.js';   // [import:algo1] wave 5: The Algorithm learns you + morning rule vote + LIVE viewers (docs/wave5/algo1.md)
 import { installDance } from './dance.js';   // [import:dance] wave 6: 21 dances, sync group dance, emote wheel 2 (docs/wave6/dance.md)
 import { installRoledays } from './roledays.js';   // [import:roledays] wave 6: role constraint days (docs/wave6/roledays.md)
+import { installA11y } from './a11y.js';   // [import:a11y] wave 7 accessibility runtime (docs/wave7/a11y.md)
 import { installHardmode } from './hardmode.js';   // [import:hardmode] wave 5: Casual / Standard / Hard difficulty rules (docs/wave5/hardmode.md)
 import { installOnboard } from './onboard.js';   // [import:onboard] wave 5: Hiring Day first-time start + staged unlocks (docs/wave5/onboard.md)
 import { installAlgo2 } from './algo2.js';   // [import:algo2] wave 6: live stream hype + ghost replay + glitch exploits (docs/wave6/algo2.md)
@@ -430,6 +431,7 @@ export class Game extends Emitter {
     this.useModule('algo1', installAlgo1);   // [slot:algo1]
     this.useModule('roledays', installRoledays);   // [slot:roledays]
     this.useModule('hardmode', installHardmode);   // [slot:hardmode]
+    this.useModule('a11y', installA11y);   // [slot:a11y]
     this.useModule('algo2', installAlgo2);   // [slot:algo2]
     this.useModule('dance', installDance);   // [slot:dance]
     this.useModule('gpusweep', installGpuSweep);   // [slot:gpusweep]
@@ -1220,14 +1222,14 @@ export class Game extends Emitter {
       const e = 1 - Math.pow(1 - t, 3);
       if (g) g.position.y = -260 * (1 - e);
       this.env.landingT = clamp(t * 1.3, 0, 1);
-      this.engine.fx.shake = Math.max(this.engine.fx.shake, 0.15 * (1 - t));
+      this.engine.fx.shake = Math.max(this.engine.fx.shake, 0.15 * (1 - t) * (this.settings.shakeScale ?? 1));
     } else if (ph === 'takeoff') {
       this.stateTimer += dt;
       const t = clamp(this.stateTimer / 7, 0, 1);
       const e = t * t;
       if (g) g.position.y = -300 * e;
       this.env.landingT = 1 - clamp(t * 1.2, 0, 1);
-      this.engine.fx.shake = Math.max(this.engine.fx.shake, 0.12);
+      this.engine.fx.shake = Math.max(this.engine.fx.shake, 0.12 * (this.settings.shakeScale ?? 1));
     } else if (g && g.position.y !== 0 && (ph === 'moon' || ph === 'company')) g.position.y = 0;
   }
 

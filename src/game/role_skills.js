@@ -109,8 +109,8 @@ export function installRoleSkills(g, K) {
     if (builtFor !== roleId()) build();
     const input = g.input;
     if (input.enabled && !g.player.dead && !g.minigame && !g.terminal?.active) {
-      if (input.codePressed('KeyY')) use(0);
-      if (input.codePressed('KeyU')) use(1);
+      if (input.pressed('roleSkill1')) use(0);
+      if (input.pressed('roleSkill2')) use(1);
     }
     hudT -= dt;
     if (hudT <= 0 && cells.length) {

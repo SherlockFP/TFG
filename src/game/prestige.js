@@ -77,7 +77,7 @@ export function installMeta(game) {
     open(tab);
   }
   const onKey = (e) => {
-    if (e.code !== RECORD_KEY || e.repeat || st.disposed || game.destroyed || !game.run) return;
+    if (e.code !== (game.settings?.keys?.record || RECORD_KEY) || e.repeat || st.disposed || game.destroyed || !game.run) return;
     if (game.input?.isTyping?.() || game.minigame || game.terminal?.active || game.ui?.chatOpen) return;
     const ui = game.ui;
     if (ui?.panelOpen && ui.panelOpen !== panelEl) return;           // another panel (pause, market, TAB) owns the screen

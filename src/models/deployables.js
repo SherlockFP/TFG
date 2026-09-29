@@ -3,6 +3,7 @@
 // Flat vertex-coloured, merged geometry (1-3 draw calls per deployable). Barricades / spikes / mines are exported as ONE
 // merged geometry (`staticGeometry`) so game/deployables.js can draw all of them through a single InstancedMesh each.
 // Conventions: metres, +Y up, origin = floor point, the deployable looks along +Z (rotation.y = aim yaw).
+import { sigHex } from '../core/a11y_core.js';   // [a11y]
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
@@ -102,7 +103,7 @@ function turret(mk) {
       head.rotation.y = st.aim || 0;
       kick = Math.max(0, kick - dt * 0.9); barrels.position.z = -kick;
       if (flashT > 0) { flashT -= dt; if (flashT <= 0) flash.visible = false; }
-      eyeMat.color.setHex(!st.on ? 0x552222 : st.target ? 0xff3a2a : 0x40e070);
+      eyeMat.color.setHex(!st.on ? 0x552222 : st.target ? sigHex('eye') : sigHex('ok'));   // [a11y]
     },
     dispose() { eyeMat.dispose(); flashMat.dispose(); },
   };

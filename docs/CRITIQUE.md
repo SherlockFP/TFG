@@ -253,3 +253,6 @@ Every outdoor moon now has the same original signature layer (pylons that watch,
 
 ## Wave 6 - dance (docs/wave6/dance.md)
 The dance list is now big and readable (wheel pages, favourites, search, thumbnails) and the crew can lock to one beat, but every animation is hand-typed numbers checked by unit tests and a couple of screenshots, not by an animator's eye; sync is per-viewer and the music is not beat-locked across players, and most dances are free so the shop/crate rows are thin incentives.
+
+## Wave 7 - a11y (docs/wave7/a11y.md)
+Palettes are tuned by simulation, not by eye (tests check delta-E under CVD matrices), but nobody colour-blind has played it; baked creature-model eye colours are still red; pad buttons are not rebindable; mouse capture still needs one click.
