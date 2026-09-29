@@ -167,9 +167,9 @@ import { installWorlds2 } from './worlds2.js';   // wave 3: Soviet raids + twin-
 
 
 // [import:ux]
+import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
 
 
-// [import:hostmig]
 
 
 // [import:eggs]
@@ -395,9 +395,9 @@ export class Game extends Emitter {
 
 
     // [slot:ux]
+    this.useModule('hostmig', installHostMig);
 
 
-    // [slot:hostmig]
 
 
     // [slot:eggs]
@@ -524,7 +524,7 @@ export class Game extends Emitter {
       if (r) { this.ui.toast(tf('{name} left the ship.', { name: r.name })); r.dispose(); this.remotes.delete(id); }
       this.voice.removePeer(id);
     });
-    net.on('hostLeft', (why) => this.emit('fatal', t(why === 'timeout' ? 'Lost connection to the host (network problem, could not reconnect). Session ended.' : 'The host has left. Session ended.')));
+    net.on('hostLeft', (why) => this.hostmig?.onHostLeft?.(why) || this.emit('fatal', t(why === 'timeout' ? 'Lost connection to the host (network problem, could not reconnect). Session ended.' : 'The host has left. Session ended.')));
     // connection loss is not a leave: the player record / avatar / items stay for ~45 s while the link is re-established
     net.on('peerLost', (id, p) => {
       if (id === net.hostId && !net.isHost) this.ui.toast(t('Connection to the host lost - trying to reconnect...'), 'bad');

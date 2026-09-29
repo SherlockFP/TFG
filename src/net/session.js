@@ -53,6 +53,30 @@ export class Session extends Emitter {
     this._rows = new Map();       // sendRows(): type -> Map(id -> last sent row)
     this.relayTypes = new Set(RELAY_TYPES);
     this.peerLinks = new Map();   // host: peerId -> Set of peer ids that client reports a direct link to
+    this.hostEpoch = 0;           // host migration counter (game/hostmig.js): +1 every time the crew elects a new host
+  }
+
+  // Host migration (game/hostmig.js, docs/wave4/hostmig.md): re-point this session at a new host. Only flips the role fields and forgets
+  // the old host's transport bookkeeping; all game-level work (rebuilding host state, avatars, items) is done by the caller.
+  // keepOld: the previous host is alive and stays in the crew (split-brain resolution). Returns the old host's player record (or null). Never emits 'hostLeft' / 'peerLeave' by itself.
+  migrateTo(newHostId, epoch, keepOld = false) {
+    const old = this.hostId;
+    this.hostId = newHostId;
+    this.isHost = newHostId === this.selfId;
+    this.connected = true;
+    this._hellos = 99;
+    if (epoch != null) this.hostEpoch = epoch;
+    let oldPlayer = null;
+    if (old && old !== newHostId && old !== this.selfId && !keepOld) {
+      const L = this.lost.get(old); if (L) clearTimeout(L.timer);
+      this.lost.delete(old); this.lastSeen.delete(old); this._stalled.delete(old); this.peerLinks.delete(old);
+      oldPlayer = this.players.get(old) || null;
+      this.players.delete(old);
+    }
+    for (const [id, p] of this.players) p.host = id === newHostId;
+    if (this.isHost && this.selfId && !this.players.has(this.selfId)) this.players.set(this.selfId, { id: this.selfId, ...this.helloData, host: true });
+    this.reportLinks();
+    return oldPlayer;
   }
 
   // client -> host: which peers do I have a direct link to (debounced; the host relays around missing links)
