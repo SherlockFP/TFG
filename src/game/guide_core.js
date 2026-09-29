@@ -59,8 +59,14 @@ export function markUsed(g, id, now = Date.now()) {
 export const usedCount = (g) => visibleFeatures().filter((f) => g.used[f.id]).length;
 
 // ------------------------------------------------------------------ tip selection
+/** `needs`: a module name, 'cmd:<word>' or an array of them (any one is enough); opts.has(name) answers for the live game */
+export function needsOk(f, opts = {}) {
+  if (!f.needs) return true;
+  const list = Array.isArray(f.needs) ? f.needs : [f.needs];
+  return list.some((n) => (opts.has ? !!opts.has(n) : false));
+}
 function featureOk(f, g, flags, opts) {
-  if (f.needs && !(opts.has ? opts.has(f.needs) : false)) return false;
+  if (!needsOk(f, opts)) return false;
   if (f.minLevel && (opts.level || 1) < f.minLevel) return false;
   if (g.used[canon(f)]) return false;
   for (const w of f.when || []) if (!flags.has(w)) return false;
@@ -113,7 +119,7 @@ export function untried(g, flags, opts = {}) {
   const out = [];
   for (const f of visibleFeatures()) {
     if (g.used[f.id]) continue;
-    if (f.needs && !(opts.has ? opts.has(f.needs) : false)) continue;
+    if (!needsOk(f, opts)) continue;
     // a feature is "relevant now" when one of its context-tips (own or hidden variants) has all its flags
     let rel = 0;
     for (const v of FEATURES) if ((v === f || v.alias === f.id) && (v.when || []).length && v.when.every((w) => flags.has(w))) rel = Math.max(rel, 1 + v.when.length);

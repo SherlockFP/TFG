@@ -7,7 +7,7 @@ Owner ask (TR): "the terminal has many commands; the Algorithm link should occas
 ## Files
 | File | Role |
 |---|---|
-| `src/game/guide_data.js` | PURE DATA: 36 hand-written features (EN/TR/RU name, how-to, 1-2 Algorithm tips, context `when`, `cmds` / `panel` / `evt` / `keys` that mark the feature used), 7 tutorial steps, every UI string. Texts are `[en, tr, ru]` triples picked with `pick(arr, lang)` |
+| `src/game/guide_data.js` | PURE DATA: 44 hand-written features (8 of them gated by `needs`: modules that may not exist in a branch, e.g. missions / survival / traps / stealth / ship2 / sfx / daily) (EN/TR/RU name, how-to, 1-2 Algorithm tips, context `when`, `cmds` / `panel` / `evt` / `keys` that mark the feature used), 7 tutorial steps, every UI string. Texts are `[en, tr, ru]` triples picked with `pick(arr, lang)` |
 | `src/game/guide_core.js` | PURE LOGIC (node-tested): profile state, `markUsed`, `selectTip` (cooldown / grace / repeat gap / max shows / context / urgent), `untried`, tutorial engine (`tutEvent` ...), `findFeature`, `suggestCommand` ("did you mean"), `classifyPanel` |
 | `src/game/guide.js` | install: usage tracking hooks, context flags, advisor loop, terminal commands, objectives hook, `game.guide` API |
 | `tools/harness/guide.test.mjs` | node test (1900+ checks) |

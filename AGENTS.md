@@ -457,7 +457,7 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
 
 ### 5.16 Wave 4 - GUIDE (module `guide`, docs/wave4/guide.md; node-tested + one headless run)
 - The Algorithm as an ADVISOR: short in-character tips in the existing intercom box (`game.lore.say`) about features the player has NOT used yet, picked by context (credits -> STORE, skill points -> K, skillbook -> spells, low HP -> food, no light -> flashlight, quota met -> CYCLE/KEYSTONE/RAID ...),
-  cooldown ~2.5 min, repeat gap 25 min, max 3 shows per tip, max 14 per session, mutable in Settings > Gameplay > Algorithm tips. Registry of 36 hand-written features (EN/TR/RU how-to) + every terminal command found at runtime (`mods.commands`).
+  cooldown ~2.5 min, repeat gap 25 min, max 3 shows per tip, max 14 per session, mutable in Settings > Gameplay > Algorithm tips. Registry of 44 hand-written features (EN/TR/RU how-to) + every terminal command found at runtime (`mods.commands`).
 - Terminal: `GUIDE` / `TIPS` / `ALGO TIPS` (things you haven't tried), `GUIDE <name|key|cmd>`, `GUIDE ALL`, `GUIDE MUTE`, `TUTORIAL [STATUS|SKIP|RESTART]`, "did you mean" for unknown words, HELP footer. The lore module's `ALGO` command is wrapped, not replaced.
 - Optional 7-step tutorial through the `objectives` hook (move/sprint/crouch, flashlight, scrap, inventory, scan, back to ship, sell): steps complete by themselves in any order, never blocks, +60 XP +25 Clout, veterans skip silently, replay from Settings. State in `profile.guide`; no net messages.
 - Files `src/game/guide{,_core,_data}.js`, test `tools/harness/guide.test.mjs`, headless `tools/harness/wave4_guide.js`. Shared edits: 2 lines in `game.js`, settings rows in `ui.js`.

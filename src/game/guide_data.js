@@ -7,7 +7,7 @@
 //   cmds  terminal words that mark the feature used         keys  KeyboardEvent.code values that mark it used
 //   panel panel id from classifyPanel()                     evt   mods-bus event / internal event id that marks it used
 //   when  [ctx flags] ALL must be true for the tip          prio  base score (1..10)
-//   needs module name on `game` that must exist             minLevel  hide the tip below this profile level
+//   needs module name on `game` (or 'cmd:<word>' = a registered terminal command) that must exist; an array = any of them             minLevel  hide the tip below this profile level
 export const LANGS3 = ['en', 'tr', 'ru'];
 export const pick = (arr, lang = 'en') => {
   if (!arr) return '';
@@ -240,7 +240,7 @@ export const FEATURES = [
       '4 m içindeki bir ekip arkadaşına bakıp E\'ye bas (veya TRADE <isim>): iki taraf da teklif doldurur, kilitler ve kabul eder. İkisi de onaylamadan hiçbir şey el değiştirmez.',
       'Посмотри на напарника в пределах 4 м и нажми E (или TRADE <имя>): обе стороны собирают предложение, фиксируют и принимают. Пока оба не согласны — ничего не переходит.'],
     [['Press E on a crewmate to trade, or type TRADE <name>. Capitalism, but with friends.', 'Bir ekip arkadaşına E ile takas teklif et, ya da TRADE <isim>. Kapitalizm, ama arkadaşlarla.', 'E на напарнике — обмен, или TRADE <имя>. Капитализм, но с друзьями.']]),
-  F('daily', 'meta', { evt: 'daily', panel: 'daily', when: ['daily'], needs: 'daily', prio: 6, key: 'daily rewards' },
+  F('daily', 'meta', { cmds: ['daily', 'rewards'], evt: 'daily', panel: 'daily', when: ['daily'], needs: ['daily', 'cmd:daily', 'cmd:rewards'], prio: 6, key: 'daily rewards' },
     ['Daily rewards', 'Günlük ödüller', 'Ежедневные награды'],
     ['Log in every day to keep your streak going: each day pays a bigger reward, and missing a day resets it.',
       'Serini sürdürmek için her gün gir: her gün daha büyük bir ödül verir, bir günü kaçırırsan seri sıfırlanır.',
@@ -260,6 +260,38 @@ export const FEATURES = [
       'Иногда существа осаждают корабль. SIEGE показывает фазу, волну, состояние корпуса и двери и время на подготовку.'],
     [['Things sometimes besiege the ship. SIEGE at the terminal shows the wave, hull and door. Prepare, or improvise.', 'Bazen yaratıklar gemiyi kuşatır. Terminalde SIEGE dalgayı, gövdeyi ve kapıyı gösterir. Hazırlan ya da doğaçla.', 'Порой корабль осаждают. SIEGE на терминале покажет волну, корпус и дверь. Готовься или импровизируй.']]),
 
+  F('missions', 'world', { cmds: ['missions', 'mission'], needs: ['voyage', 'missions', 'cmd:missions', 'cmd:mission'], when: ['orbit'], prio: 6, key: 'terminal / board' },
+    ['Missions & random moon', 'Görevler & rastgele ay', 'Миссии и случайная луна'],
+    ['The voyage mission board offers optional objectives for a trip (type MISSIONS at the terminal). MOON RANDOM routes you to a random server if you cannot decide. Pick, then pull the lever.', 'Sefer görev panosu bir yolculuk için isteğe bağlı hedefler sunar (terminalde MISSIONS yaz). MOON RANDOM karar veremezsen rastgele bir sunucuya rota çizer. Seç, sonra kolu çek.', 'Доска миссий предлагает необязательные цели для полёта (введи MISSIONS на терминале). MOON RANDOM выбирает случайный сервер, если не можешь решить. Выбери и дёрни рычаг.'],
+    [['The mission board has optional objectives for this trip. MISSIONS at the terminal. Indecisive? MOON RANDOM.', 'Görev panosunda bu sefer için isteğe bağlı hedefler var. Terminalde MISSIONS. Kararsız mısın? MOON RANDOM.', 'На доске миссий есть необязательные цели для этого полёта. MISSIONS на терминале. Не можешь выбрать? MOON RANDOM.']]),
+  F('cooking', 'gear', { cmds: ['cook', 'cooking'], needs: ['survival', 'cooking', 'cmd:cook'], when: ['orbit', 'day2'], prio: 4, key: 'E at stove' },
+    ['Cooking', 'Yemek pişirme', 'Готовка'],
+    ['Raw ingredients and found food can be cooked at a stove or campfire into meals that heal and buff more than the raw thing. Interact [E] with a cooking spot while holding ingredients.', 'Ham malzemeler ve bulunan yiyecekler ocakta ya da kamp ateşinde pişirilip çiğ halinden daha çok iyileştiren ve güçlendiren yemeklere dönüşür. Malzemeyle bir pişirme noktasında E bas.', 'Сырые ингредиенты и найденную еду можно приготовить на плите или костре: блюда лечат и усиливают сильнее сырых. Нажми E у места готовки с ингредиентами в руках.'],
+    [['Raw food is a rumour. Cook it at a stove or campfire: E while holding ingredients. Better healing, same tragedy.', 'Çiğ yiyecek bir dedikodu. Ocakta ya da kamp ateşinde pişir: malzemeyle E. Daha iyi iyileşme, aynı trajedi.', 'Сырая еда — это слух. Приготовь на плите или костре: E с ингредиентами в руках. Лечит лучше, трагедия та же.']]),
+  F('herbalism', 'gear', { cmds: ['herbs', 'herbalism'], needs: ['survival', 'herbalism', 'cmd:herbs'], when: ['moon'], prio: 4, key: 'E on plants' },
+    ['Herbalism', 'Bitki bilgisi', 'Травничество'],
+    ['Some plants outdoors can be harvested [E] for herbs that make salves and teas. Different moons grow different plants.', 'Dışarıdaki bazı bitkiler [E] ile toplanıp merhem ve çay yapılan otlara dönüşür. Farklı aylarda farklı bitkiler yetişir.', 'Некоторые растения снаружи можно собрать [E] на травы для мазей и чаёв. На разных лунах растут разные растения.'],
+    [['Some plants outside can be harvested with E. Herbs make salves and teas. Nature is content too.', 'Dışarıdaki bazı bitkiler E ile toplanabilir. Otlardan merhem ve çay olur. Doğa da içeriktir.', 'Некоторые растения снаружи можно собирать на E. Из трав делают мази и чаи. Природа — тоже контент.']]),
+  F('storage', 'ship', { cmds: ['storage', 'stash'], needs: ['survival', 'storage', 'cmd:storage', 'cmd:stash'], when: ['inship', 'orbit'], prio: 4, key: 'E at crate' },
+    ['Ship storage', 'Gemi deposu', 'Хранилище корабля'],
+    ['Storage crates in the ship keep items safe between days: interact [E] to put things in or take them out. Handy for food, tools and things you cannot carry.', 'Gemideki depo sandıkları eşyaları günler arasında güvende tutar: E ile eşya koy ya da al. Yiyecek, alet ve taşıyamadıkların için ideal.', 'Ящики-хранилища на корабле берегут вещи между днями: нажми E, чтобы положить или взять. Удобно для еды, инструментов и того, что не унести.'],
+    [['The ship has storage. E on a crate: put things in, take things out. Hoarding is a lifestyle.', 'Gemide depo var. Sandığa E: bir şeyler koy, bir şeyler al. Biriktirmek bir yaşam tarzı.', 'На корабле есть хранилище. E на ящике: положи, возьми. Накопительство — это образ жизни.']]),
+  F('traps', 'magic', { cmds: ['traps'], needs: ['traps', 'chalk', 'horror', 'cmd:traps'], when: ['moon'], prio: 4, key: 'items' },
+    ['Chalk & traps', 'Tebeşir & tuzaklar', 'Мел и ловушки'],
+    ['Chalk marks a route or a safe spot on walls and floors, so you (and your crew) find the way back. Traps can be set on the ground to slow or hurt what chases you: hold one and use it where the creatures walk.', 'Tebeşir duvarlara ve zemine yol ya da güvenli nokta işaretler; sen ve ekibin geri dönüşü bulur. Tuzaklar yere kurulup seni kovalayanı yavaşlatır veya yaralar: elinde tut ve yaratıkların yürüdüğü yerde kullan.', 'Мелом можно отметить путь или безопасное место на стенах и полу, чтобы вы нашли дорогу назад. Ловушки ставятся на землю и замедляют или ранят преследователей: возьми и используй там, где ходят существа.'],
+    [['Chalk marks your way back and traps slow what chases you. Hold one, use it. Preparation is horror with a plan.', 'Tebeşir dönüş yolunu işaretler, tuzaklar peşindekini yavaşlatır. Elinde tut, kullan. Hazırlık, planlı korkudur.', 'Мел отмечает путь назад, ловушки замедляют преследователей. Возьми, используй. Подготовка — это ужас с планом.']]),
+  F('sneak', 'basics', { evt: 'sneak', needs: ['stealth', 'sneak', 'horror', 'cmd:sneak'], when: ['indoor'], prio: 5, key: 'Ctrl' },
+    ['Sneaking', 'Sinsi hareket', 'Скрытность'],
+    ['Crouch-walking (Ctrl) is quiet: creatures notice you from much closer. Sprinting, talking and slamming doors are loud. Slow down when something is nearby.', 'Çömelerek yürümek (Ctrl) sessizdir: yaratıklar seni çok daha yakından fark eder. Koşmak, konuşmak ve kapı çarpmak gürültülüdür. Yakında bir şey varsa yavaşla.', 'Ходьба пригнувшись (Ctrl) тиха: существа замечают тебя лишь вблизи. Бег, разговоры и хлопанье дверями шумят. Замедлись, если рядом что-то есть.'],
+    [['Ctrl sneaks. Creatures notice a crouching employee far later. Silence is a benefit, not a benefit package.', 'Ctrl sinsi yürütür. Yaratıklar çömelen çalışanı çok geç fark eder. Sessizlik bir yan hak değil, bir avantajdır.', 'Ctrl — красться. Существа замечают присевшего сотрудника гораздо позже. Тишина — это преимущество, а не соцпакет.']]),
+  F('shipturrets', 'ship', { cmds: ['turrets'], needs: ['ship2', 'shipturrets', 'cmd:turrets'], when: ['inship', 'orbit', 'day2'], prio: 4, key: 'E / wrench' },
+    ['Ship turrets & wrench repair', 'Gemi taretleri & anahtarla tamir', 'Турели корабля и ремонт ключом'],
+    ['Turrets on the ship defend it during sieges: interact [E] to arm or man them. Damaged systems and turrets are repaired with a WRENCH: hold it and use it on the broken part.', 'Gemideki taretler kuşatmalarda onu savunur: E ile kur ya da başına geç. Hasarlı sistemler ve taretler İNGİLİZ ANAHTARIYLA onarılır: elinde tut ve bozuk parçada kullan.', 'Турели корабля защищают его при осадах: нажми E, чтобы включить или встать за них. Повреждённые системы и турели чинят ГАЕЧНЫМ КЛЮЧОМ: держи его и используй на сломанной детали.'],
+    [['The ship has turrets, and turrets break. Hold a wrench and use it on broken parts. Maintenance is love.', 'Gemide taretler var ve taretler bozulur. Elinde anahtar tut ve bozuk parçada kullan. Bakım sevgidir.', 'На корабле есть турели, а турели ломаются. Держи гаечный ключ и чини поломки. Обслуживание — это любовь.']]),
+  F('soundpacks', 'meta', { evt: 'soundpack', needs: ['sfx', 'sfxpacks', 'soundpacks', 'cmd:sounds'], when: ['orbit'], prio: 2, key: 'Settings > Audio' },
+    ['Sound packs', 'Ses paketleri', 'Звуковые паки'],
+    ['Settings > Audio lets you switch the sound pack (footsteps, creatures, UI). Pick the one that scares you best.', 'Ayarlar > Ses bölümünden ses paketini değiştirebilirsin (ayak sesleri, yaratıklar, arayüz). Seni en iyi korkutanı seç.', 'В Настройки > Звук можно сменить звуковой пак (шаги, существа, интерфейс). Выбери тот, что пугает лучше.'],
+    [['Sound packs exist: Settings, Audio. Change how the dark sounds. It is still dark.', 'Ses paketleri var: Ayarlar, Ses. Karanlığın sesini değiştir. Yine de karanlık.', 'Есть звуковые паки: Настройки, Звук. Измени звучание тьмы. Она всё равно тёмная.']]),
   // ------------------------------------------------------------------ magic & combat
   F('magic', 'magic', { evt: 'spell', when: ['skillbook'], prio: 9, key: 'hold C / say it' },
     ['Spells (voice & chat)', 'Büyüler (ses & sohbet)', 'Заклинания (голос и чат)'],

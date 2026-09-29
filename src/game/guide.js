@@ -19,7 +19,7 @@ import {
 import {
   ensureState, markUsed, isUsed, usedCount, visibleFeatures, featureById, canon, selectTip, recordShown, untried, findFeature, suggestCommand,
   classifyPanel, PANEL_MAP, CMD_MAP, KEY_MAP, EVT_MAP, tutInit, tutRunning, tutCurrent, tutEvent, tutSkip, tutDoneCount, tutStepProgress,
-  resetTutorial, stepObjective, tipText, firstSentence, COOLDOWN_S, TUT_TOTAL,
+  resetTutorial, stepObjective, needsOk, tipText, firstSentence, COOLDOWN_S, TUT_TOTAL,
 } from './guide_core.js';
 
 const lang = () => { try { return getLang(); } catch { return 'en'; } };
@@ -29,6 +29,7 @@ export function installGuide(game) {
   const offs = [];
   const restores = [];
   let disposed = false;
+  let sneakT = 0;
   const S = {
     t: 0, lastTipT: -Infinity, nextGap: COOLDOWN_S, pollT: 0, tipT: 0, sayQ: [], quietT: 0, tutT: 0, lastPos: null,
     last: { sold: null, scrap: 0, flash: false, market: false, mirror: false, hp: 1 }, tips: 0, ctx: new Set(),
@@ -37,7 +38,7 @@ export function installGuide(game) {
   const G = () => ensureState(game.profile);
   const g0 = G();
   const save = () => { try { game.progress?.save?.(); } catch { /* optional */ } };
-  const has = (name) => !!game[name];
+  const has = (name) => (String(name).startsWith('cmd:') ? !!game.mods?.commands?.has?.(String(name).slice(4)) : !!game[name]);
   const muted = () => game.settings?.guideTips === false;
 
   // ---------------------------------------------------------------- first run: veteran detection + used seeds
@@ -296,6 +297,8 @@ export function installGuide(game) {
     const pos = p.pos;
     if (pos && S.lastPos && !p.dead && !p.frozen) {
       const d = Math.hypot(pos.x - S.lastPos.x, pos.z - S.lastPos.z);
+      if (d > 0.02 && d < 3 && p.crouch && !p.sprinting) sneakT += 0.25;
+      if (sneakT > 3) use('sneak');
       if (d > 0 && d < 3) { if (tutRunning(g)) tut('move', { d, sprint: !!p.sprinting && d > 0.02, crouch: !!p.crouch }); }
     }
     if (pos) S.lastPos = { x: pos.x, z: pos.z };
@@ -365,7 +368,7 @@ export function installGuide(game) {
   }
   function allText() {
     const g = G();
-    const vis = visibleFeatures().filter((f) => !f.needs || has(f.needs));
+    const vis = visibleFeatures().filter((f) => needsOk(f, { has }));
     const out = [T('guide_all_title', { used: vis.filter((f) => g.used[f.id]).length, total: vis.length }), ''];
     for (const cat of Object.keys(CATS)) {
       const rows = vis.filter((f) => f.cat === cat);

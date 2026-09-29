@@ -166,6 +166,18 @@ const opts = { rng: () => 0.1, now: 1e12, has: () => true, level: 5 };
   ok(!C.untried(fresh(), F(), { ...opts, has: () => false }).some((e) => e.f.id === 'daily'), 'module-gated feature hidden');
 }
 
+{
+  // features of modules that may not exist in a branch are gated by module name or 'cmd:<word>' (array = any)
+  const hasNone = () => false;
+  const ids = (o) => C.untried(fresh(), F(), o).map((e) => e.f.id);
+  for (const id of ['missions', 'cooking', 'herbalism', 'storage', 'traps', 'sneak', 'shipturrets', 'soundpacks', 'daily']) {
+    ok(C.featureById(id), 'registry has ' + id);
+    ok(!ids({ has: hasNone }).includes(id), id + ' hidden while its module is missing');
+  }
+  ok(ids({ has: (n) => n === 'cmd:missions' }).includes('missions'), 'cmd: gate opens when the command exists');
+  ok(ids({ has: (n) => n === 'survival' }).includes('cooking') && ids({ has: (n) => n === 'survival' }).includes('storage'), 'module gate (array) opens');
+  ok(C.selectTip(fresh(), F('orbit'), session(), { ...opts, has: (n) => n === 'voyage' })?.id !== undefined, 'tips still selectable with gated modules present');
+}
 // ------------------------------------------------------------------ tutorial
 {
   const g = fresh();
