@@ -561,3 +561,10 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
 - Verified in a browser: boot, orbit panels at 1280x720, terminal route, land/walk/enter facility/pickup, ship door open from outside ([ux] fix works), takeoff + case file, HQ sell, quota met, backrooms pocket, mirror. Zero pageerrors.
 - Fixed: objective list overlapping the left HUD dock (`objectives.js fitAboveDock`), "Value extracted ▮0" when scrap was dropped/held at takeoff (`host.js hostFinishTakeoff` final tally), role-skill tile text overlap (`role_skills.js` CSS).
 - Not verified (test artifact / time): worlds2 moons, homeworld panel, core boss, ESC/pointer lock with real input, emote cam, MP 60 s. Scripts ready: `tools/harness/wave4_checkup_*` (runner keeps one browser, freezes rAF, real input via `__click/__press`).
+### 5.16 Wave 4 - UI2: one art direction "company-issued equipment" (module `ui2`, docs/wave4/ui2.md; build + one headless screenshot run)
+- New override layer `src/ui/theme.css` (+ `theme.js`, imported from main.js, adds class `tfg-ui` on `<html>`; remove that class to compare with the old look). Tokens `--t-*`,
+  bundled condensed label font (Barlow Condensed / Roboto Condensed Cyrillic, `src/ui/fonts/`), `--font2` and `--cond` now both = that face (Press Start 2P is no longer used for labels).
+  Hard edges, plate titles on hazard tape, segmented bars, flat cards, no glow/lift. Panel JS was not rewritten: everything keys off the existing base classes
+  (`.menu-frame`, `.cp-head/.cp-sec/.cp-body/.cp-foot`, `.btn*`, `*card*`, `.rl/.pt/.rec/.lb/.crp` roots). New helpers: `src/ui/glyphs.js` (`glyph(name)`, `glyphFromEmoji`), classes `.tfg-plate/.tfg-tag/.tfg-kbd/.tfg-num/.tfg-bar/.tfg-card/.tfg-hazard`.
+- Rule for panel authors: use `ui.frame()` / the base classes, `glyph()` instead of emoji, no border-radius/glow/gradient cards/`backdrop-filter`, colours from `--t-*` / `--ph*`.
+- Tools: `tools/harness/ui2_shots.mjs` (before/after from ONE page, `--both`), `tools/harness/ui2_glyphs.test.mjs`.

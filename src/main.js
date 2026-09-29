@@ -2,6 +2,7 @@ import '@fontsource/vt323';
 import '@fontsource/press-start-2p';
 import './ui/style.css';
 import './minigames/minigames.css';
+import './ui/theme.js';   // [ui2] art direction layer (src/ui/theme.css)
 import * as THREE from 'three';
 import { Engine } from './core/engine.js';
 import { Input } from './core/input.js';
