@@ -557,7 +557,7 @@ export class UI {
           el('div', { class: 'l-host' }, avIcon(fromWire(l.av) || defaultAvatar(l.host || '?'), 16), (l.host || '?') + tf(' · Lv.{n}', { n: l.level || 1 }) + (l.stars ? ` ★${l.stars | 0}` : '') + (l.crew ? ` · [${String(l.crewTag || '').slice(0, 4)}] ${String(l.crew).slice(0, 24)} (C${l.crewLv | 0})` : '')),
           el('div', { class: 'l-pl' }, el('span', { class: 'l-bar' }, el('i', { style: { width: clamp((l.players / Math.max(1, l.max)) * 100, 0, 100) + '%' } })), ` ${l.players}/${l.max}`),
           el('div', { class: 'l-ph' }, `${String(l.phase || '').toUpperCase()} ${l.moon || ''}`),
-          el('div', { class: 'l-q' }, `${t('Day')} ${l.day || 1} · ▮${l.quota || 0}`),
+          el('div', { class: 'l-q' }, `${t('Day')} ${l.day || 1} · ▮${l.quota || 0}` + (DIFF_LABEL[l.diff] ? ' · ' + t(DIFF_LABEL[l.diff]) : '')),
           el('div', { class: 'l-mods' }, (l.mods || []).length ? `${l.mods.length}` : '—'),
           this.button(full ? t('Full') : t('Join'), () => this.joinLobby(l, net.value), blocked ? 'small disabled' : 'small primary'),
         );

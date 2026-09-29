@@ -733,8 +733,9 @@ export function installSurvival(game) {
     if (!def) return;
     const opts = S.spawnOpts(rec);
     const iv = to ? game.inventory?.hostPlaceFor?.(from, def, to) : game.inventory?.hostPlaceFor?.(from, def, 'bag');
-    if (iv) game.items.hostSpawn(rec.i, new THREE.Vector3(at.x, at.y + 0.8, at.z), { ...opts, holder: from, inv: iv });
-    else game.items.hostSpawn(rec.i, new THREE.Vector3(at.x, at.y + 0.9, at.z), { ...opts, linvel: [0, 1.2, 0] });   // pockets full: it drops at your feet
+    const id = iv ? game.items.hostSpawn(rec.i, new THREE.Vector3(at.x, at.y + 0.8, at.z), { ...opts, holder: from, inv: iv })
+      : game.items.hostSpawn(rec.i, new THREE.Vector3(at.x, at.y + 0.9, at.z), { ...opts, linvel: [0, 1.2, 0] });   // pockets full: it drops at your feet
+    if (rec.sd != null) game.hardmode?.restoreSpoil?.(id, rec);   // [hardmode] a dish keeps its cook day / spoiled flag through the crate (no cold-storage reset)
   }
   function hostStorage(d, from) {
     if (!host() || !d || typeof d !== 'object') return;
@@ -776,7 +777,8 @@ export function installSurvival(game) {
       if (!it) return;
       const why = S.storeReject(it);
       if (why) return err(from, why);
-      const r = S.putRecord(s, S.recordFromItem(it), Number.isFinite(d.x) ? d.x : null, Number.isFinite(d.y) ? d.y : null);
+      const rec = S.recordFromItem(it); game.hardmode?.spoilRec?.(it.id, rec);   // [hardmode]
+      const r = S.putRecord(s, rec, Number.isFinite(d.x) ? d.x : null, Number.isFinite(d.y) ? d.y : null);
       if (!r.ok) return err(from, r.reason);
       rmItem(it);
       return commit(s);

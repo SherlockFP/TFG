@@ -41,7 +41,16 @@ export function installAlgo1(game) {
   };
   const rngFor = (salt) => new RNG(((game.run?.seed | 0) ^ salt ^ ((game.run?.day | 0) * 7919)) >>> 0);
   const run = () => game.run;
-  const a1 = () => { const r = run(); if (!r) return null; return (r.a1 = r.a1 || { debt: null }); };
+  const a1 = () => {
+    const r = run(); if (!r) return null;
+    const a = (r.a1 = r.a1 && typeof r.a1 === 'object' ? r.a1 : { debt: null });
+    if (a.debt && !K.RULES[a.debt]) a.debt = null;                                    // a synced / migrated run may carry junk: never crash on it
+    if (a.today && !K.RULES[a.today.win]) a.today = null;
+    if (a.today?.half && !K.RULES[a.today.half]) a.today.half = null;
+    return a;
+  };
+  /** the rule in force: this peer's live 'result' message, else run.a1.today (synced with the run, so a late joiner / a new host has it) while a day is running */
+  const ruleNow = () => S.rule || (['landing', 'moon'].includes(run()?.phase) && run()?.a1?.today?.win && K.RULES[run().a1.today.win] ? run().a1.today : null);
   const enabled = () => game.config?.algo1 !== false;
 
   // ------------------------------------------------------------ net
@@ -151,6 +160,7 @@ export function installAlgo1(game) {
     st.debt = newDebt;
     st.today = { win, half, day: run().day };
     S.vote = null;
+    game.broadcastRun?.(['a1']);                        // late joiners / a future host get the debt + today's rule with the run
     send({ k: 'result', win, half, debt: newDebt });
     const line = res.none ? 'Nobody voted. Fine. I choose: {@r}.' : res.tie ? 'A tie. Adorable. I choose: {@r}.' : 'The people have spoken: {@r}.';
     sayAll(line, { r: K.RULES[win].name });
@@ -159,7 +169,7 @@ export function installAlgo1(game) {
   }
   /** every knob of the active rule set (host reads run.a1.today, peers read S.rule) */
   function fx() {
-    const r = S.rule || (host() ? a1()?.today : null);
+    const r = ruleNow();
     if (!r?.win) return null;
     return K.combine([{ id: r.win, k: 1 }, ...(r.half ? [{ id: r.half, k: K.T.debtK }] : [])]);
   }
@@ -301,7 +311,7 @@ export function installAlgo1(game) {
   const restoreDay = () => { if (baseDay != null) { game.config.dayLengthSec = baseDay; baseDay = null; } };
   offs.push(mods.on('stats', (st, g) => {
     if (g !== game || !st) return;
-    const f = S.rule ? K.combine([{ id: S.rule.win, k: 1 }, ...(S.rule.half ? [{ id: S.rule.half, k: K.T.debtK }] : [])]) : null;
+    const f = fx();
     if (!f) return;
     st.jumpMul = (st.jumpMul || 1) * f.jumpMul;
     st.staminaRegen = (st.staminaRegen || 16) * f.staminaRegen;
@@ -314,7 +324,7 @@ export function installAlgo1(game) {
       if (host() && S.vote) hostCloseVote();          // lever pulled during the vote: close it now
     } else if (ph === 'orbit' || ph === 'fired' || ph === 'takeoff') {
       if (ph !== 'takeoff') { restoreDay(); S.rule = null; S.mercy = 0; game.refreshStats?.(); }
-      if (host() && ph === 'orbit') { if (a1()) a1().today = null; chooseFromProfile(); S.orbitT = 0; }
+      if (host() && ph === 'orbit') { if (a1()) { a1().today = null; game.broadcastRun?.(['a1']); } chooseFromProfile(); S.orbitT = 0; }
     }
   }));
 

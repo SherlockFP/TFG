@@ -297,9 +297,10 @@ export function installHost(X) {
       const loot = pk.spots.loot.slice();
       for (const s of loot) {
         idx++;
-        if (!s.big && rnd() > 0.88) continue;
+        const sample = kind === 'outbreak' && idx === loot.length && ITEMS.hr_specimen; // the sample case is never skipped
+        if (!s.big && !sample && rnd() > 0.88) continue;
         let id = s.big ? ['goldbar', 'ring', 'trophy', 'figurine', 'perfume', 'ring'][(rnd() * 6) | 0] : pick();
-        if (kind === 'outbreak' && idx === loot.length && ITEMS.hr_specimen) id = 'hr_specimen';
+        if (sample) id = 'hr_specimen';
         if (!ITEMS[id]) id = pick();
         g.items.hostSpawn(id, at(s), { valueMul: mul * (s.big ? 1.25 : 1) });
         n.loot++;

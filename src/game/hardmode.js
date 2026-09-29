@@ -221,6 +221,10 @@ export function installHardmode(game) {
   // ------------------------------------------------------------ food (host)
   /** survival.js calls this with the item id of every freshly cooked dish */
   function stamp(id) { if (id && run()) S.stamps.set(id, run().day | 0); }
+  /** crate put: copy the dish's cook day (+ spoiled flag) into its record, so cold storage does not reset the clock */
+  function spoilRec(id, rec) { if (S.stamps.has(id)) { rec.sd = S.stamps.get(id); if (S.spoiled.has(id)) rec.sp = 1; } return rec; }
+  /** crate take: the fresh item id inherits the record's clock */
+  function restoreSpoil(id, rec) { if (!id || !Number.isFinite(rec?.sd)) return; S.stamps.set(id, rec.sd); if (rec.sp) S.spoiled.add(id); }
   /** morning check: dishes older than the spoil window lose most of their heal. Crate records are not items, so a crate is cold storage. */
   function spoilCheck() {
     const r = run(), days = D.spoilDays(q());
@@ -308,7 +312,7 @@ export function installHardmode(game) {
 
   return {
     state: S,
-    stamp, spoilCheck,
+    stamp, spoilCheck, spoilRec, restoreSpoil,
     mode: () => D.getMode(),
     set(mode) { game.config.difficulty = D.norm(mode); sync(); return D.getMode(); },
     /** debug / tests */

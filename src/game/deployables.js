@@ -27,20 +27,20 @@ import { createDeployableModel, createKitModel, createGhost, createRelicModel, s
 // ---------------------------------------------------------------------------------------------- definitions
 // hx / hz: half extents of the footprint (oriented by yaw), h: height, r: circle used for overlap checks, cost: flow-field crossing cost
 export const DEPS = {
-  turret1: { name: 'Auto-Turret MK1', kind: 'turret', hp: 120, r: 0.55, hx: 0.5, hz: 0.5, h: 1.35, solid: 1, cost: 6, range: 22, dmg: 7, rate: 4, turn: 4, cap: 120, ammo: true, supply: ['comp_scrapmetal', 30], price: 180, weight: 8, blurb: 'Ammo-fed sentry (scrap metal reloads it). Nearest target first.' },
-  turret2: { name: 'Auto-Turret MK2', kind: 'turret', hp: 200, r: 0.55, hx: 0.5, hz: 0.5, h: 1.35, solid: 1, cost: 6, range: 26, dmg: 12, rate: 3, turn: 6, cap: 100, draw: 1.2, supply: ['comp_battery', 40], weight: 9, blurb: 'Battery / generator sentry. Faster, tougher, longer range.' },
-  turret3: { name: 'Auto-Turret MK3', kind: 'turret', hp: 320, r: 0.6, hx: 0.55, hz: 0.55, h: 1.4, solid: 1, cost: 6, range: 30, dmg: 18, rate: 3.5, turn: 9, cap: 160, draw: 2, supply: ['comp_battery', 40], weight: 11, blurb: 'Triple-barrel heavy sentry. Needs power.' },
-  tesla: { name: 'Tesla Coil', kind: 'tesla', hp: 160, r: 0.65, hx: 0.6, hz: 0.6, h: 2.2, solid: 1, cost: 6, range: 12, dmg: 30, cd: 1.6, chain: 3, fall: 0.7, cap: 100, draw: 8, supply: ['comp_battery', 40], weight: 10, blurb: 'Chain lightning through up to 3 creatures. Needs power.' },
-  barr_wood: { name: 'Wood Barricade', kind: 'barricade', hp: 200, r: 1.1, hx: 1.1, hz: 0.22, h: 1.4, solid: 1, cost: 25, price: 40, weight: 10, blurb: 'Blocks the way. Creatures chew through it.' },
-  barr_metal: { name: 'Metal Barricade', kind: 'barricade', hp: 520, r: 1.1, hx: 1.1, hz: 0.22, h: 1.5, solid: 1, cost: 25, price: 95, weight: 18, blurb: 'Heavy steel plate. Holds a lot longer.' },
-  spikes: { name: 'Spike Strip', kind: 'spikes', hp: 90, r: 1.4, hx: 1.4, hz: 0.7, h: 0.4, cost: 0, dps: 6, slow: 0.5, price: 55, weight: 6, blurb: 'Slows (-50%) and cuts creatures that cross it. Wears out.' },
-  mine: { name: 'Proximity Mine', kind: 'mine', hp: 30, r: 0.4, hx: 0.35, hz: 0.35, h: 0.2, cost: 0, dmg: 90, blast: 4.2, trig: 1.6, arm: 3, price: 70, weight: 3, blurb: 'Arms after 3 s, blasts creatures (never crew) within 4 m.' },
-  flood: { name: 'Floodlight Tower', kind: 'flood', hp: 140, r: 0.5, hx: 0.4, hz: 0.4, h: 4.1, solid: 1, cost: 6, range: 22, cap: 200, drawS: 0.5, supply: ['comp_battery', 40], price: 160, weight: 10, blurb: 'Lights up 22 m, reveals and repels dark-loving creatures.' },
-  drone: { name: 'Repair Drone', kind: 'drone', hp: 90, r: 0.45, hx: 0.4, hz: 0.4, h: 1.8, cost: 0, range: 9, heal: 6, hullHeal: 0.5, cap: 120, drawS: 1.5, supply: ['comp_battery', 40], weight: 4, blurb: 'Repairs deployables, the ship hull and the door.' },
-  sensor: { name: 'Motion Sensor', kind: 'sensor', hp: 60, r: 0.35, hx: 0.3, hz: 0.3, h: 1.7, cost: 0, range: 40, cap: 60, drawS: 0.3, supply: ['comp_battery', 40], price: 120, weight: 3, blurb: 'Pings creatures within 40 m on your HUD.' },
-  shield: { name: 'Shield Dome', kind: 'shield', hp: 200, r: 0.6, hx: 0.5, hz: 0.5, h: 1.4, solid: 1, cost: 6, range: 5.5, pool: 350, regen: 8, cap: 150, drawS: 0.5, supply: ['comp_battery', 40], weight: 9, blurb: 'Absorbs 350 damage in a 5.5 m dome, then recharges.' },
-  gen: { name: 'Portable Generator', kind: 'gen', hp: 180, r: 0.7, hx: 0.55, hz: 0.4, h: 1.25, solid: 1, cost: 6, range: 14, cap: 100, burn: 0.3, supply: ['comp_fuel', 50], price: 220, weight: 14, blurb: 'Burns fuel, powers everything within 14 m. No wires.' },
-  bank: { name: 'Battery Bank', kind: 'bank', hp: 150, r: 0.6, hx: 0.5, hz: 0.36, h: 1.0, solid: 1, cost: 6, range: 10, cap: 500, supply: ['comp_battery', 60], price: 200, weight: 12, blurb: 'Stores 500 units; a generator nearby charges it.' },
+  turret1: { name: 'Auto-Turret MK1', kind: 'turret', cap: 120, ammo: true, supply: ['comp_scrapmetal', 30], price: 180, weight: 8, blurb: 'Ammo-fed sentry (scrap metal reloads it). Nearest target first.' },
+  turret2: { name: 'Auto-Turret MK2', kind: 'turret', cap: 100, supply: ['comp_battery', 40], weight: 9, blurb: 'Battery / generator sentry. Faster, tougher, longer range.' },
+  turret3: { name: 'Auto-Turret MK3', kind: 'turret', cap: 160, supply: ['comp_battery', 40], weight: 11, blurb: 'Triple-barrel heavy sentry. Needs power.' },
+  tesla: { name: 'Tesla Coil', kind: 'tesla', cap: 100, supply: ['comp_battery', 40], weight: 10, blurb: 'Chain lightning through up to 3 creatures. Needs power.' },
+  barr_wood: { name: 'Wood Barricade', kind: 'barricade', price: 40, weight: 10, blurb: 'Blocks the way. Creatures chew through it.' },
+  barr_metal: { name: 'Metal Barricade', kind: 'barricade', price: 95, weight: 18, blurb: 'Heavy steel plate. Holds a lot longer.' },
+  spikes: { name: 'Spike Strip', kind: 'spikes', price: 55, weight: 6, blurb: 'Slows (-50%) and cuts creatures that cross it. Wears out.' },
+  mine: { name: 'Proximity Mine', kind: 'mine', price: 70, weight: 3, blurb: 'Arms after 3 s, blasts creatures (never crew) within 4 m.' },
+  flood: { name: 'Floodlight Tower', kind: 'flood', cap: 200, supply: ['comp_battery', 40], price: 160, weight: 10, blurb: 'Lights up 22 m, reveals and repels dark-loving creatures.' },
+  drone: { name: 'Repair Drone', kind: 'drone', cap: 120, supply: ['comp_battery', 40], weight: 4, blurb: 'Repairs deployables, the ship hull and the door.' },
+  sensor: { name: 'Motion Sensor', kind: 'sensor', cap: 60, supply: ['comp_battery', 40], price: 120, weight: 3, blurb: 'Pings creatures within 40 m on your HUD.' },
+  shield: { name: 'Shield Dome', kind: 'shield', cap: 150, supply: ['comp_battery', 40], weight: 9, blurb: 'Absorbs 350 damage in a 5.5 m dome, then recharges.' },
+  gen: { name: 'Portable Generator', kind: 'gen', cap: 100, supply: ['comp_fuel', 50], price: 220, weight: 14, blurb: 'Burns fuel, powers everything within 14 m. No wires.' },
+  bank: { name: 'Battery Bank', kind: 'bank', cap: 500, supply: ['comp_battery', 60], price: 200, weight: 12, blurb: 'Stores 500 units; a generator nearby charges it.' },
 };
 applyToDeps(DEPS);   // [unify] combat + footprint stats come from defense_core.js (price / weight / supply / cap / ammo stay here)
 export const DEP_TYPES = Object.keys(DEPS);
