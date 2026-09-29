@@ -16,3 +16,4 @@ LEAN MODE (token budget — mandatory, ponytail-style):
 - Don't dump long command output: pipe tests/builds through `| tail -5`, grep for FAIL/error; never cat large logs or JSON.
 - No exploratory browser runs; at most the ONE allowed short run at the end.
 - Keep the final report SHORT (≤ 25 lines): commit hash, what was built (bullets), net types, tests run, what is NOT verified. No file-by-file prose.
+- If plain `git` is blocked in your worktree (rtk hook), call `/usr/bin/git` directly.
