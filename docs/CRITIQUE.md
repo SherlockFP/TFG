@@ -147,3 +147,5 @@ The 3-day + boss loop is now real (gate -> core with wings, a labyrinth and a ca
 Proven by numbers only: node tests drive the REAL host.js flow, the real CreatureManager and real layouts (soft-lock fuzz, weekly lock, all 8 themes); nothing was seen in a browser.
 Risks: boss models and telegraph readability, the maze / arena look and lighting, whether a labyrinth is fun with creatures in it (it is a spanning tree + few loops), keystone / raid numbers (design values), 2-player sync of `run.cycle` and `cyx`,
 the arena auto-open (720 s) as the only fallback for lost cards, Legacy Bot sector (outdoor boss, no cards) never seen, `shrines` mutator unwired, no Trophy Hall / CASE entry / first-kill cosmetic yet.
+## Wave 4 - checkup (docs/wave4/checkup.md)
+First real browser pass over the full loop: it runs end to end without errors, but the 1280x720 HUD is crowded (objectives vs left dock fixed; mirror header vs clock, compass label stacking, Algorithm banner over panels, VHS overlay over the hotbar still open) and geometry count climbs from 139 to 730+ over 6 landings (possible leak). worlds2 / core boss / MP stability still unseen in a browser.
