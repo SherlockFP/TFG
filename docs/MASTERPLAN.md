@@ -655,3 +655,83 @@ Oyuncular en çok hangi yaratıktan kaçıyorsa Algoritma onu "trend" yapar: haf
 8. Ancak bunlardan sonra: §23.2 adaptif Algoritma → §23.3 canlı yayın → §23.4 sabah oylaması.
 
 Model politikası aynı (§6): Sonnet varsayılan, ağ/AI/çekirdek işlerde Opus; playtest kısa ve toplu (tek tarayıcı kuyruğu, 4 çekirdek).
+
+---
+
+## 25. WAVE 5 — AYRINTILI PLAN (kota yenilenince buradan devam; §24'ün yerine geçer)
+
+### 25.0 Kural
+- Yeni büyük sistem YOK; önce sağlamlık, birleştirme, his. Her ajan en fazla 2 kısa tarayıcı koşusu; toplu test lead'de.
+- Model: Sonnet varsayılan. Opus sadece: ağ, başlangıç akışı (oyuncu deneyimini baştan kurar), birleştirme çekirdekleri.
+- Worktree'ler `origin`un GÜNCEL HEAD'inden açılmalı (wave 4'te eski tabandan açıldı → game.js çakışmaları). Ajan başlatmadan önce slot yerleri game.js'e eklenip pushlanır.
+- Modül adı Game'de mevcut bir metodun adı OLAMAZ (`sfx` olayı: tüm sesleri kırdı).
+
+### 25.1 Oyunun başlangıcı — gemiyle mi, başka türlü mü?
+**Karar önerisi: "İşe alım günü" (Onboarding Shift).** Oyun gemide başlamaz; **Şirket'in ofisinde (ana menü odası Cell 07'nin devamı)** başlar:
+1. **Uyanış (30 sn):** Cell 07'de uyanırsın, hoparlörden Şirket'in işe alım anonsu; Algoritma araya girip ilk kez "seni izliyorum" der (kimlik anında kurulur).
+2. **Oryantasyon koridoru (2-3 dk):** kısa, lineer bir ofis koridoru — yürü/eğil/koş, el feneri dolabı (ilk el feneri burada ödünç, sonra mağazadan alınır), ilk loot (bir zımba), ilk "tehlike" (ışıklar söner, Algoritma'nın zararsız bir yaratığı koridorun sonunda görünüp kaybolur), ilk kilitli dolap (lockpick tanıtımı, §25.3).
+3. **Hangar:** küçük gemin (Mini-Skeld) seni bekler; terminal, kol, kapı burada öğretilir. İlk iniş = kolay moon + tek hedef ("50 hurda getir").
+4. **İlk dönüş:** gün özeti + Algoritma'nın ilk "yorum"u ("Sol koridoru sevdin. Not aldım.").
+- Tekrar oynayanlar/arkadaş lobisine katılanlar oryantasyonu atlar (profilde bayrak). Co-op'ta host oryantasyondaysa diğerleri hangarda bekler (bekleme yok: hangarda mini oyunlar).
+- Neden: gemide çıplak başlamak LC hissi veriyor; ofis → hangar geçişi kimliği (Şirket + Algoritma) ilk 3 dakikada anlatır ve tutorial'ı "görev" gibi hissettirir.
+- Uygulama: `onboard` modülü (Opus). Mevcut: menuroom/menueggs (Cell 07), guide tutorial adımları, ship2 hangar (yeni: HQ pier yanında hangar sahnesi ya da gemi içi hangar görünümü).
+
+### 25.2 Satranç 3D
+- 2D overlay yerine **masadaki gerçek 3D taşlar**: oyuncu masaya oturur, kamera masanın üstüne yumuşakça iner (üst-açı, hafif perspektif), taşlar fareyle tutulup sürüklenir (raycast), yasal hamle kareleri zeminde ışıklı disk, son hamle vurgusu, şah uyarısı taşın altında kırmızı halka.
+- Taş modelleri prosedürel (lathe geometry: piyon/kale/at/fil/vezir/şah), iki takım malzemesi, InstancedMesh (32 taş = 6-12 draw call).
+- Seyirciler masayı gerçek 3D'de görür (taşlar senkron). Dama aynı masada 3D pullarla.
+- 2D overlay "kolay görünüm" olarak ayarlarda kalır (erişilebilirlik).
+- Kurallar değişmez (`chess_rules.js`, perft testli). Ajan: Sonnet, 1 kısa ekran görüntüsü.
+
+### 25.3 Lockpick — daha hızlı ve kademeli
+Şu an: yavaş, tek tip (secureloot). Yeni:
+- **Kilit seviyeleri:** Basit (1 pim) → Standart (2) → Güvenlik (3) → Kasa (4, + zamanlayıcı) → Algoritma kilidi (değişen pim sırası, glitch).
+- **Hız:** basit kilit ~1.5 sn; her pim bir "zamanlama tıkı" (doğru anda tık = pim oturur). Yanlış tık = pim düşer (sadece o pim), çok yanlış = maymuncuk kırılır (dayanıklılık).
+- **Kademeli ilerleme:** kırdığın her kilit "Lockpicking" becerisine XP; seviye atladıkça pim penceresi genişler, 1 pimi otomatik oturtma, sessiz açma (stealth gürültüsü yok), sonra "tek tık kilit" perk'ü.
+- **Aletler:** maymuncuk (ucuz, kırılır) → titanyum maymuncuk → elektronik kırıcı (kasa kilidini atlar ama gürültülü) → matkap (en hızlı, en gürültülü, Listener'ı çağırır).
+- Co-op: iki kişi aynı kasada = biri pimleri tutar, diğeri çevirir (daha hızlı).
+- Ajan: Sonnet; secureloot üstüne, stealth noise'a bağlı.
+
+### 25.4 Zorlaştırılacak mekanikler (şu an fazla kolay/cömert)
+| Mekanik | Şu an | Yeni |
+|---|---|---|
+| Erken ekonomi | sim: erken kazanç kota 0'ın ~30 katı | loot değeri eğrisi: ilk 2 kota cömert kalır, kota 3'ten itibaren ×0.8, taşınan ağırlık cezası artar |
+| Kota | sabit artış | kota artışı ekip performansına göre (Algoritma "iyi gidiyorsunuz" deyip ×1.15 ekler) |
+| Gemiye dönüş | kapı hep açık | gün sonuna 90 sn kala kapı "kilitlenme uyarısı"; geç kalan dışarıda kalır (ölmez, ertesi sabah yaralı döner) |
+| Ölüm | 1 tur bekleme | ölüm = taşıdığın loot yerde kalır + ertesi gün "hayalet tekrarı" (§23.5); ekip toplayabilir |
+| Yaratık AI | çoğu düz koşar | sese duyarlı olanlar yayılır; kota 3'ten sonra yaratıklar kapı kapatabilir, ışık söndürebilir |
+| Yemek/iyileşme | pişmiş yemek bol | yemek bozulur (3 gün), pişirme istasyonu gemide tek, sandık kapasitesi sınırlı |
+| Tuzak/taret | ucuz, güçlü | fiyat günlük kullanımla artar, taretler cephane tüketir |
+| Forge | +9'a kadar düz risk | +7 üstü başarısızlıkta seviye düşer (ama kırılmaz), koruma kâğıdı nadir drop |
+- Tümü `config` düğmeleriyle; "Rahat mod" (casual) seçeneği eski değerleri korur. Zorluk seçimi lobi ayarında.
+- Ajan: Sonnet (denge) + tools/sim/economy.mjs güncellemesi ile ölçülür.
+
+### 25.5 Kötü olanlar → düzeltme (wave 5 kapsamı)
+1. **Test edilmemiş wave 4** → lead toplu tarayıcı turu (wave4_*.js hepsi, tek kuyruk, 900 s timeout); bulunan hatalar küçük Sonnet düzeltme ajanlarına paylaştırılır.
+2. **Çift sistemler** → `defense` çekirdeği (siege + homeworld2 dalga + ship2 taret aynı AI/cephane/güç), `mazegen` kütüphanesi (maps5/stealth/horror/cycle aynı planlayıcılar), yemek tek kural (food = atıştırmalık, survival = asıl iyileşme). Ajan: Opus 1 adet (çekirdek birleştirme).
+3. **Para birimleri** → Kredi + Clout; shard/bileşen/stash = malzeme. UI'da tek cüzdan satırı.
+4. **Başlangıç yükü** → §25.1 onboarding + kademeli açılım (§23.1): kota 0'da sadece iniş/loot/sat/kota görünür; forge kota 1, pet+voyage kota 2, fabrika kota 3, gate'ler ilk boss sonrası.
+5. **UI yarım** → kalan paneller ui2 temel sınıflarına; checkup'ın listesi (mirror sayacı, pusula, LIVE bandı, VHS, "a Enforcer", ▮ glifi).
+6. **Performans** → geometri sızıntısı (her `mapUnloaded`'da dispose denetimi), Sector Core/voyage draw call, gemi prop birleştirme.
+7. **2 kişi gerçek test** → sahibin yapacağı 30 dk oturum için kontrol listesi (docs/wave5/mp_checklist.md): katıl, düş-geri gel, host çık → devir, takas, RPS, sandık, gemi tamiri, satranç.
+
+### 25.6 Özgün fikirlerden wave 5'e girecekler (küçük dilimler)
+- **§23.2 Algoritma seni öğrenir — v1:** sadece 3 davranış (koridor tercihi, koşma oranı, ölüm yeri) → ertesi gün 1 değişiklik + söylediği cümle. Director üstüne. (Sonnet)
+- **§23.4 Sabah oylaması — v1:** 3 kural kartı, ekip oyu, anomaly mutator altyapısı. (Sonnet)
+- Diğerleri (canlı yayın, hayalet tekrarı, glitch silahı, taraf seçimi) wave 6.
+
+### 25.7 Ajan tablosu (sıra = öncelik)
+| # | Ajan | Model | Kapsam | Tarayıcı |
+|---|---|---|---|---|
+| 1 | lead toplu test | Opus (lead) | wave4_*.js + smoke, hata listesi | toplu, tek kuyruk |
+| 2 | fixes-a / fixes-b | Sonnet | toplu testten çıkan hatalar (2 paket) | 1 kısa |
+| 3 | onboard | Opus | §25.1 işe alım günü + kademeli açılım | 2 kısa |
+| 4 | chess3d | Sonnet | §25.2 | 1 kısa |
+| 5 | lockpick2 | Sonnet | §25.3 | 1 kısa |
+| 6 | hardmode | Sonnet | §25.4 + sim | yok (sim) |
+| 7 | unify | Opus | §25.5 #2-3 birleştirme | 1 kısa |
+| 8 | ui3 | Sonnet | §25.5 #5 | 1 toplu ekran turu |
+| 9 | perf | Sonnet | §25.5 #6 | 1 kısa (renderer.info) |
+| 10 | algo1 | Sonnet | §25.6 iki v1 | 1 kısa |
+- Paralel en fazla 5 ajan (4 çekirdek, tek tarayıcı kuyruğu). Sıra: 1 → (2,3,4,5,6) → (7,8,9,10).
+- Her ajan bitince lead birleştirir, node testleri + build, main'e push.
