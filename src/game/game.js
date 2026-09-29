@@ -246,7 +246,7 @@ import { installCosm5 } from './cosm5.js';   // wave 4: cosmetics drop (suits/ha
 import { installNvgear } from './nvgear.js';   // [import:nvgear] wave 8: buyable night-vision goggles + timed ship charger
 import { installMapmods } from './mapmods.js';
 import { installWorlds3 } from './worlds3.js';   // wave 8: wrong door + alternate Backrooms worlds + facility size/dressing (docs/wave8/worlds3.md)
-// [import:crdirector]
+import { installCrdirector } from './crdirector.js';
 import { installFacjobs } from './facjobs.js';
 import { installLcmonsters } from './lcmonsters.js';
 import { installAtmos } from './atmos.js';   // [import:atmos]
@@ -255,6 +255,8 @@ import { installArcade2 } from './arcade2.js';
 // [import:feedcams]
 // [import:downed]
 // [import:hubgate]
+// [import:mapmods]
+// [import:worlds3]
 // [import:facjobs]
 // [import:arcade2]
 // [import:mapmods]
@@ -527,7 +529,7 @@ export class Game extends Emitter {
     this.useModule('nvgear', installNvgear);   // [slot:nvgear]
     this.useModule('mapmods', installMapmods);
     this.useModule('worlds3', installWorlds3);
-    // [slot:crdirector]
+    this.useModule('crdirector', installCrdirector);
     this.useModule('facjobs', installFacjobs);
     this.useModule('lcmonsters', installLcmonsters);
     this.useModule('atmos', installAtmos);   // [slot:atmos]
@@ -536,6 +538,8 @@ export class Game extends Emitter {
     // [slot:feedcams]
     // [slot:downed]
     // [slot:hubgate]
+    // [slot:mapmods]
+    // [slot:worlds3]
     // [slot:facjobs]
     // [slot:arcade2]
     // [slot:mapmods]
