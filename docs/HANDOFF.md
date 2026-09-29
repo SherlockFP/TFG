@@ -4,6 +4,8 @@ Last updated: 2026-09-29 (end of wave 4 + ship interior fix). Written by the lea
 
 ---
 
+> **Next AI: when the owner types "devam", start with `docs/session/CONTINUE.md`.** Full conversation: `docs/session/conversation_log.md`.
+
 ## 1. What this game is (60 seconds)
 
 **TFG ("TOTALLY FUCKED GAME")** is a browser, co-op (1-4 players, P2P) first-person horror / extraction game with RPG progression.
