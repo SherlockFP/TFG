@@ -51,7 +51,7 @@ const origCrawler = BEHAVIORS.crawler;
 const api = installStealth(game);
 ok(!!api && typeof api.dispose === 'function', 'installStealth returns an api');
 // registration
-ok(CREATURES.listener?.custom && CREATURES.listener.zone === 'in' && CREATURES.listener.walk < 2 && CREATURES.listener.run > 8, 'listener registered');
+ok(CREATURES.listener?.custom && CREATURES.listener.zone === 'in' && CREATURES.listener.walk < 2 && CREATURES.listener.run > 7 && CREATURES.listener.run < 8.2, 'listener registered');
 ok(EXTRA_SPAWNS.listener, 'listener spawn weights registered');
 const tier1 = spawnTable({ ...MOONS.lufer, tier: 1 }, 'in'), tier3 = spawnTable({ ...MOONS.cipura }, 'in');
 ok(!('listener' in tier1), 'no Listener on tier 1 moons (fair early game)');
