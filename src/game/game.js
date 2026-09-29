@@ -248,6 +248,7 @@ import { installNvgear } from './nvgear.js';   // [import:nvgear] wave 8: buyabl
 // [import:lcmonsters]
 // [import:atmos]
 // [import:arcade2]
+// [import:resto]
 
 
 
@@ -520,6 +521,7 @@ export class Game extends Emitter {
     // [slot:lcmonsters]
     // [slot:atmos]
     // [slot:arcade2]
+    // [slot:resto]
 
 
 
