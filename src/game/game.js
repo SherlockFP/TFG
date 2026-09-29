@@ -252,7 +252,7 @@ import { installLcmonsters } from './lcmonsters.js';
 import { installAtmos } from './atmos.js';   // [import:atmos]
 import { installArcade2 } from './arcade2.js';
 // [import:feedcams]
-// [import:downed]
+import { installDowned } from './downed.js';   // [import:downed] wave 8: 0 HP = downed, crew revives (docs/wave8/downed.md)
 // [import:hubgate]
 // [import:mapmods]
 // [import:worlds3]
@@ -535,7 +535,7 @@ export class Game extends Emitter {
     this.useModule('atmos', installAtmos);   // [slot:atmos]
     this.useModule('arcade2', installArcade2);
     // [slot:feedcams]
-    // [slot:downed]
+    this.useModule('downed', installDowned);   // [slot:downed]
     // [slot:hubgate]
     // [slot:mapmods]
     // [slot:worlds3]
@@ -1311,7 +1311,7 @@ export class Game extends Emitter {
       this.psTimer = 1 / 15;
       const p = this.player;
       const held = p.heldItem();
-      const flags = (p.crouch ? 1 : 0) | (p.sprinting ? 2 : 0) | (p.grounded ? 0 : 4) | (p.indoor ? 8 : 0) | (p.inShip ? 16 : 0) | (p.dead ? 32 : 0);
+      const flags = (p.crouch ? 1 : 0) | (p.sprinting ? 2 : 0) | (p.grounded ? 0 : 4) | (p.indoor ? 8 : 0) | (p.inShip ? 16 : 0) | (p.dead ? 32 : 0) | (p.downed ? 64 : 0);   // 64 = downed (game/downed.js)
       const st = {
         p: [+p.pos.x.toFixed(2), +p.pos.y.toFixed(2), +p.pos.z.toFixed(2)], y: +p.yaw.toFixed(3), pt: +p.pitch.toFixed(2), f: flags,
         h: held?.type || null, fl: this.flashlightOn() ? 1 : 0, n: +(p.noise || 0).toFixed(2), vl: +this.voice.localLevel.toFixed(2),

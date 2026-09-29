@@ -223,7 +223,7 @@ export class LocalPlayer {
     const wishZ = -mx * sin + mz * cos;
 
     // crouch
-    const wantCrouch = canMove && input.isDown('crouch');
+    const wantCrouch = (canMove && input.isDown('crouch')) || !!this.downed;   // [downed] a downed player stays low
     if (wantCrouch && !this.crouch) { this.crouch = true; this.setCapsule(HALF_CROUCH); this.game.sfx('cloth_rustle', 0.22, 0.95 + Math.random() * 0.1); }
     else if (!wantCrouch && this.crouch) {
       // headroom check
@@ -239,10 +239,10 @@ export class LocalPlayer {
     const bodyCarry = this.carriesBody();
     this.bodyCarry = bodyCarry;
     this.sneak = canMove && input.isDown('sneak');   // [stealth] Alt: slow, near-silent walk (game/stealth.js: noise table, HUD meter)
-    const wantSprint = canMove && moving && input.isDown('sprint') && !this.crouch && !this.sneak && !this.exhausted && mz <= 0.1 && !bodyCarry;   // no sprinting with a body over your shoulder
+    const wantSprint = canMove && !this.downed && moving && input.isDown('sprint') && !this.crouch && !this.sneak && !this.exhausted && mz <= 0.1 && !bodyCarry;   // no sprinting with a body over your shoulder
     this.sprinting = wantSprint && this.stamina > 0;
     // Snappier than the old 3.9/6.6 but still LC-paced so creatures stay threatening.
-    let speed = this.sneak ? 2.1 : this.crouch ? 2.6 : this.sprinting ? 8.2 : 5.0;
+    let speed = this.downed ? 0.9 : this.sneak ? 2.1 : this.crouch ? 2.6 : this.sprinting ? 8.2 : 5.0;
     speed *= weightMul * s.speedMul * (this.speedBoost > 0 ? 1.25 : 1) * (this.slowT > 0 ? 0.35 : 1) * (this.game.lmMove?.speedMul ?? 1);   // [lcmonsters] Heavy Curse
     if (this.game.grab?.item) speed *= 0.88;
     if (bodyCarry) speed *= 0.85;   // on top of the 90 lb weight penalty: a slow, heavy trudge (~2.9 m/s), never frozen
@@ -276,7 +276,7 @@ export class LocalPlayer {
     // jump (coyote time after leaving a ledge + a short input buffer before landing)
     this.airT = this.grounded ? 0 : this.airT + dt;
     if (this.grounded) this.jumpedAir = false;
-    this.jumpBuf = canMove && input.pressed('jump') ? JUMP_BUFFER : Math.max(0, this.jumpBuf - dt);
+    this.jumpBuf = canMove && !this.downed && input.pressed('jump') ? JUMP_BUFFER : Math.max(0, this.jumpBuf - dt);
     // [movefix] jump facing a ledge / fence: mantle or vault instead of a plain hop (settings.keys 'jump' is the same action)
     if (this.grounded) this.mantleAir = false;
     this.mantleMsgT = Math.max(0, this.mantleMsgT - dt);
@@ -452,7 +452,7 @@ export class LocalPlayer {
   updateCamera(dt, hs, wasGrounded) {
     const g = this.game, eng = g.engine, cam = this.camera;
     const rm = g.settings.reduceMotion ? 0.35 : 1;
-    const targetEye = this.crouch ? EYE_CROUCH : EYE_STAND;
+    const targetEye = this.downed ? 0.45 : this.crouch ? EYE_CROUCH : EYE_STAND;   // [downed] camera on the floor
     this.eye = damp(this.eye, targetEye, 12, dt);
     // stair smoothing: autostep / snap-to-ground move the feet in one frame; ease the eye instead
     const dy = this.pos.y - (this._prevY ?? this.pos.y);
