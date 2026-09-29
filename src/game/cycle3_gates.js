@@ -56,7 +56,7 @@ export function installGates(C3) {
   }
   function dayRoll() {
     const run = game.run, cy = cyc()?.state();
-    if (!run || !cy || !C3.enabled()) return;
+    if (!run || !cy || !C3.enabled() || game.onboard?.locked?.('gates')) return;   // [onboard] gifted after the first sector boss
     const c = C3.ensure();
     if ((c.gates.rolled | 0) >= run.day && c.gates.rolled !== -1) return;
     const tk = K.tickGates(c.gates, run.day);

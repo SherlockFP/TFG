@@ -176,6 +176,7 @@ import { installSocial } from './social.js';   // [social] wave 4: phone + walki
 import { installWorlds2 } from './worlds2.js';   // wave 3: Soviet raids + twin-sun planet + plasma blade + fauna + loot pacing (docs/wave3/worlds2.md)
 import { installMaps5 } from './maps5.js';   // [import:maps5] wave 4: Estate 9 (hedge maze, paper archive) + Cold Storage (shifting server stacks, cryo caves) (docs/wave4/maps5.md)
 import { installAlgo1 } from './algo1.js';   // [import:algo1] wave 5: The Algorithm learns you + morning rule vote + LIVE viewers (docs/wave5/algo1.md)
+import { installOnboard } from './onboard.js';   // [import:onboard] wave 5: Hiring Day first-time start + staged unlocks (docs/wave5/onboard.md)
 
 import { installPolish4 } from './polish4.js';   // wave 4: pet egg drops, ship decals + furniture, cantina barter, maw / squad fixes (docs/wave4/polish4.md)
 
@@ -488,6 +489,8 @@ export class Game extends Emitter {
     this.useModule('daily', installDaily);
 
     this.useModule('eggs', installEggs);
+
+    this.useModule('onboard', installOnboard);   // [slot:onboard] wave 5: Hiring Day + staged unlocks (installed last: wraps hostLever / terminalCommand / objectives.compute)
 
 
   }

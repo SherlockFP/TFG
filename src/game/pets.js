@@ -60,7 +60,7 @@ export function installPets(game) {
     state, ctx, atHq,
     active: () => C.activePet(state()),
     open(tab = 'stable') {
-      if (typeof document === 'undefined' || !game.ui?.openPanel) return null;
+      if (typeof document === 'undefined' || !game.ui?.openPanel || game.onboard?.deny?.('pets')) return null;   // [onboard] gifted at quota 2
       const ctl = createPetsPanel({ game, api, tab });
       S.panelEl = ctl.el;
       game.ui.openPanel(ctl.el);

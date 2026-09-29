@@ -1,0 +1,490 @@
+// ONBOARD (wave 5, module 'onboard'; docs/wave5/onboard.md; MASTERPLAN 25.1 "Hiring Day" + 23.1 staged unlocks).
+//   Hiring Day   a first-time start for a fresh HOST profile: wake in Cell 07 (Company announcement, The Algorithm's first "I'm watching you") -> short linear
+//                orientation corridor (move / crouch / sprint, borrow a flashlight from a locker, first loot, blackout + a harmless Algorithm creature glimpse, first
+//                locked cabinet = openMinigame('lockpick', {tier:'simple'})) -> hangar with the Mini-Skeld -> board -> terminal / lever / door in the real ship -> first
+//                landing on the easiest moon with ONE objective (bring 50 scrap) -> first return: day summary + The Algorithm's first remark.
+//                The wing is compact merged geometry far from the ship (onboard_world.js, no lights) and is disposed on boarding. Steps are FACTS (onboard_core.js),
+//                the guide's tutorial steps (move / flash / scrap) are marked as they happen. Returning players, veterans, friend lobbies, loaded saves and dev
+//                auto-host skip it (profile.onboard flag); in co-op the crew simply stays in the ship (the real "hangar") and can not pull the lever meanwhile.
+//   Unlocks      systems are locked at first and "gifted" by The Algorithm: forge quota 1, pets + voyage quota 2, homeworld quota 3, glitch gates after the first boss.
+//                Other modules ask game.onboard.locked(id) / deny(id) (one guard line each); Settings > "Unlock everything" opens all.
+// State: profile.onboard (flow), profile.unlocks (schedule). No new net message types: the wing is local to the host player, the crew is told through
+// the existing 'sys' message. Debug: game.onboard.debug(), .skip(), .force(stepId).
+import * as THREE from 'three';
+import { sysMsg } from '../core/i18n.js';
+import { wrapMethod } from './dailyEvents.js';
+import * as K from './onboard_core.js';
+import { TEXT, x, xf } from './onboard_text.js';
+import { buildWing, SHUTTER } from './onboard_world.js';
+
+const CSS = `.ob-pa{position:fixed;left:50%;top:clamp(48px,8vh,96px);transform:translateX(-50%);z-index:58;width:min(760px,94vw);background:#12130d;border:2px solid #f2c230;color:#e8e6d0;font:600 15px/1.35 'Bahnschrift','Arial Narrow',Arial,sans-serif;letter-spacing:.03em;box-shadow:0 6px 30px #000c;pointer-events:none;opacity:0;transition:opacity .35s}
+.ob-pa.on{opacity:1}
+.ob-pa .h{padding:4px 12px;background:repeating-linear-gradient(-45deg,#f2c230 0 10px,#15150f 10px 20px);color:#111;font-weight:800;text-transform:uppercase}
+.ob-pa .h b{background:#f2c230;padding:1px 8px}
+.ob-pa .t{padding:10px 14px}
+.ob-skip{position:fixed;left:50%;bottom:16%;transform:translateX(-50%);z-index:58;padding:5px 12px;background:#12130d;border:1px solid #f2c230;color:#f2c230;font:700 13px 'Bahnschrift','Arial Narrow',Arial,sans-serif;letter-spacing:.05em;pointer-events:none;display:none}`;
+
+const STEP_SAY = { crouch: 'say.crouch', sprint: 'say.sprint', locker: 'say.locker', flash: 'say.flash', loot: 'say.loot', lock: 'say.lock', hangar: 'say.hangar', terminal: 'say.terminal' };
+const CMD_LOCK = { pets: 'pets', home: 'homeworld', factory: 'homeworld', ghost: 'homeworld', signals: 'voyage', missions: 'voyage', mission: 'voyage', take: 'voyage', dropjob: 'voyage', voyage: 'voyage', warp: 'voyage' };
+const SKIP_HOLD = 2.0;
+
+export function installOnboard(game) {
+  const mods = game.mods;
+  if (!mods) return null;
+  const offs = [], restores = [];
+  let disposed = false, style = null, paEl = null, skipEl = null;
+  const T = { t: 0 };
+  const S = {
+    decided: false, flow: null, wing: null, wingT: 0, tl: [], sh: { armed: true, t: -1, fails: 0, sprint: false, reopenAt: 0 }, blk: null, mugId: null, said: new Set(),
+    board: null, histStart: 0, termWas: false, termT: 0, uT: 0, giftAt: 0, giftHint: null, skipT: 0, crewSeen: 0, retAt: 0, goalSaid: false, deadWas: false, pollT: 0, lastPos: null,
+    landSaid: false, paT: 0,
+  };
+  const warn = (tag, e) => { try { console.warn('[onboard] ' + tag, e); } catch { /* ignore */ } };
+  const save = () => { try { game.progress?.save?.(); } catch { /* optional */ } };
+  const say = (id, vars) => { const s = xf(id, vars); try { if (game.lore?.say) game.lore.say(s); else game.ui?.toast?.(s, 'info'); } catch { /* optional */ } };
+  const sfx = (n, v = 0.7) => { try { game.sfx?.(n, v); } catch { /* unknown sound */ } };
+  const toast = (s, kind = 'info') => { try { game.ui?.toast?.(s, kind); } catch { /* optional */ } };
+  const qsp = () => { try { return new URLSearchParams(location.search); } catch { return new URLSearchParams(''); } };
+
+  // ============================================================================================ UNLOCKS (always installed)
+  const U = () => { const u = K.ensureUnlocks(game.profile); if (u) K.decideMode(game.profile); return u; };
+  const unlockAll = () => !!game.settings?.unlockAll;
+  const prog = () => K.progressOf(game.run, U());
+  function locked(id) {
+    const u = U();
+    if (!u) return false;
+    return K.isLockedId(id, u, prog(), unlockAll());
+  }
+  function lockedVars(id) { const r = K.requirementText(id); return { name: TEXT['u.' + id]?.[0] || id, n: r?.q || 0, boss: !!r?.boss }; }
+  function lockedText(id, term) {
+    const v = lockedVars(id);
+    return xf(term ? (v.boss ? 'locked_term_boss' : 'locked_term') : (v.boss ? 'locked_boss' : 'locked_q'), v);
+  }
+  let denyAt = -9;
+  /** guard for other modules: true (and a toast) when `id` is still locked */
+  function deny(id) {
+    if (disposed || !locked(id)) return false;
+    if (T.t - denyAt > 1.5) { denyAt = T.t; toast(lockedText(id), 'bad'); sfx('ui_error', 0.4); }
+    return true;
+  }
+  /** host terminal ROUTE: { k, v } (a translatable message) or null */
+  function routeBlocked(m) {
+    if (disposed || !m) return null;
+    if (m.home && locked('homeworld')) { const v = lockedVars('homeworld'); return { k: v.boss ? TEXT.locked_term_boss[0] : TEXT.locked_term[0], v }; }
+    return null;
+  }
+  restores.push(wrapMethod(mods, 'terminalCommand', (orig) => function (w0, rest, term) {
+    if (!disposed) {
+      let id = CMD_LOCK[w0];
+      if (w0 === 'moon' && ['random', 'rnd', 'rand'].includes(rest?.[0])) id = 'voyage';
+      if (w0 === 'route' && /^(s|~|sig|signal)\s*[1-3]$/.test((rest || []).join(' '))) id = 'voyage';
+      if (id && locked(id)) { term?.print?.(lockedText(id, true), 'err'); return true; }
+    }
+    return orig.call(this, w0, rest, term);
+  }));
+  function announceGift(id) {
+    const name = TEXT['u.' + id]?.[0] || id;
+    toast(xf('gift_toast', { name }), 'good');
+    sfx('ui_levelup', 0.6);
+    say('gift.' + id);
+    S.giftHint = { id, until: T.t + 240 };
+  }
+  function tickUnlocks(dt) {
+    S.uT -= dt;
+    if (S.uT > 0) return;
+    S.uT = 0.5;
+    const u = U();
+    if (!u || !game.run) return;
+    if (K.fold(u, prog())) save();
+    if (flowActive()) return;
+    if (!['orbit', 'company'].includes(game.run.phase)) return;
+    if (game.ui?.panelOpen || game.terminal?.active || game.minigame || T.t < S.giftAt) return;
+    const [id] = K.pendingGifts(u, prog(), unlockAll());
+    if (id && K.markGiven(u, id)) { save(); announceGift(id); S.giftAt = T.t + 9; }
+  }
+
+  // ============================================================================================ HIRING DAY
+  const flowActive = () => !!S.flow && S.flow.s === 'run';
+  const stage = () => (flowActive() ? K.stageOf(S.flow) : 'done');
+  const step = () => (flowActive() ? K.currentStep(S.flow)?.id || null : null);
+  const localP = () => (S.wing ? S.wing.local(game.player.pos) : { x: 0, y: 0, z: 0 });
+
+  function note(ev, data) {
+    const fl = S.flow;
+    if (!fl || fl.s !== 'run') return null;
+    const r = K.note(fl, ev, data);
+    if (r.done.length) onDone(r);
+    return r;
+  }
+  function onDone(r) {
+    for (const id of r.done) {
+      sfx('ui_confirm', 0.35);
+      try {
+        if (id === 'sprint') game.guide?.tutEvent?.('move', { d: 99, sprint: true, crouch: true });
+        if (id === 'flash') game.guide?.tutEvent?.('flash');
+        if (id === 'loot') game.guide?.tutEvent?.('scrap');
+      } catch { /* guide optional */ }
+    }
+    save();
+    if (r.finished) { finish(); return; }
+    const s = r.step;
+    if (s && STEP_SAY[s] && !S.said.has(s)) { S.said.add(s); game.later ? game.later(() => { if (!disposed && flowActive()) say(STEP_SAY[s]); }, 900) : say(STEP_SAY[s]); }
+    if (s === 'locker' && !S.mugId) spawnMug();
+  }
+  function finish() {
+    const xp = 50;
+    try { game.progress?.addXp?.(xp, 'Hiring Day'); } catch { /* optional */ }
+    toast(xf('done_toast', { xp }), 'good');
+    sfx('ui_quota_met', 0.5);
+    save();
+    hidePa();
+  }
+
+  // ---- decide + begin ----------------------------------------------------------------------------------------------------
+  function markSkip(why) {
+    const fl = K.newFlow();
+    K.skipFlow(fl, why);
+    game.profile.onboard = fl;
+    save();
+  }
+  function decide() {
+    S.decided = true;
+    const q = qsp();
+    const forced = q.get('hiringday') === '1' && !!game.isHost;
+    const ctx = {
+      profile: game.profile, settings: game.settings, isHost: !!game.isHost, hasRunData: !!game.opts?.runData, phase: game.run?.phase, quotaIndex: game.run?.quotaIndex, day: game.run?.day,
+      devAuto: q.has('autohost') || q.has('autojoin'), forced,
+    };
+    const r = K.shouldRun(ctx);
+    if (r.mark === 'skip') markSkip(r.why);
+    if (r.run) begin();
+  }
+  function begin() {
+    if (S.wing || disposed) return;
+    const fl = K.newFlow();
+    fl.startedAt = Date.now();
+    game.profile.onboard = fl;
+    S.flow = fl;
+    save();
+    style = document.createElement('style'); style.textContent = CSS; document.head.appendChild(style);
+    const ui = document.getElementById('ui') || document.body;
+    paEl = document.createElement('div'); paEl.className = 'ob-pa'; paEl.innerHTML = '<div class="h"><b></b></div><div class="t"></div>'; ui.appendChild(paEl);
+    skipEl = document.createElement('div'); skipEl.className = 'ob-skip'; ui.appendChild(skipEl);
+    S.wing = buildWing(game);
+    const sp = S.wing.spawn();
+    game.player.teleport(sp.pos, sp.yaw); game.player.pitch = 0;
+    game.engine.fx.fade = 1; game.engine.fadeTarget = 1;
+    S.wingT = 0; S.tl = [];
+    const at = (t0, fn) => S.tl.push({ at: t0, fn });
+    at(0.7, () => { game.engine.fadeTarget = 0; });
+    at(3.3, () => { game.engine.fadeTarget = 1; });
+    at(3.55, () => { game.engine.fadeTarget = 0; });
+    at(2.6, () => pa('pa1'));
+    at(8.6, () => pa('pa2'));
+    at(14.6, () => pa('pa3'));
+    at(16.5, () => say('alg1'));
+    at(22.5, () => say('alg2'));
+    at(25.5, () => { hidePa(); sfx('door_open', 0.8); S.wing.doors.cell.set(true); note('announced'); });
+    at(1.2, () => { try { game.ui?.hud?.bigText?.(x('sign.crt1'), x('sign.cell')); } catch { /* optional */ } });
+    S.crewSeen = game.remotes?.size || 0;
+  }
+  function pa(id) {
+    if (!paEl) return;
+    paEl.querySelector('.h b').textContent = x('pa_h');
+    paEl.querySelector('.t').textContent = x(id);
+    paEl.classList.add('on');
+    sfx('ui_notify', 0.4);
+    S.paT = T.t + 5.6;
+  }
+  function hidePa() { paEl?.classList.remove('on'); S.paT = 0; }
+
+  function spawnMug() {
+    if (!game.isHost || !S.wing || !game.items?.hostSpawn) return;
+    try { S.mugId = game.items.hostSpawn('mug', S.wing.pts.mug, { value: 12 }); } catch (e) { warn('mug', e); }
+  }
+  function openLocker() {
+    if (!S.wing || S.wing.lockerOpen()) return;
+    S.wing.setLocker(true);
+    sfx('door_open', 0.7);
+    try { game.items.hostSpawn('flashlight', S.wing.pts.lockerDrop, { linvel: [1.5, 1.4, 0.2] }); } catch (e) { warn('flashlight', e); }
+    note('locker');
+  }
+  function pickCabinet() {
+    if (game.minigame) return;
+    game.openMinigame('lockpick', { tier: 'simple' }, (res) => {
+      if (disposed || !flowActive() || S.flow.f.lock) return;
+      if (res?.success) {
+        note('lock', { tries: (S.flow.f.lockTries | 0) + 1 });
+        sfx('door_open', 0.8);
+        S.wing?.doors.hangar.set(true);
+        say('say.lock_ok');
+      } else if (!res?.cancelled) { note('lockTry'); }
+    });
+  }
+  function board() {
+    if (S.board || !S.wing) return;
+    S.board = { t: 0 };
+    game.engine.fadeTarget = 1;
+    sfx('door_open', 0.6);
+  }
+  function toShip() {
+    const w = S.wing;
+    S.wing = null; S.board = null;
+    try { w?.dispose(); } catch (e) { warn('dispose wing', e); }
+    S.tl = []; S.blk = null;
+    hidePa();
+    game.spawnInShip();
+    game.player.pitch = 0;
+    game.engine.fadeTarget = 0;
+    try { game.updateAmbience(); } catch { /* optional */ }
+    S.histStart = game.terminal?.history?.length || 0;
+  }
+  function abortWing(why) {
+    if (!S.wing) return;
+    K.forceTo(S.flow, why === 'landing' ? 'door' : 'terminal');
+    toShip();
+    save();
+  }
+  function skip() {
+    if (!flowActive()) return false;
+    K.skipFlow(S.flow, 'skipped');
+    if (S.wing) toShip();
+    hidePa();
+    toast(x('skipped'), 'info');
+    save();
+    return true;
+  }
+
+  // ---- per frame: the wing -----------------------------------------------------------------------------------------------
+  function wingTick(dt) {
+    const W = S.wing, fl = S.flow, p = game.player, f = fl.f;
+    W.update(dt);
+    S.wingT += dt;
+    while (S.tl.length && S.tl[0].at <= S.wingT) S.tl.shift().fn();
+    if (S.paT && T.t > S.paT) hidePa();
+    const l = W.local(p.pos);
+    // walking / lateral habit (the Algorithm reads it in its first remark)
+    if (S.lastPos) {
+      const d = Math.hypot(p.pos.x - S.lastPos.x, p.pos.z - S.lastPos.z);
+      if (d > 0.005 && d < 3) note('moved', { d, x: W.inCorridor(p.pos) && l.z < -8 ? l.x : undefined });
+    }
+    S.lastPos = { x: p.pos.x, z: p.pos.z };
+    // crouch under the duct
+    if (!f.crouched && p.crouch && l.z < -13.0 && l.z > -15.5 && Math.abs(l.x) < 1.7) note('crouched');
+    // sprint shutter
+    shutterTick(dt, l, p);
+    // flashlight
+    if (!f.flash && game.flashlightOn?.()) note('flash');
+    // the mug
+    if (S.mugId && !f.loot) {
+      const it = game.items.get(S.mugId);
+      if (it) S.mugSeen = true;
+      if ((S.mugSeen && !it) || (it && (p.slots.includes(S.mugId) || it.holder === game.selfId))) note('loot');
+    }
+    // the gate after the break room opens once flashlight + mug are done
+    if (f.flash && f.loot && !W.doors.gate.open) { W.doors.gate.set(true); sfx('door_open', 0.6); }
+    blackoutTick(dt, l, p);
+    // boarding
+    if (S.board) {
+      S.board.t += dt;
+      if (S.board.t > 0.95) { toShip(); note('boarded'); }
+    }
+    // crew arrived while the host is in orientation
+    const n = game.remotes?.size || 0;
+    if (n > S.crewSeen) { toast(x('crew_wait'), 'info'); }
+    S.crewSeen = n;
+  }
+  function shutterTick(dt, l, p) {
+    const sh = S.sh, f = S.flow.f, W = S.wing, door = W.doors.shutter;
+    if (f.sprinted) return;
+    if (sh.t < 0) {
+      if (sh.armed && l.z < SHUTTER.trigger && l.z > SHUTTER.trigger - 2.5 && Math.abs(l.x) < 1.7) { sh.t = 0; sh.sprint = false; sh.armed = false; }
+      else if (l.z > SHUTTER.trigger + 0.5) sh.armed = true;
+      return;
+    }
+    if (sh.reopenAt) {   // the shutter is closed: wait, then open it again for another try
+      if (T.t >= sh.reopenAt) {
+        sh.reopenAt = 0; door.set(true); sfx('door_open', 0.5);
+        say('say.sprint_retry');
+        const between = l.z < SHUTTER.trigger && l.z > SHUTTER.z + 0.8;
+        if (between) { sh.t = 0; sh.grace = 0.9; } else { sh.t = -1; sh.armed = false; }   // still in the run-up: go again at once; else cross the line again
+      }
+      return;
+    }
+    sh.grace = Math.max(0, (sh.grace || 0) - dt);
+    sh.t += dt;
+    if (p.sprinting) sh.sprint = true;
+    if (l.z < SHUTTER.z - 0.7) { sh.t = -1; note('sprinted'); return; }   // through
+    if (sh.t >= 2.2 + (sh.grace || 0) && Math.abs(l.z - SHUTTER.z) > 0.8 && l.z > SHUTTER.z) {
+      note('shutterFail');
+      sh.fails++;
+      if (sh.fails >= K.SPRINT_FAILS_FREE) { say('say.sprint_free'); sh.t = -1; note('sprinted'); return; }
+      door.set(false); sfx('door_close', 0.9);
+      try { game.engine.shake?.(0.25); } catch { /* optional */ }
+      sh.reopenAt = T.t + 1.6;
+    }
+  }
+  function blackoutTick(dt, l, p) {
+    const W = S.wing, f = S.flow.f;
+    if (f.blackout) return;
+    if (!S.blk) {
+      if (W.doors.gate.open && l.z < -49.0) { S.blk = { t: 0, ph: 'dark', seen: 0, figT: 0, fl: 0 }; W.setLight(0); sfx('power_down', 0.9); try { game.engine.fx.noise = 0.5; setTimeout(() => { try { game.engine.fx.noise = 0; } catch { /* gone */ } }, 500); } catch { /* optional */ } }
+      return;
+    }
+    const B = S.blk;
+    B.t += dt;
+    if (B.ph === 'dark') { if (B.t > 1.0) { B.ph = 'fig'; sfx('light_flicker', 0.5); } }
+    else if (B.ph === 'fig') {
+      B.figT += dt;
+      W.showFigure(true, T.t);
+      const fp = W.figure.getWorldPosition(new THREE.Vector3()); fp.y += 1.7;
+      const eye = p.eyePos(), to = fp.sub(eye), d = to.length();
+      if (d < 30 && to.normalize().dot(p.forward()) > 0.88) B.seen += dt;
+      if (B.seen > 0.7 || B.figT > 5.5) { B.ph = 'flick'; B.fl = 0; sfx('light_flicker', 0.7); }
+    } else if (B.ph === 'flick') {
+      B.fl += dt;
+      W.setLight(Math.sin(B.fl * 44) > 0 ? 0.75 : 0.1);
+      if (B.fl > 0.3) W.showFigure(false);
+      if (B.fl > 0.8) {
+        W.setLight(1); sfx('power_up', 0.8); S.blk = null;
+        say('say.blackout');
+        note('blackout');
+      }
+    }
+  }
+
+  // ---- per frame: ship / field / return ------------------------------------------------------------------------------------
+  function shipTick(dt) {
+    const fl = S.flow, f = fl.f, run = game.run, ph = run?.phase, p = game.player;
+    const s = step();
+    if (s === 'terminal') {
+      const on = !!game.terminal?.active;
+      if (on) S.termT += dt;
+      if (on && (game.terminal.history?.length || 0) > S.histStart) note('terminal');
+      else if (S.termWas && !on && S.termT >= 4) note('terminal');
+      if (!on && S.termWas) S.termT = 0;
+      S.termWas = on;
+    }
+    if (ph && ph !== 'orbit') { if (!f.terminal) note('terminal'); if (!f.lever) note('lever'); }   // landing started (any peer pulled it)
+    if (ph === 'moon' && f.lever && !S.landSaid) { S.landSaid = true; say('say.land', { n: K.GOAL }); }
+    if (ph === 'moon' && !f.door && game.ship?.door?.open) note('door');
+    if (ph === 'moon' && S.landSaid) {
+      // collected value (host: exact, clients: the ship's items)
+      const n = game.hostData?.dayStats?.collected ?? game.objectives?.clientCollected?.() ?? 0;
+      if (n > (f.collected | 0)) note('collected', { n });
+      if (!S.goalSaid && (f.collected | 0) >= K.GOAL) { S.goalSaid = true; say('say.goal'); toast(x('obj.field_done'), 'good'); }
+    }
+    const dead = !!p.dead;
+    if (dead && !S.deadWas) note('death');
+    S.deadWas = dead;
+    // first return: back in orbit after the landing
+    if (ph === 'orbit' && f.lever && !f.returned && S.landSaid) { if (!f.door) note('door'); note('returned'); S.retAt = T.t; }
+    if (f.returned && !f.summary) {
+      const since = T.t - S.retAt;
+      if ((since > 4 && !game.ui?.panelOpen && !game.terminal?.active) || since > 35) {
+        const rm = K.remarkFor(f);
+        note('summary');
+        game.later ? game.later(() => say('rem.' + rm.id, rm.vars), 1200) : say('rem.' + rm.id, rm.vars);
+      }
+    }
+  }
+  function flowTick(dt) {
+    if (!S.decided) { if (game.run && game.net && game.player && game.isHost !== undefined) decide(); return; }
+    if (!flowActive()) return;
+    const p = game.player;
+    if (!p || !game.run) return;
+    // hold Backspace to skip (any stage)
+    const holding = !!game.input?.codeDown?.('Backspace') && !game.terminal?.active && !game.minigame;
+    S.skipT = holding ? S.skipT + dt : Math.max(0, S.skipT - dt * 2);
+    if (skipEl) { skipEl.style.display = S.skipT > 0.1 ? 'block' : 'none'; if (S.skipT > 0.1) skipEl.textContent = xf('skip_prog', { n: Math.min(100, Math.round((S.skipT / SKIP_HOLD) * 100)) }); }
+    if (S.skipT >= SKIP_HOLD) { S.skipT = 0; skip(); return; }
+    if (S.wing && stage() === 'wing') wingTick(dt);
+    else if (!S.wing && flowActive()) shipTick(dt);
+  }
+
+  // ---- hooks ---------------------------------------------------------------------------------------------------------------
+  offs.push(mods.on('update', (dt, g) => {
+    if (g !== game || disposed) return;
+    T.t += dt;
+    try { tickUnlocks(dt); } catch (e) { warn('unlocks', e); }
+    try { flowTick(dt); } catch (e) { warn('flow', e); }
+  }));
+  offs.push(mods.on('phase', (ph, g) => {
+    if (g !== game || disposed || !flowActive()) return;
+    if (S.wing && ph !== 'orbit') abortWing(ph);   // someone landed the ship while the host was still in orientation
+  }));
+  offs.push(mods.on('interactables', (list, g) => {
+    if (g !== game || disposed || !S.wing || !flowActive()) return;
+    const W = S.wing, f = S.flow.f;
+    if (f.locker || W.lockerOpen()) list.push({ pos: W.pts.locker, r: 1.0, reach: 3, label: x('p.locker_open'), action: () => sfx('ui_click', 0.3) });
+    else list.push({ pos: W.pts.locker, r: 1.0, reach: 3, label: x('p.locker'), action: openLocker });
+    if (f.lock) list.push({ pos: W.pts.cabinet, r: 1.0, reach: 3, label: x('p.cabinet_open'), action: () => sfx('ui_click', 0.3) });
+    else if (f.blackout) list.push({ pos: W.pts.cabinet, r: 1.0, reach: 3, label: x('p.cabinet'), action: pickCabinet });
+    else list.push({ pos: W.pts.cabinet, r: 1.0, reach: 3, label: x('p.cabinet_wait'), action: () => sfx('door_locked', 0.7) });
+    if (W.doors.hangar.open) list.push({ pos: W.pts.board, r: 1.7, reach: 4.6, label: x('p.board'), action: board });
+  }));
+  // the objective tracker: in the wing it shows ONLY our lines (the orbit lines about the lever would be nonsense there)
+  function myLines() {
+    const out = [];
+    const fl = S.flow;
+    if (!fl || fl.s !== 'run') return out;
+    const s = K.currentStep(fl), f = fl.f;
+    if (!s) return out;
+    const add = (text, kind = 'main', done = false, progress = null) => out.push({ text, kind, done, progress });
+    if (s.id === 'field') {
+      const n = f.collected | 0;
+      add(xf('obj.field', { a: n, b: K.GOAL }), 'main', n >= K.GOAL, Math.min(1, n / K.GOAL));
+      if (n >= K.GOAL) add(x('obj.field_done'), 'sub');
+    } else add(x('obj.' + s.id), 'main', false, s.id === 'walk' ? Math.min(1, (f.dist || 0) / K.WALK_DIST) : null);
+    if (s.id === 'blackout' && S.blk) add(x('say.flash'), 'hint');
+    add(x('skip_hint'), 'hint');
+    return out;
+  }
+  if (game.objectives?.compute) restores.push(wrapMethod(game.objectives, 'compute', (orig) => function (...a) {
+    if (!disposed && S.wing && flowActive()) return myLines();
+    return orig.apply(this, a);
+  }));
+  offs.push(mods.on('objectives', (add, g) => {
+    if (g && g !== game) return;
+    if (disposed) return;
+    if (!S.wing && flowActive()) for (const l of myLines()) add(l.text, l.kind, l.done, l.progress);
+    else if (S.giftHint && T.t < S.giftHint.until && !flowActive()) add(xf('gift_hint', { name: TEXT['u.' + S.giftHint.id]?.[0] || S.giftHint.id }), 'hint');
+  }));
+  // co-op: the crew can not launch the ship while the new hire is still in orientation
+  restores.push(wrapMethod(game, 'hostLever', (orig) => function (from) {
+    if (!disposed && flowActive() && from !== game.selfId && ['wing', 'ship'].includes(stage()) && !S.flow.f.lever && (S.wing || step() === 'terminal')) {
+      try { game.net.sendTo(from, 'sys', sysMsg(TEXT.lever_wait[0], {}, 'info')); } catch { /* net closing */ }
+      return undefined;
+    }
+    return orig.call(this, from);
+  }));
+
+  // ---- guide: while Hiring Day runs the guide's own tutorial lines are held (see guide.js: game.onboard.active()) ------------------------
+  const api = {
+    /** Hiring Day is running (the guide holds its tutorial lines) */
+    active: () => !disposed && flowActive(),
+    stage, step, flow: () => S.flow,
+    locked, deny, routeBlocked, lockedText,
+    unlocks: () => { const u = U(); return u ? { mode: u.mode, q: u.q, boss: u.boss, given: { ...u.given }, open: K.UNLOCK_IDS.filter((id) => !locked(id)) } : null; },
+    skip, begin, decide,
+    force: (id) => { if (!flowActive()) return false; const ok = K.forceTo(S.flow, id); if (S.wing && K.stageOf(S.flow) !== 'wing') toShip(); return ok; },
+    note,
+    core: K,
+    debug: () => ({
+      decided: S.decided, flow: S.flow ? JSON.parse(JSON.stringify(S.flow)) : null, stage: stage(), step: step(), wing: !!S.wing, wingT: +S.wingT.toFixed(1), sh: { ...S.sh }, blk: S.blk ? { ...S.blk } : null,
+      stats: S.wing?.stats || null, lines: myLines().map((l) => l.text), lockedNow: K.UNLOCK_IDS.filter((id) => locked(id)),
+    }),
+    wing: () => S.wing,
+    dispose() {
+      if (disposed) return;
+      disposed = true;
+      for (const o of offs) { try { o(); } catch { /* ignore */ } }
+      for (const r of restores.reverse()) { try { r(); } catch { /* ignore */ } }
+      try { S.wing?.dispose(); } catch { /* ignore */ }
+      S.wing = null;
+      paEl?.remove(); skipEl?.remove(); style?.remove();
+      try { game.engine.fadeTarget = 0; } catch { /* engine gone */ }
+    },
+  };
+  return api;
+}

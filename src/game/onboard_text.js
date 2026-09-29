@@ -1,0 +1,120 @@
+// ONBOARD text (EN / TR / RU): one table id -> [en, tr, ru], registered into the i18n tables at import (same idiom as eggs_text.js).
+// Read with x(id) / xf(id, vars) (both go through t() / tf(), so the language is resolved when the text is shown, never frozen at import).
+// Voice: the Company is cheerful and bureaucratic, The Algorithm is calm and watching (docs/LORE.md, MASTERPLAN 21.3).
+import { t, tf, addTranslations } from '../core/i18n.js';
+
+export const TEXT = {
+  // ---- the company announcement (top subtitle bar) and The Algorithm's first lines
+  pa_h: ['COMPANY ANNOUNCEMENT', 'ŞİRKET DUYURUSU', 'ОБЪЯВЛЕНИЕ КОМПАНИИ'],
+  pa1: ['Welcome to 0-Algorithm Corp., Employee. Today is your Hiring Day. Please remain calm.', 'Hoş geldin, 0-Algorithm A.Ş. Çalışanı. Bugün işe alım günün. Lütfen sakin ol.', 'Добро пожаловать в 0-Algorithm Corp., Сотрудник. Сегодня ваш день найма. Сохраняйте спокойствие.'],
+  pa2: ['Your onboarding is mandatory. Your enthusiasm is also mandatory.', 'Oryantasyonun zorunlu. Coşkun de zorunlu.', 'Ваше обучение обязательно. Ваш энтузиазм тоже обязателен.'],
+  pa3: ['Please proceed to the corridor. Do not touch the ceiling. Do not read the ceiling.', 'Lütfen koridora geç. Tavana dokunma. Tavanı okuma.', 'Пройдите в коридор. Не трогайте потолок. Не читайте потолок.'],
+  alg1: ['Hello, Employee. I am The Algorithm. I\'m watching you.', 'Merhaba, Çalışan. Ben Algoritma. Seni izliyorum.', 'Здравствуй, Сотрудник. Я Алгоритм. Я слежу за тобой.'],
+  alg2: ['Everything you do from now on is content. Smile.', 'Bundan sonra yaptığın her şey içerik. Gülümse.', 'Всё, что ты делаешь отныне, контент. Улыбнись.'],
+  // ---- objectives (one per step)
+  'obj.wake': ['Wake up. Listen to the Company announcement.', 'Uyan. Şirket duyurusunu dinle.', 'Проснись. Слушай объявление компании.'],
+  'obj.walk': ['Walk out of Cell 07 (WASD)', '07 numaralı hücreden çık (WASD)', 'Выйди из камеры 07 (WASD)'],
+  'obj.crouch': ['Crouch under the duct (hold Ctrl)', 'Havalandırma kanalının altından çömelerek geç (Ctrl basılı)', 'Пройди под воздуховодом пригнувшись (удерживай Ctrl)'],
+  'obj.sprint': ['Sprint to the end of the hall before the shutter closes (hold Shift)', 'Panjur kapanmadan koridorun sonuna koş (Shift basılı)', 'Добеги до конца зала, пока не закрылся щит (удерживай Shift)'],
+  'obj.locker': ['Open the company locker (E)', 'Şirket dolabını aç (E)', 'Открой шкафчик компании (E)'],
+  'obj.flash': ['Switch the flashlight on (F)', 'El fenerini aç (F)', 'Включи фонарик (F)'],
+  'obj.loot': ['Pick up the coffee mug from the desk (E)', 'Masadaki kahve kupasını al (E)', 'Возьми кружку со стола (E)'],
+  'obj.blackout': ['Walk on. Keep the flashlight on.', 'İlerle. Feneri açık tut.', 'Иди дальше. Держи фонарик включённым.'],
+  'obj.lock': ['Pick the lock of the filing cabinet (E)', 'Dosya dolabının kilidini aç (E)', 'Вскрой замок картотеки (E)'],
+  'obj.hangar': ['Board your ship, the Mini-Skeld (E)', 'Gemine bin: Mini-Skeld (E)', 'Поднимись на свой корабль Mini-Skeld (E)'],
+  'obj.terminal': ['Use the ship TERMINAL (E). Type MOONS. The route is already set.', 'Gemi TERMİNALİNİ kullan (E). MOONS yaz. Rota hazır.', 'Используй ТЕРМИНАЛ корабля (E). Введи MOONS. Маршрут уже задан.'],
+  'obj.lever': ['Pull the LEVER to land (E)', 'İnmek için KOLU çek (E)', 'Дёрни РЫЧАГ, чтобы сесть (E)'],
+  'obj.door': ['Open the ship DOOR (E) and step outside', 'Gemi KAPISINI aç (E) ve dışarı çık', 'Открой ДВЕРЬ корабля (E) и выйди наружу'],
+  'obj.field': ['HIRING DAY GOAL: ▮{a} / ▮{b} of scrap in the ship', 'İŞE ALIM GÜNÜ HEDEFİ: gemide ▮{a} / ▮{b} hurda', 'ЦЕЛЬ ДНЯ НАЙМА: ▮{a} / ▮{b} хлама на корабле'],
+  'obj.field_done': ['Goal reached. Pull the lever to fly home.', 'Hedef tamam. Eve dönmek için kolu çek.', 'Цель достигнута. Дёрни рычаг, чтобы лететь домой.'],
+  'obj.return': ['Read your day summary', 'Gün özetini oku', 'Прочитай итоги дня'],
+  skip_hint: ['Skip the orientation: hold Backspace', 'Oryantasyonu atla: Backspace basılı tut', 'Пропустить обучение: удерживай Backspace'],
+  skip_prog: ['Skipping... {n}%', 'Atlanıyor... {n}%', 'Пропуск... {n}%'],
+  // ---- Algorithm remarks while it happens
+  'say.crouch': ['Ducts. The Company builds them low on purpose. Crouch: hold Ctrl.', 'Kanallar. Şirket onları bilerek alçak yapar. Çömel: Ctrl basılı tut.', 'Воздуховоды. Компания нарочно строит их низкими. Присядь: удерживай Ctrl.'],
+  'say.sprint': ['A shutter. It closes when you cross the line. Sprint: hold Shift. Punctuality is a virtue.', 'Bir panjur. Çizgiyi geçince kapanır. Koş: Shift basılı tut. Dakiklik bir erdemdir.', 'Щит. Он закроется, когда пересечёшь линию. Беги: удерживай Shift. Пунктуальность добродетель.'],
+  'say.sprint_retry': ['Try again. I have nowhere to be.', 'Tekrar dene. Gidecek yerim yok.', 'Попробуй ещё. Мне некуда спешить.'],
+  'say.sprint_free': ['Fine. The Company is feeling generous today.', 'Peki. Şirket bugün cömert.', 'Ладно. Компания сегодня щедра.'],
+  'say.locker': ['Locker 07 is yours. The flashlight is on loan. It will be deducted from your future.', '07 numaralı dolap senin. Fener ödünç. Geleceğinden düşülecek.', 'Шкафчик 07 твой. Фонарик выдан взаймы. Его вычтут из твоего будущего.'],
+  'say.flash': ['Press F. Light is a courtesy, not a right.', 'F\'ye bas. Işık bir nezaket, hak değil.', 'Нажми F. Свет — любезность, а не право.'],
+  'say.loot': ['A mug. Anything that used to matter to someone is scrap. Take it with E.', 'Bir kupa. Birileri için bir zamanlar önemli olan her şey hurdadır. E ile al.', 'Кружка. Всё, что когда-то что-то значило, хлам. Возьми на E.'],
+  'say.blackout': ['Do not worry about that one. It is contractually harmless. Mostly.', 'Şuna aldırma. Sözleşmeye göre zararsız. Çoğunlukla.', 'Не обращай на него внимания. По контракту он безвреден. В основном.'],
+  'say.lock': ['Locked. Everything valuable is. Click when the marker is inside the green.', 'Kilitli. Değerli olan her şey öyle. İşaret yeşilin içindeyken tıkla.', 'Заперто. Всё ценное заперто. Кликай, когда маркер в зелёной зоне.'],
+  'say.lock_ok': ['Lock defeated. I am almost proud.', 'Kilit yenildi. Neredeyse gurur duyuyorum.', 'Замок побеждён. Я почти горжусь.'],
+  'say.hangar': ['Your ship. Company property. Try not to scratch it.', 'Geminiz. Şirket malı. Çizmemeye çalış.', 'Твой корабль. Собственность компании. Постарайся не поцарапать.'],
+  'say.terminal': ['The route is set: 56K-Dialup. The easiest moon in the catalogue. Also the cheapest.', 'Rota hazır: 56K-Dialup. Katalogdaki en kolay ay. Ve en ucuzu.', 'Маршрут задан: 56K-Dialup. Самая лёгкая луна в каталоге. И самая дешёвая.'],
+  'say.land': ['Your first moon. One objective: ▮{n} of scrap in the ship. Then come home. The stream is live.', 'İlk ayın. Tek hedef: gemiye ▮{n} hurda. Sonra eve dön. Yayın canlı.', 'Твоя первая луна. Одна цель: ▮{n} хлама на корабле. Потом домой. Эфир идёт.'],
+  'say.goal': ['Target reached. Now leave, before the moon reconsiders.', 'Hedef tamam. Şimdi git, ay fikrini değiştirmeden.', 'Цель достигнута. Улетай, пока луна не передумала.'],
+  done_toast: ['HIRING DAY COMPLETE: +{xp} XP', 'İŞE ALIM GÜNÜ TAMAM: +{xp} XP', 'ДЕНЬ НАЙМА ЗАВЕРШЁН: +{xp} XP'],
+  skipped: ['Orientation skipped. The Algorithm will remember that.', 'Oryantasyon atlandı. Algoritma bunu hatırlayacak.', 'Обучение пропущено. Алгоритм это запомнит.'],
+  // ---- the first remark, chosen from what you actually did (onboard_core.remarkFor)
+  'rem.died': ['You died on your first day. Retention is important. I noted it.', 'İlk gününde öldün. Elde tutma önemli. Not aldım.', 'Ты умер в первый же день. Удержание важно. Я отметил.'],
+  'rem.short': ['Only ▮{n} of ▮{goal}. I have adjusted your expectations. Not mine.', '▮{goal} hedefinin sadece ▮{n} kadarı. Senin beklentilerini ayarladım. Benimkileri değil.', 'Только ▮{n} из ▮{goal}. Я скорректировал твои ожидания. Не свои.'],
+  'rem.lock': ['{n} attempts on a SIMPLE lock. I noted it. Tomorrow the locks get harder.', 'BASİT bir kilitte {n} deneme. Not aldım. Yarın kilitler zorlaşıyor.', '{n} попыток на ПРОСТОМ замке. Я отметил. Завтра замки будут сложнее.'],
+  'rem.shutter': ['The shutter caught you {n} times. I noted your relationship with deadlines.', 'Panjur seni {n} kez yakaladı. Son tarihlerle ilişkini not aldım.', 'Щит поймал тебя {n} раза. Я отметил твои отношения с дедлайнами.'],
+  'rem.left': ['You hugged the left wall the whole way. I noted it. Habits are data.', 'Bütün yol boyunca sol duvara yaslandın. Not aldım. Alışkanlık veridir.', 'Ты всю дорогу жался к левой стене. Я отметил. Привычки это данные.'],
+  'rem.right': ['You hugged the right wall the whole way. I noted it. Habits are data.', 'Bütün yol boyunca sağ duvara yaslandın. Not aldım. Alışkanlık veridir.', 'Ты всю дорогу жался к правой стене. Я отметил. Привычки это данные.'],
+  'rem.clean': ['▮{n} on day one. Acceptable. I noted how you walk. Tomorrow I will use it.', 'İlk günde ▮{n}. Kabul edilebilir. Nasıl yürüdüğünü not aldım. Yarın kullanacağım.', '▮{n} в первый день. Приемлемо. Я запомнил, как ты ходишь. Завтра использую.'],
+  // ---- world signs / prompts
+  'p.locker': ['Open company locker 07 [E]', '07 numaralı şirket dolabını aç [E]', 'Открыть шкафчик компании 07 [E]'],
+  'p.locker_open': ['Locker 07 (empty)', '07 numaralı dolap (boş)', 'Шкафчик 07 (пуст)'],
+  'p.cabinet': ['Pick the cabinet lock [E]', 'Dolabın kilidini aç [E]', 'Вскрыть замок картотеки [E]'],
+  'p.cabinet_open': ['Filing cabinet (open)', 'Dosya dolabı (açık)', 'Картотека (открыта)'],
+  'p.cabinet_wait': ['Locked. The lights are off, and something is here.', 'Kilitli. Işıklar kapalı ve burada bir şey var.', 'Заперто. Свет погас, и здесь что-то есть.'],
+  'p.board': ['Board the Mini-Skeld [E]', 'Mini-Skeld\'e bin [E]', 'Подняться на Mini-Skeld [E]'],
+  'p.board_wait': ['The ship is sealed. Finish the orientation first.', 'Gemi mühürlü. Önce oryantasyonu bitir.', 'Корабль опечатан. Сначала закончи обучение.'],
+  'p.door_wait': ['Sealed', 'Mühürlü', 'Запечатано'],
+  'sign.cell': ['CELL 07', 'HÜCRE 07', 'КАМЕРА 07'],
+  'sign.cell2': ['EMPLOYEE PROCESSING', 'ÇALIŞAN İŞLEME', 'ОБРАБОТКА СОТРУДНИКОВ'],
+  'sign.crt1': ['HIRING DAY', 'İŞE ALIM GÜNÜ', 'ДЕНЬ НАЙМА'],
+  'sign.crt2': ['WELCOME, EMPLOYEE', 'HOŞ GELDİN, ÇALIŞAN', 'ДОБРО ПОЖАЛОВАТЬ, СОТРУДНИК'],
+  'sign.crt3': ['SMILE. YOU ARE ON AIR.', 'GÜLÜMSE. YAYINDASIN.', 'УЛЫБНИСЬ. ТЫ В ЭФИРЕ.'],
+  'sign.note': ['Do not trust the mug. - J.', 'Kupaya güvenme. - J.', 'Не верь кружке. - Дж.'],
+  'sign.crouch': ['LOW CEILING: CROUCH (CTRL)', 'ALÇAK TAVAN: ÇÖMEL (CTRL)', 'НИЗКИЙ ПОТОЛОК: ПРИСЕДЬ (CTRL)'],
+  'sign.sprint': ['SHUTTER AHEAD: SPRINT (SHIFT)', 'İLERİDE PANJUR: KOŞ (SHIFT)', 'ВПЕРЕДИ ЩИТ: БЕГИ (SHIFT)'],
+  'sign.locker': ['LOCKER ROOM', 'SOYUNMA ODASI', 'РАЗДЕВАЛКА'],
+  'sign.break': ['BREAK ROOM', 'DİNLENME ODASI', 'КОМНАТА ОТДЫХА'],
+  'sign.hangar': ['HANGAR', 'HANGAR', 'АНГАР'],
+  'sign.hangar_h': ['MINI-SKELD: YOUR SHIP', 'MINI-SKELD: SENİN GEMİN', 'MINI-SKELD: ТВОЙ КОРАБЛЬ'],
+  'sign.terminal': ['TERMINAL', 'TERMİNAL', 'ТЕРМИНАЛ'],
+  'sign.terminal2': ['Routes, store, info. Press E and type.', 'Rota, mağaza, bilgi. E\'ye bas ve yaz.', 'Маршруты, магазин, инфо. Нажми E и печатай.'],
+  'sign.lever': ['LEVER', 'KOL', 'РЫЧАГ'],
+  'sign.lever2': ['Lands the ship. Pull it when the crew is aboard.', 'Gemiyi indirir. Ekip gemideyken çek.', 'Сажает корабль. Дёргай, когда команда на борту.'],
+  'sign.door': ['DOOR', 'KAPI', 'ДВЕРЬ'],
+  'sign.door2': ['The airlock. Open it on the moon, close it when chased.', 'Hava kilidi. Ayda aç, kovalanınca kapat.', 'Шлюз. Открывай на луне, закрывай, когда гонятся.'],
+  // ---- co-op
+  crew_wait: ['Your crew is aboard. They wait in the ship while you finish orientation.', 'Ekibin gemide. Sen oryantasyonu bitirene kadar bekliyorlar.', 'Твоя команда на борту. Она ждёт в корабле, пока ты заканчиваешь обучение.'],
+  lever_wait: ['The new hire is still in orientation. Wait for them.', 'Yeni çalışan hâlâ oryantasyonda. Onu bekleyin.', 'Новичок ещё проходит обучение. Подождите его.'],
+  // ---- staged unlocks: the Algorithm's gifts
+  'u.forge': ['FORGE', 'DEMİRHANE', 'КУЗНИЦА'],
+  'u.pets': ['PETS', 'EVCİL HAYVANLAR', 'ПИТОМЦЫ'],
+  'u.voyage': ['VOYAGE', 'SEYAHAT', 'ПУТЕШЕСТВИЯ'],
+  'u.homeworld': ['HOMEWORLD', 'EV GEZEGENİ', 'РОДНОЙ МИР'],
+  'u.gates': ['GLITCH GATES', 'GLİTCH KAPILARI', 'ГЛИТЧ-ВРАТА'],
+  'gift.forge': ['A gift: the FORGE. The Monetizer at HQ enhances your gear. Nothing is free. Try it.', 'Bir hediye: DEMİRHANE. HQ\'daki Paralaştırıcı ekipmanını güçlendirir. Hiçbir şey bedava değil. Dene.', 'Подарок: КУЗНИЦА. Монетизатор в штабе улучшает снаряжение. Ничего не бесплатно. Попробуй.'],
+  'gift.pets': ['A gift: PETS. Press N. They will love you. I will use it.', 'Bir hediye: EVCİL HAYVANLAR. N\'ye bas. Seni sevecekler. Ben de bunu kullanacağım.', 'Подарок: ПИТОМЦЫ. Нажми N. Они полюбят тебя. Я воспользуюсь этим.'],
+  'gift.voyage': ['A gift: VOYAGE. Random moons, signals and jobs at the terminal: MOON RANDOM, SIGNALS, MISSIONS.', 'Bir hediye: SEYAHAT. Terminalde rastgele aylar, sinyaller ve işler: MOON RANDOM, SIGNALS, MISSIONS.', 'Подарок: ПУТЕШЕСТВИЯ. Случайные луны, сигналы и задания на терминале: MOON RANDOM, SIGNALS, MISSIONS.'],
+  'gift.homeworld': ['A gift: your HOMEWORLD. ROUTE HOME at the terminal. Build. It produces while you sleep. You do not sleep.', 'Bir hediye: EV GEZEGENİN. Terminalde ROUTE HOME. İnşa et. Sen uyurken üretir. Sen uyumazsın.', 'Подарок: твой РОДНОЙ МИР. ROUTE HOME на терминале. Строй. Он производит, пока ты спишь. Ты не спишь.'],
+  'gift.gates': ['A gift: GLITCH GATES. They open in orbit from now on. Type GATES. Do not thank me.', 'Bir hediye: GLİTCH KAPILARI. Bundan sonra yörüngede açılırlar. GATES yaz. Teşekkür etme.', 'Подарок: ГЛИТЧ-ВРАТА. Теперь они открываются на орбите. Введи GATES. Не благодари.'],
+  gift_toast: ['NEW TOY: {@name}', 'YENİ OYUNCAK: {@name}', 'НОВАЯ ИГРУШКА: {@name}'],
+  gift_hint: ['NEW TOY from The Algorithm: {@name}', 'Algoritma\'dan YENİ OYUNCAK: {@name}', 'НОВАЯ ИГРУШКА от Алгоритма: {@name}'],
+  locked_q: ['LOCKED: {@name}. The Algorithm gifts it after quota {n}.', 'KİLİTLİ: {@name}. Algoritma bunu {n}. kotadan sonra hediye eder.', 'ЗАКРЫТО: {@name}. Алгоритм подарит это после квоты {n}.'],
+  locked_boss: ['LOCKED: {@name}. The Algorithm gifts it after your first sector boss.', 'KİLİTLİ: {@name}. Algoritma bunu ilk sektör patronundan sonra hediye eder.', 'ЗАКРЫТО: {@name}. Алгоритм подарит это после первого босса сектора.'],
+  locked_term: ['{@name} is locked. The Algorithm gifts it after quota {n}. (Settings: Unlock everything.)', '{@name} kilitli. Algoritma bunu {n}. kotadan sonra hediye eder. (Ayarlar: Her şeyin kilidini aç.)', '{@name} закрыто. Алгоритм подарит это после квоты {n}. (Настройки: открыть всё.)'],
+  locked_term_boss: ['{@name} is locked. The Algorithm gifts it after your first sector boss. (Settings: Unlock everything.)', '{@name} kilitli. Algoritma bunu ilk sektör patronundan sonra hediye eder. (Ayarlar: Her şeyin kilidini aç.)', '{@name} закрыто. Алгоритм подарит это после первого босса сектора. (Настройки: открыть всё.)'],
+  // ---- settings
+  set_unlock: ['Unlock everything (skip the Algorithm\'s gifts)', 'Her şeyin kilidini aç (Algoritma hediyelerini atla)', 'Открыть всё (пропустить подарки Алгоритма)'],
+  set_unlock_note: ['forge, pets, voyage, homeworld and gates from the start; for veterans', 'demirhane, evcil hayvanlar, seyahat, ev gezegeni ve kapılar en baştan; kıdemliler için', 'кузница, питомцы, путешествия, родной мир и врата с самого начала; для ветеранов'],
+  set_skip: ['Skip Hiring Day (first-time intro)', 'İşe Alım Gününü atla (ilk giriş)', 'Пропустить День найма (первое вступление)'],
+  set_skip_note: ['new profiles start straight in the ship', 'yeni profiller doğrudan gemide başlar', 'новые профили сразу начинают на корабле'],
+};
+
+const trMap = {}, ruMap = {};
+for (const v of Object.values(TEXT)) { trMap[v[0]] = v[1]; ruMap[v[0]] = v[2]; }
+addTranslations(trMap);
+addTranslations(ruMap, 'ru');
+
+export const x = (id) => { const v = TEXT[id]; return v ? t(v[0]) : id; };
+export const xf = (id, vars) => { const v = TEXT[id]; return v ? tf(v[0], vars) : id; };
+/** the three-language rows (for tests / the i18n audit) */
+export const rows = () => Object.entries(TEXT);
