@@ -720,6 +720,14 @@ Model politikası aynı (§6): Sonnet varsayılan, ağ/AI/çekirdek işlerde Opu
 - **§23.4 Sabah oylaması — v1:** 3 kural kartı, ekip oyu, anomaly mutator altyapısı. (Sonnet)
 - Diğerleri (canlı yayın, hayalet tekrarı, glitch silahı, taraf seçimi) wave 6.
 
+### 25.8 Toplama: E yerine vurarak (sahibin isteği)
+- Ağaç, kaya, maden damarı, bitki (survival), fabrika kaynak düğümleri (homeworld2), kırılabilir kasalar: **E'ye basılı tutmak yerine eldeki aletle/silahla vurarak** toplanır.
+- Her hedefin HP'si var; vuruş = hasar (alet türüne göre: balta ağaca ×2, kazma kayaya ×2, çıplak el ×0.3, silah ×0.6). Her vuruşta parçacık + ses + hafif sallanma; son vuruşta devrilme/parçalanma ve drop.
+- Mevcut melee sistemi (actions.js tierDmg, combat melee) kullanılır: vuruş raycast'i yaratık yerine "harvestable" hedefe de çarpar. E sadece küçük şeyler için kalır (ot toplama, eşya alma).
+- Host-otoriter: istemci vuruşu `hit` isteğiyle yollar, host HP düşürür ve drop'u spawn eder (mevcut creature damage yolu gibi).
+- Yeni alet: **Balta** ve **Kazma** mağazada (ucuz); dayanıklılık (durability) düşer.
+- Ajan tablosuna: #11 `harvest2` (Sonnet), `hardmode` ile paralel.
+
 ### 25.7 Ajan tablosu (sıra = öncelik)
 | # | Ajan | Model | Kapsam | Tarayıcı |
 |---|---|---|---|---|
