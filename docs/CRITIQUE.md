@@ -223,3 +223,6 @@ The new core loop exists end to end in code (partition, capture, fortify, capped
 
 ## Wave 5 - aimchase (docs/wave5/aimchase.md)
 NPC shooters now telegraph (laser, white lock, fire at the locked point) and creatures obey one speed table (sustained < sprint, short bursts, fatigue, door hesitation); only node-tested, laser/vignette look and difficulty feel are unverified in a browser.
+
+## Wave 6 - story (docs/wave6/story.md)
+The identity line finally has a player-facing choice: two patrons, an allegiance meter fed by contracts and patron jobs, unlocks / creature rules / zone attack frequency that follow it, three acts and three endings (one secret, tied to the egg meta-secret) and a weekly trend creature. Honest limits: node-tested only (paper numbers for pay, thresholds and jobs per ending), voyage missions are not patron-tagged, the finale overlay / dock chip / case card are barely eyeballed, and "no healing" only sees consumables used through `useItem`. The tone change is extra intercom lines, not a rewrite of the existing Algorithm voice.
