@@ -240,7 +240,7 @@ import { installCosm5 } from './cosm5.js';   // wave 4: cosmetics drop (suits/ha
 
 
 // [import:ui2]
-// [import:nvgear]
+import { installNvgear } from './nvgear.js';   // [import:nvgear] wave 8: buyable night-vision goggles + timed ship charger
 // [import:mapmods]
 // [import:worlds3]
 // [import:crdirector]
@@ -512,7 +512,7 @@ export class Game extends Emitter {
 
 
     // [slot:ui2]
-    // [slot:nvgear]
+    this.useModule('nvgear', installNvgear);   // [slot:nvgear]
     // [slot:mapmods]
     // [slot:worlds3]
     // [slot:crdirector]
