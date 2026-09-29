@@ -1,7 +1,7 @@
 # Wave 5 - SHIPDECK: Upper Deck expansion (MASTERPLAN 25.10, second half)
 
 Owner: "geminin ust katina cikamiyorum, gemiye ust kat koy, tycoon oyunlari gibi gemiyi overall gelistir".
-Status: node-tested (`ship2_overlap` 26, `shipdeck.test.mjs` 14 with the real Rapier character controller, `shipyard_install` 28, `shipyard*`, `ship2_*`, `stairs`), `npm run build` clean, ONE short headless tour (swiftshader, see "Browser" below). Not hand-played, not tried with two real players.
+Status: node-tested (`ship2_overlap` 26, `shipdeck.test.mjs` 14 with the real Rapier character controller, `shipyard_install` 28, `shipyard*`, `ship2_*`, `stairs`), `npm run build` clean, NO browser run (the shared browser lock stayed busy for the full 5 minute budget, so the tour was skipped as instructed; see "Browser"). Not hand-played, not tried with two real players.
 
 ## What the crew gets
 Shipyard panel has a new tab **UPPER DECK** (also reachable from the terminal `SHIPYARD` command and the Frame Console): a side cross-section of the ship (built parts filled, the next upgrade dashed green), the three tiers with costs, the buy button (credits, or ship parts at the Frame Console) and the room picker.
@@ -35,7 +35,7 @@ Chess table (now x -2.25, z 1.0), the third ceiling lamp, the disco ball (`SL.DI
 * Knobs: `shipyard_core.js` `DECK_CR`, `DECK_ROOM_CR`, `deckPartCost`; geometry constants in `shiplayout.js`.
 
 ## Browser
-`tools/harness/wave5_shipdeck.js` (body for `headless_shots.mjs`): buys Mk III through the profile state, 5 3D shots (stair well in the hub, lane B looking up, deck rooms, dome, hull from outside) + the panel tab. Result and screenshot notes are in the hand-back report; see AGENTS.md 5.19.
+NOT run. `tools/harness/wave5_shipdeck.js` (body for `headless_shots.mjs`) is ready for the lead's batch: it buys Mk III through the profile state, takes 5 3D shots (stair well in the hub, lane B looking up, deck rooms, dome, hull from outside) + the panel tab, and returns page errors, the deck mesh count and the SVG size. First things to eyeball: stair readability, hatch frame, room furniture scale, dome / glass tint under the PSX shader, the panel cross-section at 1280x720, and the roof (turret socket moved aft, mounts re-placed).
 
 ## Known gaps (honest)
 * Not hand-played; the stair feel is only proven with the kinematic controller in node. The hub loses a 2.3 x 2.9 m block of floor (walkways stay >= 0.9 m by test, but it is tighter).
