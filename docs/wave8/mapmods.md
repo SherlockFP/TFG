@@ -32,7 +32,7 @@ Files: `src/game/mapmods_core.js` (pure rules, node-tested), `src/game/mapmods.j
   the Volatile blast is 22 (inside the 45 % quota 0-1 hit cap), nasty ones are gated by minQ.
 
 ## Sector Map (the map device)
-Item `sectormap`, 110 credits, store category Consumables (shop data-driven), sits in the ship storage or your hands. On the ship terminal (orbit only, host-authoritative):
+Item `sectormap`, 200 credits (110 before the econ8 pass, see econ8.md), store category Consumables (shop data-driven), sits in the ship storage or your hands. On the ship terminal (orbit only, host-authoritative):
 - `ATLAS` (or `AFFIX`): readout of tomorrow's map: title (prefixes + moon + suffixes), each affix with its reward, total reward, maps aboard. `MOON` prints it too.
 - `ATLAS REROLL`: consumes a map, rerolls the whole set (chaos orb: can get worse).
 - `ATLAS ADD`: consumes a map, adds one affix (exalted orb), max 3.

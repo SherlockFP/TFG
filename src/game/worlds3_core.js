@@ -19,7 +19,7 @@ export const THEMES = {
   pool: {
     title: 'LEVEL 37', sub: '"The Poolrooms"', hint: 'White tiles, warm water. Deep patches pull you down. Sound carries far over water.', w: [2, 2, 2],
     fog: hex(0xcfe9ee), dens: 0.026, hemi: [0.86, 0.98, 1], hemiG: [0.3, 0.42, 0.46], amb: [0.85, 0.97, 1], panel: 0xe4f8ff, light: 0xcfeeff,
-    ambience: 'ambience_sewer_water', ambVol: 0.4, lootMul: 1.35, hunters: { br_hound: 60, br_smiler: 25, lurker: 15 },
+    ambience: 'ambience_sewer_water', ambVol: 0.4, lootMul: 1.1, hunters: { br_hound: 60, br_smiler: 25, lurker: 15 },
     deep: 9, deepR: 2.3, deepSlow: 0.16, deepStamina: 34,
     echoLoud: 1.0, echoEvery: 1.3,   // SIGNATURE: sound carries far over water - moving here reports a noise to the creatures
     loot: { sig: ['w3_float', 'w3_whistle'], pool: [['goldbar', 4], ['trophy', 6], ['ring', 3], ['perfume', 5], ['pickles', 4], ['bottles', 5]], n: 5, sigN: 2 },
@@ -28,7 +28,7 @@ export const THEMES = {
   data: {
     title: 'SERVER 404', sub: '"The Algorithm\'s Data Center"', hint: 'Flooded racks. The water bites back in pulses.', w: [1, 2, 2],
     fog: hex(0x0d1c2c), dens: 0.05, hemi: [0.45, 0.66, 1], hemiG: [0.1, 0.16, 0.3], amb: [0.5, 0.7, 1], panel: 0x9fd0ff, light: 0x7fb8ff,
-    ambience: 'ambience_serverfarm', ambVol: 0.55, lootMul: 1.5, hunters: { scuttler: 40, br_smiler: 30, spider: 15, lurker: 15 },
+    ambience: 'ambience_serverfarm', ambVol: 0.55, lootMul: 1.2, hunters: { scuttler: 40, br_smiler: 30, spider: 15, lurker: 15 },
     zapEvery: 9, zapWarn: 1.5, zapDmg: 14,
     loot: { sig: ['w3_corechip', 'w3_fanarray'], pool: [['gpu', 6], ['hdd', 6], ['motherboard', 5], ['cryptocoin', 4], ['modem', 4], ['usbidol', 2]], n: 5, sigN: 2 },
     dress: ['rack', 'rack', 'rackpair', 'ups', 'cabletray'], dressP: 0.19,
@@ -36,7 +36,7 @@ export const THEMES = {
   hotel: {
     title: 'FLOOR 404', sub: '"The Endless Hotel"', hint: 'Numbered doors, none of them yours. The lights go out on schedule; numbers and the EXIT distance lie.', w: [1, 2, 2],
     fog: hex(0x3a1c14), dens: 0.05, hemi: [1, 0.78, 0.6], hemiG: [0.3, 0.14, 0.08], amb: [1, 0.72, 0.55], panel: 0xffc27a, light: 0xffb060,
-    ambience: 'ambience_mansion', ambVol: 0.5, lootMul: 1.45, hunters: { mannequin: 45, br_smiler: 30, lurker: 25 },
+    ambience: 'ambience_mansion', ambVol: 0.5, lootMul: 1.2, hunters: { mannequin: 45, br_smiler: 30, lurker: 25 },
     blackoutEvery: 55, blackoutLen: 6.5, mapLie: 0.4,   // SIGNATURE: room numbers re-roll and the EXIT distance hint lies (both re-rolled at every blackout)
     loot: { sig: ['w3_roomkey', 'w3_ledger'], pool: [['bell', 5], ['lamp', 5], ['painting', 6], ['perfume', 6], ['ring', 3], ['goldbar', 3], ['vhs', 4]], n: 5, sigN: 2 },
     dress: ['hoteldoor', 'hoteldoor', 'hoteldoor', 'luggage', 'sconce', 'plant'], dressP: 0.2,
@@ -44,7 +44,7 @@ export const THEMES = {
   fun: {
     title: 'LEVEL FUN', sub: '"Party\'s Never Over"', hint: 'Somebody planned this for you. They are early. They are very early.', w: [0, 1, 2],
     fog: hex(0x7a1a26), dens: 0.04, hemi: [1, 0.7, 0.72], hemiG: [0.4, 0.1, 0.16], amb: [1, 0.66, 0.7], panel: 0xff9aa8, light: 0xff6a80,
-    ambience: 'ambience_backrooms', ambVol: 0.4, lootMul: 2, hunters: { br_partygoer: 55, br_smiler: 25, br_hound: 20 },
+    ambience: 'ambience_backrooms', ambVol: 0.4, lootMul: 1.6, hunters: { br_partygoer: 55, br_smiler: 25, br_hound: 20 },
     huntAfter: 55, huntEvery: [15, 26], huntCap: 2,   // SIGNATURE: the party starts early
     loot: { sig: ['w3_cake', 'w3_pinata'], pool: [['trophy', 6], ['airhorn', 6], ['clownhorn', 5], ['goldbar', 3], ['playbutton', 2], ['liketrophy', 4], ['animefig', 4]], n: 6, sigN: 2 },
     dress: ['gifts', 'gifts', 'partytable', 'balloons', 'banner'], dressP: 0.2,
@@ -52,7 +52,7 @@ export const THEMES = {
   asylum: {
     title: 'WARD 13', sub: '"Saint Kefal Asylum"', hint: 'The doors lock behind you. Find the ward key.', w: [0, 2, 2],
     fog: hex(0x1a261f), dens: 0.055, hemi: [0.7, 0.9, 0.75], hemiG: [0.12, 0.18, 0.14], amb: [0.7, 0.88, 0.72], panel: 0xd8f2dc, light: 0xb8e0c0,
-    ambience: 'ambience_hospital', ambVol: 0.55, lootMul: 1.4, hunters: { mannequin: 35, lurker: 30, br_smiler: 35 },
+    ambience: 'ambience_hospital', ambVol: 0.55, lootMul: 1.15, hunters: { mannequin: 35, lurker: 30, br_smiler: 35 },
     lockMax: 300,   // SIGNATURE: the EXIT is locked until somebody picks up the ward key (auto-opens after lockMax s so nobody is stuck)
     loot: { sig: ['w3_patientfile', 'w3_jacket'], pool: [['skull', 5], ['teeth', 6], ['pot', 3], ['flask', 5], ['phone', 4], ['vhs', 4], ['perfume', 3], ['key', 2]], n: 5, sigN: 2 },
     dress: ['wheelchair', 'wheelchair', 'hospbed', 'padded', 'filecab'], dressP: 0.2,
