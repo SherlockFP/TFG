@@ -14,6 +14,7 @@ import { insideShip } from '../world/ship.js';
 import { createBarterPanel } from '../ui/panels/polish4_barter.js';
 import * as P from './polish4_core.js';
 import { TR_P4, RU_P4 } from './polish4_i18n.js';
+import { SPOTS as SHIP_SPOTS } from '../world/shiplayout.js';
 
 HOST_ONLY.add('p4msg');
 addTranslations(TR_P4, 'tr');   // (checked against the live tables: fills gaps only, nothing existing is overridden)
@@ -307,9 +308,11 @@ export function installPolish4(game) {
     // decal on both hull sides
     if (cur.decal !== 'none') {
       const col = css(paintHex(paintOf().c1));
-      const tex = decalTexture(cur.decal, col), mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.08 }), geo = new THREE.PlaneGeometry(1.5, 1.5);
+      // [wave5] spot from world/shiplayout.js: on the +z side it used to sit on top of the KC-07 hull number (x -5.4 .. -2.2)
+      const E = SHIP_SPOTS.emblem;
+      const tex = decalTexture(cur.decal, col), mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.08 }), geo = new THREE.PlaneGeometry(E.s, E.s);
       deco.disp.push(tex, mat, geo);
-      for (const sg of [1, -1]) { const m = new THREE.Mesh(geo, mat); m.position.set(-4.6, 1.5, sg * 3.84); m.rotation.y = sg > 0 ? 0 : Math.PI; m.userData.p4 = 1; deco.group.add(m); }
+      for (const sg of [1, -1]) { const m = new THREE.Mesh(geo, mat); m.position.set(sg > 0 ? E.x : E.xNeg, E.y, sg * E.zOut); m.rotation.y = sg > 0 ? 0 : Math.PI; m.userData.p4 = 1; deco.group.add(m); }
     }
     for (const f of cur.furn) {
       const model = furnModel(f.id);

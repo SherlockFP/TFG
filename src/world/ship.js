@@ -6,8 +6,8 @@ import { createProp } from '../models/props.js';
 import { G } from '../physics/physics.js';
 import { boxOccupied } from './doorsafe.js';
 import { CORE_GAPS } from './hardpoints.js';
-import { SPOTS, SPAWNS, LAMPS, WINDOWS_Z, PAD } from './shiplayout.js';
-import { buildShipDeco, holedWall } from './shipdeco.js';
+import { SPOTS, SPAWNS, LAMPS, WINDOWS_Z, PAD, MOD_SPOTS } from './shiplayout.js';
+import { buildShipDeco, gridWall } from './shipdeco.js';
 
 export const SHIP = {
   x0: -7, x1: 7, z0: -3.5, z1: 3.5, h: 3.4,
@@ -31,21 +31,9 @@ export function insideShip(p, margin = 0) {
 /** Vertical wall along one axis with doorway gaps. ax 'z': wall at x=fixed running z a0->a1; ax 'x': wall at z=fixed running x a0->a1.
  * gaps: [{c, w, h}] (centre, width, height). ySill: when y0 < 0 the gap gets a sill from y0 up to 0. */
 export function gapWall(gb, key, ax, fixed, a0, a1, y0, y1, uv, gaps, color) {
-  const dir = Math.sign(a1 - a0) || 1;
-  const list = gaps.map((g) => ({ s: dir > 0 ? g.c - g.w / 2 : g.c + g.w / 2, e: dir > 0 ? g.c + g.w / 2 : g.c - g.w / 2, h: g.h })).sort((p, q) => (p.s - q.s) * dir);
-  const seg = (p, q, ya, yb) => {
-    if (Math.abs(q - p) < 1e-4 || yb - ya < 1e-4) return;
-    if (ax === 'z') gb.vrect(key, fixed, p, fixed, q, ya, yb, uv, color, Math.abs(p - a0));
-    else gb.vrect(key, p, fixed, q, fixed, ya, yb, uv, color, Math.abs(p - a0));
-  };
-  let cur = a0;
-  for (const g of list) {
-    seg(cur, g.s, y0, y1);
-    if (y0 < 0) seg(g.s, g.e, y0, 0);
-    seg(g.s, g.e, g.h, y1);
-    cur = g.e;
-  }
-  seg(cur, a1, y0, y1);
+  // [wave5] built as a T-junction-free grid (shipdeco gridWall): the doorway hole runs from the floor (or y0 when the wall starts above it) to g.h;
+  // a wall that starts below the floor (outer hull) keeps its sill piece under the hole
+  gridWall(gb, key, ax, fixed, a0, a1, y0, y1, uv, gaps.map((g) => ({ s: g.c - g.w / 2, e: g.c + g.w / 2, y0: Math.max(0, y0), y1: g.h })), color);
 }
 
 /** The doorway itself (between the door leaf and the outer hull, incl. the first step): counts as aboard when the ship lifts off. */
@@ -71,7 +59,7 @@ export function buildShip({ physics, lightPool, scene }) {
   };
 
   // --- interior surfaces ---
-  gb.hrect('ship_floor', S.x0, S.z0, S.x1, S.z1, 0, true, 0.5);
+  // [wave5] the floor is built by shipdeco.js (per-room tinted, no second coplanar layer)
   gb.hrect('ship_ceiling', S.x0, S.z0, S.x1, S.z1, S.h, false, 0.5);
   // back wall (+x), faces -x; hardpoint doorway gap R1 (sealed by ship.hardpoints.R1 until a module is installed)
   const gapsX = [CORE_GAPS.R1], gapsZ = [CORE_GAPS.N1, CORE_GAPS.N2];
@@ -80,31 +68,23 @@ export function buildShip({ physics, lightPool, scene }) {
   gapWall(gb, 'ship_wall', 'x', S.z0, S.x0, S.x1, 0, S.h, 0.5, gapsZ);
   // +z wall with door gap, faces -z
   const dL = S.door.x - S.door.width / 2, dR = S.door.x + S.door.width / 2;
-  gb.vrect('ship_wall', S.x1, S.z1, dR, S.z1, 0, S.h, 0.5);
-  holedWall(gb, 'ship_wall', S.z1, dL, S.x0, 0, S.h, 0.5, WINDOWS_Z);   // [ship2] clerestory windows (holes through both hull plates)
-  gb.vrect('ship_wall', dR, S.z1, dL, S.z1, S.door.height, S.h, 0.5);
+  const winHoles = WINDOWS_Z.map((w) => ({ s: w.x0, e: w.x1, y0: w.y0, y1: w.y1 })), doorHole = { s: dL, e: dR, y0: 0, y1: S.door.height };
+  gridWall(gb, 'ship_wall', 'x', S.z1, S.x1, S.x0, 0, S.h, 0.5, [doorHole, ...winHoles]);   // [ship2] clerestory windows (holes through both hull plates)
   // front wall (-x) with window, faces +x
   const wz0 = -2.4, wz1 = 2.4, wy0 = 1.15, wy1 = 2.75;
-  gb.vrect('ship_wall', S.x0, S.z1, S.x0, wz1, 0, S.h, 0.5);
-  gb.vrect('ship_wall', S.x0, wz0, S.x0, S.z0, 0, S.h, 0.5);
-  gb.vrect('ship_wall', S.x0, wz1, S.x0, wz0, 0, wy0, 0.5);
-  gb.vrect('ship_wall', S.x0, wz1, S.x0, wz0, wy1, S.h, 0.5);
-  // hazard strip along the floor edge near the door
-  gb.hrect('hazard_stripes', dL, S.z1 - 0.35, dR, S.z1, 0.005, true, 0.8);
+  gridWall(gb, 'ship_wall', 'z', S.x0, S.z1, S.z0, 0, S.h, 0.5, [{ s: wz0, e: wz1, y0: wy0, y1: wy1 }]);
+  // (the hazard strip inside the door is drawn by shipdeco.js with the floor stripes: shiplayout DOOR_HAZARD)
 
   // --- exterior hull (slightly larger box, faces outward) ---
   const E = 0.25, ex0 = S.x0 - E, ex1 = S.x1 + E, ez0 = S.z0 - E, ez1 = S.z1 + E, eh = S.h + 0.45;
   // [ux] the +z outer plate has a real door opening now (it used to be one solid plate, so the ship looked CLOSED from outside even with the door open)
-  holedWall(gb, 'metal_plate', ez1, ex0, dL, -0.6, eh, 0.35, WINDOWS_Z); // +z outer, left of the door (faces +z) -> direction +x gives +z normal ([ship2] window holes)
+  gridWall(gb, 'metal_plate', 'x', ez1, ex0, ex1, -0.6, eh, 0.35, [doorHole, ...winHoles]);   // +z outer (faces +z): door opening + [ship2] window holes
   for (const w of WINDOWS_Z) {                                          // window tunnel through the hull skin
     gb.hrect('metal_dark', w.x0, S.z1, w.x1, ez1, w.y0, true, 0.5);
     gb.hrect('metal_dark', w.x0, S.z1, w.x1, ez1, w.y1, false, 0.5);
     gb.vrect('metal_dark', w.x0, ez1, w.x0, S.z1, w.y0, w.y1, 0.5);
     gb.vrect('metal_dark', w.x1, S.z1, w.x1, ez1, w.y0, w.y1, 0.5);
   }
-  gb.vrect('metal_plate', dR, ez1, ex1, ez1, -0.6, eh, 0.35);          // right of the door
-  gb.vrect('metal_plate', dL, ez1, dR, ez1, S.door.height, eh, 0.35);  // above the door
-  gb.vrect('metal_plate', dL, ez1, dR, ez1, -0.6, 0, 0.35);            // below the sill
   gb.vrect('metal_dark', dL, ez1, dL, S.z1, 0, S.door.height, 0.5);    // jamb (faces +x): hull thickness between the inner wall and the outer plate
   gb.vrect('metal_dark', dR, S.z1, dR, ez1, 0, S.door.height, 0.5);    // jamb (faces -x)
   gb.hrect('metal_dark', dL, S.z1, dR, ez1, S.door.height, false, 0.5); // lintel underside
@@ -139,7 +119,7 @@ export function buildShip({ physics, lightPool, scene }) {
   const stripeMat = new THREE.MeshLambertMaterial({ color: 0xc8581c });
   for (const zz of [ez0 - 0.02, ez1 + 0.02]) {
     // [ux] the +z stripe stops at the door opening
-    let segs = zz > 0 ? [[ex0, dL], [dR, ex1]] : [[ex0, ex1]];
+    let segs = zz > 0 ? [[ex0, dL], [dR, ex1]] : gapsZ.map((g) => [g.c - g.w / 2, g.c + g.w / 2]).sort((p, q) => p[0] - q[0]).reduce((acc, [a, b]) => { const [p, q] = acc.pop(); return [...acc, [p, a], [b, q]]; }, [[ex0, ex1]]);   // [wave5] -z: stops at the N1 / N2 doorways
     if (zz > 0) {   // [ship2] the stripe must not cross the clerestory windows
       for (const w of WINDOWS_Z) segs = segs.flatMap(([p, q]) => (w.x1 <= p || w.x0 >= q ? [[p, q]] : [[p, Math.max(p, w.x0)], [Math.min(q, w.x1), q]])).filter(([p, q]) => q - p > 0.05);
     }
@@ -160,7 +140,7 @@ export function buildShip({ physics, lightPool, scene }) {
     const decalMat = new THREE.MeshLambertMaterial({ map: tex, transparent: true, alphaTest: 0.3 });
     for (const zz of [ez0 - 0.03, ez1 + 0.03]) {
       const d = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 1.2), decalMat);
-      d.position.set(zz > 0 ? -3.8 : 3.8, 1.5, zz);
+      d.position.set(zz > 0 ? -3.8 : 4.45, 1.5, zz);   // [wave5] -z: clear of the N2 doorway (x 1.65 .. 2.85)
       d.rotation.y = zz > 0 ? 0 : Math.PI;
       group.add(d);
     }
@@ -212,7 +192,7 @@ export function buildShip({ physics, lightPool, scene }) {
     const nose = new THREE.Mesh(ng, levelMaterial('metal_plate'));
     nose.scale.set(1.8, 1.0, 2.7); nose.position.set(ex0, 0.1, 0); nose.name = 'ship2_nose'; group.add(nose);
     const ring = new THREE.Mesh(new THREE.TorusGeometry(1, 0.05, 6, 24), new THREE.MeshLambertMaterial({ color: 0xe07a1c }));   // orange band around the nose
-    ring.rotation.y = Math.PI / 2; ring.scale.set(2.7, 1.0, 1.0); ring.position.set(ex0 - 0.9, 0.1, 0); ring.scale.set(2.65, 0.95, 1); group.add(ring);
+    ring.rotation.y = Math.PI / 2; ring.position.set(ex0 - 0.9, 0.1, 0); ring.scale.set(2.34, 0.87, 1); group.add(ring);   // [wave5] sits ON the dome (its section at 0.9 m is 2.34 x 0.87); it used to float around it and show as a stray orange line under the cockpit window
   }
 
   // --- colliders ---
@@ -237,7 +217,9 @@ export function buildShip({ physics, lightPool, scene }) {
   // --- door leaf (sliding along +x) ---
   const leafMat = levelMaterial('door_metal');
   const leaf = new THREE.Mesh(new THREE.BoxGeometry(S.door.width, S.door.height, 0.12), leafMat);
-  leaf.position.set(S.door.x, S.door.height / 2, S.z1 + 0.02);
+  // [wave5] the leaf lives INSIDE the hull skin (inner face 3 cm behind the inner wall plane): at z1 + 0.02 its inner face stuck 4 cm into the
+  // cabin, so the open leaf showed through the cargo wall next to the door
+  leaf.position.set(S.door.x, S.door.height / 2, S.z1 + 0.09);
   group.add(leaf);
   const DZ = S.z1 + 0.15;   // door collider centre z
   const addCollider = () => physics.addStaticBox(S.door.x, S.door.height / 2, DZ, S.door.width / 2, S.door.height / 2, 0.15, 0, G.DOOR, { kind: 'shipdoor' });
@@ -387,7 +369,7 @@ export function buildShip({ physics, lightPool, scene }) {
 
   return {
     group, colliders, emitters, door, anchors, points, spawns, flood, hardpoints,
-    layout: { obstacles: deco.obstacles, spots: SPOTS, pad: PAD }, deco,   // [ship2] obstacles = AABBs {min,max} of partitions / signs / crates for the fault-panel placer
+    layout: { obstacles: deco.obstacles, spots: SPOTS, pad: PAD, mods: MOD_SPOTS }, deco,   // [ship2] obstacles = AABBs {min,max} of partitions / signs / crates for the fault-panel placer
     doorOutside: new THREE.Vector3(S.door.x, -0.9, S.z1 + 2.2),
   };
 }

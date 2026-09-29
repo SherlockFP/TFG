@@ -50,14 +50,30 @@ function signAtlas() {
   return { tex, cols, rows };
 }
 
-/** shell wall with rectangular holes: like gapWall but the holes have a lower and an upper edge. dir follows a0 -> a1 (vrect orientation = left normal of the direction). */
+/** [wave5] wall with rectangular holes, built as a grid WITHOUT T-junctions: every column is split at every hole edge, so no vertex of one quad sits in the
+ * middle of a neighbour's edge (with the PSX vertex snap those T-junctions opened into dotted see-through seams, e.g. above the cockpit window).
+ * ax 'x': the wall runs along x at z = fixed; ax 'z': along z at x = fixed. a0 -> a1 = direction (vrect faces the left-hand normal of it).
+ * holes: [{ s, e, y0, y1 }] in world units (s < e). */
+export function gridWall(gb, key, ax, fixed, a0, a1, y0, y1, uv, holes, color) {
+  const lo = Math.min(a0, a1), hi = Math.max(a0, a1);
+  const hs = holes.map((h) => ({ s: Math.max(lo, h.s), e: Math.min(hi, h.e), y0: Math.max(y0, h.y0), y1: Math.min(y1, h.y1) })).filter((h) => h.e - h.s > 1e-4 && h.y1 - h.y0 > 1e-4);
+  const xs = [...new Set([lo, hi, ...hs.flatMap((h) => [h.s, h.e])].map((v) => +v.toFixed(5)))].sort((p, q) => p - q);
+  const ys = [...new Set([y0, y1, ...hs.flatMap((h) => [h.y0, h.y1])].map((v) => +v.toFixed(5)))].sort((p, q) => p - q);
+  const dir = a1 >= a0 ? 1 : -1;
+  for (let i = 0; i + 1 < xs.length; i++) {
+    const p = xs[i], q = xs[i + 1];
+    for (let j = 0; j + 1 < ys.length; j++) {
+      const ya = ys[j], yb = ys[j + 1], mx = (p + q) / 2, my = (ya + yb) / 2;
+      if (hs.some((h) => mx > h.s && mx < h.e && my > h.y0 && my < h.y1)) continue;
+      const [u, v] = dir > 0 ? [p, q] : [q, p];
+      if (ax === 'z') gb.vrect(key, fixed, u, fixed, v, ya, yb, uv, color, Math.abs(u - a0));
+      else gb.vrect(key, u, fixed, v, fixed, ya, yb, uv, color, Math.abs(u - a0));
+    }
+  }
+}
+/** shell wall with rectangular holes {x0, x1, y0, y1} along x at z (kept for callers; now a gridWall) */
 export function holedWall(gb, key, z, a0, a1, y0, y1, uv, holes, color) {
-  const dir = Math.sign(a1 - a0) || 1;
-  const list = holes.map((h) => ({ s: dir > 0 ? h.x0 : h.x1, e: dir > 0 ? h.x1 : h.x0, y0: h.y0, y1: h.y1 })).sort((p, q) => (p.s - q.s) * dir);
-  const seg = (p, q, ya, yb) => { if (Math.abs(q - p) < 1e-4 || yb - ya < 1e-4) return; gb.vrect(key, p, z, q, z, ya, yb, uv, color, Math.abs(p - a0)); };
-  let cur = a0;
-  for (const h of list) { seg(cur, h.s, y0, y1); seg(h.s, h.e, y0, h.y0); seg(h.s, h.e, h.y1, y1); cur = h.e; }
-  seg(cur, a1, y0, y1);
+  gridWall(gb, key, 'x', z, a0, a1, y0, y1, uv, holes.map((h) => ({ s: h.x0, e: h.x1, y0: h.y0, y1: h.y1 })), color);
 }
 
 export function buildShipDeco({ physics, lightPool, group }) {
@@ -79,12 +95,12 @@ export function buildShipDeco({ physics, lightPool, group }) {
   // accent bands: a coloured strip under each header + a dado along the bottom of every partition side
   const band = (cx, cy, cz, sx, sy, sz, c) => gb.box('plain', cx, cy, cz, sx, sy, sz, 0.5, c);
   band(-4.0, 2.44, 0, 0.24, 0.12, 2.0, C_BLUE);                                   // cockpit hatch header band
-  band(3.2, 2.44, (S.z0 - 1.85) / 2, 0.24, 0.12, -1.85 - S.z0, C_ORANGE);           // engine arch band
+  band(3.2, 2.44, (S.z0 + L.ENGINE_Z) / 2, 0.24, 0.12, L.ENGINE_Z - S.z0, C_ORANGE);   // engine arch band
   for (const s of [-1, 1]) {
     band(-4.0 + s * 0.09, 0.14, (S.z0 - 1.0) / 2, 0.03, 0.22, -1.0 - S.z0, C_BLUE);
     band(-4.0 + s * 0.09, 0.14, (1.0 + S.z1) / 2, 0.03, 0.22, S.z1 - 1.0, C_BLUE);
   }
-  for (const s of [-1, 1]) band(5.1, 0.14, -1.85 + s * 0.09, 3.8, 0.22, 0.03, C_ORANGE);
+  for (const s of [-1, 1]) band(5.1, 0.14, L.ENGINE_Z + s * 0.09, 3.8, 0.22, 0.03, C_ORANGE);
   // rounded door-frame posts + caps
   const parts = [];
   const cyl = (r, h, seg = 12) => new THREE.CylinderGeometry(r, r, h, seg);
@@ -116,8 +132,9 @@ export function buildShipDeco({ physics, lightPool, group }) {
     parts.push({ g: cyl(0.4, 0.14, 16), p: [R.x, 2.5, R.z], c: C_DARK });
     for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2 + Math.PI / 4; parts.push({ g: cyl(0.045, 2.5, 6), p: [R.x + Math.cos(a) * 0.4, 1.25, R.z + Math.sin(a) * 0.4], c: C_WHITE }); }
     parts.push({ g: cyl(0.1, 0.9, 8), p: [R.x, 2.95, R.z], c: C_DARK });                      // feed pipe into the ceiling
-    for (const yy of [1.0, 1.55]) parts.push({ g: cyl(0.05, 3.4, 8), p: [5.3, yy, -1.98], r: [0, 0, Math.PI / 2], c: yy < 1.2 ? C_ORANGE : C_WHITE });   // pipes along the engine wall
-    parts.push({ g: new THREE.BoxGeometry(0.9, 0.7, 0.06), p: [4.2, 1.9, -1.98], c: C_DARK });   // wall junction box
+    const wallZ = L.ENGINE_Z - 0.08;   // engine-room face of the bulkhead
+    for (const yy of [1.0, 1.55]) parts.push({ g: cyl(0.05, 3.4, 8), p: [5.3, yy, wallZ - 0.07], r: [0, 0, Math.PI / 2], c: yy < 1.2 ? C_ORANGE : C_WHITE });   // pipes along the engine wall
+    parts.push({ g: new THREE.BoxGeometry(0.9, 0.7, 0.06), p: [4.2, 1.9, wallZ - 0.03], c: C_DARK });   // wall junction box
     obst(R.x - 0.55, R.x + 0.55, R.z - 0.55, R.z + 0.55, 0, 2.7);
     box(R.x, 1.3, R.z, 1.0, 2.6, 1.0);
   }
@@ -157,14 +174,18 @@ export function buildShipDeco({ physics, lightPool, group }) {
   wallMesh.name = 'ship2_partitions';
   group.add(wallMesh);
 
-  // ---- floor tints + guide stripes (decals just above the floor)
+  // ---- floor (wave 5): the tinted room rects ARE the floor (world/ship.js no longer builds a second floor under them), guide stripes + the door
+  // hazard strip sit 6 mm above it. All flat layers skip the PSX vertex snap and use polygon offsets (like homeworld_map.js flatLayer):
+  // snapped coplanar quads with different vertices used to shimmer / z-fight at a distance.
+  const flat = (mat, layer) => { mat.defines = { ...(mat.defines || {}), PSX_NOSNAP: '' }; const off = layer === 0 ? 1 : -layer * 8; mat.polygonOffset = true; mat.polygonOffsetFactor = off; mat.polygonOffsetUnits = off; return mat; };
   const gf = new GeoBuilder();
-  for (const r of L.ROOM_TINTS) gf.hrect('ship_floor', r.x0, r.z0, r.x1, r.z1, 0.006, true, 0.5, r.c);
-  for (const s of L.STRIPES) gf.hrect('stripe', s.x0, s.z0, s.x1, s.z1, 0.011, true, 1, s.c);
-  const floorTex = levelTexture('ship_floor');
+  for (const r of L.ROOM_TINTS) gf.hrect('ship_floor', r.x0, r.z0, r.x1, r.z1, 0, true, 0.5, r.c);
+  for (const s of L.STRIPES) gf.hrect('stripe', s.x0, s.z0, s.x1, s.z1, 0.006, true, 1, s.c);
+  const H = L.DOOR_HAZARD; gf.hrect('hazard', H.x0, H.z0, H.x1, H.z1, 0.006, true, 0.8);
   const decalMats = {
-    ship_floor: new THREE.MeshLambertMaterial({ map: floorTex, vertexColors: true, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }),
-    stripe: new THREE.MeshBasicMaterial({ vertexColors: true, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 }),
+    ship_floor: flat(new THREE.MeshLambertMaterial({ map: levelTexture('ship_floor'), vertexColors: true }), 0),
+    stripe: flat(new THREE.MeshBasicMaterial({ vertexColors: true }), 1),
+    hazard: flat(new THREE.MeshLambertMaterial({ map: levelTexture('hazard_stripes') }), 1),
   };
   const floorMesh = gf.build((key) => decalMats[key]);
   floorMesh.name = 'ship2_floor';

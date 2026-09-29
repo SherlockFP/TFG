@@ -1,5 +1,5 @@
 // TROPHY WALL (module 'cycle3', part 'trophy'). Every boss kill (Foreman / Legacy Bot outdoors, the Sector Core bosses, the gate / raid / keystone bosses), every
-// raid + keystone completion and the hidden gate mount a trophy on the ship's +z wall (x -5.4 .. 0.3, free of props). Interact = a card with the kill date, crew and time.
+// raid + keystone completion and the hidden gate mount a trophy on the hub face of the cockpit bulkhead (world/shiplayout.js SPOTS.trophy). Interact = a card with the kill date, crew and time.
 // State: run.c3.trophies (host writes, generic run sync = the whole crew sees the same wall; late joiners too) + the host's profile.cycle3.trophies (survives 'fired' / a new
 // run); every crew member also stores the records of the fights they were part of (K.saveToProfile). Net: 'c3s' {k:'trophy', id, rec, first} (host -> all).
 import * as THREE from 'three';
@@ -8,8 +8,13 @@ import { insideShip } from '../world/ship.js';
 import { DOSSIERS } from './cycle3_lore.js';
 import { RAID_DIFFS } from './cycle_plan.js';
 import { wrapMethod } from './dailyEvents.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { SPOTS as SHIP_SPOTS, TROPHY_PLAQUE, trophySlots } from '../world/shiplayout.js';
 
-const WALL_Z = 3.44, COL0 = -4.95, COLD = 0.98, ROW_Y = [2.2, 1.12], COLS = 6;
+// [wave5 ship_interior] the wall moved from the +z hull wall (where it covered the mirror, the store kiosk, the contract board, the clerestory windows
+// and cut through the cockpit bulkhead) to the hub face of the cockpit bulkhead: world/shiplayout.js SPOTS.trophy / trophySlots(). It is now 3 merged
+// meshes (frames + emblems, glow parts, one name-plate atlas) instead of ~85 separate draw calls.
+const PLAQUE_SCALE = TROPHY_PLAQUE.w / 0.94;   // the plaque below is modelled at 0.94 m wide
 const COLORS = { foreman: 0xffb02a, loadbalancer: 0x38e0ff, middlemanager: 0xc8c8d8, hydra: 0x6cff5a, surgeon: 0x9affc8, host: 0xd06aff, excavator: 0xd8a45a, lobbymanager: 0xffe64a, legacybot: 0xff5a4a, raid: 0xff3ad0, keystone: 0xffd23f, hidden: 0xff4fd0 };
 const CSS = `
 .c3p{width:min(560px,94vw);background:linear-gradient(180deg,rgba(24,16,8,.97),rgba(10,7,4,.97));border:1px solid var(--amber,#ff8a3d);box-shadow:0 0 36px rgba(255,138,61,.22);padding:14px 20px 16px;font-family:var(--font,'VT323',monospace);color:#ffe9cf;position:relative}
@@ -53,18 +58,36 @@ function emblem(id, on) {
   }
   return g;
 }
-function plate(text, sub, on) {
-  const cv = document.createElement('canvas'); cv.width = 256; cv.height = 56;
-  const x = cv.getContext('2d');
+/** draws one name plate (256 x 56) at (ox, oy) of an atlas canvas context */
+function plateInto(x, ox, oy, text, sub, on) {
+  x.save(); x.translate(ox, oy);
   x.fillStyle = on ? '#c8a040' : '#3a3a40'; x.fillRect(0, 0, 256, 56);
   x.fillStyle = on ? '#1a1208' : '#111116'; x.textAlign = 'center'; x.textBaseline = 'middle';
   let size = 24; x.font = `bold ${size}px monospace`;
   while (x.measureText(text).width > 240 && size > 11) { size--; x.font = `bold ${size}px monospace`; }
   x.fillText(text, 128, sub ? 20 : 28);
   if (sub) { x.font = 'bold 18px monospace'; x.fillText(sub, 128, 42); }
-  const tex = new THREE.CanvasTexture(cv); tex.magFilter = THREE.NearestFilter; tex.minFilter = THREE.NearestFilter; tex.colorSpace = THREE.SRGBColorSpace;
-  const m = new THREE.Mesh(new THREE.PlaneGeometry(0.76, 0.166), new THREE.MeshBasicMaterial({ map: tex }));
-  return m;
+  x.restore();
+}
+/** merge the meshes of `root` (world matrices relative to it) into vertex-coloured geometries: { lit, glow } (MeshBasic parts = glow) */
+function bakeGroup(root) {
+  root.updateMatrixWorld(true);
+  const inv = new THREE.Matrix4().copy(root.matrixWorld).invert(), m = new THREE.Matrix4(), lit = [], glowL = [];
+  root.traverse((o) => {
+    if (!o.isMesh || !o.geometry) return;
+    let g = o.geometry.clone();
+    m.multiplyMatrices(inv, o.matrixWorld); g.applyMatrix4(m);
+    if (g.index) g = g.toNonIndexed();
+    for (const k of Object.keys(g.attributes)) if (k !== 'position' && k !== 'normal') g.deleteAttribute(k);
+    const mt = o.material, c = mt.color ? mt.color.clone() : new THREE.Color(1, 1, 1);
+    if (mt.emissive) c.add(mt.emissive.clone().multiplyScalar(mt.emissiveIntensity ?? 1));
+    const n = g.attributes.position.count, a = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) { a[i * 3] = c.r; a[i * 3 + 1] = c.g; a[i * 3 + 2] = c.b; }
+    g.setAttribute('color', new THREE.BufferAttribute(a, 3));
+    (mt.isMeshBasicMaterial ? glowL : lit).push(g);
+  });
+  const merge = (l) => { if (!l.length) return null; const out = mergeGeometries(l, false); for (const g of l) g.dispose(); out.computeBoundingSphere(); return out; };
+  return { lit: merge(lit), glow: merge(glowL) };
 }
 
 export function installTrophy(C3) {
@@ -132,7 +155,9 @@ export function installTrophy(C3) {
   });
 
   // ------------------------------------------------------------ the wall (every peer)
-  const slotPos = (i) => ({ x: COL0 + (i % COLS) * COLD, y: ROW_Y[Math.floor(i / COLS)] ?? 1.5 });
+  const SLOTS = trophySlots();
+  const TW = SHIP_SPOTS.trophy;
+  const slotPos = (i) => SLOTS[i] || SLOTS[0];
   function disposeWall() {
     if (!wall) return;
     wall.removeFromParent();
@@ -143,18 +168,40 @@ export function installTrophy(C3) {
     disposeWall();
     if (typeof document === 'undefined' || !game.scene) return;
     wall = new THREE.Group(); wall.name = 'c3_trophy_wall';
-    const board = mat(0x4a3018), frame = mat(0x2a1a0c);
+    wall.userData.mounts = K.TROPHY_SLOTS.length;
+    // model every plaque at full size in a scratch group (as before), then bake: frames + emblems -> 1 lit mesh, glowing bits -> 1 unlit mesh
+    const scratch = new THREE.Group();
+    const board = mat(0x4a3018), frame = mat(0x2a1a0c), temp = [board, frame];
+    const cols = 2, rows = Math.ceil(K.TROPHY_SLOTS.length / cols), cv = document.createElement('canvas'); cv.width = 256 * cols; cv.height = 56 * rows;
+    const cx = cv.getContext('2d');
+    const plateGeos = [];
     K.TROPHY_SLOTS.forEach((s, i) => {
       const rec = map()[s.id], on = !!(rec && rec.kills > 0), p = slotPos(i);
       const g = new THREE.Group();
-      g.position.set(p.x, p.y, WALL_Z); g.rotation.y = Math.PI;
-      const b = new THREE.Mesh(new THREE.BoxGeometry(0.88, 0.9, 0.05), board); g.add(b);
-      const f = new THREE.Mesh(new THREE.BoxGeometry(0.94, 0.96, 0.03), frame); f.position.z = -0.02; g.add(f);
-      const e = emblem(s.id, on); e.position.set(0, 0.1, 0.09); e.scale.setScalar(1.25); g.add(e);
-      const nm = on ? t(K.BOSS_NAMES[s.id] || s.id) : '???';
-      const pl = plate(nm, on ? `x${rec.kills}` : '', on); pl.position.set(0, -0.32, 0.03); g.add(pl);
-      wall.add(g);
+      g.position.set(p.x, p.y, p.z); g.rotation.y = Math.PI / 2; g.scale.setScalar(PLAQUE_SCALE);   // faces +x (into the hub)
+      const b = new THREE.Mesh(new THREE.BoxGeometry(0.88, 0.9, 0.05), board); b.position.z = 0.025; g.add(b);
+      const f = new THREE.Mesh(new THREE.BoxGeometry(0.94, 0.96, 0.03), frame); f.position.z = 0.015; g.add(f);
+      const e = emblem(s.id, on); e.position.set(0, 0.1, 0.12); e.scale.setScalar(1.25); g.add(e);
+      e.traverse((o) => { if (o.material) temp.push(o.material); });
+      scratch.add(g);
+      const nm = on ? t(K.BOSS_NAMES[s.id] || s.id) : '???', ox = (i % cols) * 256, oy = Math.floor(i / cols) * 56;
+      if (cx) plateInto(cx, ox, oy, nm, on ? `x${rec.kills}` : '', on);
+      // name plate quad under the emblem (atlas UVs)
+      const pg = new THREE.PlaneGeometry(0.76, 0.166); pg.translate(0, -0.32, 0.056);
+      const uv = pg.attributes.uv, u0 = ox / cv.width, u1 = (ox + 256) / cv.width, v1 = 1 - oy / cv.height, v0 = 1 - (oy + 56) / cv.height;
+      for (let k = 0; k < uv.count; k++) uv.setXY(k, uv.getX(k) ? u1 : u0, uv.getY(k) ? v1 : v0);
+      g.updateMatrix(); pg.applyMatrix4(g.matrix); plateGeos.push(pg);
     });
+    const baked = bakeGroup(scratch);
+    scratch.traverse((o) => o.geometry?.dispose?.());
+    for (const m of new Set(temp)) m.dispose?.();
+    if (baked.lit) { const mesh = new THREE.Mesh(baked.lit, new THREE.MeshLambertMaterial({ vertexColors: true })); mesh.name = 'c3_trophy_frames'; wall.add(mesh); }
+    if (baked.glow) { const mesh = new THREE.Mesh(baked.glow, new THREE.MeshBasicMaterial({ vertexColors: true })); mesh.name = 'c3_trophy_glow'; wall.add(mesh); }
+    if (cx && plateGeos.length) {
+      const tex = new THREE.CanvasTexture(cv); tex.magFilter = THREE.NearestFilter; tex.minFilter = THREE.NearestFilter; tex.generateMipmaps = false; tex.colorSpace = THREE.SRGBColorSpace;
+      const geo = mergeGeometries(plateGeos, false); for (const g of plateGeos) g.dispose();
+      const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: tex })); mesh.name = 'c3_trophy_plates'; wall.add(mesh);
+    }
     game.scene.add(wall);
   }
   const sigNow = () => K.TROPHY_SLOTS.map((s) => map()[s.id]?.kills | 0).join(',') + '|' + getLang();
@@ -189,14 +236,23 @@ export function installTrophy(C3) {
     game.audio?.ui?.('ui_notify', 0.4);
   }
   const hintFor = (id) => (id === 'raid' ? 'Clear the Algorithm\'s Core raid (terminal RAID).' : id === 'keystone' ? 'Complete a Corrupted Keystone (terminal KEYSTONE).' : id === 'hidden' ? 'Solve the three rules inside a Hidden Gate (terminal GATES, PING).' : 'Defeat this boss (Sector Cores, gates, raids) to mount its trophy.');
+  const _o = new THREE.Vector3(), _d = new THREE.Vector3();
   C3.interFns.push((list, p) => {
     if (!wall || !insideShip(p.pos)) return;
-    if (Math.abs(p.pos.z - WALL_Z) > 4.5 || p.pos.x < COL0 - 2 || p.pos.x > COL0 + COLD * COLS + 2) return;
+    const z0 = TW.z - (TW.cols / 2) * TW.dz - 0.6, z1 = TW.z + (TW.cols / 2) * TW.dz + 0.6;
+    if (p.pos.x < TW.x || p.pos.x > TW.x + 4.2 || p.pos.z < z0 - 1.5 || p.pos.z > z1 + 1.5) return;
+    // the plaques are small (0.38 m pitch): pick the one under the crosshair (camera ray vs the wall plane), else the nearest to the player
+    let hy = p.pos.y + 1.4, hz = p.pos.z;
+    const cam = game.camera;
+    if (cam) {
+      cam.getWorldPosition(_o); cam.getWorldDirection(_d);
+      if (_d.x < -0.05) { const k = (TW.x - _o.x) / _d.x; if (k > 0 && k < 5) { hy = _o.y + _d.y * k; hz = _o.z + _d.z * k; } }
+    }
     let best = -1, bd = 1e9;
-    K.TROPHY_SLOTS.forEach((s, i) => { const q = slotPos(i), d = Math.hypot(p.pos.x - q.x, (p.pos.y + 1.2) - q.y) + Math.abs(p.pos.z - WALL_Z) * 0.3; if (d < bd) { bd = d; best = i; } });
-    if (best < 0 || bd > 2.6) return;
+    K.TROPHY_SLOTS.forEach((s, i) => { const q = slotPos(i), d = Math.hypot(hy - q.y, hz - q.z); if (d < bd) { bd = d; best = i; } });
+    if (best < 0 || bd > 0.9) return;
     const s = K.TROPHY_SLOTS[best], q = slotPos(best), rec = map()[s.id], on = !!(rec && rec.kills > 0);
-    list.push({ pos: new THREE.Vector3(q.x, q.y, WALL_Z - 0.35), r: 1.1, reach: 3.2, noLos: true, label: on ? tf('Trophy: {n} [E]', { n: t(K.BOSS_NAMES[s.id] || s.id) }) : t('Empty mount [E]'), sub: on ? `${K.fmtDate(rec.first.at)} · ${(rec.first.crew || []).length} ${t('crew')}` : t('not earned yet'), action: () => openCard(s.id) });
+    list.push({ pos: new THREE.Vector3(q.x + 0.12, q.y, q.z), r: 0.3, reach: 3.2, noLos: true, label: on ? tf('Trophy: {n} [E]', { n: t(K.BOSS_NAMES[s.id] || s.id) }) : t('Empty mount [E]'), sub: on ? `${K.fmtDate(rec.first.at)} · ${(rec.first.crew || []).length} ${t('crew')}` : t('not earned yet'), action: () => openCard(s.id) });
   });
   C3.ticks.push(() => {
     if (!game.scene || !game.run) return;

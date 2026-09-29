@@ -211,8 +211,8 @@ const freshMoonDay = (g, id = 'hamsi') => { g.run.moon = id; g.run.forecast[id] 
   ok(cy(g).stage === 'days' && cy(g).sector === 1, 'A: the core was won as usual');
   // the Trophy Wall is drawn (12 mounts) and E at a mount opens the card with date / crew / time
   g.advance(0.3);
-  ok(g.cycle3.trophy.wall?.children.length === 12 && g.cycle3.trophy.wall.parent === g.scene, 'A: the wall has 12 mounts in the scene');
-  g.player = { pos: new THREE.Vector3(K.TROPHY_SLOTS.findIndex((x) => x.id === boss) % 6 * 0.98 - 4.95, 1.0, 1.0), indoor: false, dead: false };
+  ok(g.cycle3.trophy.wall?.userData.mounts === 12 && g.cycle3.trophy.wall.children.length <= 3 && g.cycle3.trophy.wall.parent === g.scene, 'A: the wall has 12 mounts in the scene (merged: <= 3 meshes)');
+  { const q = g.cycle3.trophy.slotPos(K.TROPHY_SLOTS.findIndex((x) => x.id === boss)); g.player = { pos: new THREE.Vector3(q.x + 1.2, q.y - 1.4, q.z), indoor: false, dead: false }; }   // [wave5] the wall is on the cockpit bulkhead (hub face)
   { const list = []; g.mods.emit('interactables', list, g);
     const it = list.find((x) => /Trophy: /.test(x.label));
     ok(!!it && /\d{4}-\d\d-\d\d/.test(it.sub), `A: a mount offers "${it?.label}" (${it?.sub})`);

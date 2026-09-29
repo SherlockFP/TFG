@@ -18,6 +18,7 @@ import { CREATURE_FLAVOUR } from './components.js';
 import { G } from '../physics/physics.js';
 import { insideShip, SHIP } from '../world/ship.js';
 import { boxOccupied } from '../world/doorsafe.js';
+import { SPOTS as SHIP_SPOTS, TABLE_SPOTS } from '../world/shiplayout.js';
 import { hudDock } from '../ui/dock.js';
 import { WEAPON_ARCS } from '../models/avatar.js';
 import { EMOTE_BY_ID } from './emotes.js';
@@ -926,36 +927,32 @@ export function installSurvival(game) {
   }
 
   // ---------------------------------------------------------------- fixtures + starter kit (host, once per run)
-  const FIX = {
-    stove: { cand: [[-4.95, -3.12], [-4.3, -3.12], [-5.3, -3.12]], yaw: 0, half: [0.62, 0.34] },
-    brew: { cand: [[-3.7, -3.15], [-3.05, -3.15], [-3.4, -3.15]], yaw: 0, half: [0.47, 0.33] },
-    crate: { cand: [[-3.4, 3.1], [-2.5, 3.1], [-4.3, 3.1], [-1.6, 3.1]], yaw: Math.PI, half: [0.52, 0.38] },
-    planter: { cand: [[-1.2, 3.12], [-0.4, 3.12], [-2.2, 3.12], [0.45, 3.12]], yaw: Math.PI, half: [0.77, 0.34] },
-  };
-  function pickSpot(kind) {
-    const F0 = FIX[kind];
-    for (const [x, z] of F0.cand) {
-      try { if (!boxOccupied(game.physics, x, 0.5, z, F0.half[0], 0.4, F0.half[1], G.STATIC | G.DOOR)) return { x, z }; } catch { return { x, z }; }
-    }
-    return { x: F0.cand[0][0], z: F0.cand[0][1] };
-  }
+  // [wave5 ship_interior] the built-in ship fixtures stand where world/shiplayout.js says (galley counter: stove + brewing stand; cargo: storage
+  // crate + grow-strip planter). They used to probe candidate spots at runtime and ended up in the cockpit doorway, through the cockpit bulkhead,
+  // in front of the mirror and inside the store kiosk. Saved runs are migrated: a built-in that stands anywhere else is moved to its spot.
+  const FIX = { stove: 'stove', brew: 'brew', crate: 'crate', planter: 'svPlanter' };
+  const spotOf = (kind) => { const sp = SHIP_SPOTS[FIX[kind]]; return { x: sp.x, z: sp.z, yaw: sp.ry || 0 }; };
   function ensureFixtures() {
     if (!host() || !run()) return;
-    const have = (k) => structs().some((s) => s.w === 'ship' && s.k === k && s.b);
-    const make = (kind, id, sk, opts = {}) => {
-      if (have(kind)) return;
-      const sp = pickSpot(sk || kind);
-      commit(S.newStruct(kind, id, 'ship', { x: sp.x, y: 0, z: sp.z }, FIX[sk || kind].yaw, { builtin: true, ...opts }));
+    const builtin = (k) => structs().find((s) => s.w === 'ship' && s.k === k && s.b);
+    const make = (kind, id, opts = {}) => {
+      const sp = spotOf(kind), cur = builtin(kind);
+      if (cur) {
+        if (Math.abs(cur.x - sp.x) > 0.02 || Math.abs(cur.z - sp.z) > 0.02 || Math.abs((cur.yaw || 0) - sp.yaw) > 0.01 || cur.y) commit({ ...cur, x: sp.x, y: 0, z: sp.z, yaw: sp.yaw });
+        return;
+      }
+      commit(S.newStruct(kind, id, 'ship', { x: sp.x, y: 0, z: sp.z }, sp.yaw, { builtin: true, ...opts }));
     };
-    make('stove', 'stove0', 'stove');
-    make('brew', 'brew0', 'brew');
-    make('crate', S.BUILTIN.crate, 'crate', { tier: 1, lab: 'SHIP' });
-    make('planter', S.BUILTIN.planter, 'planter');
+    make('stove', 'stove0');
+    make('brew', 'brew0');
+    make('crate', S.BUILTIN.crate, { tier: 1, lab: 'SHIP' });
+    make('planter', S.BUILTIN.planter);
     if (!run().svStart) {
       run().svStart = 1;
-      const st = structs().find((s) => s.k === 'stove' && s.b) || { x: -4.95, z: -3.1 };
+      const [tx, tz] = TABLE_SPOTS[0];
       let k = 0;
-      for (const [ty, n] of D.STARTER) for (let i = 0; i < n; i++) later(0.8 + 0.12 * k++, () => { if (host() && game.items) spawnAt(ty, new THREE.Vector3(st.x + (k % 5) * 0.12 - 0.2, 1.4, st.z + 0.5 + (k % 3) * 0.12), {}); });
+      // starter food is laid out on the mess table (it used to rain onto the cockpit floor by the N1 doorway); if the table is not built yet it lands on its spot
+      for (const [ty, n] of D.STARTER) for (let i = 0; i < n; i++) { const j = k++; later(0.8 + 0.12 * j, () => { if (host() && game.items) spawnAt(ty, new THREE.Vector3(tx - 0.25 + (j % 3) * 0.25, 1.05, tz - 0.45 + (Math.floor(j / 3) % 4) * 0.3), {}); }); }
       try { game.broadcastRun(['svStart']); } catch { /* offline */ }
     }
     mirrorHome();
