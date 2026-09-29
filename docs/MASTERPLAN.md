@@ -662,7 +662,7 @@ Model politikası aynı (§6): Sonnet varsayılan, ağ/AI/çekirdek işlerde Opu
 
 ### 25.0 Kural
 - Yeni büyük sistem YOK; önce sağlamlık, birleştirme, his. Her ajan en fazla 2 kısa tarayıcı koşusu; toplu test lead'de.
-- Model: Sonnet varsayılan. Opus sadece: ağ, başlangıç akışı (oyuncu deneyimini baştan kurar), birleştirme çekirdekleri.
+- Model: **Wave 5'te bütün ajanlar Sonnet 5.5** (sahibin kararı, 2026-09-29). Opus kullanılmaz; lead sadece birleştirme/test koordinasyonu yapar.
 - Worktree'ler `origin`un GÜNCEL HEAD'inden açılmalı (wave 4'te eski tabandan açıldı → game.js çakışmaları). Ajan başlatmadan önce slot yerleri game.js'e eklenip pushlanır.
 - Modül adı Game'de mevcut bir metodun adı OLAMAZ (`sfx` olayı: tüm sesleri kırdı).
 
@@ -674,7 +674,7 @@ Model politikası aynı (§6): Sonnet varsayılan, ağ/AI/çekirdek işlerde Opu
 4. **İlk dönüş:** gün özeti + Algoritma'nın ilk "yorum"u ("Sol koridoru sevdin. Not aldım.").
 - Tekrar oynayanlar/arkadaş lobisine katılanlar oryantasyonu atlar (profilde bayrak). Co-op'ta host oryantasyondaysa diğerleri hangarda bekler (bekleme yok: hangarda mini oyunlar).
 - Neden: gemide çıplak başlamak LC hissi veriyor; ofis → hangar geçişi kimliği (Şirket + Algoritma) ilk 3 dakikada anlatır ve tutorial'ı "görev" gibi hissettirir.
-- Uygulama: `onboard` modülü (Opus). Mevcut: menuroom/menueggs (Cell 07), guide tutorial adımları, ship2 hangar (yeni: HQ pier yanında hangar sahnesi ya da gemi içi hangar görünümü).
+- Uygulama: `onboard` modülü (Sonnet). Mevcut: menuroom/menueggs (Cell 07), guide tutorial adımları, ship2 hangar (yeni: HQ pier yanında hangar sahnesi ya da gemi içi hangar görünümü).
 
 ### 25.2 Satranç 3D
 - 2D overlay yerine **masadaki gerçek 3D taşlar**: oyuncu masaya oturur, kamera masanın üstüne yumuşakça iner (üst-açı, hafif perspektif), taşlar fareyle tutulup sürüklenir (raycast), yasal hamle kareleri zeminde ışıklı disk, son hamle vurgusu, şah uyarısı taşın altında kırmızı halka.
@@ -708,7 +708,7 @@ Model politikası aynı (§6): Sonnet varsayılan, ağ/AI/çekirdek işlerde Opu
 
 ### 25.5 Kötü olanlar → düzeltme (wave 5 kapsamı)
 1. **Test edilmemiş wave 4** → lead toplu tarayıcı turu (wave4_*.js hepsi, tek kuyruk, 900 s timeout); bulunan hatalar küçük Sonnet düzeltme ajanlarına paylaştırılır.
-2. **Çift sistemler** → `defense` çekirdeği (siege + homeworld2 dalga + ship2 taret aynı AI/cephane/güç), `mazegen` kütüphanesi (maps5/stealth/horror/cycle aynı planlayıcılar), yemek tek kural (food = atıştırmalık, survival = asıl iyileşme). Ajan: Opus 1 adet (çekirdek birleştirme).
+2. **Çift sistemler** → `defense` çekirdeği (siege + homeworld2 dalga + ship2 taret aynı AI/cephane/güç), `mazegen` kütüphanesi (maps5/stealth/horror/cycle aynı planlayıcılar), yemek tek kural (food = atıştırmalık, survival = asıl iyileşme). Ajan: Sonnet (çekirdek birleştirme).
 3. **Para birimleri** → Kredi + Clout; shard/bileşen/stash = malzeme. UI'da tek cüzdan satırı.
 4. **Başlangıç yükü** → §25.1 onboarding + kademeli açılım (§23.1): kota 0'da sadece iniş/loot/sat/kota görünür; forge kota 1, pet+voyage kota 2, fabrika kota 3, gate'ler ilk boss sonrası.
 5. **UI yarım** → kalan paneller ui2 temel sınıflarına; checkup'ın listesi (mirror sayacı, pusula, LIVE bandı, VHS, "a Enforcer", ▮ glifi).
@@ -731,13 +731,13 @@ Model politikası aynı (§6): Sonnet varsayılan, ağ/AI/çekirdek işlerde Opu
 ### 25.7 Ajan tablosu (sıra = öncelik)
 | # | Ajan | Model | Kapsam | Tarayıcı |
 |---|---|---|---|---|
-| 1 | lead toplu test | Opus (lead) | wave4_*.js + smoke, hata listesi | toplu, tek kuyruk |
+| 1 | lead toplu test | lead | wave4_*.js + smoke, hata listesi | toplu, tek kuyruk |
 | 2 | fixes-a / fixes-b | Sonnet | toplu testten çıkan hatalar (2 paket) | 1 kısa |
-| 3 | onboard | Opus | §25.1 işe alım günü + kademeli açılım | 2 kısa |
+| 3 | onboard | Sonnet | §25.1 işe alım günü + kademeli açılım | 2 kısa |
 | 4 | chess3d | Sonnet | §25.2 | 1 kısa |
 | 5 | lockpick2 | Sonnet | §25.3 | 1 kısa |
 | 6 | hardmode | Sonnet | §25.4 + sim | yok (sim) |
-| 7 | unify | Opus | §25.5 #2-3 birleştirme | 1 kısa |
+| 7 | unify | Sonnet | §25.5 #2-3 birleştirme | 1 kısa |
 | 8 | ui3 | Sonnet | §25.5 #5 | 1 toplu ekran turu |
 | 9 | perf | Sonnet | §25.5 #6 | 1 kısa (renderer.info) |
 | 10 | algo1 | Sonnet | §25.6 iki v1 | 1 kısa |
