@@ -95,9 +95,9 @@ Everything in `TABLE` (`src/game/difficulty.js`): `lootMul`, `carry`, `growthMax
 DOOR_CLOSERS / LIGHT_CUTTERS (creature ids) are exported from `hardmode.js`.
 
 ## Known gaps
-- Not run in a browser: the HUD countdown, hover-while-stranded and the door/light tricks are only tested against stubs. The stranded player keeps gear but loses sellable scrap; if all crew are outside at midnight the old "everyone dead -> all scrap lost" path still fires.
+- Not run in a browser: the HUD countdown, hover-while-stranded and the door/light tricks are only tested against stubs. The stranded player keeps gear but loses sellable scrap; if all crew are outside at midnight they are all stranded (no more "everyone dead -> all scrap lost"; Casual keeps the old rule).
 - Death: the "ghost replay" (23.5) is wave 6; the drop itself was already there. A body that falls into the void still drops its loot below the map (not recovered).
-- Food: crates are cold storage (no aging inside) - intentional but exploitable (take out, cook nothing, put back). Raw plants and potions never spoil. Saved dishes get their clock at the first morning check.
+- Food: a dish keeps its cook day (and spoiled flag) in the crate record (`sd` / `sp`), so taking it out and putting it back no longer resets the clock. Raw plants and potions never spoil. Saved dishes get their clock at the first morning check.
 - Casual on an OLD save behaves exactly as before; Standard is the default for everyone, including existing lobbies (the host picks; joiners follow).
-- The lobby browser does not show the difficulty yet; `hostAnnounce` was not touched.
+- The lobby browser shows the difficulty (`diff` in `hostAnnounce`).
 - Creature tricks use `hostSetDoor` / `hostSetPower` (the cut opens blast doors like every blackout does; they are re-closed after the cut).

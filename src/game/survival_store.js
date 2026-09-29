@@ -169,7 +169,7 @@ export function sanitizeStruct(s) {
       seen.add(r.u);
       o.n = Math.max(o.n, r.u | 0);
       const c = { u: r.u | 0, i: String(r.i), x: r.x | 0, y: r.y | 0 };
-      for (const k of ['v', 'bv', 'b', 'c', 'du', 'dr']) if (Number.isFinite(r[k])) c[k] = r[k];
+      for (const k of ['v', 'bv', 'b', 'c', 'du', 'dr', 'sd', 'sp']) if (Number.isFinite(r[k])) c[k] = r[k];
       if (typeof r.tr === 'string' && TIERS[r.tr]) c.tr = r.tr;
       if (typeof r.af === 'object' && r.af) c.af = r.af;
       if (Number.isFinite(r.pl) && r.pl > 0) c.pl = r.pl | 0;

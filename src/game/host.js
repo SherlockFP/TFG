@@ -76,6 +76,7 @@ export const hostMethods = {
       code: this.net.code, name: this.opts.lobbyName || (this.profile.name + "'s crew"), host: this.profile.name,
       players: this.net.playerCount(), max: this.config.maxPlayers, phase: this.run.phase, moon: MOONS[this.run.moon]?.short,
       quota: this.run.quota, day: this.run.day, locked: !!this.opts.password, mods: this.mods?.enabledIds() || [],
+      diff: this.config.difficulty || undefined,   // [hardmode] shown in the lobby browser
       level: this.profile.level, av: liteOf(this.profile),   // [profile] host avatar (258 chars)
     };
     this.emit('announce', info);
@@ -386,7 +387,7 @@ export const hostMethods = {
     for (const it of [...this.items.all()]) if (it.holder && leftBehind.some((p) => p.id === it.holder) && !(stranded?.has(it.holder) && !(isSellable(it.def) && !it.soulbound))) this.net.broadcast('it', { e: 'rm', id: it.id });
     hd.leftBehindIds = new Set(leftBehind.map((p) => p.id));
     for (const p of leftBehind) if (!stranded?.has(p.id)) this.hostHurtPlayer(p.id, 999, 'left');
-    const allDead = aboard.length === 0 && !moon.company;
+    const allDead = aboard.length === 0 && !moon.company && !stranded?.size;   // [hardmode] everyone stranded outside (not dead) is the stranded path, not 'all crew lost'
     // scrap still lying around on the moon (for the performance grade)
     let leftValue = 0;
     if (!moon.company) for (const it of this.items.all()) {

@@ -160,14 +160,15 @@ ok('repair: needs a tool in hand, range and being outside; then hold E fills the
   game.player.inShip = false; standAt(spot);
   game.net.sent.length = 0; req(game, { op: 'rstart', tg: 'h:' + spot.i, item: it.id });
   const rs = msgs(game, 'rs')[0]; assert.ok(rs && rs.need >= 3 && rs.need <= 4.5, 'need ' + rs?.need);
-  hold(game, 1.0); assert.equal(game.run.s2.sp.length, 1, 'not done yet');
+  const mine = () => game.run.s2.sp.some((p) => p.i === spot.i);   // other random hull damage (weather / creature timers) may add spots meanwhile: only watch OUR spot
+  hold(game, 1.0); assert.ok(mine(), 'not done yet');
   const before = game.net.sent.filter((m) => m[2].k === 'rp').length; assert.ok(before >= 1, 'progress messages');
   // client mirror: ring state is set by the host's rs message
   assert.equal(s2.client().ring, 'h:' + spot.i);
   game._handlers.get('s2req')({ op: 'rhold', down: true }, 'H');
   // the host owns the ring: holding the whole time completes in a bounded time even through the red arc
-  let t = 1.0; while (t < 14 && game.run.s2.sp.length) { tick(game, 1, 0.05); t += 0.05; }
-  assert.equal(game.run.s2.sp.length, 0, 'fixed after holding, t=' + t.toFixed(1)); assert.equal(msgs(game, 'rd').length, 1);
+  let t = 1.0; while (t < 14 && mine()) { tick(game, 1, 0.05); t += 0.05; }
+  assert.ok(!mine(), 'fixed after holding, t=' + t.toFixed(1)); assert.equal(msgs(game, 'rd').length, 1);
   assert.ok(game.net.bcasts.some((b) => b[0] === 'xp'), 'xp reward'); assert.equal(s2.client().ring, null);
   game.input._down = false;
 });

@@ -20,7 +20,7 @@ Module `algo1` (`src/game/algo1.js` glue, `algo1_core.js` pure rules, `algo1_i18
 
 ## Known gaps
 - Not hand-played or browser-run; the vote panel is fixed top-centre (`.a1-vote`) and needs a 1280x720 look. In orbit the pointer is usually locked, so keys 1/2/3 are the real input, click works only with a free cursor.
-- Peers that join mid-day miss the `result` message (rule knobs on their side: jump / stamina only). Host migration drops `S.pend` / vote state (`run.a1.debt` survives if the run is saved).
+- The active rule lives in `run.a1.today` (broadcast with the run), so late joiners and a migrated host apply jump / stamina / creature knobs from it; `run.a1` is sanitised on read. Host migration still drops `S.pend` / an open vote.
 - Rules do not cover fog / weather, shrine counts or elites; "silent but fast creatures" is approximated as fewer + faster creatures.
 - Viewers are not saved and do not reward anything yet (listen to `tfg:viewers`).
 - The Algorithm only adds creatures; it does not yet pre-place traps or change loot on the favourite route.
