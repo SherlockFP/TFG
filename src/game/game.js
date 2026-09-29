@@ -109,6 +109,7 @@ import { installGameplay2 } from './gameplay2.js';
 
 // [import:shipyard]
 import { installShipyard } from './shipyard.js';
+import { installShip2 } from './ship2.js';   // [ship2]
 
 
 import { installSkeletons } from './skeletons.js';
@@ -328,6 +329,9 @@ export class Game extends Emitter {
 
 
     this.useModule('worlds2', installWorlds2);   // [worlds2]
+
+
+    this.useModule('ship2', installShip2);   // [ship2] (after gameplay2 / shipyard / siege / food / worlds2: it wraps hostFinishTakeoff and reads game.deployables)
 
 
     // [slot:ux]

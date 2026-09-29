@@ -10,5 +10,6 @@ import ach from './ru_ach.js';
 import local2 from './ru_local2.js';
 import data2 from './ru_data2.js';
 import trade from './ru_trade.js';   // [trade]
+import ship2 from './ru_ship2.js';   // [ship2]
 
-export const RU_PARTS = [core, lore, names, local, wrap1, manual, ach, local2, data2, trade];
+export const RU_PARTS = [core, lore, names, local, wrap1, manual, ach, local2, data2, trade, ship2];

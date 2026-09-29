@@ -20,9 +20,10 @@ import { SHIP } from '../world/ship.js';
 import { G } from '../physics/physics.js';
 import { createCraftingPanel } from '../ui/panels/crafting.js';
 import { SHARD_IDS } from './enhance.js';   // [forge]
+import { SPOTS } from '../world/shiplayout.js';
 
 // ---------------------------------------------------------------------------------------------- placement
-const BENCH = { x: 4.05, z: SHIP.z0 + WORKBENCH_SIZE.d / 2 + 0.03 };   // -z wall of the ship, right of the arcade
+const BENCH = { x: SPOTS.bench.x, z: SHIP.z0 + WORKBENCH_SIZE.d / 2 + 0.03 };   // -z wall of the ship, right of the arcade
 const TOP = WORKBENCH_SIZE.top;
 const BENCH_REACH = 7;            // m from the bench (host validation)
 const CRAFT_CD = 0.25;            // s between requests per player

@@ -8,6 +8,7 @@ import { ITEMS, STORE_ITEMS, SHIP_UPGRADES, itemDef, isSellable } from './items.
 import { CREATURES } from './creatures.js';
 import { buyRate } from './progression.js';
 import { insideShip } from '../world/ship.js';
+import { dropPoint } from '../world/shiplayout.js';
 import { escapeHtml } from '../core/util.js';
 import { t, tf, tfIn, sysMsg } from '../core/i18n.js';
 
@@ -424,7 +425,7 @@ export class Terminal {
         run.credits -= cost;
         g.broadcastRun(['credits']);
         for (let i = 0; i < n; i++) {
-          const pos = { x: 4.5 + Math.random() * 1.5, y: 1.2 + i * 0.25, z: -2 + Math.random() * 1.2 };
+          const pos = dropPoint(i);   // [ship2] the loot bay (world/shiplayout.js)
           g.items.hostSpawn(cmd.item, pos, { value: 0 });
         }
         g.net.broadcast('fx', { k: 'snd', s: 'dropship', p: [5, 2, -1], v: 0.8 });

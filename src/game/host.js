@@ -248,6 +248,7 @@ export const hostMethods = {
       // state-set request, not a toggle: two players pressing at once end in the last request, and a request for the state the door
       // is already in (double press, stale label) is dropped instead of replaying the hydraulics for everybody
       if (this.ship.door.open === !!d.open) return;
+      if (this.ship2?.doorJam?.(from, !!d.open)) return;   // [ship2] damaged hull: the door actuator can jam (never twice in a row)
       this.net.broadcast('door', { id: 'ship', open: !!d.open });
     });
     H('lever', (d, from) => this.hostLever(from));

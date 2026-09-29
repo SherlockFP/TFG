@@ -6,8 +6,9 @@ import * as THREE from 'three';
 import * as C from './pets_core.js';
 import { G } from '../physics/physics.js';
 import { t } from '../core/i18n.js';
+import { SPOTS } from '../world/shiplayout.js';
 
-export const INCUBATOR_POS = { x: -0.7, z: 2.95 };
+export const INCUBATOR_POS = { x: SPOTS.incubator.x, z: SPOTS.incubator.z };
 const EGG_COL = { pet_egg_common: '#eadfc4', pet_egg_wild: '#8fd08a', pet_egg_glitch: '#8a66ff', strange_egg: '#ff66d8' };
 
 export function installIncubator(game, api) {

@@ -2,6 +2,7 @@
 // pickups, Decon Shower booth, static haze volume, remote-player aura, and the small item models (Signal Counter, Antivirus
 // Shot, Faraday Suit). Everything is emissive / unlit so it never touches the light pool. Safe to import in node (no DOM at import).
 import * as THREE from 'three';
+import { SPOTS } from '../world/shiplayout.js';
 
 const HAS_DOM = typeof document !== 'undefined';
 const TAU = Math.PI * 2;
@@ -274,7 +275,7 @@ export function createHolo(glyph, colorHex) {
 }
 
 // ============================================================================================ Decon Shower
-export const DECON = { x: -0.1, z: 2.92, w: 1.1, d: 1.1, h: 2.25 };
+export const DECON = { x: SPOTS.decon.x, z: SPOTS.decon.z, w: 1.1, d: 1.1, h: 2.25 };
 export function createDecon() {
   const group = new THREE.Group();
   group.name = 'decon_shower';

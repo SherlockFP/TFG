@@ -20,10 +20,11 @@ import { wrapMethod } from './dailyEvents.js';
 import { RNG, hashString } from '../core/rng.js';
 import { getLang, t, tf } from '../core/i18n.js';
 import { SHIP } from '../world/ship.js';
+import { SPOTS } from '../world/shiplayout.js';
 
 HOST_ONLY.add('lore');   // clients only take 'lore' broadcasts from the host
 const tr = () => { try { return getLang() === 'tr'; } catch { return false; } };
-const BOARD_POS = { x: -2.2, y: 1.75, z: SHIP.z1 - 0.045 };   // +z wall inside the ship, between the terminal and the door
+const BOARD_POS = { x: SPOTS.board.x, y: SPOTS.board.y, z: SHIP.z1 - 0.045 };   // +z wall inside the ship, between the terminal and the door
 
 export function installLore(game) {
   const offs = [];
