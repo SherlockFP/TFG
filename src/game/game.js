@@ -249,9 +249,10 @@ import { installMapmods } from './mapmods.js';
 // [import:crdirector]
 import { installFacjobs } from './facjobs.js';
 // [import:lcmonsters]
-// [import:atmos]
+import { installAtmos } from './atmos.js';   // [import:atmos]
 import { installArcade2 } from './arcade2.js';
 // [import:resto]
+// [import:arcade2]
 
 
 
@@ -523,9 +524,10 @@ export class Game extends Emitter {
     // [slot:crdirector]
     this.useModule('facjobs', installFacjobs);
     // [slot:lcmonsters]
-    // [slot:atmos]
+    this.useModule('atmos', installAtmos);   // [slot:atmos]
     this.useModule('arcade2', installArcade2);
     // [slot:resto]
+    // [slot:arcade2]
 
 
 

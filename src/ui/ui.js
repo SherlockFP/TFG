@@ -774,7 +774,7 @@ export class UI {
           section(t('Performance')), check(t('Show FPS'), 'showFps'),
           section(t('Character')), check(t('Classic avatar'), 'classicAvatar', t('Applies to new models after reload.')));   // [avatar2]
       } else if (tab === 'Audio') {
-        body.append(section(t('Volume')), slider(t('Master volume'), 'masterVolume', 0, 1, 0.05, pct), slider(t('Effects volume'), 'sfxVolume', 0, 1, 0.05, pct), slider(t('Music volume'), 'musicVolume', 0, 1, 0.05, pct), check(t('Dynamic music'), 'dynamicMusic', t('Layers react to chases, bosses and extraction.'), true), slider(t('Music intensity'), 'musicIntensity', 0, 1, 0.05, pct), slider(t('Voice volume'), 'voiceVolume', 0, 1.5, 0.05, pct), slider(t('Instrument volume'), 'instrumentVolume', 0, 1.5, 0.05, pct), slider(t('Dance volume'), 'danceVolume', 0, 1, 0.05, pct),
+        body.append(section(t('Volume')), slider(t('Master volume'), 'masterVolume', 0, 1, 0.05, pct), slider(t('Effects volume'), 'sfxVolume', 0, 1, 0.05, pct), slider(t('Ambience volume'), 'ambienceVolume', 0, 1, 0.05, pct), slider(t('Music volume'), 'musicVolume', 0, 1, 0.05, pct), check(t('Dynamic music'), 'dynamicMusic', t('Layers react to chases, bosses and extraction.'), true), slider(t('Music intensity'), 'musicIntensity', 0, 1, 0.05, pct), slider(t('Voice volume'), 'voiceVolume', 0, 1.5, 0.05, pct), slider(t('Instrument volume'), 'instrumentVolume', 0, 1.5, 0.05, pct), slider(t('Dance volume'), 'danceVolume', 0, 1, 0.05, pct),
           check(t('Menu sounds'), 'uiSounds', null, true));
         const audio = this.app.audio;
         body.append(section(t('Output')));
