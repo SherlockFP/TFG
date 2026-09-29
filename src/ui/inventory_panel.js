@@ -260,7 +260,7 @@ export class InventoryPanel {
       return this.itemHTML(e, px(sz.w), px(sz.h)).replace('style="', `style="left:${e.inv.x * (CELL + GAP)}px;top:${e.inv.y * (CELL + GAP)}px;`);
     }).join('');
     const bagged = list.filter((e) => e.inv?.k === 'bag');
-    el.querySelector('.tinv-empty').textContent = bagged.length ? '' : (bagE ? t('Empty — drag loot here') : t('Wear a bag for more room'));
+    el.querySelector('.tinv-empty').textContent = bagged.length ? '' : (bagE ? t('Empty - drag loot here') : t('Wear a bag for more room'));
     // hotbar
     el.querySelector('.tinv-hotrow').innerHTML = p.slots.map((id, i) => {
       const e = id && byId.get(id);

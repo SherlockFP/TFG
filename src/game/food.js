@@ -374,7 +374,7 @@ export function installFood(game) {
     else if (d.k === 'cheers') onCheers(d);
     else if (d.k === 'cake') onCake(d);
     else if (d.k === 'wf') { if (Array.isArray(d.ids) && d.ids.includes(me())) getWellFed(); }
-    else if (d.k === 'tm') toast(t('Table meal! Eat with the crew for Well Fed.'), 'info');
+    else if (d.k === 'tm') toast(t('Table meal. Eat with the crew to get Well Fed.'), 'info');
     else if (d.k === 'offer') onOffer(d);
     else if (d.k === 'gave') {
       const item = t(FOODS[d.ty]?.name || '');
@@ -414,7 +414,7 @@ export function installFood(game) {
     burst(pos, CONFETTI);
     if (Array.isArray(d.ids) && d.ids.includes(me())) {
       grant('f_cake', Math.max(30, Math.min(150, Number(d.dur) || 60)));
-      toast(t('Cake Day! Everyone nearby is happy.'), 'good');
+      toast(t('Cake Day. Everyone nearby is happy.'), 'good');
       sfx('ui_levelup', 0.4);
     }
   }

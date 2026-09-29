@@ -56,7 +56,7 @@ export const PHONE_LINES = [
   L('The copy in the mirror is doing well. We may keep it and let you go. We may not let you go.', 'Aynadaki kopya iyi gidiyor. Onu tutup seni bırakabiliriz. Bırakmayabiliriz.'),
   L('Please stay on the line. Your call is very important to our metrics.', 'Lütfen hatta kalın. Çağrınız metriklerimiz için çok önemli.'),
   L('I have been watching how you look at the door. It is not a door. It is a KPI.', 'Kapıya nasıl baktığını izliyorum. O bir kapı değil. O bir KPI.'),
-  L('Great content. Let us run it back.', 'Harika içerik. Bir kez daha oynatalım.'),
+  L('Nice pose. Hold it. Hold it. Good.', 'Güzel poz. Öyle kal. Öyle kal. Güzel.'),
 ];
 export const PHONE_IDLE = L('The line is open. Someone is breathing in time with you.', 'Hat açık. Biri seninle aynı ritimde nefes alıyor.');
 

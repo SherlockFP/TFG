@@ -1,5 +1,6 @@
 // Item definitions registry. Mods can add entries with registerItem().
 import { localizeFields } from '../core/i18n.js';
+import { humanizeId } from '../core/util.js';
 // kind: scrap | big (physics valuable) | fish | drop | tool | weapon | consumable
 // value: [min, max] credits (scrap); price: store price (credits); coin: black market price (Clout)
 // weight in lb (LC-style), hands: 1 | 2
@@ -283,5 +284,5 @@ export function registerItem(def) {
   return ITEMS[def.id];
 }
 
-export function itemDef(id) { return ITEMS[id] || { id, name: id, kind: 'scrap', value: [5, 10], weight: 5, hands: 1 }; }
+export function itemDef(id) { return ITEMS[id] || { id, name: humanizeId(id), kind: 'scrap', value: [5, 10], weight: 5, hands: 1 }; }
 export function isSellable(def) { return ['scrap', 'big', 'fish', 'drop'].includes(def.kind) || (def.value && def.kind !== 'tool'); }

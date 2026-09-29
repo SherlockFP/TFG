@@ -229,7 +229,7 @@ export function installContracts(core) {
     c.state = 'complete';
     c.progress = c.n;
     const tx = contractText(c, false);
-    game.net.broadcast('sys', sysMsg('CONTRACT COMPLETE: {title} — payout at the end of the day.', { title: tx.title }, 'good'));
+    game.net.broadcast('sys', sysMsg('CONTRACT COMPLETE: {title} - payout at the end of the day.', { title: tx.title }, 'good'));
     core.broadcast('contract', { state: 'complete', f: c.faction, title: c.title });
     core.algo?.hostSayFaction(c.faction, 'done');
     game.later?.(() => core.algo?.hostSay('contract_done', { faction: c.faction }, { gap: 2 }), 5000);
@@ -268,7 +268,7 @@ export function installContracts(core) {
     game.broadcastRun?.(['credits']);
     game.net.broadcast('xp', { xp, coin: 10 + 5 * q, reason: 'Secret objective' });
     core.broadcast('secret', { id: s.id, credits, xp });
-    game.net.broadcast('sys', sysMsg('SECRET OBJECTIVE COMPLETE: {n} — ▮{credits}, {xp} XP', { n: SECRETS[s.id].name[0], credits, xp }, 'good'));
+    game.net.broadcast('sys', sysMsg('SECRET OBJECTIVE COMPLETE: {n} - ▮{credits}, {xp} XP', { n: SECRETS[s.id].name[0], credits, xp }, 'good'));
     core.algo?.hostSay('secret', {}, { gap: 3 });
     day.secret = { id: s.id };
     core.emit('tfg:contract', { id: 'secret:' + s.id, state: 'secret' });
@@ -294,7 +294,7 @@ export function installContracts(core) {
         core.factions.hostAdd(c.faction, c.reward.rep, 'contract');
         core.factions.hostAdd(c.rival, RIVAL_REP, 'rival contract');
         game.net.broadcast('xp', { xp: c.reward.xp, coin, reason: 'Contract: ' + tx.title });
-        game.net.broadcast('sys', { text: `CONTRACT PAID: ${tx.title} — ▮${credits} · ${FACTIONS[c.faction].name} +${c.reward.rep} rep`, kind: 'good' });
+        game.net.broadcast('sys', { text: `CONTRACT PAID: ${tx.title} - ▮${credits} · ${FACTIONS[c.faction].name} +${c.reward.rep} rep`, kind: 'good' });
         let ending = null;
         if (c.chain !== null && c.chain !== undefined) {
           run.chains = { ...run.chains, [c.faction]: Math.max(run.chains?.[c.faction] | 0, c.chain + 1) };
@@ -313,7 +313,7 @@ export function installContracts(core) {
         core.emit('tfg:contract', { id: c.id, state: 'void', faction: c.faction });
       } else {
         core.factions.hostAdd(c.faction, FAIL_REP, 'failed');
-        game.net.broadcast('sys', { text: `CONTRACT FAILED: ${tx.title} — ${FACTIONS[c.faction].name} ${FAIL_REP} rep`, kind: 'bad' });
+        game.net.broadcast('sys', { text: `CONTRACT FAILED: ${tx.title} - ${FACTIONS[c.faction].name} ${FAIL_REP} rep`, kind: 'bad' });
         core.algo?.hostSay('contract_fail', { faction: c.faction }, { gap: 2 });
         out.contract = { title: c.title, f: c.faction, result: 'failed', progress: c.progress, n: c.n };
         logResult(c, 'failed');
@@ -333,7 +333,7 @@ export function installContracts(core) {
     const c = run.contract;
     if (c) {
       const tx = contractText(c, T);
-      out.push(`${t('ACTIVE')}: [${FACTIONS[c.faction].short}]${c.patron ? (c.patron === 'company' ? ' ' + t('<COMPANY>') : ' ' + t('<ALGORITHM>')) : ''} ${tx.title} — ${stateName(c.state, T)} ${c.progress || 0}/${c.n}`, `  ${tx.brief}`, '');
+      out.push(`${t('ACTIVE')}: [${FACTIONS[c.faction].short}]${c.patron ? (c.patron === 'company' ? ' ' + t('<COMPANY>') : ' ' + t('<ALGORITHM>')) : ''} ${tx.title} - ${stateName(c.state, T)} ${c.progress || 0}/${c.n}`, `  ${tx.brief}`, '');
     }
     const offers = run.contracts?.offers || [];
     if (!offers.length) out.push(t('No offers. New ones arrive in orbit.'));
@@ -356,7 +356,7 @@ export function installContracts(core) {
     const c = run?.contract;
     const T = tr();
     if (phase === 'orbit') {
-      if (c) add(`${t('Contract')}: ${contractText(c, T).title} — ${t('land to start')}`, 'sub');
+      if (c) add(`${t('Contract')}: ${contractText(c, T).title} - ${t('land to start')}`, 'sub');
       else if (run?.contracts?.offers?.some((o) => !o.taken)) add(t('Contract board: terminal CONTRACTS or the board in the ship'), 'hint');
     } else if (phase === 'moon' && c) {
       const tx = contractText(c, T);

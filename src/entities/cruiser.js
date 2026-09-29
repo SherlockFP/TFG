@@ -480,7 +480,7 @@ export function installCruiser(game) {
           try { game.particles?.burst(st.pos.clone().add(_v.set(0, -0.6, 0)), 'dust', null, 2.5); } catch { /* ignore */ }
           const dist = st.pos.distanceTo(game.camera.position);
           game.engine?.shake?.(clamp(0.9 - dist / 40, 0, 0.7));
-          if (isHost()) game.net.broadcast('sys', sysMsg('UPLINK VAN delivered next to the ship. Hop in!', {}, 'good'));
+          if (isHost()) game.net.broadcast('sys', sysMsg('Uplink Van delivered next to the ship.', {}, 'good'));
         }
       } else {
         d.retract += dt;

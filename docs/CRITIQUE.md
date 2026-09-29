@@ -265,3 +265,6 @@ Palettes are tuned by simulation, not by eye (tests check delta-E under CVD matr
 Low preset is unverified against the 60 percent draw-call target (instanced decor thinning cuts triangles, not calls); module-added ship props (workbench, arcade table...) still unmerged; Rapier wasm (4.3 MB) dominates first load.
 ## Wave 8 - balance (docs/wave8/balance.md)
 One-shots are gone except telegraphed hazards from quota 4, but the sim's solo shovel player still dies 40-60 % on mid quotas from attrition alone (no healing/dodge model); the 0.4 s wind-up gate is untested in a live browser and relies on behaviours setting an attack state as the visible tell.
+
+## Wave 8 - studio (docs/wave8/studio.md)
+Copy and consistency pass; browser not run: the six new 64x96 posters and the pictogram achievement cards have not been looked at, the Algorithm still leans on "content / engagement" in nearly every line, and about 370 keys per language are still untranslated in the i18n audit (mostly a11y / cycle3). Placeholder tool models (axe, pickaxe, forge shards) are listed for an art pass.

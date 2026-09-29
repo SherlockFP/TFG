@@ -20,6 +20,8 @@ export function dampAngle(a, b, lambda, dt) { return a + angleDiff(a, b) * (1 - 
 export function dist2(ax, az, bx, bz) { const dx = ax - bx, dz = az - bz; return dx * dx + dz * dz; }
 export function dist3(a, b) { const dx = a.x - b.x, dy = a.y - b.y, dz = a.z - b.z; return Math.sqrt(dx * dx + dy * dy + dz * dz); }
 
+/** Last-resort display name for a data id that has no name (never show 'fish_boot' / 'm5cold' to a player). */
+export function humanizeId(id) { return String(id ?? '').replace(/([a-z])(\d)/gi, '$1 $2').replace(/[_-]+/g, ' ').trim().replace(/\b\w/g, (c) => c.toUpperCase()); }
 export function fmtMoney(v) { return '▮' + Math.round(v).toLocaleString('en-US'); }
 
 export function fmtClock(minutes) {

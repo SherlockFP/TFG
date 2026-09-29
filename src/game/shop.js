@@ -245,7 +245,7 @@ export function installShop(game) {
     },
     /** lines for the terminal STORE LIST (text purists) */
     textList() {
-      const out = ['Welcome to the Company store. Deliveries arrive instantly (for a small fee we do not mention).', 'Type STORE for the shop screen. BUY <item> [n] still works here.', ''];
+      const out = ['Company Store. Delivery is instant. The fee is not mentioned.', 'Type STORE for the store screen. BUY <item> [n] still works here.', ''];
       const st = stock();
       const deals = st.filter((e) => e.dealKind === 'deal'), eom = st.find((e) => e.dealKind === 'eom');
       if (deals.length) out.push("TODAY'S DEALS: " + deals.map((e) => `${e.name} -${Math.round(e.off * 100)}%`).join(', '));

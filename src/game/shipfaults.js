@@ -388,7 +388,7 @@ export function installShipFaults(game, ctx = {}) {
     else if (d.k === 'clear') clearClient();
     else if (d.k === 'fixed') {
       const nm = FL[d.ty]?.name || d.ty;
-      toast(`✔ ${t(nm)} — ${d.by ? game.playerName(d.by) : ''}`, 'good');
+      toast(`✔ ${t(nm)} - ${d.by ? game.playerName(d.by) : ''}`, 'good');
       game.audio?.ui?.('ui_quota_met', 0.4);
     } else if (d.k === 'hit') {
       const cf = C.faults.get(d.i); if (cf) cf.hitT = 0.5;
@@ -459,7 +459,7 @@ export function installShipFaults(game, ctx = {}) {
     if (g !== game || !C.act) return;
     const all = [...C.faults.values()], done = all.filter((f) => f.done).length, n = all.length;
     add(`${t('PRE-FLIGHT FAULTS')} ${done}/${n}`, 'main', done === n && n > 0, n ? done / n : 0);
-    for (const f of all) add(`${f.done ? '✔' : '◇'} ${t(FL[f.ty].name)}${f.done ? '' : ' — ' + t(FL[f.ty].hint)}`, 'sub', f.done);
+    for (const f of all) add(`${f.done ? '✔' : '◇'} ${t(FL[f.ty].name)}${f.done ? '' : ' - ' + t(FL[f.ty].hint)}`, 'sub', f.done);
     const now = game.time || 0;
     if (C.launchAt != null) add(tf('PRE-FLIGHT COMPLETE - ignition in {n}', { n: Math.max(0, Math.ceil(C.launchAt - now)) }), 'hint');
     else if (C.dlAt != null) add(`${tf('PURGE IN {n}s', { n: Math.max(0, Math.ceil(C.dlAt - now)) })}${C.near ? ` · ${C.near} ${t('creatures near the ship')}` : ''}`, 'warn');

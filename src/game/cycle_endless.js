@@ -123,7 +123,7 @@ export function createEndless(ctx) {
   function fire() {
     if (!active()) return;
     payout(true);
-    say('THE ENGAGEMENT METER HIT ZERO. You are fired. (Cash-out rewards halved.)', {}, 'bad');
+    say('THE ENGAGEMENT METER HIT ZERO. You are deplatformed. (Cash-out rewards halved.)', {}, 'bad');
   }
 
   // ------------------------------------------------------------ mutator knobs (host wrappers + per-landing setup)

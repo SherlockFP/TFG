@@ -40,7 +40,17 @@ const P = {
   mask: 'M4 6h16v7a8 8 0 0 1-16 0z M8 11h2 M14 11h2 M9 16h6',
   web: 'M12 2v20 M2 12h20 M5 5l14 14 M19 5L5 19 M12 7l5 5-5 5-5-5z',
   crane: 'M3 21h18 M7 21V8 M7 8h13 M20 8v5 M5 8L12 3l7 5',
-  user: 'M12 3a3.5 3.5 0 1 0 .01 0z M5 21v-5a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v5z',
+  user: 'M12 3a3.5 3.5 0 1 0 .01 0z M5 21v-5a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v5z',  // wave 8 studio: pictograms for the achievement cards (they used colour emoji before)
+  blade: 'M4 20l3-3 M6 18L18 6l0 0 M14 4l6 6 M17 7l-9 9',
+  target: 'M12 3a9 9 0 1 0 .01 0z M12 8a4 4 0 1 0 .01 0z M12 12h.01',
+  coin: 'M12 3a9 9 0 1 0 .01 0z M12 7v10 M14.5 9.5c-.6-1.2-4.5-1.2-4.5 1.2s4.5 1.3 4.5 3.3-3.9 2.4-4.8 1',
+  chart: 'M3 20h18 M5 16l5-5 4 3 6-8 M15 6h5v5',
+  medal: 'M12 13a5 5 0 1 0 .01 0z M8.5 9.5L6 3h5 M15.5 9.5L18 3h-5',
+  rocket: 'M12 2c4 3 5 8 4 13H8c-1-5 0-10 4-13z M12 9h.01 M8 15l-3 4 M16 15l3 4 M12 19v3',
+  doc: 'M6 3h9l4 4v14H6z M15 3v4h4 M9 12h7 M9 16h7',
+  fish: 'M3 12c4-6 12-6 16 0-4 6-12 6-16 0z M19 12l3-3v6z M8 11h.01',
+  crown: 'M3 18l2-10 5 5 2-7 2 7 5-5 2 10z',
+  flag: 'M5 21V3 M5 4h13l-3 4 3 4H5',
 };
 const EMOJI = {
   '🪳': 'bug', '🦝': 'person', '🕷️': 'spider', '🕷': 'spider', '👁️': 'eye', '👁': 'eye', '🧍': 'person', '🟢': 'blob', '🎁': 'gift',
@@ -48,6 +58,12 @@ const EMOJI = {
   '💣': 'mine', '🚪': 'door', '🏗️': 'crane', '🏗': 'crane', '👹': 'skull', '👾': 'bug', '📦': 'box', '🏢': 'building', '🪐': 'planet',
   '🏚️': 'building', '🏚': 'building', '📅': 'calendar', '❔': 'help', '🏆': 'trophy', '🔒': 'lock', '👤': 'user', '📷': 'camera',
   '📐': 'book', '🎙': 'mic', '🎙️': 'mic', '🔇': 'mute', '⚡': 'bolt', '🔥': 'flame', '❄': 'snow', '⚙': 'gear', '🚐': 'van', '☀': 'sun', '☾': 'moon',
+  // wave 8 studio: achievement icons
+  '🗡': 'blade', '💀': 'skull', '☠': 'skull', '🎯': 'target', '🦶': 'person', '📖': 'book', '🔩': 'gear', '💰': 'coin', '💵': 'coin',
+  '🏦': 'building', '📈': 'chart', '📊': 'chart', '🏅': 'medal', '🪙': 'coin', '😇': 'star', '🩹': 'hazard', '⚰': 'box', '👻': 'mask',
+  '🍖': 'hound', '🚀': 'rocket', '📄': 'doc', '🎣': 'fish', '🐟': 'fish', '🐠': 'fish', '✨': 'star', '🎰': 'coin', '🕹': 'blob',
+  '☢': 'hazard', '🔟': 'user', '🎖': 'medal', '👑': 'crown', '👥': 'person', '🗓': 'calendar', '🌟': 'star', '💫': 'star',
+  '🛰': 'planet', '🧿': 'eye', '📚': 'book', '📜': 'doc', '🏁': 'flag', '🧠': 'gear', '🪬': 'eye', '🏴': 'flag',
 };
 
 export function glyph(name, opts = {}) {
@@ -60,7 +76,7 @@ export function glyph(name, opts = {}) {
 /** Closest pictogram for an emoji (or a single-emoji string); anything else comes back HTML-escaped. */
 export function glyphFromEmoji(s, opts) {
   const k = String(s ?? '').trim();
-  const name = EMOJI[k];
+  const name = EMOJI[k] || EMOJI[k.replace(/\uFE0F/g, '')];
   if (name) return glyph(name, opts);
   return k.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 }

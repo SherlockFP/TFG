@@ -61,7 +61,7 @@ export const BACKROOMS = {
   layout: { plan: 'open', doorP: 0.06, blastP: 0, loops: 0.2, bigChance: 0.22, corridorH: 2.9, hub: { type: 'poolrooms', w: 4, h: 4 }, hubAlways: true, roomMul: 0.6, lockedP: 0.1 },
   lamps: { corridor: 'ceiling_panel', every: 2, color: C_PANEL, flicker: 0.28 },   // placed by facility.js, replaced by the troffer grid below
   lampColor: C_PANEL,
-  posters: ['sign_noclip', 'poster_missing', 'graffiti', 'poster_hang'],
+  posters: ['sign_noclip', 'poster_missing', 'graffiti', 'poster_hang', 'poster_grave', 'poster_lost'],
   landmarks: ['wet_floor_sign', 'ext:tfg_stack_chair', 'cardboard_boxes'],
   doorProp: 'door_single',
   corridorScrap: 0.12,

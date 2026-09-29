@@ -330,7 +330,7 @@ export function createServiceRecord({ game = null, profile = game?.profile, tab,
       body.appendChild(r);
     }
     if (spec.featured) body.appendChild(mk('div', 'rec-gold', `Featured moon: ${MOONS[spec.featured]?.name || spec.featured} (+25% scrap)`));
-    body.appendChild(mk('div', 'rec-d', 'Every crew gets the SAME facility for the same day + moon this week. Score = scrap sold before you get fired.'));
+    body.appendChild(mk('div', 'rec-d', 'Every crew gets the SAME facility for the same day + moon this week. Score = scrap sold before you get deplatformed.'));
     if (active) body.appendChild(mk('div', 'rec-good', `THIS RUN IS THE WEEKLY CHALLENGE · score ▮${fmt(active.score)} · quotas ${active.quotas || 0}${active.fin ? ' · FINAL' : ''}`));
     else if (game?.meta?.weekly) {
       const why = game.meta.weekly.startBlock();
@@ -371,7 +371,7 @@ export function createServiceRecord({ game = null, profile = game?.profile, tab,
     row.append(mk('span', 'rec-gold', `Crew Lv.${lv.level}`), bar(lv.need ? lv.into / lv.need : 1), mk('span', 'rec-d', `${fmt(lv.into)}/${fmt(lv.need)}`));
     body.appendChild(row);
     body.appendChild(mk('div', 'rec-d', `Perk: every member earns +${Math.min(25, lv.level > 1 ? lv.level : 0)}% XP in this crew's sessions. Crew XP: days survived, scrap sold, quotas met (host sessions). Crew Lv.5 unlocks the "Rally the Crew" emote for members.`));
-    if (shared && !isOwner) body.appendChild(mk('div', 'rec-note', `You are playing in the host's crew. Your own crew: [${own.tag}] ${own.name} (Lv.${own.level}) — it shows when you host.`));
+    if (shared && !isOwner) body.appendChild(mk('div', 'rec-note', `You are playing in the host's crew. Your own crew: [${own.tag}] ${own.name} (Lv.${own.level}) - it shows when you host.`));
     if (isOwner) {
       body.appendChild(mk('div', 'rec-h', 'RENAME'));
       const nameIn = mk('input', 'rec-in'); nameIn.value = p.crew.name; nameIn.maxLength = 24;

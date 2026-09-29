@@ -121,7 +121,7 @@ export default {
   "Spam Bot": "Spam Bot",
   "Swarms of cheap spam bots. Crunchy. Easy XP for new janitors.": "Ucuz spam botları sürüsü. Çıtır çıtır. Yeni temizlikçilere kolay XP.",
   "Data Hoarder": "Veri İstifçisi",
-  "Hoards content in its nest. Harmless... until you touch its stuff. Yippee!": "Gizli yuvasında içerik biriktirir. Zararsız... eşyalarına dokunana kadar. Yippee!",
+  "Hoards content in its nest. Harmless until you touch its stuff.": "Yuvasında içerik biriktirir. Eşyalarına dokunmadıkça zararsız.",
   "Web Crawler": "Web Crawler",
   "Indexes everything at terrifying speed, in straight lines. Terrible at corners. Sidestep it.": "Her şeyi korkunç hızla, dümdüz indeksler. Köşelerde berbat. Yana kay.",
   "Lurker": "Lurker",

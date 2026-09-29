@@ -121,7 +121,7 @@ export default {
   "Spam Bot": "Спам-бот",
   "Swarms of cheap spam bots. Crunchy. Easy XP for new janitors.": "Рои дешёвых спам-ботов. Хрустят. Лёгкий опыт для новых уборщиков.",
   "Data Hoarder": "Барахольщик данных",
-  "Hoards content in its nest. Harmless... until you touch its stuff. Yippee!": "Копит контент в гнезде. Безобиден... пока не тронешь его вещи. Йиппи!",
+  "Hoards content in its nest. Harmless until you touch its stuff.": "Копит контент в гнезде. Безобиден, пока не тронешь его вещи.",
   "Web Crawler": "Веб-краулер",
   "Indexes everything at terrifying speed, in straight lines. Terrible at corners. Sidestep it.": "Индексирует всё с пугающей скоростью, по прямой. Ужасно поворачивает. Отскочи в сторону.",
   "Lurker": "Лёркер",

@@ -338,7 +338,7 @@ export function installFootball(game) {
     fx(game.audio, 'fun_whistle', { volume: 0.8 });
     fx(game.audio, 'fun_cheer', { volume: 0.95 });
     game.ui?.hud?.bigText?.(t('GOAL!'), `${name} scores!  (crew goals: ${S.goals})`);
-    game.ui?.toast?.(`⚽ GOAL! ${name} — ${S.goals} total`, 'good');
+    game.ui?.toast?.(`⚽ GOAL! ${name} - ${S.goals} total`, 'good');
     const conf = { count: 26, color: [0xff5a5a, 0xffd23f, 0x5adfff, 0x7dff8a, 0xffffff], speed: 4.2, up: 4, life: 1.1, size: 0.07, gravity: 7, drag: 1.2 };
     game.particles?.burst?.(p, conf);
     game.engine?.shake?.(0.05);

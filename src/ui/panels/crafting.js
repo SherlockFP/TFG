@@ -9,7 +9,7 @@ import { analyzeInfo, dismantleYield, dismantleBlock, isStrange } from '../../ga
 import { iconImg } from '../icons.js';
 import { t, tf } from '../../core/i18n.js';
 import { glyph } from '../glyphs.js';
-import { escapeHtml } from '../../core/util.js';
+import { escapeHtml, humanizeId } from '../../core/util.js';
 
 const STYLE_ID = 'tfg-crafting-style';
 const CSS = `
@@ -92,7 +92,7 @@ const icon = (type, fallback = '?') => {
   try { box.appendChild(iconImg(type)); } catch { box.textContent = fallback; }
   return box;
 };
-const nameOf = (id) => t(ITEMS[id]?.name || id);
+const nameOf = (id) => t(ITEMS[id]?.name || humanizeId(id));
 const fmt = (v) => String(Math.round(v || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 const pct = (p) => (p >= 0.995 ? '100' : p < 0.01 ? '<1' : String(Math.round(p * 100)));
 const CAT_LABEL = { survival: 'survival', combat: 'combat', tools: 'tools', gear: 'gear', arcane: 'arcane', tech: 'tech' };

@@ -43,7 +43,7 @@ export const SEWER = {
   layout: { plan: 'rooms', doorP: 0.14, blastP: 0.12, loops: 0.8, bigChance: 0.32, corridorH: 3.6, hub: { type: 'cistern', w: 5, h: 5 }, hubAlways: true, lockedP: 0.1 },
   lamps: { corridor: 'ceiling_lamp', every: 3, color: C_SODIUM, flicker: 0.22 },
   lampColor: C_SODIUM,
-  posters: ['graffiti', 'poster_missing', 'sign_danger', 'blood_splat', 'poster_fish'],
+  posters: ['graffiti', 'poster_missing', 'sign_danger', 'blood_splat', 'poster_fish', 'poster_noref', 'poster_wash'],
   landmarks: ['pump_machine', 'barrel', 'crate_wood'],
   doorProp: 'door_single',
   corridorPipes: true,

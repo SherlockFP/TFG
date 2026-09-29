@@ -41,7 +41,7 @@ export const TIPS = [
   'Daily events change the rules: check the terminal before you land.',
   'Fragile scrap loses value when it hits the floor. Carry it gently.',
   'Firewall Turrets can be disabled from the terminal with their code.',
-  'Phish Dayı sells soulbound gear at HQ. It spawns with you every landing.',
+  'Soulbound gear from Phish Dayı at HQ comes back with you on every landing.',
   'AI Slop is calmed by music. A boombox is a lifesaver.',
   'Ping (P / middle mouse) to mark loot and danger for your crew.',
   'Hold B for the emote wheel. Z / X are quick emotes.',

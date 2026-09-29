@@ -41,7 +41,7 @@ const CARD_RU = {
 };
 const TR = {
   'THE BOARD': 'TAHTA', 'THE ADMINISTRATOR': 'YÖNETİCİ', 'TURN {n} / {max}': 'TUR {n} / {max}', 'ROUND {n}': 'TUR {n}',
-  'YOUR TURN — ROLL [SPACE]': 'SIRA SENDE — ZAR AT [SPACE]', "{name}'s turn": 'Sıra {name} oyuncusunda', 'Rolling...': 'Zar atılıyor...',
+  'YOUR TURN - ROLL [SPACE]': 'SIRA SENDE - ZAR AT [SPACE]', "{name}'s turn": 'Sıra {name} oyuncusunda', 'Rolling...': 'Zar atılıyor...',
   '[T] table view': '[T] masa görünümü', 'Loot: {c} credits, {n} items': 'Ganimet: {c} kredi, {n} eşya',
   '{name} rolls a {n}.': '{name} {n} attı.', '{name} finds {n} credits.': '{name} {n} kredi buldu.', '{name} finds: {item}.': '{name} buldu: {item}.',
   'TRAP! {name} loses {p}% health.': 'TUZAK! {name} sağlığının %{p} kadarını kaybetti.', '{name} draws "{card}": {text}': '{name} "{card}" kartını çekti: {text}',
@@ -59,7 +59,7 @@ const TR = {
 };
 const RU = {
   'THE BOARD': 'ДОСКА', 'THE ADMINISTRATOR': 'АДМИНИСТРАТОР', 'TURN {n} / {max}': 'ХОД {n} / {max}', 'ROUND {n}': 'РАУНД {n}',
-  'YOUR TURN — ROLL [SPACE]': 'ТВОЙ ХОД — БРОСЬ [SPACE]', "{name}'s turn": 'Ходит {name}', 'Rolling...': 'Бросок...',
+  'YOUR TURN - ROLL [SPACE]': 'ТВОЙ ХОД — БРОСЬ [SPACE]', "{name}'s turn": 'Ходит {name}', 'Rolling...': 'Бросок...',
   '[T] table view': '[T] вид на стол', 'Loot: {c} credits, {n} items': 'Добыча: {c} кредитов, предметов: {n}',
   '{name} rolls a {n}.': '{name} выбрасывает {n}.', '{name} finds {n} credits.': '{name} находит {n} кредитов.', '{name} finds: {item}.': '{name} находит: {item}.',
   'TRAP! {name} loses {p}% health.': 'ЛОВУШКА! {name} теряет {p}% здоровья.', '{name} draws "{card}": {text}': '{name} тянет «{card}»: {text}',
@@ -498,7 +498,7 @@ export function installBoardGame(game) {
     const tt = $('.bg-turn'), pr = $('.bg-prompt');
     tt.textContent = tf('TURN {n} / {max}', { n: C.round, max: C.turns });
     if (C.ended) pr.textContent = '';
-    else if (C.myTurn) { pr.textContent = t('YOUR TURN — ROLL [SPACE]'); pr.className = 'bg-prompt me'; }
+    else if (C.myTurn) { pr.textContent = t('YOUR TURN - ROLL [SPACE]'); pr.className = 'bg-prompt me'; }
     else { pr.className = 'bg-prompt'; pr.textContent = C.phase === 'duel' ? '' : C.rolling ? t('Rolling...') : C.cur ? tf("{name}'s turn", { name: name(C.cur) }) : ''; }
     const trk = $('.bg-track');
     const cells = [];

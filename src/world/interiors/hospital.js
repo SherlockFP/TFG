@@ -45,7 +45,7 @@ export const HOSPITAL = {
   },
   lamps: { corridor: 'fluorescent', every: 2, color: C_CLINIC, flicker: 0.3 },
   lampColor: C_CLINIC,
-  posters: ['poster_hospital', 'poster_missing', 'poster_safety', 'poster_like', 'blood_splat'],
+  posters: ['poster_hospital', 'poster_missing', 'poster_safety', 'poster_like', 'blood_splat', 'poster_wash', 'poster_hr', 'poster_delete'],
   landmarks: ['wheelchair', 'iv_stand', 'hospital_bed'],
   doorProp: 'door_single',
   corridorScrap: 0.07,

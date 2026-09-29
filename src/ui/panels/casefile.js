@@ -118,13 +118,13 @@ export function renderCaseCard(c, opts = {}) {
   row('MVP', escapeHtml(c.mvp ? `${c.mvp.name} (▮${c.mvp.loot})` : '—'));
   row(L('Most valuable item', 'En değerli eşya'), escapeHtml(c.top ? `${c.top.name} (▮${c.top.value})` : '—'));
   if (c.deaths?.length) row(L('Cause of death', 'Ölüm nedeni'), escapeHtml(c.deaths.map((d) => `${d.name} ${tr() ? 'öldü' : d.causeText}`).join(' · ')), 'bad wide');
-  if (c.abandoned?.length) row(L('Teammate abandoned', 'Terk edilen'), escapeHtml(c.abandoned.join(', ')), 'bad');
+  if (c.abandoned?.length) row(L('Crewmate abandoned', 'Terk edilen'), escapeHtml(c.abandoned.join(', ')), 'bad');
   if (c.contract) row(L('Contract', 'Sözleşme'), escapeHtml(`${pickLang(c.contract.title, tr())} [${FACTIONS[c.contract.f]?.short || ''}] ${String(c.contract.result).toUpperCase()}`), c.contract.result === 'failed' ? 'bad' : '');
   if (c.secret) row(L('Secret objective', 'Gizli görev'), escapeHtml(pickLang(c.secret.name, tr()) + ' ✔'));
   card.appendChild(mk('div', 'lc-rows', rows.join('')));
   let i = rows.length;
   if (c.lastWords) {
-    card.appendChild(mk('div', 'lc-words', `<small>${L('LAST WORDS', 'SON SÖZLER')} — ${escapeHtml(c.lastWords.name)}</small><q>${escapeHtml(c.lastWords.text || L('[no transmission]', '[yayın yok]'))}</q>`));
+    card.appendChild(mk('div', 'lc-words', `<small>${L('LAST WORDS', 'SON SÖZLER')} - ${escapeHtml(c.lastWords.name)}</small><q>${escapeHtml(c.lastWords.text || L('[no transmission]', '[yayın yok]'))}</q>`));
     card.lastChild.style.setProperty('--i', i++);
   }
   const v = verdictOf(c);

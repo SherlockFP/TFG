@@ -18,7 +18,7 @@ export default {
   "LOW GRAVITY PATCH": "ПАТЧ НИЗКОЙ ГРАВИТАЦИИ",
   "A physics hotfix went wrong. You jump 40% higher and move 6% faster.": "Физический хотфикс пошёл не так. Ты прыгаешь на 40% выше и двигаешься на 6% быстрее.",
   "DOUBLE XP WEEKEND": "ВЫХОДНЫЕ ДВОЙНОГО ОПЫТА",
-  "Engagement event! All XP earned on this moon is doubled. Creatures are hyped too.": "Ивент вовлечённости! Весь опыт на этой луне удвоен. Существа тоже на хайпе.",
+  "Engagement event. All XP earned on this moon is doubled. Creatures are hyped too.": "Ивент вовлечённости. Весь опыт на этой луне удвоен. Существа тоже на хайпе.",
   "HAUNTED CACHE": "ПРОКЛЯТЫЙ КЭШ",
   "Three cursed golden archives are hidden deep inside. Something guards them.": "Три проклятых золотых архива спрятаны глубоко внутри. Кто-то их охраняет.",
   "CAFFEINE OVERDOSE": "ПЕРЕДОЗ КОФЕИНА",

@@ -313,7 +313,7 @@ export const hostMethods = {
     if (!inShip) return;
     if (run.phase === 'orbit') {
       if (run.daysLeft <= 0 && run.moon !== 'hq') {
-        this.net.sendTo(from, 'sys', sysMsg('DEADLINE! Route to 0-Algorithm HQ and sell your scrap.', {}, 'bad'));
+        this.net.sendTo(from, 'sys', sysMsg('Deadline. Route to 0-Algorithm HQ and sell your scrap.', {}, 'bad'));
         return;
       }
       run.seed = Math.floor(Math.random() * 1e9);
@@ -347,7 +347,7 @@ export const hostMethods = {
     } else {
       this.hostSetPhase('moon');
       const ev = this.run.dailyEvent;
-      this.net.broadcast('sys', sysMsg('DAILY EVENT: {@n} — {@n2}', { n: ev?.name || 'NORMAL FEED', n2: ev?.desc || '' }, ev?.dangerMul > 1.15 ? 'warn' : 'info'));
+      this.net.broadcast('sys', sysMsg('DAILY EVENT: {@n} - {@n2}', { n: ev?.name || 'NORMAL FEED', n2: ev?.desc || '' }, ev?.dangerMul > 1.15 ? 'warn' : 'info'));
       this.hostData.pressureStage = 0;
       this.hostData.moonT = 0;
       this.hostPopulateMoon();
@@ -453,7 +453,7 @@ export const hostMethods = {
     // quota evaluation after leaving the company on deadline day
     if (moon.company && run.daysLeft <= 0) this.hostEvaluateQuota();
     else if (run.daysLeft <= 0) {
-      this.net.broadcast('sys', sysMsg('Deadline reached. Route to 0-Algorithm HQ and sell!', {}, 'bad'));
+      this.net.broadcast('sys', sysMsg('Deadline reached. Autopilot set to 0-Algorithm HQ. Sell what you have.', {}, 'bad'));
       run.moon = 'hq';
       this.broadcastRun(['moon']);
     }
@@ -472,7 +472,7 @@ export const hostMethods = {
       run.sold = 0;
       run.daysLeft = 3;
       this.broadcastRun(['credits', 'quotaIndex', 'quota', 'sold', 'daysLeft']);
-      this.net.broadcast('sys', sysMsg('QUOTA MET! Overtime bonus ▮{bonus}. New quota: ▮{quota}', { bonus, quota: run.quota }, 'good'));
+      this.net.broadcast('sys', sysMsg('Quota met. Overtime bonus ▮{bonus}. Next quota: ▮{quota}', { bonus, quota: run.quota }, 'good'));
       this.net.broadcast('quotamet', { bonus, surplus, prev, quota: run.quota, quotaIndex: run.quotaIndex });
       this.net.broadcast('fx', { k: 'snd', s: 'ui_quota_met', p: [0, 1.5, 0], v: 1 });
       this.net.broadcast('xp', { xp: 150 + run.quotaIndex * 80, coin: 30 + run.quotaIndex * 15, reason: 'Quota met', quota: true });
@@ -763,7 +763,7 @@ export const hostMethods = {
       void moon;
       if (run.time >= 23 * 60 && !hd.alarmPlayed) {
         hd.alarmPlayed = true;
-        this.net.broadcast('sys', sysMsg('WARNING: The autopilot will leave at midnight!', {}, 'bad'));
+        this.net.broadcast('sys', sysMsg('The autopilot leaves at midnight. Get back to the ship.', {}, 'bad'));
         this.net.broadcast('fx', { k: 'snd', s: 'ship_alarm', p: [0, 2, 0], v: 1, r: 30, m: 400 });
       }
       if (run.time >= 24 * 60 - 1) { run.time = 24 * 60; hd.alarmPlayed = false; this.hostBeginTakeoff('midnight'); }

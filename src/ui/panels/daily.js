@@ -144,7 +144,7 @@ export function createDailyPanel({ ui, svc, closeButton, tab = null }) {
         const r = svc.claimLogin();
         if (r.ok) {
           msg.kind = 'good';
-          msg.text = r.lapse === 'grace' ? t('Grace day used: your streak is safe.') : r.lapse === 'reset' ? (r.comeback ? t('Welcome back! A fresh week starts, with a comeback bonus on day 1.') : t('A fresh week starts.')) : tf('Day {n} claimed. See you tomorrow.', { n: r.day });
+          msg.text = r.lapse === 'grace' ? t('Grace day used: your streak is safe.') : r.lapse === 'reset' ? (r.comeback ? t('Welcome back. A new week starts with a comeback bonus on day 1.') : t('A fresh week starts.')) : tf('Day {n} claimed. See you tomorrow.', { n: r.day });
           if (r.reward.crate) msg.text += ' ' + t('A cosmetic crate is waiting in CRATES.');
         }
         render('b:crate');

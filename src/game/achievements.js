@@ -16,6 +16,7 @@ import { MARKET, MAX_LEVEL, REBIRTH_LEVEL, prestigeStars, MASTERY, masteryRank }
 import { SUIT_COLORS, HATS } from '../models/avatar.js';
 import { saveProfile } from '../core/save.js';
 import { getLang, t } from '../core/i18n.js';
+import { glyphFromEmoji } from '../ui/glyphs.js';   // wave 8: pictograms instead of colour emoji
 
 const DAY_MS = 86400000;
 const CHECK_INTERVAL = 2;      // seconds between achievement evaluations
@@ -98,9 +99,9 @@ export const ACHIEVEMENTS = [
   A('sell_1k', '💰', 'bronze', 'Small Business', 'Sell ▮1,000 of scrap with your crew.', ['Küçük İşletme', 'Ekibinle ▮1.000 değerinde hurda sat.'], counter((p) => n(st(p).sold), 1000)),
   A('sell_10k', '💵', 'silver', 'Middle Management', 'Sell ▮10,000 of scrap.', ['Orta Kademe Yönetici', '▮10.000 değerinde hurda sat.'], counter((p) => n(st(p).sold), 10000)),
   A('sell_100k', '🏦', 'gold', 'Shareholder Value', 'Sell ▮100,000 of scrap.', ['Hissedar Değeri', '▮100.000 değerinde hurda sat.'], counter((p) => n(st(p).sold), 100000), { title: 'Tycoon', cosmetic: 'suit:red' }),
-  A('quota_1', '📈', 'bronze', 'Quota Is Love', 'Meet your first profit quota.', ['Kota Aşktır', 'İlk kâr kotanı doldur.'], counter((p) => n(st(p).quotasMet), 1)),
-  A('quota_5', '📊', 'silver', 'Team Player', 'Meet 5 profit quotas.', ['Takım Oyuncusu', '5 kota doldur.'], counter((p) => n(st(p).quotasMet), 5), { title: 'Team Player' }),
-  A('quota_10', '🏅', 'gold', 'Employee of the Month', 'Meet 10 profit quotas.', ['Ayın Çalışanı', '10 kota doldur.'], counter((p) => n(st(p).quotasMet), 10), { title: 'Employee of the Month' }),
+  A('quota_1', '📈', 'bronze', 'Quota Is Love', 'Meet your first quota.', ['Kota Aşktır', 'İlk kotanı doldur.'], counter((p) => n(st(p).quotasMet), 1)),
+  A('quota_5', '📊', 'silver', 'Team Player', 'Meet 5 quotas.', ['Takım Oyuncusu', '5 kota doldur.'], counter((p) => n(st(p).quotasMet), 5), { title: 'Team Player' }),
+  A('quota_10', '🏅', 'gold', 'Employee of the Month', 'Meet 10 quotas.', ['Ayın Çalışanı', '10 kota doldur.'], counter((p) => n(st(p).quotasMet), 10), { title: 'Employee of the Month' }),
   A('tycoon', '🪙', 'gold', 'Clout Chaser', 'Earn ◈10,000 Clout in total.', ['Clout Avcısı', 'Toplam ◈10.000 Clout kazan.'], counter((p) => n(st(p).coinsEarned), 10000), { title: 'Clout Chaser' }),
   A('arsenal', '🔫', 'silver', 'Arsenal', 'Own 3 Black Market weapons.', ['Cephanelik', 'Karaborsadan 3 silah sahibi ol.'], counter(weaponsOwned, 3)),
   // --- survival & death
@@ -111,7 +112,7 @@ export const ACHIEVEMENTS = [
   A('frequent_flyer', '👻', 'silver', 'Frequent Flyer', 'Die 50 times.', ['Müdavim Hayalet', '50 kez öl.'], counter((p) => n(st(p).deaths), 50), { title: 'Revenant' }),
   A('nemesis', '🍖', 'silver', 'Favourite Snack', 'Die 10 times to the same creature.', ['Favori Atıştırmalık', 'Aynı yaratığa 10 kez öl.'], counter(nemesisMax, 10), { title: 'Snack' }),
   A('left_behind', '🚀', 'bronze', 'Left Behind', 'Miss the ship at midnight.', ['Geride Kalan', 'Gece yarısı gemiyi kaçır.'], counter((p) => n(st(p).deathsBy?.left), 1), { title: 'Forgotten' }),
-  A('pink_slip', '📄', 'bronze', 'Pink Slip', 'Get fired by The Algorithm.', ['Kovuldun', 'Şirket tarafından kovul.'], counter((p) => n(st(p).fired), 1), { title: 'Unemployed' }),
+  A('pink_slip', '📄', 'bronze', 'Pink Slip', 'Get deplatformed by The Algorithm.', ['Kovuldun', 'Şirket tarafından kovul.'], counter((p) => n(st(p).fired), 1), { title: 'Unemployed' }),
   // --- minigames & activities
   A('angler', '🎣', 'bronze', 'Gone Fishing', 'Catch 10 fish.', ['Balığa Çıktım', '10 balık tut.'], counter((p) => n(st(p).fish), 10)),
   A('master_angler', '🐟', 'silver', 'Master Angler', 'Catch 50 fish.', ['Usta Balıkçı', '50 balık tut.'], counter((p) => n(st(p).fish), 50), { title: 'Angler' }),
@@ -347,7 +348,7 @@ const CSS = `
  color:#ffe9a8;font-family:var(--font,'VT323',monospace);text-shadow:0 0 6px rgba(0,0,0,.9);animation:kach-in .45s cubic-bezier(.2,1.4,.4,1) both}
 .kach-banner::after{content:'';position:absolute;top:0;bottom:0;width:60px;left:-80px;background:linear-gradient(90deg,transparent,rgba(255,240,180,.35),transparent);transform:skewX(-20deg);animation:kach-shine 1.6s .35s ease-out both}
 .kach-banner.kach-out{animation:kach-out .4s ease-in both}
-.kach-bi{font-size:44px;line-height:1;min-width:52px;text-align:center;filter:drop-shadow(0 0 8px rgba(255,210,80,.85))}
+.kach-bi{font-size:44px;line-height:1;min-width:52px;text-align:center;color:var(--kt);filter:drop-shadow(0 0 8px rgba(255,210,80,.85))}
 .kach-k{font-family:var(--font2,monospace);font-size:11px;letter-spacing:2px;color:var(--kt)}
 .kach-bn{font-size:31px;line-height:1.05;color:#fff3c4;text-shadow:0 0 10px rgba(255,200,60,.7),2px 2px 0 #000}
 .kach-bd{font-size:19px;opacity:.85}
@@ -370,7 +371,7 @@ const CSS = `
 .kach-card.unlocked{border-color:var(--kt);box-shadow:inset 0 0 14px rgba(255,210,80,.08)}
 .kach-card.locked{opacity:.55}
 .kach-card.locked .kach-ic{filter:grayscale(1) brightness(.7)}
-.kach-ic{font-size:30px;line-height:1.1;min-width:38px;text-align:center}
+.kach-ic{font-size:30px;line-height:1.1;min-width:38px;text-align:center;color:var(--kt)}
 .kach-body{flex:1;min-width:0}
 .kach-n{color:#fff3c4;font-size:21px;line-height:1.1}
 .kach-t{font-size:15px;margin-left:6px;color:var(--kt);letter-spacing:1px}
@@ -432,7 +433,7 @@ class BannerQueue {
     text.append(mk('div', 'kach-k', item.kicker), mk('div', 'kach-bn', item.name));
     if (item.desc) text.appendChild(mk('div', 'kach-bd', item.desc));
     if (item.reward) text.appendChild(mk('div', 'kach-br', item.reward));
-    node.append(mk('div', 'kach-bi', item.icon || '🏆'), text);
+    const bi = mk('div', 'kach-bi'); bi.innerHTML = glyphFromEmoji(item.icon || '🏆'); node.append(bi, text);
     this.host.appendChild(node);
     try { this.game.audio?.ui?.('ui_levelup', 0.75); } catch { /* audio optional */ }
     this.later(() => node.classList.add('kach-out'), BANNER_MS - 400);
@@ -854,7 +855,7 @@ export function renderAchievementsPanel(container, game, profile = game?.profile
       }
       body.appendChild(mk('div', 'kach-rw', rewardText(a.reward || {})));
       if (n(un?.at) > 0) body.appendChild(mk('div', 'kach-at', `${L('Unlocked on')} ${new Date(un.at).toISOString().slice(0, 10)}`));
-      card.append(mk('div', 'kach-ic', a.icon), body);
+      const ic = mk('div', 'kach-ic'); ic.innerHTML = glyphFromEmoji(a.icon); card.append(ic, body);
       grid.appendChild(card);
     }
     root.appendChild(grid);

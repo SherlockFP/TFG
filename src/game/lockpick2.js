@@ -125,7 +125,7 @@ export function installLockpick2(game) {
       const holding = helpId === s.id;
       out.push({
         pos: V.set(s.x, s.y + 1, s.z).clone(), r: 1.6, reach: L.COOP.REACH,
-        label: holding ? t('HOLDING THE PINS') : t('Hold the pins [hold E]'), sub: t('A teammate is picking - your help makes the lock faster'),
+        label: holding ? t('HOLDING THE PINS') : t('Hold the pins [hold E]'), sub: t('A crewmate is picking. Your help makes the lock faster.'),
         action: () => { helpId = s.id; helpSend = 0; },
       });
     }

@@ -875,7 +875,7 @@ export function installMagic(game) {
       game.engine.flash(sp.color, 0.45); game.engine.shake(0.25);
       burst(game.player.pos.clone().setY(game.player.pos.y + 1), 'learn', null, 1);
       ringFx(game.player.pos.clone().setY(game.player.pos.y + 0.08), sp.color, 0.3, 5, 1.1);
-      game.ui?.systemMessage?.(`✦ ${t('NEW SPELL LEARNED')}: ${t(sp.name).toUpperCase()} — "${sp.say.en}" / "${sp.say.tr}"`, 'good');
+      game.ui?.systemMessage?.(`✦ ${t('NEW SPELL LEARNED')}: ${t(sp.name).toUpperCase()} - "${sp.say.en}" / "${sp.say.tr}"`, 'good');
     }
     return true;
   }

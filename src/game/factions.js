@@ -196,7 +196,7 @@ export function installFactions(core) {
     const run = game.run || {};
     ensure(run);
     const T = tr();
-    const out = [t('FACTIONS — reputation -100..100 (war below -40)'), ''];
+    const out = [t('FACTIONS - reputation -100..100 (war below -40)'), ''];
     for (const id of FACTION_IDS) {
       const f = FACTIONS[id], r = rep(id), s = standing(r);
       const bar = '[' + '#'.repeat(Math.round((r + 100) / 10)).padEnd(20, '-') + ']';

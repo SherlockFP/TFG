@@ -9,7 +9,7 @@ export default {
   '{name} is too far away (max {m} m).': '{name} çok uzakta (en fazla {m} m).', 'Not now.': 'Şimdi olmaz.', 'Trade request sent.': 'Takas isteği gönderildi.',
   'Nobody with that name is close.': 'Yakınlarda o isimde kimse yok.',
   'TRADE': 'TAKAS', 'Your inventory': 'Envanterin', 'Your offer': 'Teklifin', 'Clout': 'Clout', 'Summary': 'Özet', 'with {name} · Lv.{lvl}': '{name} ile · Sv.{lvl}',
-  'Empty': 'Boş', 'items': 'eşya', 'You': 'Sen', 'ACCEPTED': 'KABUL EDİLDİ', 'LOCKED': 'KİLİTLİ', 'EDITING': 'DÜZENLİYOR', '{n} item(s)': '{n} eşya',
+  'Empty': 'Boş', 'items': 'eşya', 'You': 'Sen', 'ACCEPTED': 'KABUL EDİLDİ', 'LOCKED': 'KİLİTLİ', 'EDITING': 'DÜZENLİYOR',
   'You give': 'Verdiğin', 'You get': 'Aldığın', 'Careful: they are offering nothing.': 'Dikkat: karşı taraf hiçbir şey vermiyor.',
   'Their offer is worth far less than yours.': 'Onların teklifi seninkinden çok daha değersiz.', 'UNLOCK': 'KİLİDİ AÇ', 'LOCK OFFER': 'TEKLİFİ KİLİTLE',
   'TRADE IN {n}': 'TAKAS {n} SN SONRA', 'Swapping...': 'Takas ediliyor...', 'Waiting for {name} to accept.': '{name} kabul etsin diye bekleniyor.',

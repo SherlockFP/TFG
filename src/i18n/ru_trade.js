@@ -9,7 +9,7 @@ export default {
   '{name} is too far away (max {m} m).': '{name} слишком далеко (макс. {m} м).', 'Not now.': 'Сейчас нельзя.', 'Trade request sent.': 'Запрос на обмен отправлен.',
   'Nobody with that name is close.': 'Никого с таким именем рядом нет.',
   'TRADE': 'ОБМЕН', 'Your inventory': 'Твой инвентарь', 'Your offer': 'Твоё предложение', 'Clout': 'Клаут', 'Summary': 'Итог', 'with {name} · Lv.{lvl}': 'с {name} · Ур.{lvl}',
-  'Empty': 'Пусто', 'items': 'предм.', 'You': 'Ты', 'ACCEPTED': 'ПРИНЯТО', 'LOCKED': 'ЗАФИКСИРОВАНО', 'EDITING': 'ПРАВИТ', '{n} item(s)': '{n} предм.',
+  'Empty': 'Пусто', 'items': 'предм.', 'You': 'Ты', 'ACCEPTED': 'ПРИНЯТО', 'LOCKED': 'ЗАФИКСИРОВАНО', 'EDITING': 'ПРАВИТ',
   'You give': 'Ты отдаёшь', 'You get': 'Ты получаешь', 'Careful: they are offering nothing.': 'Осторожно: они ничего не предлагают.',
   'Their offer is worth far less than yours.': 'Их предложение стоит гораздо меньше твоего.', 'UNLOCK': 'РАЗБЛОКИРОВАТЬ', 'LOCK OFFER': 'ЗАФИКСИРОВАТЬ',
   'TRADE IN {n}': 'ОБМЕН ЧЕРЕЗ {n}', 'Swapping...': 'Меняем...', 'Waiting for {name} to accept.': 'Ждём, пока {name} примет.',

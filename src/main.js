@@ -337,7 +337,7 @@ class App {
     if (this.fpsT > 0.5) {
       const st = this.audio.state();
       this.ui.soundHint.classList.toggle('hidden', st === 'running' || !this.booted);
-      if (st === 'suspended' || st === 'interrupted') this.ui.soundHint.textContent = t('🔇 The browser paused the sound - click anywhere to resume');
+      if (st === 'suspended' || st === 'interrupted') this.ui.soundHint.textContent = t('The browser paused the sound. Click anywhere to resume.');
       if (this.settings.showFps) { this.fpsEl.textContent = Math.round(this.frames / this.fpsT) + ' fps · ' + (this.engine.sceneStats?.calls ?? 0) + ' dc · ' + Math.round((this.engine.sceneStats?.tris ?? 0) / 1000) + 'k tris'; this.fpsEl.style.display = ''; }
       else this.fpsEl.style.display = 'none';
       this.frames = 0; this.fpsT = 0;

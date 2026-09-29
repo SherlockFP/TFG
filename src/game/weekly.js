@@ -125,7 +125,7 @@ export function installWeekly(game) {
     if (!game.isHost) return 'Only the host can start the Weekly Challenge.';
     if (r.weekly) return 'This run is already a Weekly Challenge.';
     if (r.phase !== 'orbit') return 'Start it from orbit.';
-    if ((r.day || 1) !== 1 || (r.quotaIndex || 0) !== 0 || (r.sold || 0) !== 0) return 'Only a fresh run (day 1, nothing sold) can become a Weekly Challenge. Get fired or use a new save slot.';
+    if ((r.day || 1) !== 1 || (r.quotaIndex || 0) !== 0 || (r.sold || 0) !== 0) return 'Only a fresh run (day 1, nothing sold) can become a Weekly Challenge. Get deplatformed or use a new save slot.';
     return '';
   }
   /** Host: turn the current fresh run into this week's challenge. */

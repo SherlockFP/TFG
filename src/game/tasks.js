@@ -337,7 +337,7 @@ export function installTasks(game) {
     const p = ensureWardrobeProfile(game.profile);
     p.fun.tasks += 1;
     game.progress?.save?.();
-    if (s) game.ui?.toast?.(`✔ ${TASK_TYPES[s.type].name} — ${counts(me()).d}/${counts(me()).n}`, 'good');
+    if (s) game.ui?.toast?.(`✔ ${TASK_TYPES[s.type].name} - ${counts(me()).d}/${counts(me()).n}`, 'good');
     fx(game.audio, 'fun_ok', { volume: 0.7 });
     game.mods?.emit('tfg:taskDone', s, game);
   }

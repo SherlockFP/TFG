@@ -49,7 +49,7 @@ export const SERVERFARM = {
   },
   lamps: { corridor: 'fluorescent', every: 3, color: C_COLD, flicker: 0.1 },
   lampColor: C_COLD,
-  posters: ['sign_aisle', 'sign_danger', 'poster_work', 'poster_fish', 'poster_like'],
+  posters: ['sign_aisle', 'sign_danger', 'poster_work', 'poster_fish', 'poster_like', 'poster_delete', 'poster_grave'],
   landmarks: ['server_rack_prop', 'crac_unit', 'generator'],
   doorProp: 'door_single',
   corridorPipes: true,
