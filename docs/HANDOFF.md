@@ -59,7 +59,7 @@ Identity (binding, see `docs/MASTERPLAN.md` §21):
   - Ready-made but mostly **never-run** feature scripts: `tools/harness/wave4_*.js`.
 - **Never `rm -rf node_modules`** (worktrees symlink the shared one). Never `pkill` by a pattern that matches your own shell.
 
-## 6. Multi-agent workflow that worked
+## 6. Multi-agent workflow that worked (scripts + sub-agent rules are in `tools/lead/`, see its README)
 
 1. Lead adds `[import:X]`/`[slot:X]` placeholders to `game.js`, commits and pushes **before** spawning agents; agents must branch from the **current** HEAD.
 2. Spawn Sonnet agents with `isolation: worktree`, one module each, a shared rules file (module pattern, net prefix, i18n, UI style, budget, doc + AGENTS/CRITIQUE entry, commit but don't push).

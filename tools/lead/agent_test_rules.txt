@@ -1,0 +1,6 @@
+UPDATE from lead: the owner now wants you to TEST your work in the real game too (budget rule relaxed a bit). After your node tests + build pass:
+- Start your own dev server from YOUR worktree on your port: `npx vite --port PORT --strictPort > /tmp/vite-PORT.log 2>&1 &` and remember its PID (kill only that PID later; never pkill by pattern).
+- Run 1-3 short headless checks: `flock /tmp/tfg-browser.lock node tools/harness/headless.mjs --port PORT --script <your_script.js> --shot <out.png> --wait 4000` (script = body of an async fn; window.kefal.game exists; see tools/harness/smoke_land.js / wave2_*.js for examples). Exercise your feature programmatically (spawn/trigger it, call your module API, check for pageerrors, return key numbers). Look at the screenshot with the Read tool to sanity-check visuals.
+- Also run tools/harness/smoke_land.js once to prove nothing else broke. Zero new pageerrors required.
+- Save the script as tools/harness/wave4_<module>.js, commit it. Keep runs short; don't loop endlessly.
+- OWNER UPDATE: keep playtests SHORT and FAST. Max 2 headless runs total, each under ~2 minutes, no long loops/waiting. Prefer node tests. The browser lock is shared by ~18 agents — hold it as briefly as possible (never hold it while thinking/editing).
