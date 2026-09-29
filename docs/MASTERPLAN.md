@@ -566,3 +566,92 @@ Ayrıntı ve ölçümler: `docs/wave3/worlds2.md` §4. Yeni bir zorluk sistemi e
 | **worlds2** | Sovyet binaları/brutalist blok biyomu + baskın olayları, Star Wars esintili gezegen (çöl ikiz güneş, kum/uzay yaratıkları, cantina karakolu) + **ışın kılıcı**, gezegen yaratıkları dışarıdan (yörüngeden/iniş) görünsün, **loot sayısını azalt + zaman baskısı + gün geçtikçe zorlaşma** |
 | **shipyard** | §13 Starter Pod → modüller, gemi parçaları, özelleştirme, çok daha büyük gemi seçenekleri |
 | **backrooms2** | Yarım kalan noclip cep boyutu + Backrooms yaratıkları + liminal görseller (WIP branch'ler: `worktree-wf_fa5fa8a1-dc0-2`, `-3`) |
+
+---
+
+## 21. OYUNUN KİMLİĞİ (2026-09-29, wave 5'ten itibaren bağlayıcı)
+
+### 21.1 Tek cümle
+**TFG, seni izleyip sana göre değişen bir yapay zekânın (The Algorithm) canlı yayınında hayatta kalmaya çalışan bir şirket ekibinin co-op korku/ganimet oyunudur.**
+
+Oyuncuya 10 saniyede anlatılan hâli: *"Arkadaşlarınla gezegenlere inip loot topluyorsun. Ama dünyayı bir yapay zekâ yönetiyor, seni izliyor, alışkanlıklarını öğreniyor ve her gün oyunu sana karşı yeniden yazıyor."*
+
+### 21.2 Üç sütun (her yeni özellik en az birine hizmet etmeli, yoksa eklenmez)
+1. **İzlenen olmak** — Algoritma her şeyi görür, yorum yapar, oyunu değiştirir. Oyunun "kötü adamı" bir yaratık değil, oyunun kendisi.
+2. **Birlikte panik** — co-op iletişim, birbirini kurtarma, birlikte gülünecek anlar (ölüm, glitch, sahte dolap). Solo da oynanır ama asıl tat ekiple.
+3. **Risk → ganimet** — ne kadar derine/riskli gidersen o kadar iyi loot; eve dönüş (extraction) her zaman gerilimli.
+
+### 21.3 Ton
+Kurumsal korku + kara mizah. Şirket seni harcanabilir personel olarak görür, Algoritma seni içerik olarak görür. Korku gerçek ama oyun kendini fazla ciddiye almaz (sahte chat, "Employee of the Month", absürt görevler).
+
+### 21.4 Görsel kimlik
+PSX/düşük poligon + "şirket ekipmanı" arayüzü (docs/wave4/ui2.md): sert köşeler, uyarı şeritleri, dar kondanse font, terminal yeşili ve tehlike sarısı. Algoritma'nın kendi görsel dili: glitch, magenta/cyan, "LIVE" yayın bandı. Emoji yok, yumuşak cam kartlar yok.
+
+### 21.5 Oyun döngüsü (katmanlar, sırayla açılır)
+- **Dakika:** keşfet → loot → sesle/ışıkla hayatta kal → gemiye dön.
+- **Gün:** Algoritma'nın sabah kuralları → iniş → çıkış → gün özeti (case file).
+- **Hafta (kota):** sat → kotayı tut → gemiyi/ekipmanı geliştir → sektör bossu.
+- **Uzun vade:** gemi/ev gezegeni, rol ağacı, kozmetik, Algoritma'nın hikâyesi (Şirket mi, Algoritma mı?).
+
+---
+
+## 22. DÜRÜST DURUM DEĞERLENDİRMESİ — neler kötü, neden, nasıl düzelir
+
+| # | Sorun | Neden kötü | Çözüm |
+|---|---|---|---|
+| 1 | **Kimlik bulanık** (LC + Satisfactory + CoC + RE + Backrooms + Pokémon + Diablo + satranç) | Oyuncu "bu ne oyunu?" diyemez; hiçbir şey derin değil | §21 kimliği; her sistem Algoritma'ya bağlanır ya da kademeli açılan "yan oyuncak" olur |
+| 2 | **Aynı işi yapan sistemler**: 3 kule savunması (siege, homeworld2 dalgaları, ship2 taretleri), 4 labirent üreticisi (maps5, stealth, horror, cycle), 2 yemek sistemi (food + survival) | Bakım zor, oyuncu kafası karışır, denge imkânsız | **Birleştirme dalgası**: tek `defense` çekirdeği, tek `mazegen` kütüphanesi, tek yemek/iyileşme kuralı |
+| 3 | **Para birimi enflasyonu**: kredi, Clout, shard, bileşen, parça stash, sezon XP, ticket | Ödüller anlamsızlaşır | 2 ana birim: **Kredi** (ekip, run içi) + **Clout** (kişisel, kalıcı). Shard/bileşen = craft malzemesi (para değil) |
+| 4 | **Neredeyse hiçbir şey elle oynanmadı**; 2 kişi gerçek WebRTC testi yok | Co-op oyunda en büyük risk ağ; denge sayıları tahmin | Wave 5'in ilk işi toplu tarayıcı testi (tools/harness/wave4_*.js) + 2 kişi gerçek oturum |
+| 5 | **Başlangıç ağır**: tutorial + ipuçları + günlük ödül + sezon + görevler + pet + forge + 50 komut aynı anda | Yeni oyuncu boğulur, ilk 10 dakikada bırakır | **Kademeli açılım** (§23.1): ilk saat sadece iniş-loot-sat-kota; diğerleri Algoritma "yeni oyuncak" diye sunar |
+| 6 | **Gemi içi karışık/buglu** (çok modül aynı gemiye eşya koydu) | Oyunun "evi" kötü görünüyor | Opus ajanı: tek otorite `shiplayout.js`, çakışma testi, ekran görüntüsüyle doğrulama (wave 5, öncelikli) |
+| 7 | **UI yarım yenilendi** (sadece menü/HUD/envanter/roller) | Paneller arası tutarsızlık, bazı yazılar üst üste | Kalan panelleri ui2 temel sınıflarına geçir; 1280x720 ekran görüntüsü turu |
+| 8 | **Performans**: Sector Core ~600 draw call, iniş başına GPU geometri sayısı büyüyor (sızıntı şüphesi) | Zayıf PC'de takılma, uzun oturumda çökme | dispose denetimi (her modülün mapUnloaded temizliği), statik prop birleştirme, LOD |
+| 9 | **Algoritma sığ**: şu an ipucu sesi + birkaç event | En özgün fikrimiz boşa gidiyor | §23.2 fikirleri: Algoritma oyuncuyu öğrenir ve oyunu yeniden yazar |
+| 10 | **Taklit hissi** (LC çakması) | Özgünlük yok | LC mekaniklerinin üstüne Algoritma katmanı + seyirci/yayın mekaniği + oyuncu oylaması; LC'de olmayan şeyleri öne çıkar |
+
+---
+
+## 23. ÖZGÜN FİKİRLER (öncelik sırasıyla)
+
+### 23.1 Kademeli açılım — "Algoritma'nın oyuncakları"
+Sistemler kilitli başlar; Algoritma belli anlarda "sana yeni bir oyuncak verdim" diye açar (kota 1: forge, kota 2: pet + voyage, kota 3: homeworld fabrika, ilk boss sonrası: gate'ler...). Her açılış kısa bir tanıtım + mini görev. Hem boğulma biter hem sürekli yeni şey hissi olur. *Mevcut `guide` modülü + `progression` üstüne kurulur.*
+
+### 23.2 Algoritma seni öğrenir (adaptif direktör)
+Oyuncu davranışı kaydedilir (hangi koridor, ne sıklıkla koşuyor, nerede ölüyor, hangi silah, gizli mi gürültülü mü). Algoritma buna göre bir sonraki günü ayarlar ve **bunu söyler**: *"Hep sol koridordan gidiyorsun. Oraya bir şey koydum."* Karşı-oyun: oyuncular bilerek alışkanlık değiştirip Algoritma'yı kandırabilir. *Mevcut director + stealth noise + facility variety üstüne.*
+
+### 23.3 Canlı yayın / seyirci puanı
+Ekip her iniş "canlı yayında". Sahte sohbet akar (Türkçe/İngilizce/Rusça, kara mizah). Riskli-eğlenceli hareketler (boss'a çıplak elle girmek, 1 HP ile kaçmak, sahte dolabı çalıp kaçmak) **izleyici** kazandırır → izleyici = bonus loot/Clout, ama çok izleyici = Algoritma daha çok "şov" ister (zorluk artar). *Mevcut LIVE bandı + daily + cosm5 emote'ları.*
+
+### 23.4 Sabah oylaması
+Her gün Algoritma 3 kural önerir ("ışıklar kapalı", "yerçekimi yarım", "yaratıklar sessiz ama hızlı", "tüm loot iki kat ama kapı 1 dk'da kapanır"); ekip oylar. Kaybeden kural ertesi güne "borç" olarak kalır. *Mevcut anomaly/mutator altyapısı.*
+
+### 23.5 Ölüm bilgi olur — "hayalet tekrarı"
+Ölen oyuncunun son 10 saniyesi ertesi gün aynı yerde yarı saydam tekrar oynar; o bölgede yaratıklar toplanır ama ölünün düşürdüğü loot da oradadır. Ölüm = sonraki tur için harita ipucu.
+
+### 23.6 Glitch'ler oyuncunun silahı
+Maplarda Algoritma hataları: duvardan geçme noktası, eşya kopyalama rafı, yaratığı donduran piksel. Kullanmak güçlü ama her kullanım "yama sayacını" artırır; dolunca Algoritma yamalar ve bir ceza eventi yollar. Risk/ödül + Algoritma kimliği.
+
+### 23.7 Taraf seçimi — Şirket mi, Algoritma mı?
+Görev tahtası iki taraftan iş verir. Şirket işleri güvenli/az para; Algoritma işleri garip/çok para ama sadakat ister. Taraf puanı hikâyeyi, açılan yaratıkları, kozmetikleri ve **sonu** belirler (3 son: Şirketin sadık elemanı / Algoritma'nın avatarı / ikisini de kandıran kaçak).
+
+### 23.8 Ekip rolleri iletişimi zorlasın
+Bazı günler Algoritma rollere kısıt verir: "Navigatör haritayı görür ama silah tutamaz", "Taşıyıcı karanlıkta görür ama konuşamaz (sadece ping)". Co-op iletişimi mekaniğe dönüşür.
+
+### 23.9 Algoritma'nın kendi yaratıkları "içerik trendi"
+Oyuncular en çok hangi yaratıktan kaçıyorsa Algoritma onu "trend" yapar: haftalık trend yaratık daha sık, daha güçlü ama daha değerli drop. Topluluk (hub) genelinde paylaşılabilir.
+
+---
+
+## 24. WAVE 5 PROGRAMI (sıra bağlayıcı; yeni büyük özellik yok, önce sağlamlık)
+
+1. **Gemi içi (Opus, başladı)** — docs/wave5/ship_interior.md.
+2. **Toplu tarayıcı testi + bug fix** — tools/harness/wave4_*.js hepsini koş, hataları düzelt; smoke_land 900 s timeout.
+3. **2 kişi gerçek oturum** — WebRTC üstünden 30 dk; hostmig, social, trade, arcade RPS, survival sandık, ship2 tamir.
+4. **Birleştirme** — tek defense çekirdeği, tek mazegen, tek yemek kuralı, 2 para birimi (§22 #2-3).
+5. **Kademeli açılım** (§23.1) + başlangıcın sadeleşmesi.
+6. **UI turu** — kalan panelleri ui2'ye geçir; checkup'ın listelediği üst üste binmeler.
+7. **Performans** — sızıntı + draw call.
+8. Ancak bunlardan sonra: §23.2 adaptif Algoritma → §23.3 canlı yayın → §23.4 sabah oylaması.
+
+Model politikası aynı (§6): Sonnet varsayılan, ağ/AI/çekirdek işlerde Opus; playtest kısa ve toplu (tek tarayıcı kuyruğu, 4 çekirdek).
