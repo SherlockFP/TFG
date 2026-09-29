@@ -244,7 +244,7 @@ import { installCosm5 } from './cosm5.js';   // wave 4: cosmetics drop (suits/ha
 // [import:mapmods]
 // [import:worlds3]
 // [import:crdirector]
-// [import:facjobs]
+import { installFacjobs } from './facjobs.js';
 
 
 
@@ -513,7 +513,7 @@ export class Game extends Emitter {
     // [slot:mapmods]
     // [slot:worlds3]
     // [slot:crdirector]
-    // [slot:facjobs]
+    this.useModule('facjobs', installFacjobs);
 
 
 
@@ -810,7 +810,7 @@ export class Game extends Emitter {
       this.world.outdoor = outdoor; this.world.terrain = outdoor.terrain;
       this.scene.add(outdoor.group);
       this.world.mapGroup = outdoor.group;
-      const layout = generateLayout(run.seed, moon.interior, moon.size, moon.layoutOpts);   // [cycle] Sector Core / Raid / Keystone moons carry layoutOpts
+      const layout = generateLayout(run.seed, moon.interior, moon.size, moon.layoutOpts || this.facjobs?.layoutOpts?.(moon, run) || undefined);   // [cycle] Sector Core / Raid / Keystone moons carry layoutOpts
       const fac = buildFacility(layout, { physics: this.physics, lightPool: this.lights });
       this.world.facility = fac;
       this.env.interiorFog = fac.atmosphere || null;   // per-theme indoor haze (backrooms yellow, sewer green, server farm blue)
