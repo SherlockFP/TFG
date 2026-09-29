@@ -929,7 +929,7 @@ function findSite(B, info, slot, n, sites) {
       if (Math.abs(x) > lim || Math.abs(z) > lim) continue;
       if (B.avoid(x, z, info.radius + 4)) continue;
       if (sites.some((s) => Math.hypot(s.x - x, s.z - z) < s.radius + info.radius + 22)) continue;
-      if (!B.clearAt(x, z, info.core, scale)) continue;
+      if (!B.clearAt(x, z, pass === 0 ? info.radius : info.core, scale)) continue;   // [geomfix] first pass: the whole footprint (radio mast / lander legs sit outside the core)
       if (groundDrop(B.terrain, x, z, info.core) > info.maxDrop) continue;
       return { x, z };
     }
@@ -953,7 +953,7 @@ export function buildOutposts(ctx) {
     // true when no existing obstacle (radius scaled by `scale`) is within r of (x, z)
     clearAt(x, z, r, scale = 1) {
       for (let i = 0; i < obstacles.length; i += 4) {
-        const dx = obstacles[i] - x, dz = obstacles[i + 1] - z, rr = r + obstacles[i + 2] * scale;
+        const dx = obstacles[i] - x, dz = obstacles[i + 1] - z, rr = r + (obstacles[i + 2] === INST_R ? Math.max(obstacles[i + 2] * scale, obstacles[i + 3]) : obstacles[i + 2] * scale);   // [geomfix] rocks / trees keep their real footprint on the relaxed pass (outposts grew through rocks)
         if (dx * dx + dz * dz < rr * rr) return false;
       }
       return true;

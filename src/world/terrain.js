@@ -392,7 +392,17 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
   const sc = terrain.scale || 1, sc2 = sc * sc;
   const ownMats = [];   // tinted material clones owned by this moon
 
+  const footprints = [];   // [geomfix] every solid box of the map (x, y, z, hx, hy, hz, rotY) so scatter passes can test "is this spot inside something"
+  const solidAt = (x, z, r = 0, y = null) => {
+    for (const [bx, by, bz, hx, hy, hz, rot] of footprints) {
+      if (hy < 0.2 || (y != null && (by + hy < y + 0.2 || by - hy > y + 1.6))) continue;
+      const dx = x - bx, dz = z - bz, cs = Math.cos(rot), sn = Math.sin(rot);
+      if (Math.abs(dx * cs - dz * sn) < hx + r && Math.abs(dx * sn + dz * cs) < hz + r) return true;
+    }
+    return false;
+  };
   const addBox = (x, y, z, sx, sy, sz, rotY = 0, data = null) => {
+    footprints.push([x, y, z, sx / 2, sy / 2, sz / 2, +rotY || 0]);
     const c = physics.addStaticBox(x, y, z, sx / 2, sy / 2, sz / 2, rotY, G.STATIC, data || { kind: 'prop' });
     colliders.push(c);
     return c;
@@ -406,7 +416,7 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
     obj.updateMatrixWorld(true);
     for (const c of obj.userData.colliders || []) {
       const cp = new THREE.Vector3(...c.c).applyMatrix4(obj.matrixWorld);
-      addBox(cp.x, cp.y, cp.z, c.s[0], c.s[1], c.s[2], rotY);
+      addBox(cp.x, cp.y, cp.z, c.s[0], c.s[1], c.s[2], rotY, { kind: 'prop', id });
     }
     for (const l of obj.userData.lights || []) {
       const p = new THREE.Vector3(...l.p).applyMatrix4(obj.matrixWorld);
@@ -508,7 +518,9 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
   for (let k = 0; k < Math.round(90 * sc2); k++) {
     const x = rng.float(-140, 140) * sc, z = rng.float(-140, 140) * sc;
     if (avoid(x, z, -4)) continue;
-    rocks.push({ x, y: terrain.heightAt(x, z) - 0.2, z, rot: rng.float(0, 6.28), scale: rng.float(0.6, 1.6), variant: rng.int(0, 2) });
+    const rk = { x, y: terrain.heightAt(x, z) - 0.2, z, rot: rng.float(0, 6.28), scale: rng.float(0.6, 1.6), variant: rng.int(0, 2) };
+    if (terrain.distToPath(x, z) < 0.9 + 1.8 * rk.scale) continue;   // [geomfix] a big rock never sits in the walking lane
+    rocks.push(rk);
   }
   const rockTint = b.rockTint != null && b.decor ? b.rockTint : null;
   instanceProps(rng.chance(0.5) ? 'rock_big' : 'rock_small', rocks.slice(0, Math.round(45 * sc2)), group, rockTint, ownMats);
@@ -565,12 +577,14 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
   const nPoi = Math.round((10 + Math.round((moon.size || 1) * 6)) * sc);
   const outdoorScrapSpots = [];
   for (const s of (decor?.scrapSpots || []).slice(0, 2)) outdoorScrapSpots.push({ x: s.x, z: s.z });
+  const poiAt = [];
   for (let k = 0; k < nPoi; k++) {
     const id = rng.pick(poi);
     for (let t = 0; t < 10; t++) {
       const x = rng.float(-120, 120) * sc, z = rng.float(-120, 120) * sc;
-      if (avoid(x, z, 2)) continue;
-      placeStatic(id, x, z, rng.float(0, 6.28));
+      if (avoid(x, z, 2) || poiAt.some((q) => Math.hypot(q.x - x, q.z - z) < 4.2)) continue;   // [geomfix] POI props keep a gap between each other
+      if (rocks.some((q) => Math.hypot(q.x - x, q.z - z) < 1.2 + 3 * q.scale) || trees.some((q) => Math.hypot(q.x - x, q.z - z) < (treeIsRock ? 1.2 + 3 * q.scale : 3))) continue;   // [geomfix] POI junk never spawns inside a rock / trunk
+      placeStatic(id, x, z, rng.float(0, 6.28)); poiAt.push({ x, z });
       if (rng.chance(0.4)) outdoorScrapSpots.push({ x: x + rng.float(-3, 3), z: z + rng.float(-3, 3) });
       break;
     }
@@ -600,7 +614,7 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
     entranceObj: entObj,
     outposts,
     decor,
-    landmarks, harvest, avoid, ownMats, voyage,
+    landmarks, harvest, avoid, solidAt, ownMats, voyage,
     // per-frame visuals of the biome decor (glitch cubes, pulsing grid, fires, blinking racks); cheap when idle
     update(dt, game) { decor?.update(dt, game); landmarks?.update(dt, game); voyage?.update(dt); },
     dispose(physicsRef) {

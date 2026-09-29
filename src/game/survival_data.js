@@ -103,6 +103,17 @@ export const BIOME_PLANTS = {
 export const plantTable = (biome) => BIOME_PLANTS[biome] || BIOME_PLANTS.hills;
 
 /** Seeded plant scatter. o = { scale (terrain scale), avoid(x, z, margin) -> bool, heightAt(x, z) -> y, count }. Same seed -> same list on every peer. */
+/** placement guard for wild plants on a built outdoor map: the map's own avoid() + never inside a rock / trunk ([geomfix]; harvest lists carry x, z, scale, kind) */
+export function plantAvoid(out) {
+  return (x, z, m) => {
+    try {
+      if (out.avoid?.(x, z, m) || out.solidAt?.(x, z, 0.25, out.terrain?.heightAt?.(x, z))) return true;
+      const h = out.harvest;
+      return !!h && (h.rocks.some((q) => Math.hypot(q.x - x, q.z - z) < 1.8 * q.scale + 0.3) || h.trees.some((q) => Math.hypot(q.x - x, q.z - z) < (q.kind === 'rock' ? 1.8 : 0.6) * q.scale + 0.3));
+    } catch { return false; }
+  };
+}
+
 export function planPlants(seed, biome, o = {}) {
   const tbl = plantTable(biome);
   const entries = Object.entries(tbl).map(([k, w]) => ({ k, w }));

@@ -342,7 +342,7 @@ export function installSurvival(game) {
     try {
       list = D.planPlants(world.seed | 0, moon.biome, {
         scale: terrain?.scale || 1,
-        avoid: (x, z, m) => { try { return !!out.avoid?.(x, z, m); } catch { return false; } },
+        avoid: D.plantAvoid(out),
         heightAt: (x, z) => (terrain?.heightAt ? terrain.heightAt(x, z) - 0.02 : 0),
       });
     } catch (e) { console.warn('[survival] plan', e); return; }
