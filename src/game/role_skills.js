@@ -14,13 +14,14 @@ import { hudDock } from '../ui/dock.js';
 import { createMiniTurretMesh } from '../models/combat_wave2.js';
 import { clamp, fin3, arr3, synth, sin, ex, nz, hex } from './combat_kit.js';
 
+// [ux] wave 3: every active skill 300 s (5 min); Revive Pulse 600 s (10 min).
 export const ROLE_SKILLS = {
-  scout: [{ id: 'dash', name: 'Dash', cd: 9, desc: 'A quick burst of speed in the direction you move.' }, { id: 'sonar', name: 'Sonar Pulse', cd: 25, desc: 'Marks every creature within 35 m through walls for 6 s.' }],
-  hauler: [{ id: 'slam', name: 'Ground Slam', cd: 14, desc: 'Shockwave: 5 m, damages and staggers what is around you.' }, { id: 'lift', name: 'Adrenaline Lift', cd: 40, desc: 'For 8 s heavy loads do not slow you and you run 12% faster.' }],
-  technician: [{ id: 'turret', name: 'Mini-Turret', cd: 45, desc: 'Deploys a turret for 25 s that shoots the nearest creature (noisy).' }, { id: 'overclock', name: 'Overclock', cd: 30, desc: 'For 8 s lockpick, fuse and safe panels open instantly.' }],
-  medic: [{ id: 'beam', name: 'Heal Beam', cd: 8, desc: 'Heals the crewmate you look at (or yourself) by ~35 HP.' }, { id: 'revive', name: 'Revive Pulse', cd: 120, desc: 'Heals crew within 10 m and revives one dead crewmate lying near you.' }],
-  occultist: [{ id: 'surge', name: 'Mana Surge', cd: 45, desc: 'Restores 60 mana (Blood Magic: heals 40 HP instead).' }, { id: 'link', name: 'Soul Link', cd: 40, desc: 'For 10 s damage taken by you or linked crewmates within 14 m is shared.' }],
-  enforcer: [{ id: 'charge', name: 'Charge', cd: 12, desc: 'Rush forward, staggering and hitting everything in your path.' }, { id: 'cry', name: 'War Cry', cd: 30, desc: 'Staggers every creature within 8 m. Very loud.' }],
+  scout: [{ id: 'dash', name: 'Dash', cd: 300, desc: 'A quick burst of speed in the direction you move.' }, { id: 'sonar', name: 'Sonar Pulse', cd: 300, desc: 'Marks every creature within 35 m through walls for 6 s.' }],
+  hauler: [{ id: 'slam', name: 'Ground Slam', cd: 300, desc: 'Shockwave: 5 m, damages and staggers what is around you.' }, { id: 'lift', name: 'Adrenaline Lift', cd: 300, desc: 'For 8 s heavy loads do not slow you and you run 12% faster.' }],
+  technician: [{ id: 'turret', name: 'Mini-Turret', cd: 300, desc: 'Deploys a turret for 25 s that shoots the nearest creature (noisy).' }, { id: 'overclock', name: 'Overclock', cd: 300, desc: 'For 8 s lockpick, fuse and safe panels open instantly.' }],
+  medic: [{ id: 'beam', name: 'Heal Beam', cd: 300, desc: 'Heals the crewmate you look at (or yourself) by ~35 HP.' }, { id: 'revive', name: 'Revive Pulse', cd: 600, desc: 'Heals crew within 10 m and revives one dead crewmate lying near you.' }],
+  occultist: [{ id: 'surge', name: 'Mana Surge', cd: 300, desc: 'Restores 60 mana (Blood Magic: heals 40 HP instead).' }, { id: 'link', name: 'Soul Link', cd: 300, desc: 'For 10 s damage taken by you or linked crewmates within 14 m is shared.' }],
+  enforcer: [{ id: 'charge', name: 'Charge', cd: 300, desc: 'Rush forward, staggering and hitting everything in your path.' }, { id: 'cry', name: 'War Cry', cd: 300, desc: 'Staggers every creature within 8 m. Very loud.' }],
 };
 const COLORS = { scout: 0x4fd8ff, hauler: 0xff6bb0, technician: 0x5b8cff, medic: 0x55f08a, occultist: 0xb06bff, enforcer: 0xff4d3d };
 
@@ -327,7 +328,7 @@ export function installRoleSkills(g, K) {
     switch (d?.op) {
       case 'slam': {
         const p = fin3(d.p);
-        if (!p || !near(p, 5) || !rateOk(from, 'slam', 4)) return;
+        if (!p || !near(p, 5) || !rateOk(from, 'slam', 100)) return;
         const m = clamp(Number(d.mul) || 1, 0.5, 2.5);
         for (const { c } of K.creaturesIn(p, 5, { los: true })) {
           K.hurt(c, 24 * m, from, { stun: 1.2 });
@@ -339,7 +340,7 @@ export function installRoleSkills(g, K) {
         return;
       }
       case 'charge': {
-        if (!rateOk(from, 'charge', 4)) return;
+        if (!rateOk(from, 'charge', 100)) return;
         const dir = fin3(d.d), m = clamp(Number(d.mul) || 1, 0.5, 2.5);
         for (const id of (Array.isArray(d.ids) ? d.ids : []).slice(0, 8)) {
           const c = g.creatures.host.get(id);
@@ -351,14 +352,14 @@ export function installRoleSkills(g, K) {
       }
       case 'cry': {
         const p = fin3(d.p);
-        if (!p || !near(p, 5) || !rateOk(from, 'cry', 10)) return;
+        if (!p || !near(p, 5) || !rateOk(from, 'cry', 100)) return;
         for (const { c } of K.creaturesIn(p, 8, { los: false })) K.stun(c, c.def?.boss ? 1.0 : 1.5, from);
         g.creatures.noise(p, 3.5);
         return;
       }
       case 'turret': {
         const p = fin3(d.p);
-        if (!p || !near(p, 6) || !rateOk(from, 'turret', 10)) return;
+        if (!p || !near(p, 6) || !rateOk(from, 'turret', 100)) return;
         const mine = [...hostTurrets.entries()].filter(([, v]) => v.owner === from);
         if (mine.length >= 2) { const [oid] = mine[0]; hostTurrets.delete(oid); K.fx('turretoff', { id: oid }); }
         const id = 'mt' + (turretN++);
@@ -374,7 +375,7 @@ export function installRoleSkills(g, K) {
       }
       case 'revive': {
         const p = fin3(d.p), amt = clamp(Number(d.amt) || 35, 0, 60);
-        if (!p || !near(p, 5) || !rateOk(from, 'revive', 45)) return;
+        if (!p || !near(p, 5) || !rateOk(from, 'revive', 290)) return;
         K.fx('pulse', { p: arr3(p), by: from, amt });
         // one dead crewmate whose body lies within 12 m
         let best = null, bd = 12;
@@ -394,7 +395,7 @@ export function installRoleSkills(g, K) {
         return;
       }
       case 'link': {
-        if (!rateOk(from, 'link', 15)) return;
+        if (!rateOk(from, 'link', 100)) return;
         const ids = (Array.isArray(d.ids) ? d.ids : []).filter((id) => typeof id === 'string' && g.remotes.has(id)).slice(0, 3);
         if (!ids.length) return;
         hostLinks.set(from, { members: new Set([from, ...ids]), until: g.time + 10 });

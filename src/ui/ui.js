@@ -46,6 +46,21 @@ export class UI {
     this.root.appendChild(this.menuEl);
     this.overlay = el('div', { class: 'overlay hidden' });
     this.root.appendChild(this.overlay);
+    // [ux] panels use vector / pixel icons: strip emoji from panel text (also for content that re-renders itself later)
+    try {
+      const EM = '[\\u{1F300}-\\u{1FAFF}\\u{26A0}\\u{26A1}\\u{2705}\\u{274C}\\u{2764}\\u{2B50}\\u{FE0F}]';
+      const EMOJI = new RegExp(EM + '\\s?', 'gu'), HAS = new RegExp(EM, 'u');
+      const fix = (n) => { const v = n.nodeValue; if (v && HAS.test(v)) { const r = v.replace(EMOJI, ''); if (r.trim()) n.nodeValue = r; } };
+      const strip = (node) => {
+        if (!node) return;
+        if (node.nodeType === 3) { fix(node); return; }
+        if (node.nodeType !== 1) return;
+        const w = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+        for (let n = w.nextNode(); n; n = w.nextNode()) fix(n);
+      };
+      this._emojiObs = new MutationObserver((muts) => { for (const m of muts) for (const n of m.addedNodes) strip(n); });
+      this._emojiObs.observe(this.overlay, { childList: true, subtree: true });
+    } catch { /* optional */ }
     this.chatEl = el('div', { class: 'chat hidden' }, el('div', { class: 'chat-log' }), el('input', { class: 'chat-in hidden', maxlength: 200, placeholder: t('Say something... (Enter)') }));
     this.root.appendChild(this.chatEl);
     this.chatLog = this.chatEl.querySelector('.chat-log');

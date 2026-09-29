@@ -118,3 +118,5 @@ check bubble size / font, leg look when crouching, elbow direction of the IK arm
 
 ## Food & drinks (wave 2, module `food`)
 Added optional buffs + social fun (cheers, cake, table, booze). Unverified in a browser: first-person eat arcs, blur overlay, table / machine placement. Booze courage only touches STATIC; no chat bubbles exist to slur yet.
+
+- [ux wave 3] Not browser-verified: unified panel CSS may still miss panels with very specific injected styles; ship hull door opening, emote camera and new suit geometry were only node/build checked.

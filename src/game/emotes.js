@@ -80,7 +80,7 @@ export class EmoteSystem {
     this.t = 0;
     this.wheelOpen = false;
     this.wheelAng = 0; this.wheelMag = 0; this.hover = -1;
-    this.camYaw = 0; this.camPitch = 0.25; this.camDist = 3.1;
+    this.camYaw = 0; this.camPitch = 0.25; this.camDist = 2.7;
     this.buildWheel();
     this.avatar = null;
     this.music = null;
@@ -124,7 +124,7 @@ export class EmoteSystem {
     this.current = def; this.t = 0;
     g.emote = emoteNetId(def);
     g.emoteT = g.time + def.dur;
-    this.camYaw = g.player.yaw + Math.PI; this.camPitch = 0.22;
+    this.camYaw = g.player.yaw; this.camPitch = 0.2;   // [ux] start BEHIND the player (over the shoulder), not a front selfie
     this.music?.stop(0.3); this.music = null;
     if (def.music) this.music = g.audio.play(def.music, { follow: this.ensureAvatar().root, loop: true, volume: 0.5, refDistance: 3, maxDistance: 35 });
     g.audio.ui('ui_confirm', 0.35);
@@ -197,10 +197,12 @@ export class EmoteSystem {
     const g = this.game, p = g.player;
     const head = new THREE.Vector3(p.pos.x, p.pos.y + 1.45, p.pos.z);
     const dir = new THREE.Vector3(Math.sin(this.camYaw) * Math.cos(this.camPitch), Math.sin(this.camPitch), Math.cos(this.camYaw) * Math.cos(this.camPitch));
-    const hit = g.physics.raycast(head, dir, this.camDist, G.STATIC | G.DOOR);
+    // [ux] over-the-shoulder: pivot shifted to the camera's right so the player sits left of centre
+    const pivot = head.clone().add(new THREE.Vector3(Math.cos(this.camYaw) * 0.42, 0.08, -Math.sin(this.camYaw) * 0.42));
+    const hit = g.physics.raycast(pivot, dir, this.camDist, G.STATIC | G.DOOR);
     const d = hit ? Math.max(0.4, hit.distance - 0.25) : this.camDist;
-    g.camera.position.copy(head).addScaledVector(dir, d);
-    g.camera.lookAt(head);
+    g.camera.position.copy(pivot).addScaledVector(dir, d);
+    g.camera.lookAt(pivot);
     this.thirdPerson = true;
   }
 

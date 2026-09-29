@@ -51,6 +51,7 @@ export class Input {
       if (!this.locked) { this.down.clear(); this.mouseButtons.clear(); }
       this.onLockChange?.(this.locked);
     });
+    document.addEventListener('pointerlockerror', () => { this.onLockFail?.(); });   // [ux] browser refused (ESC cooldown): main shows click-to-resume
   }
   isTyping() {
     const a = document.activeElement;
@@ -60,8 +61,8 @@ export class Input {
     if (this.locked) return;
     try {
       const p = this.canvas.requestPointerLock({ unadjustedMovement: true });
-      if (p && p.catch) p.catch(() => { try { this.canvas.requestPointerLock(); } catch { /* ignore */ } });
-    } catch { try { this.canvas.requestPointerLock(); } catch { /* ignore */ } }
+      if (p && p.catch) p.catch(() => { try { const q = this.canvas.requestPointerLock(); if (q && q.catch) q.catch(() => this.onLockFail?.()); } catch { this.onLockFail?.(); } });
+    } catch { try { this.canvas.requestPointerLock(); } catch { this.onLockFail?.(); } }   // [ux]
   }
   unlock() { if (document.pointerLockElement) document.exitPointerLock(); }
   key(action) { return this.settings.keys[action] || action; }

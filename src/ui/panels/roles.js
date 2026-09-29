@@ -21,24 +21,26 @@ const CSS = `
 .rl{width:min(1180px,96vw);max-height:92vh;display:flex;flex-direction:column;background:linear-gradient(180deg,rgba(14,9,4,.98),rgba(6,4,2,.98));
  border:1px solid var(--amber-dim,#a8531f);box-shadow:0 0 60px rgba(0,0,0,.9),inset 0 0 80px rgba(255,120,40,.06);padding:14px 20px 12px;position:relative;overflow:hidden;font-family:var(--font,'VT323',monospace);color:var(--text,#ffd9b8)}
 .rl::before{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 1px,transparent 1px 3px);mix-blend-mode:multiply}
-.rl-head{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
+.rl-head{display:flex;align-items:baseline;gap:4px 16px;flex-wrap:wrap;line-height:1.25}
 .rl-title{font-family:var(--font2,monospace);font-size:20px;color:var(--amber,#ff8a3d);letter-spacing:3px;text-shadow:0 0 12px rgba(255,138,61,.45)}
 .rl-sub{opacity:.75;font-size:19px}
 .rl-warn{margin:8px 0 0;padding:4px 10px;border-left:3px solid #ff6b5a;background:rgba(255,80,60,.08);color:#ffb0a4;font-size:19px}
-.rl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0;overflow:auto;min-height:0;padding:2px}
-.rl-card{position:relative;display:flex;flex-direction:column;gap:6px;padding:12px 14px 12px;border:1px solid rgba(255,138,61,.25);background:linear-gradient(160deg,rgba(0,0,0,.35),rgba(0,0,0,.6));cursor:pointer;transition:transform .12s,box-shadow .15s,border-color .15s;overflow:hidden}
+.rl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));grid-auto-rows:min-content;align-items:start;gap:12px;margin:12px 0;overflow:auto;min-height:0;padding:2px}/* [ux] responsive, no squashed rows */
+.rl-card{position:relative;display:flex;flex-direction:column;gap:6px;padding:12px 14px 12px;border:1px solid rgba(255,138,61,.25);background:linear-gradient(160deg,rgba(0,0,0,.35),rgba(0,0,0,.6));cursor:pointer;transition:transform .12s,box-shadow .15s,border-color .15s;overflow:visible;min-width:0;height:auto}
+.rl-card>*{position:relative;z-index:1;flex:0 0 auto;min-width:0;overflow-wrap:anywhere}
 .rl-card::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 90% at 0% 0%,var(--rc) 0%,transparent 55%);opacity:.13}
 .rl-card:hover{transform:translateY(-2px);border-color:var(--rc);box-shadow:0 0 22px color-mix(in srgb,var(--rc) 40%,transparent)}
 .rl-card.cur{border-color:var(--rc);box-shadow:0 0 26px color-mix(in srgb,var(--rc) 55%,transparent),inset 0 0 30px color-mix(in srgb,var(--rc) 12%,transparent)}
 .rl-card.cur::after{opacity:.24}
 .rl-top{display:flex;align-items:center;gap:12px}
-.rl-name{font-family:var(--font2,monospace);font-size:15px;letter-spacing:2px;color:var(--rc);text-shadow:0 0 10px color-mix(in srgb,var(--rc) 60%,transparent)}
-.rl-tag{font-size:19px;opacity:.85;color:#fff0dc}
-.rl-desc{font-size:18px;opacity:.78;line-height:1.05;min-height:38px}
-.rl-stats{font-size:19px;line-height:1.05}
+.rl-top canvas{flex:0 0 auto}
+.rl-name{font-family:var(--font2,monospace);font-size:15px;line-height:1.3;letter-spacing:2px;color:var(--rc);text-shadow:0 0 10px color-mix(in srgb,var(--rc) 60%,transparent)}
+.rl-tag{font-size:19px;line-height:1.2;opacity:.85;color:#fff0dc}
+.rl-desc{font-size:18px;opacity:.78;line-height:1.25}
+.rl-stats{font-size:19px;line-height:1.2}
 .rl-good{color:#8dff8d}.rl-bad{color:#ff6b5a}
-.rl-apt{font-size:18px;line-height:1.05;color:#ffe08a;opacity:.95}
-.rl-kit{font-size:17px;opacity:.85;border-top:1px dashed rgba(255,138,61,.25);padding-top:5px;margin-top:2px}
+.rl-apt{font-size:18px;line-height:1.25;color:#ffe08a;opacity:.95}
+.rl-kit{font-size:17px;line-height:1.25;opacity:.85;border-top:1px dashed rgba(255,138,61,.25);padding-top:5px;margin-top:2px}
 .rl-kit b{color:#ffe08a;font-weight:normal}
 .rl-btn{font-family:var(--font,monospace);font-size:21px;color:var(--rc);background:rgba(0,0,0,.35);border:1px solid var(--rc);padding:2px 12px;cursor:pointer;align-self:flex-start;margin-top:2px}
 .rl-btn:hover{background:var(--rc);color:#120904}
@@ -48,8 +50,7 @@ const CSS = `
 .rl-msg{font-size:19px;min-height:22px}
 .rl-close{font-family:var(--font,monospace);font-size:21px;color:var(--amber,#ff8a3d);background:rgba(255,138,61,.08);border:1px solid var(--amber-dim,#a8531f);padding:2px 16px;cursor:pointer}
 .rl-close:hover{background:var(--amber,#ff8a3d);color:#150a02}
-@media (max-width:980px){.rl-grid{grid-template-columns:repeat(2,1fr)}}
-@media (max-width:640px){.rl-grid{grid-template-columns:1fr}.rl{padding:10px 12px}}
+@media (max-width:640px){.rl{padding:10px 12px}}
 `;
 function ensureStyle() {
   if (typeof document === 'undefined' || document.getElementById(STYLE_ID)) return;

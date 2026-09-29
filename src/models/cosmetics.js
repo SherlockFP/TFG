@@ -12,6 +12,7 @@
 //   redraw(), tinterRefresh(), getHat() }
 import * as THREE from 'three';
 import { G, xf, merged, lam, bas, tex, mk, pv, cached, clamp, lerp, TAU, PI } from './modelkit.js';
+import { W3_OUTFITS, W3_BUILDERS } from './cosmetics_wave3.js';   // [ux] wave-3 suits
 
 // ------------------------------------------------------------------ registry
 /** @typedef {{id:string,name:string,tier:string,color:string,desc:string,how:string}} OutfitDef */
@@ -29,6 +30,7 @@ export const OUTFITS = [
   { id: 'goldemp', name: 'Gold Employee', tier: 'legendary', color: '#d6a51f', desc: 'Employee of the Month, forever.', how: 'Get the "Employee of the Month" achievement' },
   { id: 'venom', name: 'Venom Symbiote', tier: 'mythic', color: '#0a0a10', desc: 'We are Venom. Glossy black, a white spider on the chest and a few restless tendrils.', how: 'Bring a Symbiote Sample home, or kill 50 creatures' },
 ];
+OUTFITS.push(...W3_OUTFITS);   // [ux]
 export const OUTFIT_BY_ID = Object.fromEntries(OUTFITS.map((o) => [o.id, o]));
 
 export const FACE_ACCS = [
@@ -680,6 +682,8 @@ const BACK_BUILDERS = {
     });
   },
 };
+
+Object.assign(BUILDERS, W3_BUILDERS);   // [ux]
 
 /** { tint, map, emissive, glove } of an outfit (first-person sleeves use it) */
 export function outfitLook(id) {

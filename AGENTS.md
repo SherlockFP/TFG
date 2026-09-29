@@ -317,6 +317,9 @@ Also: the tool grip offset in `refreshHeldVisuals` had the wrong sign (weapons e
 Secured containers in facilities (glass case, wall / floor safe, cage / locker, electronic lockbox, vault crate) opened with Glass Cutter / Breaching Drill (Payday-style jam + noise) / Bolt Cutters / Hack Tool / Plasma Torch / lockpick / crowbar / EMP / Code Slip, each with a loud crude melee fallback. Pure rules `src/game/secureloot_core.js` + `node tools/harness/secureloot.test.mjs`; net `slAct` / `slSt`. NOT hand-played; `tools/harness/wave2_secureloot.js` written, not run.
 + Homeworld tycoon (module `homeworld`, docs/wave2/homeworld.md): moon HOME (terminal `ROUTE HOME`), build mode ([E] console / [H]), per-game-day economy, power/cooling limits, away-raid sim + HUD; node test `tools/harness/homeworld.test.mjs` PASS (26), build OK, NOT browser-tested; shared-file hooks marked `[hw]` in game.js / host.js.
 
+### 5.15 Wave 3 - UX batch (docs/wave3/ux.md; build + node tests only, NOT browser-verified)
+Unified panel CSS + emoji strip, roles panel layout, pointer-lock re-capture fallback, no FP hands in menu, behind-the-shoulder emote camera, per-weapon melee grips, ship hull door opening, 12 new suits, role skill cooldowns 300 s / revive 600 s (no passive HP regen exists - verified).
+
 ### 5.5 Smoke test (paste in the browser console on `?autohost=local&code=T1&name=Tester`, after ~4 s)
 ```js
 const g = kefal.game, errs = []; addEventListener('error', e => errs.push(e.message));
