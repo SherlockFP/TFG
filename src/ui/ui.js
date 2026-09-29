@@ -23,6 +23,7 @@ import { profilePanel, applyProfileName } from './panels/profile.js';   // [prof
 import { NAME_REASONS, NAME_MAX } from '../core/profilename.js';   // [profile]
 import { avatarCanvas, avatarDataUrl, fromWire, defaultAvatar } from './avatarpic.js';   // [profile]
 import { avatarOfPeer } from '../game/profilesync.js';   // [profile]
+import { soundPackSection } from './soundpack_ui.js';   // [sfx] Settings > Audio > Sound pack
 
 // [profile] tiny avatar icon (16x16 thumbnail) for chat / lists
 const avIcon = (av, px = 16) => { const c = avatarCanvas(av, px, { thumb: true }); c.style.marginRight = '4px'; return c; };
@@ -755,6 +756,7 @@ export class UI {
         };
         tick();
         body.append(el('div', { class: 'dim note' }, t('No sound? 1) Press Test sound and watch the bar. If the bar moves but you hear nothing, the sound is going to another device: pick your headphones above or in Windows sound settings. 2) Bluetooth headsets switch to "hands-free" when a mic is in use: choose "Headset (Hands-Free)" as output, or turn voice chat to listen-only.')));
+        body.append(...soundPackSection(this, audio, section));   // [sfx] custom sound pack
       } else if (tab === 'Voice') {
         const mode = el('select', { 'data-nav': 'set:vmode' }, el('option', { value: 'open', selected: s.voiceMode === 'open' }, t('Open mic')), el('option', { value: 'ptt', selected: s.voiceMode === 'ptt' }, t('Push to talk') + ` [${prettyKey(s.keys.ptt)}]`));
         mode.addEventListener('change', () => { s.voiceMode = mode.value; apply(); });

@@ -101,6 +101,7 @@ import { installForge } from './forge.js';
 
 
 import { installMusic } from './music.js';
+import { installSfx } from './sfx.js';   // wave 4: creature voices + footsteps + biome beds (docs/wave4/sfx.md)
 
 
 // [import:gameplay2]
@@ -269,6 +270,7 @@ export class Game extends Emitter {
 
 
     this.useModule('music', installMusic);
+    this.useModule('sfx', installSfx);   // [sfx]
 
 
     // [slot:gameplay2]
