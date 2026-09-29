@@ -8,6 +8,7 @@ import * as THREE from 'three';
 import { createAvatar, SUIT_COLORS } from '../models/avatar.js';
 import { baseTitleOf } from '../game/achievements.js';
 import { EMOTES, EMOTE_BY_ID, applyEmoteFx, isEmoteUnlocked } from '../game/emotes.js';
+import { skinClock } from '../render/weaponskins.js';   // [cosm5] weapon-skin preview time
 import { el } from '../core/util.js';
 import { t } from '../core/i18n.js';
 
@@ -74,6 +75,14 @@ export class CharPreview {
     this.canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); this.ok = false; }, false);
     this.canvas.addEventListener('webglcontextrestored', () => { this.ok = true; this.kick(); }, false);
     this.ok = true;
+  }
+
+  /** [cosm5] show a prop (e.g. a skinned weapon) on the turntable instead of the avatar; null brings the avatar back */
+  setProp(obj) {
+    if (this.prop) { this.holder?.remove(this.prop); this.prop = null; }
+    if (obj && this.holder) { this.prop = obj; this.holder.add(obj); }
+    if (this.avatar) this.avatar.root.visible = !this.prop;
+    this.kick();
   }
 
   bindDrag() {
@@ -163,6 +172,7 @@ export class CharPreview {
     root.position.set(0, 0, 0);
     root.rotation.set(0, 0, 0);
     this.holder.rotation.y = this.yaw;
+    if (this.prop) skinClock.value = time;   // [cosm5]
     const def = this.emote;
     if (def) {
       this.emoteT += dt;

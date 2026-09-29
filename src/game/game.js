@@ -192,7 +192,7 @@ import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs
 // [import:maps5]
 
 
-// [import:cosm5]
+import { installCosm5 } from './cosm5.js';   // wave 4: cosmetics drop (suits/hats/backs/weapon skins/emotes; docs/wave4/cosm5.md)
 
 
 // [import:checkup]
@@ -420,7 +420,7 @@ export class Game extends Emitter {
     // [slot:maps5]
 
 
-    // [slot:cosm5]
+    this.useModule('cosm5', installCosm5);   // [slot:cosm5]
 
 
     // [slot:checkup]
