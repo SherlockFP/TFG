@@ -6,4 +6,6 @@ Loop rule: 2-3 Sonnet agents at a time (1 browser/QA agent max) → merge with t
 
 | # | Batch | Result |
 |---|---|---|
-| 1 | perf4 (landing hitch + oscillator warnings), QA night1 (fall check + wave 8 screenshots + fixes), econ8 (economy pass + museum doors) | running |
+| 1 | perf4 (landing hitch + oscillator warnings) | merged 8b6fdd6: landing built by a sliced job queue (`game.landQ`, report via `landQ.report()`), shader prewarm, oscillator freq clamp. Unmeasured in browser. |
+| 1 | QA night1, econ8 | running |
+| 2 | feedcams2 (core verb depth, Opus architect — owner: run it like a studio, Opus when needed, mostly Sonnet) | running |
