@@ -75,13 +75,13 @@ import { installFun } from './fun.js';
 import { installBackroomsLevels } from './brlevels.js';
 
 
-// [import:backrooms]
+import { installBackrooms } from './backrooms.js';
 
 
-// [import:brcreatures]
+import { installBackroomsCreatures } from './creatures_backrooms.js';
 
 
-// [import:liminal]
+import { installLiminal } from './liminal.js';
 
 
 import { installCombat } from './combat.js';   // wave 2: melee combos / parry, new weapons, spells, role skills
@@ -242,13 +242,13 @@ export class Game extends Emitter {
     this.useModule('brlevels', installBackroomsLevels);
 
 
-    // [slot:backrooms]
+    this.useModule('backrooms', installBackrooms);
 
 
-    // [slot:brcreatures]
+    this.useModule('brcreatures', installBackroomsCreatures);
 
 
-    // [slot:liminal]
+    this.useModule('liminal', installLiminal);
 
 
     this.useModule('combat', installCombat);

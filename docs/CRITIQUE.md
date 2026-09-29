@@ -118,3 +118,6 @@ check bubble size / font, leg look when crouching, elbow direction of the IK arm
 
 ## Food & drinks (wave 2, module `food`)
 Added optional buffs + social fun (cheers, cake, table, booze). Unverified in a browser: first-person eat arcs, blur overlay, table / machine placement. Booze courage only touches STATIC; no chat bubbles exist to slur yet.
+
+## Wave 3 - backrooms2
+Noclip pocket + Backrooms entities + liminal overlay/photos are integrated but were only node-tested this round (browser budget): look at the VHS caption on small screens, the polaroid scenes, hug/struggle flow with two players, and the pocket hunt pacing (240 s warn, weighted Smiler / Hound / Partygoer) before calling it done.

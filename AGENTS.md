@@ -391,7 +391,7 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
 `docs/THEME.md` TFG naming bible · `docs/BUGS.md` verified bug list · `docs/AUDIO_AUDIT.md` deferred audio issues ·
 `docs/CRITIQUE.md` honest critique + plan · `CREDITS.md` asset licenses · `README.md` player-facing readme ·
 `docs/REVIEW_WAVE1.md` reviewer report for the wave-1 merge (scores, dead stats, HUD collisions, top-10 fixes; run `tools/harness/wave1_day.js` first, it was written but not executed) ·
-`docs/wave1/*.md` per-module notes · `docs/wave2/*.md` wave-2 modules (anomaly, forge, skeletons).
+`docs/wave1/*.md` per-module notes · `docs/wave2/*.md` wave-2 modules (anomaly, forge, skeletons).  `docs/wave3/*.md` wave-3 modules (backrooms2).
 
 ### 5.14 Session handoff (2026-09-28 night, lead) — READ THIS FIRST
 - Branch `claude/focused-hawking-32j4um` (pushed) holds everything merged; **`main` (live on Render) was NOT updated** —
@@ -415,3 +415,7 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
   2 real players. First job next session: `npm run dev`, play 15 min, run `tools/harness/smoke_land.js` + `tools/harness/mp2.mjs`,
   fix crashes, then merge to `main`.
 - Gotcha learned: never `rm -rf node_modules` inside a worktree whose node_modules is a symlink (it wiped the shared install once).
+
+### 5.15 Wave 3 - BACKROOMS2 (modules `backrooms`, `brcreatures`, `liminal`; docs/wave3/backrooms2.md; node-tested + builds, NOT run in a browser)
+- Finished the interrupted noclip pocket realm + entities (Smiler / Pale Hound / Partygoer / Moth) and merged them with the Level 0 overhaul (`brlevels`); slots `backrooms`, `brcreatures`, `liminal` are now installed in `game.js`.
+- New: `game.liminal` (VHS found-footage overlay in the pocket and in backrooms facilities, procedural 5-scene polaroid painter for `br_polaroid`), RU strings (`src/game/br_i18n_ru.js`), weighted pocket hunters. Tests: `tools/harness/br_pocket.test.mjs`, `br_i18n.test.mjs`.
