@@ -32,7 +32,7 @@ export const INTERIOR_NAMES = {
 };
 const BASE_INTERIORS = new Set(['factory', 'mansion', 'mineshaft']);
 const INTERIOR_W = { factory: 9, mansion: 7, mineshaft: 6, office: 8, backrooms: 8, serverfarm: 8, sewer: 7, hospital: 7 };
-const BIOME_INTERIOR_BONUS = {
+export const BIOME_INTERIOR_BONUS = {
   datascape: { serverfarm: 12, backrooms: 9 }, servermarsh: { sewer: 13, serverfarm: 6 }, ashfield: { factory: 8, serverfarm: 7, hospital: 4 },
   crystal: { mineshaft: 12, backrooms: 5 }, snow: { mansion: 6, hospital: 6 }, desert: { mineshaft: 10, office: 3 },
   moor: { mansion: 9, hospital: 6 }, blackforest: { mansion: 6, backrooms: 6 }, swamp: { sewer: 9, factory: 3 }, hills: { office: 7, factory: 4 },
@@ -64,7 +64,7 @@ const NOUNS = [
 ];
 const ADJ = ['Abandoned', 'Dead', 'Forgotten', 'Corrupted', 'Archived', 'Orphaned', 'Cursed', 'Deleted', 'Unindexed', 'Haunted', 'Legacy',
   'Broken', 'Quarantined', 'Shadowbanned', 'Deprecated', 'Paywalled', 'Unmoderated', 'Hacked', 'Mirrored', 'Lost', 'Leaked', 'Rotting', 'Silent', 'Throttled'];
-const BIOME_ADJ = {
+export const BIOME_ADJ = {
   datascape: ['Glitched', 'Corrupted', 'Neon', 'Recursive', 'Fragmented'], servermarsh: ['Flooded', 'Waterlogged', 'Sunken', 'Drowned', 'Leaking'],
   ashfield: ['Burnt', 'Scorched', 'Melted', 'Overheated', 'Charred'], crystal: ['Cached', 'Crystal', 'Compressed', 'Prismatic', 'Frozen'],
   snow: ['Frozen', 'Cold', 'Snowed-In'], desert: ['Sunbaked', 'Dusty', 'Buried'], swamp: ['Soggy', 'Sunken', 'Rotting'],
@@ -78,7 +78,7 @@ const SECTOR_NAMES = ['Deadnet Reach', 'The Lost Tabs', 'Broken Link Belt', 'Cac
   'Packet Graveyard', 'The Deep Feed', 'Ping Abyss', 'Bitrot Nebula', '404 Cluster', 'Dial Tone Void', 'The Cookie Jar', 'Spam Belt',
   'Timeout Rift', 'Lag Spike Ridge', 'The Comment Section', 'Beta Wasteland', 'Captcha Fields'];
 
-const BIOME_DESC = {
+export const BIOME_DESC = {
   datascape: ['A corrupted datascape: neon wireframe ground and floating glitch blocks.', 'The terrain renders wrong here. Neon grid everywhere, monoliths humming.'],
   servermarsh: ['Server racks rot in knee-deep flood water. The fans still spin.', 'A flooded server marsh. Mist, dead trees and blinking LEDs under the surface.'],
   ashfield: ['A burnt-out data center field. Ash still falls, fires still smoulder.', 'Everything overheated at once. Charred racks under a copper sky.'],
@@ -127,7 +127,7 @@ function round10(v) { return Math.round(v / 10) * 10; }
 
 // ------------------------------------------------------------------ stats
 const TIER_COST = [0, 0, 160, 420, 780, 1150, 1600];
-const WEATHER_POOL = {
+export const WEATHER_POOL = {
   datascape: ['clear', 'foggy', 'stormy', 'eclipsed'], servermarsh: ['rainy', 'rainy', 'foggy', 'stormy', 'clear'],
   ashfield: ['clear', 'foggy', 'stormy', 'eclipsed'], crystal: ['clear', 'clear', 'foggy', 'eclipsed'],
   hills: ['clear', 'clear', 'rainy', 'foggy'], swamp: ['rainy', 'rainy', 'foggy', 'clear', 'stormy'], snow: ['clear', 'foggy', 'stormy', 'eclipsed'],
@@ -204,6 +204,11 @@ export function generateSector(runKey, index) {
   sectorCache.set(key, sector);
   if (sectorCache.size > 6) sectorCache.delete(sectorCache.keys().next().value);
   return sector;
+}
+
+/** [voyage] one moon from a free-form key (random voyages, uncharted signals): the sector generator with no registry side effects. */
+export function generateMoonFromKey(key, { biome, tier, index = 0, safe = false, deep = false }) {
+  return generateMoon({ runKey: key, index, k: 0, biome, tier, usedNames: new Set(), safe, deep });
 }
 
 function generateMoon({ runKey, index, k, biome, tier, usedNames, safe, deep }) {

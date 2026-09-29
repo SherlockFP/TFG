@@ -197,3 +197,4 @@ Risks: readability of the laser / crusher telegraphs and the panel text, closet 
 ## Wave 4 - survival (foraging / farming / cooking / storage)
 Proven by node tests only (recipe + quality maths, growth timing, storage transfer + persistence, hunger drain, host handlers on a stub game); nothing was seen in a browser. Risks: stove / crate / planter default positions next to shipyard rooms, the drag-and-drop panel at 1280x720, plant models and glow, cooking needle feel (zones 50 / 72 / 86 %), whether hunger + warmth stay unannoying, heal balance of a perfect 3-ingredient stew (~80 HP) against the medkit. Left out: ship2 / homeworld2 planters (API only), seed shop, plants in facilities, secure-crate lock.
 
+- Wave 4 voyage: the macro layer exists (random moons, signals, warp, 9 jobs, 7 set pieces) but was never seen in a browser: check set-piece scale, decor density, marker readability and NPC escorts (they ignore prop colliders); the mission board is terminal-only.

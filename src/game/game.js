@@ -187,6 +187,9 @@ import { installHorror } from './horror.js';   // wave 4: pay-to-arm traps, outb
 import { installSurvival } from './survival.js';   // wave 4: foraging, farming, cooking, brewing, storage crates, hunger (docs/wave4/survival.md)
 
 
+import { installVoyage } from './voyage.js';   // wave 4: random moons, signals, warp events, missions, set pieces (docs/wave4/voyage.md)
+
+
 // [import:ux]
 import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
 
@@ -230,7 +233,6 @@ import { installCosm5 } from './cosm5.js';   // wave 4: cosmetics drop (suits/ha
 
 
 
-// [import:voyage]
 import { installGuide } from './guide.js';   // wave 4: Algorithm advisor + first-landing tutorial (docs/wave4/guide.md)
 
 import { installDaily } from './daily.js';   // wave 4: login calendar, daily/weekly challenges, crates, season track (docs/wave4/daily.md)
@@ -431,6 +433,9 @@ export class Game extends Emitter {
     this.useModule('survival', installSurvival);   // [survival]
 
 
+    this.useModule('voyage', installVoyage);   // [voyage]
+
+
     // [slot:ux]
     this.useModule('hostmig', installHostMig);
 
@@ -474,7 +479,6 @@ export class Game extends Emitter {
 
 
 
-    // [slot:voyage]
     this.useModule('guide', installGuide);   // [guide] installed last: wraps the terminal / ALGO command of the modules above
 
     this.useModule('daily', installDaily);

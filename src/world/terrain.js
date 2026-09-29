@@ -14,6 +14,8 @@ import './biomes_wave1.js';   // registers the lava / ice / jungle biomes (BIOME
 import './worlds2_biomes.js';   // wave 3: registers the Soviet panel district + twin-sun desert (BIOMES, fixed moons, decor builders)
 import * as FACILITY from './facility.js';
 import { setInteriorProbe } from '../game/moongen.js';
+import { voyageFlats } from '../game/voyage_core.js';   // wave 4 voyage: flat zones for set pieces / mission sites (pure)
+import { buildVoyageWorld } from './voyage_world.js';   // wave 4 voyage: set pieces + mission structures + the 8 voyage biome decors
 
 export const TERRAIN_SIZE = 320;   // base map size; generated big moons scale it (moon.mapScale, up to 1.5x)
 const RES = 100; // cells per side at scale 1 (cell size stays ~3.2 m at every scale)
@@ -74,7 +76,8 @@ export function planMoon(seed, moon) {
       }
     }
   }
-  return { entrance, entranceYaw: Math.atan2(-entrance.x, -entrance.z), fires, ponds, lakes, biome, scale: sc };
+  const flats = voyageFlats(seed, moon, { entrance, fires, ponds, lakes, scale: sc });   // [] unless the moon has voyage content / an active mission
+  return { entrance, entranceYaw: Math.atan2(-entrance.x, -entrance.z), fires, ponds, lakes, biome, scale: sc, flats };
 }
 
 export class Terrain {
@@ -234,6 +237,7 @@ export class Terrain {
       f.y = f.y ?? dryY(n.fbm(f.x * 0.012, f.z * 0.012, 4) * b.height * 0.5);
       flat(f.x, f.z, 5, 8, f.y);
     }
+    for (const f of this.plan.flats || []) { f.y = f.y ?? dryY(n.fbm(f.x * 0.012, f.z * 0.012, 4) * b.height * 0.5); flat(f.x, f.z, f.r, f.fall, f.y); }   // voyage set pieces
     for (const p of this.plan.ponds) {
       const d = Math.hypot(x - p.x, z - p.z);
       p.y = p.y ?? n.fbm(p.x * 0.012, p.z * 0.012, 4) * b.height * 0.5;
@@ -471,9 +475,13 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
     return false;
   };
   // wave 1 landmarks (towers, ruins, parkour, billboards) reserve their footprint before trees / rocks / outposts are placed
-  try { landmarkSites = planLandmarks({ seed, moon, plan, terrain, avoid: avoidBase }); } catch (err) { console.warn('landmark plan', err); landmarkSites = []; }
+  const flatAvoid = (x, z, m = 0) => (plan.flats || []).some((f) => Math.hypot(x - f.x, z - f.z) < f.r + 4 + m);   // wave 4 voyage: landmarks keep off the set piece / mission zones
+  try { landmarkSites = planLandmarks({ seed, moon, plan, terrain, avoid: (x, z, m = 0) => avoidBase(x, z, m) || flatAvoid(x, z, m) }); } catch (err) { console.warn('landmark plan', err); landmarkSites = []; }
   const reserved = [];   // wave 3 (worlds2): footprints reserved by biome decor (Soviet blocks, cantina outpost) so props / outposts keep off them
   const avoid = (x, z, m = 0) => avoidBase(x, z, m) || landmarkSites.some((st) => siteBlocks(st, x, z, m)) || reserved.some((st) => siteBlocks(st, x, z, m));
+  // wave 4 voyage: set piece of a voyage moon + structures of the active mission (reserves its footprint before trees / rocks / props are placed)
+  let voyage = null;
+  try { voyage = buildVoyageWorld({ seed, moon, plan, terrain, group, addBox, emitters, colliders, avoid, reserved }); } catch (err) { console.warn('voyage world', err); voyage = null; }
   const treeId = b.trees;
   const trees = [];
   if (treeId) {
@@ -584,14 +592,15 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
     entranceObj: entObj,
     outposts,
     decor,
-    landmarks, harvest, avoid, ownMats,
+    landmarks, harvest, avoid, ownMats, voyage,
     // per-frame visuals of the biome decor (glitch cubes, pulsing grid, fires, blinking racks); cheap when idle
-    update(dt, game) { decor?.update(dt, game); landmarks?.update(dt, game); },
+    update(dt, game) { decor?.update(dt, game); landmarks?.update(dt, game); voyage?.update(dt); },
     dispose(physicsRef) {
       for (const c of colliders) physicsRef.removeCollider(c);
       for (const em of emitters) lightPool.remove(em);
       outposts?.dispose(physicsRef);
       landmarks?.dispose();
+      voyage?.dispose();
       decor?.dispose();
       group.traverse((o) => { if (o.geometry && o.isMesh && !o.isInstancedMesh) o.geometry.dispose(); });
       for (const m of ownMats) m.dispose();
