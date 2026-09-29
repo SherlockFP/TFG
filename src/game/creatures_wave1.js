@@ -256,11 +256,17 @@ export function zombotBehavior(c, dt, M) {
   if (!d.init) {
     d.init = 1; track(c);
     d.think = rnd() * 0.4; d.spd = 0.85 + rnd() * 0.35; d.doorT = rnd() * 0.4;
+    d.crawler = rnd() < 0.12;   // born crippled: crawls (slower, low pose); any zombie below 35% hp turns into one too
     // a single zombie from the generic outdoor spawn calls its pack
     if (!d.grouped) { d.grouped = true; const n = 2 + ((rnd() * 3) | 0); for (let k = 0; k < n; k++) spawnZombot(M, V.set(c.pos.x + (rnd() - 0.5) * 5, c.pos.y, c.pos.z + (rnd() - 0.5) * 5).clone(), { level: c.level, zone: c.zone }); }
     if (d.wave) c.setState('run');
   }
   if (c.age < 0.85) return;   // digging out of the ground
+  // get-up pose after a stun (the generic stun timer already set 'idle': play 'getup' for 0.9 s first)
+  // (behaviours are skipped while stunned; a finished stun leaves stunT at a fresh negative remainder, which is the cue)
+  if (c.stunT < 0 && c.stunT !== d.stunSig) { d.stunSig = c.stunT; if (c.state === 'idle') c.setState('getup'); }
+  if (c.state === 'getup') { if (c.t < 0.9) return; c.setState('idle'); }
+  if (!d.crawler && c.maxHp && c.hp < c.maxHp * 0.35) d.crawler = true;
   const list = swarmList(M);
   // target selection (throttled)
   d.think -= dt;
@@ -275,7 +281,7 @@ export function zombotBehavior(c, dt, M) {
   }
   // groans: one voice at a time across the whole swarm
   if (now >= s.nextGroan && tgt && rnd() < dt * 3) { s.nextGroan = now + 0.7 + rnd() * 1.1; M.sound(c, ['voice_zombie_grunt', 'voice_zombie_anger', 'scuttler_hiss'], 0.55, 3, 0.75 + rnd() * 0.45, 34); }
-  if (c.state === 'attack') {
+  if (c.state === 'attack' || c.state === 'grab') {
     if (!d.hit && c.t >= 0.38) {
       d.hit = true;
       const p = tgt || g.aiPlayerById(c.target);
@@ -308,10 +314,10 @@ export function zombotBehavior(c, dt, M) {
   const dist = tgt.pos.distanceTo(c.pos);
   if (dist < 1.15 && c.cooldown <= 0 && Math.abs(tgt.pos.y - c.pos.y) < 2) {
     c.yaw = Math.atan2(tgt.pos.x - c.pos.x, tgt.pos.z - c.pos.z);
-    c.setState('attack'); d.hit = false; c.cooldown = 1.2;
+    c.setState(rnd() < 0.35 ? 'grab' : 'attack'); d.hit = false; c.cooldown = 1.2;
     return;
   }
-  c.setState('run');
+  c.setState(d.crawler ? 'crawl' : 'run');
   // steering target: flow field indoors (one Dijkstra per hunted player, shared by the swarm), straight line outdoors
   let tx = tgt.pos.x, tz = tgt.pos.z;
   const nav = M.nav(c);
@@ -325,7 +331,7 @@ export function zombotBehavior(c, dt, M) {
   }
   let dx = tx - c.pos.x, dz = tz - c.pos.z;
   const L = Math.hypot(dx, dz) || 1;
-  const sp = c.def.run * d.spd * (d.speedMul || 1);
+  const sp = c.def.run * d.spd * (d.speedMul || 1) * (d.crawler ? 0.5 : 1);
   dx = (dx / L) * sp; dz = (dz / L) * sp;
   // separation (bodies spread out instead of stacking)
   let sx = 0, sz = 0;
