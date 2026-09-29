@@ -18,7 +18,7 @@ import { hudDock } from '../ui/dock.js';
 import { addTranslations, t } from '../core/i18n.js';
 import { isSellable } from './items.js';
 import { scaleFor, lootLuckFor, earlyRules, capHit, ThreatModel, THREAT, LEVELS, levelIndex } from './balance_core.js';
-import { isInstakillOk, modeDmgMul } from './balance_rules.js';
+import { instakillHere, modeDmgMul } from './balance_rules.js';
 import { getMode } from './difficulty.js';
 
 const TICK = 0.25;            // s between host meter steps
@@ -110,7 +110,7 @@ export function installBalance(game) {
     const kind = c?.def?.boss ? 'boss' : c?.def?.hazard ? 'hazard' : 'creature';
     const q = quota();
     if (dmg < 999) dmg = Math.max(1, Math.round(dmg * scale(kind).dmg * (kind === 'creature' ? modeDmgMul(q, getMode()) : 1)));
-    return capHit(dmg, q, kind === 'boss' || isInstakillOk(c?.type, c?.def));   // 45 / 60 / 85 % of 100 HP per hit; telegraphed hazards + bosses uncapped from quota 4
+    return capHit(dmg, q, kind === 'boss' || instakillHere(c?.type, c?.def));   // 45 / 60 / 85 % of 100 HP per hit; telegraphed hazards + bosses uncapped from quota 4
   }
 
   // ------------------------------------------------------------------ noise

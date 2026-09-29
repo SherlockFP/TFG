@@ -1,7 +1,8 @@
 // BALANCE RULES (wave 8 "balance", docs/wave8/balance.md). ONE place for the fairness rules every creature obeys, whichever module registered it.
 //   Pure maths at the top (no THREE / DOM: node-testable, shared with tools/sim), the game glue (installBalanceRules) at the bottom.
 //   1. HIT CAP    a single non-boss hit takes at most 45 % (quota 0-1) / 60 % (2-3) / 85 % (4+) of a 100 HP bar. Only INSTAKILL_OK
-//                 (telegraphed hazards: Pop-up jingle, Worm rumble, Fake Exit, Closet Thing, Clickbait Mine) may kill in one hit, and only from quota 4.
+//                 (telegraphed hazards: Pop-up jingle, Worm rumble, Fake Exit, Closet Thing, Clickbait Mine) may kill in one hit, and only from quota 4 on HARD
+//                 (wave 8: on Casual / Standard 0 HP = DOWNED, game/downed.js, so the allowlist is capped like everything else).
 //   2. WIND-UP    every creature attack lands >= 0.4 s after its attack state began (CreatureManager.attack asks gate()); a target that
 //                 steps away or a creature that gets stunned in that window dodges the hit. Repeat calls inside 0.45 s are swallowed.
 //   3. GRABS      a hold (giant grab, Clickbait tongue) ends by itself after 3.2 s and then grants 4 s of grab immunity; mashing JUMP
@@ -9,7 +10,7 @@
 //   4. SCALING    creatures get +0 % / +0 % / +10 % damage on Casual / Standard / Hard from quota 3 (difficulty.js `dmgMul`).
 //   5. REGISTER   registerCreature() runs normalizeDef(): a non-allowlisted def with dmg > 90 (the old 999 "kills you" number) is clamped to 90.
 import { addTranslations, t } from '../core/i18n.js';
-import { eff } from './difficulty.js';
+import { eff, getMode } from './difficulty.js';
 
 export const RULES = Object.freeze({
   baseHp: 100,
@@ -25,6 +26,8 @@ export const RULES = Object.freeze({
 /** hazards / specials that may be a true one-hit kill (each has a loud, obvious tell), from quota RULES.instakillFrom on */
 export const INSTAKILL_OK = new Set(['jester', 'sandkefal', 'mimicdoor', 'mine', 'hr_ambusher']);
 export const isInstakillOk = (type, def) => INSTAKILL_OK.has(type) || !!def?.instakill;
+/** wave 8 "downed": the allowlist only kills in one hit on Hard (elsewhere 0 HP = down, and these hits are capped like any other) */
+export const instakillHere = (type, def, mode = getMode()) => mode === 'hard' && isInstakillOk(type, def);
 /** max fraction of a 100 HP bar one hit may take at quota index q */
 export function hitCapFrac(q) {
   let f = RULES.capTable[0][1];
