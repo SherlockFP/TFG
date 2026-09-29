@@ -81,3 +81,6 @@ export function glyphify(html, opts) {
 }
 
 export const GLYPH_NAMES = Object.keys(P);
+
+/** artdir: raw path data of a pictogram (24 grid) for SVG compositions / canvas Path2D; '' if unknown. */
+export const glyphPath = (name) => P[name] || '';

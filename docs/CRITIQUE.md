@@ -250,3 +250,6 @@ Role constraint days turn co-op communication into a rule (8 cards, host-validat
 
 ## Wave 6 - mapart (docs/wave6/mapart.md)
 Every outdoor moon now has the same original signature layer (pylons that watch, LIVE panels, drones, glitch scars, ad billboards, crashed pods, camps with journals, tape) plus one landmark per biome family and a horizon silhouette, all seeded and merged (a handful of draw calls, no lights). Judgement: identity and variety come from the family landmarks and the corporate-decay props, which read as TFG rather than LC; the risk is scale / fog (landmarks at 60-108 m sit in dense fog on swamp / forest moons) and that the layer is not yet hand-checked on every generated biome.
+
+## Wave 6 - artdir (docs/wave6/artdir.md)
+The game now has an identity kit (wordmark, seal, the Algorithm's eye; amber = Company, magenta/cyan = Algorithm) and the main menu, panel headers, tabs, tooltips, loading, pause, death and report screens follow it, but it is mostly dressing: the CRT menu text is still small at 720p (2 columns helped), header stamps are decorative and keyed on title text, several panels (trade, homeworld, shipyard, forge) were not re-shot, and the eye only follows a pointer. Whether the stamps and ticker read as charm or clutter after an hour of play is untested.

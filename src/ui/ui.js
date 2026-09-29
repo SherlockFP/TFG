@@ -32,6 +32,7 @@ import { UI as GUIDE_UI, pick as guidePick } from '../game/guide_data.js';   // 
 import { resetTutorial as guideResetTutorial } from '../game/guide_core.js';   // [guide]
 import { x as obx } from '../game/onboard_text.js';   // [onboard] Settings: unlock everything / skip Hiring Day
 import { soundPackSection } from './soundpack_ui.js';   // [sfx] Settings > Audio > Sound pack
+import { syncArtdir } from './artdir.js';   // [artdir] html.tfg-artdir / ad-calm from settings
 
 // [profile] tiny avatar icon (16x16 thumbnail) for chat / lists
 const avIcon = (av, px = 16) => { const c = avatarCanvas(av, px, { thumb: true }); c.style.marginRight = '4px'; return c; };
@@ -106,6 +107,7 @@ export class UI {
   applyUiPrefs() {
     const s = this.app.settings || {};
     this.root.classList.toggle('reduce-motion', !!s.reduceMotion);
+    syncArtdir(s);   // [artdir]
     this.root.classList.toggle('no-cross', s.showCrosshair === false);
     this.root.classList.toggle('no-objectives', s.showObjectives === false);
     peekCharPreview()?.set({ reduceMotion: !!s.reduceMotion });
@@ -831,6 +833,7 @@ export class UI {
         body.append(section(t('General')), row(t('Language'), lang),
           section(t('Comfort')),
           check(t('Reduce motion'), 'reduceMotion', t('less camera shake, bob and screen warp; calmer menus')),
+          check(t('Art direction'), 'artDir', t('Company stamps, memo ticker, animated logo and panel art. Off = plain panels'), true),   // [artdir]
           check(t('Head bob'), 'headBob', null, true),
           check(t('Avatars above name tags'), 'tagAvatars', t("small picture over teammates' heads"), true),   // [profile]
           section(t('HUD')),

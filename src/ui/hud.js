@@ -144,7 +144,7 @@ export class HUD {
       <div class="hud-float"></div>
       <div class="hud-toasts"></div>
       <div class="hud-big hidden"><div class="big-main"></div><div class="big-sub"></div></div>
-      <div class="hud-dead hidden"><div class="dead-main">DECEASED</div><div class="dead-sub"></div><div class="dead-tip"></div></div>
+      <div class="hud-dead hidden"><div class="dead-main">DECEASED</div><div class="dead-sub"></div><div class="dead-tip"></div><div class="dead-stamp ad-only"><b></b><span></span></div></div>
       <div class="hud-spec hidden"></div>
       <div class="hud-voice hidden">${glyph('mic')}</div>
       <div class="hud-dmgdir"></div>
@@ -298,6 +298,8 @@ export class HUD {
     this.root?.classList?.toggle('is-dead', !!dead);
     this.$.deadSub.textContent = text || '';
     this.$.deadTip.textContent = tip ? '▸ ' + tip : '';
+    const st = this.$.dead.querySelector('.dead-stamp');   // [artdir] "TERMINATED - reason" stamp (html.tfg-artdir only)
+    if (st) { st.firstChild.textContent = t('TERMINATED'); st.lastChild.textContent = text || ''; }
     if (!dead) this.$.spec.classList.add('hidden');
   }
   setSpectate(text) {
@@ -513,6 +515,8 @@ export class HUD {
     this.$.health.classList.toggle('crit', hpf < 0.25 && !p.dead);
     this.$.stam.style.width = (p.stamina / p.maxStamina * 100) + '%';
     this.$.stamBox.classList.toggle('exhausted', p.exhausted);
+    this.$.stamBox.classList.toggle('low', p.stamina < p.maxStamina * 0.25 && !p.exhausted);   // [artdir]
+    this.el.classList.toggle('hp-low', hpf < 0.3 && !p.dead);   // [artdir] red edge pulse
     this.$.weight.textContent = Math.round(p.carryWeight ? p.carryWeight() + (game.stats.carryRelief || 0) : 0) + ' lb';
     // clock
     const onMoon = (run.phase === 'moon' || run.phase === 'takeoff') && !p.indoor;

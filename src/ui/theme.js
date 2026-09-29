@@ -6,3 +6,7 @@ import './theme.css';
 import './ui3.css';
 
 if (typeof document !== 'undefined') document.documentElement.classList.add('tfg-ui', 'tfg-ui3');
+// ARTDIR (wave 6): identity layer (logo kit, stamped panel headers, loading / death / report art). Class `tfg-artdir`, docs/wave6/artdir.md.
+import './artdir.css';
+import { initArtdir } from './artdir.js';
+initArtdir();
