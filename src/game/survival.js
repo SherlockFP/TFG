@@ -28,6 +28,7 @@ import * as S from './survival_store.js';
 import * as M from '../models/survival.js';
 import { createCookPanel, createStoragePanel } from '../ui/panels/survival.js';
 import { buildDictionaries } from './survival_i18n.js';
+import { fireCooks, stoveSingle } from './difficulty.js';
 
 HOST_ONLY.add('svfx');
 
@@ -861,6 +862,8 @@ export function installSurvival(game) {
       if (!st) return err(from, 'Get closer to the stove.');
       const items = validIngredients(d.ids, from);
       if (!items) return err(from, 'Those ingredients are gone.');
+      if (st.k === 'fire' && !fireCooks()) return err(from, 'Only the ship stove cooks now.');   // [hardmode] Hard: campfires only warm
+      if (stoveSingle() && st.k === 'stove' && [...F.sessions].some(([who, se]) => who !== from && se.sid === st.id && (performance.now() - se.t0) / 1000 < se.dur * 1.12 + 1.5)) return err(from, 'The stove is busy.');   // [hardmode] one station, one cook at a time
       const dur = D.cookSeconds(items.length, st.k === 'fire' ? 'fire' : 'stove');
       F.sessions.set(from, { ids: items.map((i) => i.id), sid: st.id, kind: st.k, dur, t0: performance.now() });
       return game.net.sendTo(from, 'svfx', { k: 'cookok', to: from, dur });
@@ -883,7 +886,8 @@ export function installSurvival(game) {
       const tier = D.QUAL[q].tier;
       for (const it of items) rmItem(it);
       const at = new THREE.Vector3(st.x + Math.sin(st.yaw || 0) * 0.1, st.y + (st.k === 'stove' ? 1.25 : 0.7), st.z + Math.cos(st.yaw || 0) * 0.1);
-      game.items.hostSpawn(dish.id, at, { tier, value: pack.value, baseValue: pack.baseValue, linvel: [0, 1.5, 0] });
+      const dishId = game.items.hostSpawn(dish.id, at, { tier, value: pack.value, baseValue: pack.baseValue, linvel: [0, 1.5, 0] });
+      game.hardmode?.stamp?.(dishId);   // [hardmode] food ages
       fxAll('cook', at, q);
       xp(from, [1, 2, 4, 8][q], t('Chef'));
       return game.net.sendTo(from, 'svfx', { k: 'cooked', to: from, ty: dish.id, q, p: +p.toFixed(3) });

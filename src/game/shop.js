@@ -16,6 +16,7 @@ import * as THREE from 'three';
 import { ITEMS, STORE_ITEMS, SHIP_UPGRADES } from './items.js';
 import { TIERS, tierColor } from './tiers.js';
 import { RNG, hashString } from '../core/rng.js';
+import { isTrapItem, trapUnitPrice } from './difficulty.js';
 import { addTranslations, t, tf } from '../core/i18n.js';
 import { CRUISER } from '../entities/cruiser.js';
 import { createWeaponContext, installWeapons } from './weapons.js';
@@ -115,6 +116,13 @@ export function dailyQty(run, entries = catalogEntries()) {
   for (const e of entries.slice().sort((a, b) => (a.id < b.id ? -1 : 1))) if (isPremium(e)) out[e.id] = rng.chance(0.85) ? rng.int(1, 3) : 0;
   return out;
 }
+/** [hardmode] trap / turret kits bought today (any kind): every one raises the next kit's price (difficulty.js priceMul) */
+export const trapsBoughtToday = (run) => {
+  const sold = run?.shop && run.shop.d === run.day ? run.shop.sold : null;
+  let n = 0;
+  if (sold) for (const [id, c] of Object.entries(sold)) if (isTrapItem(ITEMS[id])) n += c | 0;
+  return n;
+};
 export const soldToday = (run, id) => (run?.shop && run.shop.d === run.day ? run.shop.sold?.[id] || 0 : 0);
 
 /** Full priced stock for the run: entries + { price, off, deal, eom, qty (null = unlimited), left, soldOut, locked, lockReason }. */
@@ -127,7 +135,9 @@ export function stockFor(run, lore = null) {
       if (deals[e.id]) { off = deals[e.id]; kind = 'deal'; }
       else if (eom?.id === e.id) { off = eom.off; kind = 'eom'; }
     }
-    const price = e.currency === 'clout' ? e.base : Math.max(1, Math.round(e.base * (1 - off)));
+    let price = e.currency === 'clout' ? e.base : Math.max(1, Math.round(e.base * (1 - off)));
+    const priceBase = price;
+    if (e.currency === 'credits' && isTrapItem(e.def)) price = trapUnitPrice(price, trapsBoughtToday(run), 1);   // [hardmode] kit price rises with today's purchases
     const q = qty[e.id] ?? null;
     const left = q == null ? null : Math.max(0, q - soldToday(run, e.id));
     const owned = e.upgradeId ? !!run?.upgrades?.[e.upgradeId] : e.van ? !!run?.cruiser : false;
@@ -138,7 +148,7 @@ export function stockFor(run, lore = null) {
       const need = d.minRep ?? -20;
       if (Number.isFinite(rep) && rep < need) { locked = true; lockReason = `${t('Requires')} ${d.faction} ${need}`; }
     }
-    return { ...e, price, off, dealKind: kind, eomQuote: kind === 'eom' ? eom.quote : '', qty: q, left, soldOut: (left !== null && left <= 0) || owned, owned, locked, lockReason };
+    return { ...e, price, priceBase, off, dealKind: kind, eomQuote: kind === 'eom' ? eom.quote : '', qty: q, left, soldOut: (left !== null && left <= 0) || owned, owned, locked, lockReason };
   });
 }
 
@@ -274,6 +284,7 @@ export function installShop(game) {
     const plan = [];
     let total = 0;
     const taken = new Map();
+    let trapTaken = 0;
     for (const raw of cmd.lines) {
       const e = st.get(String(raw?.id));
       if (!e || e.currency !== 'credits') return fail(t('Not sold here.'));
@@ -283,6 +294,7 @@ export function installShop(game) {
       if (e.left != null) n = Math.min(n, e.left - (taken.get(e.id) || 0));
       if (n <= 0) return fail(tf('{name}: SOLD OUT today.', { name: e.name }));
       let unit = e.price, trade = null;
+      if (isTrapItem(e.def)) { unit = trapUnitPrice(e.priceBase, trapsBoughtToday(run) + trapTaken, n); trapTaken += n; }   // [hardmode] rising kit price within one order too
       if (raw.trade && e.def?.upgradeFrom && e.def.upgradePrice > 0) {
         trade = [...g.items.all()].find((it) => it.type === e.def.upgradeFrom && it.holder === from && !it.affix);
         if (trade) { unit = e.def.upgradePrice; n = 1; }

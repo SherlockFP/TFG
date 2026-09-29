@@ -8,6 +8,7 @@ import { G, groups } from '../physics/physics.js';
 import { clamp, damp, lerp } from '../core/util.js';
 import { itemDef } from '../game/items.js';
 import { slowFactorAt } from '../world/setpieces.js';
+import { weightMul as diffWeightMul } from '../game/difficulty.js';
 import * as FACILITY from '../world/facility.js';
 
 const RADIUS = 0.34;
@@ -227,7 +228,7 @@ export class LocalPlayer {
 
     // weight & speed
     const weight = this.carryWeight();
-    const weightMul = clamp(1 - Math.max(0, weight - 10) / 260, 0.60, 1);
+    const weightMul = diffWeightMul(weight, this.game.run?.quotaIndex | 0);   // [hardmode] was clamp(1 - max(0, weight - 10) / 260, 0.6, 1); Casual / quota 0-2 unchanged (difficulty.js)
     this.weightMul = weightMul;
     const moving = len > 0;
     const bodyCarry = this.carriesBody();

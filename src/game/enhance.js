@@ -3,6 +3,7 @@
 // rollCreatureTier with a ForgeRng (seeded, logged, forceable in tests), so numbers live in ONE place.
 import { TIER_ORDER, TIERS, tierIndex, rollTier } from './tiers.js';
 import { RNG } from '../core/rng.js';
+import { forgeFailFrom, forgeDriveMul } from './difficulty.js';
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 
@@ -23,6 +24,8 @@ export const shardDef = (id) => SHARD_DEFS.find((s) => s.id === id) || null;
 export const SHARD_ALIASES = { shard_crystal: ['comp_crystal'] };
 export const BACKUP_ID = 'forge_backup';
 export const BACKUP_COST = { id: 'shard_crystal', n: 3 };
+/** live cost of a Backup Drive (difficulty.js: x2 shards in Standard from quota 3) */
+export const backupCost = () => ({ id: BACKUP_COST.id, n: Math.ceil(BACKUP_COST.n * forgeDriveMul()) });
 
 /** Shard Exchange: 5 lower shards -> 1 upper shard, up to Legendary (Source Code can never be bought). */
 export const EXCHANGE_N = 5;
@@ -48,7 +51,7 @@ export const PLUS = [
   { lv: 9, chance: 0.20, credits: 450, mat: ['shard_source', 1],  bonus: 0.65 },
 ];
 /** A failed attempt at this level and above drops the item one level (Backup Drive prevents it). */
-export const FAIL_DROP_FROM = 6;
+export const FAIL_DROP_FROM = 6;   // legacy default; the live value comes from difficulty.js (forgeFailFrom: 6 Casual / Standard, 5 Hard from quota 3)
 export const SACRIFICE_BONUS = 0.10;
 
 export const plusBonus = (n) => PLUS[clamp(n | 0, 0, MAX_PLUS)]?.bonus || 0;
@@ -73,7 +76,7 @@ export function enhanceInfo(cur, { backup = false } = {}) {
   if (!row) return null;
   return {
     target, chance: row.chance, credits: row.credits, mat: row.mat.slice(), bonus: row.bonus, from: plusBonus(cur),
-    failDrops: target >= FAIL_DROP_FROM, protect: !!backup && target >= FAIL_DROP_FROM,
+    failDrops: target >= forgeFailFrom(), protect: !!backup && target >= forgeFailFrom(),
     opens: overclockSlots(target) > overclockSlots(cur) ? overclockSlots(target) : 0,
   };
 }
@@ -84,7 +87,7 @@ export function resolveEnhance(cur, roll, { backup = false } = {}) {
   if (!info) return null;
   const ok = roll < info.chance;
   if (ok) return { ok: true, from: cur, to: info.target, chance: info.chance, backupUsed: false, dropped: false };
-  if (info.target < FAIL_DROP_FROM) return { ok: false, from: cur, to: cur, chance: info.chance, backupUsed: false, dropped: false };
+  if (!info.failDrops) return { ok: false, from: cur, to: cur, chance: info.chance, backupUsed: false, dropped: false };
   if (backup) return { ok: false, from: cur, to: cur, chance: info.chance, backupUsed: true, dropped: false };
   return { ok: false, from: cur, to: Math.max(0, cur - 1), chance: info.chance, backupUsed: false, dropped: true };
 }
