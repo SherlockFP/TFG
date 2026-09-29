@@ -568,3 +568,10 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
   (`.menu-frame`, `.cp-head/.cp-sec/.cp-body/.cp-foot`, `.btn*`, `*card*`, `.rl/.pt/.rec/.lb/.crp` roots). New helpers: `src/ui/glyphs.js` (`glyph(name)`, `glyphFromEmoji`), classes `.tfg-plate/.tfg-tag/.tfg-kbd/.tfg-num/.tfg-bar/.tfg-card/.tfg-hazard`.
 - Rule for panel authors: use `ui.frame()` / the base classes, `glyph()` instead of emoji, no border-radius/glow/gradient cards/`backdrop-filter`, colours from `--t-*` / `--ph*`.
 - Tools: `tools/harness/ui2_shots.mjs` (before/after from ONE page, `--both`), `tools/harness/ui2_glyphs.test.mjs`.
+
+### 5.17 Wave 4 lead handoff (2026-09-29)
+- Merged to main: cycle3, hostmig, guide, cosm5, polish4, daily, arcade, social, maps5, stealth, eggs, sfx, ship2, homeworld2, horror, survival, voyage, checkup, ui2 (+ lead viewmodel fix b17bf60).
+- IMPORTANT: the sfx module is installed as `game.cvoice` (NOT `game.sfx`): `game.sfx(name, vol)` is the core sound function and was shadowed (every sound call threw). Never give a module a name that is already a Game method.
+- Listener run speed lowered 8.8 -> 7.6 m/s (sprint is 8.2) so players can break contact.
+- Verified: all node suites + build; browser: boot + hamsi landing with all 55 modules, 0 page errors. NOT browser-verified: almost every wave-4 feature (see each docs/wave4/*.md "not verified" list; harness scripts tools/harness/wave4_*.js are ready). smoke_land.js now exceeds a 400 s timeout under swiftshader (warm-up), give it 900 s.
+- Open from checkup: mirror timer over clock/compass, compass SHIP/ENTRANCE overlap, Algorithm LIVE banner over panels, VHS overlay over hotbar, GPU geometry count grows across landings (possible leak), "a Enforcer" grammar.
