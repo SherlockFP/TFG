@@ -237,7 +237,7 @@ export class LocalPlayer {
     const wantSprint = canMove && moving && input.isDown('sprint') && !this.crouch && !this.sneak && !this.exhausted && mz <= 0.1 && !bodyCarry;   // no sprinting with a body over your shoulder
     this.sprinting = wantSprint && this.stamina > 0;
     // Snappier than the old 3.9/6.6 but still LC-paced so creatures stay threatening.
-    let speed = this.sneak ? 2.1 : this.crouch ? 2.6 : this.sprinting ? 8.2 : 5.0;
+    let speed = this.sneak ? 2.1 : this.crouch ? 2.6 : this.sprinting ? 7.8 : 4.75;   // owner: a touch slower (was 8.2 / 5.0)
     speed *= weightMul * s.speedMul * (this.speedBoost > 0 ? 1.25 : 1) * (this.slowT > 0 ? 0.35 : 1);
     if (this.game.grab?.item) speed *= 0.88;
     if (bodyCarry) speed *= 0.85;   // on top of the 90 lb weight penalty: a slow, heavy trudge (~2.9 m/s), never frozen

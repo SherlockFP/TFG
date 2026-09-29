@@ -1,14 +1,14 @@
 // CHASE TUNING (wave 5, docs/wave5/aimchase.md, MASTERPLAN 25.13): the ONE place that decides how fast creatures may actually run.
-//   Rule: a creature's SUSTAINED chase speed is below the player's sprint (8.2 m/s). Fast hunters (def.run / def.walk above SUSTAINED)
+//   Rule: a creature's SUSTAINED chase speed is below the player's sprint (7.8 m/s). Fast hunters (def.run / def.walk above SUSTAINED)
 //   get a short BURST (2-3 s up to ~9.5 m/s), then are TIRED (slow), then must recover at the sustained speed before the next burst.
 //   Fast movers also turn wide (lower turn rate, they slow down when not facing the path), and hesitate 1-2 s when a shut door is in
 //   their face. Bosses / hazards / the Worm are exempt (they have their own scripted mechanics).
 //   Applied host-side inside CreatureManager.follow() (src/entities/creatures.js), so every behaviour that walks a path is covered,
 //   including creatures registered by other modules. def.run stays what the behaviour ASKS for; this table decides what it GETS.
-export const PLAYER_SPRINT = 8.2;
+export const PLAYER_SPRINT = 7.8;
 
 export const TUNING = {
-  sustained: 7.0,      // m/s a chaser can hold forever (< 8.2, so a sprinter always pulls away in the long run)
+  sustained: 6.8,      // m/s a chaser can hold forever (< 7.8, so a sprinter always pulls away in the long run)
   burstMax: 9.4,       // m/s cap while bursting
   burstDur: 2.2,       // s of burst (2-3 s)
   tiredDur: 3.0,       // s of fatigue after a burst
