@@ -7,6 +7,8 @@
 // is disposed. dispose() only frees the GPU copy: three re-uploads on the next render, so a cached / shared resource that
 // is still used later merely costs one re-upload. Render-target and video textures are never touched.
 
+import * as THREE from 'three';
+
 const SCAN_S = 1.5, SETTLE_S = 2.5;
 const TEX_KEYS = ['map', 'emissiveMap', 'alphaMap', 'lightMap', 'aoMap', 'normalMap', 'bumpMap', 'specularMap', 'envMap', 'roughnessMap', 'metalnessMap', 'displacementMap'];
 
@@ -32,11 +34,31 @@ export function sweepRemoved(known, root) {
   return { geos: g, texs: t };
 }
 
+/** Object3D.prototype.onBeforeRender fires for every object three actually draws: remembering the drawn geometry / material textures there catches
+ *  resources that live shorter than one SCAN_S scan (a creature killed 1 s after it spawned, a thrown item) - the periodic scan alone missed those. */
+function installDrawHook(known, active) {
+  const proto = THREE.Object3D.prototype, prev = proto.onBeforeRender;
+  const seenMat = new WeakSet();
+  const hook = function (renderer, scene, camera, geometry, material, group) {
+    if (active() && geometry) {
+      known.geos.add(geometry);
+      if (material && !seenMat.has(material)) {
+        seenMat.add(material);
+        for (const k of TEX_KEYS) { const t = material[k]; if (t && t.isTexture) known.texs.add(t); }
+      }
+    }
+    if (prev) prev.call(this, renderer, scene, camera, geometry, material, group);
+  };
+  proto.onBeforeRender = hook;
+  return () => { if (proto.onBeforeRender === hook) proto.onBeforeRender = prev; };
+}
+
 export function installGpuSweep(game) {
   const mods = game.mods;
   const known = { geos: new Set(), texs: new Set() };
   const offs = [];
   let acc = SCAN_S, settle = -1, loaded = false, last = { geos: 0, texs: 0 }, sweeps = 0;
+  const unhook = installDrawHook(known, () => loaded || settle >= 0);
   const scene = () => game.engine?.scene;
   const on = (ev, fn) => { const off = mods.on(ev, fn); if (typeof off === 'function') offs.push(off); };
   on('update', (dt, g) => {
@@ -57,6 +79,6 @@ export function installGpuSweep(game) {
   return {
     sweepNow() { last = sweepRemoved(known, scene()); sweeps++; return last; },
     stats: () => ({ remembered: known.geos.size, texs: known.texs.size, last, sweeps }),
-    dispose() { for (const off of offs) { try { off(); } catch { /* ignore */ } } offs.length = 0; known.geos.clear(); known.texs.clear(); },
+    dispose() { unhook(); for (const off of offs) { try { off(); } catch { /* ignore */ } } offs.length = 0; known.geos.clear(); known.texs.clear(); },
   };
 }

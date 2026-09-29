@@ -37,7 +37,7 @@ import { installPings } from './pings.js';
 import { EmoteSystem } from './emotes.js';
 import { Objectives } from './objectives.js';
 import { clamp } from '../core/util.js';
-import { installBosses } from './bosses.js';
+import { installBosses } from './lazymods.js';
 import { Particles, ScanFx } from '../render/particles.js';
 import { installLootFx } from './loot.js';
 import { installShipFeatures } from './shipfeatures.js';
@@ -75,7 +75,7 @@ import { installFun } from './fun.js';
 import { installBackroomsLevels } from './brlevels.js';
 
 
-import { installBackrooms } from './backrooms.js';
+import { installBackrooms } from './lazymods.js';
 
 
 import { installBackroomsCreatures } from './creatures_backrooms.js';
@@ -87,17 +87,17 @@ import { installLiminal } from './liminal.js';
 import { installCombat } from './combat.js';   // wave 2: melee combos / parry, new weapons, spells, role skills
 
 
-import { installSiege } from './siege.js';
+import { installSiege } from './lazymods.js';
 
 
 // [import:bugfix]
 import { installBugfix } from './bugfix.js';
 
 
-import { installArcade } from './arcade.js';
+import { installArcade } from './lazymods.js';
 
 
-import { installAnomaly } from './anomaly.js';
+import { installAnomaly } from './lazymods.js';
 
 
 import { installForge } from './forge.js';
@@ -114,7 +114,7 @@ import { installGameplay2 } from './gameplay2.js';
 
 
 // [import:shipyard]
-import { installShipyard } from './shipyard.js';
+import { installShipyard } from './lazymods.js';
 import { installShip2 } from './ship2.js';   // [ship2]
 import { installShipdeck } from './shipdeck.js';   // [shipdeck]
 
@@ -122,7 +122,7 @@ import { installShipdeck } from './shipdeck.js';   // [shipdeck]
 import { installSkeletons } from './skeletons.js';
 
 
-import { installCreatureEmotes } from './cemotes.js';
+import { installCreatureEmotes } from './lazymods.js';
 
 
 import { installFpBody } from './fpbody.js';   // [fpbody]
@@ -134,7 +134,7 @@ import { installGrenades } from './grenades.js';
 import { installDurability } from './durability.js';   // [durability]
 
 
-import { installMirror } from './mirror.js';   // [mirror] dimension (docs/wave2/mirror.md)
+import { installMirror } from './lazymods.js';   // [mirror] dimension (docs/wave2/mirror.md)
 
 
 // [import:avatar2]
@@ -144,7 +144,7 @@ import { installMirror } from './mirror.js';   // [mirror] dimension (docs/wave2
 import { installTrade } from './trade.js';
 
 
-import { installBoardGame } from './boardgame.js';   // [boardgame]
+import { installBoardGame } from './lazymods.js';   // [boardgame]
 
 
 import { installLockpick2 } from './lockpick2.js';   // wave 5: tiered timing-click lockpicking (docs/wave5/lockpick2.md)
@@ -158,14 +158,14 @@ import { installFood } from './food.js';   // wave 2: food & drinks (buffs, booz
 
 
 // [import:homeworld]
-import { installHomeworld } from './homeworld.js';
+import { installHomeworld } from './lazymods.js';
 
 
-import { installHomeworld2 } from './homeworld2.js';
+import { installHomeworld2 } from './lazymods.js';
 
 
 // [import:pets]
-import { installPets } from './pets.js';
+import { installPets } from './lazymods.js';
 
 
 import { installCycle } from './cycle.js';   // [cycle] inert: rules only, see docs/wave2/cycle.md
@@ -176,10 +176,10 @@ import { installCycle3 } from './cycle3.js';   // wave 4: Glitch Gates (red / hi
 
 
 import { installSocial } from './social.js';   // [social] wave 4: phone + walkie text radio (hub lives on the App: net/hub.js)
-import { installWorlds2 } from './worlds2.js';   // wave 3: Soviet raids + twin-sun planet + plasma blade + fauna + loot pacing (docs/wave3/worlds2.md)
-import { installMaps5 } from './maps5.js';   // [import:maps5] wave 4: Estate 9 (hedge maze, paper archive) + Cold Storage (shifting server stacks, cryo caves) (docs/wave4/maps5.md)
+import { installWorlds2 } from './lazymods.js';   // wave 3: Soviet raids + twin-sun planet + plasma blade + fauna + loot pacing (docs/wave3/worlds2.md)
+import { installMaps5 } from './lazymods.js';   // [import:maps5] wave 4: Estate 9 (hedge maze, paper archive) + Cold Storage (shifting server stacks, cryo caves) (docs/wave4/maps5.md)
 import { installAlgo1 } from './algo1.js';   // [import:algo1] wave 5: The Algorithm learns you + morning rule vote + LIVE viewers (docs/wave5/algo1.md)
-import { installDance } from './dance.js';   // [import:dance] wave 6: 21 dances, sync group dance, emote wheel 2 (docs/wave6/dance.md)
+import { installDance } from './lazymods.js';   // [import:dance] wave 6: 21 dances, sync group dance, emote wheel 2 (docs/wave6/dance.md)
 import { installRoledays } from './roledays.js';   // [import:roledays] wave 6: role constraint days (docs/wave6/roledays.md)
 import { installA11y } from './a11y.js';   // [import:a11y] wave 7 accessibility runtime (docs/wave7/a11y.md)
 import { installHardmode } from './hardmode.js';   // [import:hardmode] wave 5: Casual / Standard / Hard difficulty rules (docs/wave5/hardmode.md)
@@ -195,15 +195,15 @@ import { installPolish4 } from './polish4.js';   // wave 4: pet egg drops, ship 
 import { installStealth } from './stealth.js';   // wave 4: sneak, noise, sound-hunting creatures, noisemaker (docs/wave4/stealth.md)
 
 
-import { installHorror } from './horror.js';   // wave 4: pay-to-arm traps, outbreak wing, mansion, closets, chalk + Forger, fake closet (docs/wave4/horror.md)
+import { installHorror } from './lazymods.js';   // wave 4: pay-to-arm traps, outbreak wing, mansion, closets, chalk + Forger, fake closet (docs/wave4/horror.md)
 
 
-import { installSurvival } from './survival.js';   // wave 4: foraging, farming, cooking, brewing, storage crates, hunger (docs/wave4/survival.md)
+import { installSurvival } from './lazymods.js';   // wave 4: foraging, farming, cooking, brewing, storage crates, hunger (docs/wave4/survival.md)
 
 
-import { installVoyage } from './voyage.js';   // wave 4: random moons, signals, warp events, missions, set pieces (docs/wave4/voyage.md)
+import { installVoyage } from './lazymods.js';   // wave 4: random moons, signals, warp events, missions, set pieces (docs/wave4/voyage.md)
 import { installZones } from './zones.js';   // [import:zones] wave 5: zone capture, fortify, passive income, counter-attacks, sector map (docs/wave5/zones.md)
-import { installStory } from './story.js';   // [import:story] wave 6: two patrons (Company / Algorithm), allegiance, 3 acts + 3 endings, trend creature (docs/wave6/story.md)
+import { installStory } from './lazymods.js';   // [import:story] wave 6: two patrons (Company / Algorithm), allegiance, 3 acts + 3 endings, trend creature (docs/wave6/story.md)
 
 
 // [import:ux]
@@ -254,6 +254,8 @@ import { installGuide } from './guide.js';   // wave 4: Algorithm advisor + firs
 import { installDaily } from './daily.js';   // wave 4: login calendar, daily/weekly challenges, crates, season track (docs/wave4/daily.md)
 
 import { installEggs } from './eggs.js';   // wave 4: easter eggs on moons + menu cell secrets (docs/wave4/eggs.md)
+import { QUALITY } from '../render/quality.js';   // [perf2] graphics preset table
+import { makeDistCull } from '../render/distcull.js';   // [perf2] small far props off (per preset)
 import { installMapArt } from './mapart.js';   // wave 6: signature layer of every outdoor moon (pylons, billboards, drones, biome landmark) docs/wave6/mapart.md
 
 
@@ -1161,8 +1163,9 @@ export class Game extends Emitter {
     if (zonePrevIndoor !== p.indoor || zonePrevShip !== p.inShip) this.updateAmbience();
     updateThemeOneShots(this, dt);
     // indoors the black fog hides everything past ~40 m: cull it with the far plane
-    const far = (p.dead ? this.env.indoor : p.indoor) ? 46 : 420;
+    const far = (p.dead ? this.env.indoor : p.indoor) ? 46 : QUALITY.far;   // [perf2]
     if (this.camera.far !== far) { this.camera.far = far; this.camera.updateProjectionMatrix(); }
+    { const w = this.world; (this._cull ||= makeDistCull()).update(dt, [w.outdoor?.group, w.facility?.group], this.camera.position, (p.dead ? this.env.indoor : p.indoor) ? 0 : QUALITY.propFar); }   // [perf2] outdoors only (indoor fog + 46 m far plane already cull)
 
     if (!p.dead) this.localActions(dt, input);
     this.updateItemFx();

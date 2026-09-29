@@ -7,6 +7,8 @@ import { el, escapeHtml, clamp } from '../core/util.js';
 import { t, setLang, getLang, LANGS, tf } from '../core/i18n.js';
 import { HUD, randomTip } from './hud.js';
 import { iconHTML, typeFromName } from './icons.js';
+import { chooseQuality, resolveLevel } from '../render/quality.js';   // [perf2]
+import '../render/quality_i18n.js';
 import { glyph } from './glyphs.js';   // [ui2]
 import { listRuns, loadRun, deleteRun, saveSettings, saveProfile } from '../core/save.js';
 import { ACTION_NAMES, KEY_GROUPS, findConflicts, bindKey, resetKeys, CB_MODES, CB_LABELS, PALETTES, FOV_MIN, FOV_MAX, UI_SCALE_MIN, UI_SCALE_MAX } from '../core/a11y_core.js';   // [a11y]
@@ -760,7 +762,10 @@ export class UI {
         res.addEventListener('change', () => { s.renderHeight = +res.value; apply(); });
         const jit = el('select', { 'data-nav': 'set:jit' }, ...[['0', 'Off'], ['1', 'Normal'], ['2', 'Strong']].map(([v, n]) => el('option', { value: v, selected: String(s.vertexJitter) === v }, t(n))));
         jit.addEventListener('change', () => { s.vertexJitter = +jit.value; saveSettings(s); this.toast(t('Vertex jitter applies after reload.')); });
-        body.append(section(t('Display')), row(t('Resolution (PSX)'), res), slider(t('Field of view'), 'fov', FOV_MIN, FOV_MAX, 1, (v) => v + '°'), el('div', { class: 'dim note' }, t('Comfort tip: values above 100 stretch the edges and can cause motion sickness. Try 85-95 with Reduce motion.')),
+        const qsel = el('select', { 'data-nav': 'set:quality' }, ...['auto', 'low', 'medium', 'high'].map((v) => el('option', { value: v, selected: (s.quality || 'auto') === v }, t(v === 'auto' ? 'Auto' : v === 'low' ? 'Low' : v === 'medium' ? 'Medium' : 'High'))));   // [perf2]
+        qsel.addEventListener('change', () => { chooseQuality(s, qsel.value); apply(); render(); });
+        body.append(section(t('Graphics quality')), row(t('Graphics quality'), qsel), el('div', { class: 'dim note' }, (s.quality || 'auto') === 'auto' && s.qualityAuto ? tf('Auto picked {level} after a short speed test.', { level: t(s.qualityAuto === 'low' ? 'Low' : s.qualityAuto === 'high' ? 'High' : 'Medium') }) : t('Quality sets resolution, draw distance, fog, bloom, outlines, particles, decor density and distant creature animation.')),
+          section(t('Display')), row(t('Resolution (PSX)'), res), slider(t('Field of view'), 'fov', FOV_MIN, FOV_MAX, 1, (v) => v + '°'), el('div', { class: 'dim note' }, t('Comfort tip: values above 100 stretch the edges and can cause motion sickness. Try 85-95 with Reduce motion.')),
           section(t('Retro filter')), row(t('Vertex jitter') + ` (${t('reload')})`, jit), check(t('Dithering'), 'dither'), check(t('Outlines'), 'outlines'),
           section(t('Performance')), check(t('Show FPS'), 'showFps'),
           section(t('Character')), check(t('Classic avatar'), 'classicAvatar', t('Applies to new models after reload.')));   // [avatar2]

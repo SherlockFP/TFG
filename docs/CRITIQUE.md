@@ -261,3 +261,5 @@ Combat now has weight (hitstop, class sounds, muzzle flash, toppling corpses, he
 The game now has an identity kit (wordmark, seal, the Algorithm's eye; amber = Company, magenta/cyan = Algorithm) and the main menu, panel headers, tabs, tooltips, loading, pause, death and report screens follow it, but it is mostly dressing: the CRT menu text is still small at 720p (2 columns helped), header stamps are decorative and keyed on title text, several panels (trade, homeworld, shipyard, forge) were not re-shot, and the eye only follows a pointer. Whether the stamps and ticker read as charm or clutter after an hour of play is untested.
 ## Wave 7 - a11y (docs/wave7/a11y.md)
 Palettes are tuned by simulation, not by eye (tests check delta-E under CVD matrices), but nobody colour-blind has played it; baked creature-model eye colours are still red; pad buttons are not rebindable; mouse capture still needs one click.
+## Wave 7 - perf2
+Low preset is unverified against the 60 percent draw-call target (instanced decor thinning cuts triangles, not calls); module-added ship props (workbench, arcade table...) still unmerged; Rapier wasm (4.3 MB) dominates first load.

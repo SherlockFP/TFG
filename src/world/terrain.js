@@ -591,7 +591,7 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
   let landmarks = null;
   try { landmarks = buildLandmarks({ seed, moon, plan, terrain, group, addBox, emitters, avoid: avoidBase, sites: landmarkSites }); } catch (err) { console.warn('landmarks', err); landmarks = null; }
 
-  try { if (!globalThis.__kefalNoOutMerge) mergeStaticMeshes(placed.filter(isStaticProp), group); } catch (err) { console.warn('outdoor prop merge', err); }
+  try { if (globalThis.__kefalOutMerge) mergeStaticMeshes(placed.filter(isStaticProp), group); } catch (err) { console.warn('outdoor prop merge', err); }
   for (const em of emitters) lightPool.add(em);
   for (const s of outdoorScrapSpots) s.y = terrain.heightAt(s.x, s.z);
 

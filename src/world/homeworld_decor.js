@@ -7,6 +7,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { RNG } from '../core/rng.js';
+import { QUALITY } from '../render/quality.js';   // [perf2]
 import { t, addTranslations } from '../core/i18n.js';
 import { planHomeDecor, EMBLEM } from './homeworld_decor_plan.js';
 
@@ -329,11 +330,12 @@ export function buildHomeDecor(seed, env) {
     const g = new THREE.PlaneGeometry(0.75, 1.0); g.rotateY(Math.PI / 2); g.translate(0, -0.5, 0); geos.push(g);
     const m = own(new THREE.MeshLambertMaterial({ side: THREE.DoubleSide })); cloth = new THREE.InstancedMesh(g, m, clothN); cloth.frustumCulled = false;
     const cc = [0xe8742a, 0xe8742a, 0xd8d0c0, 0x4a7a72, 0xe8742a, 0x2a2a30, 0xd8b840, 0xd8d0c0, 0xe8742a, 0x7a3a5a];
-    for (let i = 0; i < clothN; i++) cloth.setColorAt(i, new THREE.Color(cc[i])); group.add(cloth);
+    for (let i = 0; i < clothN; i++) cloth.setColorAt(i, new THREE.Color(cc[i])); cloth.count = Math.max(4, Math.round(clothN * QUALITY.decor)); group.add(cloth);
   }
   {
     const g = new THREE.PlaneGeometry(0.3, 0.3); geos.push(g); const m = own(new THREE.MeshLambertMaterial({ side: THREE.DoubleSide })); debris = new THREE.InstancedMesh(g, m, debrisN); debris.frustumCulled = false;
     for (let i = 0; i < debrisN; i++) { D.x[i] = rng.float(-HALF + 4, HALF - 4); D.z[i] = rng.float(-HALF + 4, HALF - 4); D.y[i] = rng.float(0.3, 2.6); D.sp[i] = rng.float(0.6, 1.4); D.ph[i] = rng.float(0, 6.28); debris.setColorAt(i, new THREE.Color([0xd8d0c0, 0xc8ccd2, 0xe8b820, 0xff2ad8, 0x2af4ff][i % 5])); }
+    debris.count = Math.max(4, Math.round(debrisN * QUALITY.decor));   // [perf2] graphics preset
     group.add(debris);
   }
 

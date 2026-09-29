@@ -7,6 +7,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { RNG } from '../core/rng.js';
 import { onLangChange } from '../core/i18n.js';
 import { makeCanvasTexture } from '../render/textures.js';
+import { thinDecor } from '../render/quality.js';   // [perf2]
 import { ADS, SIGNS, HOLO, tx } from './mapart_text.js';
 import { CELL } from './mapart_core.js';
 import { buildLandmark } from './mapart_lm.js';
@@ -312,6 +313,7 @@ export function buildArt(specs, ctx) {
     const cells = [];
     for (const s of scars) for (const c of s.cells) { const x = s.x + c.dx, z = s.z + c.dz; cells.push({ x, z, y: h(x, z), s: c.s, h: c.h, c: c.c }); }
     if (cells.length) {
+      const all = cells.slice(); cells.length = 0; cells.push(...thinDecor(all));   // [perf2] graphics preset
       const PAL = [0xff2bd6, 0x2af4ff, 0x120a1e, 0xf4f4ff];
       scarMesh = new THREE.InstancedMesh(BOX, own(new THREE.MeshBasicMaterial({ color: 0xffffff }), mats), cells.length);
       cells.forEach((c, i) => {

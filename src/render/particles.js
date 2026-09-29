@@ -2,6 +2,7 @@
 // One THREE.Points with a fixed capacity; burst() writes into a ring buffer, update() integrates.
 // Custom shader, so the global PSX vertex-snap patch is not applied (points would jitter badly).
 import * as THREE from 'three';
+import { QUALITY } from './quality.js';   // [perf2]
 
 const CAP = 600;
 
@@ -69,9 +70,10 @@ export class Particles {
   /** burst(pos, preset | opts, dir?) — dir biases the spray (e.g. away from the attacker). */
   burst(pos, preset = 'blood', dir = null, mul = 1) {
     const o = typeof preset === 'string' ? PRESETS[preset] || PRESETS.blood : preset;
-    const n = Math.round((o.count || 10) * mul);
+    const n = Math.max(1, Math.round((o.count || 10) * mul * QUALITY.particles));   // [perf2]
+    const cap = Math.min(CAP, QUALITY.particleCap);
     for (let k = 0; k < n; k++) {
-      const i = this.head; this.head = (this.head + 1) % CAP;
+      const i = this.head % cap; this.head = (i + 1) % cap;
       const a = Math.random() * Math.PI * 2, u = Math.random() * 2 - 1, s = Math.sqrt(1 - u * u);
       const sp = (o.speed || 3) * (0.35 + Math.random() * 0.8);
       let vx = Math.cos(a) * s * sp, vy = Math.abs(u) * sp * 0.5 + (o.up || 0) * Math.random(), vz = Math.sin(a) * s * sp;
