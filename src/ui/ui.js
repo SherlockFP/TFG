@@ -30,6 +30,7 @@ import { avatarCanvas, avatarDataUrl, fromWire, defaultAvatar } from './avatarpi
 import { avatarOfPeer } from '../game/profilesync.js';   // [profile]
 import { UI as GUIDE_UI, pick as guidePick } from '../game/guide_data.js';   // [guide]
 import { resetTutorial as guideResetTutorial } from '../game/guide_core.js';   // [guide]
+import { x as obx } from '../game/onboard_text.js';   // [onboard] Settings: unlock everything / skip Hiring Day
 import { soundPackSection } from './soundpack_ui.js';   // [sfx] Settings > Audio > Sound pack
 
 // [profile] tiny avatar icon (16x16 thumbnail) for chat / lists
@@ -840,6 +841,8 @@ export class UI {
             if (gd?.restartTutorial) { gd.restartTutorial(); this.toast(guidePick(GUIDE_UI.set_replay_now, getLang()), 'good'); }
             else { guideResetTutorial(this.app.profile); saveProfile(this.app.profile); this.toast(guidePick(GUIDE_UI.set_replay_done, getLang()), 'good'); }
           }, 'small')),
+          check(obx('set_unlock'), 'unlockAll', obx('set_unlock_note'), false),   // [onboard] veterans: no staged gifts
+          check(obx('set_skip'), 'skipHiringDay', obx('set_skip_note'), false),   // [onboard]
           section(t('Social hub')),   // [social]
           check(t('Join the hub network (players, friends, messages)'), 'hubEnabled', t('only your nickname, avatar, level and status are broadcast'), true),
           check(t('Stay in the hub during a run'), 'hubInRun', t('lets the ship phone show messages and invites'), true));

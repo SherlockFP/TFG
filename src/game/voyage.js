@@ -104,7 +104,7 @@ export function installVoyage(game) {
   let disposed = false, boundNet = null;
   const on = (ev, fn) => { const off = mods.on(ev, fn); if (typeof off === 'function') offs.push(off); };
   const host = () => !!game.isHost;
-  const enabled = () => game.config?.voyage !== false;
+  const enabled = () => game.config?.voyage !== false && !game.onboard?.locked?.('voyage');   // [onboard] gifted at quota 2
   const run = () => game.run;
   const mm = typeof window !== 'undefined' ? window.__kefalMods : null;
   if (mm?.itemModels) { mm.itemModels.set('vy_blackbox', blackboxModel); mm.itemModels.set('vy_relic', relicModel); mm.itemModels.set('vy_meteorite', meteoriteModel); }
@@ -835,7 +835,7 @@ export function installVoyage(game) {
   const tierBar = (m) => { const n = clamp(Math.round(m.riskScore ?? m.tier ?? 1), 1, 5); return '[' + '#'.repeat(n) + '-'.repeat(5 - n) + ']'; };
   function sigLines() {
     const r = run(), out = [];
-    if (!r) return out;
+    if (!r || !enabled()) return out;
     signals().forEach((id, i) => {
       const m = V.generateVoyageMoon(id);
       if (!m) return;

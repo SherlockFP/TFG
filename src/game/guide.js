@@ -199,7 +199,7 @@ export function installGuide(game) {
   on('objectives', (add, g, phase) => {
     if (g && g !== game) return;
     const gs = G();
-    if (!gs || !tutRunning(gs) || game.player?.dead) return;
+    if (!gs || !tutRunning(gs) || game.player?.dead || game.onboard?.active?.()) return;   // [onboard] Hiring Day shows its own objectives
     const s = tutCurrent(gs);
     if (!s) return;
     const idx = TUT_STEPS.indexOf(s) + 1;
@@ -327,7 +327,7 @@ export function installGuide(game) {
     S.pollT -= dt;
     if (S.pollT <= 0) { S.pollT = 0.25; poll(0.25); }
     const g = G();
-    if (!g || !game.run) return;
+    if (!g || !game.run || game.onboard?.active?.()) return;   // [onboard] the guide waits while Hiring Day runs
     // queued tutorial lines first (tips wait while a tutorial line is due)
     if (S.sayQ.length && S.sayQ[0].at <= S.t) {
       if (tutRunning(g) || S.sayQ[0].src === TUT_DONE_SAY) { if (canSpeak()) { const q = S.sayQ.shift(); say(pick(q.src, lang())); S.quietT = 4; } }

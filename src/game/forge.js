@@ -148,7 +148,7 @@ export function installForge(game) {
 
   // ------------------------------------------------------------------ interactables + panel
   function open(tab = 'enhance') {
-    if (!stations() || disposed) return;
+    if (!stations() || disposed || game.onboard?.deny?.('forge')) return;   // [onboard] gifted at quota 1
     const ui = game.ui;
     const ctl = createForgePanel(ui, game, api, { tab });
     ui.openPanel(ctl.el);

@@ -178,6 +178,7 @@ import { installWorlds2 } from './worlds2.js';   // wave 3: Soviet raids + twin-
 import { installMaps5 } from './maps5.js';   // [import:maps5] wave 4: Estate 9 (hedge maze, paper archive) + Cold Storage (shifting server stacks, cryo caves) (docs/wave4/maps5.md)
 import { installAlgo1 } from './algo1.js';   // [import:algo1] wave 5: The Algorithm learns you + morning rule vote + LIVE viewers (docs/wave5/algo1.md)
 import { installHardmode } from './hardmode.js';   // [import:hardmode] wave 5: Casual / Standard / Hard difficulty rules (docs/wave5/hardmode.md)
+import { installOnboard } from './onboard.js';   // [import:onboard] wave 5: Hiring Day first-time start + staged unlocks (docs/wave5/onboard.md)
 
 import { installAimtell } from './aimtell.js';   // wave 5: telegraphed NPC aim laser (docs/wave5/aimchase.md)
 import { installChase } from './chase.js';       // wave 5: chase tension vignette / pulse
@@ -498,6 +499,8 @@ export class Game extends Emitter {
     this.useModule('daily', installDaily);
 
     this.useModule('eggs', installEggs);
+
+    this.useModule('onboard', installOnboard);   // [slot:onboard] wave 5: Hiring Day + staged unlocks (installed last: wraps hostLever / terminalCommand / objectives.compute)
 
 
   }
