@@ -274,6 +274,7 @@ class App {
     }
     this.stopLobbyBrowser();
     saveProfile(this.profile);
+    this.input.enabled = true;   // [menufix] game.update left it false (pause panel open) -> menu-room mouse look / walking were dead after a run
     this.input.unlock();
     setTimeout(() => this.input.unlock(), 120);
     this.ui.hud.setDead(false);

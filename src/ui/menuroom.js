@@ -443,7 +443,7 @@ export class MenuRoom {
     this.onMouse = (e) => { this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1; this.mouse.y = (e.clientY / window.innerHeight) * 2 - 1; this.idle = 0; };
     this.onClick = () => {
       if (this.boot?.active) { this.skipBoot(); return; }
-      if (this.state === 'free' && !this.modal && !this.terminal.active) { if (!this.app.input.locked) { this.relock(); this.needClick = false; } else this.interact(); }
+      if ((this.state === 'free' || this.state === 'standing') && !this.modal && !this.terminal.active) { if (!this.app.input.locked) this.relock(); else if (this.state === 'free') this.interact(); }
       else if (this.modal && this.modal.kind !== 'vend') this.closeModal();
     };
     this.onLock = () => {
@@ -714,6 +714,7 @@ export class MenuRoom {
   }
   stepState(dt) {
     const rig = this.rig;
+    if (!this.app.input.enabled && !this.terminal.active) this.app.input.enabled = true;   // [menufix] never let a stale flag from a finished run kill look/walk here
     this.stateT += dt;
     switch (this.state) {
       case 'seated': {

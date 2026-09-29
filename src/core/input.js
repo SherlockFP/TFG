@@ -64,14 +64,14 @@ export class Input {
   }
   lock() {
     if (this.locked) return;
-    // [ctrlw] fullscreen on play (Settings: fullscreenPlay, default on): lets Keyboard Lock catch Ctrl+W instead of closing the tab
-    if (this.settings.fullscreenPlay !== false && !document.fullscreenElement && document.documentElement.requestFullscreen) {
-      try { document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(() => {}); } catch { /* not allowed */ }
-    }
-    try {
+    try {   // pointer lock FIRST, synchronously inside the user gesture ([menufix]: requestFullscreen consumes the activation, so lock-after-fullscreen was refused)
       const p = this.canvas.requestPointerLock({ unadjustedMovement: true });
       if (p && p.catch) p.catch(() => { try { const q = this.canvas.requestPointerLock(); if (q && q.catch) q.catch(() => this.onLockFail?.()); } catch { this.onLockFail?.(); } });
     } catch { try { this.canvas.requestPointerLock(); } catch { this.onLockFail?.(); } }   // [ux]
+    // [ctrlw] then fullscreen (Settings: fullscreenPlay, default on): lets Keyboard Lock catch Ctrl+W instead of closing the tab
+    if (this.settings.fullscreenPlay !== false && !document.fullscreenElement && document.documentElement.requestFullscreen) {
+      try { document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(() => {}); } catch { /* not allowed */ }
+    }
   }
   unlock() { if (document.pointerLockElement) document.exitPointerLock(); }
   key(action) { return this.settings.keys[action] || action; }

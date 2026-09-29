@@ -645,3 +645,6 @@ Layered stems (5 biome beds, tension / chase / boss / extract, menu / orbit / ho
 - Colour-blind palettes remap signal colours (tiers, HUD danger/ok, lasers, eyes, aimtell, zones) via `core/a11y_core.js sig()`; all actions rebindable with conflict banner + reset; gamepad play (`core/gamepad_core.js`, `Input.pollPad`) with pad/key glyph prompts; UI scale, hold-to-toggle, shake slider, reduce-flash, FOV 60-110. Settings > Accessibility.
 ### 5.21 Wave 7 - PERF2 (docs/wave7/perf2.md; node: perf2.test.mjs 171 + gpusweep_cycle.test.mjs 17 + build; browser Low-vs-Medium run NOT completed)
 Graphics quality presets Auto/Low/Medium/High (render/quality.js, Settings > Video, first-boot 3 s probe), 19 session-only modules lazy-loaded via game/lazymods.js (first-load JS 11153 -> 9844 kB), outdoor prop merge now opt-in, ship furniture merged (orbit 180 -> 176 calls), gpusweep draw-hook fix (short-lived resources), small-prop distance cull. Low ~60 percent draw-call target unverified.
+
+### 5.22 Wave 8 - MENUFIX (docs/wave8/menufix.md)
+Menu-room look dead after standing: `leaveGame` left `input.enabled=false` (fixed + menuroom re-asserts), `Input.lock()` now pointer-lock first then fullscreen (fullscreen ate the user activation), menu click also re-locks while standing. Wave 5-7 node tests all green.
