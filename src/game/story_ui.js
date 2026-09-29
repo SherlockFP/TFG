@@ -97,7 +97,7 @@ export function registerCase() {
   };
   caseTexts.story = (c) => {
     const y = c.story || {};
-    return [`CASE #${c.n} — ${storyCaseTitle(c)}`, '', `${t('Crew')}: ${(c.crew || []).join(', ') || '-'}   ${t('Day')}: ${c.day | 0}`,
+    return [`CASE #${c.n} - ${storyCaseTitle(c)}`, '', `${t('Crew')}: ${(c.crew || []).join(', ') || '-'}   ${t('Day')}: ${c.day | 0}`,
       tf('Allegiance {a}. Jobs done: Company {jc}, Algorithm {ja}. Betrayals: Company {bc}, Algorithm {ba}.', { a: Math.round(y.a || 0), jc: y.jc | 0, ja: y.ja | 0, bc: y.bc | 0, ba: y.ba | 0 }), '', t(y.text || '')].join('\n');
   };
 }

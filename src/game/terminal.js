@@ -10,6 +10,7 @@ import { buyRate } from './progression.js';
 import { insideShip } from '../world/ship.js';
 import { dropPoint } from '../world/shiplayout.js';
 import { escapeHtml } from '../core/util.js';
+const n0 = (v) => Math.round(v || 0).toLocaleString('en-US');   // credits are always shown with thousands separators (docs/wave8/studio_style.md)
 import { t, tf, tfIn, sysMsg } from '../core/i18n.js';
 
 const BANNER = [
@@ -83,7 +84,7 @@ export class Terminal {
     this.active = true;
     this.game.input.unlock();
     this.el.classList.remove('hidden');
-    if (!this.lines.length) { this.print(BANNER.join('\n'), 'banner'); this.print(t('Welcome to the Company terminal. Type HELP for a list of commands.')); }
+    if (!this.lines.length) { this.print(BANNER.join('\n'), 'banner'); this.print(t('Company terminal online. Type HELP.')); }
     this.render();
     setTimeout(() => this.inp.focus(), 30);
     this.game.sfx('terminal_enter', 0.4);
@@ -143,11 +144,11 @@ export class Terminal {
           t('>SECTOR       map of the current uncharted sector'),
           t('>INFO <moon>  details: biome, interior, risk, modifiers'),
           t('>ROUTE <moon> set the autopilot destination (or ROUTE #2)'),
-          t('>STORE        the Company Store screen (STORE LIST = plain text)'),
+          t('>STORE        open the Company Store (STORE LIST: plain text)'),
           t('>BUY <item> [n]'),
           t('>BUY VAN      order the Uplink Van (4 seats + cargo bed)'),
           t('>SCAN         scrap remaining on this moon'),
-          t('>QUOTA        profit quota status'),
+          t('>QUOTA        quota, deadline, credits'),
           t('>CREW         crew status'),
           t('>BESTIARY     creature entries  (>BESTIARY <name>)'),
           t('>SWITCH [name] change the radar target'),
@@ -162,7 +163,7 @@ export class Terminal {
       case 'moons': case 'moon': {
         const sector = ensureSector(run);
         const out = [t('CURRENT ROUTE') + ': ' + (MOONS[run.moon]?.name || '-'), ''];
-        if (run.dailyEvent) out.push(tf('TODAY: {name} — {desc}', { name: t(run.dailyEvent.name), desc: t(run.dailyEvent.desc) }), '');
+        if (run.dailyEvent) out.push(tf('TODAY: {name} - {desc}', { name: t(run.dailyEvent.name), desc: t(run.dailyEvent.desc) }), '');
         out.push(t('CHARTED MOONS:'));
         for (const id of MOON_ORDER) {
           const m = MOONS[id];
@@ -203,7 +204,7 @@ export class Terminal {
         if (moon.id === run.moon) { this.print(tf('Already routed to {name}.', { name: moon.name })); return; }
         this.pending = { op: 'route', moon: moon.id };
         const rcost = g.shipyard?.routeFee ? g.shipyard.routeFee(moon, !!g.config?.freeTravel) : (g.config?.freeTravel ? 0 : moon.cost);   // [shipyard] +5 % per module
-        this.print(`${tf('Route the autopilot to {name}?', { name: moon.name })} ${rcost ? tf('It will cost ▮{c}.', { c: rcost }) : t('Free travel.')}\n${this.moonInfo(moon, run, true)}\n${tf('Your credits: ▮{c}', { c: run.credits })}${run.credits < rcost ? '  ' + t('(NOT ENOUGH)') : ''}\n\n${t('Type CONFIRM or DENY.')}`);
+        this.print(`${tf('Route the autopilot to {name}?', { name: moon.name })} ${rcost ? tf('It will cost ▮{c}.', { c: rcost }) : t('Free travel.')}\n${this.moonInfo(moon, run, true)}\n${tf('Credits: ▮{c}', { c: n0(run.credits) })}${run.credits < rcost ? '  ' + t('(NOT ENOUGH)') : ''}\n\n${t('Type CONFIRM or DENY.')}`);
         return;
       }
       case 'store': case 'shop': {
@@ -214,7 +215,7 @@ export class Terminal {
           return;
         }
         if (g.shop?.textList) { const out = g.shop.textList(); out.splice(out.length - 1, 0, ...(g.cruiser?.storeLines?.() || [])); this.print(out.join('\n')); return; }
-        const out = [t('Welcome to the Company store. Deliveries arrive instantly (for a small fee we do not mention).'), ''];
+        const out = [t('Company Store. Delivery is instant. The fee is not mentioned.'), ''];
         for (const id of STORE_ITEMS) { const d = ITEMS[id]; if (d) out.push(`* ${d.name.padEnd(18)} ▮${d.price}`); }
         out.push('', t('SHIP UPGRADES:'));
         for (const [id, u] of Object.entries(SHIP_UPGRADES)) { if (u.owned) continue; out.push(`* ${u.name.padEnd(18)} ▮${u.price}${run.upgrades?.[id] ? '  [' + t('INSTALLED') + ']' : ''}`); }
@@ -259,7 +260,7 @@ export class Terminal {
         return;
       }
       case 'quota': {
-        this.print(tf('PROFIT QUOTA: ▮{sold} / ▮{quota}', { sold: run.sold, quota: run.quota }) + '\n' + tf('DEADLINE: {d} day(s)', { d: run.daysLeft }) + '\n' + tf('CREDITS: ▮{c}', { c: run.credits }) + '\n' + tf('QUOTAS MET THIS RUN: {n}', { n: run.quotaIndex }) + '\n' + tf('CURRENT COMPANY BUYING RATE: {r}%', { r: Math.round(buyRate(run.daysLeft, run.buyRnd) * 100) }));
+        this.print(tf('QUOTA: ▮{sold} / ▮{quota}', { sold: n0(run.sold), quota: n0(run.quota) }) + '\n' + tf('DAYS LEFT: {d}', { d: run.daysLeft }) + '\n' + tf('CREDITS: ▮{c}', { c: n0(run.credits) }) + '\n' + tf('QUOTAS MET THIS RUN: {n}', { n: run.quotaIndex }) + '\n' + tf('BUYING RATE: {r}%', { r: Math.round(buyRate(run.daysLeft, run.buyRnd) * 100) }));
         return;
       }
       case 'crew': {

@@ -35,7 +35,7 @@ export const DAILY_EVENTS = [
     tr: ['TIK TUZAĞI ÇILGINLIĞI', 'Yarısı kadar fazla hurda var ama her parça %20 daha değersiz.'] },
   { id: 'lowgrav', name: 'LOW GRAVITY PATCH', desc: 'A physics hotfix went wrong. You jump 40% higher and move 6% faster.', jumpMul: 1.4, speedMul: 1.06, dangerMul: 1.04, mood: 'good', w: 0.8,
     tr: ['DÜŞÜK YERÇEKİMİ YAMASI', 'Fizik yaması ters gitti. %40 daha yüksek zıplar, %6 daha hızlı koşarsın.'] },
-  { id: 'doublexp', name: 'DOUBLE XP WEEKEND', desc: 'Engagement event! All XP earned on this moon is doubled. Creatures are hyped too.', xpMul: 2, dangerMul: 1.12, mood: 'good', w: 0.55,
+  { id: 'doublexp', name: 'DOUBLE XP WEEKEND', desc: 'Engagement event. All XP earned on this moon is doubled. Creatures are hyped too.', xpMul: 2, dangerMul: 1.12, mood: 'good', w: 0.55,
     tr: ['ÇİFTE XP HAFTASONU', 'Etkileşim etkinliği! Bu ayda kazanılan tüm XP iki katı. Yaratıklar da coşkulu.'] },
   { id: 'haunted', name: 'HAUNTED CACHE', desc: 'Three cursed golden archives are hidden deep inside. Something guards them.', cache: 3, dangerMul: 1.15, eliteAdd: 0.06, mood: 'mixed', w: 0.8,
     tr: ['LANETLİ ÖNBELLEK', 'Derinlerde üç lanetli altın arşiv saklı. Bir şey onları koruyor.'] },

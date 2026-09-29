@@ -158,7 +158,7 @@ export function installCollection(game) {
     else { if (r.xp) game.progress?.addXp(r.xp, 'Codex'); if (r.coin) game.progress?.addCoins(r.coin, 'Codex'); }
     if (r.emote && unlockEmote(p, r.emote)) save();
     const item = { tier: 'gold', icon: '📖', kicker: 'CODEX MILESTONE', name: m.name, desc: `${m.cat.toUpperCase()} · press J to open the Codex`, reward: rewardLine(r) };
-    if (ach?.banner) ach.banner(item); else game.ui?.toast?.(tf('CODEX: {name} — {reward}', { name: m.name, reward: item.reward }), 'good');
+    if (ach?.banner) ach.banner(item); else game.ui?.toast?.(tf('CODEX: {name} - {reward}', { name: m.name, reward: item.reward }), 'good');
   };
 
   function evaluate() {

@@ -74,24 +74,24 @@ addTranslations({
   BUS: 'HAT', 'TURRETS OFFLINE': 'TARETLER KAPALI', FUSE: 'SİGORTA', 'FUEL CANISTER': 'YAKIT BİDONU', 'BATTERY CELL': 'PİL HÜCRESİ', COOLANT: 'SOĞUTUCU', 'ACCESS CARD': 'ERİŞİM KARTI',
   'DATA CORE': 'VERİ ÇEKİRDEĞİ', 'HEART.EXE': 'KALP.EXE', 'DEEP CORE': 'DERİN ÇEKİRDEK', 'ROOT SERVER': 'KÖK SUNUCU', 'NOCLIP CORE': 'NOCLIP ÇEKİRDEĞİ',
   'COLD CORE': 'SOĞUK ÇEKİRDEK', 'SLUDGE CORE': 'ÇAMUR ÇEKİRDEĞİ', 'PATIENT ZERO': 'SIFIR NUMARALI HASTA',
-  'Generator — needs {c} [E]': 'Jeneratör — {c} gerekli [E]', 'Insert the {c} into the generator [E]': '{c} parçasını jeneratöre tak [E]',
+  'Generator - needs {c} [E]': 'Jeneratör - {c} gerekli [E]', 'Insert the {c} into the generator [E]': '{c} parçasını jeneratöre tak [E]',
   'You need a {c}. Search the facility.': 'Bir {c} lazım. Tesisi ara.', 'Start the generator [E]': 'Jeneratörü çalıştır [E]', 'Router rewiring: restore main power': 'Router yeniden kablolama: ana elektriği geri getir',
-  'Generator stalled — restart [E]': 'Jeneratör durdu — yeniden başlat [E]', 'Generator cooling down...': 'Jeneratör soğuyor...',
+  'Generator stalled - restart [E]': 'Jeneratör durdu - yeniden başlat [E]', 'Generator cooling down...': 'Jeneratör soğuyor...',
   'OVERLOAD the generator [E]': 'Jeneratörü AŞIRI YÜKLE [E]', '60% door opens · 25% lights out · 10% alarm · 5% ???': '%60 kapı açılır · %25 ışıklar gider · %10 alarm · %5 ???',
-  'Overload cooling down': 'Aşırı yük soğuyor', 'Bus {l}: {v} — adjust [E]': 'Hat {l}: {v} — ayarla [E]', 'Panel dead — no power': 'Panel ölü — elektrik yok',
+  'Overload cooling down': 'Aşırı yük soğuyor', 'Bus {l}: {v} - adjust [E]': 'Hat {l}: {v} - ayarla [E]', 'Panel dead - no power': 'Panel ölü - elektrik yok',
   'Flip breaker {n} [E]': '{n}. sigortayı indir [E]', 'Enter the containment code [E]': 'Muhafaza kodunu gir [E]', 'Containment console': 'Muhafaza konsolu',
   'Read the note [E]': 'Notu oku [E]', 'Security console [E]': 'Güvenlik konsolu [E]', 'Silence the alarm (hack) [E]': 'Alarmı sustur (hack) [E]',
-  'Disable the turrets for 60 s (hack) [E]': "Taretleri 60 sn kapat (hack) [E]", 'Ventilation: {s} — purge [E]': 'Havalandırma: {s} — temizle [E]', 'Ventilation: CLEAN': 'Havalandırma: TEMİZ',
-  'Purging...': 'Temizleniyor...', 'Find the GENERATOR room ({d} m)': 'JENERATÖR odasını bul ({d} m)', 'The generator needs a {c} — find one in the facility': 'Jeneratöre bir {c} lazım — tesiste bul',
+  'Disable the turrets for 60 s (hack) [E]': "Taretleri 60 sn kapat (hack) [E]", 'Ventilation: {s} - purge [E]': 'Havalandırma: {s} - temizle [E]', 'Ventilation: CLEAN': 'Havalandırma: TEMİZ',
+  'Purging...': 'Temizleniyor...', 'Find the GENERATOR room ({d} m)': 'JENERATÖR odasını bul ({d} m)', 'The generator needs a {c} - find one in the facility': 'Jeneratöre bir {c} lazım - tesiste bul',
   'Carry the {c} to the generator and press [E]': '{c} parçasını jeneratöre götür ve [E] bas', 'Start the generator (router rewiring)': 'Jeneratörü çalıştır (router kablolama)',
   'Route power to the containment wing: set BUS A / B / C ({n}/3)': 'Muhafaza kanadına güç ver: HAT A / B / C ayarla ({n}/3)',
   'Flip the containment breakers in the right order ({n}/4)': 'Muhafaza sigortalarını doğru sırayla indir ({n}/4)',
   'Enter the containment code (fragments found {n}/3)': 'Muhafaza kodunu gir (bulunan parça {n}/3)',
   'Hint: a maintenance note is pinned somewhere in the facility': 'İpucu: tesiste bir yere bakım notu iğnelenmiş',
   'Or gamble: OVERLOAD the generator': 'Ya da kumar: jeneratörü AŞIRI YÜKLE', 'Take the {core} from the containment chamber': '{core} parçasını muhafaza odasından al',
-  'EXTRACTION: get the {core} to the ship — {t}': 'TAHLİYE: {core} parçasını gemiye götür — {t}', 'Exit: {d} m': 'Çıkış: {d} m',
-  '{core} extracted': '{core} çıkarıldı', 'Containment failure — the core destabilised': 'Muhafaza çöktü — çekirdek kararsızlaştı',
-  'LOCKDOWN — {s}s': 'KİLİTLEME — {s} sn', 'ALARM — creatures are converging': 'ALARM — yaratıklar toplanıyor', 'VENT GAS — find clean air (green light) or purge the vents': 'HAVALANDIRMA GAZI — temiz hava bul (yeşil ışık) ya da havalandırmayı temizle',
+  'EXTRACTION: get the {core} to the ship - {t}': 'TAHLİYE: {core} parçasını gemiye götür - {t}', 'Exit: {d} m': 'Çıkış: {d} m',
+  '{core} extracted': '{core} çıkarıldı', 'Containment failure - the core destabilised': 'Muhafaza çöktü - çekirdek kararsızlaştı',
+  'LOCKDOWN - {s}s': 'KİLİTLEME - {s} sn', 'ALARM - creatures are converging': 'ALARM - yaratıklar toplanıyor', 'VENT GAS - find clean air (green light) or purge the vents': 'HAVALANDIRMA GAZI - temiz hava bul (yeşil ışık) ya da havalandırmayı temizle',
   'BLACKOUT': 'KARARTMA', 'FACILITY STATUS: UNKNOWN': 'TESİS DURUMU: BİLİNMİYOR', 'POWER RESTORED': 'ELEKTRİK GELDİ', 'Security systems are waking up.': 'Güvenlik sistemleri uyanıyor.',
   'EXTRACTION': 'TAHLİYE', 'Get the core to the ship before the timer runs out': 'Süre bitmeden çekirdeği gemiye götür', 'CORE EXTRACTED': 'ÇEKİRDEK ÇIKARILDI',
   'The containment wing is open.': 'Muhafaza kanadı açıldı.', 'Wrong sequence. The panel bites back.': 'Yanlış sıra. Panel çarptı.', 'ACCESS DENIED': 'ERİŞİM REDDEDİLDİ',
@@ -354,7 +354,7 @@ export function installFacilitySystems(game) {
       f.gen = 1;
       if (game.run.powerOn === false && f.ev !== 'blackout') game.hostSetPower(true);
       if (f.stage === 'start' || f.stage === 'find' || f.stage === 'fuel') f.stage = f.wing ? 'core' : 'route';
-      say(`${game.playerName(from)}: ${t('POWER RESTORED')} — ${t('Security systems are waking up.')}`, 'good');
+      say(`${game.playerName(from)}: ${t('POWER RESTORED')} - ${t('Security systems are waking up.')}`, 'good');
       game.net.broadcast('xp', { to: from, xp: 70 + (game.run.quotaIndex || 0) * 10, coin: 10, reason: 'Generator restored', bounty: { type: 'minigame', target: 'fuse' } });
       push();
     } else if (a === 'restart') {
@@ -572,8 +572,8 @@ export function installFacilitySystems(game) {
       if ((f.power === 'off') !== (p.power === 'off') && p.power) emit('tfg:darkness', { on: f.power === 'off' }, game);
     }
     if (f.security !== p.security) {
-      if (f.security === 'lockdown') { big(t('LOCKDOWN'), tf('LOCKDOWN — {s}s', { s: Math.ceil(f.lock || 0) })); game.audio.play('blast_door', { volume: 0.7, bus: 'sfx' }); }
-      else if (f.security === 'alarm' && p.security !== 'lockdown' && !f.extraction) { big(t('ALARM'), t('ALARM — creatures are converging')); }
+      if (f.security === 'lockdown') { big(t('LOCKDOWN'), tf('LOCKDOWN - {s}s', { s: Math.ceil(f.lock || 0) })); game.audio.play('blast_door', { volume: 0.7, bus: 'sfx' }); }
+      else if (f.security === 'alarm' && p.security !== 'lockdown' && !f.extraction) { big(t('ALARM'), t('ALARM - creatures are converging')); }
       if ((f.security === 'alarm') !== (p.security === 'alarm')) emit('tfg:alarm', { on: f.security === 'alarm' }, game);
     }
     if (f.extraction && !p.extraction) {
@@ -584,7 +584,7 @@ export function installFacilitySystems(game) {
     }
     if (f.result && !p.result) {
       if (f.result === 'success') { big(t('CORE EXTRACTED'), coreName(f)); game.audio.play('ui_quota_met', { volume: 0.8, bus: 'sfx' }); }
-      else { big(t('CONTAINMENT FAILURE'), t('Containment failure — the core destabilised')); game.audio.play('death_sting', { volume: 0.8, bus: 'sfx' }); }
+      else { big(t('CONTAINMENT FAILURE'), t('Containment failure - the core destabilised')); game.audio.play('death_sting', { volume: 0.8, bus: 'sfx' }); }
       emit('tfg:extraction', { phase: 'end', success: f.result === 'success' }, game);
     }
     if (f.ev !== p.ev) {
@@ -603,13 +603,13 @@ export function installFacilitySystems(game) {
     const cn = coreName(f);
     switch (f.stage) {
       case 'find': return t('Find the GENERATOR room ({d} m)').replace(' ({d} m)', '');
-      case 'fuel': return tf('The generator needs a {c} — find one in the facility', { c: compName(f.need) });
+      case 'fuel': return tf('The generator needs a {c} - find one in the facility', { c: compName(f.need) });
       case 'start': return t('Start the generator (router rewiring)');
       case 'route': return f.chain === 'voltage' ? tf('Route power to the containment wing: set BUS A / B / C ({n}/3)', { n: done ? 3 : 0 }) : f.chain === 'order' ? tf('Flip the containment breakers in the right order ({n}/4)', { n: done ? 4 : 0 }) : tf('Enter the containment code (fragments found {n}/3)', { n: 3 });
       case 'core': return tf('Take the {core} from the containment chamber', { core: cn });
-      case 'extract': return tf('EXTRACTION: get the {core} to the ship — {t}', { core: cn, t: '' });
+      case 'extract': return tf('EXTRACTION: get the {core} to the ship - {t}', { core: cn, t: '' });
       case 'done': return tf('{core} extracted', { core: cn });
-      case 'failed': return t('Containment failure — the core destabilised');
+      case 'failed': return t('Containment failure - the core destabilised');
       default: return f.stage;
     }
   }
@@ -743,7 +743,7 @@ export function installFacilitySystems(game) {
       const ra = f.extraction ? routeArrow() : { d: null, deg: 0 };
       cs.exitD = ra.d;
       const p = game.player;
-      const event = f.lock > 0 ? tf('LOCKDOWN — {s}s', { s: Math.ceil(f.lock) }) : f.ev === 'unknown' ? t('FACILITY STATUS: UNKNOWN') : f.ev === 'blackout' ? t('BLACKOUT') : f.vent !== 'clean' ? `${t('AIR')}: ${t(f.vent.toUpperCase())}` : '';
+      const event = f.lock > 0 ? tf('LOCKDOWN - {s}s', { s: Math.ceil(f.lock) }) : f.ev === 'unknown' ? t('FACILITY STATUS: UNKNOWN') : f.ev === 'blackout' ? t('BLACKOUT') : f.vent !== 'clean' ? `${t('AIR')}: ${t(f.vent.toUpperCase())}` : '';
       hud.update(f, { visible: (p.indoor || f.extraction) && !p.dead, coreName: f.core, left: cs.extLeft, exitD: ra.d, arrowDeg: ra.deg, event });
     }
   }
@@ -758,26 +758,26 @@ export function installFacilitySystems(game) {
     if (g && nearP(g.pos)) {
       const c = compName(f.need);
       if (!f.fuel) {
-        list.push({ pos: g.slotPos, r: 0.6, reach: 2.4, label: () => (hasComponent(f.need) ? tf('Insert the {c} into the generator [E]', { c }) : tf('Generator — needs {c} [E]', { c })), action: () => insertComponent(f.need) });
+        list.push({ pos: g.slotPos, r: 0.6, reach: 2.4, label: () => (hasComponent(f.need) ? tf('Insert the {c} into the generator [E]', { c }) : tf('Generator - needs {c} [E]', { c })), action: () => insertComponent(f.need) });
       } else if (!f.gen) {
         list.push({ pos: g.pos, r: 0.8, reach: 2.4, label: t('Start the generator [E]'), sub: t('Router rewiring: restore main power'), action: () => startGenerator() });
       } else if (dead) {
-        list.push({ pos: g.pos, r: 0.8, reach: 2.4, label: () => (f.ev === 'blackout' ? t('Generator cooling down...') : t('Generator stalled — restart [E]')), sub: () => (f.ev === 'blackout' ? `${Math.ceil(f.evLeft || 0)}s` : ''), action: () => { if (f.ev !== 'blackout') game.net.request('facAct', { a: 'restart' }); } });
+        list.push({ pos: g.pos, r: 0.8, reach: 2.4, label: () => (f.ev === 'blackout' ? t('Generator cooling down...') : t('Generator stalled - restart [E]')), sub: () => (f.ev === 'blackout' ? `${Math.ceil(f.evLeft || 0)}s` : ''), action: () => { if (f.ev !== 'blackout') game.net.request('facAct', { a: 'restart' }); } });
       } else {
         list.push({ pos: g.overloadPos, r: 0.45, reach: 2.2, label: () => (f.ovCd > 0 ? t('Overload cooling down') : t('OVERLOAD the generator [E]')), sub: () => (f.ovCd > 0 ? `${Math.ceil(f.ovCd)}s` : t('60% door opens · 25% lights out · 10% alarm · 5% ???')), action: () => { if (!(f.ovCd > 0)) { game.audio.play('lever_pull', { volume: 0.7, bus: 'sfx' }); game.net.request('facAct', { a: 'overload' }); } } });
       }
     }
     if (f.chain === 'voltage' && !f.wing) for (const pn of sys.panels) {
       if (!nearP(pn.pos)) continue;
-      list.push({ pos: pn.pos, r: 0.55, reach: 2.3, label: () => (!f.gen || dead ? t('Panel dead — no power') : tf('Bus {l}: {v} — adjust [E]', { l: pn.label, v: f.volt?.[pn.i] ?? 0 })), action: () => { if (f.gen && !dead) game.net.request('facAct', { a: 'volt', i: pn.i }); else game.audio.play('ui_error', { volume: 0.4, bus: 'ui' }); } });
+      list.push({ pos: pn.pos, r: 0.55, reach: 2.3, label: () => (!f.gen || dead ? t('Panel dead - no power') : tf('Bus {l}: {v} - adjust [E]', { l: pn.label, v: f.volt?.[pn.i] ?? 0 })), action: () => { if (f.gen && !dead) game.net.request('facAct', { a: 'volt', i: pn.i }); else game.audio.play('ui_error', { volume: 0.4, bus: 'ui' }); } });
     }
     const c = sys.contain;
     if (c && !f.wing && nearP(c.pos)) {
       if (f.chain === 'order' && c.levers) for (const lv of c.levers) {
         if (f.ord?.includes(lv.i)) continue;
-        list.push({ pos: lv.pos, r: 0.14, reach: 2.2, label: () => (!f.gen || dead ? t('Panel dead — no power') : tf('Flip breaker {n} [E]', { n: lv.i + 1 })), action: () => { if (f.gen && !dead) game.net.request('facAct', { a: 'flip', i: lv.i }); } });
+        list.push({ pos: lv.pos, r: 0.14, reach: 2.2, label: () => (!f.gen || dead ? t('Panel dead - no power') : tf('Flip breaker {n} [E]', { n: lv.i + 1 })), action: () => { if (f.gen && !dead) game.net.request('facAct', { a: 'flip', i: lv.i }); } });
       } else if (f.chain === 'codes') {
-        list.push({ pos: c.pos, r: 0.5, reach: 2.3, label: () => (!f.gen || dead ? t('Panel dead — no power') : t('Enter the containment code [E]')), action: () => { if (f.gen && !dead) openKeypad(); } });
+        list.push({ pos: c.pos, r: 0.5, reach: 2.3, label: () => (!f.gen || dead ? t('Panel dead - no power') : t('Enter the containment code [E]')), action: () => { if (f.gen && !dead) openKeypad(); } });
       } else list.push({ pos: c.pos, r: 0.45, reach: 2.2, label: t('Containment console'), sub: () => (!f.gen ? t('NO POWER') : t('WING LOCKED')), action: () => {} });
     }
     for (const n of sys.notes) if (nearP(n.pos, 4)) list.push({ pos: n.pos, r: 0.4, reach: 2.2, label: t('Read the note [E]'), action: () => readNote(n) });
@@ -791,7 +791,7 @@ export function installFacilitySystems(game) {
       });
     }
     const v = sys.vent;
-    if (v && nearP(v.pos)) list.push({ pos: v.pos, r: 0.6, reach: 2.3, label: () => (f.purge > 0 ? t('Purging...') : f.vent === 'clean' ? t('Ventilation: CLEAN') : tf('Ventilation: {s} — purge [E]', { s: t(f.vent.toUpperCase()) })), action: () => { if (f.vent !== 'clean' && !(f.purge > 0) && !dead) game.net.request('facAct', { a: 'purge' }); } });
+    if (v && nearP(v.pos)) list.push({ pos: v.pos, r: 0.6, reach: 2.3, label: () => (f.purge > 0 ? t('Purging...') : f.vent === 'clean' ? t('Ventilation: CLEAN') : tf('Ventilation: {s} - purge [E]', { s: t(f.vent.toUpperCase()) })), action: () => { if (f.vent !== 'clean' && !(f.purge > 0) && !dead) game.net.request('facAct', { a: 'purge' }); } });
   }
 
   function hasComponent(id) {
@@ -856,7 +856,7 @@ export function installFacilitySystems(game) {
     if (!p.indoor && !f.extraction && !f.result) return;   // inside only (the outdoor lines stay clean)
     switch (f.stage) {
       case 'find': add(tf('Find the GENERATOR room ({d} m)', { d: dist(sys.gen?.pos) }), 'main'); break;
-      case 'fuel': add(tf('The generator needs a {c} — find one in the facility', { c }), 'main'); if (hasComponent(f.need)) add(tf('Carry the {c} to the generator and press [E]', { c }), 'sub'); break;
+      case 'fuel': add(tf('The generator needs a {c} - find one in the facility', { c }), 'main'); if (hasComponent(f.need)) add(tf('Carry the {c} to the generator and press [E]', { c }), 'sub'); break;
       case 'start': add(t('Start the generator (router rewiring)'), 'main'); break;
       case 'route': {
         if (f.chain === 'voltage') { const n = (f.volt || []).filter((v, k) => v === sys.targets.volt[k]).length; add(tf('Route power to the containment wing: set BUS A / B / C ({n}/3)', { n }), 'main', false, n / 3); add(t('Hint: a maintenance note is pinned somewhere in the facility'), 'hint'); }
@@ -868,17 +868,17 @@ export function installFacilitySystems(game) {
       case 'core': add(tf('Take the {core} from the containment chamber', { core: cn }), 'main'); break;
       case 'extract': {
         const left = Math.max(0, Math.ceil(cs.extLeft || f.ext?.left || 0));
-        add(tf('EXTRACTION: get the {core} to the ship — {t}', { core: cn, t: `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}` }), 'warn', false, f.ext ? left / Math.max(1, f.ext.total) : null);
+        add(tf('EXTRACTION: get the {core} to the ship - {t}', { core: cn, t: `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}` }), 'warn', false, f.ext ? left / Math.max(1, f.ext.total) : null);
         if (cs.exitD != null) add(tf('Exit: {d} m', { d: cs.exitD }), 'sub');
         break;
       }
       case 'done': add(tf('{core} extracted', { core: cn }), 'main', true); break;
-      case 'failed': add(t('Containment failure — the core destabilised'), 'warn'); break;
+      case 'failed': add(t('Containment failure - the core destabilised'), 'warn'); break;
       default: break;
     }
-    if (f.lock > 0) add(tf('LOCKDOWN — {s}s', { s: Math.ceil(f.lock) }), 'warn');
-    else if (f.security === 'alarm' && !f.extraction) add(t('ALARM — creatures are converging'), 'warn');
-    if (f.vent === 'gas' || f.vent === 'toxic') add(t('VENT GAS — find clean air (green light) or purge the vents'), 'warn');
+    if (f.lock > 0) add(tf('LOCKDOWN - {s}s', { s: Math.ceil(f.lock) }), 'warn');
+    else if (f.security === 'alarm' && !f.extraction) add(t('ALARM - creatures are converging'), 'warn');
+    if (f.vent === 'gas' || f.vent === 'toxic') add(t('VENT GAS - find clean air (green light) or purge the vents'), 'warn');
   }
 
   // ---------------------------------------------------------------- terminal

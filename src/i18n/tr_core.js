@@ -37,7 +37,7 @@ export default {
   "Select an item.": "Bir eşya seç.",
   "Turn scrap into components instead of selling it.": "Hurdayı satmak yerine bileşene çevir.",
   "Sells for": "Satış değeri",
-  "SELL / DISMANTLE / KEEP - your call.": "SAT / SÖK / SAKLA — karar senin.",
+  "SELL / DISMANTLE / KEEP - your call.": "SAT / SÖK / SAKLA - karar senin.",
   "YIELDS": "VERİR",
   "Strange items and creature drops: learn from them instead of selling them.": "Tuhaf eşyalar ve yaratık parçaları: satmak yerine onlardan öğren.",
   "STRANGE": "TUHAF",

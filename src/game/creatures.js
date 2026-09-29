@@ -6,7 +6,7 @@ export const CREATURES = {
   scuttler: { name: 'Spam Bot', hp: 30, dmg: 8, walk: 2.2, run: 5.4, power: 0.5, pack: [2, 4], xp: 18, coin: 3, drop: ['drop_scuttler', 0.25], zone: 'in', radius: 0.5, height: 0.6,
     lore: 'Swarms of cheap spam bots. Crunchy. Easy XP for new janitors.' },
   yoinker: { name: 'Data Hoarder', hp: 60, dmg: 15, walk: 2.6, run: 6.2, power: 1, xp: 40, coin: 8, zone: 'in', radius: 0.45, height: 1.0,
-    lore: 'Hoards content in its nest. Harmless... until you touch its stuff. Yippee!' },
+    lore: 'Hoards content in its nest. Harmless until you touch its stuff.' },
   crawler: { name: 'Web Crawler', hp: 160, dmg: 40, walk: 2.8, run: 11, power: 2, xp: 110, coin: 20, drop: ['drop_crawler', 0.45], zone: 'in', radius: 0.8, height: 1.2,
     lore: 'Indexes everything at terrifying speed, in straight lines. Terrible at corners. Sidestep it.' },
   lurker: { name: 'Lurker', hp: 220, dmg: 70, walk: 2.4, run: 9.5, power: 3, xp: 260, coin: 45, drop: ['drop_lurker', 0.6], zone: 'in', radius: 0.45, height: 2.2,

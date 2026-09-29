@@ -48,7 +48,7 @@ const TR = {
   'close': 'kapat', 'carried': 'taşınıyor', 'Price': 'Fiyat', 'Stun': 'Sersemletme', 'Scrap': 'Hurda', 'Valuable': 'Değerli', 'Catch': 'Av',
   'Creature drop': 'Yaratık ganimeti', 'Tool': 'Alet', 'Weapon': 'Silah', 'Consumable': 'Sarf', 'Trinket': 'Tılsım', 'Body': 'Ceset', 'Equipped': 'Kuşanıldı', 'DRAG move': 'SÜRÜKLE taşı', 'RMB quick-move / equip': 'SAĞ TIK hızlı taşı / kuşan',
   'SHIFT+CLICK drop': 'SHIFT+TIK yere at', '1-4 to hotbar': '1-4 hızlı erişime', 'I / ESC close': 'I / ESC kapat', 'Drag here to drop': 'Yere atmak için dışarı sürükle',
-  'Empty — drag loot here': 'Boş — ganimeti buraya sürükle', 'Wear a bag for more room': 'Daha fazla yer için çanta tak', 'loot weight': 'ganimet ağırlığı',
+  'Empty - drag loot here': 'Boş - ganimeti buraya sürükle', 'Wear a bag for more room': 'Daha fazla yer için çanta tak', 'loot weight': 'ganimet ağırlığı',
   'Padded Hoodie': 'Dolgulu Kapüşonlu', 'Riot Vest': 'Çevik Kuvvet Yeleği', 'Kevlar Suit': 'Kevlar Takım', 'Lucky Dongle': 'Şanslı Dongle',
   'Energy Drink Charm': 'Enerji İçeceği Tılsımı', 'Signal Amulet': 'Sinyal Muskası', 'Field Pack': 'Arazi Çantası', 'Hauler Frame': 'Yük Çerçevesi',
   'Void Satchel': 'Boşluk Heybesi', 'Belt Bag': 'Bel Çantası', 'Common': 'Sıradan', 'Uncommon': 'Nadir Olmayan', 'Rare': 'Nadir', 'Epic': 'Destansı',
@@ -776,7 +776,7 @@ export function installInventory(game) {
       hk.handled = true;
       api.equip(it.id);
     }));
-    st.offs.push(mods.on('hostStart', (g) => { if (g === game) { const n = hostReclaim(game.selfId, game.profile?.id); if (n) game.ui?.toast(tf('{n} item(s) back in your inventory.', { n }), 'info'); } }));
+    st.offs.push(mods.on('hostStart', (g) => { if (g === game) { const n = hostReclaim(game.selfId, game.profile?.id); if (n) game.ui?.toast(tf('Back in your inventory: {n}', { n }), 'info'); } }));
     st.offs.push(mods.on('playerJoin', (id, info, g) => { if (g === game && info?.pid) game.later(() => hostReclaim(id, info.pid), 1500); }));
     st.offs.push(mods.on('moonPopulated', (g) => { if (g === game) { try { hostMoonLoot(); } catch (e) { console.warn('[inventory] moon loot', e); } } }));
     st.offs.push(mods.on('phase', (ph, g) => { if (g === game) { bump(); if (ph === 'orbit' || ph === 'landing') clearBeams(); } }));

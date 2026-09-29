@@ -109,7 +109,7 @@ export function installCaseFiles(core) {
     const T = tr();
     const list = ensureCaseProfile(game.profile);
     if (!list.length) return t('No case files yet. Survive a day (or do not).');
-    const out = [t('CASE ARCHIVE (latest 10) — open with CASE <n>'), ''];
+    const out = [t('CASE ARCHIVE (latest 10) - open with CASE <n>'), ''];
     for (const c of list.slice(0, 10)) {
       out.push(`#${c.n}  ${t('DAY')} ${c.day}  ${String(c.moon || '').slice(0, 18).padEnd(18)} ▮${String(c.value).padEnd(5)} ${c.returned}/${c.entered} ${t('returned')}${c.deaths.length ? `  ✖${c.deaths.length}` : ''}${c.allDead ? '  [WIPE]' : ''}`);
     }
@@ -122,7 +122,7 @@ export function installCaseFiles(core) {
     if (!c) return t('Case not found. Type CASES.');
     if (c.kind && caseTexts[c.kind]) return caseTexts[c.kind](c);   // [cycle3] dossiers
     const L = (en, trs) => (T ? trs : t(en));
-    const out = [`CASE #${c.n} — ${c.moon} — ${L('DAY', 'GÜN')} ${c.day}${c.interior ? ' — ' + c.interior : ''}`, ''];
+    const out = [`CASE #${c.n} - ${c.moon} - ${L('DAY', 'GÜN')} ${c.day}${c.interior ? ' - ' + c.interior : ''}`, ''];
     out.push(`${L('Entered', 'Giren')} ${c.entered}, ${L('Returned', 'Dönen')} ${c.returned}, ${L('Value extracted', 'Çıkarılan değer')} ▮${c.value}, ${L('Kills', 'Öldürme')} ${c.kills}`);
     if (c.artifacts?.length) out.push(`${L('Artifacts', 'Eserler')}: ${c.artifacts.map((a) => `${a.name} (▮${a.value})`).join(', ')}`);
     if (c.events?.length) out.push(`${L('Facility events', 'Tesis olayları')}: ${c.events.join(', ')}`);
@@ -131,7 +131,7 @@ export function installCaseFiles(core) {
     if (c.mvp) out.push(`MVP: ${c.mvp.name} (▮${c.mvp.loot})`);
     if (c.top) out.push(`${L('Most valuable', 'En değerli')}: ${c.top.name} (▮${c.top.value})`);
     if (c.lastWords) out.push(`${L('LAST WORDS', 'SON SÖZLER')} (${c.lastWords.name}): "${c.lastWords.text || L('[no transmission]', '[yayın yok]')}"`);
-    if (c.contract) out.push(`${L('Contract', 'Sözleşme')}: ${pickLang(c.contract.title, T)} [${FACTIONS[c.contract.f]?.short || ''}] — ${String(c.contract.result).toUpperCase()}`);
+    if (c.contract) out.push(`${L('Contract', 'Sözleşme')}: ${pickLang(c.contract.title, T)} [${FACTIONS[c.contract.f]?.short || ''}] - ${String(c.contract.result).toUpperCase()}`);
     if (c.secret) out.push(`${L('Secret objective', 'Gizli görev')}: ${pickLang(c.secret.name, T)} ✔`);
     const v = verdictText(c, T);
     if (v) out.push('', `THE ALGORITHM: "${v}"`);

@@ -332,7 +332,7 @@ addTranslations({
   'Frame': 'Çerçeve', 'None': 'Yok', 'Amber': 'Kehribar', 'Hazard': 'Tehlike', 'Silver': 'Gümüş', 'Gold': 'Altın', 'Blood': 'Kan', 'Void': 'Boşluk',
   'Unlocks at level {n}': 'Seviye {n} ile açılır', 'Unlocks with achievement: {a}': 'Başarım ile açılır: {a}',
   'SAVE AVATAR': 'AVATARI KAYDET', 'Avatar saved.': 'Avatar kaydedildi.', 'RESET TO DEFAULT': 'VARSAYILANA DÖN', 'unsaved changes': 'kaydedilmemiş değişiklikler',
-  'Avatars above name tags': 'İsim etiketlerinin üstünde avatar', "small picture over teammates' heads": 'ekip arkadaşlarının başının üstünde küçük resim',
+  'Avatars above name tags': 'İsim etiketlerinin üstünde avatar', "small picture over crewmates' heads": 'ekip arkadaşlarının başının üstünde küçük resim',
   '[PROFILE] name / avatar': '[PROFİL] ad / avatar', 'Edit profile': 'Profili düzenle',
 }, 'tr');
 addTranslations({
@@ -349,6 +349,6 @@ addTranslations({
   'Frame': 'Рамка', 'None': 'Нет', 'Amber': 'Янтарь', 'Hazard': 'Опасность', 'Silver': 'Серебро', 'Gold': 'Золото', 'Blood': 'Кровь', 'Void': 'Пустота',
   'Unlocks at level {n}': 'Откроется на уровне {n}', 'Unlocks with achievement: {a}': 'Откроется за достижение: {a}',
   'SAVE AVATAR': 'СОХРАНИТЬ АВАТАР', 'Avatar saved.': 'Аватар сохранён.', 'RESET TO DEFAULT': 'СБРОС', 'unsaved changes': 'есть несохранённые изменения',
-  'Avatars above name tags': 'Аватары над никами', "small picture over teammates' heads": 'маленькая картинка над головой напарников',
+  'Avatars above name tags': 'Аватары над никами', "small picture over crewmates' heads": 'маленькая картинка над головой напарников',
   '[PROFILE] name / avatar': '[ПРОФИЛЬ] имя / аватар', 'Edit profile': 'Изменить профиль',
 }, 'ru');

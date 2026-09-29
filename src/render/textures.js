@@ -1766,6 +1766,93 @@ def('poster_hang', 64, 96, (p, r) => {
   tapeCorners(p);
   p.grime(r, 0.3);
 });
+// wave 8 studio: six more notice-board posters (faction slogans from docs/LORE.md) so no room repeats the same three
+def('poster_delete', 64, 96, (p, r) => {
+  paper(p, r, [52, 84, 112]);
+  p.frame(2, 2, 60, 92, [200, 226, 240]);
+  p.ellipse(32, 24, 15, 8, [226, 238, 244]); p.circle(32, 24, 6, [30, 60, 90]); p.circle(32, 24, 2.5, [10, 14, 20]);
+  p.line(16, 40, 48, 10, [190, 40, 40]); p.line(17, 40, 49, 10, [190, 40, 40]);
+  p.textC('IF YOU SEE', 32, 46, [230, 240, 246]);
+  p.textC('SOMETHING,', 32, 54, [230, 240, 246]);
+  p.textS('DELETE', 32, 64, [255, 255, 255], [20, 40, 60], 2);
+  p.textC('SOMETHING', 32, 78, [230, 240, 246]);
+  p.textC('MOD BUREAU', 32, 87, [150, 190, 214]);
+  tapeCorners(p);
+  p.grime(r, 0.3);
+});
+def('poster_grave', 64, 96, (p, r) => {
+  paper(p, r, [96, 106, 62]);
+  p.frame(2, 2, 60, 92, [210, 220, 150]);
+  p.rect(22, 14, 20, 24, [160, 168, 150]); p.ellipse(32, 14, 10, 6, [160, 168, 150]);
+  p.textC('404', 32, 22, [50, 56, 40], 2);
+  p.rect(14, 38, 36, 2, [40, 60, 30]);
+  p.textC('IS NOT AN', 32, 46, [236, 240, 200]);
+  p.textC('ERROR.', 32, 54, [236, 240, 200]);
+  p.textC('IT IS A', 32, 66, [236, 240, 200]);
+  p.textS('GRAVE.', 32, 74, [255, 255, 230], [40, 48, 26], 2);
+  p.textC('THE ARCHIVE', 32, 87, [190, 200, 130]);
+  tapeCorners(p);
+  p.grime(r, 0.32);
+});
+def('poster_noref', 64, 96, (p, r) => {
+  paper(p, r, [56, 20, 42]);
+  p.frame(2, 2, 60, 92, [255, 90, 160]);
+  p.textS('NO', 32, 10, [255, 110, 170], [20, 6, 14], 3);
+  p.textS('REFUNDS', 32, 28, [255, 230, 240], [20, 6, 14], 2);
+  p.textS('NO', 32, 46, [255, 110, 170], [20, 6, 14], 2);
+  p.textC('RECEIPTS', 32, 58, [255, 230, 240]);
+  p.textC('NO', 32, 66, [255, 110, 170]);
+  p.textC('MODERATORS', 32, 74, [255, 230, 240]);
+  p.textC('DARK WEB BAZAAR', 32, 87, [200, 100, 150]);
+  tapeCorners(p);
+  p.grime(r, 0.3);
+});
+def('poster_hr', 64, 96, (p, r) => {
+  paper(p, r, [214, 206, 178]);
+  p.rect(4, 4, 56, 9, [40, 110, 74]);
+  p.textC('HR NOTICE', 32, 6, [236, 240, 226]);
+  const k = [40, 36, 30];
+  p.rect(31, 20, 2, 26, k); p.rect(20, 46, 24, 2, k); p.line(14, 24, 50, 24, k);
+  p.line(14, 24, 10, 34, k); p.line(14, 24, 18, 34, k); p.rect(8, 34, 12, 2, k);
+  p.line(50, 24, 46, 30, k); p.line(50, 24, 54, 30, k); p.rect(44, 30, 12, 2, k);
+  p.textC('WORK-LIFE', 32, 56, k);
+  p.textC('BALANCE:', 32, 63, k);
+  p.textC('PENDING', 32, 71, [150, 30, 28], 2);
+  p.textC('ASK HR-BOT', 32, 87, [80, 74, 60]);
+  tapeCorners(p);
+  p.grime(r, 0.25);
+});
+def('poster_wash', 64, 96, (p, r) => {
+  paper(p, r, [150, 194, 208]);
+  p.frame(2, 2, 60, 92, [40, 80, 100]);
+  const k = [40, 80, 100];
+  p.ellipse(32, 28, 12, 10, [236, 214, 190]);
+  for (let i = 0; i < 4; i++) p.rect(22 + i * 6, 8 + (i === 0 || i === 3 ? 4 : 0), 4, 12, [236, 214, 190]);
+  p.circle(32, 28, 3, [20, 20, 20]); p.circle(32, 28, 1, [255, 255, 255]);
+  p.textC('WASH YOUR', 32, 50, k);
+  p.textS('HANDS.', 32, 58, [255, 255, 255], [30, 60, 80], 2);
+  p.textC('THEY ARE', 32, 74, k);
+  p.textC('WATCHING.', 32, 81, k);
+  p.textC('FACILITIES', 32, 89, [60, 100, 120]);
+  tapeCorners(p);
+  p.grime(r, 0.28);
+});
+def('poster_lost', 64, 96, (p, r) => {
+  paper(p, r, [230, 222, 190]);
+  const k = [30, 28, 24];
+  p.textC('LOST', 32, 6, k, 3);
+  p.ellipse(32, 38, 10, 7, k); p.circle(32, 26, 6, k);
+  p.line(27, 22, 25, 16, k); p.line(28, 21, 25, 16, k); p.line(37, 22, 39, 16, k); p.line(36, 21, 39, 16, k);
+  p.circle(30, 26, 1, [230, 222, 190]); p.circle(35, 26, 1, [230, 222, 190]);
+  p.line(41, 40, 50, 32, k); p.line(42, 40, 51, 33, k);
+  p.textC('ANSWERS TO', 32, 50, k);
+  p.textC('ANYTHING.', 32, 57, k);
+  p.textC('FOUND: 4 CATS.', 32, 66, [150, 30, 28]);
+  p.textC('NONE ARE HERS.', 32, 73, [150, 30, 28]);
+  for (let i = 0; i < 7; i++) { p.rect(4 + i * 8, 82, 7, 12, [214, 206, 176]); p.line(4 + i * 8, 82, 4 + i * 8, 94, k); }
+  tapeCorners(p);
+  p.grime(r, 0.25);
+});
 def('sign_noclip', 64, 64, (p, r) => {
   paper(p, r, [226, 214, 150]);
   p.rect(2, 2, 60, 16, [30, 28, 20]);

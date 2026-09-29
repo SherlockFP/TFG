@@ -113,7 +113,7 @@ export class Progress {
       g.net?.send('pinfo', g.helloData());
       g.mods?.emit('levelUp', p.level, g);
       if (before < REBIRTH_LEVEL && p.level >= REBIRTH_LEVEL) {
-        setTimeout(() => g.ui?.toast?.(tf('REBIRTH available! Press J → REBIRTH for a permanent ★ (or keep climbing to {MAX_LEVEL}).', { MAX_LEVEL }), 'good'), 2500);
+        setTimeout(() => g.ui?.toast?.(tf('Rebirth available: press J, then REBIRTH, for a permanent ★. Or keep climbing to {MAX_LEVEL}.', { MAX_LEVEL }), 'good'), 2500);
       }
     }
     this.save();
@@ -236,7 +236,7 @@ export class Progress {
       if (b.done || b.type !== type) continue;
       if (b.target !== target && b.target !== 'any' && !(type === 'collect' || type === 'sell')) continue;
       b.progress = Math.min(b.n, b.progress + n);
-      if (b.progress >= b.n) { b.done = true; this.game.ui.toast(t('Bounty complete! Claim it at the HQ board.'), 'good'); this.game.audio.ui('ui_confirm', 0.7); }
+      if (b.progress >= b.n) { b.done = true; this.game.ui.toast(t('Bounty complete. Claim it at the HQ board.'), 'good'); this.game.audio.ui('ui_confirm', 0.7); }
       changed = true;
     }
     if (changed) { this.save(); this.game.ui.hud?.refreshBounties?.(); }

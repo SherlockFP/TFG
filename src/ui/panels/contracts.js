@@ -87,7 +87,7 @@ export function createLoreBoard({ game, lore, tab, onClose } = {}) {
     const ch = chapterOf(run.quotaIndex);
     const focus = run.algo?.focus;
     head.append(cv, mk('div', '', `<div class="lb-title">${L('THE ALGORITHM LINK', 'ALGORİTMA BAĞLANTISI')}</div>`
-      + `<div class="lb-sub">${L('CHAPTER', 'BÖLÜM')} ${ch.n}: ${escapeHtml(pickLang(ch.name, T))} — ${escapeHtml(pickLang(ch.sub, T))}</div>`
+      + `<div class="lb-sub">${L('CHAPTER', 'BÖLÜM')} ${ch.n}: ${escapeHtml(pickLang(ch.name, T))} - ${escapeHtml(pickLang(ch.sub, T))}</div>`
       + `<div class="lb-sub">${L("Today's focus", 'Bugünün odağı')}: <b style="color:#ff3d7f">${focus ? escapeHtml(pickLang(FOCUS_NAME[focus], T)) : '???'}</b> · ${L('mood', 'ruh hali')}: ${escapeHtml(run.algo?.mood || 'curious')} · ▮${run.credits ?? 0}</div>`));
     root.appendChild(head);
     const ctx = cv.getContext('2d');
@@ -145,7 +145,7 @@ export function createLoreBoard({ game, lore, tab, onClose } = {}) {
       card.style.setProperty('--fc', f.color);
       card.innerHTML = `<div class="lb-k">${f.glyph} ${escapeHtml(f.name.toUpperCase())} · ${escapeHtml(tx.icon)} ${escapeHtml(tx.type)}${o.patron ? ' · ' + (o.patron === 'company' ? L('THE COMPANY', 'ŞİRKET') : L('THE ALGORITHM', 'ALGORİTMA')) : ''}</div>`
         + `<div class="lb-n">${escapeHtml(tx.title)}</div>`
-        + (chain ? `<div class="lb-chain">★ ${escapeHtml(pickLang(CHAINS[o.faction].name, T))} — ${L('step', 'adım')} ${o.chain + 1}/5</div>` : '')
+        + (chain ? `<div class="lb-chain">★ ${escapeHtml(pickLang(CHAINS[o.faction].name, T))} - ${L('step', 'adım')} ${o.chain + 1}/5</div>` : '')
         + `<div class="lb-b">${escapeHtml(tx.brief)}${tx.goal !== tx.brief ? `<br><span style="opacity:.7">${escapeHtml(tx.goal)}</span>` : ''}</div>`
         + `<div class="lb-r">▮${o.reward.credits} · +${o.reward.rep} ${escapeHtml(f.short)} <span class="neg">${RIVAL_REP} ${escapeHtml(FACTIONS[o.rival].short)}</span> · ${o.reward.xp} XP</div>`;
       const b = mk('button', 'lb-btn', o.taken ? L('TAKEN', 'ALINDI') : L('ACCEPT', 'KABUL ET'));
@@ -158,7 +158,7 @@ export function createLoreBoard({ game, lore, tab, onClose } = {}) {
     });
     body.appendChild(grid);
     renderPatronJobs(body, run);
-    body.appendChild(mk('div', 'lb-secret', `??? ${L('SECRET OBJECTIVE — every day hides one. The Algorithm will tell you when you stumble into it.', 'GİZLİ GÖREV — her gün bir tane saklı. Üstüne düştüğünüzde Algoritma söyleyecek.')}`));
+    body.appendChild(mk('div', 'lb-secret', `??? ${L('SECRET OBJECTIVE - every day hides one. The Algorithm will tell you when you stumble into it.', 'GİZLİ GÖREV - her gün bir tane saklı. Üstüne düştüğünüzde Algoritma söyleyecek.')}`));
   }
 
   /** [links] today's story patron jobs (module story) with take buttons; same rules as the terminal JOB <n> */

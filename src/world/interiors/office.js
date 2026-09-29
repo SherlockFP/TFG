@@ -42,7 +42,7 @@ export const OFFICE = {
   layout: { plan: 'wings', doorP: 0.62, blastP: 0.05, loops: 0.35, bigChance: 0.34, corridorH: 3.1, hub: { type: 'elevator_hub', w: 4, h: 4 }, hubAlways: true, lockedP: 0.16 },
   lamps: { corridor: 'fluorescent', every: 2, color: C_LAMP, flicker: 0.14 },
   lampColor: C_LAMP,
-  posters: ['poster_work', 'poster_like', 'poster_hang', 'poster_fish', 'poster_missing', 'poster_safety'],
+  posters: ['poster_work', 'poster_like', 'poster_hang', 'poster_fish', 'poster_missing', 'poster_safety', 'poster_hr', 'poster_delete', 'poster_wash', 'poster_lost'],
   landmarks: ['planter', 'copier', 'water_cooler'],
   doorProp: 'door_single',
   corridorScrap: 0.08,

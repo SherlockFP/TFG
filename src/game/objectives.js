@@ -44,16 +44,16 @@ export class Objectives {
             const d = Math.hypot(s.x - p.pos.x, s.z - p.pos.z);
             return !best || d < best.d ? { s, d } : best;
           }, null);
-          if (nearest && nearest.d > 5) add(tf('Nearby lead: {name} ({d} m) — check it for supplies', { name: nearest.s.name, d: Math.round(nearest.d) }), 'sub');
+          if (nearest && nearest.d > 5) add(tf('Nearby lead: {name} ({d} m) - check it for supplies', { name: nearest.s.name, d: Math.round(nearest.d) }), 'sub');
         }
         const time = run.time || 480;
-        if (time > 23 * 60) add(t('THE SHIP LEAVES AT MIDNIGHT — RUN BACK NOW'), 'warn');
+        if (time > 23 * 60) add(t('THE SHIP LEAVES AT MIDNIGHT - RUN BACK NOW'), 'warn');
         else if (time > 21 * 60) add(t('It is getting late. Head back to the ship soon.'), 'warn');
         const target = Math.ceil(need / Math.max(1, run.daysLeft));
         const today = g.hostData?.dayStats?.collected ?? this.clientCollected();
         add(tf('Bring scrap to the ship: ▮{a} / ▮{b} today', { a: today, b: target }), 'main', today >= target && target > 0, target ? Math.min(1, today / target) : 1);
         const carrying = p.slots.filter((id) => id && isSellable(g.items.get(id)?.def || {})).length;
-        if (carrying && !p.inShip) add(tf(carrying > 1 ? 'Carrying {n} items — get them to the ship' : 'Carrying {n} item — get it to the ship', { n: carrying }), 'sub');
+        if (carrying && !p.inShip) add(tf(carrying > 1 ? 'Carrying {n} items - get them to the ship' : 'Carrying {n} item - get it to the ship', { n: carrying }), 'sub');
         if (!p.indoor && g.world.outdoor) {
           const e = g.world.outdoor.mainExit.pos;
           const d = Math.round(Math.hypot(e.x - p.pos.x, e.z - p.pos.z));

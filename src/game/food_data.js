@@ -305,12 +305,12 @@ export const TR = {
   'Hiccups, heavy sway, delayed turning. You may pass out (not lethal).': 'Hıçkırık, ağır sallanma, gecikmeli dönüş. Bayılabilirsin (ölümcül değil).', 'Everything is fine. Everything is spinning. Passing out is likely.': 'Her şey yolunda. Her şey dönüyor. Bayılma ihtimali yüksek.',
   'CHEERS!': 'ŞEREFE!', 'You blacked out.': 'Bayıldın.', 'You come to. You dropped what you were holding.': 'Kendine geldin. Elindekini düşürdün.', '{name} passed out.': '{name} bayıldı.',
   'Ship table [E]': 'Gemi masası [E]', 'Hold food or a drink and press E. Eat together: Well Fed on the next landing.': 'Yiyecek veya içecek tut, E\'ye bas. Birlikte ye: sonraki inişte Tok ve Mutlu.',
-  'Eat here [E]': 'Burada ye [E]', 'Well Fed: the next landing starts on a full stomach.': 'Tok ve Mutlu: sonraki iniş tok karnına başlar.', 'Table meal! Eat with the crew for Well Fed.': 'Masa yemeği! Ekiple ye, Tok ve Mutlu ol.',
+  'Eat here [E]': 'Burada ye [E]', 'Well Fed: the next landing starts on a full stomach.': 'Tok ve Mutlu: sonraki iniş tok karnına başlar.', 'Table meal. Eat with the crew to get Well Fed.': 'Masa yemeği. Ekiple ye, Tok ve Mutlu ol.',
   'Vending Machine [E]': 'Otomat [E]', 'Fridge [E]': 'Buzdolabı [E]', '{n} left': '{n} kaldı', 'It is empty.': 'İçi boş.', 'It hums. Nothing comes out.': 'Uğuldar. Hiçbir şey çıkmaz.',
   'Take {item} from {name} [E]': '{name} kişisinden {item} al [E]', 'You hold out the {item}. A crewmate can take it with E.': '{item} uzattın. Bir ekip arkadaşı E ile alabilir.',
   'Hold food or a drink to offer it.': 'İkram etmek için yiyecek veya içecek tut.', '{name} handed you {item}.': '{name} sana {item} verdi.', 'You handed {item} to {name}.': '{name} kişisine {item} verdin.',
   'No free hands.': 'Eller dolu.', 'Offer [H]': 'İkram et [H]', 'Slow down, chef.': 'Yavaş ol şef.',
-  'Cake Day! Everyone nearby is happy.': 'Pasta Günü! Yakındaki herkes mutlu.', 'Burp.': 'Geğirik.', 'You are already eating.': 'Zaten yiyorsun.',
+  'Cake Day. Everyone nearby is happy.': 'Pasta Günü. Yakındaki herkes mutlu.', 'Burp.': 'Geğirik.', 'You are already eating.': 'Zaten yiyorsun.',
 };
 export const RU = {
   'Instant Noodles': 'Лапша быстрого приготовления', 'Deluxe Ramen Bowl': 'Рамен «Делюкс»', 'Pizza Slice': 'Кусок пиццы', 'Pizza Box': 'Коробка пиццы', 'Energy Bar': 'Энергобатончик',
@@ -344,10 +344,10 @@ export const RU = {
   'Hiccups, heavy sway, delayed turning. You may pass out (not lethal).': 'Икота, сильная качка, запаздывающие повороты. Можно отключиться (не смертельно).', 'Everything is fine. Everything is spinning. Passing out is likely.': 'Всё хорошо. Всё кружится. Отключка вероятна.',
   'CHEERS!': 'ЗА ЗДОРОВЬЕ!', 'You blacked out.': 'Вы отключились.', 'You come to. You dropped what you were holding.': 'Вы очнулись. Всё из рук выпало.', '{name} passed out.': '{name} отключился.',
   'Ship table [E]': 'Стол на корабле [E]', 'Hold food or a drink and press E. Eat together: Well Fed on the next landing.': 'Возьмите еду или напиток и нажмите E. Ешьте вместе: «Сыт и доволен» на следующей посадке.',
-  'Eat here [E]': 'Поесть здесь [E]', 'Well Fed: the next landing starts on a full stomach.': 'Сыт и доволен: следующая посадка начнётся на сытый желудок.', 'Table meal! Eat with the crew for Well Fed.': 'Ужин за столом! Ешьте с командой, чтобы стать сытыми и довольными.',
+  'Eat here [E]': 'Поесть здесь [E]', 'Well Fed: the next landing starts on a full stomach.': 'Сыт и доволен: следующая посадка начнётся на сытый желудок.', 'Table meal. Eat with the crew to get Well Fed.': 'Общий стол. Поешьте вместе, чтобы стать сытыми и довольными.',
   'Vending Machine [E]': 'Автомат [E]', 'Fridge [E]': 'Холодильник [E]', '{n} left': 'Осталось {n}', 'It is empty.': 'Пусто.', 'It hums. Nothing comes out.': 'Гудит. Ничего не выпадает.',
   'Take {item} from {name} [E]': 'Взять {item} у {name} [E]', 'You hold out the {item}. A crewmate can take it with E.': 'Вы протянули: {item}. Напарник может взять на E.',
   'Hold food or a drink to offer it.': 'Возьмите еду или напиток, чтобы угостить.', '{name} handed you {item}.': '{name} угостил вас: {item}.', 'You handed {item} to {name}.': 'Вы отдали {item}: {name}.',
   'No free hands.': 'Руки заняты.', 'Offer [H]': 'Угостить [H]', 'Slow down, chef.': 'Не спеши, шеф.',
-  'Cake Day! Everyone nearby is happy.': 'День торта! Все рядом довольны.', 'Burp.': 'Ик.', 'You are already eating.': 'Вы уже едите.',
+  'Cake Day. Everyone nearby is happy.': 'День торта. Все рядом довольны.', 'Burp.': 'Ик.', 'You are already eating.': 'Вы уже едите.',
 };

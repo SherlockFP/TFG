@@ -86,10 +86,14 @@ export function loadSettings() {
 }
 export function saveSettings(s) { store(KEY_SETTINGS, s); }
 
+// first-run handle: a job title plus a 3-digit badge number (<= 16 chars, passes profilename rules)
+const HANDLES = ['Janitor', 'Lurker', 'Intern', 'Temp', 'Contractor', 'Nobody', 'Trainee', 'Guest', 'Volunteer', 'Newbie', 'Extra', 'Anon'];
+export const defaultHandle = () => HANDLES[Math.floor(Math.random() * HANDLES.length)] + Math.floor(Math.random() * 900 + 100);
+
 export function defaultProfile() {
   return {
     id: randomId(10),
-    name: 'Employee' + Math.floor(Math.random() * 900 + 100),
+    name: defaultHandle(),
     suit: 'orange',
     hat: 'none',
     avatar: null,            // [profile] { m, f, px, png?, bg? } (ui/avatarpic.js); null = generated default seeded by the name

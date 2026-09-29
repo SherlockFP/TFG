@@ -6,6 +6,7 @@ import { TIERS, tierColor } from '../../game/tiers.js';
 import * as D from '../../game/durability_core.js';
 import { iconImg } from '../icons.js';
 import { t, tf } from '../../core/i18n.js';
+import { humanizeId } from '../../core/util.js';
 import { ensureDurStyle } from '../durability_style.js';
 
 const CSS = `
@@ -56,7 +57,7 @@ function mk(tag, cls, text) {
   if (text !== undefined && text !== null) e.textContent = String(text);
   return e;
 }
-const nameOf = (id) => t(ITEMS[id]?.name || id);
+const nameOf = (id) => t(ITEMS[id]?.name || humanizeId(id));
 const ico = (type) => { const b = mk('div', 'drp-ic'); try { b.appendChild(iconImg(type)); } catch { b.textContent = '?'; } return b; };
 const fmt = (v) => String(Math.round(v || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 

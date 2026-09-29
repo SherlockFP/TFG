@@ -258,7 +258,7 @@ export const actionMethods = {
     if (p.inShip || p.pos.distanceTo(new THREE.Vector3(0, 0, 0)) < 12) {
       add({ pos: sp.terminal, r: 0.8, label: t('Use terminal [E]'), action: () => this.openTerminal() });
       add({
-        pos: sp.lever, r: 0.6, label: () => ph === 'orbit' ? (this.run.daysLeft <= 0 && this.run.moon !== 'hq' ? t('Deadline! Route to the Company') : tf('Land on {name} [E]', { name: MOONS[this.run.moon]?.name })) : (ph === 'moon' || ph === 'company') ? t('Start the ship / take off [E]') : t('Ship in flight...'),
+        pos: sp.lever, r: 0.6, label: () => ph === 'orbit' ? (this.run.daysLeft <= 0 && this.run.moon !== 'hq' ? t('Deadline. Route to 0-Algorithm HQ') : tf('Land on {name} [E]', { name: MOONS[this.run.moon]?.name })) : (ph === 'moon' || ph === 'company') ? t('Start the ship / take off [E]') : t('Ship in flight...'),
         action: () => { if (ph === 'orbit' || ph === 'moon' || ph === 'company') { this.sfx('lever_pull', 0.9); this.animLever(); this.net.request('lever'); } },
       });
       add({ pos: sp.doorOpen, r: 0.5, label: () => this.ship.door.label(this.run?.phase), action: () => this.net.request('shipdoor', { open: !this.ship.door.open }) });
@@ -285,7 +285,7 @@ export const actionMethods = {
     if (outd && !p.indoor) {
       for (const ip of outd.interactables) {
         if (ip.type === 'exit') add({ pos: ip.pos, r: 1.2, reach: 2.6, label: ip.index === 0 ? t('Enter facility [E]') : t('Enter fire exit [E]'), action: () => this.useExit(ip.index, true) });
-        if (ip.type === 'pond' && p.pos.distanceTo(ip.pos) < ip.r + 3) add({ pos: p.pos.clone().add(new THREE.Vector3(0, 1.2, 0)).addScaledVector(p.forward().setY(0).normalize(), 1.6), r: 1.5, noLos: true, label: held?.type === 'rod' ? t('Cast your line [E]') : t('A pond. (Needs a fishing rod)'), action: () => held?.type === 'rod' && this.startFishing() });
+        if (ip.type === 'pond' && p.pos.distanceTo(ip.pos) < ip.r + 3) add({ pos: p.pos.clone().add(new THREE.Vector3(0, 1.2, 0)).addScaledVector(p.forward().setY(0).normalize(), 1.6), r: 1.5, noLos: true, label: held?.type === 'rod' ? t('Cast your line [E]') : t('A pond. You need a Phishing Rod.'), action: () => held?.type === 'rod' && this.startFishing() });
       }
     }
     if (outd?.outposts && !p.indoor) outd.outposts.addInteractables(this, add);
@@ -296,7 +296,7 @@ export const actionMethods = {
         if (ip.type === 'market') add({ pos: ip.pos, r: 1.2, reach: 3, label: t('Black Market - Phish Dayı [E]'), action: () => this.ui.openMarket(this) });
         if (ip.type === 'slots') add({ pos: ip.pos, r: 0.6, label: t('GACHA MACHINE - play slots [E]'), action: () => this.startSlots() });
         if (ip.type === 'bounties') add({ pos: ip.pos, r: 0.9, label: t('Bounty board [E]'), action: () => this.ui.openBounties(this) });
-        if (ip.type === 'pond' && p.pos.distanceTo(ip.pos) < 5) add({ pos: p.pos.clone().add(new THREE.Vector3(0, 1.2, 0)).addScaledVector(p.forward().setY(0).normalize(), 1.6), r: 1.5, noLos: true, label: held?.type === 'rod' ? t('Cast your line [E]') : t('The sea. (Needs a fishing rod)'), action: () => held?.type === 'rod' && this.startFishing(true) });
+        if (ip.type === 'pond' && p.pos.distanceTo(ip.pos) < 5) add({ pos: p.pos.clone().add(new THREE.Vector3(0, 1.2, 0)).addScaledVector(p.forward().setY(0).normalize(), 1.6), r: 1.5, noLos: true, label: held?.type === 'rod' ? t('Cast your line [E]') : t('The sea. You need a Phishing Rod.'), action: () => held?.type === 'rod' && this.startFishing(true) });
       }
     }
     this.mods?.emit('interactables', out, this);
@@ -1013,7 +1013,7 @@ export const actionMethods = {
     this.net.send('pst', { dead: true, cause, pos: p.pos.toArray() });
     if (this.isHost) this.hostOnPlayerDied(this.selfId, { cause, pos: p.pos.toArray() });
     this.progress.onDeath(cause);
-    const DEATH_TIPS = ['Crouch (C) to stay quiet — most things hunt by sound.', 'Scan (right click) before you walk into a room.',
+    const DEATH_TIPS = ['Crouch (C) to stay quiet - most things hunt by sound.', 'Scan (right click) before you walk into a room.',
       'Ping (P) threats so your crew knows.', 'Dead crewmates can still watch and ping. Stay on comms.', 'Bodies can be carried back to cut the fine.',
       'Close doors behind you. Some things cannot open them.', 'Do not stare at what blinks. Do not look away either.', 'Leave before midnight. The ship will not wait.'];
     this.ui.hud?.setDead(true, 'You ' + this.deathText(cause).replace('their', 'your'), DEATH_TIPS[Math.floor(Math.random() * DEATH_TIPS.length)]);
@@ -1171,7 +1171,7 @@ export const actionMethods = {
   startSafe(door) {
     const danger = this.hostDangerGuess();
     this.openMinigame('safe', { difficulty: clamp(0.25 + danger * 0.12, 0, 0.95) }, (res) => {
-      if (res.success) { this.net.request('vault', { id: door.id }); this.ui.toast(t('Vault unlocked!'), 'good'); }
+      if (res.success) { this.net.request('vault', { id: door.id }); this.ui.toast(t('Vault unlocked.'), 'good'); }
       else if (!res.cancelled) { this.net.request('alarm', { p: door.pos.toArray() }); this.ui.toast(t('ALARM TRIGGERED!'), 'bad'); }
     });
   },

@@ -176,7 +176,7 @@ export function installLore(game) {
       case 'case': cases.receive(d.c); break;
       case 'secret': {
         const s = SECRETS[d.id];
-        hud?.bigText?.(t('SECRET OBJECTIVE COMPLETE'), tf('{pickLang} — ▮{credits} · {xp} XP', { pickLang: pickLang(s?.name, T), credits: d.credits, xp: d.xp }));
+        hud?.bigText?.(t('SECRET OBJECTIVE COMPLETE'), tf('{pickLang} - ▮{credits} · {xp} XP', { pickLang: pickLang(s?.name, T), credits: d.credits, xp: d.xp }));
         game.sfx?.('ui_quota_met', 0.6);
         break;
       }
@@ -390,7 +390,7 @@ export function installLore(game) {
     api.registerCommand('logs', (rest, term) => {
       const p = game.profile.loreLogs || {};
       const got = LORE_LOGS.map((l, i) => ({ l, i })).filter((x) => p[x.l.id]);
-      term.print([(t('RECOVERED LOGS ')) + `${got.length}/${LORE_LOGS.length}`, ...got.map((x) => `${String(x.i + 1).padStart(2, '0')}. ${x.l.title} — ${x.l.author}`), '', '>LOG <n>'].join('\n'));
+      term.print([(t('RECOVERED LOGS ')) + `${got.length}/${LORE_LOGS.length}`, ...got.map((x) => `${String(x.i + 1).padStart(2, '0')}. ${x.l.title} - ${x.l.author}`), '', '>LOG <n>'].join('\n'));
     }, 'recovered lore logs');
     api.registerCommand('log', (rest, term) => {
       const l = LORE_LOGS[(parseInt(rest[0], 10) || 0) - 1];
@@ -408,7 +408,7 @@ export function installLore(game) {
       const a = game.run?.algo || {};
       const s = a.scores || {};
       term.print([
-        'THE ALGORITHM — ' + (t('behaviour analysis')),
+        'THE ALGORITHM - ' + (t('behaviour analysis')),
         `${t("Today's focus")}: ${a.focus ? pickLang(FOCUS_NAME[a.focus], T()) : '???'}   ${t('mood')}: ${a.mood || 'curious'}   engagement: ${a.engagement ?? '?'}`,
         `${t("Yesterday's scores")}: ${Object.entries(s).map(([k, v]) => `${k} ${v}`).join(' · ') || '-'}`,
         ...(a.lines || []).map((l) => `  "${l}"`),
@@ -462,7 +462,7 @@ export function installLore(game) {
     if (!d.company && c && (c.state === 'running' || c.state === 'complete') && Array.isArray(extra)) {
       const f = FACTIONS[c.faction], T = tr();
       const ok = c.state === 'complete' && !d.allDead;
-      extra.push(`<span style="color:${f.color}">${f.glyph} ${t('CONTRACT')}</span> ${pickLang(c.title, T).replace(/</g, '&lt;')} — <b style="color:${ok ? '#7dff7d' : '#ff6b5a'}">${ok ? (t('PAID')) : (t('FAILED'))}</b>`);
+      extra.push(`<span style="color:${f.color}">${f.glyph} ${t('CONTRACT')}</span> ${pickLang(c.title, T).replace(/</g, '&lt;')} - <b style="color:${ok ? '#7dff7d' : '#ff6b5a'}">${ok ? (t('PAID')) : (t('FAILED'))}</b>`);
     }
   });
   on('update', (dt, g) => {
@@ -492,7 +492,7 @@ export function installLore(game) {
     const p = game.player;
     if (board.mesh && p.inShip) {
       const pos = new THREE.Vector3(BOARD_POS.x, 1.55, BOARD_POS.z - 0.25);
-      out.push({ pos, r: 0.9, reach: 2.6, label: t('Contract board — The Algorithm [E]'), sub: () => (game.run?.contract ? pickLang(game.run.contract.title, tr()) : ''), action: () => openBoard() });
+      out.push({ pos, r: 0.9, reach: 2.6, label: t('Contract board - The Algorithm [E]'), sub: () => (game.run?.contract ? pickLang(game.run.contract.title, tr()) : ''), action: () => openBoard() });
     }
     if (p.indoor && logState.placed.length) {
       for (const L of logState.placed) {

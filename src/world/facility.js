@@ -1158,7 +1158,7 @@ export function buildFacility(layout, { physics, lightPool }) {
     const nPost = st.posters || (rng.chance(0.5) ? 1 : 0);
     for (let k = 0; k < nPost && wallSlots.length; k++) {
       const s = wallSlots[(wallCount + k) % wallSlots.length];
-      decals.push({ s, tex: def.posters ? rng.pick(def.posters) : L.theme === 'mansion' ? rng.pick(['poster_missing', 'poster_fish', 'graffiti']) : rng.pick(['poster_work', 'poster_safety', 'poster_like', 'poster_fish', 'poster_missing', 'sign_danger', 'graffiti', 'blood_splat']), y: 1.6, size: 1.1 });
+      decals.push({ s, tex: def.posters ? rng.pick(def.posters) : L.theme === 'mansion' ? rng.pick(['poster_missing', 'poster_fish', 'graffiti', 'poster_lost', 'poster_grave']) : rng.pick(['poster_work', 'poster_safety', 'poster_like', 'poster_fish', 'poster_missing', 'sign_danger', 'graffiti', 'blood_splat', 'poster_hr', 'poster_wash', 'poster_delete', 'poster_noref']), y: 1.6, size: 1.1 });
     }
     // scrap spots in room (none in the containment chamber: the CORE is its only prize)
     const spots = r.type === 'core' ? 0 : Math.max(2, Math.round(r.w * r.h * 0.9));

@@ -44,7 +44,7 @@ export function renderCycleCase(c, opts = {}) {
   if (y.kills) row(t('Kills'), String(y.kills));
   if (y.time) row(t('Time'), `${Math.floor(y.time / 60)}:${String(Math.round(y.time % 60)).padStart(2, '0')}`);
   if (y.depth !== undefined) row(t('Depth'), String(y.depth | 0));
-  if (y.fired) row(t('Outcome'), t('FIRED'), 'bad');
+  if (y.fired) row(t('Outcome'), t('DEPLATFORMED'), 'bad');
   card.appendChild(mk('div', 'lc-rows', rows.join('')));
   const lines = dossierLines(y.key);
   if (lines.length) card.appendChild(mk('div', 'c3-dos', `${escapeHtml(lines[0])}<i>${escapeHtml(lines[1] || '')}</i>`));
@@ -54,7 +54,7 @@ export function renderCycleCase(c, opts = {}) {
 }
 export function textCycleCase(c) {
   const y = c.cycle || {};
-  const out = [`CASE #${c.n} — ${titleOf(c)}`, ''];
+  const out = [`CASE #${c.n} - ${titleOf(c)}`, ''];
   out.push(`${t('Filed')}: ${fmtDate(y.first?.at || c.at)}   ${t('Crew')}: ${(c.crew || []).join(', ') || '-'}`);
   const bits = [];
   if (y.sector !== undefined) bits.push(`${t('Sector')} ${(y.sector | 0) + 1}`);

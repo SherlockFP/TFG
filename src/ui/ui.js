@@ -3,7 +3,7 @@
 // Every panel is a "CRT terminal" (same look as the Black Ops style monitor room in crtmenu.js), keyboard and
 // gamepad navigable (arrows / D-pad move focus, Enter / A confirm, Esc / B back, LB / RB switch tabs).
 // Full-screen reports (day summary, quota met, deplatformed) play one at a time; toasts wait while one is up.
-import { el, escapeHtml, clamp } from '../core/util.js';
+import { el, escapeHtml, clamp, fmtMoney } from '../core/util.js';
 import { t, setLang, getLang, LANGS, tf } from '../core/i18n.js';
 import { HUD, randomTip } from './hud.js';
 import { iconHTML, typeFromName } from './icons.js';
@@ -84,7 +84,7 @@ export class UI {
     this.root.appendChild(this.mgLayer);
     this.clickHint = el('div', { class: 'click-hint hidden' }, t('Click to resume'));
     this.root.appendChild(this.clickHint);
-    this.soundHint = el('div', { class: 'sound-hint hidden', html: glyph('mute') + ' ' + escapeHtml(t('🔇 Sound is off - click anywhere to enable it').replace('🔇 ', '')) });   // [ui2]
+    this.soundHint = el('div', { class: 'sound-hint hidden', html: glyph('mute') + ' ' + escapeHtml(t('Sound is off. Click anywhere to enable it.')) });   // [ui2]
     this.root.appendChild(this.soundHint);
     this.panelOpen = null;
     this.marketOpen = false;
@@ -496,8 +496,8 @@ export class UI {
         const card = el('div', { class: 'slot-card' + (chosen.slot === r.slot ? ' sel' : '') + (d ? '' : ' empty'), tabindex: 0, 'data-slot': r.slot });
         card.append(...[
           el('div', { class: 'slot-t' }, el('span', {}, `${t('Slot').toUpperCase()} ${r.slot}`), el('span', { class: 'slot-day' }, d ? `${t('Day').toUpperCase()} ${d.day}` : t('New run').toUpperCase())),
-          d ? el('div', { class: 'slot-q' }, `${t('Quota')} #${(d.quotaIndex || 0) + 1} · ▮${d.sold}/${d.quota}`) : el('div', { class: 'slot-q dim' }, '— — —'),
-          d ? el('div', { class: 'slot-c' }, `${t('Credits')} ▮${d.credits}`) : null,
+          d ? el('div', { class: 'slot-q' }, `${t('Quota')} #${(d.quotaIndex || 0) + 1} · ${fmtMoney(d.sold)}/${fmtMoney(d.quota)}`) : el('div', { class: 'slot-q dim' }, '— — —'),
+          d ? el('div', { class: 'slot-c' }, `${t('Credits')} ${fmtMoney(d.credits)}`) : null,
           d ? el('div', { class: 'dim slot-crew' }, `${(d.crew || []).slice(0, 4).join(', ')}`) : null,
         ].filter(Boolean));
         card.addEventListener('click', () => { chosen = { slot: r.slot, data: d }; this.sfx(); renderSlots(); slots.querySelector(`[data-slot="${r.slot}"]`)?.focus({ preventScroll: true }); });
@@ -569,7 +569,7 @@ export class UI {
           el('div', { class: 'l-host' }, avIcon(fromWire(l.av) || defaultAvatar(l.host || '?'), 16), (l.host || '?') + tf(' · Lv.{n}', { n: l.level || 1 }) + (l.stars ? ` ★${l.stars | 0}` : '') + (l.crew ? ` · [${String(l.crewTag || '').slice(0, 4)}] ${String(l.crew).slice(0, 24)} (C${l.crewLv | 0})` : '')),
           el('div', { class: 'l-pl' }, el('span', { class: 'l-bar' }, el('i', { style: { width: clamp((l.players / Math.max(1, l.max)) * 100, 0, 100) + '%' } })), ` ${l.players}/${l.max}`),
           el('div', { class: 'l-ph' }, `${String(l.phase || '').toUpperCase()} ${l.moon || ''}`),
-          el('div', { class: 'l-q' }, `${t('Day')} ${l.day || 1} · ▮${l.quota || 0}` + (DIFF_LABEL[l.diff] ? ' · ' + t(DIFF_LABEL[l.diff]) : '')),
+          el('div', { class: 'l-q' }, `${t('Day')} ${l.day || 1} · ${fmtMoney(l.quota || 0)}` + (DIFF_LABEL[l.diff] ? ' · ' + t(DIFF_LABEL[l.diff]) : '')),
           el('div', { class: 'l-mods' }, (l.mods || []).length ? `${l.mods.length}` : '—'),
           this.button(full ? t('Full') : t('Join'), () => this.joinLobby(l, net.value), blocked ? 'small disabled' : 'small primary'),
         );
@@ -700,7 +700,7 @@ export class UI {
       const achBox = el('div', { class: 'ach-host' });
       renderAchievementsPanel(achBox, this.app.game, p);
       body.append(achBox);
-      body.append(el('div', { class: 'menu-row' }, this.button(`${t('SERVICE RECORD [J]')} — ${t('Codex · Mastery · Rebirth · Weekly · Crew')}`, () => {
+      body.append(el('div', { class: 'menu-row' }, this.button(`${t('SERVICE RECORD [J]')} - ${t('Codex · Mastery · Rebirth · Weekly · Crew')}`, () => {
         if (this.app.game?.meta) { this.app.game.meta.open(); return; }
         const rec = createServiceRecord({ game: null, profile: p, onClose: () => { this.closePanel(); render(); } });
         this.openPanel(rec.el);
@@ -853,7 +853,7 @@ export class UI {
           check(t('Ask before leaving the page'), 'confirmLeave', null, true),   // [ctrlw]
           check(t('Art direction'), 'artDir', t('Company stamps, memo ticker, animated logo and panel art. Off = plain panels'), true),   // [artdir]
           check(t('Head bob'), 'headBob', null, true),
-          check(t('Avatars above name tags'), 'tagAvatars', t("small picture over teammates' heads"), true),   // [profile]
+          check(t('Avatars above name tags'), 'tagAvatars', t("small picture over crewmates' heads"), true),   // [profile]
           section(t('HUD')),
           check(t('Objective tracker'), 'showObjectives', null, true),
           check(t('Crosshair'), 'showCrosshair', null, true),
@@ -1004,12 +1004,12 @@ export class UI {
 
   screen_howto() {
     const txt = [
-      `<b>THE JOB</b><br>You are a contract content janitor for <b>The Algorithm</b>. Fly to the server moons, loot the abandoned facilities, bring the lost content back to the ship and sell it at <b>0-Algorithm HQ</b> to meet the <b>Engagement Quota</b> every 3 days. Miss it and you get deplatformed.`,
-      `<b>THE SHIP</b><br>Use the <b>terminal</b> (MOONS, ROUTE, STORE, BUY, SCAN, BESTIARY, codes). Pull the <b>lever</b> to land or take off. The ship leaves at <b>midnight</b> — with or without you.`,
+      `<b>THE JOB</b><br>You are a contract content janitor for <b>The Algorithm</b>. Fly to the server moons, clear out the abandoned facilities and bring the lost content back to the ship. Sell it at <b>0-Algorithm HQ</b> to meet the <b>engagement quota</b> every 3 days. Miss it and you are deplatformed.`,
+      `<b>THE SHIP</b><br>The <b>terminal</b> takes typed commands (MOONS, ROUTE, STORE, BUY, SCAN, BESTIARY, door codes). Pull the <b>lever</b> to land or take off. The ship leaves at <b>midnight</b>, with or without you.`,
       `<b>CONTROLS</b><br>WASD move · Shift sprint · Ctrl crouch · Alt sneak (quiet) · Space jump · E interact / pick up · LMB use / attack / grab big loot · RMB scan · MMB / P ping · G drop · Q throw · F flashlight · 1-4 slots · R reload · V push-to-talk · Z/X emotes · Enter chat · I inventory · K passive tree · hold C spell wheel (or say / type the spell word) · J service record · hold B emote wheel · Tab character · Esc menu`,
       `<b>SURVIVAL</b><br>Every creature has a rule. <i>Scan</i> them and read the BESTIARY. Sound matters: sprinting, horns and <b>your voice</b> attract things. Some exits are not what they seem.`,
-      `<b>PROGRESSION</b><br>You earn XP and <b>Clout</b> for securing scrap, kills, bounties, fishing and minigames. Level up to gain skill points and spend them in the passive tree (K). Buy soulbound weapons, armor, perks and cosmetics from <b>Phish Dayı</b>'s Black Market at HQ. Higher tier moons and later quotas are more dangerous — and more profitable.`,
-      `<b>MINIGAMES</b><br>Crack vault keypads, rewire fuse boxes, pick locks, fish at ponds and the HQ dock, play FLAPPY PHISH on the ship's arcade, and gamble your coins at the GACHA MACHINE.`,
+      `<b>PROGRESSION</b><br>You earn XP and <b>Clout</b> from scrap, kills, bounties, fishing and minigames. Every level gives a skill point for the passive tree [K]. The Black Market at HQ, run by <b>Phish Dayı</b>, sells soulbound weapons, armor and cosmetics for Clout. Higher-tier moons and later quotas hurt more and pay more.`,
+      `<b>MINIGAMES</b><br>Crack vault keypads, rewire fuse boxes, pick locks, fish at ponds and the HQ dock, play FLAPPY PHISH on the ship's arcade, and gamble Clout at the GACHA MACHINE.`,
       `<b>MULTIPLAYER</b><br>Host a lobby (public or private with password) and friends can find it in the lobby browser or join with the 6-letter code. Everything is peer-to-peer; the host runs the world.`,
     ].map((p) => t(p)).join('<br><br>');
     const f = this.frame(t('HOW TO PLAY'), el('div', { class: 'howto', html: txt }), el('div', { class: 'menu-row' }, this.backButton(() => this.showMenu('title'))));
@@ -1053,7 +1053,7 @@ export class UI {
       else this.toast(t('Voice chat: listening only. You can change this in Settings > Voice.'));
     };
     const box = this.panel('voice');
-    box.append(this.panelHead(t('🎙 VOICE CHAT')), el('div', { class: 'cp-body' },
+    box.append(this.panelHead(t('VOICE CHAT')), el('div', { class: 'cp-body' },
       el('div', { class: 'howto', html: t(`Talk to your crew with <b>proximity voice chat</b> - nearby crewmates hear you in 3D, walls muffle you, your avatar's mouth moves.<br><br><span class="dim">Using <b>Bluetooth headphones</b>? Turning the mic on can switch them to low-quality "hands-free" mode and some systems go silent. If you lose sound, pick the headset in Settings > Audio > Output device, use a separate mic, or choose "listen only".</span>`) }),
       el('div', { class: 'menu-list' },
         this.button(t('Enable mic (open mic)'), () => choose('yes', 'open'), 'big'),
@@ -1070,7 +1070,7 @@ export class UI {
     box.append(this.panelHead(t('PAUSED')), el('div', { class: 'cp-body' },
       el('div', { class: 'pause-info' },
         el('span', {}, `${t('Lobby code')}: `, el('b', { class: 'pause-code' }, code)),
-        el('span', { class: 'dim' }, `${g?.isHost ? t('You are the host') : t('Connected')} · ${1 + (g?.remotes.size || 0)} ${t('player(s)')}`)),
+        el('span', { class: 'dim' }, `${g?.isHost ? t('You are the host') : t('Connected')} · ${t('Players')} ${1 + (g?.remotes.size || 0)}`)),
       el('div', { class: 'menu-list' },
         this.button(t('Resume'), () => this.closePanel(), 'big'),
         this.button(t('Copy invite code'), () => { navigator.clipboard?.writeText(code); this.toast(`${t('Copied')}: ${code}`); }),
@@ -1103,7 +1103,7 @@ export class UI {
     const wrap = this.panel('wide market');
     const render = () => {
       wrap.innerHTML = '';
-      wrap.appendChild(this.panelHead(`${t('Black Market')} — Phish Dayı`, tf('◈ {coins} · Lv.{level}', { coins: p.coins, level: p.level })));
+      wrap.appendChild(this.panelHead(`${t('Black Market')} - Phish Dayı`, tf('◈ {coins} · Lv.{level}', { coins: p.coins, level: p.level })));
       const body = el('div', { class: 'cp-body' });
       body.appendChild(el('div', { class: 'dim' }, tf('"Ooo, hoş geldin evlat! Good stuff, fair prices... mostly." · You have ◈ {coins} · Lv.{level}', { coins: p.coins, level: p.level })));
       body.appendChild(el('div', { class: 'tabs' }, ...['Weapons', 'Armor', 'Perks', 'Cosmetics'].map((n) => this.button(t(n), () => { tab = n; this.marketTab = n; render(); }, tab === n ? 'tab sel' : 'tab'))));
@@ -1249,7 +1249,7 @@ export class UI {
     const score = d.allDead ? -1 : ratio * 100 - (deaths.length / nP) * 40;
     const grade = d.company ? null : score >= 70 ? 'S' : score >= 50 ? 'A' : score >= 35 ? 'B' : score >= 20 ? 'C' : score >= 8 ? 'D' : 'F';
     const GRADE_COL = { S: '#ffd84a', A: '#7dffa0', B: '#7fd4ff', C: '#e8e0d0', D: '#ff9a4a', F: '#ff4a3a' };
-    const GRADE_QUIP = { S: t('The Algorithm is aroused.'), A: t('Solid content. Engagement up.'), B: t('Mid. Acceptable mid.'), C: t('Ratioed by a moon.'),
+    const GRADE_QUIP = { S: t('The Algorithm is delighted. Be worried.'), A: t('Solid content. Engagement up.'), B: t('Mid. Acceptable mid.'), C: t('Ratioed by a moon.'),
       D: t('Your metrics are being reviewed.'), F: t('Shadowbanned by reality.') };
     // crew badges
     const badges = new Map(players.map((p) => [p.id, []]));
@@ -1262,7 +1262,7 @@ export class UI {
     for (const p of players) if (!p.dead && !p.loot && !d.company && players.length > 1) badges.get(p.id).push([t('SHIP GUARD'), '#9a9aa8']);
     const crew = players.map((p) => `<div class="rp-crew${p.dead ? ' dead' : ''}"><span class="rp-name">${p.dead ? '✖ ' : ''}<img class="av" width="16" height="16" style="image-rendering:pixelated;vertical-align:middle;margin-right:4px" src="${avatarDataUrl(avatarOfPeer(game, p.id, p.name), 16)}" alt="">${escapeHtml(p.name)}</span>`
       + `<span class="rp-badges">${badges.get(p.id).map(([b, c]) => `<i style="--c:${c}">${b}</i>`).join('')}</span>`
-      + `<span class="rp-stat">▮${p.loot || 0} · ${tf('{n} kills', { n: p.kills || 0 })}</span></div>`).join('');
+      + `<span class="rp-stat">${fmtMoney(p.loot || 0)} · ${tf('{n} kills', { n: p.kills || 0 })}</span></div>`).join('');
     const rows = [
       [t('Scrap collected'), d.collected, '▮', avail > 0 ? tf('{n}% of moon', { n: Math.round(ratio * 100) }) : ''],
       [t('On board'), d.shipValue, '▮', ''],
@@ -1276,7 +1276,7 @@ export class UI {
       <div class="rp-rows">${rows.map(([l, v, pre, note], i) => `<div class="rp-row" style="--i:${i}"><span>${l}</span><span class="rp-note">${note}</span><b data-v="${Number(v) || 0}" data-pre="${pre}">${pre}0</b></div>`).join('')}</div>
       ${crew ? `<div class="rp-crewlist" style="--i:${rows.length}">${crew}</div>` : ''}
       ${extra.map((x) => `<div class="sum-extra">${x}</div>`).join('')}
-      <div class="rp-foot"><span>${t('QUOTA')} ▮${d.sold} / ▮${d.quota}</span><span>${d.daysLeft} ${t('DAYS LEFT')}</span></div>
+      <div class="rp-foot"><span>${t('QUOTA')} ${fmtMoney(d.sold)} / ${fmtMoney(d.quota)}</span><span>${d.daysLeft} ${t('DAYS LEFT')}</span></div>
       ${grade ? `<div class="rp-grade" style="--gc:${GRADE_COL[grade]}"><div class="rp-letter">${grade}</div><div class="rp-quip">${GRADE_QUIP[grade]}</div></div>` : ''}` });
     this.root.appendChild(box);
     // count-up rows, then slam the grade stamp
@@ -1316,7 +1316,7 @@ export class UI {
     document.querySelectorAll('.fired').forEach((x) => x.remove());
     const lines = [
       t('> reviewing creator metrics...'),
-      tf('> profit quota ........ ▮{sold} / ▮{quota}   [FAILED]', { sold: d.sold, quota: d.quota }),
+      tf('> quota ............... ▮{sold} / ▮{quota}   [FAILED]', { sold: d.sold, quota: d.quota }),
       tf('> days survived ....... {days}', { days: d.days }),
       tf('> quotas met .......... {n}', { n: d.quotaIndex }),
       t('> community guidelines  VIOLATED (being bad at your job)'),
@@ -1341,7 +1341,7 @@ export class UI {
     document.querySelectorAll('.quotamet').forEach((x) => x.remove());
     const box = el('div', { class: 'quotamet', html: `<div class="qm-main">${t('QUOTA MET')}</div>
       <div class="qm-sub">${tf('Quota #{n} cleared', { n: d.quotaIndex })}${d.surplus > 0 ? ' · ' + tf('surplus ▮{n}', { n: d.surplus }) : ''}</div>
-      <div class="qm-rows"><div><span>${t('OVERTIME BONUS')}</span><b>+▮${d.bonus}</b></div><div><span>${t('NEXT QUOTA')}</span><b class="qm-next">▮${d.prev}</b></div><div><span>${t('DEADLINE')}</span><b>3 ${t('DAYS')}</b></div></div>
+      <div class="qm-rows"><div><span>${t('OVERTIME BONUS')}</span><b>+${fmtMoney(d.bonus)}</b></div><div><span>${t('NEXT QUOTA')}</span><b class="qm-next">${fmtMoney(d.prev)}</b></div><div><span>${t('DEADLINE')}</span><b>3 ${t('DAYS')}</b></div></div>
       <div class="qm-tag">${t('The Algorithm is pleased. For now.')}</div>` });
     for (let i = 0; i < 70; i++) {
       const c = el('i', { class: 'qm-conf' });
@@ -1354,7 +1354,7 @@ export class UI {
       const t0 = performance.now();
       const step = (now) => {
         const k = Math.min(1, (now - t0) / 1400);
-        next.textContent = '▮' + Math.round(d.prev + (d.quota - d.prev) * (1 - Math.pow(1 - k, 3)));
+        next.textContent = fmtMoney(d.prev + (d.quota - d.prev) * (1 - Math.pow(1 - k, 3)));
         if (k < 1 && box.isConnected) requestAnimationFrame(step); else next.classList.add('done');
       };
       requestAnimationFrame(step);
@@ -1368,10 +1368,10 @@ export class UI {
     void game;
     const rowHtml = (x) => {
       const type = x.type || typeFromName(x.name);
-      return `<div class="sum-row sale-row">${type ? iconHTML(type, 'sale-ico') : '<i class="sale-ico none"></i>'}<span class="sale-n">${escapeHtml(x.name)}</span><span>▮${x.v}</span></div>`;
+      return `<div class="sum-row sale-row">${type ? iconHTML(type, 'sale-ico') : '<i class="sale-ico none"></i>'}<span class="sale-n">${escapeHtml(x.name)}</span><span>${fmtMoney(x.v)}</span></div>`;
     };
     const lines = d.list.slice(0, 12).map(rowHtml).join('');
-    const box = el('div', { class: 'summary sale', html: `<div class="sum-title">${t('THE ALGORITHM IS PLEASED')}</div>${lines}${d.list.length > 12 ? `<div class="dim">+${d.list.length - 12} ${t('more...')}</div>` : ''}<div class="sum-row q"><span>${t('TOTAL')} (${Math.round(d.rate * 100)}%)</span><span>▮${d.total}</span></div>` });
+    const box = el('div', { class: 'summary sale', html: `<div class="sum-title">${t('THE ALGORITHM IS PLEASED')}</div>${lines}${d.list.length > 12 ? `<div class="dim">+${d.list.length - 12} ${t('more...')}</div>` : ''}<div class="sum-row q"><span>${t('TOTAL')} (${Math.round(d.rate * 100)}%)</span><span>${fmtMoney(d.total)}</span></div>` });
     document.querySelectorAll('.summary.sale').forEach((x) => x.remove());
     this.root.appendChild(box);
     setTimeout(() => box.classList.add('out'), 6000);
