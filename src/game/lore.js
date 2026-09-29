@@ -332,7 +332,7 @@ export function installLore(game) {
   function updateBoard(dt) {
     board.t += dt;
     board.acc += dt;
-    if (!board.mesh || board.acc < (algo.speaking ? 0.08 : 0.25)) return;
+    if (!board.mesh || board.acc < (algo.speaking ? 0.08 : 0.4)) return;   // [perf3] idle redraw 0.25 -> 0.4 s (canvas draw + texture upload, up to ~20 ms)
     board.acc = 0;
     if (game.camera?.position?.length?.() > 22) return;
     drawBoard();

@@ -134,10 +134,13 @@ export class Objectives {
   // up from bottom:170px: at 1280x720 a long list ran into it (overlapping text). Hide the lowest lines that would collide.
   fitAboveDock() {
     const rows = this.el.children;
-    for (const r of rows) r.style.display = '';
-    const dock = document.querySelector('.hud-dock-left');
+    const dock = (this._dockEl?.isConnected ? this._dockEl : (this._dockEl = document.querySelector('.hud-dock-left')));   // [perf3] cached ref
     const dr = dock?.getBoundingClientRect();
     const limit = dr && dr.height > 4 ? dr.top - 8 : innerHeight - 178;
+    const key = this.last + '|' + Math.round(limit) + '|' + this.top;   // [perf3] same rows + same limit as last pass: nothing to re-measure (unhide/measure/hide = 2+ forced layouts)
+    if (key === this._fitKey) return;
+    this._fitKey = key;
+    for (const r of rows) r.style.display = '';
     let cut = false;
     for (const r of rows) { if (!cut && r !== rows[0] && r.getBoundingClientRect().bottom > limit) cut = true; if (cut) r.style.display = 'none'; }
   }
