@@ -48,8 +48,8 @@ const SOUNDS = {
 };
 
 const CSS = `.rs{display:flex;gap:8px;font-family:var(--font,monospace);pointer-events:none}
-.rs-c{position:relative;width:74px;height:40px;border:1px solid var(--rc);background:rgba(6,10,22,.78);color:var(--rc);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 8px rgba(0,0,0,.6)}
-.rs-c b{font-size:12px;letter-spacing:1px;color:#fff;text-shadow:0 0 4px #000}.rs-c span{position:relative;z-index:1;font-size:15px;line-height:1;color:#fff;text-shadow:0 0 4px #000,0 0 2px #000;font-variant-numeric:tabular-nums}
+.rs-c{position:relative;width:92px;height:40px;padding:0 4px 0 12px;box-sizing:border-box;border:1px solid var(--rc);background:rgba(6,10,22,.78);color:var(--rc);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 8px rgba(0,0,0,.6)}
+.rs-c b{font-size:11px;letter-spacing:.5px;color:#fff;text-shadow:0 0 4px #000;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}/* [checkup] long names used to wrap under the key letter */.rs-c span{font-size:14px;line-height:1}
 .rs-c i{position:absolute;inset:0;background:conic-gradient(rgba(0,0,0,.72) var(--cd,0%),transparent 0)}
 .rs-c u{position:absolute;left:2px;top:-1px;font-size:14px;text-decoration:none;color:#fff}
 .rs-c.rdy{animation:rsr .5s ease-out}@keyframes rsr{0%{box-shadow:0 0 16px var(--rc)}100%{box-shadow:inset 0 0 8px rgba(0,0,0,.6)}}`;

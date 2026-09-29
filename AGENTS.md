@@ -557,3 +557,7 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
 ### 5.16 Wave 4 - VOYAGE (module `voyage`, docs/wave4/voyage.md; node-tested + builds, NOT run in a browser)
 - `MOON RANDOM` / `SIGNALS` (3 rotating uncharted signals) / random warp at the lever (12 %, crew vote on distress, never in quota 1-2 unless `WARP EARLY`) / `MISSIONS` board with 9 job types / 7 set pieces / 8 new biomes. A voyage moon is a pure function of its id `vy<tier><content>_<seed36>`.
 - Shared edits: `moongen.js` (exports + `generateMoonFromKey`), `terrain.js` (`plan.flats`, `buildVoyageWorld` hook), `game.js` slot. Net: `vyreq`, `vyx`, `vyn`. State `run.vy`. Test: `node tools/harness/voyage.test.mjs`.
+### 5.16 Wave 4 - CHECKUP (QA pass, docs/wave4/checkup.md; 3 headless runs, cut short by the owner's quota)
+- Verified in a browser: boot, orbit panels at 1280x720, terminal route, land/walk/enter facility/pickup, ship door open from outside ([ux] fix works), takeoff + case file, HQ sell, quota met, backrooms pocket, mirror. Zero pageerrors.
+- Fixed: objective list overlapping the left HUD dock (`objectives.js fitAboveDock`), "Value extracted ▮0" when scrap was dropped/held at takeoff (`host.js hostFinishTakeoff` final tally), role-skill tile text overlap (`role_skills.js` CSS).
+- Not verified (test artifact / time): worlds2 moons, homeworld panel, core boss, ESC/pointer lock with real input, emote cam, MP 60 s. Scripts ready: `tools/harness/wave4_checkup_*` (runner keeps one browser, freezes rAF, real input via `__click/__press`).

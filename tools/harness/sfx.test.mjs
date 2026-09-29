@@ -320,9 +320,9 @@ const fakeFile = (name, byte, size = 16) => ({ name, size, type: 'audio/ogg', ar
 // ------------------------------------------------------------------------------------------------ wiring (text scan)
 {
   const cr = fs.readFileSync(new URL('../../src/entities/creatures.js', import.meta.url), 'utf8');
-  ok(cr.includes('game.sfx?.onState?.(this, prev, st)') && cr.includes('game.sfx?.onHurt?.(v, d)'), 'creatures.js hooks');
+  ok(cr.includes('game.cvoice?.onState?.(this, prev, st)') && cr.includes('game.cvoice?.onHurt?.(v, d)'), 'creatures.js hooks');
   const g = src('game.js');
-  ok(g.includes("import { installSfx } from './sfx.js'") && g.includes("this.useModule('sfx', installSfx)"), 'game.js slot');
+  ok(g.includes("import { installSfx } from './sfx.js'") && g.includes("this.useModule('cvoice', installSfx)"), 'game.js slot');
   const au = fs.readFileSync(new URL('../../src/audio/audio.js', import.meta.url), 'utf8');
   ok(au.includes('attachSoundPack'), 'audio.js attaches the pack');
   const ui = fs.readFileSync(new URL('../../src/ui/ui.js', import.meta.url), 'utf8');

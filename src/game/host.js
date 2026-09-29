@@ -416,6 +416,17 @@ export const hostMethods = {
       for (const it of [...this.items.all()]) if (it.bag?.length) this.net.broadcast('it', { e: 'bag', id: it.id, bg: [] });
       shipValue = 0;
     }
+    // [checkup] final tally: scrap dropped in the ship < 1 s before takeoff (the collect pass runs once a second) or still in an
+    // aboard player's hands counted in shipValue but never in 'collected' -> the case file said "Value extracted 0"
+    if (!moon.company && !allDead) {
+      for (const it of this.items.all()) {
+        if (it.collected || hd.collected?.has(it.id) || !isSellable(it.def) || it.soulbound || it.type === 'body') continue;
+        const heldAboard = it.holder && aboard.some((p) => p.id === it.holder);
+        if (!heldAboard && (it.holder || !insideShip(it.obj.position))) continue;
+        hd.collected?.add(it.id); it.collected = true; hd.dayStats.collected += it.value;
+        const who = it.holder || it.lastHolder; if (who) this.dayPer(who).loot += it.value;
+      }
+    }
     // bodies disappear (crew revives in orbit)
     for (const it of [...this.items.all()]) if (it.type === 'body') this.net.broadcast('it', { e: 'rm', id: it.id });
     const summary = {

@@ -124,6 +124,19 @@ export class Objectives {
     // sit below the top-left HUD block (health, stamina, run chips), which grows with the daily-event chip
     const tl = !hidden && this.game.ui.hud?.el.querySelector('.hud-tl');
     if (tl) { const top = Math.max(205, Math.round(tl.getBoundingClientRect().bottom + 14)); if (top !== this.top) { this.top = top; this.el.style.top = top + 'px'; } }
+    if (!hidden) this.fitAboveDock();
+  }
+
+  // [checkup] the list grows down from the top-left block while the left HUD dock (pickup feed, buffs, Level 0 card...) grows
+  // up from bottom:170px: at 1280x720 a long list ran into it (overlapping text). Hide the lowest lines that would collide.
+  fitAboveDock() {
+    const rows = this.el.children;
+    for (const r of rows) r.style.display = '';
+    const dock = document.querySelector('.hud-dock-left');
+    const dr = dock?.getBoundingClientRect();
+    const limit = dr && dr.height > 4 ? dr.top - 8 : innerHeight - 178;
+    let cut = false;
+    for (const r of rows) { if (!cut && r !== rows[0] && r.getBoundingClientRect().bottom > limit) cut = true; if (cut) r.style.display = 'none'; }
   }
 
   dispose() { this.el.remove(); }

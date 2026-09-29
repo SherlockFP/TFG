@@ -1,4 +1,4 @@
-// SFX - creature voices, footsteps and biome ambience beds (module `sfx`, docs/wave4/sfx.md). Installed with `this.useModule('sfx', installSfx)`.
+// SFX - creature voices, footsteps and biome ambience beds (module `sfx`, docs/wave4/sfx.md). Installed with `this.useModule('cvoice', installSfx) (game.cvoice; game.sfx stays the core sfx function)`.
 //  1. every creature type (src/game/sfx_profiles.js) has its own procedural voice: idle / alert / chase / attack / hurt / death / footsteps, rendered
 //     lazily with src/audio/creaturevoice.js (32 kHz buffers, cached per voice) and played 3D through the shared AudioManager panner (HRTF,
 //     distance rolloff, wall occlusion lowpass + a level dip through walls, dull air for far sources);
@@ -8,8 +8,8 @@
 //     alerts / attacks carry far, idle calls are quiet tells, big things shake the floor with their steps;
 //  4. a player's custom Sound pack (src/audio/soundpack.js) wins over the synth per event: creature_<type>_<event>, creature_any_<event>, voice_<n>;
 //  5. biome / interior ambience beds are layered under the existing ambience ('sxbed' layer).
-// Hooks: creatures.js CreatureView.setState -> game.sfx.onState(view, prev, state) (returns 'own' when the stock recorded sound must not play),
-// CreatureManager 'hp' -> game.sfx.onHurt(view, d). Everything else runs from the mods 'update' event. API: see the returned object.
+// Hooks: creatures.js CreatureView.setState -> game.cvoice.onState(view, prev, state) (returns 'own' when the stock recorded sound must not play),
+// CreatureManager 'hp' -> game.cvoice.onHurt(view, d). Everything else runs from the mods 'update' event. API: see the returned object.
 import * as THREE from 'three';
 import { CREATURES } from './creatures.js';
 import { MOONS } from './moons.js';

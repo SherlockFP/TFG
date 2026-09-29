@@ -10,7 +10,7 @@ const tick = async (n = 10, dt = 1 / 30) => { kefal.tick(n, dt, false); await wa
 if (!a.ctx) await a.init();
 await a.resume();
 await wait(400);
-out.audio = { state: a.state(), sfx: !!g.sfx, packAttached: !!a.pack, packEnabled: a.pack?.enabled };
+out.audio = { state: a.state(), sfx: !!g.cvoice, packAttached: !!a.pack, packEnabled: a.pack?.enabled };
 
 g.run.daysLeft = 3; g.run.moon = 'hamsi'; g.player.inShip = true; g.hostLever(g.selfId); g.hostFinishLanding();
 for (let i = 0; i < 20; i++) await tick();
@@ -20,7 +20,7 @@ for (const c of [...g.creatures.host.values()]) g.creatures.hostRemove(c.id);
 await tick(4);
 
 // ---- 1. a crowd through the real path: every type walks / runs around the player
-const cues = [], off = g.sfx.onCue((c) => cues.push(c));
+const cues = [], off = g.cvoice.onCue((c) => cues.push(c));
 const types = ['lurker', 'crawler', 'scuttler', 'scuttler', 'scuttler', 'giant', 'hound', 'mannequin', 'jester', 'moderator', 'screamer', 'yoinker'];
 const spawned = types.map((t, i) => {
   const ang = (i / types.length) * Math.PI * 2, r = 9 + (i % 3) * 3;
@@ -47,7 +47,7 @@ out.hurtDeath = cues.slice(n1).map((c) => c.event);
 
 // ---- 3. ambience bed of the moon (hamsi = hills)
 await tick(70);
-out.bed = { name: g.sfx.bed, playing: !!a.ambience.get('sxbed'), buffer: a.buffers.has('sx:bed:hills') };
+out.bed = { name: g.cvoice.bed, playing: !!a.ambience.get('sxbed'), buffer: a.buffers.has('sx:bed:hills') };
 off();
 
 // ---- 4. custom sound pack
@@ -66,7 +66,7 @@ out.pack = { added: r.added, ignored: r.ignored.map((i) => i.file + ':' + i.reas
   has: pk.has('creature_lurker_alert'), clickReplaced: a.buffers.get('ui_click') !== origClick };
 // which buffer does the creature layer pick now?
 const before = new Set(a.handles);
-g.sfx.playType('lurker', 'alert', me.clone().add(new THREE.Vector3(0, 0, -5)), { id: 'packtest' });
+g.cvoice.playType('lurker', 'alert', me.clone().add(new THREE.Vector3(0, 0, -5)), { id: 'packtest' });
 const h = [...a.handles].find((x) => !before.has(x));
 out.pack.playedName = h?.name || null;
 // IndexedDB really holds the files (second store instance)

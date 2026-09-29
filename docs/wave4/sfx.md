@@ -39,7 +39,7 @@ Gameplay intent
 - **Telegraph**: `alert` is a distinct rising cue that fires when the wind-up / roar / aim state starts (before the `attack` hit); attacks are short and sharp.
 - **Locate threats**: everything is HRTF-panned from the creature (the sound follows it); alerts / attacks carry far (`range[1]`), idle calls are quiet tells (55 % reach),
   steps 35 %. Big things (Influencer, Worm, Dune Maw, bosses) shake the floor with low, slow steps; a Lurker, the Host and Prowlers are near silent (`sil`) on purpose.
-  Other modules (e.g. `stealth`) can subscribe: `game.sfx.onCue((cue, view) => ...)` / mods event `sx:cue` with `{ id, type, event, dist, t }`.
+  Other modules (e.g. `stealth`) can subscribe: `game.cvoice.onCue((cue, view) => ...)` / mods event `sx:cue` with `{ id, type, event, dist, t }`.
 - **Not spammy**: a per-creature cooldown per event (`EVENT_COOLDOWN` x a seeded 0.85-1.15), a per-TYPE crowd gap (`CROWD_GAP`, x2.2 for `crowd` types), at most 10 simultaneous
   sounds of this layer (idle / chase / steps are dropped first), distance gates, idle timers seeded per creature id + phase.
 - **Distance / occlusion**: panner rolloff from the profile range, `occlude: true` (the existing raycast lowpass in `audio.update`), a 40 % level dip through walls
@@ -48,7 +48,7 @@ Gameplay intent
 - **Footsteps by size**: foot classes `pad paw skitter scuttle plastic squelch metal bone boot stomp hoof bare shoe flap shuffle wheel rumble`; stride (metres per step) and
   pitch scale with size. **Surface hook**: the floor under the creature is classified with the same rules as `game.footstep` (metal ship, interior floors, biome ground);
   a quiet layer of the existing `step_<surface>_N` sample is added (metal / gravel / water / wood / tile / concrete; softer for grass / snow / mud / carpet).
-  `game.sfx.setSurfaceResolver(fn(pos) -> 'metal' | ...)` overrides it; `game.sfx.surfaceAt(pos)` exposes it.
+  `game.cvoice.setSurfaceResolver(fn(pos) -> 'metal' | ...)` overrides it; `game.cvoice.surfaceAt(pos)` exposes it.
 - Rendering: lazy, 32 kHz, cached in `audio.buffers` as `sx:<voice>:<event>:<variant>`; `prime(type)` renders a creature's sounds in idle slices when its first view appears
   (1170 recipes render in ~6 s total in node, ~5 ms each, so a first play never hitches).
 

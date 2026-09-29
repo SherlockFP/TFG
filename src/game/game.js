@@ -344,7 +344,7 @@ export class Game extends Emitter {
 
 
     this.useModule('music', installMusic);
-    this.useModule('sfx', installSfx);   // [sfx]
+    this.useModule('cvoice', installSfx);   // [sfx] stored as game.cvoice: game.sfx is the core sound-effect FUNCTION and must not be shadowed
 
 
     // [slot:gameplay2]
