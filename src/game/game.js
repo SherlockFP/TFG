@@ -162,6 +162,10 @@ import { installCycle } from './cycle.js';   // [cycle] inert: rules only, see d
 import { installWorlds2 } from './worlds2.js';   // wave 3: Soviet raids + twin-sun planet + plasma blade + fauna + loot pacing (docs/wave3/worlds2.md)
 
 
+// [import:horror]
+import { installHorror } from './horror.js';   // wave 4: pay-to-arm traps, outbreak wing, mansion, closets, chalk + Forger, fake closet (docs/wave4/horror.md)
+
+
 // [import:ux]
 
 
@@ -328,6 +332,10 @@ export class Game extends Emitter {
 
 
     this.useModule('worlds2', installWorlds2);   // [worlds2]
+
+
+    // [slot:horror]
+    this.useModule('horror', installHorror);
 
 
     // [slot:ux]

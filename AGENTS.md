@@ -454,3 +454,12 @@ install in the Game constructor (or after `installNetHandlers`), `update(dt)` in
 - Wrappers on the host.js flow live in `src/game/cycle.js` (`hostEvaluateQuota / hostLever / hostSetPhase / hostPopulateMoon / hostBeginTakeoff / hostFinishTakeoff / hostUpdate`, `applyRunState`, `onPhase`, the `unlock` handler). Net: `cyx`, `cyreq`. State: `run.cycle`.
 - Tests: `node tools/harness/cycle.test.mjs`, `cycle2_plan.test.mjs`, `cycle2_bosses.test.mjs`, `cycle2_flow.test.mjs` (real host flow + fuzz + soft-lock proof), `cycle2_i18n.test.mjs`.
 - First job when a browser is available: land on a core of every interior, watch the 3 new boss fights (name card, HP bar, rings), open the arena with cards, run a keystone and a raid with 2 tabs.
+
+### 5.16 Wave 4 - HORROR (module `horror`, docs/wave4/horror.md; node-tested + builds, NOT run in a browser)
+- Pay-to-arm traps in corridors / mazes (laser grid, crusher, spike floor, live floor, flame vent; credits via a wall panel, creature-triggered, refunds + kill credit), the OUTBREAK wing (Shamblers, 8-round sidearm + rare ammo box,
+  typewriter safe room + item box, Green Herb FOOD item, crest-locked quarantine door), a two-floor dark oak MANSION (foyer, stairs, secret bookcases, Manor Wardens), bigger-on-the-inside CLOSETS (ballroom / warehouse / outbreak / mansion
+  pockets at x >= 8000, seamless `portalMap()` teleport), CHALK (arrows / X, 24 per player, synced) + The Forger (scratches, redraws arrows wrong) and the FAKE closet ambush (tells + knock / hook counterplay).
+- Files: `src/game/horror*.js` (core rules, maps, pocket / closet / trap / chalk builders, host, creatures, text), `src/models/horror_models.js`. Slot `horror` in `game.js`. Net: `hrReq`, `hrs`, `hrfx`, `hrch`.
+  Integrates without generator edits (reads the layout on `mapLoaded`; extension event `horrorPlan`).
+- Tests: `node tools/harness/horror.test.mjs`, `horror_build.test.mjs`, `horror_install.test.mjs` (real facility + fake game). Browser script written but NOT run: `tools/harness/wave4_horror.js`.
+- First job with a browser: land on `orkinos` day >= 2, look at a trap panel + lane, cross a closet, read the fake closet tells, draw chalk, and check pocket lighting / performance (each pocket ~800 static boxes).
