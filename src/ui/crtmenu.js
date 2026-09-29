@@ -200,7 +200,7 @@ export class CRTMenu {
     const runs = listRuns().filter((r) => r.data);
     const items = [];
     if (runs.length) items.push({ id: 'continue', label: t('CONTINUE') });
-    items.push({ id: 'host', label: t('HOST GAME') }, { id: 'browser', label: t('JOIN GAME') }, { id: 'daily', label: t('DAILY') }, { id: 'profile', label: t('PROFILE') }, { id: 'character', label: t('CHARACTER') },
+    items.push({ id: 'host', label: t('HOST GAME') }, { id: 'browser', label: t('JOIN GAME') }, { id: 'daily', label: t('DAILY') }, { id: 'profile', label: t('PROFILE') }, { id: 'hub', label: t('HUB') }, { id: 'character', label: t('CHARACTER') },
       { id: 'mods', label: t('MODS') }, { id: 'settings', label: t('SETTINGS') }, { id: 'howto', label: t('HOW TO PLAY') });
     this.items = items;
     this.sel = Math.min(this.sel, items.length - 1);

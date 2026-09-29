@@ -166,6 +166,7 @@ import { installCycle } from './cycle.js';   // [cycle] inert: rules only, see d
 import { installCycle3 } from './cycle3.js';   // wave 4: Glitch Gates (red / hidden), Trophy Wall, cycle case files, Elevator Stop, relay puzzle (docs/wave4/cycle3.md)
 
 
+import { installSocial } from './social.js';   // [social] wave 4: phone + walkie text radio (hub lives on the App: net/hub.js)
 import { installWorlds2 } from './worlds2.js';   // wave 3: Soviet raids + twin-sun planet + plasma blade + fauna + loot pacing (docs/wave3/worlds2.md)
 
 import { installPolish4 } from './polish4.js';   // wave 4: pet egg drops, ship decals + furniture, cantina barter, maw / squad fixes (docs/wave4/polish4.md)
@@ -182,7 +183,6 @@ import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs
 
 
 
-// [import:social]
 
 
 
@@ -403,6 +403,9 @@ export class Game extends Emitter {
     this.useModule('arcade', installArcade);
 
 
+    this.useModule('social', installSocial);   // [social]
+
+
     // [slot:ux]
     this.useModule('hostmig', installHostMig);
 
@@ -414,7 +417,6 @@ export class Game extends Emitter {
 
 
 
-    // [slot:social]
 
 
 
