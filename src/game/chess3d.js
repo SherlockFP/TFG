@@ -32,14 +32,14 @@ export function setClassic(v) { try { localStorage.setItem(KEY, v ? '1' : '0'); 
 
 const CSS = `
 .overlay.arc3d{background:transparent;pointer-events:none;align-items:flex-end;padding-bottom:12px}
-.a3h{pointer-events:auto;width:min(820px,96vw);background:var(--ph-bg,rgba(12,7,3,.95));border:1px solid var(--ph-line,rgba(255,150,70,.3));box-shadow:0 4px 18px rgba(0,0,0,.6);padding:6px 10px 8px;font-family:VT323,monospace;color:var(--ph-hi,#ffe9b0);display:flex;flex-direction:column;gap:5px}
+.a3h{pointer-events:auto;position:fixed;right:8px;top:50%;transform:translateY(-50%);width:min(230px,40vw);max-height:80vh;overflow:auto;background:var(--ph-bg,rgba(12,7,3,.95));border:1px solid var(--ph-line,rgba(255,150,70,.3));box-shadow:0 4px 18px rgba(0,0,0,.6);padding:6px 10px 8px;font-family:VT323,monospace;color:var(--ph-hi,#ffe9b0);display:flex;flex-direction:column;gap:5px}
 .a3h .r{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.a3h .st{font-size:26px;line-height:1;flex:1;min-width:0}.a3h .st.bad{color:#ff7a5a}.a3h .st.good{color:#8dff9d}
+.a3h .st{font-size:20px;line-height:1;flex:1;min-width:0}.a3h .st.bad{color:#ff7a5a}.a3h .st.good{color:#8dff9d}
 .a3h .tt{font-size:20px;color:var(--ph-dim,rgba(255,190,140,.6))}
 .a3h .seat{display:flex;align-items:center;gap:6px;border:1px solid var(--ph-line,rgba(255,150,70,.3));background:rgba(0,0,0,.35);padding:2px 8px;font-size:20px}
 .a3h .seat.turn{border-color:var(--ph-hi,#ffe9b0);box-shadow:0 0 8px var(--ph-glow,rgba(255,170,80,.5))}
 .a3h .seat .dot{width:12px;height:12px;border-radius:50%;border:2px solid #000;flex:none}.a3h .seat .dot.w{background:#f3ead6}.a3h .seat .dot.b{background:#2a1d16;border-color:#efe3c8}
-.a3h .hint{font-size:17px;color:var(--ph-dim,rgba(255,190,140,.6))}
+.a3h .hint{font-size:14px;color:var(--ph-dim,rgba(255,190,140,.6))}
 `;
 function ensureCss() {
   if (typeof document === 'undefined' || document.getElementById('tfg-chess3d-css')) return;

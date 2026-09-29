@@ -24,3 +24,8 @@ Other notes
 - `Oscillator.frequency.value 21096 / 25087 outside nominal range` warnings repeat many times during play (audio code sets a note far above nominal). Harmless but noisy.
 - A Vite dev server started before a merge keeps 404-ing new `public/mods/*.js` files; restart it after merging.
 - Tests run: algo1.test.mjs, algo2.test.mjs pass; `npm run build` OK.
+
+## Wave 8 follow-up
+- algo-sub moved to a compact top ticker (docklayout TOP_BANNERS, 2-line clamp, shorter dwell); chess3d HUD is a 230px right-edge side panel.
+- Menu sit/stand/click/look/ESC (headless): passes (yaw changes via movementX under pointer lock; ESC returns to seated; modal null, terminal inactive, input.enabled true).
+- Fall-through check (/tmp/qa/fall.js) not concluded (run cut for quota); still open.

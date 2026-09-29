@@ -114,19 +114,19 @@ export function drawAlgoFace(ctx, w, h, t, o = {}) {
 // ------------------------------------------------------------------ intercom DOM
 const STYLE_ID = 'tfg-algo-style';
 const CSS = `
-.algo-sub{position:fixed;left:50%;bottom:clamp(150px,21vh,230px);transform:translateX(-50%);z-index:25;display:flex;gap:12px;align-items:center;
- max-width:min(820px,92vw);padding:8px 16px 8px 8px;background:linear-gradient(90deg,rgba(12,4,10,.92),rgba(12,4,10,.78));border:1px solid rgba(255,61,127,.55);
- box-shadow:0 0 24px rgba(255,61,127,.25),inset 0 0 30px rgba(255,61,127,.08);pointer-events:none;font-family:var(--font,monospace);opacity:0;transition:opacity .25s}
+.algo-sub{position:fixed;left:50%;top:120px;transform:translateX(-50%);z-index:15;display:flex;gap:8px;align-items:center;
+ max-width:min(560px,70vw);padding:4px 10px 4px 4px;background:linear-gradient(90deg,rgba(12,4,10,.92),rgba(12,4,10,.78));border:1px solid rgba(255,61,127,.55);
+ box-shadow:0 0 14px rgba(255,61,127,.22);pointer-events:none;font-family:var(--font,monospace);opacity:0;transition:opacity .15s}
 .algo-sub.on{opacity:1}
 .algo-sub::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px);pointer-events:none}
 .algo-sub.glitch{animation:algoJit .18s steps(2) 2}
 @keyframes algoJit{0%{transform:translateX(-50%) skewX(0)}50%{transform:translateX(calc(-50% + 6px)) skewX(-8deg);filter:hue-rotate(60deg)}100%{transform:translateX(-50%)}}
-.algo-face{width:84px;height:63px;image-rendering:pixelated;flex:none;border:1px solid rgba(255,61,127,.35)}
+.algo-face{width:42px;height:32px;image-rendering:pixelated;flex:none;border:1px solid rgba(255,61,127,.35)}
 .algo-body{min-width:0}
 .algo-who{display:flex;gap:10px;align-items:baseline;font-family:var(--font2,monospace);font-size:10px;letter-spacing:2px;color:#ff3d7f;text-shadow:0 0 8px rgba(255,61,127,.6)}
 .algo-live{color:#ff2a2a;animation:algoBlink 1s steps(1) infinite}
 @keyframes algoBlink{50%{opacity:.2}}
-.algo-text{font-size:25px;line-height:1.12;color:#ffe9f2;margin-top:4px;text-shadow:-1px 0 rgba(255,32,80,.7),1px 0 rgba(32,224,255,.7),0 0 10px rgba(255,61,127,.35);min-height:28px}
+.algo-text{font-size:17px;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;color:#ffe9f2;margin-top:4px;text-shadow:-1px 0 rgba(255,32,80,.7),1px 0 rgba(32,224,255,.7),0 0 10px rgba(255,61,127,.35);min-height:19px}
 .algo-text i{font-style:normal;color:#ff3d7f;opacity:.8}
 `;
 function ensureStyle() {
@@ -222,7 +222,7 @@ export function installAlgorithm(core) {
     ensureDom();
     if (!st.el) return;
     const f = n.voice && FACTIONS[n.voice];
-    st.cur = { ...n, shown: 0, t: 0, dur: 1.2 + n.text.length * 0.034 + 3.2 };
+    st.cur = { ...n, shown: 0, t: 0, dur: 1.2 + n.text.length * 0.034 + 1.8 };
     st.nameEl.textContent = f ? `${f.name.toUpperCase()} · ${f.leader.toUpperCase()}` : t('THE ALGORITHM');
     st.el.style.borderColor = f ? f.color : '';
     st.nameEl.style.color = f ? f.color : '';
