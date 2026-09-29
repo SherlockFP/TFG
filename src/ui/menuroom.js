@@ -8,6 +8,7 @@ import './menuroom.css';
 import { t, getLang } from '../core/i18n.js';
 import { L, pick, NOTES, SLIPS, PHONE_LINES, PHONE_IDLE, VEND, POSTERS, SECRET_INFO } from './menulore.js';
 import { TerminalUI } from './menuterminal.js';
+import { MenuEggs } from './menueggs.js';   // [eggs] wave 4
 import { PianoSynth, TuneMatcher, buildPiano, buildStool, KEYMAP, KEY_LABELS, midiOf, noteName, isBlack } from './menupiano.js';
 
 // ------------------------------------------------------------------------------------------------ layout constants
@@ -121,6 +122,7 @@ export class MenuRoom {
       setScore: (k, n) => { const s = this.secrets(); s.scores = { ...(s.scores || {}), [k]: n }; this.save(); },
       onClose: () => { this.uiShow(this.ui.cross, this.state === 'free'); if (this.state === 'free') this.relock(); },
     });
+    try { this.eggs = new MenuEggs(this); } catch (e) { console.warn('[menuroom] eggs failed', e); this.eggs = null; }   // [eggs] wave 4: hidden props + secrets counter
     this.bindEvents();
   }
 
@@ -277,7 +279,7 @@ export class MenuRoom {
       const l = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.02, 0.025), bas(0xff2a14)); l.position.set(0, 0.03, 0); strap.add(l);
       a.add(strap); arms.add(a); this.armStraps.push({ g: strap, led: l, arm: a, sx });
     }
-    this.arms = arms; this.cam.add(arms);
+    this.arms = arms; arms.visible = false;   // [eggs] owner: no hands / viewmodel in the main menu - the strapped forearms are built but never attached to the camera
   }
 
   buildPianoSet() {
@@ -1095,7 +1097,7 @@ export class MenuRoom {
     document.removeEventListener('pointerlockchange', this.onLock);
     if (document.pointerLockElement && (this.state === 'free' || this.state === 'piano' || this.state === 'standing')) { try { document.exitPointerLock(); } catch { /* ignore */ } }
     try { this.app.audio?.setAmbience?.('cellrain', null, 0, 0.5); } catch { /* ignore */ }
-    this.synth?.dispose(); this.terminal?.dispose(); this.piano?.dispose?.();
+    this.eggs?.dispose(); this.synth?.dispose(); this.terminal?.dispose(); this.piano?.dispose?.();
     this.ui.root.remove();
     if (this.arms) this.cam.remove(this.arms);
     this.app.ui?.menuEl?.classList.remove('cell-roam');

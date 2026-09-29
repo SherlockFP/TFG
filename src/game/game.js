@@ -182,7 +182,6 @@ import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs
 
 
 
-// [import:eggs]
 
 
 
@@ -229,6 +228,8 @@ import { installCosm5 } from './cosm5.js';   // wave 4: cosmetics drop (suits/ha
 import { installGuide } from './guide.js';   // wave 4: Algorithm advisor + first-landing tutorial (docs/wave4/guide.md)
 
 import { installDaily } from './daily.js';   // wave 4: login calendar, daily/weekly challenges, crates, season track (docs/wave4/daily.md)
+
+import { installEggs } from './eggs.js';   // wave 4: easter eggs on moons + menu cell secrets (docs/wave4/eggs.md)
 
 
 
@@ -418,7 +419,6 @@ export class Game extends Emitter {
 
 
 
-    // [slot:eggs]
 
 
 
@@ -465,6 +465,8 @@ export class Game extends Emitter {
     this.useModule('guide', installGuide);   // [guide] installed last: wraps the terminal / ALGO command of the modules above
 
     this.useModule('daily', installDaily);
+
+    this.useModule('eggs', installEggs);
 
 
   }
