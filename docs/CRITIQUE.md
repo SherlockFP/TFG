@@ -265,3 +265,5 @@ Palettes are tuned by simulation, not by eye (tests check delta-E under CVD matr
 Low preset is unverified against the 60 percent draw-call target (instanced decor thinning cuts triangles, not calls); module-added ship props (workbench, arcade table...) still unmerged; Rapier wasm (4.3 MB) dominates first load.
 ## Wave 8 - balance (docs/wave8/balance.md)
 One-shots are gone except telegraphed hazards from quota 4, but the sim's solo shovel player still dies 40-60 % on mid quotas from attrition alone (no healing/dodge model); the 0.4 s wind-up gate is untested in a live browser and relies on behaviours setting an attack state as the visible tell.
+## Wave 8 - mapmods (docs/wave8/mapmods.md)
+Affixes and the Sector Map currency are node-tested but never seen in a browser: the landing card layout at 1280x720, the ATLAS terminal flow across two peers, and the Volatile blast timing are unchecked. Three asked-for affixes (Flooded, Barricaded, Algorithm hype x1.5) were skipped for lack of a clean hook. Rewards are modest (Rare about +50 % value at most) so the risk-for-reward trade may need tuning once someone plays it.
