@@ -249,6 +249,8 @@ import { installWorlds3 } from './worlds3.js';   // wave 8: wrong door + alterna
 import { installCrdirector } from './crdirector.js';
 import { installFacjobs } from './facjobs.js';
 import { installLcmonsters } from './lcmonsters.js';
+import { installLabyrinths } from './labyrinths.js';   // [labyrinths] metro ghost train + greenhouse vines / spores (docs/wave8/labyrinths.md)
+// [import:lcmonsters]
 import { installAtmos } from './atmos.js';   // [import:atmos]
 import { installArcade2 } from './arcade2.js';
 import { installFeedcams } from './feedcams.js';   // [import:feedcams]
@@ -534,6 +536,8 @@ export class Game extends Emitter {
     this.useModule('crdirector', installCrdirector);
     this.useModule('facjobs', installFacjobs);
     this.useModule('lcmonsters', installLcmonsters);
+    this.useModule('labyrinths', installLabyrinths);   // [labyrinths]
+    // [slot:lcmonsters]
     this.useModule('atmos', installAtmos);   // [slot:atmos]
     this.useModule('arcade2', installArcade2);
     this.useModule('feedcams', installFeedcams);   // [slot:feedcams]

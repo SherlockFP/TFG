@@ -46,7 +46,7 @@ export function rollJobs(runId, day, moonId, quotaIndex = 0) {
 
 /** layoutOpts for a moon on this run (merged over nothing: jobMoon() moons have none). null = classic layout. */
 export function layoutOptsFor(moon, run) {
-  if (!jobMoon(moon) || !run || run.moon == null) return null;
+  if (!jobMoon(moon) || !run || run.moon == null || ['metro', 'greenhouse'].includes(moon.interior)) return null;   // [labyrinths] theme-owned layouts
   const r = rollJobs(run.runId ?? 'x', run.day ?? 1, run.moon, run.quotaIndex | 0);
   return r.arch ? archOpts(r.arch) : null;
 }

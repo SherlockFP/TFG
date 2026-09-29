@@ -12,6 +12,7 @@ import { dropPoint } from '../world/shiplayout.js';
 import { escapeHtml } from '../core/util.js';
 const n0 = (v) => Math.round(v || 0).toLocaleString('en-US');   // credits are always shown with thousands separators (docs/wave8/studio_style.md)
 import { t, tf, tfIn, sysMsg } from '../core/i18n.js';
+import { LAB_HINT } from './labyrinths_core.js';   // [labyrinths]
 
 const BANNER = [
   '  _  _______ _____ _    _',
@@ -337,6 +338,7 @@ export class Terminal {
     lines.push(`${t('Tier')} ${m.tier}  ·  ${t('Risk')} ${riskBar(m)} ${t(m.risk || ['', 'LOW', 'MODERATE', 'HIGH', 'SEVERE', 'LETHAL'][Math.min(5, m.tier)])}  ·  ${costText(m)}`);
     lines.push(`${t('Biome')}: ${t(biomeName(m.biome))}   ${t('Interior')}: ${interiorName(m.interior)}   ${t('Size')}: ${sizeLabel(m.size || 1)}${(m.mapScale || 1) > 1 ? ' (' + t('big map') + ')' : ''}`);
     lines.push(`${t('Forecast')}: ${weatherName(run, m)}   ${t('Scrap value')}: x${(m.scrapMul || 1).toFixed(2)}`);
+    if (LAB_HINT[m.interior]) lines.push(`${t('Hazard')}: ${t(LAB_HINT[m.interior])}`);   // [labyrinths] the interior's signature mechanic
     for (const k of m.mods || []) lines.push(`+ ${MODIFIERS[k]?.name || k}: ${MODIFIERS[k]?.desc || ''}`);
     if (!brief || !m.generated) lines.push(m.desc || '');
     else lines.push(m.desc.split('. ')[0].replace(/\.?$/, '.'));

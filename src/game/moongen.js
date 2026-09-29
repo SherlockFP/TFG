@@ -18,6 +18,7 @@ import { MOONS, MOON_ORDER, BIOMES, GEN_BIOME_IDS } from './moons.js';
 import { RNG, hashString } from '../core/rng.js';
 import { getLang } from '../core/i18n.js';
 import { CREATURES } from './creatures.js';
+import { labInterior } from './labyrinths_core.js';   // [labyrinths]
 import '../world/biomes_wave1_data.js';   // registers lava / ice / jungle into BIOMES (data only) so every peer rolls the same sectors
 import '../world/worlds2_data.js';   // wave 3: soviet / twinsun biomes + the two fixed moons (own RNG stream below, older rolls stay identical)
 
@@ -28,10 +29,10 @@ export const isGeneratedId = (id) => GEN_RE.test(String(id || ''));
 // ------------------------------------------------------------------ interiors
 export const INTERIOR_NAMES = {
   factory: 'Data Center', mansion: 'Haunted Homepage', mineshaft: 'Deep Web Mine',
-  office: 'Corporate Intranet', backrooms: 'The Backrooms', serverfarm: 'Cloud Storage', sewer: 'The Comment Sewer', hospital: 'Telehealth Clinic',   // same as interiors/index.js INTERIOR_NAMES
+  office: 'Corporate Intranet', backrooms: 'The Backrooms', serverfarm: 'Cloud Storage', sewer: 'The Comment Sewer', hospital: 'Telehealth Clinic', metro: 'The Packet Subway', greenhouse: 'Link Rot Greenhouse',   // [labyrinths] same as interiors/index.js INTERIOR_NAMES
 };
 const BASE_INTERIORS = new Set(['factory', 'mansion', 'mineshaft']);
-const INTERIOR_W = { factory: 9, mansion: 7, mineshaft: 6, office: 8, backrooms: 8, serverfarm: 8, sewer: 7, hospital: 7 };
+const INTERIOR_W = { factory: 9, mansion: 7, mineshaft: 6, office: 8, backrooms: 8, serverfarm: 8, sewer: 7, hospital: 7 };   // metro / greenhouse: swapped in by labInterior() (own hash stream)
 export const BIOME_INTERIOR_BONUS = {
   datascape: { serverfarm: 12, backrooms: 9 }, servermarsh: { sewer: 13, serverfarm: 6 }, ashfield: { factory: 8, serverfarm: 7, hospital: 4 },
   crystal: { mineshaft: 12, backrooms: 5 }, snow: { mansion: 6, hospital: 6 }, desert: { mineshaft: 10, office: 3 },
@@ -99,6 +100,7 @@ const INTERIOR_DESC = {
   factory: 'Inside: a cramped data center.', mansion: 'Inside: a haunted personal homepage.', mineshaft: 'Inside: a crypto mine dug deep under the surface.',
   office: 'Inside: an abandoned content farm office block.', backrooms: 'Inside: endless yellow rooms. Do not noclip.',
   serverfarm: 'Inside: rows of screaming server racks.', sewer: 'Inside: the undernet sewers. Mind the slop.', hospital: 'Inside: a dead clinic. The machines still beep.',
+  metro: 'Inside: a dead subway. Ghost trains still run the tunnel.', greenhouse: 'Inside: a feral hydroponics greenhouse. Vines and spores.',   // [labyrinths]
 };
 
 // ------------------------------------------------------------------ modifiers (all effects are real: they only change moon def fields
@@ -230,7 +232,8 @@ function generateMoon({ runKey, index, k, biome, tier, usedNames, safe, deep }) 
   const bonus = BIOME_INTERIOR_BONUS[biome] || {};
   const iw = Object.entries(INTERIOR_W).map(([id, w]) => ({ id, w: w + (bonus[id] || 0) }));
   const wanted = R.weighted(iw).id;
-  const interior = interiorAvailable(wanted) ? wanted : 'factory';
+  let interior = interiorAvailable(wanted) ? wanted : 'factory';
+  { const li = labInterior(runKey, index, k, biome, tier, interior); if (li && interiorAvailable(li)) interior = li; }   // [labyrinths]
   // size / scale
   let size = 1.0 + (tier - 1) * 0.28 + R.float(-0.1, 0.35) + (deep ? 0.15 : 0);
   size = +Math.max(1.0, Math.min(2.6, size)).toFixed(2);

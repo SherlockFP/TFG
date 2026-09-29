@@ -13,8 +13,8 @@ export const MOONS = {
     outdoor: { hound: 5, mimic: 2 },
   },
   lufer: {
-    id: 'lufer', name: '12-Forum', short: 'Forum', tier: 1, cost: 0, biome: 'swamp', interior: 'factory', size: 1.0,
-    desc: 'A swampy old message board. Frequent rain. Ponds full of phish.',
+    id: 'lufer', name: '12-Forum', short: 'Forum', tier: 1, cost: 0, biome: 'swamp', interior: 'greenhouse', size: 1.0,   // [labyrinths] was factory
+    desc: 'A swampy old message board. Frequent rain. Ponds full of phish. An overgrown hydroponics greenhouse hides the good scrap: cut the vines.',
     weather: ['rainy', 'rainy', 'foggy', 'clear', 'stormy'], scrapCount: [12, 16], scrapMul: 1.05, power: 4, outdoorPower: 3, ponds: 3,
     creatures: { scuttler: 24, yoinker: 18, crawler: 14, lurker: 10, mannequin: 6, sludge: 14, spider: 12, leech: 14, jester: 3, screamer: 5, mimic: 4, turret: 6, mine: 10 },
     outdoor: { hound: 6, giant: 3, mimic: 3 },
@@ -27,8 +27,8 @@ export const MOONS = {
     outdoor: { hound: 12, giant: 5, mimic: 4 },
   },
   levrek: {
-    id: 'levrek', name: '88-Chatroom', short: 'Chatroom', tier: 2, cost: 200, biome: 'desert', interior: 'mineshaft', size: 1.35,
-    desc: 'Red desert of dead chatrooms. An abandoned crypto mine runs deep under the mesa. Something digs under the sand.',
+    id: 'levrek', name: '88-Chatroom', short: 'Chatroom', tier: 2, cost: 200, biome: 'desert', interior: 'metro', size: 1.35,   // [labyrinths] was mineshaft
+    desc: 'Red desert of dead chatrooms. An abandoned subway runs under the mesa, and the ghost trains still keep their schedule. Something digs under the sand.',
     weather: ['clear', 'clear', 'foggy', 'eclipsed'], scrapCount: [16, 22], scrapMul: 1.3, power: 6, outdoorPower: 5,
     creatures: { scuttler: 18, yoinker: 14, crawler: 18, lurker: 10, mannequin: 12, sludge: 10, spider: 14, leech: 12, jester: 8, screamer: 8, mimic: 6, turret: 10, mine: 14 },
     outdoor: { sandkefal: 8, hound: 6, giant: 3, mimic: 3 },

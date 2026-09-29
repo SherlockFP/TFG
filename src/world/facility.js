@@ -17,6 +17,8 @@ import { planMaps2, buildRooms2, installRoomStyles2 } from './rooms2.js';   // [
 import { planVarietyRooms, planVarietyFeatures, shortcutInfo, buildVariety, installVarietyStyles } from './facility_variety.js';   // [stealth] wave 4 variety
 import { carveMaze } from './mazegen.js';
 import { planArch } from './facility_arch.js';   // [facjobs] atrium / ring layout archetypes
+import { planLabArch } from './interiors/lab_themes.js';   // [labyrinths] metro layout plan
+import { decorateHeroes } from './interiors/heroes.js';   // [labyrinths] hero rooms for the older themes
 
 // Interior theme registry (ids: factory, mansion, mineshaft, office, backrooms, serverfarm, sewer, hospital).
 export { INTERIORS, INTERIOR_THEMES, INTERIOR_NAMES, getInterior, isInteriorTheme };
@@ -54,7 +56,8 @@ export function generateLayout(seed, theme = 'factory', size = 1, opts = null) {
   const R = layoutRules(theme);
   const O = opts && typeof opts === 'object' ? { ...opts } : {};
   if (O.plan === 'wings' && R.plan === 'rooms') R.plan = 'wings';
-  if (O.arch && !(R.plan === 'rooms' && theme !== 'mineshaft')) O.arch = null;   // [facjobs] archetypes only reshape plain room themes (opts is a private copy below)
+  if (R.arch) O.arch = R.arch;   // [labyrinths] theme-owned layout plan (metro) wins over the facjobs archetype
+  else if (O.arch && !(R.plan === 'rooms' && theme !== 'mineshaft')) O.arch = null;   // [facjobs] archetypes only reshape plain room themes (opts is a private copy below)
   if (O.arch === 'atrium' || O.arch === 'ring') R.plan = 'wings';
   if (O.loops != null) R.loops = O.loops;
   if (O.roomMul > 0) R.roomMul = (R.roomMul || 1) * O.roomMul;
@@ -123,7 +126,7 @@ export function generateLayout(seed, theme = 'factory', size = 1, opts = null) {
 
   // [facjobs] archetype spines (atrium / ring): drawn before any other room so everything else keeps clear of them
   const spines = [];
-  const archDone = O.arch ? planArch({ arch: O.arch, W, H, ent, cells, idx, canPlace, addRoom, line, spines, nodes }) : false;
+  const archDone = O.arch ? (R.arch ? planLabArch({ arch: O.arch, W, H, ent, cells, idx, addRoom, line, spines, open, edgeKey, size }) : planArch({ arch: O.arch, W, H, ent, cells, idx, canPlace, addRoom, line, spines, nodes })) : false;   // [labyrinths] R.arch = theme plan
 
   // landmark hub: a big, tall, readable room near the middle (always for themes that ask, else big maps)
   if (!archDone && R.hub && (R.hubAlways || size >= 1.6)) {
@@ -1388,7 +1391,9 @@ export function buildFacility(layout, { physics, lightPool }) {
     layout: L, group, lightPool, addBox, placeProp, propBoxes, nav, Y, CELL: C, levelMaterial, GeoBuilder, emitters,
     zones: setPieces.zones, scrapSpots, darkCells, setPieces,
   };
-  if (typeof def.decorate === 'function') def.decorate({ ...themeCtx, rng: new RNG((L.seed ^ 0x7de1c0) >>> 0) });
+  let themeOut = null, heroOut = null;   // [labyrinths] decorate() may return { lab } (runtime data for src/game/labyrinths.js)
+  if (typeof def.decorate === 'function') themeOut = def.decorate({ ...themeCtx, rng: new RNG((L.seed ^ 0x7de1c0) >>> 0) }) || null;
+  try { heroOut = decorateHeroes({ ...themeCtx, rng: new RNG((L.seed ^ 0x4e70c1) >>> 0), theme }); } catch (e) { console.warn('hero rooms', e); }   // [labyrinths]
   // gameplay set pieces shared by every theme: laser grids, breaker rooms, cave-ins, vent shortcuts, sludge
   const hazards = buildHazards({ ...themeCtx, rng: new RNG((L.seed ^ 0x4a2a7d) >>> 0), interior: def });
   setPieces.hazards = hazards;
@@ -1428,13 +1433,14 @@ export function buildFacility(layout, { physics, lightPool }) {
     wallSpots: wallSpots.filter((s) => nav.nearestWalkable(...nav.toGrid(s.x, s.z), 2)), ceilingSpots: ceilingSpots.filter(okSpot),
     reactorSpot: reactorRoom?.reactorSpot || null, mainDoor, fireDoors,
     setPieces, zones: setPieces.zones, landmarkSpots, hazards,
-    sys, chestSpots, m2, variety,   // [stealth] fac.variety = hatches / rewards / shortcut latch (src/game/stealth.js); [maps2] fac.m2 = story-room notes / light switches / windows (src/game/maps2.js)
+    sys, chestSpots, m2, variety, lab: themeOut?.lab || null, heroes: heroOut || null,   // [labyrinths]   // [stealth] fac.variety = hatches / rewards / shortcut latch (src/game/stealth.js); [maps2] fac.m2 = story-room notes / light switches / windows (src/game/maps2.js)
     // facility systems runtime data + chest spots (dead-end / treasure / vault rooms) for the world module
     interior: def.id, interiorName: def.name, atmosphere: def.atmosphere || null,
     dispose(physicsRef) {
       try { sys?.dispose(); } catch (e) { console.warn('facility systems dispose', e); }
       try { m2?.dispose?.(); } catch (e) { console.warn('maps2 dispose', e); }   // [maps2]
       try { variety?.dispose?.(); } catch (e) { console.warn('variety dispose', e); }   // [stealth]
+      try { themeOut?.lab?.dispose?.(); } catch (e) { console.warn('lab dispose', e); }   // [labyrinths]
       setPieces.dispose(physicsRef);
       for (const c of colliders) physicsRef.removeCollider(c);
       for (const e of emitters) lightPool.remove(e);
