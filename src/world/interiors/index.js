@@ -25,6 +25,7 @@ import { BACKROOMS } from './backrooms.js';
 import { SERVERFARM } from './serverfarm.js';
 import { SEWER } from './sewer.js';
 import { HOSPITAL } from './hospital.js';
+import { STUDIO_THEMES } from './themes_studio.js';   // [repomaps] wave 8: influencer / academy / colddata / museum
 import { themeAmbience } from '../../audio/extassets.js';
 import { addTranslations } from '../../core/i18n.js';
 
@@ -42,6 +43,7 @@ export const INTERIORS = {
   serverfarm: SERVERFARM,
   sewer: SEWER,
   hospital: HOSPITAL,
+  ...STUDIO_THEMES,   // [repomaps]
 };
 export const THEMES_BY_ID = INTERIORS;
 export const INTERIOR_THEMES = Object.freeze(Object.keys(INTERIORS));

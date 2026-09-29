@@ -25,7 +25,7 @@ BIOMES.m5cold = {
 
 {
   registerMoon({
-    id: ESTATE_MOON, name: 'E9-Estate of the Departed', short: 'Estate 9', tier: 2, cost: 320, biome: 'm5estate', interior: 'mansion', size: 1.3, mapScale: 1.1,
+    id: ESTATE_MOON, name: 'E9-Estate of the Departed', short: 'Estate 9', tier: 2, cost: 320, biome: 'm5estate', interior: 'influencer', size: 1.3, mapScale: 1.1,   // [repomaps] Influencer Mansion
     desc: 'The overgrown grounds of a mansion whose owner uploaded themselves. A hedge maze hides the estate vault, the Paper Archive keeps every unposted draft '
       + 'on two levels of shelves, and something in the topiary is watching you.',
     weather: ['foggy', 'foggy', 'clear', 'rainy', 'eclipsed'], scrapCount: [15, 20], scrapMul: 1.35, power: 6, outdoorPower: 4, landmarkBonus: 0,
@@ -34,7 +34,7 @@ BIOMES.m5cold = {
     m5: { hedge: true, archive: true },
   });
   registerMoon({
-    id: COLD_MOON, name: 'C0-Cold Storage Vault', short: 'Cold Storage', tier: 3, cost: 640, biome: 'm5cold', interior: 'serverfarm', size: 1.5, mapScale: 1.1,
+    id: COLD_MOON, name: 'C0-Cold Storage Vault', short: 'Cold Storage', tier: 3, cost: 640, biome: 'm5cold', interior: 'colddata', size: 1.5, mapScale: 1.1,   // [repomaps] Cold Storage Data Station
     desc: 'A frozen data vault: server aisles that rearrange themselves, cryo caves full of sleeping subscribers and a blizzard that never quite stops. '
       + 'Watch the amber strips. Do not thaw anything.',
     weather: ['foggy', 'stormy', 'clear', 'foggy', 'eclipsed'], scrapCount: [18, 24], scrapMul: 1.55, power: 8, outdoorPower: 5, landmarkBonus: 0,

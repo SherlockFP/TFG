@@ -29,7 +29,7 @@ const SLUDGE_DMG = 5, SLUDGE_TICK = 0.6;
 const CRAWL_T = 0.75;
 
 // laser count per theme = base + size * mul (rounded); no entry = no lasers
-const LASER_RATE = { serverfarm: [2, 1.5], office: [1, 0.8], hospital: [0, 0.7], factory: [-1, 1.2] };
+const LASER_RATE = { serverfarm: [2, 1.5], office: [1, 0.8], hospital: [0, 0.7], factory: [-1, 1.2], museum: [2, 1.6], colddata: [0, 0.6], influencer: [0, 0.4] };   // [repomaps] museum = laser-grid corridors
 const CAVE_RATE = { sewer: [1, 1], mineshaft: [1, 1], backrooms: [1, 0.8], mansion: [0, 0.8], factory: [0, 0.6], office: [0, 0.4], hospital: [0, 0.5], serverfarm: [0, 0.3] };
 
 function hash01(a, b) {

@@ -248,6 +248,7 @@ import { installCosm5 } from './cosm5.js';   // wave 4: cosmetics drop (suits/ha
 // [import:lcmonsters]
 // [import:atmos]
 // [import:arcade2]
+import { installRepomaps } from './repomaps.js';   // [import:repomaps] wave 8: themed interiors (Influencer Mansion, Content Academy, Cold Storage Data Station, Museum of Deleted Content) (docs/wave8/repomaps.md)
 
 
 
@@ -520,6 +521,7 @@ export class Game extends Emitter {
     // [slot:lcmonsters]
     // [slot:atmos]
     // [slot:arcade2]
+    this.useModule('repomaps', installRepomaps);   // [slot:repomaps]
 
 
 
