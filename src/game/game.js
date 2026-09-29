@@ -251,12 +251,13 @@ import { installFacjobs } from './facjobs.js';
 import { installLcmonsters } from './lcmonsters.js';
 import { installAtmos } from './atmos.js';   // [import:atmos]
 import { installArcade2 } from './arcade2.js';
-// [import:feedcams]
+import { installFeedcams } from './feedcams.js';   // [import:feedcams]
 import { installDowned } from './downed.js';   // [import:downed] wave 8: 0 HP = downed, crew revives (docs/wave8/downed.md)
 import { installHubgate } from './hubgate.js';   // [import:hubgate]
 // [import:soul]
 // [import:mapmods]
 // [import:worlds3]
+// [import:resto]
 // [import:facjobs]
 // [import:arcade2]
 // [import:mapmods]
@@ -535,12 +536,13 @@ export class Game extends Emitter {
     this.useModule('lcmonsters', installLcmonsters);
     this.useModule('atmos', installAtmos);   // [slot:atmos]
     this.useModule('arcade2', installArcade2);
-    // [slot:feedcams]
+    this.useModule('feedcams', installFeedcams);   // [slot:feedcams]
     this.useModule('downed', installDowned);   // [slot:downed]
     this.useModule('hubgate', installHubgate);   // [slot:hubgate] wave 8: Hub door, unlock cards, Quick Shift
     // [slot:soul]
     // [slot:mapmods]
     // [slot:worlds3]
+    // [slot:resto]
     // [slot:facjobs]
     // [slot:arcade2]
     // [slot:mapmods]
