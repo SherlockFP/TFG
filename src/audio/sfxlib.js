@@ -2530,3 +2530,27 @@ def('orbit_ambience', { dur: 24, loop: true, vol: 0.5, warm: 5, xf: 0.2 }, c => 
   const eL = D.echo(o[0], c.sr, 0.6, 0.4, 0.25, 0.4), eR = D.echo(o[1], c.sr, 0.9, 0.4, 0.25, 0.4);
   return D.reverb([eL, eR], c.sr, { room: 0.92, damp: 0.35, wet: 0.5, dry: 0.7, size: 1.3, down: 3 });
 });
+
+// =====================================================================================
+// DANCE LOOPS (wave 6, game/dance.js): six short 8-beat loops, one per dance mood, tempo == the dance's bpm
+// =====================================================================================
+CAT = 'item';
+function danceLoop(name, bpm, P) {
+  const s = 60 / bpm / 4, rep = str => str + ' | ' + str;
+  def(name, { dur: s * 32, loop: true, vol: 0.6, warm: 0.4, xf: 0.02 }, c => {
+    const o = stereo(c);
+    seq(c, o, rep(P.kick), s, (cc, m, l, v) => iKick(cc, v), { g: 1 });
+    if (P.clap) seq(c, o, rep(P.clap), s, (cc, m, l, v) => iClap(cc, v), { g: 0.55 });
+    if (P.hat) seq(c, o, rep(P.hat), s, (cc, m, l, v) => iHat(cc, v), { g: 0.3, pan: 0.25 });
+    seq(c, o, rep(P.bass), s, (cc, m, l, v) => iBass(cc, m, s * 1.7, v, { cut1: P.cut || 2600, cut0: 500, fdec: 0.08, sus: 0.6, drive: P.drive }), { g: 0.8 });
+    if (P.lead) seq(c, o, rep(P.lead), s, (cc, m, l, v) => iChip(cc, m, l * 0.9, v, { type: P.wave || 'square', lp: 4000, sus: 0.4, dec: 0.05 }), { g: 0.32, pan: 0.2 });
+    if (P.pad) seq(c, o, rep(P.pad), s, (cc, m, l, v) => iPad(cc, m, l, v, { voices: 3, att: 0.05, rel: 0.3, cut: 1800, detune: 18 }), { g: 0.3 });
+    return lofi(c, D.reverb(o, c.sr, { room: 0.4, wet: 0.08, damp: 0.5, down: 3 }), 60, 9500, 1.15);
+  });
+}
+danceLoop('dance_office', 112, { kick: 'X . . . X . . . X . . . X . . .', clap: '. . . . X . . . . . . . X . . .', hat: 'x . x . x . x . x . x . x . x x', bass: 'A2 . . A2 . . A2 . G2 . . G2 . . E2 .', lead: 'E5 . . D5 . C5 . . A4 . . . C5 . D5 .', pad: 'A3,C4,E4 - - - - - - - G3,B3,D4 - - - - - - -' });
+danceLoop('dance_robot', 128, { kick: 'X . . . X . . . X . . . X . . .', hat: '. . x . . . x . . . x . . . x .', bass: 'D2 . D2 . D2 . D3 . D2 . D2 . F2 . G2 .', lead: 'D5 . . . A4 . . . D5 . . F5 . E5 . .', cut: 1800, wave: 'saw', drive: 1.4 });
+danceLoop('dance_sway', 84, { kick: 'X . . . . . . . X . . . . . X .', clap: '. . . . X . . . . . . . X . . .', hat: 'x . . x . . x . x . . x . . x .', bass: 'F2 . . . . . C3 . D2 . . . . . A2 .', lead: 'A4 . . C5 . . E5 . . . D5 . C5 . . .', pad: 'F3,A3,C4 - - - - - - - D3,F3,A3 - - - - - - -', cut: 1400, wave: 'tri' });
+danceLoop('dance_glitch', 140, { kick: 'X . . X . . X . X . . X . X . .', clap: '. . . . X . . . . . . . X . . X', hat: 'x x . x x . x x . x x . x . x x', bass: 'C2 . C2 C2 . . C3 . Eb2 . Eb2 . . G2 . .', lead: 'G5 . Eb5 . C5 . . G4 . . Bb4 . C5 . . .', cut: 3200, wave: 'square', drive: 1.8 });
+danceLoop('dance_disco', 120, { kick: 'X . . . X . . . X . . . X . . .', clap: '. . . . X . . . . . . . X . . .', hat: '. . x . . . x . . . x . . . x .', bass: 'A2 A3 A2 A3 A2 A3 A2 A3 F2 F3 F2 F3 G2 G3 G2 G3', lead: 'E5 . G5 . E5 . C5 . D5 . F5 . D5 . B4 .', pad: 'A3,C4,E4 - - - - - - - F3,A3,C4 - - - G3,B3,D4 - - -', cut: 3000 });
+danceLoop('dance_metal', 150, { kick: 'X . X . X . X . X . X . X . X X', clap: '. . . . X . . . . . . . X . . .', hat: 'x . x . x . x . x . x . x . x .', bass: 'E2 E2 . E2 E2 . E2 . G2 G2 . G2 A2 . A2 .', lead: 'E4 . . G4 . . B4 . E5 . D5 . B4 . G4 .', cut: 2400, wave: 'saw', drive: 2.2 });

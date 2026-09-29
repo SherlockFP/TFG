@@ -60,6 +60,8 @@ export function unlockEmote(profile, id) {
   return true;
 }
 export const EMOTE_BY_ID = Object.fromEntries(EMOTES.map((e) => [e.id, e]));
+/** ui/emotewheel.js installs a factory here (wave 6 wheel: pages, favourites, thumbnails); without it the classic ring below is used */
+export const WHEEL = { make: null };
 const NATIVE = new Set(['dance', 'wave', 'point', 'sit']);
 
 // network id <-> emote
@@ -81,7 +83,9 @@ export class EmoteSystem {
     this.wheelOpen = false;
     this.wheelAng = 0; this.wheelMag = 0; this.hover = -1;
     this.camYaw = 0; this.camPitch = 0.25; this.camDist = 2.7;
-    this.buildWheel();
+    this.wheelUI = WHEEL.make ? WHEEL.make(this) : null;
+    if (!this.wheelUI) this.buildWheel();
+    this.startMs = 0; this.holdT = 0;
     this.avatar = null;
     this.music = null;
   }
@@ -121,12 +125,12 @@ export class EmoteSystem {
   play(def) {
     const g = this.game;
     if (!def || g.player.dead) return;
-    this.current = def; this.t = 0;
+    this.current = def; this.t = 0; this.startMs = performance.now();
     g.emote = emoteNetId(def);
     g.emoteT = g.time + def.dur;
     this.camYaw = g.player.yaw; this.camPitch = 0.2;   // [ux] start BEHIND the player (over the shoulder), not a front selfie
     this.music?.stop(0.3); this.music = null;
-    if (def.music) this.music = g.audio.play(def.music, { follow: this.ensureAvatar().root, loop: true, volume: 0.5, refDistance: 3, maxDistance: 35 });
+    if (def.music) this.music = g.audio.play(def.music, { follow: this.ensureAvatar().root, loop: true, volume: 0.5 * (g.settings?.danceVolume ?? 0.8) / 0.8, refDistance: 3, maxDistance: 35 });
     g.audio.ui('ui_confirm', 0.35);
   }
   stop() {
@@ -134,7 +138,7 @@ export class EmoteSystem {
     this.current = null;
     this.game.emote = null;
     this.music?.stop(0.4); this.music = null;
-    if (this.avatar) this.avatar.root.visible = false;
+    if (this.avatar) { this.avatar.root.visible = false; this.avatar.setHitFlash?.(0); }
   }
 
   update(dt, input) {
@@ -142,6 +146,13 @@ export class EmoteSystem {
     const p = g.player;
     // wheel (hold B)
     const holding = input.enabled && input.locked && input.codeDown('KeyB') && !p.dead;
+    if (this.wheelUI) {
+      if (holding && !this.wheelOpen) { this.wheelOpen = true; this.holdT = 0; this.wheelUI.open(); }
+      if (this.wheelOpen) {
+        this.holdT += dt; this.wheelUI.update(input, dt);
+        if (!holding) { this.wheelOpen = false; const pick = this.wheelUI.close(); if (pick) this.play(pick); else if (this.holdT < 0.25) this.wheelUI.openStudio(); }
+      }
+    } else {
     if (holding && !this.wheelOpen) { this.buildWheel(); this.wheelOpen = true; this.wheel.classList.remove('hidden'); this.wheelX = 0; this.wheelY = 0; this.hover = -1; g.audio.ui('ui_hover', 0.4); }
     if (this.wheelOpen) {
       this.wheelX += input.mouseDX; this.wheelY += input.mouseDY;
@@ -161,6 +172,7 @@ export class EmoteSystem {
         this.nameEl.textContent = t('EMOTES');
         if (this.hover >= 0 && this.list[this.hover]) this.play(this.list[this.hover]);
       }
+    }
     }
     // quick emotes (Z / X)
     if (input.pressed('emote1')) this.play(EMOTE_BY_ID.dance);
@@ -210,7 +222,7 @@ export class EmoteSystem {
 
   dispose() {
     this.stop();
-    this.wheel?.remove();
+    this.wheel?.remove(); this.wheelUI?.dispose?.();
     this.avatar?.root.removeFromParent();
     this.avatar?.dispose?.();
   }

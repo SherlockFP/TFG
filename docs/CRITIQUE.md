@@ -250,3 +250,6 @@ Role constraint days turn co-op communication into a rule (8 cards, host-validat
 
 ## Wave 6 - mapart (docs/wave6/mapart.md)
 Every outdoor moon now has the same original signature layer (pylons that watch, LIVE panels, drones, glitch scars, ad billboards, crashed pods, camps with journals, tape) plus one landmark per biome family and a horizon silhouette, all seeded and merged (a handful of draw calls, no lights). Judgement: identity and variety come from the family landmarks and the corporate-decay props, which read as TFG rather than LC; the risk is scale / fog (landmarks at 60-108 m sit in dense fog on swamp / forest moons) and that the layer is not yet hand-checked on every generated biome.
+
+## Wave 6 - dance (docs/wave6/dance.md)
+The dance list is now big and readable (wheel pages, favourites, search, thumbnails) and the crew can lock to one beat, but every animation is hand-typed numbers checked by unit tests and a couple of screenshots, not by an animator's eye; sync is per-viewer and the music is not beat-locked across players, and most dances are free so the shop/crate rows are thin incentives.

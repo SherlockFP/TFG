@@ -113,7 +113,7 @@ export function combine(list) {
 
 // ------------------------------------------------------------------ viewers (cosmetic in v1, event 'tfg:viewers')
 export const VIEW = { base: 120, max: 99999, decay: 0.02 };
-export const VIEW_GAIN = { escape: 0.35, boss_hit: 0.12, sprint_away: 0.18, death: 0.25, vote: 0.05 };
+export const VIEW_GAIN = { escape: 0.35, boss_hit: 0.12, sprint_away: 0.18, death: 0.25, vote: 0.05, dance: 0.04 };
 export const newViewers = () => ({ n: VIEW.base });
 /** kind in VIEW_GAIN: the audience grows by a share of itself (min +25). Returns the delta. */
 export function addViewers(v, kind) {

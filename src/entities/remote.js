@@ -174,7 +174,7 @@ export class RemotePlayer {
     });
     this.avatar.setMouth(this.voiceLevel);
     if (this.emoteDef && !this.dead) { applyEmoteFx(this.avatar, this.root, this.emoteDef, (performance.now() - this.emoteStart) / 1000); if (!this.faceSet) { this.avatar.setExpression?.(this.emoteDef.face || 'normal'); this.faceSet = true; } }
-    else if (this.faceSet) { this.root.rotation.x = 0; this.root.rotation.z = 0; this.avatar.setExpression?.(this.dead ? 'dead' : 'normal'); this.faceSet = false; }
+    else if (this.faceSet) { this.root.rotation.x = 0; this.root.rotation.z = 0; this.avatar.setHitFlash?.(0); this.avatar.setExpression?.(this.dead ? 'dead' : 'normal'); this.faceSet = false; }
     if (!this.dead) this.body.setNextKinematicTranslation({ x: this.pos.x, y: this.pos.y + 0.9, z: this.pos.z });
     // footsteps
     if (!this.dead && this.grounded && speed > 0.6) {

@@ -455,6 +455,7 @@ export function createAvatar2({ suitColor = '#d9642b', hat = 'none', visorColor,
   const instr = pv(spine, [0, 0, 0.09], null, 'instr');       // instrument mount (music.js): the classic torso front was 0.09 m closer
   return {
     root,
+    limbs: { shL: armL.sh, elL: armL.el, shR: armR.sh, elR: armR.el, hipL: legL.hip, kneeL: legL.knee, ankleL: legL.ankle, hipR: legR.hip, kneeR: legR.knee, ankleR: legR.ankle },   // [dance] pivots for keyframed dances
     parts: { head, torso: spine, handR: armR.hand, handL: armL.hand, backpack, face, neck, hips: body, hatSlot, chest: chestFrame, instr },
     height: 1.8,
     radius: 0.35,
