@@ -251,7 +251,6 @@ import { installFacjobs } from './facjobs.js';
 import { installLcmonsters } from './lcmonsters.js';
 import { installAtmos } from './atmos.js';   // [import:atmos]
 import { installArcade2 } from './arcade2.js';
-// [import:resto]
 // [import:feedcams]
 // [import:downed]
 // [import:hubgate]
@@ -261,6 +260,7 @@ import { installArcade2 } from './arcade2.js';
 // [import:arcade2]
 // [import:mapmods]
 import { installRepomaps } from './repomaps.js';   // [import:repomaps] wave 8: themed interiors (Influencer Mansion, Content Academy, Cold Storage Data Station, Museum of Deleted Content) (docs/wave8/repomaps.md)
+import { installResto } from './resto.js';   // [import:resto] wave 8: alien restaurant tycoon on the homeworld
 
 
 
@@ -534,7 +534,6 @@ export class Game extends Emitter {
     this.useModule('lcmonsters', installLcmonsters);
     this.useModule('atmos', installAtmos);   // [slot:atmos]
     this.useModule('arcade2', installArcade2);
-    // [slot:resto]
     // [slot:feedcams]
     // [slot:downed]
     // [slot:hubgate]
@@ -544,6 +543,7 @@ export class Game extends Emitter {
     // [slot:arcade2]
     // [slot:mapmods]
     this.useModule('repomaps', installRepomaps);   // [slot:repomaps]
+    this.useModule('resto', installResto);   // [slot:resto]
 
 
 
