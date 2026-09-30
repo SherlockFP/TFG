@@ -434,6 +434,7 @@ export default {
   "THE SHIP LEAVES AT MIDNIGHT - RUN BACK NOW": "КОРАБЛЬ УЛЕТАЕТ В ПОЛНОЧЬ — БЕГОМ НАЗАД",
   "It is getting late. Head back to the ship soon.": "Уже поздно. Скоро возвращайся на корабль.",
   "Bring scrap to the ship: ▮{a} / ▮{b} today": "Принеси хлам на корабль: сегодня ▮{a} / ▮{b}",
+  "Quota covered by the scrap aboard. More scrap is overtime bonus": "Квота покрыта хламом на борту. Остальное - премия за сверхурочные",
   "Carrying {n} items - get them to the ship": "Несёшь предметов: {n} — доставь их на корабль",
   "Carrying {n} item - get it to the ship": "Несёшь предметов: {n} — доставь на корабль",
   "Find the facility entrance ({d} m)": "Найди вход в комплекс ({d} м)",

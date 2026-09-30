@@ -12,7 +12,7 @@ import { forgeName } from '../game/enhance.js';   // [forge]
 import { durBarHTML, durClass } from './durability_style.js';   // [durability]
 import { TIERS } from '../game/tiers.js';
 import { ensureInventoryStyles } from './inventory_style.js';
-import { xpForLevel, rankOf } from '../game/progression.js';
+import { xpForLevel, rankOf, quotaState } from '../game/progression.js';
 import { MOONS, WEATHER } from '../game/moons.js';
 import * as DailyEvents from '../game/dailyEvents.js';
 import { t, getLang, tf } from '../core/i18n.js';
@@ -560,7 +560,7 @@ export class HUD {
     this.$.quota.classList.toggle('hidden', !showQ);
     if (showQ) {
       const moon = MOONS[run.moon];
-      let s = `${t('QUOTA')} ▮${run.sold ?? 0}/${run.quota ?? 0} · ${run.daysLeft ?? 3} ${t('DAYS LEFT')} · ${t('CREDITS')} ▮${run.credits ?? 0}`;
+      let s = `${t('QUOTA')} ${quotaState(run).text} · ${run.daysLeft ?? 3} ${t('DAYS LEFT')} · ${t('CREDITS')} ▮${run.credits ?? 0}`;
       if (run.phase === 'orbit') s += ` · ${t('ROUTE')}: ${moon?.name || '-'}`;
       if (run.phase === 'company') s += ` · ${t('BUYING AT')} ${Math.round((run.buyRate || 0) * 100)}%`;
       if (this.$.quota.textContent !== s) this.$.quota.textContent = s;

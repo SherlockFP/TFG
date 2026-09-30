@@ -11,6 +11,7 @@ import { escapeHtml } from '../core/util.js';
 import { MOONS } from './moons.js';
 import { hudDensityOf } from '../ui/hudcalm_ui.js';
 import { walletRowOf } from './wallet.js';
+import { quotaState } from './progression.js';   // [econ9] one quota source
 
 const FLASH_S = { standard: 6, minimal: 3 };
 // dock item id -> rule.  f: shown for FLASH_S s after each change of its text (digits ignored, so ticking timers do not re-trigger)
@@ -138,7 +139,7 @@ export function installHudCalm(game) {
     const objs = (game.objectives?.full || []).map((o) => `<div class="hc-o ${o.kind}${o.done ? ' done' : ''}">${o.done ? '✔' : o.kind === 'warn' ? '!' : '◆'} ${escapeHtml(o.text)}</div>`).join('');
     const rows = [
       [tf('Day {n}', { n: run.day ?? 1 }), escapeHtml(moon)],
-      [t('QUOTA'), `▮${run.sold || 0} / ▮${run.quota || 0}`],
+      [t('QUOTA'), quotaState(run).text],
       [t('Days left'), String(run.daysLeft ?? '')],
       [t('Clock'), txt('.clock-time')],
       [`${txt('.lvl')} ${txt('.rank')}`, walletRowOf(game)],   // [hud6] the Tab card is where Clout lives

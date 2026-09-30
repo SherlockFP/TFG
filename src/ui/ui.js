@@ -15,7 +15,7 @@ import { listRuns, loadRun, deleteRun, saveSettings, saveProfile } from '../core
 import { ACTION_NAMES, KEY_GROUPS, findConflicts, bindKey, resetKeys, CB_MODES, CB_LABELS, PALETTES, FOV_MIN, FOV_MAX, UI_SCALE_MIN, UI_SCALE_MAX } from '../core/a11y_core.js';   // [a11y]
 import { PAD_HELP } from '../core/gamepad_core.js';
 import { markPadActive } from '../game/a11y.js';
-import { SKILLS, SKILL_CAP, xpForLevel, rankOf, derivedStats, MARKET, armorDef, dailyBounties, bountyText } from '../game/progression.js';
+import { SKILLS, SKILL_CAP, xpForLevel, rankOf, derivedStats, MARKET, armorDef, dailyBounties, bountyText, quotaState } from '../game/progression.js';
 import { ITEMS, RARITY } from '../game/items.js';
 import { MOONS } from '../game/moons.js';
 import { SUIT_COLORS, HATS } from '../models/avatar.js';
@@ -1284,7 +1284,7 @@ export class UI {
       <div class="rp-rows">${rows.map(([l, v, pre, note], i) => `<div class="rp-row" style="--i:${i}"><span>${l}</span><span class="rp-note">${note}</span><b data-v="${Number(v) || 0}" data-pre="${pre}">${pre}0</b></div>`).join('')}</div>
       ${crew ? `<div class="rp-crewlist" style="--i:${rows.length}">${crew}</div>` : ''}
       ${extra.map((x) => `<div class="sum-extra">${x}</div>`).join('')}
-      <div class="rp-foot"><span>${t('QUOTA')} ${fmtMoney(d.sold)} / ${fmtMoney(d.quota)}</span><span>${d.daysLeft} ${t('DAYS LEFT')}</span></div>
+      <div class="rp-foot"><span>${t('QUOTA')} ${quotaState(d).text}</span><span>${d.daysLeft} ${t('DAYS LEFT')}</span></div>
       ${grade ? `<div class="rp-grade" style="--gc:${GRADE_COL[grade]}"><div class="rp-letter">${grade}</div><div class="rp-quip">${GRADE_QUIP[grade]}</div></div>` : ''}` });
     this.root.appendChild(box);
     // count-up rows, then slam the grade stamp

@@ -477,6 +477,7 @@ const TR = {
   'THE SHIP LEAVES AT MIDNIGHT - RUN BACK NOW': 'GEMİ GECE YARISI KALKIYOR - HEMEN GERİ KOŞ',
   'It is getting late. Head back to the ship soon.': 'Geç oluyor. Yakında gemiye dön.',
   'Bring scrap to the ship: ▮{a} / ▮{b} today': 'Gemiye hurda getir: bugün ▮{a} / ▮{b}',
+  'Quota covered by the scrap aboard. More scrap is overtime bonus': 'Kota gemideki hurdayla karşılandı. Fazlası mesai primi',
   'Carrying {n} items - get them to the ship': '{n} eşya taşıyorsun - gemiye götür',
   'Carrying {n} item - get it to the ship': '{n} eşya taşıyorsun - gemiye götür',
   'Find the facility entrance ({d} m)': 'Tesis girişini bul ({d} m)',

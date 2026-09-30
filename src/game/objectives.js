@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { MOONS } from './moons.js';
 import { isSellable } from './items.js';
 import { insideShip } from '../world/ship.js';
-import { bountyText } from './progression.js';
+import { bountyText, quotaState } from './progression.js';
 import { escapeHtml } from '../core/util.js';
 import { t, tf } from '../core/i18n.js';
 
@@ -50,9 +50,10 @@ export class Objectives {
         const time = run.time || 480;
         if (time > 23 * 60) add(t('THE SHIP LEAVES AT MIDNIGHT - RUN BACK NOW'), 'warn');
         else if (time > 21 * 60) add(t('It is getting late. Head back to the ship soon.'), 'warn');
-        const target = Math.ceil(need / Math.max(1, run.daysLeft));
         const today = g.hostData?.dayStats?.collected ?? this.clientCollected();
-        add(tf('Bring scrap to the ship: ▮{a} / ▮{b} today', { a: today, b: target }), 'main', today >= target && target > 0, target ? Math.min(1, today / target) : 1);
+        const target = quotaState(run, shipValue - today).perDay;   // [econ9] the cash still needed at today's pace: scrap already aboard from earlier days counts (deadline day pays 100 %)
+        if (target <= 0 && need > 0) add(t('Quota covered by the scrap aboard. More scrap is overtime bonus'), 'main', true, 1);
+        else add(tf('Bring scrap to the ship: ▮{a} / ▮{b} today', { a: today, b: target }), 'main', today >= target && target > 0, target ? Math.min(1, today / target) : 1);
         const carrying = p.slots.filter((id) => id && isSellable(g.items.get(id)?.def || {})).length;
         if (carrying && !p.inShip) add(tf(carrying > 1 ? 'Carrying {n} items - get them to the ship' : 'Carrying {n} item - get it to the ship', { n: carrying }), 'sub').lead = true;   // [onegoal] loot in hand = the goal
         if (!p.indoor && g.world.outdoor) {

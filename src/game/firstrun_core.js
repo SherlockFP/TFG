@@ -33,6 +33,9 @@ export function stageOf(ctx = {}) {
 /** deterministic on every peer: the very first landing of a campaign run (plans that all peers rebuild must not depend on a profile) */
 export const firstDay = (run) => !!run && !run.quick && (run.day | 0) <= 1 && (run.quotaIndex | 0) <= 0;
 
+/** [econ9] the first-sale beat only appears once the Company pays well (>= 77 %: last landing day or the deadline); selling on day 1 pays 30-38 % */
+export const sellWindow = (run) => !!run && (run.daysLeft | 0) <= 1;
+
 /** is `kind` allowed at `stage` (day = run.day for the wrong door: nothing before day 2) */
 export function allow(kind, stage, day = 1) {
   if (stage === 'free') return true;

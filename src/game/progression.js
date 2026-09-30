@@ -66,8 +66,9 @@ export const BALANCE = {
   // wiped around quota 6 while holding 20x the quota in scrap. Now the quota curve binds the economy and the crew
   // has to move to deeper (richer, riskier) moons as it grows: median quotas met ~8-11 (competent 2-4 players),
   // ~11-13 for great crews (p90 15+).
-  quotaBase: 130,             // first quota
-  quotaGrowth: 100,           // LC growth term: quotaGrowth * (1 + q^2/16) * (0.8..1.2)
+  quotaBase: 330,             // first quota (wave 9: was 130 = 20-30x sold/quota at q0, no decisions; owner 300-350, docs/wave9/econ9.md)
+  overtimeDiv: 10,            // wave 9: overtime bonus = surplus / overtimeDiv (was 5; credits need sinks, not a faucet)
+  quotaGrowth: 85,            // (wave 9: 100 -> 85 to offset the higher base) LC growth term: quotaGrowth * (1 + q^2/16) * (0.8..1.2)
   valuePerQuota: 0.015,       // scrap value multiplier growth per met quota
   countPerQuota: 0.2,         // extra indoor scrap items per met quota
   indoorPowerPerQuota: 0.03,  // indoor creature budget growth per met quota
@@ -313,6 +314,16 @@ export function nextQuota(prevQuota, quotaIndex, rng = Math.random) {
   if (quotaIndex === 0) return base;
   const growth = BALANCE.quotaGrowth * (1 + (quotaIndex * quotaIndex) / 16) * (0.8 + 0.4 * rng());
   return Math.round(prevQuota + growth);
+}
+
+/** [econ9] THE quota source for the top bar, the Tab card, the day report and the day goal (all read run.sold / run.quota through this).
+ *  need = cash still missing; perDay = the share of it one more landing day has to bring (deadline day pays 100 %, so scrap value = cash);
+ *  `banked` = scrap already aboard from earlier days (unsold, at full deadline value) is subtracted from what today has to bring. */
+export function quotaState(run, banked = 0) {
+  const quota = Math.max(0, Math.round(Number(run?.quota) || 0)), sold = Math.max(0, Math.round(Number(run?.sold) || 0));
+  const need = Math.max(0, quota - sold), days = Math.max(1, Math.round(Number(run?.daysLeft) || 0));
+  const open = Math.max(0, need - Math.max(0, Math.round(banked)));
+  return { quota, sold, need, days, met: quota > 0 && sold >= quota, perDay: Math.ceil(open / days), text: `▮${sold}/▮${quota}` };
 }
 
 // Company buy rate by days left (3 = first day of cycle ... 0 = deadline)

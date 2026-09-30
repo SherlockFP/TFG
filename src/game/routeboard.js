@@ -35,6 +35,7 @@ const TEXT = {
   orbit_only: ['Routing opens in orbit.', 'Rota yalnızca yörüngede seçilir.', 'Маршрут выбирается только на орбите.'],
   hq: ['0-ALGORITHM HQ · SELL SCRAP', '0-ALGORITHM HQ · HURDA SAT', '0-ALGORITHM HQ · ПРОДАТЬ ХЛАМ'],
   hq_rate: ['buying at {r}%', '%{r} fiyattan alıyor', 'скупка по {r}%'],
+  hq_dl: ['deadline day pays 100 %', 'son gün %100 öder', 'в последний день платят 100 %'],   // [econ9] do not sell early: the deadline day pays full price
   keys: ['pick', 'seç', 'выбор'],
   k_route: ['route', 'rota', 'маршрут'],
   k_all: ['ALL ROUTES', 'TÜM ROTALAR', 'ВСЕ МАРШРУТЫ'],
@@ -189,7 +190,7 @@ export function installRouteboard(game) {
     el.innerHTML = `<div class="rb-head"><span class="tfg-plate">${escapeHtml(x('rb.title'))}</span><span class="rb-sub">${escapeHtml(xf('rb.sub', { d: r.day ?? 1, s: r.sold | 0, q: r.quota | 0, n: r.daysLeft ?? 0 }))}</span><span class="rb-cred tfg-num">▮${(r.credits | 0).toLocaleString('en-US')}</span></div>
       <div class="tfg-hazard"></div>${strip()}
       <div class="rb-cards">${cards.map((c, i) => cardHtml(c, i, orbit)).join('')}</div>
-      ${hq ? `<div class="rb-hq${sel === cards.length ? ' sel' : ''}" data-i="${cards.length}"><kbd class="tfg-kbd">${cards.length + 1}</kbd>${escapeHtml(x('hq'))}${r.moon === 'hq' ? ` <span class="tfg-tag">${escapeHtml(x('cur'))}</span>` : ''}<em>${escapeHtml(xf('hq_rate', { r: Math.round(buyRate(r.daysLeft, r.buyRnd) * 100) }))}</em></div>` : ''}
+      ${hq ? `<div class="rb-hq${sel === cards.length ? ' sel' : ''}" data-i="${cards.length}"><kbd class="tfg-kbd">${cards.length + 1}</kbd>${escapeHtml(x('hq'))}${r.moon === 'hq' ? ` <span class="tfg-tag">${escapeHtml(x('cur'))}</span>` : ''}<em>${escapeHtml(xf('hq_rate', { r: Math.round(buyRate(r.daysLeft, r.buyRnd) * 100) }))}${(r.daysLeft | 0) > 0 ? escapeHtml(' · ' + x('hq_dl')) : ''}</em></div>` : ''}
       ${gen ? `<div class="rb-msg">${escapeHtml(xf('sector', { n: gen }))}</div>` : ''}
       ${orbit ? '' : `<div class="rb-msg">${escapeHtml(x('orbit_only'))}</div>`}
       <div class="rb-foot"><span><kbd class="tfg-kbd">1-${cards.length + 1}</kbd> ${escapeHtml(x('keys'))}</span><span><kbd class="tfg-kbd">ENTER</kbd> ${escapeHtml(x('k_route'))}</span><span class="rb-all"><kbd class="tfg-kbd">TAB</kbd> ${escapeHtml(x('k_all'))}</span><span><kbd class="tfg-kbd">ESC</kbd> ${escapeHtml(x('k_type'))}</span>${footNext()}</div>`;
