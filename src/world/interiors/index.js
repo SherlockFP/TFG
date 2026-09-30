@@ -28,6 +28,7 @@ import { HOSPITAL } from './hospital.js';
 import { STUDIO_THEMES } from './themes_studio.js';   // [repomaps] wave 8: influencer / academy / colddata / museum
 import { METRO, GREENHOUSE } from './lab_themes.js';   // [labyrinths]
 import { PRISON, TOWER } from './lab_vertical.js';   // [labyrinths]
+import { LABYR10_THEMES } from './labyr10_themes.js';   // [labyr10] wave 10: deadmall / funhouse
 import { themeAmbience } from '../../audio/extassets.js';
 import { addTranslations } from '../../core/i18n.js';
 
@@ -47,6 +48,7 @@ export const INTERIORS = {
   hospital: HOSPITAL,
   ...STUDIO_THEMES,   // [repomaps]
   metro: METRO, greenhouse: GREENHOUSE, prison: PRISON, tower: TOWER,   // [labyrinths]
+  ...LABYR10_THEMES,   // [labyr10]
 };
 export const THEMES_BY_ID = INTERIORS;
 export const INTERIOR_THEMES = Object.freeze(Object.keys(INTERIORS));

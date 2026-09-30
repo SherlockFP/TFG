@@ -222,7 +222,7 @@ import { installStory } from './lazymods.js';   // [import:story] wave 6: two pa
 // [import:ux]
 // wave 10 (content + soul) placeholders
 // [import:creatures10]
-// [import:labyr10]
+import { installLabyr10 } from './labyr10.js';   // [import:labyr10] wave 10: Dead Mall + Mirror Funhouse life
 // [import:moons10]
 // [import:outlife10]
 // [import:landing10]
@@ -611,7 +611,7 @@ export class Game extends Emitter {
     this.useModule('eggs', installEggs);
     this.useModule('mapart', installMapArt);
     // [slot:creatures10]
-    // [slot:labyr10]
+    this.useModule('labyr10', installLabyr10);   // [slot:labyr10]
     // [slot:moons10]
     // [slot:outlife10]
     // [slot:landing10]
