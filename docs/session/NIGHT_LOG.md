@@ -25,3 +25,5 @@ Loop rule: 2-3 Sonnet agents at a time (1 browser/QA agent max) → merge with t
 | 9 | sound2 | merged 1f4d357: 64 procedural sounds for all wave-8 features, fixed 5 non-existent sound ids (LC monster cues fell back to generic), mix-policy categories, game.sound2 helper, atmos beds for labyrinth/repomaps/expedition themes. |
 | 9 | full regression (lead) | all node tests pass except cycle2_flow (bosses coverage + exceptions) and ship2_install (timeout) → regress fixer agent running. |
 | 10 | regress (cycle2_flow + ship2_install), qafix1 (horror.js slicing, museum render cost, dark facilities, arrival banner queue + garbled map card, palette vs clock, downed bar/font, lantern beam, hub door count) | running |
+| 10 | Opus review | merged 8d33ad4: docs/REVIEW_W8_NIGHT.md — 5.0 on paper / 4.5 on screen; 'wide and busy' now; 12-task backlog; proposes a freeze on new systems. Loop now follows that backlog. |
+| 11 | solo self-revive (review task 7) | running |
