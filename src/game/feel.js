@@ -131,6 +131,7 @@ export function installFeel(game) {
     undo.push(() => { if (g.pickup === mine) g.pickup = orig; });
   }
   let beatT = 0, lowSet = false;
+  offs.push(mm?.on?.('warm', (reg) => reg(flashTexture())));   // [perf6] the landing warm set uploads the muzzle flash texture before the first shot
   offs.push(mm?.on?.('update', (dt) => {
     for (let i = flashes.length - 1; i >= 0; i--) {   // muzzle flash: quick grow then fade
       const f = flashes[i]; f.t += dt; const u = f.t / f.dur;

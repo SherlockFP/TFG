@@ -194,6 +194,7 @@ import { installOneGoal } from './onegoal.js';   // [onegoal] wave 8 night: one 
 import { installOnboard } from './onboard.js';   // [import:onboard] wave 5: Hiring Day first-time start + staged unlocks (docs/wave5/onboard.md)
 import { installAlgo2 } from './algo2.js';   // [import:algo2] wave 6: live stream hype + ghost replay + glitch exploits (docs/wave6/algo2.md)
 import { installLandQ } from './landingq.js';   // [import:landq] wave 8 perf4: landing job queue (build steps + mapLoaded handlers spread over frames)
+import { installWarmSet } from './warmset.js';   // wave 8 perf6: landing warm set (docs/wave8/perf6.md)
 import { installLoaner } from './loaner.js';   // wave 8 QA: first-landing loaner torch
 import { installGpuSweep } from './gpusweep.js';   // [import:gpusweep] wave 5: frees GPU geometry / textures of unloaded maps (docs/wave5/zfixperf.md)
 
@@ -482,6 +483,7 @@ export class Game extends Emitter {
     this.useModule('algo2', installAlgo2);   // [slot:algo2]
     this.useModule('dance', installDance);   // [slot:dance]
     this.useModule('landQ', installLandQ);   // [slot:landq]
+    this.useModule('warmSet', installWarmSet);   // [perf6] landing warm set + perfInfo()
     this.useModule('loaner', installLoaner);
     this.useModule('gpusweep', installGpuSweep);   // [slot:gpusweep]
 
@@ -908,6 +910,7 @@ export class Game extends Emitter {
     }
     if (q) {
       this.mods?.emitSliced?.('mapLoaded', [this.world, this], (n, f) => q.add(n, f));
+      this.warmSet?.queue(q, run, moon);   // [perf6] one off-scene copy of each creature / scrap / VFX the moon can show, compiled + uploaded by the prewarm below
       q.add('prewarm', () => q.prewarm());   // shaders of everything built above compile during the descent, not on first sight
     } else this.mods?.emit('mapLoaded', this.world, this);
   }

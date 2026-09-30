@@ -11,7 +11,7 @@
 export class LandingQueue {
   constructor({ budgetMs = 8, startDelay = 0.35, now = () => (typeof performance !== 'undefined' ? performance.now() : Date.now()) } = {}) {
     this.budgetMs = budgetMs; this.startDelay = startDelay; this.now = now;
-    this.enabled = true; this.jobs = []; this.wait = 0; this.last = []; this.running = false; this.flushing = false; this._inJob = false; this._ins = 0;
+    this.enabled = true; this.afterPrewarm = []; this.jobs = []; this.wait = 0; this.last = []; this.running = false; this.flushing = false; this._inJob = false; this._ins = 0;
   }
   get pending() { return this.jobs.length; }
   /** queue one job; the first one of a batch arms the start delay (title card + thrusters get a frame first) */
@@ -40,7 +40,7 @@ export class LandingQueue {
     try { while (this.jobs.length) { this._run(this.jobs.shift()); n++; } } finally { this.flushing = false; }
     return n;
   }
-  clear() { this.jobs.length = 0; this.wait = 0; }
+  clear() { this.jobs.length = 0; this.wait = 0; for (const f of this.afterPrewarm.splice(0)) { try { f(); } catch { /* ignore */ } } }   // [perf6] a cleared landing still removes its warm group
   report() { return this.last.slice().sort((a, b) => b.ms - a.ms); }
   get totalMs() { return this.last.reduce((s, j) => s + j.ms, 0); }
 }
@@ -52,9 +52,10 @@ export function installLandQ(game) {
    *  compileAsync starts the driver compiles and returns without blocking on the link (KHR_parallel_shader_compile) */
   q.prewarm = () => {
     const e = game.engine, r = e?.renderer;
-    if (!r || !e.scene || !e.camera) return;
+    const done = () => { for (const f of q.afterPrewarm.splice(0)) { try { f(); } catch (err) { console.warn('[landingq] afterPrewarm', err); } } };   // [perf6] the warm set's hidden group goes away once compiled
+    if (!r || !e.scene || !e.camera) { done(); return; }
     const prev = r.getRenderTarget();
-    try { r.setRenderTarget(e.rt || null); (r.compileAsync || r.compile).call(r, e.scene, e.camera)?.catch?.(() => {}); } catch (err) { console.warn('[landingq] prewarm', err); } finally { r.setRenderTarget(prev); }
+    try { r.setRenderTarget(e.rt || null); const p = (r.compileAsync || r.compile).call(r, e.scene, e.camera); if (p?.then) p.then(done, done); else done(); } catch (err) { console.warn('[landingq] prewarm', err); done(); } finally { r.setRenderTarget(prev); }
   };
   q.dispose = () => { q.clear(); off?.(); };
   return q;
