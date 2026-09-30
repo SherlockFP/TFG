@@ -239,7 +239,7 @@ export const TROPHY_SLOTS = [
   { id: 'excavator', kind: 'boss' }, { id: 'lobbymanager', kind: 'boss' }, { id: 'legacybot', kind: 'boss' }, { id: 'raid', kind: 'raid' }, { id: 'keystone', kind: 'keystone' }, { id: 'hidden', kind: 'gate' },
 ];
 export const TROPHY_IDS = TROPHY_SLOTS.map((s) => s.id);
-export const BOSS_NAMES = { ...Object.fromEntries(Object.values(BOSS_TABLE).map((b) => [b.id, b.name])), legacybot: LEGACY_BOSS.name, raid: "The Algorithm's Core", keystone: 'Corrupted Keystone', hidden: 'The Hidden Gate' };
+export const BOSS_NAMES = { ...Object.fromEntries(Object.values(BOSS_TABLE).filter((b) => !b.themed).map((b) => [b.id, b.name])), legacybot: LEGACY_BOSS.name, raid: "The Algorithm's Core", keystone: 'Corrupted Keystone', hidden: 'The Hidden Gate' };
 export const isTrophyId = (id) => TROPHY_IDS.includes(id);
 export const mmss = (sec) => { sec = Math.max(0, Math.round(sec || 0)); return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`; };
 export const fmtDate = (ms) => { try { return new Date(ms).toISOString().slice(0, 10); } catch { return '-'; } };

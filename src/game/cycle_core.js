@@ -5,6 +5,8 @@
 //   { v, mode: 'classic'|'endless', stage: 'days'|'gate'|'core'|'grace', sector, fails, cores, bossDead, attempts, declined, firstKills:{theme:1}, endless }
 // step(cy, ev) is pure and returns { cy, fx: [...] }.  fx tells the glue what to do (gateOpen, win, grace, shameful, ...).
 
+import { themedEntry } from './bossdress_core.js';   // pure data (wave 8 night)
+
 export const TUNE = {
   coresForEndless: 3,      // Sector Cores cleared before "PATCH 1.0" is offered
   graceDays: 1,            // extra no-quota collection days after the first lost core
@@ -27,14 +29,15 @@ export const BOSS_TABLE = {
 };
 // Themed sector bosses for the interiors that have no boss of their own (wave 8 hero content): each maps to the most fitting EXISTING boss
 // (same id / kit / model / trophy; aliases, so hp, dmg, names and translations stay in one place).
-BOSS_TABLE.metro = BOSS_TABLE.mansion;             // the ghost train's station host: blinks behind you the moment you look away
-BOSS_TABLE.greenhouse = BOSS_TABLE.hospital;     // the head gardener: elective pruning, drags the weakest patient onto the potting table
-BOSS_TABLE.prison = BOSS_TABLE.factory;         // the warden is the Foreman: "Site Supervisor" with a whistle and a shift schedule
-BOSS_TABLE.tower = BOSS_TABLE.office;    // the Ivory Tower's Synergy Enforcer: mandatory meetings, paper shields
-BOSS_TABLE.influencer = BOSS_TABLE.mansion;        // the Estate's Host: Welcome, Guest
-BOSS_TABLE.academy = BOSS_TABLE.office;  // the principal: detention-as-a-meeting
-BOSS_TABLE.museum = BOSS_TABLE.mansion;            // the curator: exhibits that move when nobody looks
-BOSS_TABLE.colddata = BOSS_TABLE.serverfarm;    // the cold-storage Load Balancer: routes damage through the frozen nodes
+// Wave 8 night (bossdress_core.js): themed COPIES - same id / hp / dmg / rank, own name + title + intro + accent (game/bossdress.js dresses the lair).
+BOSS_TABLE.metro = themedEntry(BOSS_TABLE.mansion, 'metro');              // the ghost train's station host: blinks behind you the moment you look away
+BOSS_TABLE.greenhouse = themedEntry(BOSS_TABLE.hospital, 'greenhouse');   // the head gardener: elective pruning, drags the weakest patient onto the potting table
+BOSS_TABLE.prison = themedEntry(BOSS_TABLE.factory, 'prison');            // the warden is the Foreman: a whistle and a shift schedule
+BOSS_TABLE.tower = themedEntry(BOSS_TABLE.office, 'tower');               // the Ivory Tower's Synergy Enforcer: mandatory meetings, paper shields
+BOSS_TABLE.influencer = themedEntry(BOSS_TABLE.mansion, 'influencer');    // the Estate's concierge: Welcome, Guest
+BOSS_TABLE.academy = themedEntry(BOSS_TABLE.office, 'academy');           // the principal: detention-as-a-meeting
+BOSS_TABLE.museum = themedEntry(BOSS_TABLE.mansion, 'museum');            // the curator: exhibits that move when nobody looks
+BOSS_TABLE.colddata = themedEntry(BOSS_TABLE.serverfarm, 'colddata');     // the cold-storage Load Balancer: routes damage through the frozen nodes
 export const LEGACY_BOSS = { id: 'legacybot', name: 'Legacy Bot', title: 'World Boss', rank: 'S', hp: 1500, dmg: 36, existing: true };
 export const CREW_MUL = [1, 1, 1.6, 2.1, 2.5];   // index = crew size (0 counts as 1)
 

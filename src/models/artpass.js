@@ -468,8 +468,99 @@ function execNameplate(k) {                                // tower: desk namepl
   k.add(L('metal', STEEL), cyl(0.004, 0.004, 0.02, 5), [-0.12, 0.031, 0.02], [0, 0, HP]);        // pen
 }
 
+// --------------------------------------------------------------------------------------------------------- big valuables (hero content, wave 8 night)
+// kind 'big' physics props (grabbed with LMB, the item body is sized from the model box): base on the floor, about 0.5-1.6 m, no lights.
+function turnstile(k) {                                    // metro: waist-high tripod turnstile, ticket slot lit
+  const st = L('metal', 0xb4bac0), dk = L('metal_dark', GREY_D);
+  k.add(dk, box(0.6, 0.04, 0.6), [0, 0.02, 0]);
+  k.add(st, box(0.26, 0.9, 0.26), [0, 0.49, 0]);
+  k.add(L('plastic', YEL), box(0.28, 0.05, 0.28), [0, 0.96, 0]);
+  k.add(B(0x40e070), box(0.1, 0.03, 0.005), [0, 0.86, 0.133]);                                  // green go light
+  k.add(B(0xffb640), box(0.12, 0.012, 0.005), [0, 0.7, 0.133]);                                  // ticket slot
+  k.add(dk, cyl(0.06, 0.06, 0.1, 8), [0, 0.98, 0]);
+  for (let i = 0; i < 3; i++) { const a = i * TAU / 3 + 0.4, x = Math.cos(a), z = Math.sin(a); k.limb(st, [0, 0.98, 0], [x * 0.42, 0.98 - (i === 1 ? 0.06 : 0), z * 0.42], 0.022, 0.022, 6); k.add(L('rubber', RUBBER), cyl(0.028, 0.028, 0.05, 6), [x * 0.42, 0.98, z * 0.42]); }
+  k.add(stencil(), plane(0.16, 0.08), [0, 0.5, 0.133]);
+}
+function ticketKiosk(k) {                                  // metro: ticket vending kiosk with a dead screen
+  const bd = L('plastic', 0x2c4a86), dk = L('metal_dark', GREY_D);
+  k.add(dk, box(0.62, 0.06, 0.5), [0, 0.03, 0]);
+  k.add(bd, box(0.56, 1.5, 0.44), [0, 0.81, 0]);
+  k.add(L('plastic', 0x1c2c52), box(0.6, 0.1, 0.48), [0, 1.6, 0]);
+  k.add(L('screen_terminal'), plane(0.4, 0.3), [0, 1.2, 0.222]);
+  k.add(B(0xffb640), box(0.3, 0.03, 0.005), [0, 1.42, 0.224]);                                    // header strip
+  k.add(L('keypad'), plane(0.22, 0.22), [0, 0.86, 0.222]);
+  k.add(dk, box(0.3, 0.06, 0.06), [0, 0.6, 0.235]);                                               // card slot
+  k.add(dk, box(0.36, 0.2, 0.06), [0, 0.3, 0.235]); k.add(B(0xffb640), box(0.3, 0.02, 0.005), [0, 0.34, 0.267]);   // ticket tray
+  k.add(stencil(), plane(0.16, 0.08), [0.18, 1.55, 0.246]);
+}
+function bigPlanter(k) {                                   // greenhouse: cracked terracotta planter with a fern
+  k.add(L('paint', 0xa8582c), cyl(0.32, 0.22, 0.5, 10), [0, 0.25, 0]);
+  k.add(L('paint', 0xb86a3a), cyl(0.36, 0.36, 0.07, 10), [0, 0.53, 0]);
+  k.add(L('dirt', 0x4a3420), circ(0.31, 10), [0, 0.565, 0], [-HP, 0, 0]);
+  const lf = L('leaves', 0x3f8a3a, { flat: true });
+  for (let i = 0; i < 7; i++) { const a = i * 0.9, r = 0.16 + (i % 3) * 0.05; k.limb(lf, [0, 0.56, 0], [Math.cos(a) * r * 1.6, 0.85 + (i % 3) * 0.1, Math.sin(a) * r * 1.6], 0.03, 0.006, 4); k.add(lf, ico(0.09, 0), [Math.cos(a) * r * 1.7, 0.9 + (i % 3) * 0.1, Math.sin(a) * r * 1.7]); }
+  k.add(L('paint', 0x8a4a22), box(0.05, 0.16, 0.02), [0.31, 0.3, 0.09], [0, 0, 0.4]);              // crack patch
+}
+function terrarium(k) {                                    // greenhouse: glass seed terrarium on a steel stand, faint green glow
+  const fr = L('metal', 0x8a9096), gl = L('glass', 0xa8e8c8, { opacity: 0.4 });
+  k.add(fr, box(0.9, 0.08, 0.5), [0, 0.04, 0]);
+  for (const [x, z] of [[-0.43, -0.23], [0.43, -0.23], [-0.43, 0.23], [0.43, 0.23]]) k.add(fr, box(0.04, 0.6, 0.04), [x, 0.38, z]);
+  k.add(fr, box(0.9, 0.04, 0.5), [0, 0.7, 0]);
+  k.add(gl, box(0.86, 0.6, 0.02), [0, 0.38, 0.235]); k.add(gl, box(0.86, 0.6, 0.02), [0, 0.38, -0.235]);
+  k.add(gl, box(0.02, 0.6, 0.46), [-0.43, 0.38, 0]); k.add(gl, box(0.02, 0.6, 0.46), [0.43, 0.38, 0]);
+  k.add(L('dirt', 0x4a3420), box(0.8, 0.1, 0.4), [0, 0.13, 0]);
+  const lf = L('leaves', 0x3f8a3a, { flat: true });
+  for (const [x, z, h] of [[-0.25, 0, 0.3], [0.05, 0.08, 0.4], [0.28, -0.05, 0.25]]) { k.limb(L('bark', 0x5a3e24), [x, 0.18, z], [x, 0.18 + h, z], 0.012, 0.008, 4); k.add(lf, ico(0.09, 0), [x, 0.2 + h, z]); }
+  k.add(B(0x6cff8a), box(0.5, 0.02, 0.06), [0, 0.68, 0.16]);                                       // grow strip
+  k.add(hazard(), box(0.2, 0.05, 0.005), [0.3, 0.05, 0.26], null, null, 0.2);
+}
+function evidenceLocker(k) {                               // prison: grey steel evidence locker, red seal strip
+  const st = L('metal', 0x7a8086), dk = L('metal_dark', GREY_D);
+  k.add(st, box(0.7, 1.4, 0.5), [0, 0.7, 0]);
+  k.add(dk, box(0.72, 0.05, 0.52), [0, 1.42, 0]); k.add(dk, box(0.72, 0.05, 0.52), [0, 0.03, 0]);
+  k.add(L('metal', 0x8a9096), box(0.32, 1.3, 0.02), [-0.17, 0.7, 0.26]); k.add(L('metal', 0x8a9096), box(0.32, 1.3, 0.02), [0.17, 0.7, 0.26]);   // door pair
+  k.add(dk, box(0.04, 0.16, 0.03), [-0.05, 0.75, 0.285]); k.add(dk, box(0.04, 0.16, 0.03), [0.05, 0.75, 0.285]);                                      // handles
+  k.add(B(0xff5030), box(0.7, 0.05, 0.005), [0, 1.0, 0.272]);                                                                                          // evidence seal
+  k.add(L('paint', 0xe6dcc0), box(0.14, 0.09, 0.004), [0.2, 1.22, 0.272]);
+  k.add(stencil(), plane(0.16, 0.08), [-0.18, 0.4, 0.272]);
+}
+function searchlight(k) {                                  // prison: yard searchlight on a stand, hood and lens
+  const dk = L('metal_dark', GREY_D), st = L('metal', STEEL);
+  k.add(dk, cyl(0.3, 0.34, 0.06, 8), [0, 0.03, 0]);
+  for (let i = 0; i < 3; i++) { const a = i * TAU / 3, x = Math.cos(a) * 0.24, z = Math.sin(a) * 0.24; k.limb(st, [x, 0.05, z], [0, 0.9, 0], 0.02, 0.02, 5); }
+  k.add(dk, cyl(0.06, 0.06, 0.12, 6), [0, 0.95, 0]);
+  k.add(L('paint', 0x3a4a3a), cyl(0.3, 0.3, 0.4, 10), [0, 1.18, 0.02], [HP, 0, 0]);
+  k.add(L('paint', 0x3a4a3a), cyl(0.31, 0.31, 0.03, 10), [0, 1.18, 0.23], [HP, 0, 0]);
+  k.add(B(0xfff2c0), circ(0.26, 10), [0, 1.18, 0.246]);
+  k.add(B(0xff5030), box(0.06, 0.03, 0.03), [0.2, 1.4, -0.1]);                                     // alarm lamp
+  k.add(hazard(), cyl(0.31, 0.31, 0.05, 10, true), [0, 1.18, -0.16], [HP, 0, 0], null, 0.2);
+}
+function founderBust(k) {                                  // tower / museum / estate: polished marble bust of the Founder on a plinth
+  const mb = L('rock', 0xd8d4c8), wd = L('wood_dark', 0x4a2e1a);
+  k.add(wd, box(0.42, 0.5, 0.42), [0, 0.25, 0]); k.add(L('gold', BRASS), box(0.3, 0.06, 0.006), [0, 0.32, 0.213]);   // plinth + plate
+  k.add(mb, box(0.46, 0.05, 0.46), [0, 0.525, 0]);
+  k.add(mb, cyl(0.2, 0.26, 0.24, 8), [0, 0.67, 0]);                                                 // chest
+  k.add(mb, cyl(0.07, 0.09, 0.1, 8), [0, 0.84, 0]);                                                 // neck
+  k.add(mb, sph(0.13, 8, 6), [0, 0.99, 0]);                                                         // head
+  k.add(mb, box(0.05, 0.06, 0.05), [0, 0.97, 0.13]);                                                // nose
+  k.add(L('paint', 0x2a2a30), box(0.2, 0.02, 0.02), [0, 1.02, 0.115]);                             // stern brow
+}
+function execSafe(k) {                                     // tower / cold storage: heavy executive safe, brass dial
+  const st = L('metal', 0x3a3e46), dk = L('metal_dark', 0x1c1e22), br = L('gold', BRASS);
+  k.add(st, box(0.8, 0.95, 0.7), [0, 0.5, 0]);
+  k.add(dk, box(0.84, 0.05, 0.74), [0, 0.99, 0]); k.add(dk, box(0.84, 0.06, 0.74), [0, 0.03, 0]);
+  k.add(dk, box(0.66, 0.8, 0.04), [0, 0.52, 0.36]);                                                 // door plate
+  k.add(br, cyl(0.1, 0.1, 0.04, 12), [0, 0.6, 0.39], [HP, 0, 0]); k.add(dk, cyl(0.03, 0.03, 0.05, 6), [0, 0.6, 0.41], [HP, 0, 0]);
+  for (let i = 0; i < 8; i++) { const a = i * TAU / 8; k.add(br, box(0.01, 0.025, 0.006), [Math.cos(a) * 0.075, 0.6 + Math.sin(a) * 0.075, 0.412], [0, 0, a - HP]); }
+  k.limb(br, [0.24, 0.5, 0.39], [0.24, 0.66, 0.39], 0.018, 0.018, 5);                              // handle
+  k.add(B(0xff3a2a), box(0.05, 0.02, 0.005), [-0.22, 0.86, 0.383]);
+  k.add(hazard(), box(0.7, 0.05, 0.005), [0, 0.2, 0.383], null, null, 0.2);
+}
+
 // --------------------------------------------------------------------------------------------------------- registry
 const ART = {
+  hb_turnstile: turnstile, hb_ticketkiosk: ticketKiosk, hb_planter: bigPlanter, hb_terrarium: terrarium,   // big valuables (game/herocontent_core.js BIG_DEFS)
+  hb_locker: evidenceLocker, hb_searchlight: searchlight, hb_bust: founderBust, hb_safe: execSafe,
   hc_cardreader: cardReader, hc_railspike: railSpike, hc_lantern: conductorLantern, hc_lostbag: lostBag,   // hero-content scrap (game/herocontent.js)
   hc_growlamp: growLamp, hc_seedvault: seedVault, hc_bonsai: bonsai, hc_phone: contrabandPhone, hc_keyring: wardenKeyring,
   hc_shield: riotShield, hc_elevdial: elevatorDial, hc_nameplate: execNameplate,

@@ -69,7 +69,7 @@ export function createInstances(ctx) {
   const say = (key, vars, kind) => game.net.broadcast('sys', sysMsg(key, vars || {}, kind || 'info'));
   const cyx = (d) => game.net.broadcast('cyx', d);
   const rndFor = (salt) => new RNG((hashString(String(game.run?.seed) + ':' + salt)) >>> 0);
-  const nm = (type) => CREATURES[type]?.$name || CREATURES[type]?.name || type;
+  const nm = (type) => game.bossDress?.nameOf?.(type) || CREATURES[type]?.$name || CREATURES[type]?.name || type;
 
   function walkable(x, z) {
     const nav = fac()?.nav;

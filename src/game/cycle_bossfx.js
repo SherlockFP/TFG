@@ -230,6 +230,8 @@ const CSS = `
 .cy-card.on{animation:cyCard 3.4s ease-out forwards}
 .cy-card-name{font-size:34px;color:#fff;letter-spacing:6px;text-shadow:0 0 14px #ff5a1a,3px 3px 0 #000}
 .cy-card-title{font-size:15px;color:#ffcf9a;letter-spacing:4px;margin-top:6px;text-shadow:2px 2px 0 #000}
+.cy-card-intro{font-size:13px;color:#e8d6c0;letter-spacing:1px;margin-top:6px;font-style:italic;text-shadow:2px 2px 0 #000}
+.cy-card-intro:empty{display:none}
 .cy-card-rank{display:inline-block;margin-top:8px;padding:1px 12px;border:2px solid #ff8a3a;color:#ff8a3a;font-size:16px;letter-spacing:3px}
 .cy-dark{position:absolute;inset:0;background:radial-gradient(circle,rgba(0,0,0,.35),rgba(0,0,0,.97));pointer-events:none;z-index:8;opacity:0;transition:opacity .25s}
 .cy-strip{position:absolute;left:50%;bottom:118px;transform:translateX(-50%);pointer-events:none;z-index:9;font-family:var(--font2,monospace);font-size:13px;letter-spacing:2px;color:#ffe3b0;text-shadow:1px 1px 0 #000;text-align:center}
@@ -251,7 +253,7 @@ export function createBossUi(game, bossInfo) {
     bar.innerHTML = '<div class="cy-name"><span class="cy-n"></span><span class="cy-rank"></span><span class="cy-p2"></span></div><div class="cy-track"><div class="cy-chip"></div><div class="cy-fill"></div><div class="cy-mark"></div></div><div class="cy-aux"></div>';
     ui().appendChild(bar);
     card = document.createElement('div'); card.className = 'cy-card';
-    card.innerHTML = '<div class="cy-card-name"></div><div class="cy-card-title"></div><div class="cy-card-rank"></div>';
+    card.innerHTML = '<div class="cy-card-name"></div><div class="cy-card-title"></div><div class="cy-card-intro"></div><div class="cy-card-rank"></div>';
     ui().appendChild(card);
     dark = document.createElement('div'); dark.className = 'cy-dark'; ui().appendChild(dark);
   }
@@ -260,8 +262,10 @@ export function createBossUi(game, bossInfo) {
     ensure(); if (!card) return;
     const info = bossInfo(ty), def = CREATURES[ty];
     if (!info || !def) return;
-    q(card, '.cy-card-name').textContent = String(def.name).toUpperCase();
-    q(card, '.cy-card-title').textContent = t(info.title);
+    const th = game.bossDress?.infoOf?.(ty);   // wave 8 night: themed boss name / title / intro (bossdress.js)
+    q(card, '.cy-card-name').textContent = String(th ? th.name : def.name).toUpperCase();
+    q(card, '.cy-card-title').textContent = th ? th.title : t(info.title);
+    q(card, '.cy-card-intro').textContent = th ? th.intro : '';
     q(card, '.cy-card-rank').textContent = t('RANK') + ' ' + info.rank;
     card.classList.remove('on'); void card.offsetWidth; card.classList.add('on');
     try { game.audio?.play?.('ship_alarm', { volume: 0.5, bus: 'sfx' }); } catch { /* ignore */ }
@@ -312,7 +316,7 @@ export function createBossUi(game, bossInfo) {
     }
     if (!bv) { if (bar) bar.classList.add('cy-off'); lastId = null; return; }
     ensure(); if (!bar) return;
-    if (bv.id !== lastId) { lastId = bv.id; chip = 1; chipHold = 0; q(bar, '.cy-n').textContent = String(bv.def.name).toUpperCase(); const info = bossInfo(bv.type); q(bar, '.cy-rank').textContent = info ? info.rank : ''; q(bar, '.cy-p2').textContent = t('PHASE 2'); }
+    if (bv.id !== lastId) { lastId = bv.id; chip = 1; chipHold = 0; q(bar, '.cy-n').textContent = String(game.bossDress?.nameOf?.(bv.type) || bv.def.name).toUpperCase(); const info = bossInfo(bv.type); q(bar, '.cy-rank').textContent = info ? info.rank : ''; q(bar, '.cy-p2').textContent = t('PHASE 2'); }
     const f = bv.maxHp ? Math.max(0, Math.min(1, bv.hp / bv.maxHp)) : 0;
     if (f >= chip) chip = f; else { chipHold += dt; if (chipHold > 0.5) chip = Math.max(f, chip - dt * 0.45); }
     if (f < chip - 0.001 && chipHold === 0) chipHold = 0.0001;

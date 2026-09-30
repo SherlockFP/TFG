@@ -1,6 +1,7 @@
 // Game orchestrator: world loading, main loop, networking glue, players, items, creatures.
 // Host-only logic lives in host.js, local player actions in actions.js (mixed into the prototype).
 import * as THREE from 'three';
+import { installBossdress } from './bossdress.js';   // wave 8 night: themed sector boss names + lair dressing (docs/wave8/bossdress.md)
 import { installHerocontent } from './herocontent.js';   // wave 8: themed scrap tables for metro / greenhouse / prison / tower (docs/wave8/herocontent.md); early so every import-time SCRAP_TABLE walker sees them
 import { Physics, G } from '../physics/physics.js';
 import { LightPool } from '../render/lightpool.js';
@@ -555,6 +556,7 @@ export class Game extends Emitter {
     this.useModule('facjobs', installFacjobs);
     this.useModule('lcmonsters', installLcmonsters);
     this.useModule('labyrinths', installLabyrinths);   // [labyrinths]
+    this.useModule('bossdress', installBossdress);   // wave 8 night: themed boss names + lair dressing
     this.useModule('herocontent', installHerocontent);   // wave 8: hero-content scrap tables + models
     // [slot:lcmonsters]
     this.useModule('atmos', installAtmos);   // [slot:atmos]
