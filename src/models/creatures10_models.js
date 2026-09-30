@@ -34,7 +34,7 @@ const api = (K, root, parts, height, radius, update) => ({
 // ================================================================================================ BUFFERING
 // A tall, thin company man in a grey suit with a tie, arms to the knees. Where the face should be: a black disc with a loading spinner (10 dots, a fading
 // tail) turning on it. The spinner is the whole rule: turning = moving; stuck and amber = your window; racing red = it is about to hit you.
-export const BUF_RING = { n: 10, r: 0.19 };
+export const BUF_RING = { n: 10, r: 0.32 };
 const BUF_SPIN = { walk: 2.6, spin: 8, windup: 16, attack: 5, buffer: 0, resume: 0, stunned: 0.6, dead: 0, idle: 2.6 };
 export function createBufferingModel(o = {}) {
   const K = kit(), root = new THREE.Group();
@@ -56,12 +56,13 @@ export function createBufferingModel(o = {}) {
   });
   K.box(torso, suit, 0.06, 0.2, 0.06, 0, 0.95, 0);
   const head = K.pivot(torso, 0, 1.13, 0);
-  const disc = K.add(head, new THREE.CylinderGeometry(0.27, 0.27, 0.08, 12), skin, 0, 0, 0); disc.rotation.x = PI / 2;
-  const ring = K.pivot(head, 0, 0, 0.05);
+  const disc = K.add(head, new THREE.CylinderGeometry(0.36, 0.36, 0.08, 12), skin, 0, 0, 0); disc.rotation.x = PI / 2;
+  const ring = K.pivot(head, 0, 0, 0.1);
   const dots = [];
   for (let i = 0; i < BUF_RING.n; i++) {
-    const a = (i / BUF_RING.n) * TAU, m = K.B(0xbff4ff), d = K.box(ring, m, 0.075, 0.075, 0.03, Math.sin(a) * BUF_RING.r, Math.cos(a) * BUF_RING.r, 0);
-    d.rotation.z = -a; dots.push({ m, k: (i / BUF_RING.n) ** 1.6 });   // the fading tail of a loading spinner
+    const a = (i / BUF_RING.n) * TAU, m = K.B(0xbff4ff), d = K.box(ring, m, 0.15, 0.15, 0.04, Math.sin(a) * BUF_RING.r, Math.cos(a) * BUF_RING.r, 0);
+    const kk = (i / BUF_RING.n) ** 1.6; d.scale.setScalar(0.7 + 0.5 * kk);   // the leading dot is the biggest
+    d.rotation.z = -a; dots.push({ m, k: kk, lead: i === BUF_RING.n - 1 });   // the fading tail of a loading spinner
   }
   const bar = K.B(0xbff4ff); K.box(head, bar, 0.36, 0.02, 0.02, 0, -0.34, 0.03);   // a "progress bar" under the head: the fill is the time to the next buffer
   const fill = K.box(head, K.B(0xffffff), 0.34, 0.012, 0.03, 0, -0.34, 0.045);
@@ -77,11 +78,11 @@ export function createBufferingModel(o = {}) {
     ring.rotation.z -= st.w * dt;
     // ---- colours: cyan while moving, amber + slow breathing while buffering, red racing before a hit
     let c = C_RUN, glow = 1;
-    if (state === 'buffer') { c = C_BUF; glow = 0.75 + 0.25 * Math.sin(time * 4); }
+    if (state === 'buffer') { c = C_BUF; glow = 0.85 + 0.15 * Math.sin(time * 4); }
     else if (state === 'resume') { const u = clamp(t / 0.8, 0, 1); c = [C_BUF[0] + (C_RUN[0] - C_BUF[0]) * u, C_BUF[1] + (C_RUN[1] - C_BUF[1]) * u, C_BUF[2] + (C_RUN[2] - C_BUF[2]) * u]; glow = 0.8 + 0.2 * Math.sin(time * 26); }
     else if (state === 'windup' || state === 'attack') { c = C_HIT; glow = 0.6 + 0.4 * Math.abs(Math.sin(time * 18)); }
     else if (state === 'dead') glow = 0.06;
-    for (const d of dots) { const k = (state === 'buffer' ? 0.75 : 0.12 + 0.88 * d.k) * glow; d.m.color.setRGB(c[0] * k, c[1] * k, c[2] * k); }
+    for (const d of dots) { const k = (state === 'buffer' ? 0.95 : 0.4 + 0.6 * d.k) * glow * (d.lead && state !== 'buffer' ? 1.4 : 1); d.m.color.setRGB(c[0] * k, c[1] * k, c[2] * k); }
     col.setRGB(c[0] * glow, c[1] * glow, c[2] * glow); bar.color.copy(col); fill.material.color.copy(col);
     const f = state === 'buffer' ? 0.99 : clamp(prog, 0.02, 1); fill.scale.x = Math.max(0.02, f * (state === 'buffer' ? 0.99 : 1)); fill.position.x = -0.17 * (1 - fill.scale.x);
     // ---- body: stiff stride while moving, slump + tremble while buffering, arms up before the strike
