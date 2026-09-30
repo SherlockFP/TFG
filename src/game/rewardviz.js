@@ -16,19 +16,19 @@ import * as C from './rewardviz_core.js';
 
 HOST_ONLY.add('rvpk');
 
-const LABEL = { scrap: 'Scrap', job: 'Job pay', crate: 'Job crate', pocket: 'Pocket loot', map: 'MAP BONUS', till: 'Diner', ore: 'Ore mined', clout: 'Clout', fine: 'Casualty fine', fee: 'Job fee', tax: 'Viewer tax' };
+const LABEL = { scrap: 'Scrap', job: 'Job pay', crate: 'Job crate', pocket: 'Pocket loot', map: 'MAP BONUS', till: 'Diner', yard: 'Homestead', ore: 'Ore mined', clout: 'Clout', fine: 'Casualty fine', fee: 'Job fee', tax: 'Viewer tax' };
 const TR = {
   'INCOME BY SOURCE': 'KAYNAĞA GÖRE GELİR', Scrap: 'Hurda', 'Job pay': 'Görev ödemesi', 'Job crate': 'Görev sandığı', 'Pocket loot': 'Cep ganimeti', 'MAP BONUS': 'HARİTA BONUSU',
-  Diner: 'Lokanta', 'Ore mined': 'Çıkarılan cevher', Clout: 'Clout', 'Casualty fine': 'Kayıp cezası', 'Job fee': 'Görev harcı', 'Viewer tax': 'İzleyici vergisi',
+  Diner: 'Lokanta', Homestead: 'Yurt', 'Ore mined': 'Çıkarılan cevher', Clout: 'Clout', 'Casualty fine': 'Kayıp cezası', 'Job fee': 'Görev harcı', 'Viewer tax': 'İzleyici vergisi',
   'Job not started: -▮{n} fee': 'Görev başlamadı: -▮{n} ücret', 'Job not started: -▮{n} fee. Press E again to leave anyway': 'Görev başlamadı: -▮{n} ücret. Yine de kalkmak için tekrar E',
-  'ORE {a}/{b} today': 'CEVHER {a}/{b} bugün', 'The diner made ▮{n} while you were away': 'Lokanta sen yokken ▮{n} kazandı',
+  'ORE {a}/{b} today': 'CEVHER {a}/{b} bugün', 'The diner made ▮{n} while you were away': 'Lokanta sen yokken ▮{n} kazandı', 'The homestead piled up ▮{n}': 'Yurtta ▮{n} birikti',
   '+{n} % VALUE': '+%{n} DEĞER', 'CURSED ×{n}': 'LANETLİ ×{n}',
 };
 const RU = {
   'INCOME BY SOURCE': 'ДОХОД ПО ИСТОЧНИКАМ', Scrap: 'Хлам', 'Job pay': 'Оплата задания', 'Job crate': 'Ящик задания', 'Pocket loot': 'Добыча из кармана', 'MAP BONUS': 'БОНУС КАРТЫ',
-  Diner: 'Закусочная', 'Ore mined': 'Добыто руды', Clout: 'Клаут', 'Casualty fine': 'Штраф за потери', 'Job fee': 'Штраф за задание', 'Viewer tax': 'Налог зрителей',
+  Diner: 'Закусочная', Homestead: 'Усадьба', 'Ore mined': 'Добыто руды', Clout: 'Клаут', 'Casualty fine': 'Штраф за потери', 'Job fee': 'Штраф за задание', 'Viewer tax': 'Налог зрителей',
   'Job not started: -▮{n} fee': 'Задание не начато: -▮{n} штраф', 'Job not started: -▮{n} fee. Press E again to leave anyway': 'Задание не начато: -▮{n} штраф. Нажми E ещё раз, чтобы всё равно взлететь',
-  'ORE {a}/{b} today': 'РУДА {a}/{b} сегодня', 'The diner made ▮{n} while you were away': 'Закусочная заработала ▮{n}, пока вас не было',
+  'ORE {a}/{b} today': 'РУДА {a}/{b} сегодня', 'The diner made ▮{n} while you were away': 'Закусочная заработала ▮{n}, пока вас не было', 'The homestead piled up ▮{n}': 'В усадьбе накопилось ▮{n}',
   '+{n} % VALUE': '+{n} % СТОИМОСТИ', 'CURSED ×{n}': 'ПРОКЛЯТО ×{n}',
 };
 addTranslations(TR, 'tr'); addTranslations(RU, 'ru');
@@ -69,6 +69,7 @@ export function installRewardviz(game) {
 
   // ---------------------------------------------------------------- 1. ledger feeds (additive net listeners on other modules' messages)
   const onFj = (d) => { if (d?.k !== 'pay') return; reward('job', d.cr); C.note(L, 'clout', d.cl); if (d.full && (d.cr || d.cl)) C.note(L, 'crate', 1); C.note(L, 'fee', d.fee); };
+  const onHs = (m) => { if (m?.k === 'col') C.note(L, 'yard', m.n); };   // Kefal Homestead cash-ins (manual + sweeper arm)
   const onRs = (m) => { if (m?.k === 'till') reward('till', m.n); else if (m?.k === 'pay') C.note(L, 'till', m.amt); };
   const onAc = (m) => { if (m?.k === 'r' && (m.to === me() || !game.net)) C.note(L, 'clout', m.coins); };
   const onFc = (d) => { if (d?.k === 'sale') C.note(L, 'tax', d.cut); };
@@ -76,7 +77,7 @@ export function installRewardviz(game) {
   function bindNet(net) {
     if (!net || boundNet === net) return;
     boundNet = net;
-    net.on('msg:fjfx', onFj); net.on('msg:rsmsg', onRs); net.on('msg:ac2s', onAc); net.on('msg:fcfx', onFc); net.on('msg:rvpk', onPk);
+    net.on('msg:fjfx', onFj); net.on('msg:rsmsg', onRs); net.on('msg:hsmsg', onHs); net.on('msg:ac2s', onAc); net.on('msg:fcfx', onFc); net.on('msg:rvpk', onPk);
   }
   offs.push(mods.on('netReady', (n, g) => { if (g === game) bindNet(n); }));
   if (game.net) bindNet(game.net);
@@ -139,6 +140,13 @@ export function installRewardviz(game) {
     if (!MOONS[r?.moon]?.home || MOONS[r?.moon]?.ghost || till < 1) return;
     timers.push(setTimeout(() => { if (!disposed) toast(tf('The diner made ▮{n} while you were away', { n: till }), 'good'); }, 2500));
   }));
+  // the homestead pot, announced on arrival (the host's 1 Hz snapshot has landed by then)
+  offs.push(mods.on('mapLoaded', (world, g) => {
+    if (g !== game) return;
+    const r = run();
+    if (!MOONS[r?.moon]?.home || MOONS[r?.moon]?.ghost || !(r?.hs?.b || []).includes('belt')) return;
+    timers.push(setTimeout(() => { const n = Math.floor(game.homestead?.pileNow?.() ?? r.hs.pile ?? 0); if (!disposed && n >= 1) toast(tf('The homestead piled up ▮{n}', { n }), 'good'); }, 3200));
+  }));
   offs.push(mods.on('phase', (ph, g) => { if (g && g !== game) return; if (ph === 'moon') { armed = 0; pocket.clear(); } }));
 
   // ---------------------------------------------------------------- 3. scan chip: sector-map value
@@ -155,7 +163,7 @@ export function installRewardviz(game) {
       disposed = true;
       for (const o of offs) { try { o?.(); } catch { /* ignore */ } }
       for (const id of timers) clearTimeout(id);
-      try { boundNet?.off?.('msg:fjfx', onFj); boundNet?.off?.('msg:rsmsg', onRs); boundNet?.off?.('msg:ac2s', onAc); boundNet?.off?.('msg:fcfx', onFc); boundNet?.off?.('msg:rvpk', onPk); } catch { /* ignore */ }
+      try { boundNet?.off?.('msg:fjfx', onFj); boundNet?.off?.('msg:rsmsg', onRs); boundNet?.off?.('msg:hsmsg', onHs); boundNet?.off?.('msg:ac2s', onAc); boundNet?.off?.('msg:fcfx', onFc); boundNet?.off?.('msg:rvpk', onPk); } catch { /* ignore */ }
       style?.remove();
     },
   };

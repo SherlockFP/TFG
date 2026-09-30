@@ -20,6 +20,7 @@ import { VIEW_GAIN } from './algo1_core.js';
 import { HOME_Y } from '../world/homeworld_map.js';
 import * as C from './resto_core.js';
 import * as V from '../world/resto_view.js';
+const { easeOutBack } = V;
 import { TR, RU } from './resto_i18n.js';
 import { createRestoPanel } from '../ui/panels/resto.js';
 
@@ -39,7 +40,6 @@ const ING = INGREDIENTS;
 const QIDX = (tier) => { const i = C.QTIER.indexOf(tier); return i < 0 ? 2 : i; };
 
 const CSS = `.rs-hint{position:fixed;left:50%;bottom:118px;transform:translateX(-50%);z-index:30;font:20px var(--font,'VT323',monospace);color:#ffe9c8;background:rgba(10,6,12,.86);border:1px solid #ff4fd8;padding:3px 12px;pointer-events:none}`;
-const easeOutBack = (x) => { const c1 = 1.70158, c3 = c1 + 1, k = Math.min(1, Math.max(0, x)) - 1; return 1 + c3 * k * k * k + c1 * k * k; };
 
 export function installResto(game) {
   const mods = game.mods, offs = [];
@@ -506,7 +506,7 @@ export function installResto(game) {
       case 'pay': { const at = new THREE.Vector3(m.x, HOME_Y + 1.5, m.z); game.sound2?.cue('resto_bell', at, 0.6); game.sound2?.cue('alien_chatter', at, 0.5, { pitch: 1.25, delay: 0.25 }); game.audio?.play?.('coins', { volume: 0.25 });   // [sound2]
          game.particles?.burst?.(new THREE.Vector3(m.x, HOME_Y + 1.5, m.z), 'sparks'); if (m.by === me()) { const [n, w] = String(m.extra || '').split('|'); game.ui?.toast(`+${m.amt}${w ? ` ${n} ${t(w === 'scrap' ? 'scrap' : 'Clout tip')}` : ''}`, 'good'); } break; }
       case 'cooked': game.particles?.burst?.(new THREE.Vector3(m.x, HOME_Y + 1.3, m.z), m.q === 0 ? 'dust' : 'sparks'); if (m.q === 0) game.audio?.play?.('ui_error', { volume: 0.35, bus: 'ui' }); else game.sound2?.cue('resto_sizzle', new THREE.Vector3(m.x, HOME_Y + 1.3, m.z), 0.7); break;   // [sound2] kitchen sizzle
-      case 'angry': game.sound2?.cue('alien_chatter', new THREE.Vector3(m.x, HOME_Y + 1.8, m.z), 0.7, { pitch: 0.7 });   // [sound2] grumbling game.particles?.burst?.(new THREE.Vector3(m.x, HOME_Y + 1.8, m.z), 'dust'); break;
+      case 'angry': game.sound2?.cue('alien_chatter', new THREE.Vector3(m.x, HOME_Y + 1.8, m.z), 0.7, { pitch: 0.7 }); game.particles?.burst?.(new THREE.Vector3(m.x, HOME_Y + 1.8, m.z), 'dust'); break;   // [sound2] grumbling
       case 'swat': game.particles?.burst?.(new THREE.Vector3(m.x, HOME_Y + 0.2, m.z), 'goo'); break;
       case 'land': game.audio?.play?.('ship_land', { volume: 0.25 }); break;
       case 'cookok': {

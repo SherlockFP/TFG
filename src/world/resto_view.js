@@ -27,7 +27,8 @@ function P(kind, a, pos = [0, 0, 0], rot = [0, 0, 0], color = 0x888888) {
   if (g.attributes.uv) g.deleteAttribute('uv');
   return g;
 }
-class B {
+export const easeOutBack = (x) => { const c1 = 1.70158, c3 = c1 + 1, k = Math.min(1, Math.max(0, x)) - 1; return 1 + c3 * k * k * k + c1 * k * k; };
+export class B {
   constructor() { this.l = []; this.e = []; }
   box(w, h, d, x, y, z, c, glow = false, ry = 0) { (glow ? this.e : this.l).push(P('box', [w, h, d], [x, y, z], [0, ry, 0], c)); return this; }
   cyl(r, h, x, y, z, c, glow = false, seg = 8) { (glow ? this.e : this.l).push(P('cyl', [r, r, h, seg], [x, y, z], [0, 0, 0], c)); return this; }

@@ -142,11 +142,12 @@ export function createHomeworldPanel(ui, game, hw, opts = {}) {
     const st = S(), P = H.powerStats(st), out = H.dayOutput(st, { exhibits: hw.exhibits() });
     const bar = (a, b, label) => `<div class="hw-row"><span class="nm">${label} ${a}/${b}</span><span class="hw-bar${a > b ? ' bad' : ''}"><span style="width:${Math.min(100, (a / Math.max(1, b)) * 100)}%"></span></span></div>`;
     const daily = H.RES_KEYS.filter((k) => out[k] > 0.001).map((k) => `${H.RES_ICON[k].length === 1 ? H.RES_ICON[k] : t('shards')}${out[k].toFixed(1)}`).join('  ');
-    const rs = st.st;
+    const rs = st.st, hsS = game.homestead?.state?.(), hsRow = hsS && hsS.b?.includes('belt') ? `<div class="hw-box">${escapeHtml(t('Homestead'))}: <b>▮${Math.floor(game.homestead.pileNow())}/${Math.floor(game.homestead.core.pileCap(hsS))}</b></div>` : '';   // wave 8 tycoon: one row, the plot has its own panel at the booth
     mainEl.innerHTML = glyphify(`<div class="hw-box">${bar(P.demand, P.supply, '⚡ ' + t('Power'))}${bar(P.heat, P.cooling, '❄ ' + t('Cooling'))}
       <div class="hw-note">${escapeHtml(t('Buildings produce per GAME DAY (a day on a moon), not in real time. Storage is capped: come back and collect.'))}</div></div>
       <div class="hw-box">${escapeHtml(t('Per day now'))}: <b>${daily || '-'}</b> · ${escapeHtml(t('worth'))} ≈ ▮${Math.round(H.valueOf(out))} · ${escapeHtml(t('workers'))} ${H.workersOf(st)} · +${Math.round(H.boostOf(st) * 100)}%<br>
       ${escapeHtml(t('Ready to collect'))}: <b>${H.stored(st)}</b>  ·  ${escapeHtml(t('Days accounted'))}: ${st.days}</div>
+      ${hsRow}
       <div class="hw-row"><button class="btn" data-op="collect">${escapeHtml(t('COLLECT'))}</button><button class="btn" data-op="deposit">${escapeHtml(t('DEPOSIT HELD COMPONENTS'))}</button><button class="btn" data-op="withdraw">${escapeHtml(t('WITHDRAW 6 COMPONENTS'))}</button></div>
       <div class="hw-box">${escapeHtml(t('Raids'))}: ${escapeHtml(t('repelled'))} ${rs.repelled} · ${escapeHtml(t('held'))} ${rs.held} · ${escapeHtml(t('breached'))} ${rs.breached} · ${escapeHtml(t('Chance per landed day'))} ${Math.round(H.raidChance(st, (game.run?.day || 0) + 99) * 1000) / 10}%<br>
       <span class="hw-note">${escapeHtml(t('While the crew is away the homeworld can be raided. Towers, walls and mines defend it on their own; fly home in time and the crew adds firepower. A lost raid wrecks a building (repair it, it is never destroyed) and steals part of the storage.'))}</span></div>
