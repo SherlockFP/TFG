@@ -826,6 +826,7 @@ export function installVoyage(game) {
   const onKey = (e) => {
     if (!S.prompt || S.prompt.voted || game.terminal?.active || e.repeat) return;
     if (e.code !== 'KeyB' && e.code !== 'KeyM') return;
+    e.preventDefault(); e.stopImmediatePropagation();   // the open vote prompt owns B/M (trade decline / emote wheel yield)
     S.prompt.voted = true;
     askHost('vote', { yes: e.code === 'KeyB' });
     renderPrompt();
@@ -1153,6 +1154,8 @@ export function installVoyage(game) {
     core: V, state: vy, stats: S.stats, signals, board: () => V.boardFor(runKey(), run()?.day | 0, run()?.quotaIndex | 0, charted(), signals()),
     routeRandom: () => hostRouteRandom(game.selfId), routeSignal: (n) => hostRouteSignal(n, game.selfId), take: (n) => hostTake(game.selfId, n),
     populate: hostPopulate, host: () => S.host, mstep, use: hostUse,
+    /** true while the distress-vote prompt still waits for B / M */
+    votePromptOpen: () => !!(S.prompt && !S.prompt.voted),
     dispose() {
       disposed = true;
       for (const o of offs.splice(0)) { try { o?.(); } catch { /* ignore */ } }

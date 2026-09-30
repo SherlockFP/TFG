@@ -277,6 +277,7 @@ export function installTrade(game) {
     if (disposed || e.repeat || game.destroyed || !game.net || !game.run) return;
     if (e.code !== TRADE_KEY && e.code !== DECLINE_KEY) return;
     if (game.input?.isTyping?.()) return;
+    if (e.code === DECLINE_KEY && game.voyage?.votePromptOpen?.()) return;   // open vote prompt wins M
     if (e.code === TRADE_KEY) {
       if (S.incoming) { e.preventDefault(); respond(true); return; }
       if (S.snap || S.outgoing) return;

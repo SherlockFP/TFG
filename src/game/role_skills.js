@@ -108,7 +108,7 @@ export function installRoleSkills(g, K) {
   K.update((dt) => {
     if (builtFor !== roleId()) build();
     const input = g.input;
-    if (input.enabled && !g.player.dead && !g.minigame && !g.terminal?.active) {
+    if (input.enabled && !g.player.dead && !g.minigame && !g.terminal?.active && !g.rpsPromptOpen?.()) {
       if (input.pressed('roleSkill1')) use(0);
       if (input.pressed('roleSkill2')) use(1);
     }

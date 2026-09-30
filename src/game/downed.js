@@ -18,6 +18,8 @@ import { getMode } from './difficulty.js';
 export const RULES = Object.freeze({
   bleed: Object.freeze({ casual: 30, standard: 20, hard: 0 }),   // s until bleed-out; 0 = the feature is off (Hard: normal death)
   reviveS: 3,            // s a crewmate holds E
+  reviveMedic: 0.6,      // reviver time multiplier for the Medic role (40 % faster)
+  kitHp: 0.4,            // a medkit / adrenaline used on a downed crewmate stands them up at this fraction
   reviveHp: 0.3,         // fraction of max HP after a revive
   orbitHp: 0.5,          // downed players still lying there when the ship reaches orbit
   repeatWin: 60,         // s: a second down inside this window bleeds out ...
@@ -52,12 +54,12 @@ export class DownBook {
     return e;
   }
   /** a crewmate holds E on `id` (called ~5x/s). returns the entry, {done:true} entry when the 3 s are full, or null (refused) */
-  hold(id, by, now, dist) {
+  hold(id, by, now, dist, mul = 1) {
     const e = this.e.get(id);
     if (!e || by === id || this.e.has(by) || !(dist <= RULES.hostRange)) return null;
     if (e.by && e.by !== by && now - e.holdAt < RULES.grace) return null;   // one reviver at a time
     const dt = e.by === by ? Math.min(0.4, Math.max(0, now - e.holdAt)) : 0.1;
-    e.by = by; e.holdAt = now; e.prog += dt;
+    e.by = by; e.holdAt = now; e.prog += dt / (mul > 0 ? mul : 1);
     if (e.prog >= RULES.reviveS) { this.e.delete(id); e.done = true; }
     return e;
   }
@@ -109,6 +111,7 @@ const CSS = `.dn-bar{background:#12130d;border:2px solid #ff4a3a;color:#ffe9d0;f
 .dn-vig{position:fixed;inset:0;pointer-events:none;z-index:5;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 38%,rgba(70,0,0,.55) 78%,rgba(20,0,0,.9) 100%);animation:dnpulse 1.1s ease-in-out infinite}
 @keyframes dnpulse{50%{opacity:.62}}
 .dn-root{position:fixed;inset:0;pointer-events:none;z-index:7;overflow:hidden}
+.dn-mark em{font-style:normal;color:#ff6a4a;font-size:16px;line-height:1}
 .dn-mark{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;font:700 12px/1 'Bahnschrift','Arial Narrow',sans-serif;color:#ffe9d0;text-transform:uppercase;letter-spacing:.05em;text-shadow:0 0 4px #000}
 .dn-ring{width:46px;height:46px;border-radius:50%;background:conic-gradient(#7dff9b var(--p,0%),#3a1410 0);display:flex;align-items:center;justify-content:center}
 .dn-ring b{width:34px;height:34px;border-radius:50%;background:#12130d;display:flex;align-items:center;justify-content:center;font-size:15px;color:#ff8a7a}
@@ -207,12 +210,17 @@ export function installDowned(game) {
       } else if (d.k === 'hold') {
         const e = S.book.e.get(d.id), rp = rawPlayer(from), vp = rawPlayer(d.id);
         if (!e || !rp || rp.dead || !vp) return;
-        const r = S.book.hold(d.id, from, S.clock, rp.pos.distanceTo(vp.pos));
+        const r = S.book.hold(d.id, from, S.clock, rp.pos.distanceTo(vp.pos), d.m ? RULES.reviveMedic : 1);
         if (!r) return;
         if (r.done) {
           send({ k: 'up', id: r.id, by: from, hp: RULES.reviveHp });
           maybeSay('{name} got back up. Chat is disappointed. Then delighted.', { name: nameOf(r.id) }, 0.4);
         }
+      } else if (d.k === 'kit') {   // a crewmate jabbed a medkit / adrenaline into a downed player
+        const e = S.book.e.get(d.id), rp = rawPlayer(from), vp = rawPlayer(d.id);
+        if (!e || !rp || rp.dead || !vp || S.book.e.has(from) || from === d.id || !(rp.pos.distanceTo(vp.pos) <= RULES.hostRange)) return;
+        S.book.e.delete(d.id);
+        send({ k: 'up', id: d.id, by: from, hp: RULES.kitHp });
       } else if (d.k === 'stop') {
         const e = S.book.stop(d.id, from);
         if (e) send({ k: 'pg', id: e.id, p: 0, by: null, l: e.left });
@@ -316,7 +324,14 @@ export function installDowned(game) {
   }));
   offs.push(mods.on('localDeath', () => { S.me = null; S.hold = null; if (game.player) game.player.downed = false; }));
   // a downed player switches nothing: items can not be used
-  offs.push(mods.on('useItem', (it, hk, g) => { if (g === game && game.player?.downed) hk.handled = true; }));
+  offs.push(mods.on('useItem', (it, hk, g) => { if (g !== game) return;
+    if (game.player?.downed) { hk.handled = true; return; }
+    const tid = game.interactTarget?.action?.__dn;   // medkit / adrenaline on the downed crewmate I am looking at
+    if (!hk.handled && it && KITS.includes(it.type) && tid && S.down.has(tid)) {
+      hk.handled = true;
+      try { game.net.request('consume', { id: it.id }); game.net.request('dnreq', { k: 'kit', id: tid }); } catch { /* net closing */ }
+    }
+  }));
 
   // ------------------------------------------------------------ remote avatars lie face-down
   offs.push(mods.on('remoteAvatar', (r) => {
@@ -364,10 +379,18 @@ export function installDowned(game) {
       if (!m) { m = document.createElement('div'); m.className = 'dn-mark'; root.appendChild(m); S.marks.set(id, m); }
       seen.add(id);
       const vis = _v.z < 1 && Math.abs(_v.x) < 1.05 && Math.abs(_v.y) < 1.05;
-      m.style.display = vis ? '' : 'none';
-      if (!vis) continue;
-      m.style.left = ((_v.x * 0.5 + 0.5) * 100).toFixed(1) + '%'; m.style.top = ((-_v.y * 0.5 + 0.5) * 100).toFixed(1) + '%';
-      const html = `${ring(e.prog / RULES.reviveS, Math.ceil(Math.max(0, e.left)))}<span>${e.name}</span>`;
+      m.style.display = '';
+      // off-screen: pin the marker to the screen edge with an arrow pointing at the body
+      let sx = _v.x, sy = _v.y;
+      if (_v.z >= 1) { sx = -sx; sy = -sy; }
+      let arrow = '';
+      if (!vis) {
+        const k = Math.max(Math.abs(sx), Math.abs(sy), 1e-3), ex = sx / k * 0.88, ey = sy / k * 0.82;
+        arrow = `<em style="transform:rotate(${Math.round(Math.atan2(-sy, sx) * 180 / Math.PI)}deg)">&#9654;</em>`;
+        sx = ex; sy = ey;
+      }
+      m.style.left = ((sx * 0.5 + 0.5) * 100).toFixed(1) + '%'; m.style.top = ((-sy * 0.5 + 0.5) * 100).toFixed(1) + '%';
+      const html = `${arrow}${ring(e.prog / RULES.reviveS, Math.ceil(Math.max(0, e.left)))}<span>${e.name}</span>`;
       if (m.dataset.h !== html) { m.dataset.h = html; m.innerHTML = html; }
     }
     for (const [id, m] of S.marks) if (!seen.has(id)) { m.remove(); S.marks.delete(id); }
@@ -428,9 +451,9 @@ export function installDowned(game) {
     if (holding) {
       if (!S.hold || S.hold.id !== tid) S.hold = { id: tid, t: 0 };
       S.hold.t += dt;
-      const e = S.down.get(tid); e.prog = Math.min(RULES.reviveS, e.prog + dt);
+      const e = S.down.get(tid); e.prog = Math.min(RULES.reviveS, e.prog + dt / (game.rpg?.role?.() === 'medic' ? RULES.reviveMedic : 1));
       S.sendT -= dt;
-      if (S.sendT <= 0) { S.sendT = 0.2; game.net.request('dnreq', { k: 'hold', id: tid }); }
+      if (S.sendT <= 0) { S.sendT = 0.2; game.net.request('dnreq', { k: 'hold', id: tid, m: game.rpg?.role?.() === 'medic' ? 1 : 0 }); }
     } else if (S.hold) {
       const e = S.down.get(S.hold.id); if (e) e.prog = Math.max(0, e.prog - dt * RULES.decay);
       S.hold = null; S.sendT = 0;

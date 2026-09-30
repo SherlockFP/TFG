@@ -256,6 +256,7 @@ export function createRpsClient({ game, request, isHost }) {
     }
   }
   window.addEventListener('keydown', onKey, true);
+  game.rpsPromptOpen = () => !disposed && !!(C.ask && C.ask.b === me() && !C.m);   // role skills (Y) + others yield while the wager prompt is open
 
   // ---------------------------------------------------------------------------------------------- challenging
   function remotesNear(range) {
@@ -317,6 +318,7 @@ export function createRpsClient({ game, request, isHost }) {
     dispose() {
       if (disposed) return;
       disposed = true;
+      game.rpsPromptOpen = null;
       window.removeEventListener('keydown', onKey, true);
       try { game.mods.chatCommands?.delete('rps'); } catch { /* ignore */ }
       dropSprites(); for (const k of Object.keys(icons)) icons[k].dispose();

@@ -66,6 +66,7 @@ import { installCrafting } from './crafting.js';
 
 import { installLore } from './lore.js';
 import { t, tf, sysText } from '../core/i18n.js';
+import './deathtext_i18n.js';
 
 import { installHorde } from './horde.js';
 
@@ -1079,7 +1080,7 @@ export class Game extends Emitter {
       laser: 'walked into a laser grid.', collapse: 'was buried by a cave-in.', toxic: 'dissolved in toxic sludge.',
       cruiser: 'was run over by the Uplink Van.',
     };
-    return map[cause] || CREATURES[cause]?.deathText || 'died.';
+    return t(map[cause] || CREATURES[cause]?.deathText || 'died.');
   }
 
   respawn() {
