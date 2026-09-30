@@ -427,3 +427,4 @@ skyline and ground life; Dead Mall (parody neon, grilles, dry fountain atrium) r
 corridor with EXIT counter, mascot poster, door 101) is the strongest new idea; Captcha tile test reads well; Ratio twins
 readable; centre cards now queue one at a time. Still weak: Buffering tell only fixed in code (re-check in the dark), new
 creatures/crises/gear never played by a human or with 2 real players, balance of 12 new threats + 5 gadgets is paper-only.
+- W12 atmos12: interiors get decals / lamp shafts / dust motes / drips / sparks / vent breath / per-theme grade in 3 draw calls; strength of every effect is untested by eye (tune PROFILES in atmos12_core.js after the first browser look).

@@ -238,7 +238,7 @@ import { installGear11 } from './gear11.js';
 // [import:creatures12]
 // [import:labyr12]
 // [import:moons12]
-// [import:atmos12]
+import { installAtmos12 } from './atmos12.js';
 // [import:coop12]
 // [import:balance12]
 import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
@@ -639,7 +639,7 @@ export class Game extends Emitter {
     // [slot:creatures12]
     // [slot:labyr12]
     // [slot:moons12]
-    // [slot:atmos12]
+    this.useModule('atmos12', installAtmos12);
     // [slot:coop12]
     // [slot:balance12]
 
