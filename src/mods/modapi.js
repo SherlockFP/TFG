@@ -403,7 +403,11 @@ export class ModManager extends Emitter {
     if (!c || (c.owner && !this.featureOn(c.owner))) {
       if (w0 === 'help' && this.commands.size) {
         const live = [...this.commands.entries()].filter(([, v]) => !v.owner || this.featureOn(v.owner));
-        setTimeout(() => terminal.print(tf('FEATURE & MOD COMMANDS:\n{n}', { n: live.map(([k, v]) => `>${k.toUpperCase()}  ${t(v.help || '')}`).join('\n') })), 0);
+        // [lanes] no vocabulary dump: the list only on HELP ALL, otherwise one hint line
+        const all = String(rest?.[0] || '').toLowerCase() === 'all';
+        setTimeout(() => terminal.print(all
+          ? tf('FEATURE & MOD COMMANDS:\n{n}', { n: live.map(([k, v]) => `>${k.toUpperCase()}  ${t(v.help || '')}`).join('\n') })
+          : tf('{n} feature commands: >HELP ALL', { n: live.length })), 0);
       }
       return false;
     }

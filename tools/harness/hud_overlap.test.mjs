@@ -1,9 +1,9 @@
 // node tools/harness/hud_overlap.test.mjs - wave 9 "three message lanes". No browser: lays out every always-on / lane HUD element at 1280x720
 // from the real CSS rules (src/ui/style.css, src/game/algorithm.js) + the real dock math (planDocks / toastPush in src/ui/docklayout.js)
-// and fails when two of them overlap. Heights of content-sized boxes are documented worst-case estimates (what the lanes allow).
+// and fails when two of them overlap. SCOPE: the always-on frame only; stacked banners (TOP_BANNERS/BOTTOM_BANNERS), hud-chips and .tfg-asg are not modelled. Heights of content-sized boxes are documented worst-case estimates (what the lanes allow).
 import fs from 'fs';
 import { planDocks, toastPush, promptBottom } from '../../src/ui/docklayout.js';
-import { TOAST_MAX, TOAST_MS } from '../../src/ui/hud.js';
+import { HUD, TOAST_MAX, TOAST_MS, TOAST_LONG_MS } from '../../src/ui/hud.js';
 let bad = 0;
 const chk = (c, m) => { if (!c) { bad++; console.log('FAIL', m); } };
 const rd = (p) => fs.readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
@@ -76,5 +76,46 @@ const compact = calm.slice(at, calm.indexOf('];', at));
 chk((compact.match(/^\s{8}(?:goal|line)/gm) || []).length === 5, 'compact Tab card has exactly 5 lines');
 chk(!/gen\.forEach/.test(term) && /HELP ALL/.test(term), 'terminal: no server dump under MOONS, HELP is short');
 chk(!/this\.print\('\\n' \+ readout\(\)\)/.test(mm), 'MOONS does not append the SECTOR MAP readout');
+
+// ---- behaviour (fake DOM + fake timers): toasts queue instead of evicting; 9 s opt-in survives; HELP stays short with mods loaded
+{
+  const timers = []; let now = 0;
+  globalThis.setTimeout = (fn, d) => { timers.push({ fn, at: now + d, id: timers.length + 1 }); return timers.length; };
+  globalThis.clearTimeout = (id) => { const t = timers[id - 1]; if (t) t.dead = true; };
+  const advance = (ms) => { now += ms; for (const tm of timers.filter((x) => !x.dead && x.at <= now)) { tm.dead = true; tm.fn(); } };
+  const mkEl = () => { const cl = new Set(), kids = [], e = { children: kids, textContent: '',
+    classList: { add: (c) => cl.add(c), remove: (c) => cl.delete(c), contains: (c) => cl.has(c) },
+    set className(v) { cl.clear(); v.split(/\s+/).forEach((c) => c && cl.add(c)); },
+    setAttribute() {}, addEventListener() {}, appendChild(k) { kids.push(k); k.parent = e; return k; }, append(...ks) { ks.forEach((k) => e.appendChild(k)); },
+    remove() { const i = e.parent?.children.indexOf(e); if (i >= 0) e.parent.children.splice(i, 1); }, style: {} }; return e; };
+  globalThis.document = { createElement: mkEl, createTextNode: (x) => ({ nodeType: 3, x }) };
+  const box = mkEl(), fake = { $: { toasts: box }, toastQ: null, gate: null, pendingToasts: [], pendingBig: null, nextFlush: 0 };
+  Object.setPrototypeOf(fake, HUD.prototype);
+  const text = () => box.children.map((k) => k._tx);
+  fake.showToast('a', 'info'); fake.showToast('b', 'info'); fake.showToast('c', 'info'); fake.showToast('d', 'info');
+  chk(text().join() === 'a,b' && fake.toastQ.length === 2, 'three+ toasts in one tick: first two stay, the rest queue (nothing evicted unread)');
+  advance(TOAST_MS + 1);
+  chk(text().join() === 'c,d' && !fake.toastQ.length, 'queued toasts appear when the slots free, in order');
+  advance(TOAST_MS + 1);
+  fake.showToast('lobby', 'info', 9000); fake.showToast('x', 'info', 6000);
+  advance(TOAST_MS + 1);
+  chk(text().join() === 'lobby', 'a 9000 ms request is honoured (lobby code toast lasts 9 s) while ms > 4000 without opt-in is capped to 4 s');
+  advance(TOAST_LONG_MS - TOAST_MS);
+  chk(text().length === 0, 'the 9 s toast is gone after 9 s');
+  // flushPending must not push gated toasts out unread
+  fake.showToast('p', 'info'); fake.showToast('q', 'info'); fake.pendingToasts.push(['r', 'info']); fake.nextFlush = 0;
+  fake.flushPending();
+  chk(text().join() === 'p,q' && fake.pendingToasts.length === 1, 'flushPending waits while both slots are busy');
+  advance(TOAST_MS + 1); fake.flushPending();
+  chk(text().join() === 'r', 'flushPending releases once a slot is free');
+
+  const { ModManager } = await import('../../src/mods/modapi.js');
+  const cmds = new Map(); for (let i = 0; i < 30; i++) cmds.set('cmd' + i, { fn() {}, help: 'x', owner: null });
+  const out = [], term = { print: (m) => out.push(m) }, mm = { commands: cmds, featureOn: () => true };
+  ModManager.prototype.terminalCommand.call(mm, 'help', [], term); advance(1);
+  chk(out.length === 1 && out[0].split('\n').length === 1 && !/CMD0/.test(out[0]), 'HELP with 30 module commands adds one hint line, not a dump');
+  out.length = 0; ModManager.prototype.terminalCommand.call(mm, 'help', ['all'], term); advance(1);
+  chk(out.length === 1 && out[0].split('\n').length >= 30, 'HELP ALL lists the module commands');
+}
 console.log(bad ? `hud_overlap FAIL (${bad})` : `hud_overlap OK (${names.length} elements)`);
 process.exit(bad ? 1 : 0);

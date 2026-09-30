@@ -2,7 +2,7 @@
 // scan labels (with item icons), floating damage numbers, XP/level, coins, toasts, death/spectate
 // overlays, run chips (daily event / favor / streak), outdoor compass, and the landing briefing card.
 import { spreadLabels } from './compass_labels.js';
-export const TOAST_MAX = 2, TOAST_MS = 4000;   // [lanes] lane 2 (toasts): right column, max 2 visible, 4 s
+export const TOAST_MAX = 2, TOAST_MS = 4000, TOAST_LONG_MS = 9000;   // [lanes] lane 2 (toasts): right column, max 2 visible, 4 s; ms >= TOAST_LONG_MS is the opt-in for the few must-read ones (lobby code)
 import * as THREE from 'three';
 import { iconHTML, typeFromName } from './icons.js';
 import { glyph } from './glyphs.js';   // [ui2]
@@ -294,24 +294,34 @@ export class HUD {
     this.showToast(text, kind, ms);
   }
   showToast(text, kind = 'info', ms = TOAST_MS) {
-    ms = Math.min(ms || TOAST_MS, TOAST_MS);
-    // [lanes] lane 2: right column, at most TOAST_MAX visible, TOAST_MS each, a repeat only refreshes the live one
+    ms = ms >= TOAST_LONG_MS ? TOAST_LONG_MS : Math.min(ms || TOAST_MS, TOAST_MS);
+    // [lanes] lane 2: right column, at most TOAST_MAX on screen, TOAST_MS each. Never evict an unread one: extra toasts queue until a slot frees.
     const txt = typeof text === 'string' ? t(text) : text;
     const box = this.$.toasts, label = typeof txt === 'string' ? txt : null;
     if (label) for (const k of box.children) if (k._tx === label && !k.classList.contains('out')) { clearTimeout(k._t1); clearTimeout(k._t2); this.armToast(k, ms); return; }
+    const q = this.toastQ || (this.toastQ = []);
+    if (box.children.length >= TOAST_MAX) {
+      if (!q.some((p) => p[0] === txt)) q.push([txt, kind, ms]);
+      if (q.length > 8) q.shift();
+      return;
+    }
     const e = el('div', { class: 'toast ' + kind }, txt);
     e._tx = label;
     box.appendChild(e);
     this.armToast(e, ms);
-    const live = [...box.children].filter((k) => !k.classList.contains('out'));
-    for (let i = 0; i < live.length - TOAST_MAX; i++) { clearTimeout(live[i]._t1); clearTimeout(live[i]._t2); live[i].remove(); }
   }
   armToast(e, ms) {
     e.classList.remove('out');
     e._t1 = setTimeout(() => e.classList.add('out'), ms - 500);
-    e._t2 = setTimeout(() => e.remove(), ms);
+    e._t2 = setTimeout(() => { e.remove(); this.drainToastQ(); }, ms);
+  }
+  drainToastQ() {
+    const q = this.toastQ;
+    while (q?.length && this.$.toasts.children.length < TOAST_MAX) { const [txt, kind, ms] = q.shift(); this.showToast(txt, kind, ms); }
   }
   flushPending() {
+    if (this.toastQ?.length) this.drainToastQ();
+    if (this.$.toasts.children.length >= TOAST_MAX) return;   // [lanes] both slots busy: keep gated toasts queued instead of pushing one out unread
     if ((!this.pendingToasts.length && !this.pendingBig) || this.gate?.()) return;
     const now = performance.now();
     if (now < this.nextFlush) return;

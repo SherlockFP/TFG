@@ -85,12 +85,9 @@ export function layoutDocks(docks) {
   const R = docks.right, L = docks.left, B = docks.bottom;
   const asgB = Math.max(0, ...[...document.querySelectorAll('.tfg-asg, [data-hud-right]')].map((e) => shown(e)?.bottom + 8 || 0));   // [qa1] mod widgets (assignment card) sit at the top right: the right dock started under them
   // [qa2] toasts (right column) must not slide under the Algorithm ticker (centre top, up to 560 px wide): push them below it when they overlap horizontally
-  const toastEl = document.querySelector('.hud-toasts'), algoR = shown(document.querySelector('.algo-sub'));
-  let toastMt = null;
-  if (toastEl) {
-    const mt = parseFloat(toastEl.style.marginTop) || 0, baseTop = toastEl.getBoundingClientRect().top - mt;
-    toastMt = toastPush(algoR, baseTop, innerWidth);
-  }
+  const toastEl = document.querySelector('.hud-toasts');
+  let toastMt = null, toastBase = 0;   // [lanes] the push is computed below, once the whole centre banner stack is placed
+  if (toastEl) toastBase = toastEl.getBoundingClientRect().top - (parseFloat(toastEl.style.marginTop) || 0);
   const chatEl = document.querySelector('.chat');
   let chatTop = null;
   if (chatEl) {
@@ -113,6 +110,11 @@ export function layoutDocks(docks) {
     if (sel === '.hud-big') { const top = Math.max(y, H * 0.22); topPins.push([e, top]); y = Math.max(y, top + r.height + 8); continue; }
     topPins.push([e, y + r.height * mid]);
     y += r.height + 8;
+  }
+  if (toastEl) {   // [lanes] toasts clear the Algorithm slot AND every banner stacked under it (a1-vote, ob-pa, sg-banner, hban, g2-card, hud-big)
+    let right = 0, stackB = 0;
+    for (const it of topEls) { const r = it && it[3]; if (r) { right = Math.max(right, r.right); stackB = Math.max(stackB, y - 8); } }
+    toastMt = toastPush(stackB ? { right, bottom: stackB } : null, toastBase, innerWidth);
   }
   const plan = planDocks(H, { inv: inv ? inv.top : null, tr: tr ? tr.bottom : null, xpf: xpf ? xpf.bottom : null, toasts: toasts ? toasts.bottom : null, asgB,
     obj: obj ? obj.bottom : null, tl: tl ? tl.bottom : null, chatTop: chatTop ? chatTop.top : null });
