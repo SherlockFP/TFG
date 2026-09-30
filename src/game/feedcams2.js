@@ -132,13 +132,28 @@ export function installFeedcams2(game) {
     const beams = [], discs = [];
     for (let i = 0; i < n; i++) {
       const dayD = !!S.drones[i].day;   // [cam90] the daylight path drone: a stronger, warmer disc so the cone reads in the sun
-      const bm = new THREE.Mesh(new THREE.ConeGeometry(C.DRONE.R, C.DRONE.alt, 20, 1, true), new THREE.MeshBasicMaterial({ color: 0xfff0c8, transparent: true, opacity: dayD ? 0.12 : 0.07, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, fog: false }));
-      const dc = new THREE.Mesh(new THREE.CircleGeometry(C.DRONE.R, 24).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xfff0c8, transparent: true, opacity: dayD ? 0.3 : 0.16, depthWrite: false, blending: THREE.AdditiveBlending, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, fog: false }));
+      // [feelfix2] round (56 slices), soft-edged: the beam brightens toward the lamp and fades to nothing at the rim (vertex colours, additive, no depth write); the ground patch is a radial-falloff disc, not a hard polygon
+      const bm = new THREE.Mesh(softCone(C.DRONE.R, C.DRONE.alt, 56), new THREE.MeshBasicMaterial({ color: 0xfff0c8, vertexColors: true, transparent: true, opacity: dayD ? 0.32 : 0.2, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, fog: false }));
+      const dc = new THREE.Mesh(softDisc(C.DRONE.R, 56), new THREE.MeshBasicMaterial({ color: 0xfff0c8, vertexColors: true, transparent: true, opacity: dayD ? 0.42 : 0.24, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, fog: false }));
       bm.frustumCulled = dc.frustumCulled = false; bm.renderOrder = dc.renderOrder = 4;
       beams.push(bm); discs.push(dc);
     }
     want.group.add(body, lamp, ...beams, ...discs);
     S.vis = { body, lamp, beams, discs, dummy: new THREE.Object3D(), col: new THREE.Color(), lampKey: new Array(n).fill(-1) };
+  }
+  /** [feelfix2] open cone, apex (lamp) up: brightness 1 at the apex falling to 0 at the base rim */
+  function softCone(R, h, seg) {
+    const g = new THREE.ConeGeometry(R, h, seg, 4, true), p = g.attributes.position, c = new Float32Array(p.count * 3);
+    for (let i = 0; i < p.count; i++) { const k = Math.pow(Math.max(0, Math.min(1, (p.getY(i) + h / 2) / h)), 1.4); c[i * 3] = c[i * 3 + 1] = c[i * 3 + 2] = k; }
+    g.setAttribute('color', new THREE.BufferAttribute(c, 3)); return g;
+  }
+  /** [feelfix2] flat disc (y = 0), 4 rings with a radial falloff to a black (= invisible when additive) rim */
+  function softDisc(R, seg) {
+    const RINGS = [[0, 1], [0.55, 0.8], [0.8, 0.4], [0.93, 0.12], [1, 0]], pos = [], col = [], idx = [];
+    for (const [rr, k] of RINGS) for (let j = 0; j < seg; j++) { const a = (j / seg) * Math.PI * 2; pos.push(Math.cos(a) * R * rr, 0, Math.sin(a) * R * rr); col.push(k, k, k); }
+    for (let r = 0; r + 1 < RINGS.length; r++) for (let j = 0; j < seg; j++) { const a = r * seg + j, b = r * seg + (j + 1) % seg, c2 = (r + 1) * seg + j, d = (r + 1) * seg + (j + 1) % seg; idx.push(a, c2, b, b, c2, d); }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setIndex(idx); return g;
   }
   function mergeBoxes(list) {   // tiny local merge (4 boxes, no index juggling): non-indexed positions + normals
     const pos = [], nor = [];

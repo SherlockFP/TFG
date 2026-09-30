@@ -98,7 +98,7 @@ export function installFeedcams(game) {
       const m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, fog: false }));
       m.frustumCulled = false; m.renderOrder = 4; void n4; return m;
     };
-    const M = 8, coneP = new Float32Array(n * M * 18), coneC = new Float32Array(n * M * 24);
+    const M = 20, coneP = new Float32Array(n * M * 18), coneC = new Float32Array(n * M * 24);
     const env = mkMesh(envP, envC), cone = mkMesh(coneP, coneC);
     cone.geometry.attributes.position.setUsage(THREE.DynamicDrawUsage); cone.geometry.attributes.color.setUsage(THREE.DynamicDrawUsage);
     // junction boxes + cables (static, one merged mesh): the quiet way to kill a camera ([E] on the box)
@@ -180,8 +180,8 @@ export function installFeedcams(game) {
       vt.gg = e[5] ? 0.12 : 0.28; vt.bb = e[5] ? 0.1 : 0.12;
       for (let j = 0; j < v.M; j++) {
         const a0 = yaw - c.fov / 2 + c.fov * j / v.M, a1 = yaw - c.fov / 2 + c.fov * (j + 1) / v.M, r0 = vt.dist(a0), r1 = vt.dist(a1);
-        vt.vert(a0, c.r0, A); vt.vert(a0, r0, A * 0.2); vt.vert(a1, c.r0, A);
-        vt.vert(a1, c.r0, A); vt.vert(a0, r0, A * 0.2); vt.vert(a1, r1, A * 0.2);
+        vt.vert(a0, c.r0, A); vt.vert(a0, r0, A * 0.04); vt.vert(a1, c.r0, A);
+        vt.vert(a1, c.r0, A); vt.vert(a0, r0, A * 0.04); vt.vert(a1, r1, A * 0.04);
       }
     }
     v.body.instanceMatrix.needsUpdate = v.lamp.instanceMatrix.needsUpdate = true;

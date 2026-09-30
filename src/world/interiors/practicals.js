@@ -13,6 +13,7 @@ export function addPracticals(ctx) {
   const L = ctx.layout, K = layoutKit(L), Y = ctx.Y, C = K.C, def = ctx.def || {};
   const tint = def.lampColor ?? def.lamps?.color ?? 0xffe6c0;
   const corridorH = L.corridorH || 3.2;
+  const cmod = def.practicals?.corridor | 0 || 5;   // [feelfix2] theme knob: 1 dim strip per cmod corridor cells (5 by default; metro / influencer use 2)
   const strips = [], exits = [];
   for (const r of L.rooms) {
     const rc = K.roomRect(r), cx = (rc.x0 + rc.x1) / 2, cz = (rc.z0 + rc.z1) / 2, h = r.height || corridorH;
@@ -23,7 +24,7 @@ export function addPracticals(ctx) {
   }
   for (let z = 0; z < L.h; z++) for (let x = 0; x < L.w; x++) {
     const i = L.idx(x, z);
-    if (L.cells[i] !== 2 || ctx.darkCells?.has?.(i) || (x + z * 2) % 5 !== 1) continue;
+    if (L.cells[i] !== 2 || ctx.darkCells?.has?.(i) || (x + z * 2) % cmod !== 1) continue;
     const ew = L.open.has(L.edgeKey(x, z, 0)) || L.open.has(L.edgeKey(x, z, 2));
     strips.push(box(ew ? 1.6 : 0.12, 0.04, ew ? 0.12 : 1.6, K.wx(x) + C / 2, Y + corridorH - 0.03, K.wz(z) + C / 2));
   }

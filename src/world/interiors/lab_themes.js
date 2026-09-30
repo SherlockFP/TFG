@@ -82,8 +82,8 @@ export const METRO = {
     rooms: {
       entrance: R({ floor: 'tiles_dirty', wall: 'tiles_white', ceil: 'concrete_dark', lamp: 'ceiling_lamp', wall_: ['vending_machine', 'bench'], clutter: ['wet_floor_sign', 'cardboard_boxes'], posters: 2 }),
       tunnel: R({ floor: 'asphalt', wall: 'concrete_dark', ceil: 'concrete_dark' }),
-      platform: R({ floor: 'tiles_dirty', wall: 'tiles_white', ceil: 'concrete_dark' }),
-      terminus: R({ floor: 'tiles_dirty', wall: 'tiles_white', ceil: 'concrete_dark' }),
+      platform: R({ floor: 'tiles_checker', wall: 'tiles_white', ceil: 'concrete_dark' }),   // [feelfix2] checker floor: the platform reads against the dark rails
+      terminus: R({ floor: 'tiles_checker', wall: 'tiles_white', ceil: 'concrete_dark' }),
       alcove: R({ floor: 'concrete_stained', wall: 'concrete_dark', ceil: 'concrete_dark', wall_: ['fuse_box'], clutter: ['barrel'] }),
       control_room: R({ floor: 'metal_plate', wall: 'metal_dark', lamp: 'fluorescent', center: ['desk'], wall_: ['server_rack_prop', 'server_rack_prop', 'fuse_box'], clutter: ['office_chair'], posters: 1 }),
       depot: R({ floor: 'concrete_stained', wall: 'metal_rust', lamp: 'ceiling_lamp', rows: 'shelf_metal', wall_: ['crate_metal', 'pallet', 'barrel'], clutter: ['crate_wood', 'barrel', 'traffic_cone'] }),
@@ -108,8 +108,9 @@ export const METRO = {
     return 3.5;
   },
   layout: { plan: 'wings', arch: 'metro', doorP: 0.5, blastP: 0.06, loops: 0.22, bigChance: 0.3, corridorH: 3.2, hub: null, lockedP: 0.1, roomMul: 1.25 },
-  lamps: { corridor: 'ceiling_lamp', every: 3, color: C_SODIUM, flicker: 0.2 },
+  lamps: { corridor: 'ceiling_lamp', every: 2, color: C_SODIUM, flicker: 0.12 },   // [feelfix2] was every 3 / flicker 0.2
   lampColor: C_SODIUM,
+  practicals: { corridor: 2 },   // [feelfix2]
   posters: ['poster_safety', 'poster_missing', 'graffiti', 'sign_danger', 'poster_delete', 'poster_wash'],
   landmarks: ['generator', 'crate_metal', 'barrel'],
   doorProp: 'door_single',
@@ -165,7 +166,7 @@ function decorateMetro(ctx) {
   if (!parts.length) return null;
   const B = new LabBuilder(ctx);
   const xC = K.wx(L.entrance.room.cx) + C / 2;
-  let zA = Infinity, zB = -Infinity, nEm = 0;
+  let zA = Infinity, zB = -Infinity, nEm = 0, nEm2 = 0;
   const warnLamps = [];
   for (const r of parts) {
     const rc = K.roomRect(r), h = r.height || 4.6;
@@ -192,6 +193,15 @@ function decorateMetro(ctx) {
         if (navClear(ctx.nav, px - 0.5, z - 0.5, px + 0.5, z + 0.5, 0.4)) B.solid('m:concrete', px, Y + h / 2, z, 0.9, h, 0.9);
       }
       for (const sx of [-2.6, 2.6]) B.box('g:2aa0ff', xC + sx * 2, Y + 3.7, (rc.z0 + rc.z1) / 2, 3.0, 0.5, 0.08);
+      // [feelfix2] practicals: cold ceiling strips over both platform edges + a light pooled every ~10 m, a hazard band and a glow trim on both walls
+      for (let z = rc.z0 + 2.5, i = 0; z < rc.z1 - 1.5; z += 5, i++) {
+        for (const sx of [-4, 4]) B.box('g:d8ecff', xC + sx, Y + h - 0.32, z, 0.5, 0.06, 1.4);
+        if (i % 2 === 0 && nEm2 < 14) { ctx.emitters.push({ pos: new THREE.Vector3(xC, Y + h - 1.3, z), color: 0xb8d4ff, intensity: 0.85, distance: 13, group: 'facility' }); nEm2++; }
+      }
+      for (const wx of [rc.x0 + 0.05, rc.x1 - 0.05]) {
+        B.box('m:hazard_stripes', wx, Y + 1.0, (rc.z0 + rc.z1) / 2, 0.06, 0.18, rc.z1 - rc.z0, 0.6);
+        B.box('g:2aa0ff', wx, Y + 2.9, (rc.z0 + rc.z1) / 2, 0.06, 0.07, rc.z1 - rc.z0);
+      }
       if (r.metro === 'terminus') {
         B.solid('m:hazard_stripes', xC, Y + 0.45, rc.z0 + 0.45, 2.4, 0.9, 0.5);
         for (const sx of [-0.9, 0.9]) B.box('g:ff2a2a', xC + sx, Y + 1.05, rc.z0 + 0.72, 0.16, 0.16, 0.06);

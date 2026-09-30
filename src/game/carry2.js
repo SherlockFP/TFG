@@ -236,7 +236,8 @@ export function installCarry2(game) {
     else if (helperOf()) mode = 'helper';
     else if (held && C.isHeavy(def)) mode = 'solo';
     const f = C.carryFeel(def, mode);
-    P.carryMul = mode === 'co' ? C.coopHolderMul(P.weightMul) : f.speed;
+    P.carryMul = mode === 'co' ? C.coopHolderMul() : f.speed;
+    P.carryCancel = mode === 'co';   // localplayer divides the weight penalty out (effective speed = carryMul)
     P.carryTurn = f.turn;
     if (f.sway > 0 && !P.frozen) {   // low-frequency roll / pitch sway, stronger while moving (engine.punch honours reduce motion)
       S.swayT += dt;
@@ -355,7 +356,7 @@ export function installCarry2(game) {
       if (P && !P.dead) {
         const held = feelTick(P, dt);
         bumpTick(P, held, dt); gripTick(P, dt);
-      } else if (P) { P.carryMul = 1; P.carryTurn = 1; S.grip = null; }
+      } else if (P) { P.carryMul = 1; P.carryTurn = 1; P.carryCancel = false; S.grip = null; }
       flyTick(dt);
       S.scan -= dt; if (S.scan <= 0) { S.scan = 0.25; scanBulky(); }
       if (S.co.size || straps.length) strapsTick();
@@ -377,7 +378,7 @@ export function installCarry2(game) {
       if (game.dropItem === wrappedDrop) { if (hadDrop) game.dropItem = origDrop; else delete game.dropItem; }
       for (const ln of straps) { ln.removeFromParent(); ln.geometry.dispose(); ln.material.dispose(); }
       straps.length = 0;
-      if (game.player) { game.player.carryMul = 1; game.player.carryTurn = 1; }
+      if (game.player) { game.player.carryMul = 1; game.player.carryTurn = 1; game.player.carryCancel = false; }
       style?.remove();
     },
   };

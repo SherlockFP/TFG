@@ -139,6 +139,21 @@ export function classify(def, geom, id) {
   return 'scrap';
 }
 
+/** [feelfix2] a held bulky item may cover at most this share of the frame (72 deg vertical fov, 16:9) */
+export const COVER_MAX = 0.25;
+const TAN_V = Math.tan(36 * Math.PI / 180), ASPECT = 16 / 9;
+/** screen share (0..1) of a camera-space box centred (cx, cy, cz) with size rs; nearest-face depth clamped to 0.12 m */
+export function boxCover(cx, cy, cz, rs) {
+  const zn = Math.max(0.12, -(cz + rs.z / 2)), zf = Math.max(0.12, -(cz - rs.z / 2));
+  let x0 = 9, x1 = -9, y0 = 9, y1 = -9;
+  for (const z of [zn, zf]) for (const x of [cx - rs.x / 2, cx + rs.x / 2]) for (const y of [cy - rs.y / 2, cy + rs.y / 2]) {
+    const nx = x / (z * TAN_V * ASPECT), ny = y / (z * TAN_V);
+    x0 = Math.min(x0, nx); x1 = Math.max(x1, nx); y0 = Math.min(y0, ny); y1 = Math.max(y1, ny);
+  }
+  const w = Math.max(0, Math.min(1, x1) - Math.max(-1, x0)), h = Math.max(0, Math.min(1, y1) - Math.max(-1, y0));
+  return (w * h) / 4;
+}
+
 /**
  * Fit a held item. Returns { cls, pos (hand frame), quat, grip: { R?, L? } (camera-space hand targets for the arm IK),
  * pen, palm (nearest vertex to the palm, m), box (camera-space AABB) }.
@@ -154,6 +169,7 @@ export function fitGrip(geom, def, id = '') {
   const grip = {};
   const pos = V();
   let G;   // grip point in root-local space (before rotation)
+  let cover = 0, sc = 1, big = false;   // share of the screen a two-hand carry covers (see COVER_MAX)
 
   // ---- orientation
   const longAxis = s.z >= s.x && s.z >= s.y ? 'z' : (s.y >= s.x ? 'y' : 'x');
@@ -174,16 +190,23 @@ export function fitGrip(geom, def, id = '') {
 
   if (cls === 'carry' || cls === 'body') {
     // both hands on the item: hands at its sides (or behind its rear face when it is wider than the hand span)
-    const yh = cls === 'body' ? -0.36 : -0.3, zh = -0.56;
+    let yh = cls === 'body' ? -0.36 : -0.3;
+    const zh = -0.56;
     const wide = rs.x / 2 + 0.025 > 0.27;
     const hw = Math.min(0.27, Math.max(0.14, rs.x / 2 + 0.025));
     const bottom = yh - 0.06 - Math.max(0, rs.y - 0.5) * 0.35;
-    const cy = bottom + rs.y / 2;
+    let cy = bottom + rs.y / 2, ox = 0;
     const cz = wide ? zh - rs.z / 2 - 0.035 : zh - rs.z / 2 + Math.min(0.04, rs.z * 0.4);
-    grip.R = V(hw, yh, zh); grip.L = V(-hw, yh, zh);
+    // [feelfix2] bulky loot must not blind the player: slide it low and to the right (hands follow) until it covers <= COVER_MAX of the view
+    if (cls === 'carry') {
+      cover = boxCover(ox, cy, cz, rs); big = cover > COVER_MAX;
+      for (let i = 0; i < 10 && cover > COVER_MAX; i++) { const d = yh > -0.62 ? 0.035 : 0; ox = Math.min(0.3, ox + 0.04); cy -= d; yh -= d; cover = boxCover(ox, cy, cz, rs); }
+      if (cover > COVER_MAX) { sc = Math.max(0.55, Math.sqrt(COVER_MAX / cover)); rc.multiplyScalar(sc); cover = boxCover(ox, cy, cz, rs.clone().multiplyScalar(sc)); }   // still too big: draw it smaller in the hands
+    }
+    grip.R = V(hw + ox, yh, zh); grip.L = V(-hw + ox, yh, zh);
     hand.copy(grip.R);
-    // item centre (rotated box centre) at (0, cy, cz) in camera space
-    pos.set(0 - rc.x, cy - rc.y, cz - rc.z).sub(hand);
+    // item centre (rotated box centre) at (ox, cy, cz) in camera space
+    pos.set(ox - rc.x, cy - rc.y, cz - rc.z).sub(hand);
     G = null;
   } else {
     if (geom.hasGrip && !(cls === 'scrap')) {
@@ -232,7 +255,7 @@ export function fitGrip(geom, def, id = '') {
     p.set(geom.pts[i], geom.pts[i + 1], geom.pts[i + 2]).applyQuaternion(qq).add(pos).add(hand);
     cam.expandByPoint(p); palmD = Math.min(palmD, p.distanceTo(palm));
   }
-  return { cls, pos, quat: q, grip, pen, palm: palmD, box: cam, hand };
+  return { cls, pos, quat: q, grip, pen, palm: palmD, box: cam, hand, cover, scale: sc, ghost: big };
 }
 
 // arm pose reaching a camera-space target (same IK the view model runs); returns FK { base, elbow, wrist, hand }

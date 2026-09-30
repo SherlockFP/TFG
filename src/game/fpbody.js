@@ -334,6 +334,27 @@ export function installFpBody(game) {
       return true;
     } catch (e) { warn('place ' + it.type, e); return false; }
   }
+  // [feelfix2] a bulky two-hand item (vending machine, rack, statue, core) is drawn semi-transparent (cloned materials) and a little smaller
+  // while it is the held item, so it never blinds the player; everything is restored the moment it is no longer held.
+  const cloneMat = (m) => { const c = m.clone(); c.transparent = true; c.opacity = Math.min(m.opacity ?? 1, 0.6); return c; };
+  function unghost() {
+    const g = S.gh; S.gh = null;
+    if (!g) return;
+    for (const [m, orig, clone] of g.list) { m.material = orig; for (const c of [].concat(clone)) c.dispose?.(); }
+    g.it.obj.scale.copy(g.sc0);
+  }
+  function ghostTick() {
+    const p = game.player;
+    const it = p && !p.dead ? p.heldItem?.() : null;
+    const fit = it?.obj ? fitCache.get(it.obj.userData?._fpFit) : null;
+    const want = fit?.ghost ? it : null;
+    if (S.gh && S.gh.it !== want) unghost();
+    if (!want || S.gh) return;
+    const list = [];
+    want.obj.traverse((o) => { if (o.isMesh && o.material) { const clone = Array.isArray(o.material) ? o.material.map(cloneMat) : cloneMat(o.material); list.push([o, o.material, clone]); o.material = clone; } });
+    S.gh = { it: want, list, sc0: want.obj.scale.clone() };
+    want.obj.scale.setScalar((fit.scale || 1) * S.gh.sc0.x);
+  }
   /** view model hand targets (camera space) for the held item, or null */
   function gripOf(it) {
     if (!it || !opts.fitGrip) return null;
@@ -395,6 +416,7 @@ export function installFpBody(game) {
     S.t += dt;
     try { updateBubbles(dt); } catch (e) { warn('bubbles', e); }
     try { updateBody(dt); } catch (e) { warn('bodyUpdate', e); }
+    try { ghostTick(); } catch (e) { warn('ghost', e); }
     hookT -= dt;
     if (hookT <= 0) { hookT = 2; try { hookDepth(game.viewModel?.root); hookDepth(game._hand); } catch (e) { warn('hook', e); } }
   });
@@ -407,6 +429,7 @@ export function installFpBody(game) {
     get body() { return body; },
     dispose() {
       S.disposed = true;
+      try { unghost(); } catch { /* ignore */ }
       for (const off of S.offs) { try { off(); } catch { /* ignore */ } }
       for (const u of S.undo) { try { u(); } catch { /* ignore */ } }
       for (const id of [...ents.keys()]) removeEnt(id);

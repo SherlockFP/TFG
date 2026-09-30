@@ -119,7 +119,7 @@ export function layoutDocks(docks) {
 export function startLayout(docks) {
   if (timer || typeof document === 'undefined') return;
   const st = document.createElement('style');
-  st.textContent = '.hud-dock-item{flex:none}.hud-dock-item.hud-clip{display:none !important}';   // flex:none: items must overflow (and get clipped by priority), never shrink onto each other
+  st.textContent = '.hud-dock-item{flex:none}.hud-dock-item.hud-clip{display:none !important}body:has(.report) .hud-quota{visibility:hidden}';   // [feelfix2] the day report carries its own quota footer: the top banner must not show through / under it   // flex:none: items must overflow (and get clipped by priority), never shrink onto each other
   document.head.appendChild(st);
   timer = setInterval(() => { if (!document.hidden) { try { layoutDocks(docks); } catch { /* never break the HUD */ } } }, 250);
   timer?.unref?.();   // node harness tests: the HUD poll must not keep the process alive

@@ -242,6 +242,10 @@ export function installOnboard(game) {
     ui.appendChild(el);
     try { game.spawnInShip?.(); } catch (e) { warn('spawn', e); }
     game.player.pitch = 0; game.player.frozen = true;
+    try {   // [feelfix2] the first frame after the overlay looks at the terminal (the objective), never at a tarped fixture
+      const tp = game.ship?.points?.terminal, pp = game.player.pos;
+      if (tp) game.player.yaw = Math.atan2(-(tp.x - pp.x), -(tp.z - pp.z));
+    } catch (e) { warn('face', e); }
     game.engine.fx.fade = 1; game.engine.fadeTarget = 1;
     const at = (t0, fn) => st.tl.push({ at: t0, fn });
     const cap = (id, vars) => { el.querySelector('.lt .t').textContent = xf(id, vars); sfx('ui_notify', 0.3); };

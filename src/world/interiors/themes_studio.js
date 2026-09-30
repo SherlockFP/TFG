@@ -30,7 +30,7 @@ export const INFLUENCER = {
   blurb: 'A gaudy estate the Algorithm repossessed. Ring lights, trophy rooms, sponsored vases. Everything is fragile and everything is watching.',
   sig: 'VIRAL loot grows in value while you carry it, fastest under the studio ring lights. Every bump resets the hype.',
   style: {
-    corridor: { floor: 'st_velvet', wall: 'st_pinkgold', ceil: 'wallpaper_damask', base: 'wood_dark' },
+    corridor: { floor: 'marble', wall: 'st_pinkgold', ceil: 'wallpaper_damask', base: 'wood_dark' },   // [feelfix2] pale marble runner: the corridor reads against the dark pink walls
     rooms: {
       entrance: { floor: 'marble', wall: 'st_pinkgold', ceil: 'wallpaper_damask', lamp: 'chandelier', lampColor: C_GOLD, center: ['st:neon_backdrop'], wall_: ['planter', 'armchair', 'st:ring_light'], clutter: ['planter'], posters: 1 },
       atrium: { floor: 'marble', wall: 'st_pinkgold', ceil: 'wallpaper_damask', lamp: 'chandelier', lampColor: C_GOLD, center: ['st:ring_light', 'st:trophy_case'], wall_: ['st:trophy_case', 'planter', 'st:ring_light', 'armchair'], clutter: ['planter'], posters: 2 },
@@ -48,7 +48,8 @@ export const INFLUENCER = {
   roomTypes: [['studio', 4, true], ['trophy_room', 3, true], ['lounge', 3, true], ['bedroom', 4], ['vanity', 3], ['juice_bar', 2], ['nest', 1]],
   roomHeight(type, rng) { return type === 'atrium' ? rng.float(6.2, 7.0) : type === 'studio' || type === 'trophy_room' ? 4.8 : 3.8; },
   layout: { plan: 'rooms', doorP: 0.8, blastP: 0, loops: 0.4, bigChance: 0.32, corridorH: 3.4, hub: { type: 'atrium', w: 5, h: 4 }, hubAlways: true, lockedP: 0.14, shape: rectShape },
-  lamps: { corridor: 'ceiling_lamp', every: 2, color: C_PINK, flicker: 0.06 },
+  lamps: { corridor: 'ceiling_lamp', every: 2, color: C_GOLD, flicker: 0.06 },   // [feelfix2] warm gold (was pink: the walls went olive) + denser corridor practicals
+  practicals: { corridor: 2 },
   lampColor: C_PINK,
   posters: ['poster_like', 'poster_hang', 'portrait', 'poster_like'],
   landmarks: ['st:ring_light', 'st:neon_backdrop', 'st:trophy_case'],
@@ -56,8 +57,8 @@ export const INFLUENCER = {
   corridorScrap: 0.1,
   footstep: { st_velvet: 'carpet', marble: 'tile', tiles_checker: 'tile' },
   ambience: { base: 'ambience_facility', vol: 0.4, buzz: 'lights_buzz', buzzVol: 0.08, env: 'facility' },
-  atmosphere: { fog: 0x16060f, density: 0.06 },
-  decorate: decorateGlow(['studio', 'trophy_room'], C_PINK, 1.0),
+  atmosphere: { fog: 0x2a0c1c, density: 0.045 },
+  decorate: decorateGlow(['entrance', 'atrium', 'studio', 'trophy_room', 'lounge', 'bedroom', 'vanity', 'juice_bar'], C_PINK, 1.15),
 };
 
 // ------------------------------------------------------------------------------------------------------------------ Content Academy

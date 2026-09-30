@@ -247,7 +247,7 @@ export class LocalPlayer {
     speed *= weightMul * s.speedMul * (this.speedBoost > 0 ? 1.25 : 1) * (this.slowT > 0 ? 0.35 : 1) * (this.game.lmMove?.speedMul ?? 1);   // [lcmonsters] Heavy Curse
     if (this.game.grab?.item) speed *= 0.88;
     if (this.exMul != null) speed *= this.exMul;   // [expeditions] wading / heat slow (game/expeditions.js)
-    if (this.carryMul) speed *= this.carryMul;   // [carry2] bulky loot: crawl solo, near-normal with a helper
+    if (this.carryMul) speed *= this.carryMul * (this.carryCancel ? 1 / Math.max(0.5, weightMul) : 1);   // [carry2] bulky loot: crawl solo, near-normal with a helper
     if (bodyCarry) speed *= 0.85;   // on top of the 90 lb weight penalty: a slow, heavy trudge (~2.9 m/s), never frozen
     if (this.game.weatherMud && !this.indoor && !this.inShip) speed *= 0.92;
     // facility set pieces: wading through the flooded room
