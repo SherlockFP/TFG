@@ -846,3 +846,7 @@ first-join rejoin 35 s, lost-host 25 s, host never rejoins. NAT/SDP failures now
 everyone on Nostr; lobby browser shows real peer/relay counts; NETSTATS shows relays, TURN and per-peer ICE path.
 **Owner action still needed:** a TURN account + `VITE_TURN_*` on Render for friends behind CGNAT/mobile (no free
 public TURN works). Details: `docs/MULTIPLAYER_HOTFIX.md` → "Follow-up".
+
+
+### Wave 10 - landing10
+Landing sequencer: `src/game/landing10.js` (+ `landing10_core.js`) routes landing `sys` lines into ONE compact CREW BRIEFING panel after the moon title card (max 5 lines, self-dismissing, rest stays in the chat log); toasts / big text / Algorithm box wait while it runs. Fixed the case card (`.lcase-cine`) surviving `clearCinematics` and the floating cobweb "grey shards" (facility.js). Hooks: ui.js (systemMessage / fullscreenOpen / clearCinematics), docklayout TOP_BANNERS. Docs: docs/wave10/landing10.md.

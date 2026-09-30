@@ -1154,7 +1154,13 @@ export function buildFacility(layout, { physics, lightPool }) {
         const id = rng.pick(st.clutter);
         if (id === 'cobweb' || id === 'hanging_chains') {
           const cx = rng.float(x0 + 0.5, x1 - 0.5), cz = rng.float(z0 + 0.5, z1 - 0.5);
-          placeProp(id, cx, Y + r.height - (id === 'cobweb' ? 1.4 : 2.2), cz, rng.int(0, 3) * Math.PI / 2);
+          if (id === 'cobweb') {
+            // [landing10] a cobweb is a 1.4 m vertical plane: dropped at a random spot it floated as a grey shard in mid-room. It now spans a ceiling CORNER (both ends touch a wall).
+            const c2 = rng.int(0, 3), sx = c2 & 1 ? -1 : 1, sz = c2 & 2 ? -1 : 1, d = 0.495 + 0.06;
+            placeProp(id, sx > 0 ? x0 + d : x1 - d, Y + r.height - 1.4, sz > 0 ? z0 + d : z1 - d, Math.PI / 4 * sx * sz);
+            continue;
+          }
+          placeProp(id, cx, Y + r.height - 2.2, cz, rng.int(0, 3) * Math.PI / 2);
           continue;
         }
         const corner = rng.int(0, 3);

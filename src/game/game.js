@@ -225,7 +225,7 @@ import { installStory } from './lazymods.js';   // [import:story] wave 6: two pa
 // [import:labyr10]
 // [import:moons10]
 // [import:outlife10]
-// [import:landing10]
+import { installLanding10 } from './landing10.js';
 // [import:mystery10]
 import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
 
@@ -614,7 +614,7 @@ export class Game extends Emitter {
     // [slot:labyr10]
     // [slot:moons10]
     // [slot:outlife10]
-    // [slot:landing10]
+    this.useModule('landing10', installLanding10);
     // [slot:mystery10]
 
     this.useModule('onboard', installOnboard);   // [slot:onboard] wave 5: Hiring Day + staged unlocks (installed last: wraps hostLever / terminalCommand / objectives.compute)

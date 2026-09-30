@@ -153,7 +153,7 @@ export class UI {
     return b;
   }
   toast(text, kind, ms) { this.hud.toast(tNum(text), kind, ms); }   // t(): safety net for static strings that were not wrapped at the call site
-  systemMessage(text, kind = 'info') { text = tNum(text); this.chatMessage(null, text, false, kind); this.hud.toast(text, kind === 'signal' ? 'info' : kind); }
+  systemMessage(text, kind = 'info') { text = tNum(text); if (this.landHook?.capture(text, kind)) return; /* [landing10] merged into the landing briefing */ this.chatMessage(null, text, false, kind); this.hud.toast(text, kind === 'signal' ? 'info' : kind); }
   chatMessage(name, text, self, kind, avatar) {
     this.chatEl.classList.remove('hidden');
     const line = el('div', { class: 'chat-line ' + (kind || '') + (self ? ' self' : '') }, name && avatar ? avIcon(avatar, 14) : null, name ? el('span', { class: 'cn' }, name + ': ') : null, text);   // [profile] icon
@@ -1242,7 +1242,7 @@ export class UI {
   // ---------------------------------------------------------------- full-screen reports (queued, never overlapping)
   fullscreenOpen() {
     if (!this.app.game) return false;
-    if (this.cineActive) return true;
+    if (this.cineActive || this.landHook?.hold()) return true;   // [landing10] the landing sequence holds toasts / big text / Algorithm box
     const l = document.getElementById('loading');
     return !!l && !l.classList.contains('hidden');
   }
@@ -1258,7 +1258,7 @@ export class UI {
     clearTimeout(this.cineGuard);
     this.cineActive = null;
     this.root.classList.remove('cine-open');
-    for (const x of this.root.querySelectorAll(':scope > .report, :scope > .quotamet, :scope > .fired')) { x.classList.add('out'); setTimeout(() => x.remove(), 500); }
+    for (const x of this.root.querySelectorAll(':scope > .report, :scope > .quotamet, :scope > .fired, :scope > .lcase-cine')) { x.classList.add('out'); setTimeout(() => x.remove(), 500); }
   }
   nextCinematic() {
     clearTimeout(this.cineGuard);
