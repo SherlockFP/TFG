@@ -1,7 +1,7 @@
 // HERO CONTENT (wave 8, docs/wave8/herocontent.md) - pure data + registration (no THREE, no DOM): themed scrap tables for the four labyrinth
 // interiors (metro, greenhouse, prison, tower) that used to fall back to the factory mix, and the twelve new items they own.
 // Models live in models/artpass.js (ids `hc_*`); game/herocontent.js hooks them into the mod item-model registry.
-import { ITEMS, SCRAP_TABLE, registerItem } from './items.js';
+import { ITEMS, SCRAP_TABLE, BIG_TABLES, registerItem } from './items.js';
 import { addTranslations } from '../core/i18n.js';
 import { TR, RU } from './herocontent_text.js';
 
@@ -44,6 +44,35 @@ export const FILLER = {
 };
 export const HERO_THEMES = Object.freeze(Object.keys(SIGNATURE));
 
+/**
+ * BIG valuables (wave 8 night, docs/wave8/bossdress.md): kind 'big' physics props like vase / server (grabbed with LMB, so no 2-hand flag: the grab is already
+ * two-handed and slow), eight themed ones; values sit on the existing scale (vase 90-170 ... statue 200-350) so the per-theme mean stays ~165-200.
+ */
+export const BIG_DEFS = [
+  { id: 'hb_turnstile', name: 'Turnstile Gate', kind: 'big', value: [130, 210], weight: 85, hands: 0, fragile: 0.4, mass: 34, tip: 'Waist-high, tripod arms, one green light. It still counts everyone who ever passed.' },
+  { id: 'hb_ticketkiosk', name: 'Ticket Kiosk', kind: 'big', value: [170, 270], weight: 110, hands: 0, fragile: 0.5, mass: 46, tip: 'Sells single rides to a station that was renamed. Change not given.' },
+  { id: 'hb_planter', name: 'Giant Planter', kind: 'big', value: [100, 180], weight: 60, hands: 0, fragile: 0.9, mass: 22, tip: 'A cracked terracotta pot with a fern that outgrew its forum thread.' },
+  { id: 'hb_terrarium', name: 'Seed Terrarium', kind: 'big', value: [150, 250], weight: 75, hands: 0, fragile: 1.0, mass: 26, tip: 'Glass on all sides, humid inside, faintly green. Handle it like it can hear you.' },
+  { id: 'hb_locker', name: 'Evidence Locker', kind: 'big', value: [170, 280], weight: 120, hands: 0, fragile: 0.3, mass: 52, tip: 'Sealed with red tape and a stamp that says EXHIBIT A. There is no exhibit B.' },
+  { id: 'hb_searchlight', name: 'Yard Searchlight', kind: 'big', value: [140, 230], weight: 80, hands: 0, fragile: 0.6, mass: 30, tip: 'It tracked every ban appeal across the yard. The lens is still warm.' },
+  { id: 'hb_bust', name: "Founder's Bust", kind: 'big', value: [200, 320], weight: 95, hands: 0, fragile: 0.5, mass: 40, tip: 'Marble, stern and slightly too polished. The nameplate has been replaced four times.' },
+  { id: 'hb_safe', name: 'Executive Safe', kind: 'big', value: [190, 300], weight: 140, hands: 0, fragile: 0.25, mass: 60, tip: 'Brass dial, heavy door, one bonus in it. It is not yours, and it is very heavy.' },
+];
+export const BIG_IDS = Object.freeze(BIG_DEFS.map((d) => d.id));
+/** big-valuable tables per theme (falls back to the default BIG_TABLE without an entry): themed items first, then the existing bigs that fit */
+export const BIG_SIGNATURE = {
+  metro: [['hb_turnstile', 8], ['hb_ticketkiosk', 5], ['pctower', 4], ['vase', 4], ['amphora', 3], ['server', 3]],
+  greenhouse: [['hb_planter', 8], ['hb_terrarium', 6], ['aquarium', 5], ['vase', 4], ['amphora', 3]],
+  prison: [['hb_locker', 6], ['hb_searchlight', 6], ['server', 3], ['pctower', 4], ['statue', 2]],
+  tower: [['hb_bust', 5], ['hb_safe', 4], ['pctower', 9], ['aquarium', 4], ['vase', 4]],
+  influencer: [['vase', 8], ['aquarium', 6], ['hb_bust', 3], ['statue', 3], ['pctower', 3]],
+  academy: [['pctower', 8], ['hb_bust', 3], ['hb_planter', 3], ['aquarium', 4], ['vase', 4]],
+  museum: [['amphora', 8], ['vase', 6], ['statue', 5], ['hb_bust', 4], ['hb_terrarium', 2]],
+  colddata: [['server', 10], ['cryptorig', 5], ['pctower', 8], ['hb_safe', 3]],
+};
+export const BIG_THEMES = Object.freeze(Object.keys(BIG_SIGNATURE));
+export const MODEL_IDS = Object.freeze([...ITEM_IDS, ...BIG_IDS]);
+
 /** merged [id, weight] table of a theme (duplicate ids are summed) */
 export function heroTable(theme) {
   const m = new Map();
@@ -55,5 +84,7 @@ export function heroTable(theme) {
 export function registerHeroContent(force = false) {
   for (const d of ITEM_DEFS) { const { sig, ...def } = d; if (force || !ITEMS[d.id]) registerItem(def); }
   for (const th of HERO_THEMES) SCRAP_TABLE[th] = heroTable(th);
+  for (const d of BIG_DEFS) if (force || !ITEMS[d.id]) registerItem({ ...d });
+  for (const th of BIG_THEMES) BIG_TABLES[th] = BIG_SIGNATURE[th].map((e) => [...e]);
 }
 registerHeroContent();
