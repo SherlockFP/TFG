@@ -24,6 +24,7 @@ import { ensureInventoryStyles } from '../ui/inventory_style.js';
 import { InventoryPanel } from '../ui/inventory_panel.js';
 import { registerGearModels } from '../models/gear.js';
 import { affixDisplayName } from './loot.js';
+import { createGlints } from './lootglint.js';   // [heroprops] horror-safe loot glint
 
 export const INVENTORY_KEY = 'KeyI';
 
@@ -63,7 +64,7 @@ export function installInventory(game) {
   const st = {
     disposed: false, offs: [], ver: 0, weightAt: 0, weightVer: -1, weight: 0,
     rid: 0, waiting: new Map(), pendingStash: new Map(), extraByPeer: new Map(), hostT: 0, beamT: 0, tagT: 0,
-    beams: new Map(), beamGeo: null, ringGeo: null, beamMats: {}, time: 0, feedEl: null, luckT: -1, luck: 0,
+    beams: createGlints(game), time: 0, feedEl: null, luckT: -1, luck: 0,
   };
   const items = () => game.items;
   const net = () => game.net;
@@ -556,23 +557,8 @@ export function installInventory(game) {
     } catch (e) { console.warn('[inventory] feed', e); }
   }
 
-  // ------------------------------------------------------------------ world tier beams (rare+ rolled items; affixed weapons keep loot.js beams)
-  function ensureBeamRes() {
-    if (st.beamGeo) return;
-    st.beamGeo = new THREE.CylinderGeometry(0.03, 0.09, 1.6, 6, 1, true).translate(0, 0.8, 0);
-    {   // [qa2] the column fades to black (additive = transparent) toward the top: it used to read as a solid pillar through the ceiling / wall in a corridor
-      const pos = st.beamGeo.attributes.position, cols = new Float32Array(pos.count * 3);
-      for (let i = 0; i < pos.count; i++) { const k = 1 - Math.min(1, Math.max(0, pos.getY(i) / 1.6)); cols[i * 3] = cols[i * 3 + 1] = cols[i * 3 + 2] = k * k; }
-      st.beamGeo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
-    }
-    st.ringGeo = new THREE.RingGeometry(0.16, 0.34, 18).rotateX(-Math.PI / 2);
-    st.beamGeo.userData.shared = true; st.ringGeo.userData.shared = true;
-    for (const id of ['rare', 'epic', 'legendary', 'mythic']) {
-      const mk = (vc) => new THREE.MeshBasicMaterial({ color: TIERS[id].hex, transparent: true, opacity: 0.2, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false, vertexColors: !!vc });
-      st.beamMats[id] = { beam: mk(true), ring: mk(false) };
-    }
-  }
-  const BEAM_ALPHA = { rare: 0.14, epic: 0.2, legendary: 0.28, mythic: 0.34 };
+  // ------------------------------------------------------------------ world tier glint (rare+ rolled items; affixed weapons keep loot.js glints)
+  // [heroprops] was a tall additive pillar that read through walls; now a small periodic star on the item + a faint floor ring within 6 m / line of sight (game/lootglint.js)
   function updateBeams(dt) {
     st.time += dt;
     st.beamT -= dt;
@@ -582,39 +568,12 @@ export function installInventory(game) {
       st.beamT = 0.4;
       for (const it of I.all()) {
         if (!it.tier || it.affix || it.state !== 'world' || st.beams.has(it.id) || tierIndex(it.tier) < tierIndex('rare') || it.obj.parent !== game.scene) continue;
-        ensureBeamRes();
-        const m = st.beamMats[it.tier];
-        const g = new THREE.Group();
-        const beam = new THREE.Mesh(st.beamGeo, m.beam);
-        const ring = new THREE.Mesh(st.ringGeo, m.ring);
-        ring.position.y = 0.02;
-        if (it.tier === 'mythic' || it.tier === 'legendary') beam.scale.set(1.3, 1.2, 1.3);
-        beam.userData.bs = beam.scale.x;
-        g.add(beam, ring);
-        g.renderOrder = 2;
-        game.scene.add(g);
-        st.beams.set(it.id, g);
+        st.beams.add(it.id, TIERS[it.tier].hex, it.tier);
       }
     }
-    for (const [id, g] of st.beams) {
-      const it = I.get(id);
-      if (!it || it.state !== 'world' || it.obj.parent !== game.scene) { g.removeFromParent(); st.beams.delete(id); continue; }
-      g.position.copy(it.obj.position);
-      g.position.y -= (it.size?.y || 0.3) * 0.5;
-      g.children[1].rotation.y += dt * 0.8;
-      const cam = game.camera, bm = g.children[0];   // [qa2] up close the column thins out (it filled a third of the frame at 2 m); it is a far marker
-      if (cam && bm.userData.bs) { const k = Math.min(1, Math.max(0.3, (g.position.distanceTo(cam.position) - 1.5) / 5)) * bm.userData.bs; bm.scale.x = bm.scale.z = k; }
-    }
-    if (st.beamGeo) {
-      for (const [id, m] of Object.entries(st.beamMats)) {
-        const a = BEAM_ALPHA[id];
-        const pulse = id === 'mythic' ? 0.75 + 0.35 * Math.sin(st.time * 4.3) : id === 'legendary' ? 0.8 + 0.25 * Math.sin(st.time * 3.4) : 0.85 + 0.15 * Math.sin(st.time * 2.6);
-        m.beam.opacity = a * pulse;
-        m.ring.opacity = a * 1.6 * pulse;
-      }
-    }
+    st.beams.update(dt);
   }
-  function clearBeams() { for (const g of st.beams.values()) g.removeFromParent(); st.beams.clear(); }
+  function clearBeams() { st.beams.clear(); }
 
   // ------------------------------------------------------------------ per frame
   function update(dt) {
@@ -743,8 +702,7 @@ export function installInventory(game) {
       if (typeof window !== 'undefined') window.removeEventListener('keydown', onKey);
       panel.dispose();
       clearBeams();
-      st.beamGeo?.dispose(); st.ringGeo?.dispose();
-      for (const m of Object.values(st.beamMats)) { m.beam.dispose(); m.ring.dispose(); }
+      st.beams.dispose();
       st.feedEl?.remove();
       game.ui?.hud?.setBagTag?.(null);
       for (const r of st.waiting.values()) r(false);

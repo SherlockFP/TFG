@@ -10,6 +10,7 @@
 import * as THREE from 'three';
 import { RARITY } from './items.js';
 import { forgeName } from './enhance.js';   // [forge]
+import { createGlints } from './lootglint.js';   // [heroprops]
 
 export const RARITY_ORDER = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
 export const AFFIX_RARITIES = ['uncommon', 'rare', 'epic', 'legendary'];
@@ -271,9 +272,9 @@ export function applyAffixEffects(game, res, view) {
 }
 
 // ------------------------------------------------------------------------------------------
-// Loot beams: a soft vertical light column over affixed items lying in the world (client side).
+// Loot glint (client side): affixed items lying in the world get a small periodic star + a close floor ring, rarity = colour.
+// [heroprops] replaces the tall additive beams (they read through walls and broke the horror mood); see game/lootglint.js. No light added.
 // ------------------------------------------------------------------------------------------
-const BEAM_OPACITY = { uncommon: 0.16, rare: 0.24, epic: 0.3, legendary: 0.4 };
 
 /**
  * installLootFx(game) -> { update(dt), dispose() }
@@ -281,65 +282,31 @@ const BEAM_OPACITY = { uncommon: 0.16, rare: 0.24, epic: 0.3, legendary: 0.4 };
  * mod manager, call update(dt) every frame yourself.
  */
 export function installLootFx(game) {
-  const beams = new Map();          // item id -> mesh
-  let geo = null;
-  const mats = {};
-  let scanT = 0, time = 0, disposed = false;
+  const glints = createGlints(game);
+  let scanT = 0, disposed = false;
   const offs = [];
-
-  const ensureRes = () => {
-    if (geo) return;
-    geo = new THREE.CylinderGeometry(0.05, 0.13, 2.6, 6, 1, true).translate(0, 1.3, 0);
-    geo.userData.shared = true;     // never disposed by item disposal
-    for (const r of AFFIX_RARITIES) {
-      mats[r] = new THREE.MeshBasicMaterial({
-        color: RARITY[r].color, transparent: true, opacity: BEAM_OPACITY[r], depthWrite: false,
-        blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
-      });
-    }
-  };
-  const removeBeam = (id, mesh) => { mesh.removeFromParent(); beams.delete(id); };
 
   const api = {
     update(dt) {
       if (disposed) return;
-      time += dt;
       scanT -= dt;
       const items = game.items;
       if (!items) return;
       if (scanT <= 0) {
         scanT = 0.4;
         for (const it of items.all()) {
-          if (!it.affix || it.state !== 'world' || beams.has(it.id) || !RARITY[it.affix.rarity]) continue;
-          ensureRes();
-          const m = new THREE.Mesh(geo, mats[it.affix.rarity] || mats.uncommon);
-          m.frustumCulled = true;
-          m.renderOrder = 2;
-          game.scene.add(m);
-          beams.set(it.id, m);
+          if (!it.affix || it.state !== 'world' || glints.has(it.id) || !RARITY[it.affix.rarity] || it.obj.parent !== game.scene) continue;
+          glints.add(it.id, RARITY[it.affix.rarity].color, it.affix.rarity);
         }
       }
-      for (const [id, m] of beams) {
-        const it = items.get(id);
-        if (!it || it.state !== 'world' || !it.affix || it.obj.parent !== game.scene) { removeBeam(id, m); continue; }
-        m.position.copy(it.obj.position);
-        m.position.y -= (it.size?.y || 0.3) * 0.5;
-      }
-      if (geo) {
-        const pulse = 0.75 + 0.25 * Math.sin(time * 3.2);
-        for (const r of AFFIX_RARITIES) mats[r].opacity = BEAM_OPACITY[r] * (r === 'legendary' ? 0.8 + 0.4 * Math.sin(time * 5.1) : pulse);
-      }
+      glints.update(dt);
     },
     dispose() {
       if (disposed) return;
       disposed = true;
       for (const off of offs) off();
       offs.length = 0;
-      for (const m of beams.values()) m.removeFromParent();
-      beams.clear();
-      geo?.dispose();
-      for (const r of Object.keys(mats)) mats[r].dispose();
-      geo = null;
+      glints.dispose();
     },
   };
   if (game.mods?.on) {

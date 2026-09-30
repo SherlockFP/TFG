@@ -6,7 +6,7 @@ export const MOONS = {
     weather: ['clear', 'foggy'],
   },
   hamsi: {
-    id: 'hamsi', name: '56K-Dialup', short: 'Dialup', tier: 1, cost: 0, biome: 'hills', interior: 'factory', size: 0.8,
+    id: 'hamsi', name: '56K-Dialup', short: 'Dialup', tier: 1, cost: 0, biome: 'hills', interior: 'factory', interiorName: 'Abandoned Web Host', size: 0.8,
     desc: 'Rolling hills of the early web. A small abandoned web host. Good for new janitors.',
     weather: ['clear', 'clear', 'rainy', 'foggy'], scrapCount: [10, 14], scrapMul: 1.0, power: 3, outdoorPower: 2,
     creatures: { scuttler: 30, yoinker: 22, crawler: 10, lurker: 6, mannequin: 4, sludge: 8, spider: 10, leech: 12, mimic: 3, turret: 6, mine: 10 },
