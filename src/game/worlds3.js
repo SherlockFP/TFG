@@ -17,6 +17,7 @@ import { saveProfile } from '../core/save.js';
 import { navClear } from '../world/interiors/common.js';
 import { G } from '../physics/physics.js';
 import { WorldMarker } from '../render/br_fx.js';
+import { firstDay } from './firstrun_core.js';
 import { THEMES, W3_ITEMS, POCKET_KINDS, KINDS, doorChance, doorTheme, sizeClassFor, planDressing, planPocketDressing } from './worlds3_core.js';
 import { BoxBatch, addProp, paletteFor, buildDoorFrame } from '../world/worlds3_kit.js';
 import { themeTextures, numberAtlas } from '../world/worlds3_tex.js';
@@ -96,7 +97,7 @@ export function installWorlds3(game) {
   // ------------------------------------------------------------------ hooks used by game/backrooms.js (all optional there)
   const hooks = {
     /** chance for a wrong door in today's facility (base = moon override) */
-    spotChance: (r, base) => doorChance(r.day, base),
+    spotChance: (r, base) => (firstDay(r) ? 0 : doorChance(r.day, base)),   // [firstrun] the wrong door waits for day 2 (deterministic: every peer plans the same spot)
     /** theme the door opens onto (host, at pocket creation) */
     doorTheme: () => {
       if (S.forceTheme) return S.forceTheme;
@@ -461,7 +462,7 @@ export function installWorlds3(game) {
   on('mapLoaded', () => { try { dressFacility(); } catch (e) { console.warn('worlds3 dress', e); disposeDress(); } });
   on('phase', (ph) => {
     if (ph === 'orbit' || ph === 'fired') { disposeDoor(); disposeDress(); if (S.tp.pk) { cleanupSkin(); S.tp = { pk: null, th: 'l0' }; } }
-    if (ph === 'moon' && S.size && game.world.facility) game.ui.toast(tf('Facility size: {c}', { c: t(SIZE_NAME[S.size]) }), 'info');
+    if (ph === 'moon' && S.size && game.world.facility && !game.onboard?.fr?.calm?.('extras')) game.ui.toast(tf('Facility size: {c}', { c: t(SIZE_NAME[S.size]) }), 'info');
   });
   on('objectives', (add, g, phase) => {
     if (phase !== 'moon' || game.player.dead) return;

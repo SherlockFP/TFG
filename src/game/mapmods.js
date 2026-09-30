@@ -95,7 +95,7 @@ export function installMapmods(game) {
   /** at the lever: nxt becomes cur and its numbers are merged into the day event (before the phase message, so every peer gets both) */
   function applyLanding(extra) {
     const r = run(), m = mmOf(); if (!r || !m) return extra;
-    if (!realMoon(r.moon)) { m.cur = null; return { ...extra, mm: m }; }
+    if (!realMoon(r.moon) || game.onboard?.fr?.calm?.('mapmods')) { m.cur = null; return { ...extra, mm: m }; }   // [firstrun] no sector-map affixes / card before quota 1
     if (!m.nxt) { m.nxt = rollMap(seed(m), q()); m.n++; }
     m.cur = m.nxt; m.nxt = null;
     const fx = effectsOf(m.cur.a);

@@ -258,9 +258,9 @@ export function installGuide(game) {
     if (!game.run || game.run.phase === 'fired') return false;
     return !loreBusy() && S.quietT <= 0;
   }
-  function say(text) {
+  function say(text, pri = false) {
     try {
-      if (game.lore?.say) { game.lore.say(text, { mood: 'curious' }); return true; }
+      if (game.lore?.say) { game.lore.say(text, { mood: 'curious', pri }); return true; }
       game.ui?.toast?.(pick(UI.fallback_prefix, lang()) + text, 'info');
       return true;
     } catch (e) { console.warn('[guide] say', e); return false; }
@@ -331,7 +331,7 @@ export function installGuide(game) {
     if (!g || !game.run || game.onboard?.active?.()) return;   // [onboard] the guide waits while Hiring Day runs
     // queued tutorial lines first (tips wait while a tutorial line is due)
     if (S.sayQ.length && S.sayQ[0].at <= S.t) {
-      if (tutRunning(g) || S.sayQ[0].src === TUT_DONE_SAY) { if (canSpeak()) { const q = S.sayQ.shift(); say(pick(q.src, lang())); S.quietT = 4; } }
+      if (tutRunning(g) || S.sayQ[0].src === TUT_DONE_SAY) { if (canSpeak()) { const q = S.sayQ.shift(); say(pick(q.src, lang()), true); S.quietT = 4; } }
       else S.sayQ.shift();
       return;
     }
@@ -344,7 +344,7 @@ export function installGuide(game) {
     S.tipT -= dt;
     if (S.tipT > 0) return;
     S.tipT = 1;
-    if (!S.sayQ.length && canSpeak()) advise();
+    if (!S.sayQ.length && canSpeak() && !game.onboard?.fr?.calm?.('tips')) advise();   // [firstrun] no 'you have not tried X' tips before the first sale
   });
 
   // ---------------------------------------------------------------- terminal commands

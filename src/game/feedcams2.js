@@ -17,6 +17,7 @@ import { MOONS } from './moons.js';
 import { G } from '../physics/physics.js';
 import { HYPE } from './algo2_core.js';
 import { VIEW_GAIN } from './algo1_core.js';
+import { firstDay } from './firstrun_core.js';
 import { segNear } from './feedcams_core.js';
 import * as C from './feedcams2_core.js';
 import { HL_TEXT } from './feedcams2_i18n.js';
@@ -111,7 +112,7 @@ export function installFeedcams2(game) {
     S.key = want; clearVis(); S.drones = [];
     if (!want) return;
     const T = want.terrain, e = want.plan.entrance;
-    S.drones = C.planDrones({ entrance: e, seed: r.seed, day: r.day, quotaIndex: r.quotaIndex, watched });
+    S.drones = C.planDrones({ entrance: e, seed: r.seed, day: r.day, quotaIndex: r.quotaIndex, watched, first: firstDay(r) && !watched });
     S.ground = (x, z) => { try { return Math.max(T.heightAt(x, z), T.floodY ?? -1e9); } catch { return 0; } };
     const n = S.drones.length; if (!n) return;
     const bx = (sx, sy, sz, x, y, z) => new THREE.BoxGeometry(sx, sy, sz).translate(x, y, z);

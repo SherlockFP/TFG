@@ -320,7 +320,7 @@ export const hostMethods = {
       run.weather = (MOONS[run.moon]?.company || MOONS[run.moon]?.home) ? 'clear' : (run.forecast?.[run.moon] || 'clear');
       run.time = 480;
       run.powerOn = true;
-      { const ev = (MOONS[run.moon]?.company || MOONS[run.moon]?.home) ? null : dailyEventFor(run.seed, run.day, run.moon); run.dailyEvent = ev ? { ...ev } : null; }   // copy: never mutate the event table
+      { const ev = (MOONS[run.moon]?.company || MOONS[run.moon]?.home || this.onboard?.fr?.calm?.('dailyEvent')) ? null : dailyEventFor(run.seed, run.day, run.moon); run.dailyEvent = ev ? { ...ev } : null; }   // copy: never mutate the event table
       this.meta?.weekly?.hostOnLever(run);   // weekly challenge: fixed seed per (week, day, moon) + weekly mutators merged into run.dailyEvent
       this.hostData.dayStats = this.freshDayStats();
       this.hostData.collected = new Set();

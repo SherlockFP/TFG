@@ -818,6 +818,7 @@ export class Game extends Emitter {
     const t = (this.profile.tutorial = this.profile.tutorial || {});
     const show = (key, lines, delay = 1500) => {
       if (t[key]) return;
+      if (this.onboard?.fr?.active?.()) { t[key] = true; return; }   // [firstrun] a budgeted new player gets ONE teacher (Hiring Day / objectives), not three toast stacks
       t[key] = true;
       this.progress.save();
       lines.forEach((l, i) => setTimeout(() => this.ui.toast('💡 ' + l, 'info'), delay + i * 3800));

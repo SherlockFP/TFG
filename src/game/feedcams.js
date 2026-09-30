@@ -26,7 +26,7 @@ const TIPS = [
   'That red light is a camera. The cone on the floor is what it sees. Stay out of it, or you go live.',
   'Camera lock. You have three seconds before the stream goes live. Break line of sight.',
   'You are ON AIR. Scrap you carry to the ship now pays a viewer tax. Cut the feed, smash a lens or spray it.',
-  'Blind spot: right under a camera, behind walls, doors and crates. Hug the wall and slip past.',
+  'Blind spot: the green ring right under a camera, and behind walls, doors and crates. Hug the wall and slip past.',
   'That grey box on the wall feeds a camera. Cut its cable and the camera dies quietly.',
 ];
 const CSS = `#fc-vig{position:fixed;inset:0;pointer-events:none;z-index:3;opacity:0;transition:opacity .18s;box-shadow:inset 0 0 120px 30px rgba(255,20,20,.75)}
@@ -51,7 +51,7 @@ export function installFeedcams(game) {
   // ------------------------------------------------------------------ build (every peer): plan + instanced meshes + floor cones
   function clearVis() {
     const v = S.vis; if (!v) return;
-    for (const m of [v.body, v.lamp, v.env, v.cone, v.jb]) { if (!m) continue; m.removeFromParent(); m.geometry.dispose(); m.material.dispose(); }
+    for (const m of [v.body, v.lamp, v.env, v.cone, v.jb, v.ring]) { if (!m) continue; m.removeFromParent(); m.geometry.dispose(); m.material.dispose(); }
     S.vis = null;
   }
   function build(F) {
@@ -59,7 +59,7 @@ export function installFeedcams(game) {
     const r = run(), L = F?.layout;
     if (!L || !r) return;
     const watched = (r.dailyEvent?.mm || []).includes('watched');   // mapmods 'Watched' affix: the Algorithm streams this floor (+2 cameras)
-    S.plan = K.planCams(L, { seed: r.seed, day: r.day, quotaIndex: r.quotaIndex, size: L.size, extra: watched ? 2 : 0 });
+    S.plan = K.planCams(L, { seed: r.seed, day: r.day, quotaIndex: r.quotaIndex, size: L.size, extra: watched ? 2 : 0, spots: F.scrapSpots });   // spots: the tutorial camera sits between the entrance and the first loot room
     const n = S.plan.length; if (!n) return;
     const box = (sx, sy, sz, x, y, z, col) => {
       const g = new THREE.BoxGeometry(sx, sy, sz); g.translate(x, y, z);
@@ -115,8 +115,15 @@ export function installFeedcams(game) {
     }
     const jb = new THREE.Mesh(mergeGeometries(jbg), new THREE.MeshLambertMaterial({ vertexColors: true }));
     for (const g of jbg) g.dispose();
+    // [firstrun] the blind spot of the tutorial camera is drawn on the floor: a thin green ring under it (the cone has a hole there, r0)
+    let ring = null;
+    const tc = S.plan.find((c) => c.tut);
+    if (tc) {
+      ring = new THREE.Mesh(new THREE.RingGeometry(Math.max(0.3, tc.r0 - 0.14), tc.r0, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0x50ff9a, transparent: true, opacity: 0.5, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
+      ring.position.set(tc.x, floorY + 0.02, tc.z); ring.frustumCulled = false; ring.renderOrder = 4; F.group.add(ring);
+    }
     F.group.add(body, lamp, env, cone, jb);
-    S.vis = { jb, body, lamp, env, cone, tabs, M, lampKey: new Array(n).fill(''), coneOn: new Array(n).fill(true), floorY, dummy: new THREE.Object3D(), col: new THREE.Color() };
+    S.vis = { ring, jb, body, lamp, env, cone, tabs, M, lampKey: new Array(n).fill(''), coneOn: new Array(n).fill(true), floorY, dummy: new THREE.Object3D(), col: new THREE.Color() };
   }
   function ensure() {
     const F = game.world?.facility, r = run();
@@ -145,6 +152,7 @@ export function installFeedcams(game) {
       const e = F?.c?.[c.i] || [0, 0, 0, 0, 0, 0], st = e[0] === ST.BLIND && game.time + S.off >= e[1] ? 0 : e[0];
       const near = !pp || Math.hypot(pp.x - c.x, pp.z - c.z) < 60;
       const active = st === ST.OK && !off;
+      if (c.tut && v.ring) v.ring.visible = active;
       const bait = e[4] > 0 && tH <= e[4] + 0.7 ? { h: e[2], t0: e[3], t1: e[4] } : null;
       const yaw = K.camYaw(c, tH, bait);
       // body
@@ -184,7 +192,7 @@ export function installFeedcams(game) {
   function initFc() {
     const r = run(); if (!r) return;
     r.fc = { ck: game.time, c: S.plan.map(() => [0, 0, 0, 0, 0, 0]), p: {}, h: 0, tx: 0, tn: 0, lv: 0, as: 0, off: 0 };
-    S.mt.clear(); S.mark.clear(); S.ext.clear(); S.hp = S.plan.map(() => FC.hp); S.pingAt = S.waveAt = S.fjBait = 0; S.said = 0; S.feedDone = false; lastFp = '';
+    S.tutNear = null; S.mt.clear(); S.mark.clear(); S.ext.clear(); S.hp = S.plan.map(() => FC.hp); S.pingAt = S.waveAt = S.fjBait = 0; S.said = 0; S.feedDone = false; lastFp = '';
     game.broadcastRun?.(['fc']);
   }
   function setState(i, st, until = 0) {
@@ -243,6 +251,18 @@ export function installFeedcams(game) {
         if (!(S.said & 1)) { S.said |= 1; feedLine("You're live. Chat is loving it. Try not to die on camera."); }
       } else if (mt.m >= 1) mt.air = now + FC.hold;
       if (mt.air && now >= mt.air) { mt.air = 0; mt.m = Math.min(mt.m, 0.5); }
+      if (!r.fcTut && !off) {   // [firstrun] the tutorial camera pays ONCE per run for slipping through its blind ring (or a near miss) without going live
+        const tc = S.plan.find((c) => c.tut);
+        if (tc && stOf(tc.i) === ST.OK) {
+          const dd = Math.hypot(p.pos.x - tc.x, p.pos.z - tc.z);
+          if (dd < tc.R) (S.tutNear ||= new Set()).add(p.id);
+          if (S.tutNear?.has(p.id) && mt.m < 0.9 && Math.abs(p.pos.y - (tc.y - 2)) < 4 && ((dd < tc.r0 + 0.35) || (res.juke && dd < tc.R + 2))) {
+            r.fcTut = 1; r.credits = Math.max(0, (r.credits | 0) + K.TUT_PAY);
+            try { game.broadcastRun?.(['credits', 'fcTut']); } catch { /* net closing */ }
+            fx({ k: 'tut', n: K.TUT_PAY });
+          }
+        }
+      }
       if (res.juke) emit({ k: 'juke', id: p.id, pk: pk0 });
       if (res.juke && now - S.jukeAt > 45) { S.jukeAt = now; fx({ k: 'juke', to: p.id }); try { game.algo1?.bump?.('escape', 'escape'); } catch { /* optional */ } }
       if (mt.air > now) nAir++;
@@ -377,7 +397,8 @@ export function installFeedcams(game) {
   function onFxMsg(d) {
     if (disposed || !d) return;
     const c = S.plan[d.i | 0], me = game.selfId;
-    if (d.k === 'live') { if (d.id === me) { snd('ui_error', null, 0.5); toast(t(d.tag ? 'ON AIR - you are TAGGED until you reach the ship. Kill that camera to clear it.' : 'ON AIR - you are live'), 'bad'); } else toast(tf('{name} went live', { name: game.playerName?.(d.id) || '?' }), 'warn'); }
+    if (d.k === 'live') { if (d.id === me) { try { game.onboard?.fr?.camDone?.(); } catch { /* onboard optional */ } snd('ui_error', null, 0.5); toast(t(d.tag ? 'ON AIR - you are TAGGED until you reach the ship. Kill that camera to clear it.' : 'ON AIR - you are live'), 'bad'); } else toast(tf('{name} went live', { name: game.playerName?.(d.id) || '?' }), 'warn'); }
+    else if (d.k === 'tut') { toast(tf('Clean pass. The Algorithm saw nothing: +▮{n}', { n: d.n }), 'good'); snd('ui_confirm', null, 0.5); try { game.onboard?.fr?.camDone?.(); } catch { /* onboard optional */ } }
     else if (d.k === 'untag') { if (d.to === me) toast(t('Tag cleared. The recording is gone.'), 'good'); }
     else if (d.k === 'juke') { if (d.to === me) toast(t('Clean dodge. The stream lagged behind you.'), 'good'); }
     else if (d.k === 'tax') { S.taxSum = d.cut; toast(tf('The Algorithm took its cut: -▮{n} viewer tax', { n: d.cut }), 'bad'); }
@@ -413,7 +434,7 @@ export function installFeedcams(game) {
     let got = 0; try { got = +localStorage.getItem('tfg.fc.tips') || 0; } catch { /* storage optional */ }
     if ((got & bit) || (S.tipNow & bit)) return; S.tipNow = (S.tipNow || 0) | bit;
     try { localStorage.setItem('tfg.fc.tips', String(got | bit)); } catch { /* storage optional */ }
-    try { game.lore?.say?.(t(TIPS[Math.log2(bit)]), { mood: 'curious' }); } catch { /* lore optional */ }
+    try { game.lore?.say?.(t(TIPS[Math.log2(bit)]), { mood: 'curious', pri: true }); } catch { /* lore optional */ }
   }
   function clientTick(dt) {
     ensureUi();

@@ -213,6 +213,8 @@ export function installAlgorithm(core) {
   function show(d) {
     const text = textOf(d);
     if (!text) return;
+    // [firstrun] a brand-new player hears at most one Algorithm line per 45 s; teaching lines (d.pri) and deaths always pass
+    if (d.key !== 'death' && game.onboard?.fr?.algoOk?.(!!d.pri) === false) return;
     if (st.q.length >= 3) st.q.shift();
     st.q.push({ text, voice: d.voice || null, mood: d.mood || game.run?.algo?.mood });
   }

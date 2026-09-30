@@ -29,6 +29,7 @@ export class Objectives {
     switch (run.phase) {
       case 'orbit': {
         if (run.daysLeft <= 0 && !moon?.company) add(t('DEADLINE! Route to 0-Algorithm HQ: terminal → ROUTE HQ'), 'warn');
+        else if (shipValue > 0 && !moon?.company && g.onboard?.fr?.wantSell?.(shipValue)) add(tf('Sell your ▮{v} of scrap at the HQ', { v: shipValue }), 'main');   // [firstrun] the first sale beat: sell before landing again
         else if (!moon?.company) add(tf('Land on {moon}: pull the LEVER', { moon: moon?.name || t('a moon') }), 'main');
         else add(t('Pull the LEVER to land at the HQ and sell'), 'main');
         add(t('Terminal: MOONS / ROUTE / STORE / BUY'), 'hint');
@@ -57,7 +58,7 @@ export class Objectives {
         if (!p.indoor && g.world.outdoor) {
           const e = g.world.outdoor.mainExit.pos;
           const d = Math.round(Math.hypot(e.x - p.pos.x, e.z - p.pos.z));
-          if (!this.enteredToday) add(tf('Find the facility entrance ({d} m)', { d }), 'sub');
+          if (!this.enteredToday) { const ent = add(tf('Find the facility entrance ({d} m)', { d }), 'sub'); if (ent && typeof ent === 'object') ent.first = true; }   // [firstrun] 'first' = the one goal shown while budgeted
           else if (!p.inShip) add(tf('Ship: {d} m', { d: Math.round(Math.hypot(p.pos.x, p.pos.z)) }), 'sub');
         }
         if (p.indoor) {
@@ -102,6 +103,8 @@ export class Objectives {
     for (const b of (g.profile.bounties || []).slice(0, out.length >= 6 ? 0 : 2)) add(`${b.done ? '✔ ' : ''}${bountyText(b)} ${b.done ? t('(claim at HQ)') : `${Math.min(b.progress, b.n)}/${b.n}`}`, 'bounty', b.done, b.n ? Math.min(1, b.progress / b.n) : 0);
     // keep the tracker readable: warnings and main goals first, at most 7 lines
     const rank = (o) => (o.pin ? -1 : o.kind === 'warn' ? 0 : o.kind === 'main' ? 1 : o.kind === 'bounty' ? 3 : 2);   // pin: the tutorial step always makes the calm 2-line cut
+    const one = g.onboard?.fr?.only;   // [firstrun] a budgeted new player sees ONE goal (+ a warning), never the whole tracker
+    if (one) { const kept = one(out); if (kept !== out) return kept; }
     return out.map((o, i) => [o, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).slice(0, 7).map((x) => x[0]);
   }
 
