@@ -57,6 +57,7 @@ export function layoutDocks(docks) {
   const topEls = TOP_BANNERS.map(([sel, mid]) => { const e = document.querySelector(sel); return e ? [sel, mid, e, shown(e)] : null; });
   const botEls = BOTTOM_BANNERS.map((sel) => { const e = document.querySelector(sel); return e ? [e, shown(e)] : null; });
   const R = docks.right, L = docks.left, B = docks.bottom;
+  const asgB = Math.max(0, ...[...document.querySelectorAll('.tfg-asg, [data-hud-right]')].map((e) => shown(e)?.bottom + 8 || 0));   // [qa1] mod widgets (assignment card) sit at the top right: the right dock started under them
   const chatEl = document.querySelector('.chat');
   let chatTop = null;
   if (chatEl) {
@@ -81,7 +82,7 @@ export function layoutDocks(docks) {
     topPins.push([e, y + r.height * mid]);
     y += r.height + 8;
   }
-  const rTop = R ? Math.min(Math.max(tr ? tr.bottom + 10 : 96, xpf ? xpf.bottom + 6 : 0, toasts ? toasts.bottom + 8 : 0), H * 0.5) : 0;
+  const rTop = R ? Math.min(Math.max(tr ? tr.bottom + 10 : 96, xpf ? xpf.bottom + 6 : 0, toasts ? toasts.bottom + 8 : 0, asgB), H * 0.5) : 0;
   const rAvail = Math.max(0, invTop - 12 - rTop);
   let lBottom = 100;
   if (chatTop) lBottom = Math.max(lBottom, H - chatTop.top + 10);

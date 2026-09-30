@@ -16,9 +16,11 @@ const b = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftsha
 const p = await b.newPage({ viewport: { width: 1280, height: 720 } });
 const logs = new Map();
 const add = (s) => logs.set(s, (logs.get(s) || 0) + 1);
-p.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') add(m.type() + ': ' + m.text().slice(0, 400)); });
+p.on('console', (m) => { if (m.text().startsWith('QA:')) { console.log(m.text()); return; }   // console.log('QA: ...') in a script = live progress line
+  if (m.type() === 'error' || m.type() === 'warning') add(m.type() + ': ' + m.text().slice(0, 400)); });
 p.on('pageerror', (e) => add('pageerror: ' + String(e.stack || e.message).slice(0, 800)));
-await p.exposeFunction('__shot', async (name) => { await p.screenshot({ path: `${shotDir}/${name}.png` }); return true; });
+// name ending in .jpg -> JPEG (quality --q, default 55), else PNG
+await p.exposeFunction('__shot', async (name) => { await p.screenshot(/\.jpe?g$/.test(name) ? { path: `${shotDir}/${name}`, type: 'jpeg', quality: Number(arg('q', '55')), timeout: 150000 } : { path: `${shotDir}/${name}.png` }); return true; });
 await p.exposeFunction('__view', async (w, h) => { await p.setViewportSize({ width: w, height: h }); return true; });
 await p.goto(`http://127.0.0.1:${port}${url}`);
 await p.waitForFunction(() => window.kefal?.game, null, { timeout: 120000 }).catch(() => add('TIMEOUT: kefal.game never appeared'));
