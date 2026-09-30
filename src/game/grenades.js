@@ -33,6 +33,7 @@ const BLURB = {
   flash: 'Blinds and stuns creatures in sight for 3-4 s and makes them lose track of you. Look away, or it whites you out too.',
   smoke: 'A thick cloud for 20 s. Creatures cannot see through it and lose sight-based aggro.',
   decoy: 'Plays fake footsteps and voices for 10 s. Pulls sound-hunting creatures to it.',
+  speaker: 'Plays your last recorded voice clip (or a fake "Hey, over here!") every 2.4 s for 12 s. Sound-hunting creatures rush to it.',
   noisemaker: 'Throw it far away: it clatters and rings for 9 s. Sound-hunting creatures rush to the noise, so you can slip past.',
   sticky: 'Sticks to walls and creatures. 2.5 s fuse, huge damage. Do not stand close.',
   gravity: 'Pulls creatures and loose items into a point for 4 s. Throw it at your feet to reel loot in.',
@@ -490,7 +491,7 @@ export function installGrenades(game) {
         noise(at, def.noise);
         break;
       }
-      case 'decoy': case 'noisemaker': zones.push({ kind: 'decoy', x: at.x, y: at.y + 0.2, z: at.z, t: 0, life: def.dur, acc: 0, n: 0, def: kind === 'noisemaker' ? def : null }); break;   // [stealth] noisemaker = louder, dumber decoy
+      case 'decoy': case 'noisemaker': case 'speaker': zones.push({ kind: 'decoy', x: at.x, y: at.y + 0.2, z: at.z, t: 0, life: def.dur, acc: 0, n: 0, def: kind === 'decoy' ? null : def, spk: kind === 'speaker' ? (by ?? '') : null }); break;   // [gear11] speaker = the thrower's voice   // [stealth] noisemaker = louder, dumber decoy
       case 'sticky': case 'mini': {
         if (kind === 'sticky') g.net.broadcast('fx', { k: 'explode', p: P3(at) });
         noise(at, def.noise);
@@ -579,7 +580,7 @@ export function installGrenades(game) {
           z.acc = dd.pulse;
           const pos = tmpA.set(z.x, z.y, z.z);
           noise(pos, dd.noise);
-          bcast({ k: 'dz', p: P3(pos), s: z.def ? 3 : z.n++ % 3, r: Math.random() });
+          bcast({ k: 'dz', p: P3(pos), s: z.spk != null ? 4 : z.def ? 3 : z.n++ % 3, r: Math.random(), o: z.spk ?? undefined });
         }
       } else if (z.kind === 'fire') {
         z.acc -= dt;
@@ -840,6 +841,7 @@ export function installGrenades(game) {
     ringFx(pos.clone().setY(pos.y - 0.1), d.s === 3 ? 0xffb020 : 0x40ffe0, 0.3, d.s === 3 ? 3.4 : 2.4, 0.9);
     if (d.s === 3) for (let i = 0; i < 4; i++) setTimeout(() => { if (!disposed) snd(i % 2 ? 'gr_thud' : 'gr_tink', pos, 0.95, 0.8 + Math.random() * 0.5, { ref: 6, max: 60 }); }, i * 110);
     else if (d.s === 0) for (let i = 0; i < 4; i++) setTimeout(() => { if (!disposed) snd(`step_concrete_${1 + ((i + (d.r * 3 | 0)) % 3)}`, pos, 0.7, 0.9 + Math.random() * 0.25, { ref: 5, max: 45 }); }, i * 260);
+    else if (d.s === 4) { if (g.gear11?.speakerPulse) g.gear11.speakerPulse(pos, d.o); else snd('mimic_voice_1', pos, 0.8, 1, { ref: 6, max: 50 }); }   // [gear11]
     else if (d.s === 1) snd(d.r > 0.5 ? 'mimic_voice_1' : 'mimic_voice_2', pos, 0.8, 0.95 + d.r * 0.2, { ref: 6, max: 50 });
     else snd(`whisper_${1 + ((d.r * 3) | 0)}`, pos, 0.8, 1, { ref: 6, max: 50 });
   }
@@ -949,6 +951,7 @@ export function installGrenades(game) {
       case 'smoke':
         spawnCloud(pos, def.R, def.dur); snd('gr_hiss', pos, 0.9, 1, { ref: 6, max: 50 }); burst(pos, 'dust', 1.2);
         break;
+      case 'speaker': if (g.gear11?.speakerDeploy) g.gear11.speakerDeploy(pos.clone(), def.dur); else spawnDecoy(pos.clone(), def.dur); snd('gr_pin', pos, 0.7, 0.8, { ref: 4 }); ringFx(pos, 0xffd23f, 0.3, 1.8, 0.6); break;   // [gear11]
       case 'decoy': case 'noisemaker': spawnDecoy(pos.clone(), def.dur); snd('gr_pin', pos, 0.7, 0.8, { ref: 4 }); ringFx(pos, d.ty === 'noisemaker' ? 0xffb020 : 0x40ffe0, 0.3, 1.8, 0.6); break;
       case 'sticky': break;                                              // 'explode' fx from the host
       case 'mini':

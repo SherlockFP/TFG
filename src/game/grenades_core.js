@@ -40,6 +40,7 @@ export const KINDS = {
   smoke:    { item: 'smokegrenade', name: 'Smoke Grenade', fuse: 1.2, R: 5.5, dur: 20, noise: 0.8, stack: 2, price: 55, tier: 'common', color: 0x8a949a },
   decoy:    { item: 'decoybeacon', name: 'Decoy Beacon', fuse: 1.0, dur: 10, pulse: 1.2, noise: 2.6, stack: 2, price: 45, tier: 'common', color: 0x2fc4b0 },
   noisemaker: { item: 'noisemaker', name: 'Noisemaker', fuse: 0.9, dur: 9, pulse: 1.25, noise: 2.4, stack: 3, price: 22, tier: 'common', color: 0xe0a020 },   // [stealth] cheap lure: clatters for 9 s, sound-hunting creatures come to it
+  speaker:  { item: 'decoyspeaker', name: 'Decoy Speaker', fuse: 0.8, dur: 12, pulse: 2.4, noise: 3.2, stack: 2, price: 65, tier: 'uncommon', color: 0xd9482f },   // [gear11] plays the thrower's last recorded voice clip (game.gear11.speakerPulse)
   sticky:   { item: 'stickycharge', name: 'Sticky Charge', fuse: 2.5, R: 4.2, dmg: 100, stun: 1.2, noise: 4, stack: 2, price: 110, tier: 'uncommon', sticky: true, color: 0xe8701c, crew: 0.32 },
   cryo:     { item: 'craft_cryo', name: 'Cryo Grenade', legacy: true, fuse: 1.5, R: 5, stun: 5, noise: 0, color: 0x80e0ff, tier: 'common' },
   molotov:  { item: 'craft_molotov', name: 'Molotov', legacy: true, fuse: 1.4, R: 3.2, dur: 6, tick: 9, noise: 2, color: 0xff7a1a, tier: 'common' },

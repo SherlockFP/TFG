@@ -237,7 +237,8 @@ import { installShift11 } from './shift11.js';
 // [import:loop11]
 import { installEvents11 } from './events11.js';
 // [import:shift11]
-// [import:gear11]
+import { installGear11 } from './gear11.js';
+// [import:events11]
 import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
 
 
@@ -636,7 +637,8 @@ export class Game extends Emitter {
     // [slot:loop11]
     this.useModule('events11', installEvents11);
     // [slot:shift11]
-    // [slot:gear11]
+    this.useModule('gear11', installGear11);
+    // [slot:events11]
 
     this.useModule('onboard', installOnboard);   // [slot:onboard] wave 5: Hiring Day + staged unlocks (installed last: wraps hostLever / terminalCommand / objectives.compute)
     this.useModule('score', installScore);   // wave 7: adaptive procedural music + the Algorithm's jingle (docs/wave7/score.md)
