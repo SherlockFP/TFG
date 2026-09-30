@@ -237,7 +237,7 @@ import { installGear11 } from './gear11.js';
 // wave 12 placeholders
 import { installCreatures12 } from './creatures12.js';
 // [import:labyr12]
-// [import:moons12]
+import { installMoons12 } from './moons12.js';
 // [import:atmos12]
 // [import:coop12]
 // [import:balance12]
@@ -638,7 +638,7 @@ export class Game extends Emitter {
     this.useModule('gear11', installGear11);
     this.useModule('creatures12', installCreatures12);
     // [slot:labyr12]
-    // [slot:moons12]
+    this.useModule('moons12', installMoons12);
     // [slot:atmos12]
     // [slot:coop12]
     // [slot:balance12]

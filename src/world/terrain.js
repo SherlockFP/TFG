@@ -110,6 +110,7 @@ export class Terrain {
       this.noiseL = new Noise2D(seed ^ 0x51a4a); this.noiseG = new Noise2D(seed ^ 0x6a7e1);
       this.lines = [plan.entrance, ...plan.fires].map((q) => ({ x: q.x, z: q.z }));
     }
+    this.hook = this.biome.terrainHook ? this.biome.terrainHook({ seed, plan, half: this.half, scale: this.scale, moon }) : null;   // [moons12] biome shape hook: islands over a void / flattened corridors
     this.heights = new Float32Array((RES_ + 1) * (RES_ + 1));
     this.pathPts = this.makePath();
     for (let j = 0; j <= RES_; j++) for (let i = 0; i <= RES_; i++) {
@@ -162,6 +163,7 @@ export class Terrain {
   }
   /** placement test used by avoid(): true on lava, next to lava, or on land the ship cannot reach (lava biome only) */
   blocked(x, z, m = 0) {
+    if (this.hook?.off?.(x, z, m)) return true;   // [moons12] off the islands
     if (!this.lava) return false;
     const W = this.res + 1;
     const cell = (px, pz) => {
@@ -261,6 +263,7 @@ export class Terrain {
       flat(l.x, l.z, l.r * 0.85, l.r * 0.55, l.y);
     }
     flat(0, 0, 13, 16, SHIP_FLAT_Y);
+    if (this.hook) h = this.hook.shape(x, z, h);   // [moons12]
     return h;
   }
 
