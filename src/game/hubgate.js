@@ -36,7 +36,7 @@ const TEXT = {
   'hg.go': ['Open', 'Aç', 'Открыть'],
   'hg.close': ['Close', 'Kapat', 'Закрыть'],
   'hg.qs': ['QUICK SHIFT', 'HIZLI VARDİYA', 'БЫСТРАЯ СМЕНА'],
-  'hg.qs_start': ['QUICK SHIFT: one day, one moon. Bring ▮{q} of scrap aboard before midnight. Nothing here is saved.', 'HIZLI VARDİYA: bir gün, bir ay. Gece yarısından önce gemiye ▮{q} hurda getir. Burada hiçbir şey kaydedilmez.', 'БЫСТРАЯ СМЕНА: один день, одна луна. Принесите на борт хлама на ▮{q} до полуночи. Здесь ничего не сохраняется.'],
+  'hg.qs_start': ['QUICK SHIFT: one day, one moon. Bring ▮{q} of scrap aboard before midnight. Nothing here is saved. Invite: ESC > Copy join link.', 'HIZLI VARDİYA: bir gün, bir ay. Gece yarısından önce gemiye ▮{q} hurda getir. Burada hiçbir şey kaydedilmez. Davet: ESC > Katılma bağlantısını kopyala.', 'БЫСТРАЯ СМЕНА: один день, одна луна. Принесите на борт хлама на ▮{q} до полуночи. Здесь ничего не сохраняется. Приглашение: ESC > Скопировать ссылку.'],
   'hg.qs_met': ['SHIFT COMPLETE', 'VARDİYA TAMAM', 'СМЕНА ВЫПОЛНЕНА'],
   'hg.qs_short': ['SHIFT SHORT OF QUOTA', 'VARDİYA KOTANIN ALTINDA', 'СМЕНА НЕ ДОТЯНУЛА ДО КВОТЫ'],
   'hg.qs_dead': ['THE CREW DID NOT COME BACK', 'EKİP GERİ DÖNMEDİ', 'ЭКИПАЖ НЕ ВЕРНУЛСЯ'],
@@ -92,7 +92,7 @@ export function installHubgate(game) {
   let disposed = false, time = 0, tickT = 0, style = null, docksStyle = null, docksKey = '', endEl = null, door = null, panelEl = null, doorOpenK = 0;
   const S = { hub: null, told: false };
   const warn = (tag, e) => { try { console.warn('[hubgate] ' + tag, e); } catch { /* ignore */ } };
-  const toast = (s, kind = 'info') => { try { game.ui?.toast?.(s, kind); } catch { /* optional */ } };
+  const toast = (s, kind = 'info', ms) => { try { game.ui?.toast?.(s, kind, ms); } catch { /* optional */ } };
   const sfx = (n, v = 0.6) => { try { game.sfx?.(n, v); } catch { /* unknown sound */ } };
   const unlockAll = () => !!game.settings?.unlockAll;
   const ob = () => game.onboard;
@@ -327,7 +327,7 @@ export function installHubgate(game) {
     time += dt; tickT -= dt;
     try { doorTick(dt); } catch (e) { warn('door', e); }
     if (tickT <= 0) { try { coverTick(); } catch (e) { warn('cover', e); } }
-    if (!S.told && quickOn() && time > 3) { S.told = true; toast(tx('hg.qs_start', { q: game.run.quota }), 'info'); }   // host and joiner alike (run.quick came with the run state)
+    if (!S.told && quickOn() && time > 3) { S.told = true; toast(tx('hg.qs_start', { q: game.run.quota }), 'info', 9000); }   // host and joiner alike (run.quick came with the run state)
     if (tickT > 0) return;
     tickT = 0.5;
     try { publishHub(); docksTick(); } catch (e) { warn('tick', e); }

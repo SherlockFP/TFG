@@ -31,6 +31,7 @@ import { createShopPanel } from './panels/shop.js';
 import { getCharPreview, peekCharPreview, CharPreview } from './charpreview.js';
 import { profilePanel, applyProfileName } from './panels/profile.js';   // [profile]
 import { hubPanel } from './panels/hub.js';   // [social]
+import { copyJoinLink } from '../net/joinlink.js';   // [joinplay]
 import { NAME_REASONS, NAME_MAX } from '../core/profilename.js';   // [profile]
 import { avatarCanvas, avatarDataUrl, fromWire, defaultAvatar } from './avatarpic.js';   // [profile]
 import { avatarOfPeer } from '../game/profilesync.js';   // [profile]
@@ -140,7 +141,7 @@ export class UI {
     b.dataset.back = '1';
     return b;
   }
-  toast(text, kind) { this.hud.toast(tNum(text), kind); }   // t(): safety net for static strings that were not wrapped at the call site
+  toast(text, kind, ms) { this.hud.toast(tNum(text), kind, ms); }   // t(): safety net for static strings that were not wrapped at the call site
   systemMessage(text, kind = 'info') { text = tNum(text); this.chatMessage(null, text, false, kind); this.hud.toast(text, kind === 'signal' ? 'info' : kind); }
   chatMessage(name, text, self, kind, avatar) {
     this.chatEl.classList.remove('hidden');
@@ -472,21 +473,21 @@ export class UI {
     const maxAllowed = this.app.mods?.maxPlayersAllowed?.() || 4;
     const form = el('div', { class: 'form' });
     const name = el('input', { value: `${p.name}'s crew`, maxlength: 32 });
-    const pub = el('input', { type: 'checkbox', checked: true });
+    const pub = el('input', { type: 'checkbox', checked: false });   // [joinplay] private by default (PLAY and QUICK SHIFT are private too)
     const pw = el('input', { type: 'text', maxlength: 24, placeholder: '—' });
     const max = el('select', {}, ...Array.from({ length: maxAllowed - 1 }, (_, i) => el('option', { value: i + 2, selected: i + 2 === Math.min(4, maxAllowed) }, String(i + 2))));
     const net = this.netSelect();
     const diff = el('select', {}, ...DIFF_MODES.map((m) => el('option', { value: m, selected: m === (s.difficulty || DIFF_DEFAULT) }, t(DIFF_LABEL[m]))));   // [hardmode] lobby difficulty (difficulty.js)
     const diffNote = el('div', { class: 'cp-note', style: 'opacity:.7;font-size:12px;margin:-2px 0 6px' }, t(DIFF_SUMMARY[diff.value]));
     diff.addEventListener('change', () => { diffNote.textContent = t(DIFF_SUMMARY[diff.value]); });
-    form.append(
-      el('div', { class: 'cp-sec' }, t('Crew settings')),
+    const adv = el('details', { class: 'host-adv' }, el('summary', { class: 'cp-sec' }, t('ADVANCED')),   // [joinplay] the crew fields fold away; PLAY / START use saved settings
       row(t('Lobby name'), name), row(t('Public (listed in lobby browser)'), pub), row(t('Password (optional)'), pw),
       row(t('Max players'), max), row(t('Network'), net),
       row(t('Difficulty'), diff), diffNote,   // [hardmode]
     );
+    form.append(adv);
     const slots = el('div', { class: 'slots' });
-    let chosen = { slot: this.menuOpts?.slot || 1, data: null };
+    let chosen = { slot: this.menuOpts?.slot || listRuns().filter((r) => r.data).sort((a, b) => (b.data.savedAt || 0) - (a.data.savedAt || 0))[0]?.slot || 1, data: null };
     const start = () => {
       s.netStrategy = net.value; s.difficulty = diff.value; saveSettings(s);
       this.app.hostGame({ lobbyName: name.value.trim() || 'Crew', isPublic: pub.checked, password: pw.value.trim(), maxPlayers: +max.value, difficulty: diff.value, strategy: net.value, slot: chosen.slot, runData: loadRun(chosen.slot) });
@@ -1080,6 +1081,7 @@ export class UI {
         el('span', { class: 'dim' }, `${g?.isHost ? t('You are the host') : t('Connected')} · ${t('Players')} ${1 + (g?.remotes.size || 0)}`)),
       el('div', { class: 'menu-list' },
         this.button(t('Resume'), () => this.closePanel(), 'big'),
+        this.button(t('Copy join link'), () => { copyJoinLink(this, g); }, 'primary'),   // [joinplay] ?join=CODE&net=X
         this.button(t('Copy invite code'), () => { navigator.clipboard?.writeText(code); this.toast(`${t('Copied')}: ${code}`); }),
         this.button(t('CHARACTER'), () => this.openPanel(this.characterPanel(true))),
         this.button(t('SETTINGS'), () => this.openPanel(this.settingsPanel(true))),

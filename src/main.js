@@ -30,6 +30,7 @@ import { CRTMenu } from './ui/crtmenu.js';
 import { loadExtManifest, registerExtSounds } from './audio/extassets.js';
 import { preloadExtModels, EXT_PRELOAD } from './world/extmodels.js';
 import { registerExtContent } from './game/extcontent.js';
+import { parseJoin } from './net/joinlink.js';   // [joinplay]
 import './i18n/display.js';   // display-name path: item / creature / moon names go through t()
 
 const DEV_NAME_ALIAS = { Host: 'Janitor101', Client: 'Intern202', Tester: 'Temp303' };   // [algoctx] dev-URL names -> crew-style handles (save.js defaultHandle)
@@ -153,6 +154,7 @@ class App {
     const qs = new URLSearchParams(location.search);
     if (qs.has('autohost')) this.hostGame({ strategy: qs.get('autohost') || 'local', isPublic: qs.get('autohost') !== 'local', slot: 3, lobbyName: 'Test crew', maxPlayers: 4, code: qs.get('code') || undefined });
     else if (qs.has('autojoin')) this.joinGame({ code: qs.get('autojoin').toUpperCase(), strategy: qs.get('net') || 'local' });
+    else { const j = parseJoin(location.search, this.settings.netStrategy); if (j) this.joinGame(j); }   // [joinplay] ?join=CODE&net=X: the link carries the net mode
   }
 
   bindKeys() {
