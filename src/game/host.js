@@ -56,7 +56,7 @@ export const hostMethods = {
     this.registerHandlers();
     this.spawnInShip();
     this.updateAmbience();
-    this.ui.toast(tf('You are the host. Lobby code: {code}', { code: this.net.code }));
+    this.ui.toast(tf('You are the host. Lobby code: {code}. ESC > Copy join link', { code: this.net.code }), 'info', 9000);   // [joinplay] longer, queued behind the loading / stream overlay by the HUD gate
     this.hostAnnounce();
     this.tutorialHint('orbit');
     this.mods?.emit('hostStart', this);

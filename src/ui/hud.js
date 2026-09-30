@@ -283,20 +283,20 @@ export class HUD {
     this.$.lvl.parentElement.classList.remove('pulse'); void this.$.lvl.offsetWidth; this.$.lvl.parentElement.classList.add('pulse');
   }
 
-  toast(text, kind = 'info') {
+  toast(text, kind = 'info', ms) {
     if (this.gate?.()) {
       // queue (no duplicates, bounded) until the report / cinematic is gone
-      if (!this.pendingToasts.some((p) => p[0] === text)) this.pendingToasts.push([text, kind]);
+      if (!this.pendingToasts.some((p) => p[0] === text)) this.pendingToasts.push([text, kind, ms]);
       if (this.pendingToasts.length > 8) this.pendingToasts.shift();
       return;
     }
-    this.showToast(text, kind);
+    this.showToast(text, kind, ms);
   }
-  showToast(text, kind = 'info') {
+  showToast(text, kind = 'info', ms = 3800) {
     const e = el('div', { class: 'toast ' + kind }, typeof text === 'string' ? t(text) : text);   // t(): [i18n8] safety net (ui.toast already translates)
     this.$.toasts.appendChild(e);
-    setTimeout(() => e.classList.add('out'), 3800);
-    setTimeout(() => e.remove(), 4400);
+    setTimeout(() => e.classList.add('out'), ms);
+    setTimeout(() => e.remove(), ms + 600);
     while (this.$.toasts.children.length > 6) this.$.toasts.firstChild.remove();
   }
   flushPending() {
@@ -304,8 +304,8 @@ export class HUD {
     const now = performance.now();
     if (now < this.nextFlush) return;
     if (this.pendingBig) { const [m, s] = this.pendingBig; this.pendingBig = null; this.bigText(m, s); this.nextFlush = now + 700; return; }
-    const [text, kind] = this.pendingToasts.shift();
-    this.showToast(text, kind);
+    const [text, kind, ms] = this.pendingToasts.shift();
+    this.showToast(text, kind, ms);
     this.nextFlush = now + 420;
   }
 

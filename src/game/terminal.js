@@ -10,6 +10,7 @@ import { poolFor } from './threatpool.js';   // [threatmerge]
 import { buyRate } from './progression.js';
 import { insideShip } from '../world/ship.js';
 import { dropPoint } from '../world/shiplayout.js';
+import { copyJoinLink } from '../net/joinlink.js';   // [joinplay]
 import { escapeHtml } from '../core/util.js';
 const n0 = (v) => Math.round(v || 0).toLocaleString('en-US');   // credits are always shown with thousands separators (docs/wave8/studio_style.md)
 import { t, tf, tfIn, sysMsg } from '../core/i18n.js';
@@ -64,10 +65,19 @@ export class Terminal {
     if (this.el) return;
     const el = document.createElement('div');
     el.className = 'terminal hidden';
+<<<<<<< HEAD
     el.innerHTML = `<div class="term-screen"><div class="term-head"></div><div class="term-out"></div><div class="term-line"><span class="term-prompt">&gt;</span><input class="term-in" spellcheck="false" autocomplete="off" maxlength="80"/></div></div><div class="term-hint">${escapeHtml(t('[ESC] leave terminal · type HELP'))}</div>`;
     document.getElementById('ui').appendChild(el);
     this.el = el;
     this.out = el.querySelector('.term-out'); this.head = el.querySelector('.term-head');
+=======
+    el.innerHTML = `<div class="term-screen"><div class="term-code"></div><div class="term-out"></div><div class="term-line"><span class="term-prompt">&gt;</span><input class="term-in" spellcheck="false" autocomplete="off" maxlength="80"/></div></div><div class="term-hint">${escapeHtml(t('[ESC] leave terminal · type HELP'))}</div>`;
+    document.getElementById('ui').appendChild(el);
+    this.el = el;
+    this.out = el.querySelector('.term-out');
+    this.codeEl = el.querySelector('.term-code');   // [joinplay] lobby code stays visible while in a run; click copies the join link
+    this.codeEl.addEventListener('click', () => copyJoinLink(this.game.ui, this.game));
+>>>>>>> worktree-agent-a7d43c3b43b31f34d
     this.inp = el.querySelector('.term-in');
     this.inp.addEventListener('keydown', (e) => {
       e.stopPropagation();
@@ -87,6 +97,7 @@ export class Terminal {
     this.active = true;
     this.game.input.unlock();
     this.el.classList.remove('hidden');
+    if (this.codeEl && this.game.net?.code) this.codeEl.textContent = tf('LOBBY {code}', { code: this.game.net.code }) + '  [' + t('Copy join link') + ']';
     if (!this.lines.length) { this.print(BANNER.join('\n'), 'banner'); this.print(t('Company terminal online. Type HELP.')); }
     this.render();
     setTimeout(() => this.inp.focus(), 30);

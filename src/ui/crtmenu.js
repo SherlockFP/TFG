@@ -6,10 +6,11 @@ import { levelMaterial } from '../world/geobuilder.js';
 import { createAnyProp } from '../world/propfactory.js';
 import { t, tf } from '../core/i18n.js';
 import { rankOf, xpForLevel } from '../game/progression.js';
-import { listRuns, saveProfile } from '../core/save.js';
+import { listRuns, loadRun, saveProfile } from '../core/save.js';
 import { MenuRoom } from './menuroom.js';
 import { avatarOfProfile, drawAvatar } from './avatarpic.js';   // [profile]
 import { attention as dailyAttention } from '../game/daily_core.js';   // [daily] NEW! badge on the DAILY entry
+import { decideMode, isOpen } from '../game/onboard_core.js';   // [joinplay] DAILY / HUB stay hidden until the first quota is met
 import { isArtdir } from './artdir.js';   // [artdir]
 import { drawArtMenu, disposeArtMenu } from './artdir_menu.js';
 
@@ -83,6 +84,12 @@ export function makeCRT({ w = 0.8, h = 0.6, depth = 0.6, canvasW = 256, canvasH 
 
 const FONT = (px) => `${px}px "TFG Credit", VT323, "TFG Cyr VT", monospace`;   // "TFG Credit": narrow ▮ credit glyph (style.css)
 const MENU_FONT = (px) => `bold ${px}px "Arial Narrow", "Roboto Condensed", Impact, sans-serif`;
+
+/** slot of the most recently saved campaign run (0 = none) */
+export function latestSlot() {
+  const run = listRuns().filter((r) => r.data).sort((a, b) => (b.data.savedAt || 0) - (a.data.savedAt || 0))[0];
+  return run ? run.slot : 0;
+}
 
 export class CRTMenu {
   /** [ux] the first-person viewmodel / hands / fp-body are camera children of the last game: never show them in the menu room */
@@ -199,11 +206,13 @@ export class CRTMenu {
   }
 
   setItems() {
-    const runs = listRuns().filter((r) => r.data);
-    const items = [];
-    if (runs.length) items.push({ id: 'continue', label: t('CONTINUE') });
-    items.push({ id: 'host', label: t('HOST GAME') }, { id: 'quick', label: t('QUICK SHIFT') }, { id: 'browser', label: t('JOIN GAME') }, { id: 'daily', label: t('DAILY') }, { id: 'profile', label: t('PROFILE') }, { id: 'hub', label: t('HUB') }, { id: 'character', label: t('CHARACTER') },
-      { id: 'mods', label: t('MODS') }, { id: 'settings', label: t('SETTINGS') }, { id: 'howto', label: t('HOW TO PLAY') });
+    let open = true;   // [joinplay] veterans and anyone past quota 1 see everything; a fresh profile sees PLAY first and no DAILY / HUB
+    try { const p = this.app.profile; if (p) { decideMode(p); open = isOpen('shop', p.unlocks, null); } } catch { open = true; }
+    const items = [{ id: 'play', label: t('PLAY') }, { id: 'host', label: t('HOST GAME') }, { id: 'quick', label: t('QUICK SHIFT') }, { id: 'browser', label: t('JOIN GAME') }];
+    if (open) items.push({ id: 'daily', label: t('DAILY') });
+    items.push({ id: 'profile', label: t('PROFILE') });
+    if (open) items.push({ id: 'hub', label: t('HUB') });
+    items.push({ id: 'character', label: t('CHARACTER') }, { id: 'mods', label: t('MODS') }, { id: 'settings', label: t('SETTINGS') }, { id: 'howto', label: t('HOW TO PLAY') });
     this.items = items;
     this.sel = Math.min(this.sel, items.length - 1);
     this.refreshDailyBadge();
@@ -412,9 +421,10 @@ export class CRTMenu {
     const it = this.items[i];
     if (!it) return;
     this.app.audio?.ui('ui_confirm', 0.6);
-    if (it.id === 'continue') {
-      const run = listRuns().filter((r) => r.data).sort((a, b) => (b.data.savedAt || 0) - (a.data.savedAt || 0))[0];
-      this.app.ui.showMenu('host', { slot: run?.slot });
+    if (it.id === 'play') {   // [joinplay] PLAY: private lobby, saved settings, latest campaign slot (or a new run in slot 1) straight into the stream
+      const s = this.app.settings || {};
+      const slot = latestSlot() || 1;
+      this.app.hostGame({ lobbyName: `${this.app.profile?.name || 'Crew'}'s crew`, isPublic: false, password: '', maxPlayers: 4, difficulty: s.difficulty, strategy: s.netStrategy || 'nostr', slot, runData: loadRun(slot) });
       return;
     }
     if (it.id === 'quick') {   // [hubgate] one day, one moon, straight from the menu (no slot, no save); friends join by the code in the toast
