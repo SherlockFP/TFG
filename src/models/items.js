@@ -691,14 +691,15 @@ ITEMS.drop_giant = (k) => {
 };
 
 // ------------------------------------------------------------------------------------ tools
-ITEMS.flashlight = (k, root) => {
-  const body = L('metal_dark', 0x606468), rb = L('rubber');
-  k.add(body, cyl(0.02, 0.02, 0.16, 8), [0, 0, 0.02], [HP, 0, 0]);
-  k.add(body, cyl(0.022, 0.034, 0.06, 8, true), [0, 0, -0.09], [HP, 0, 0]);
-  k.add(rb, cyl(0.021, 0.021, 0.02, 8), [0, 0, 0.1], [HP, 0, 0]);
-  k.add(rb, box(0.012, 0.008, 0.02), [0, 0.022, -0.02]);
-  k.add(B(null, 0xfff2c8), circ(0.034, 8), [0, 0, -0.118], [0, PI, 0]);
-  const a = setLight(root, [0, 0, -0.12], { type: 'spot', color: 0xfff0d0, intensity: 2, distance: 18, angle: 0.5 });
+ITEMS.flashlight = (k, root) => {   // [shotfix] chunkier (was 0.16 m x 2 cm: it vanished inside the mitten) + a yellow grip band so it reads as a torch
+  const body = L('metal_dark', 0x4a4e52), rb = L('rubber'), band = L('plastic', 0xe0b020);
+  k.add(body, cyl(0.026, 0.026, 0.2, 8), [0, 0, 0.03], [HP, 0, 0]);
+  k.add(body, cyl(0.03, 0.045, 0.075, 8, true), [0, 0, -0.105], [HP, 0, 0]);
+  k.add(band, cyl(0.0275, 0.0275, 0.03, 8), [0, 0, 0.04], [HP, 0, 0]);
+  k.add(rb, cyl(0.027, 0.027, 0.022, 8), [0, 0, 0.14], [HP, 0, 0]);
+  k.add(rb, box(0.014, 0.01, 0.024), [0, 0.028, -0.03]);
+  k.add(B(null, 0xfff2c8), circ(0.042, 8), [0, 0, -0.143], [0, PI, 0]);
+  const a = setLight(root, [0, 0, -0.145], { type: 'spot', color: 0xfff0d0, intensity: 2, distance: 18, angle: 0.5 });
   root.userData.tip = a;
   return TOOL;
 };
