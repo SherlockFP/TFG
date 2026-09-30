@@ -163,8 +163,8 @@ await ok('spawn pools: not on tier 1 moons, not in the first quotas (generic gat
   AI.setC11Game(null); assert.equal(canSpawnMore(CAP, M), false, 'no run: blocked');
   const g = { run: { quotaIndex: 0 } }; AI.setC11Game(g);
   for (const id of C.ALL_IDS) assert.equal(canSpawnMore(id, M), false, 'quota 0 blocked ' + id);
-  g.run.quotaIndex = 1; assert.ok(canSpawnMore(CAP, M)); assert.equal(canSpawnMore(SB, M), false); assert.equal(canSpawnMore(REC, M), false);
-  g.run.quotaIndex = 2; assert.ok(canSpawnMore(SB, M) && canSpawnMore(REC, M));
+  for (let q = 1; q <= 5; q++) { g.run.quotaIndex = q; for (const id of C.ALL_IDS) assert.equal(canSpawnMore(id, M), q >= C.TUNE.minQuota[id], `quota ${q} gate ${id}`); }   // wave 12: Captcha 1, Shadowban 3, Recommender 4
+  assert.ok(C.TUNE.minQuota[CAP] === 1 && C.TUNE.minQuota[SB] >= 3 && C.TUNE.minQuota[REC] > C.TUNE.minQuota[CAP], 'balance12: the puzzle first, the mute + habit learner later');
   M.set('a', { type: CAP, dead: false }); assert.equal(canSpawnMore(CAP, M), false, 'max 1 Captcha alive');
 });
 

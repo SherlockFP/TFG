@@ -12,8 +12,8 @@ export const FACILITY_ONLY = new Set(['lockdown', 'flood', 'power']);
 
 // ---------------------------------------------------------------------------------------------- roll
 export const ROLL = {
-  chance: 0.34,          // per landing on a moon (quota 2+)
-  chanceEarly: 0.16,     // quota 1, from day 2 (a fresh crew is never hit on its first landing)
+  chance: 0.34,          // per landing on a moon (quota index 2+)
+  chanceEarly: 0.16,     // quota index 1, from day 2 (index 0 = the first cycle never rolls one)
   weights: { lockdown: 1, flood: 1, power: 1, viral: 0.9 },
   at: [130, 300],        // seconds after touchdown
   retry: 8,              // s between tries while a start condition fails
@@ -23,7 +23,7 @@ export const ROLL = {
 /** { id, at } or null. Deterministic for (runId, day, moon). `facility` = the moon has a walkable facility. */
 export function rollCrisis({ runId = 'x', day = 1, moon = 'm', quotaIndex = 0, facility = true, force = null } = {}) {
   const rng = new RNG(hashString(`${runId}|${day}|${moon}|ev11`));
-  const p = quotaIndex > 0 ? ROLL.chance : (day | 0) >= 2 ? ROLL.chanceEarly : 0;
+  const p = quotaIndex >= 2 ? ROLL.chance : quotaIndex === 1 && (day | 0) >= 2 ? ROLL.chanceEarly : 0;   // wave 12: none in the first cycle, 16 % from day 2 of the second, full rate from the third
   const hit = rng.next() < p;
   const at = Math.round(rng.float(ROLL.at[0], ROLL.at[1]));
   const pool = IDS.filter((id) => facility || !FACILITY_ONLY.has(id));
@@ -229,8 +229,8 @@ export const viralValue = (v) => Math.round((v || 0) * VIRAL.mul);
 /** host: { credits, xp, coin } for a finished crisis. `left` = fraction of the time budget still unused (0..1) */
 export function payout(id, quotaIndex = 0, left = 0) {
   const q = Math.max(0, quotaIndex | 0), bonus = 1 + Math.max(0, Math.min(1, left)) * 0.5;
-  if (id === 'lockdown') return { credits: Math.round((45 + 15 * q) * bonus), xp: Math.round((70 + 10 * q) * bonus), coin: 8 };
-  if (id === 'power') return { credits: Math.round((60 + 20 * q) * bonus), xp: Math.round((90 + 12 * q) * bonus), coin: 12 };
+  if (id === 'lockdown') return { credits: Math.round((110 + 30 * q) * bonus), xp: Math.round((70 + 10 * q) * bonus), coin: 8 };
+  if (id === 'power') return { credits: Math.round((160 + 40 * q) * bonus), xp: Math.round((90 + 12 * q) * bonus), coin: 12 };
   if (id === 'flood') return { credits: 0, xp: 40 + 5 * q, coin: 5 };
   if (id === 'viral') return { credits: 0, xp: 60 + 8 * q, coin: 15 };
   return { credits: 0, xp: 0, coin: 0 };

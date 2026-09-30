@@ -10,19 +10,19 @@ export const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 
 // ------------------------------------------------------------------------------------------------ item data (store)
 export const ITEMS11 = {
-  doorjammer: { id: 'doorjammer', name: 'Door Jammer', kind: 'tool', price: 55, tier: 'uncommon', weight: 1, hands: 1, charges: 2,
+  doorjammer: { id: 'doorjammer', name: 'Door Jammer', kind: 'tool', price: 70, tier: 'uncommon', weight: 1, hands: 1, charges: 2,
     tip: 'LMB at a door: it sticks shut for 40 s. Creatures and crew cannot open it. It beeps faster before it lets go, then shrieks - the noise draws creatures.' },
-  scoutdrone: { id: 'scoutdrone', name: 'Scout Drone', kind: 'tool', price: 190, tier: 'rare', weight: 3, hands: 1, battery: 30,
+  scoutdrone: { id: 'scoutdrone', name: 'Scout Drone', kind: 'tool', price: 380, tier: 'rare', weight: 3, hands: 1, battery: 30,
     tip: 'LMB: fly it for up to 30 s (battery). Your body stands still and can be hit. LMB again scans items and creatures in sight for the whole crew. E: recall. Recharge at the ship charger.' },
-  glowspray: { id: 'glowspray', name: 'Glow Trail Spray', kind: 'consumable', price: 35, tier: 'common', weight: 1, hands: 1, charges: 2,
+  glowspray: { id: 'glowspray', name: 'Glow Trail Spray', kind: 'consumable', price: 40, tier: 'common', weight: 1, hands: 1, charges: 2,
     tip: 'LMB: your footsteps leave glowing arrows for 2 minutes. Everyone sees them, they point back the way you came, and they fade after 3 minutes.' },
-  ziplinekit: { id: 'ziplinekit', name: 'Zipline Kit', kind: 'tool', price: 140, tier: 'rare', weight: 4, hands: 1,
+  ziplinekit: { id: 'ziplinekit', name: 'Zipline Kit', kind: 'tool', price: 240, tier: 'rare', weight: 4, hands: 1,
     tip: 'LMB at a wall or ceiling within 18 m (clear line of sight): a line links you to it. E on either end to slide. One line per landing. Crouch+E retracts it. Heavy loot slows the ride.' },
 };
 export const ITEM_IDS = Object.keys(ITEMS11);
 
 // decoy speaker numbers (mirrored into grenades_core KINDS.speaker)
-export const SPEAKER = { dur: 12, pulse: 2.4, noise: 3.2, fuse: 0.8, price: 65, stack: 2 };
+export const SPEAKER = { dur: 12, pulse: 2.4, noise: 3.2, fuse: 0.8, price: 90, stack: 2 };
 export const SPEAKER_PHRASE = 'Hey, over here!';
 
 // ------------------------------------------------------------------------------------------------ door jammer

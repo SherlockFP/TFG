@@ -240,7 +240,6 @@ import { installGear11 } from './gear11.js';
 // [import:moons12]
 // [import:atmos12]
 // [import:coop12]
-// [import:balance12]
 import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
 
 
@@ -641,7 +640,6 @@ export class Game extends Emitter {
     // [slot:moons12]
     // [slot:atmos12]
     // [slot:coop12]
-    // [slot:balance12]
 
     this.useModule('onboard', installOnboard);   // [slot:onboard] wave 5: Hiring Day + staged unlocks (installed last: wraps hostLever / terminalCommand / objectives.compute)
     this.useModule('score', installScore);   // wave 7: adaptive procedural music + the Algorithm's jingle (docs/wave7/score.md)
