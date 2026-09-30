@@ -35,5 +35,5 @@ Loop rule: 2-3 Sonnet agents at a time (1 browser/QA agent max) → merge with t
 | 14 | cam90 | merged f083675: path drone on every landing between ramp and entrance with a guaranteed dark flank, one-time hint, heat cuts a calm short (+caption), indoor tutorial camera = 'cut the feed' lesson. |
 | 15 | shotfix | merged 44a2250: Algorithm typewriter scramble used glyphs the font lacks (now ASCII), task waypoints: only the current goal's label floats, others edge icons, algo2 pink glitch octahedron → dead CRT monitor on a crate (phosphor colours), chunkier torch held further forward. |
 | 16 | QA night 2 (browser at gamma 1.0: everything merged after night 1 + scripted 2-player session) | running |
-| 16 | glove (first-person glove/sleeve smaller & darker, items held naturally) | running |
+| 16 | glove | merged e86a155: small dark work glove with suit-colour cuff, thinner sleeve; torch reads clearly low-right (docs/wave8/qa_shots/glove_torch.jpg, lead-checked). Found: blue light pillar clipping through walls → sent to QA night 2. |
 | 17 | herocontent | merged 36c6764: own scrap tables for metro/greenhouse/prison/tower (12 new modelled items), themed sector bosses via BOSS_TABLE aliases, route-board payouts use them; economy unchanged (median 7). |
