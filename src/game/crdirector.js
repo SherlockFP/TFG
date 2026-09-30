@@ -52,7 +52,7 @@ export function installCrdirector(game) {
     stats: { spawned: 0, queued: 0, dropped: 0, released: 0, culled: 0, peaks: 0, featured: 0 },
     // client
     told: new Map(), typeTell: new Map(), anyTell: -99, seen: loadSeen(), capT: 0, capCool: 0, scanT: 0, edge: { f: 0, b: 0, l: 0, r: 0 }, edgeSet: { f: -1, b: -1, l: -1, r: -1 },
-    darkUntil: 0, cues: 0, flick: { saved: new Map(), endT: 0 }, decorated: new WeakSet(), eyes: new Map(), phCaps: 0,
+    darkUntil: 0, cues: 0, flick: { saved: new Map(), endT: 0 }, decorated: new WeakSet(), eyes: new Map(), phCaps: 0, pullCaps: 0,
   };
   let capEl = null, edgeEl = null, edgeKids = null, style = null;
 
@@ -304,6 +304,7 @@ export function installCrdirector(game) {
     if (ph === 'calm' && S.fh > 0) S.st.len *= K.feedCalmMul(S.fh);   // a hot stream calls the next wave sooner
     if (ph === 'relax' && S.fh != null) S.fh = S.fhNow;               // the peak spent the heat memory
     if (ph) onPhase(ph, crew, act.sum, cap);
+    else if (!S.evt && K.heatPull(S.st, S.fhNow)) { send({ k: 'ph', p: 'calm', n: S.st.cycle, hp: 1 }); try { mods?.emit?.('crdirector', { kind: 'heatpull', cycle: S.st.cycle }, game); } catch { /* mods optional */ } }   // [cam90] ON AIR heat pulls the next release; every peer shows one caption
     K.expire(S.q, S.now);
     if (!S.evt) release(act, crew);
     if (S.st.phase === 'relax') cull(crew);
@@ -319,7 +320,7 @@ export function installCrdirector(game) {
   function onMsg(m, from) {
     if (disposed || !m || typeof m.k !== 'string') return;
     if (from !== game.selfId && from !== game.net?.hostId) return;   // host-authoritative: ignore anybody else
-    if (m.k === 'ph') { S.cph = m.p; onPhaseCue(m.p, m.n | 0); }   // [onegoal] S.cph: the phase as clients know it (Algorithm quiet at a peak)
+    if (m.k === 'ph') { S.cph = m.p; if (m.hp) heatCue(); else onPhaseCue(m.p, m.n | 0); }   // [onegoal] S.cph: the phase as clients know it (Algorithm quiet at a peak)
     else if (m.k === 'tr') onTrack(m);
     else if (m.k === 'dim') { if (m.to === game.selfId) onDim(+m.ms || 6000); }
     else if (m.k === 'seize') { if (m.to === game.selfId) onSeize(); }
@@ -377,6 +378,12 @@ export function installCrdirector(game) {
   }
   function restoreLights() { for (const [e, f] of S.flick.saved) e.flicker = f; S.flick.saved.clear(); S.flick.endT = 0; }
 
+  /** [cam90] "heat brings them": the stream's heat cut the calm short (one caption through the card timeline, at most 2 per landing) */
+  function heatCue() {
+    if (!localOk()) return;
+    pulse('f', 0.2);
+    if (S.pullCaps < 2) { S.pullCaps++; caption(t('HEAT — the stream is calling them in.')); }
+  }
   function onPhaseCue(ph, n) {
     if (!localOk()) return;
     if (ph === 'build') {
@@ -527,7 +534,7 @@ export function installCrdirector(game) {
       if (host()) { try { hostUpdate(dt); } catch (e) { console.warn('[crdirector] host', e); S.bypass = false; } }
       clientUpdate(dt);
     }));
-    offs.push(mods.on('phase', (ph, g) => { if (g === game && ph !== 'moon') { S.st = null; S.cph = null; S.q.length = 0; S.told.clear(); S.phCaps = 0; restoreLights(); } }));
+    offs.push(mods.on('phase', (ph, g) => { if (g === game && ph !== 'moon') { S.st = null; S.cph = null; S.q.length = 0; S.told.clear(); S.phCaps = 0; S.pullCaps = 0; restoreLights(); } }));
   }
   if (game.net) bindNet(game.net);
   installWrappers();

@@ -26,7 +26,7 @@ const TIPS = [
   'That red light is a camera. The cone on the floor is what it sees. Stay out of it, or you go live.',
   'Camera lock. You have three seconds before the stream goes live. Break line of sight.',
   'You are ON AIR. Scrap you carry to the ship now pays a viewer tax. Cut the feed, smash a lens or spray it.',
-  'Blind spot: the green ring right under a camera, and behind walls, doors and crates. Hug the wall and slip past.',
+  'Same red light indoors. This time cut the feed: the junction box [E] on the wall, or spray the lens.',   // [cam90] was the blind-spot line (taught outdoors now)
   'That grey box on the wall feeds a camera. Cut its cable and the camera dies quietly.',
 ];
 const CSS = `#fc-vig{position:fixed;inset:0;pointer-events:none;z-index:3;opacity:0;transition:opacity .18s;box-shadow:inset 0 0 120px 30px rgba(255,20,20,.75)}
@@ -251,7 +251,7 @@ export function installFeedcams(game) {
         if (!(S.said & 1)) { S.said |= 1; feedLine("You're live. Chat is loving it. Try not to die on camera."); }
       } else if (mt.m >= 1) mt.air = now + FC.hold;
       if (mt.air && now >= mt.air) { mt.air = 0; mt.m = Math.min(mt.m, 0.5); }
-      if (!r.fcTut && !off) {   // [firstrun] the tutorial camera pays ONCE per run for slipping through its blind ring (or a near miss) without going live
+      if (!r.fcTut && !off && !game.feedcams2?.drones?.().some((d) => d.day)) {   // [firstrun] the tutorial camera pays ONCE per run for slipping through its blind ring (or a near miss) without going live ([cam90] only when there is no outdoor path drone: outdoors teaches that, indoors teaches 'cut the feed')
         const tc = S.plan.find((c) => c.tut);
         if (tc && stOf(tc.i) === ST.OK) {
           const dd = Math.hypot(p.pos.x - tc.x, p.pos.z - tc.z);
@@ -339,6 +339,13 @@ export function installFeedcams(game) {
 
   // counter-play requests (host validates reach)
   const rate = new Map();
+  /** [cam90] the indoor tutorial camera is the "cut the feed" lesson: a junction-box cut or a spray on it pays once per run (the clean pass is taught outdoors) */
+  function tutCut(c) {
+    const r = run(); if (!c?.tut || !r || r.fcTut2) return;
+    r.fcTut2 = 1; r.credits = Math.max(0, (r.credits | 0) + K.TUT_CUT);
+    try { game.broadcastRun?.(['credits', 'fcTut2']); } catch { /* net closing */ }
+    fx({ k: 'tut', n: K.TUT_CUT, cut: 1 });
+  }
   function hostReq(d, from) {
     const F = fc(); if (!host() || !F || !d || run()?.phase !== 'moon') return;
     const c = S.plan[d.i | 0], pp = posOf(from), now = game.time; if (!c || !pp) return;
@@ -352,6 +359,7 @@ export function installFeedcams(game) {
     } else if (d.op === 'cut' && Math.hypot(pp.x - c.jb.x, pp.z - c.jb.z) <= 2.8 && Math.abs(pp.y + 1 - c.jb.y) < 2.5) {
       setState(c.i, ST.CUT); fx({ k: 'cut', i: c.i, by: from }); emit({ k: 'cut', i: c.i, by: from, m: S.mt.get(from)?.m || 0 }); game.broadcastRun?.(['fc']);
       if (!(S.said & 8)) { S.said |= 8; feedLine('Hey. That cable was load-bearing.'); }
+      tutCut(c);
     } else if (d.op === 'zap' && dist <= 16) {
       setState(c.i, ST.BLIND, now + FC.zap); fx({ k: 'zap', i: c.i }); game.broadcastRun?.(['fc']);
     }
@@ -364,7 +372,7 @@ export function installFeedcams(game) {
       for (const c of S.plan) {
         const e = F.c[c.i];
         if (e[0] === ST.DEAD || e[0] === ST.CUT || Math.hypot(d.p[0] - c.x, d.p[1] - c.y, d.p[2] - c.z) > 1.7 || Math.hypot(pp.x - c.x, pp.z - c.z) > 6.5) continue;
-        setState(c.i, ST.BLIND, game.time + FC.blind); fx({ k: 'spray', i: c.i }); game.broadcastRun?.(['fc']);
+        setState(c.i, ST.BLIND, game.time + FC.blind); fx({ k: 'spray', i: c.i }); game.broadcastRun?.(['fc']); tutCut(c);
       }
     } else if (d.k === 'cb' && d.t === 'tr' && Array.isArray(d.a) && Array.isArray(d.b) && d.a.length >= 3 && d.a.every(Number.isFinite) && d.b.length >= 3 && d.b.every(Number.isFinite)) {
       const pp = posOf(from); if (!pp || Math.hypot(pp.x - d.a[0], pp.z - d.a[2]) > 6) return;
@@ -413,7 +421,7 @@ export function installFeedcams(game) {
     if (disposed || !d) return;
     const c = S.plan[d.i | 0], me = game.selfId;
     if (d.k === 'live') { if (d.id === me) { try { game.onboard?.fr?.camDone?.(); } catch { /* onboard optional */ } snd('onair_sting', null, 0.65); toast(t(d.tag ? 'ON AIR - you are TAGGED until you reach the ship. Kill that camera to clear it.' : 'ON AIR - you are live'), 'bad'); } else toast(tf('{name} went live', { name: game.playerName?.(d.id) || '?' }), 'warn'); }
-    else if (d.k === 'tut') { toast(tf('Clean pass. The Algorithm saw nothing: +▮{n}', { n: d.n }), 'good'); snd('ui_confirm', null, 0.5); try { game.onboard?.fr?.camDone?.(); } catch { /* onboard optional */ } }
+    else if (d.k === 'tut') { toast(tf(d.cut ? 'Feed cut. Nobody saw who: +▮{n}' : 'Clean pass. The Algorithm saw nothing: +▮{n}', { n: d.n }), 'good'); snd('ui_confirm', null, 0.5); try { game.onboard?.fr?.camDone?.(); } catch { /* onboard optional */ } }
     else if (d.k === 'untag') { if (d.to === me) toast(t('Tag cleared. The recording is gone.'), 'good'); }
     else if (d.k === 'juke') { if (d.to === me) toast(t('Clean dodge. The stream lagged behind you.'), 'good'); }
     else if (d.k === 'tax') { S.taxSum = d.cut; toast(tf('The Algorithm took its cut: -▮{n} viewer tax', { n: d.cut }), 'bad'); }

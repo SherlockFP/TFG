@@ -27,6 +27,7 @@ export const FC = {
   hz: 10,              // host vision rate
 };
 export const ST = { OK: 0, BLIND: 1, DEAD: 2, CUT: 3 };
+export const TUT_CUT = 10;   // [cam90] credits the indoor tutorial camera pays once per run for cutting / spraying it
 export const TUT_PAY = 20;   // [firstrun] credits the tutorial camera pays once per run for a clean pass
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 export const angDiff = (from, to) => { let d = (to - from) % TAU; if (d > Math.PI) d -= TAU; else if (d < -Math.PI) d += TAU; return d; };

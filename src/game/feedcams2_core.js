@@ -49,6 +49,33 @@ export function planDrones(o = {}) {
   }
   return out;
 }
+// [cam90] the ship -> entrance walk (42-75 m) carries the game's core verb: ONE slow patrol drone, day and night, on EVERY landing (also the first one).
+//   Its lit disc sweeps the direct line for part of every lap (learn the timing), and the flank opposite its side is always dark (the obvious blind route).
+export const PATHD = { f: [0.42, 0.6], side: [4.5, 7], rx: [3.6, 4.8], per: [40, 54], tries: 8, margin: 2 };
+/** the path drone (array, 0 or 1 entries). i = its index in the drone list. ok(x, z) rejects spots (water, rocks). Ship at the origin. */
+export function planPathDrone(o = {}, i = 0) {
+  const e = o.entrance, len = e ? Math.hypot(e.x, e.z) : 0; if (!e || len < 16) return [];
+  const rng = new RNG(((o.seed | 0) ^ 0xd20e6 ^ Math.imul((o.day | 0) + 5, 6151)) >>> 0);
+  const ux = e.x / len, uz = e.z / len;
+  const rx = rng.float(PATHD.rx[0], PATHD.rx[1]), rz = rx * 0.7, rot = rng.float(0, TAU), per = rng.float(PATHD.per[0], PATHD.per[1]), ph = rng.float(0, TAU);
+  let sign = rng.chance(0.5) ? 1 : -1, pick = null;
+  for (let k = 0; k < PATHD.tries && !pick; k++) {
+    const f = rng.float(PATHD.f[0], PATHD.f[1]), side = rng.float(PATHD.side[0], PATHD.side[1]);
+    const cx = ux * len * f - uz * side * sign, cz = uz * len * f + ux * side * sign;
+    const spots = [[0, 0], [rx, 0], [-rx, 0], [0, rz], [0, -rz]];
+    if (!o.ok || spots.every(([a, b]) => o.ok(cx + a, cz + b))) pick = { cx, cz, side };
+    else if (k % 2) sign = -sign;
+    if (!pick && k === PATHD.tries - 1) pick = { cx, cz, side };
+  }
+  return [{ i, day: true, cx: pick.cx, cz: pick.cz, rx, rz, rot, per: per * (sign > 0 ? 1 : -1), ph, side: pick.side, sign }];
+}
+/** the clear flank: lateral offset (m, on the side AWAY from the drone) from the direct ship -> entrance line at which no point of the lit disc ever reaches you */
+export const blindOffset = (d) => Math.ceil(Math.max(0, DRONE.R + PATHD.margin + Math.max(d.rx, d.rz) - d.side)) + 1;
+/** a point on the direct line (t 0..1) shifted `off` m to the clear flank (off 0 = the straight walk) */
+export function pathPoint(d, e, t, off = 0) {
+  const len = Math.hypot(e.x, e.z) || 1, ux = e.x / len, uz = e.z / len;
+  return { x: e.x * t + uz * off * d.sign, z: e.z * t - ux * off * d.sign };
+}
 const sm = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
 /** ground point under the drone at host time t. bait = { x, z, t0, t1 } pulls it toward a noise for a moment */
 export function dronePos(d, t, bait) {

@@ -139,7 +139,7 @@ export function step(s, dt, o, rnd, info = {}) {
   }
   if (s.t < s.len) return null;
   const nx = nextPhase(s.phase);
-  s.phase = nx; s.t = 0; s.overT = 0; s.first = false;
+  s.phase = nx; s.t = 0; s.overT = 0; s.first = false; s.pulled = false;
   if (nx === 'build') s.cycle++;
   s.len = phaseSeconds(nx, o, rnd());
   return nx;
@@ -169,6 +169,18 @@ export function feedMul(phase, hMem) {
 }
 /** calm length multiplier after a hot stream */
 export const feedCalmMul = (hMem) => (hMem > 0 ? 1 - FEED.calmCut * Math.max(0, Math.min(1, hMem / 100)) : 1);
+
+/**
+ * [cam90] a hot stream PULLS the next release: while a calm runs and the live ON AIR heat is >= PULL.heat the calm is cut to PULL.left more seconds (once per calm).
+ * Fair early game: never before PULL.minT s of the calm (the first calm of a landing keeps its ~90 s safe window: minTFirst). Returns true when it pulled.
+ */
+export const PULL = Object.freeze({ heat: 35, minT: 25, minTFirst: 78, left: 12 });
+export function heatPull(s, heat) {
+  if (!s || s.phase !== 'calm' || s.pulled || !(heat >= PULL.heat)) return false;
+  if (s.t < (s.first ? PULL.minTFirst : PULL.minT) || s.len - s.t <= PULL.left) return false;
+  s.len = s.t + PULL.left; s.pulled = true;
+  return true;
+}
 
 // ------------------------------------------------------------------------------------------------ queue
 /** bounded FIFO of wanted spawns [{zone, type?, t}]; dedupes by keeping at most TUNE.queueMax, drops stale entries */
