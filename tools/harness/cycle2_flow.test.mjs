@@ -591,8 +591,8 @@ function metQuota(g) {
     ok(cy(g).stage === 'days' && cy(g).sector === 1, `${theme}: cleared`);
     seen.add(info.id);
   }
-  // wave 8 added greenhouse/metro interiors (no boss of their own: BOSS_TABLE falls back to the Foreman), so 8 themes map to 6 distinct bosses
-  ok(seen.size >= 6, `bosses covered: ${[...seen].join(', ')}`);
+  // wave 8 hero content: metro / greenhouse (and prison, tower, the studio themes) map to existing themed bosses (cycle_core.js), so the 8 sampled themes give 7+ distinct bosses again
+  ok(seen.size >= 7, `bosses covered: ${[...seen].join(', ')}`);
 }
 
 // ================================================================ H) never a soft-lock: "give up" policy from many states

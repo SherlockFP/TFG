@@ -8,6 +8,7 @@
 // Net: none new (routing is the existing 'term' {op:'route'} request).
 import { MOONS, MOON_ORDER, WEATHER, BIOMES } from './moons.js';
 import { ITEMS, scrapTableFor } from './items.js';
+import './herocontent_core.js';   // wave 8: the metro / greenhouse / prison / tower scrap tables (the payout estimate below reads scrapTableFor)
 import { scrapCountFor, scrapValueMul, buyRate } from './progression.js';
 import { dangerOf, dangerName, interiorName } from '../ui/hud.js';
 import { AFFIX_BY_ID } from './mapmods_core.js';

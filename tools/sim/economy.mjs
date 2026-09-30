@@ -24,6 +24,7 @@
 // not as a prediction of an exact quota. Output: per-cycle economy table, quotas-survived distribution per
 // crew, generated-moon affordability, modifier risk/reward, and hours to the first Rebirth (Lv.50).
 import { ITEMS, scrapTableFor, bigTableFor } from '../../src/game/items.js';
+import { HERO_THEMES } from '../../src/game/herocontent_core.js';   // wave 8: themed tables for metro / greenhouse / prison / tower (registered on import)
 import { MOONS } from '../../src/game/moons.js';
 import { generateSector, MODIFIERS } from '../../src/game/moongen.js';
 import { DAILY_EVENTS } from '../../src/game/dailyEvents.js';
@@ -67,7 +68,7 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 // ---------------------------------------------------------------- value tables (real data)
 const avgVal = (id) => { const d = ITEMS[id]; return d?.value ? (d.value[0] + d.value[1]) / 2 : 0; };
 const tableAvg = (t) => { let s = 0, w = 0; for (const [id, wt] of t) { if (!ITEMS[id]?.value || id === 'key') continue; s += avgVal(id) * wt; w += wt; } return w ? s / w : 40; };
-const THEMES = ['factory', 'mansion', 'mineshaft', 'office', 'backrooms', 'serverfarm', 'sewer', 'hospital'];
+const THEMES = ['factory', 'mansion', 'mineshaft', 'office', 'backrooms', 'serverfarm', 'sewer', 'hospital', ...HERO_THEMES];
 const SCRAP_AVG = Object.fromEntries(THEMES.map((t) => [t, tableAvg(scrapTableFor(t))]));
 const BIG_AVG = Object.fromEntries(THEMES.map((t) => [t, tableAvg(bigTableFor(t))]));
 const PRIZE_AVG = ['goldbar', 'ring', 'figurine', 'trophy'].reduce((s, id) => s + avgVal(id), 0) / 4;

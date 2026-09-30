@@ -25,6 +25,16 @@ export const BOSS_TABLE = {
   mineshaft:  { id: 'excavator',     name: 'The Excavator',         title: 'Proof of Work',        rank: 'A', hp: 1500, dmg: 48 },
   backrooms:  { id: 'lobbymanager',  name: 'The Lobby Manager',     title: 'Level Designer',       rank: 'A', hp: 1350, dmg: 45 },
 };
+// Themed sector bosses for the interiors that have no boss of their own (wave 8 hero content): each maps to the most fitting EXISTING boss
+// (same id / kit / model / trophy; aliases, so hp, dmg, names and translations stay in one place).
+BOSS_TABLE.metro = BOSS_TABLE.mansion;             // the ghost train's station host: blinks behind you the moment you look away
+BOSS_TABLE.greenhouse = BOSS_TABLE.hospital;     // the head gardener: elective pruning, drags the weakest patient onto the potting table
+BOSS_TABLE.prison = BOSS_TABLE.factory;         // the warden is the Foreman: "Site Supervisor" with a whistle and a shift schedule
+BOSS_TABLE.tower = BOSS_TABLE.office;    // the Ivory Tower's Synergy Enforcer: mandatory meetings, paper shields
+BOSS_TABLE.influencer = BOSS_TABLE.mansion;        // the Estate's Host: Welcome, Guest
+BOSS_TABLE.academy = BOSS_TABLE.office;  // the principal: detention-as-a-meeting
+BOSS_TABLE.museum = BOSS_TABLE.mansion;            // the curator: exhibits that move when nobody looks
+BOSS_TABLE.colddata = BOSS_TABLE.serverfarm;    // the cold-storage Load Balancer: routes damage through the frozen nodes
 export const LEGACY_BOSS = { id: 'legacybot', name: 'Legacy Bot', title: 'World Boss', rank: 'S', hp: 1500, dmg: 36, existing: true };
 export const CREW_MUL = [1, 1, 1.6, 2.1, 2.5];   // index = crew size (0 counts as 1)
 
