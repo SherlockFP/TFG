@@ -1,0 +1,11 @@
+# Wave 15 — encounter readability
+
+Touchdown and route cards now use the existing shared threat predicate. The active moon introduction closes immediately on danger and resumes the same landing after calm; its pending context is discarded after departure, death or a changed moon/day. The merged landing briefing pauses without consuming unread time, resumes when safe, and still expires after its original 45-second lifetime. Urgent system warnings bypass briefing capture during danger. Optional route-condition cards retain their existing pending state and pause their visible lifetime during pursuit.
+
+Closed passive chat hides routine system and old rows during danger and keeps recent crew messages in a compact strip. Opening chat deliberately still exposes the complete history. Existing emergency warnings, the encounter goal and interaction hint remain available.
+
+First-session audit retained the adaptive dock/ship instructions and localized Field Broker → Tools acquisition guidance introduced in wave 14. Fixed a concrete completion bug: network `itemState` events from remote and floor lamps no longer complete the local flashlight lesson; the powered lamp must belong to the local hotbar. The lesson's bag guidance and actual current shop price remain intact.
+
+Validation: existing `readability14.test.mjs` now exercises real landing sequence begin/add/tick transitions through danger, calm recovery, departure and hard expiration. It also installs the real guide and delivers local/remote/floor lamp events through its actual mod bus. Existing landing10, soul5 and mapmods fixtures remain the relevant card lifecycle checks. Browser screenshots and continuous shift QA are owned by the shared playtest agent; no separate browser session was used for this lane.
+
+Final input audit: the route board's root capture listener previously swallowed Enter when a pasted or history-restored command was already present in the real terminal input. It now steps aside for nonempty terminal input, allowing the original submit/edit/history handler to run. Empty input preserves route-board keyboard selection. The existing routeboard fixture exercises the actual installed capture listener for both command and empty-input cases; 145 checks pass. Main input source order remains unchanged.

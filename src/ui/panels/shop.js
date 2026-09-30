@@ -78,7 +78,7 @@ export function createShopPanel(ui, game, opts = {}) {
   let stock = vis(shop.stock());
   const byId = (id) => stock.find((e) => e.id === id);
   const wrap = ui.panel('wide shop');
-  const head = ui.panelHead(t('COMPANY STORE'), ' ');
+  const head = ui.panelHead(t(game.industry13 ? 'FIELD BROKER / WORKSHOP' : 'COMPANY STORE'), ' ');
   const sub = head.querySelector('.cp-sub');
   const body = el('div', { class: 'cp-body' });
   const tabsEl = el('div', { class: 'tabs' });
@@ -193,7 +193,7 @@ export function createShopPanel(ui, game, opts = {}) {
     cartBox.appendChild(el('div', { class: 'menu-row', style: { display: 'flex', gap: '8px' } },
       ui.button(t('BUY'), buyNow, 'primary' + (!cart.size || poor ? ' disabled' : '')),
       ui.button(t('CLEAR'), () => { cart.clear(); renderSide(); refreshBadges(); }, 'small' + (cart.size ? '' : ' disabled'))));
-    cartBox.appendChild(el('div', { class: 'sh-note' }, t('Deliveries arrive in the ship storage.')));
+    cartBox.appendChild(el('div', { class: 'sh-note' }, t(game.industry13 ? 'Collect your order beside the field broker.' : 'Deliveries arrive in the ship storage.')));
     sideEl.appendChild(cartBox);
     sideEl.appendChild(ui.backButton(() => ui.closePanel(), t('Close')));
     sideEl.scrollTop = keepScroll;

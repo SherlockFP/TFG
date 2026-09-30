@@ -44,7 +44,7 @@ export function defaultSettings() {
     micEnabled: true,
     micConsent: 'ask',      // 'ask' | 'yes' | 'no'  (never grab the mic without asking)
     voiceMode: 'ptt',       // 'open' | 'ptt'  (hold V to talk, like R.E.P.O.)
-    settingsVersion: 3,
+    settingsVersion: 4,
     micGain: 1.0,
     micDevice: '',
     outputDevice: '',       // AudioContext.setSinkId target ('' = system default)
@@ -79,6 +79,18 @@ export function loadSettings() {
   // v3 (2026-09-30): every player back on the same signalling network. Hosts and joiners on different modes
   // (an old MQTT / torrent / local pick) never see each other's lobbies and a code join silently times out.
   if ((s.settingsVersion || 1) < 3) { out.netStrategy = 'nostr'; out.settingsVersion = 3; }
+  // v4: migrate the old default pair only. Preserve intentional custom bindings.
+  if ((s.settingsVersion || 1) < 4) {
+    const old = s.keys || {};
+    const cTaken = Object.entries(old).some(([a, code]) => a !== 'crouch' && a !== 'magicWheel' && code === 'KeyC');
+    const slashTaken = Object.entries(old).some(([a, code]) => a !== 'magicWheel' && code === 'Backslash');
+    const oldWheel = !old.magicWheel || old.magicWheel === 'KeyC';
+    if ((!old.crouch || old.crouch === 'ControlLeft') && !cTaken && (!oldWheel || !slashTaken)) {
+      out.keys.crouch = 'KeyC';
+      if (oldWheel) out.keys.magicWheel = 'Backslash';
+    }
+    out.settingsVersion = 4;
+  }
   // [a11y] range checks (a hand-edited / old save must not give a 5 degree or 300 degree FOV)
   out.fov = clampFov(out.fov);
   out.uiScale = clampRange(out.uiScale, UI_SCALE_MIN, UI_SCALE_MAX, 1);

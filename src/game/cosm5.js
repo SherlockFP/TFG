@@ -14,6 +14,7 @@ import { EMOTES, LOCKED_EMOTES, EMOTE_BY_ID, isEmoteUnlocked, unlockEmote } from
 import { owns as ownsWardrobe, grant as grantWardrobe, ensureWardrobeProfile } from './cosmetics.js';
 import { tierDef, TIER_ORDER } from './tiers.js';
 import { glowLevel } from './enhance.js';
+import { ARSENAL13_MODELS } from './arsenal13_models.js';
 import { createItemModel } from '../models/items.js';
 import { applySkin, clearSkin, skinClock, skinOf, SKIN_IDS } from '../render/weaponskins.js';
 import { WARDROBE_EXT, TABS } from '../ui/panels/wardrobe.js';
@@ -30,7 +31,7 @@ installCosm8I18n(addTranslations);
 
 const SLOT_TAB = { suit: 'suit', hat: 'hat', back: 'back', skin: 'skin', emote: 'emote' };
 const DUPE_COINS = { common: 30, uncommon: 60, rare: 120, epic: 240, legendary: 500, mythic: 900 };
-const PREVIEW_WEAPONS = ['katana', 'plasmablade', 'bat', 'pistol', 'crowbar', 'blaster'];
+const PREVIEW_WEAPONS = ['katana', 'plasmablade', 'bat', 'pistol', 'crowbar', 'blaster', 'a13_rivet', 'a13_baton'];
 
 // ------------------------------------------------------------------------------------------------ emotes (6)
 const hh = (n) => { const x = Math.sin(n * 127.1) * 43758.5453; return x - Math.floor(x); };
@@ -216,7 +217,7 @@ function weaponPreview(type, skin) {
   let obj = null;
   try {
     const custom = typeof window !== 'undefined' ? window.__kefalMods?.itemModels?.get(type) : null;
-    obj = custom ? custom(THREE) : createItemModel(type);
+    obj = custom ? custom(THREE) : ARSENAL13_MODELS[type] ? ARSENAL13_MODELS[type]() : createItemModel(type);
   } catch { obj = null; }
   if (!obj) obj = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.6), new THREE.MeshLambertMaterial({ color: 0x888888 }));
   const wrap = new THREE.Group();
@@ -277,7 +278,7 @@ function weaponRow(ctx) {
   }
   return row;
 }
-const WEAPON_NAMES = { katana: 'Katana', plasmablade: 'Plasma Blade', bat: 'Baseball Bat', pistol: 'Pistol', crowbar: 'Crowbar', blaster: 'Blaster Pistol' };
+const WEAPON_NAMES = { katana: 'Katana', plasmablade: 'Plasma Blade', bat: 'Baseball Bat', pistol: 'Pistol', crowbar: 'Crowbar', blaster: 'Blaster Pistol', a13_rivet: 'Pressure Riveter', a13_baton: 'Pneumatic Baton' };
 const weaponName = (id) => WEAPON_NAMES[id] || id;
 
 WARDROBE_EXT.skin = {

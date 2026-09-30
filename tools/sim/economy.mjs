@@ -42,6 +42,10 @@ import { THEMES as W3T, W3_ITEMS, doorChance as w3DoorChance } from '../../src/g
 import { FC } from '../../src/game/feedcams_core.js';
 import { MN } from '../../src/game/mining_core.js';
 import { scaleFor } from '../../src/game/balance_core.js';   // wave-1 balance: sector creature scale + threat (default ON, --no-balance = the old flat numbers)
+import { visitRelayBroker, completeRelayField, relaySurveyReward } from './relay14_core.mjs';
+import { FLEET13 } from '../../src/game/fleet13_core.js';
+import { ARSENAL13_DEFS } from '../../src/game/arsenal13_core.js';
+import { SIGNAL_PARCEL_VALUE } from '../../src/game/expedition13_core.js';
 import {
   nextQuota, scrapValueMul, scrapCountBonus, indoorPowerMul, outdoorPowerMul, creatureBaseLevel,
   xpForLevel, xpToReach, REBIRTH_LEVEL, MAX_LEVEL, BALANCE,
@@ -58,6 +62,9 @@ const MODES_ONLY = args.includes('--modes-only');
 const PRE8 = args.includes('--pre8');                       // the economy before wave 8: no wave-8 layer and indoor loot x0.7 (pre-wave-8 median for 4 competent Standard was 8 quotas)
 const SHOP = !args.includes('--no-shop');                  // wave 12: crews spend credits on a wishlist (real prices); the sim used to leave credits idle, which made the piles look bigger than they are (docs/wave12/balance12.md)
 const W8 = !PRE8 && !args.includes('--no-wave8');          // wave-8 income / cost layer (docs/wave8/econ8.md)
+const RELAY = args.includes('--relay');
+const RELAY_EFFORT = Math.max(0, Math.min(1, +argv('--relay-effort', .55)));
+const districtRewards = RELAY ? (await import('../../src/game/districts13_core.js')).DISTRICT_REWARD13 : null;
 DIFF.setMode(MODE);
 const AVG_THREAT = +argv('--avg-threat', 40);   // mean Threat over a landing for a crew that holds loot and stays a while (see docs/wave1/balance.md)
 if (PRE8) BALANCE.lootCountMul = 0.7;
@@ -291,6 +298,7 @@ function wishlist(n) {
   const add = (name, cost) => { if (cost > 0) L.push({ name, cost }); };
   const mods = ['medbay', 'cargo', 'workshop', 'bunk', 'lounge', 'engine', 'lab', 'turret'];
   add('beltbag x n', per('beltbag')); add('fieldpack x n', per('bag_fieldpack')); add('riot vest x n', per('arm_riot'));
+  if (RELAY) { add('cache hauler hull', FLEET13.hauler.price); for (const def of ARSENAL13_DEFS) add(def.name, def.price); }
   add('scout drone', ITEMS11.scoutdrone.price); add('door jammer', ITEMS11.doorjammer.price); add('zipline', ITEMS11.ziplinekit.price); add('decoy speaker', 90);
   add('signal translator', SHIP_UPGRADES.signal.price); add('floodlight+', SHIP_UPGRADES.lightsplus.price);
   for (const id of mods) add(id + ' Mk I', syCost(id, 1));
@@ -303,7 +311,8 @@ function wishlist(n) {
 function simRun(crew, runKey, stats) {
   let q = 0, quota = nextQuota(0, 0, rand), credits = 60, stash = 0, minutes = 0, xp = 0, current = 'hamsi', van = false;
   const perCycle = [];
-  const inc = { scrap: 0, ore: 0, crate: 0, job: 0, pocket: 0, lantern: 0, resto: 0, arcade: 0, map: 0, hs: 0 };   // where the run's income came from (wave 8 layer)
+  const inc = { scrap: 0, ore: 0, crate: 0, job: 0, pocket: 0, lantern: 0, resto: 0, arcade: 0, map: 0, hs: 0, relay: 0 };   // relay is net side credits, excluding physical quota salvage
+  const relayRun = { runId: runKey, credits, quota, forecast: {} };
   const sk0 = crew.skill, usesResto = W8 && rand() < W8K.restoP;
   let restoK = -1, restoSpent = 0, mapNow = null, hsK = 0, wishK = 0;
   const wish = SHOP ? wishlist(crew.n) : [];
@@ -332,6 +341,7 @@ function simRun(crew, runKey, stats) {
     if (!van && credits > 900 && crew.n >= 3) { credits -= 350; van = true; }
     credits -= 15 * crew.n;                                  // flashlights / batteries / medkits
     credits -= Math.round(DIFF.eff(q).sim.upkeep * quota);   // wave 5: trap / turret kits get pricier with daily use, turrets eat ammo
+    if (RELAY) { relayRun.credits = Math.max(0, credits); relayRun.quota = quota; const net = visitRelayBroker(relayRun); credits += net; inc.relay += net; }
     let cycleValue = 0, wipes = 0, deaths = 0, rSum = 0;
     for (let d = 0; d < 3; d++) {
       const e = pickW(DAILY_EVENTS);
@@ -346,7 +356,10 @@ function simRun(crew, runKey, stats) {
       if (w8) { o.wipe = Math.min(0.95, o.wipe + w8.wipeAdd); w8.pocket *= SKILL[sk0].eff; w8.addSold = w8.ore + w8.crate + w8.pocket + w8.lantern; }
       rSum += o.r;
       const base = o.value * o.eff * (van ? 1.08 : 1) * noise(0.3) * (w8 ? w8.mul * (1 - w8.divert) : 1);
-      const got = base + (w8 ? w8.addSold : 0);
+      // Field participation competes for exploration time. Optional parcel availability is an assumption (.25), not guaranteed each landing.
+      const participation = RELAY && hashRun(runKey + ':' + q + ':' + d) / 100 < RELAY_EFFORT;
+      const signalSalvage = participation && q >= 1 && hashRun('signal:' + runKey + ':' + q + ':' + d) < 25 ? SIGNAL_PARCEL_VALUE : 0;
+      const got = base * (participation ? .97 : 1) + (w8 ? w8.addSold : 0) + signalSalvage;
       if (w8) { inc.scrap += base; inc.ore += w8.ore; inc.crate += w8.crate; inc.pocket += w8.pocket; inc.lantern += w8.lantern; }
       minutes += REAL_DAY_MIN * clamp((1440 - (e.startTime || 480)) / 960 / (e.timeMul || 1), 0.5, 1);
       // XP for this landing (per player)
@@ -356,6 +369,7 @@ function simRun(crew, runKey, stats) {
       const shareMul = (1 + 0.35 * (crew.n - 1)) / crew.n;   // killer 1, helpers 0.25-0.5
       let dxp = kills * killXp(m, q, lv) * shareMul + 0.35 * got / crew.n + 0.5 * (120 + q * 20) / crew.n + 70 * 0.5 + (35 + m.tier * 15 + q * 5) * 0.6;
       dxp *= (e.xpMul || 1);
+      if (RELAY) completeRelayField(relayRun, m.id, q * 3 + d + 1); // even an all-dead completed departure advances the actual ledger
       if (rand() < o.wipe) {
         wipes++; stash = 0; deaths += crew.n;
         credits -= Math.min(credits, Math.round(credits * 0.15 * crew.n));
@@ -366,6 +380,16 @@ function simRun(crew, runKey, stats) {
       deaths += dd;
       credits -= Math.min(credits, Math.round(credits * 0.1 * dd));
       stash += got * (1 - 0.5 * dd / crew.n * 0.3);        // a dead player's carried scrap is often lost
+      if (RELAY) {
+        relayRun.credits = Math.max(0, credits);
+        if (participation) {
+          const survey = relaySurveyReward(runKey + ':' + q + ':' + d);
+          const restoration = ['echoregistry', 'embercache'].includes(m.interior) ? 3 * districtRewards.restored + districtRewards.complete : 0;
+          relayRun.credits += survey + restoration; inc.relay += survey + restoration;
+          const net = visitRelayBroker(relayRun); inc.relay += net;
+        }
+        credits = relayRun.credits;
+      }
       cycleValue += got;
       if (w8) { credits = Math.max(0, credits + w8.job); inc.job += w8.job; }   // job pay goes straight to credits (not the quota)
       xp += dxp + (40 + m.tier * 20 + q * 10) * (1 - dd / crew.n);
@@ -463,6 +487,7 @@ function w8Report() {
     const share = (L) => { const t = L.reduce((a, x) => a + x.scrap + x.ore + x.crate + x.job + x.pocket + x.lantern + x.resto + x.arcade + x.hs, 0), p = L.reduce((a, x) => a + x.resto + x.ore + x.arcade + x.hs, 0), sd = L.reduce((a, x) => a + x.resto + x.ore + x.arcade + x.hs + x.job + x.crate + x.pocket, 0); return [p / t * 100, sd / t * 100]; };
     const sa = share(all), sd = share(D);
     console.log(`${label.padEnd(11)} | ${pad(pct(qs, 0.5), 5)}  | ${['scrap', 'ore', 'crate', 'pocket', 'lantern'].map((k) => pad(fmt(mean(all, k)), 6)).join(' ')} | ${pad(fmt(mean(all, 'job')), 4)} | ${pad(fmt(mean(D, 'resto')), 7)} | ${pad(fmt(mean(all, 'arcade')), 5)} | ${fmt(sa[0], 1)}% / ${fmt(sd[0], 1)}% | ${fmt(sa[1], 1)}% / ${fmt(sd[1], 1)}%`);
+    if (RELAY) console.log(`  relay net credits/run ${fmt(mean(all, 'relay'))}; participation ${Math.round(RELAY_EFFORT * 100)}%; actual broker caps, commission/helper costs; side shares above retain the legacy definition`);
   }
   // wave 8 tycoon: the Homestead gate (hs share of ALL income + median quotas). The owner's 25 % ceiling is for the combined side share; the baseline is already above it without the plot
   // (docs/wave8/tycoon.md), so the gate here is: the plot adds <= hsShareMax % of income, the medians stay 7 +/- 1, and only capScale (never prices) may be lowered if it fails.

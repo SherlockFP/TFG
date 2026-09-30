@@ -245,26 +245,30 @@ export function installStealth(game) {
       r.m.material.opacity = r.opacity * (1 - k) * (1 - k);
     }
   }
-  let lastFoot = 0;
+  let lastFoot = 0, lastRingAt = -Infinity;
+  const nearbyThreat = () => S.threatNearNoise(g.player, g.creatures?.views?.values());
   function footRing() {
     const p = g.player;
     if (!p || p.footIdx === lastFoot) return;
     lastFoot = p.footIdx;
-    if (!enabled() || g.settings?.stealthRings === false || !isMoon() || p.inShip || p.dead) return;
+    if (!enabled() || g.settings?.stealthRings === false || !isMoon() || p.inShip || p.dead || p.crouch || p.sneak || !nearbyThreat()) return;
     const loud = p.noise || 0;
-    if (loud < 0.05) return;
+    if (loud < 0.28 || now() - lastRingAt < 1300) return;
+    lastRingAt = now();
     const band = S.bandOf(loud);
-    ringAt(p.pos.x, p.pos.y, p.pos.z, clamp(S.radiusOf(loud, 12), 0.8, 9), band === 'LOUD' ? 0xff6a55 : band === 'STEADY' ? 0xffd23f : 0x7fe0a0, 0.75, band === 'LOUD' ? 0.28 : 0.2);
+    ringAt(p.pos.x, p.pos.y, p.pos.z, clamp(S.radiusOf(loud, 6), 0.8, 3.5), band === 'LOUD' ? 0xff6a55 : 0xffd23f, 0.45, band === 'LOUD' ? 0.10 : 0.06);
   }
   // rings for noises other people made (host-relayed 'stv'): a faint ping where it happened, only when it is near you
   function onStv(d) {
-    if (disposed || !d || !Array.isArray(d.e) || g.settings?.stealthRings === false) return;
+    if (disposed || !d || !Array.isArray(d.e) || g.settings?.stealthRings === false || !isMoon() || !nearbyThreat() || now() - lastRingAt < 1300) return;
     const p = g.player;
     for (const e of d.e.slice(0, 4)) {
       if (!Array.isArray(e)) continue;
       const x = Number(e[0]) / 10, z = Number(e[1]) / 10, loud = Number(e[2]) / 100;
-      if (!Number.isFinite(x + z + loud) || !p || Math.hypot(x - p.pos.x, z - p.pos.z) > 40) continue;
-      ringAt(x, p.pos.y, z, clamp(loud * 6, 1, 14), 0xffb04a, 1.0, 0.24);
+      if (!Number.isFinite(x + z + loud) || loud < 0.5 || !p || Math.hypot(x - p.pos.x, z - p.pos.z) > 12) continue;
+      ringAt(x, p.pos.y, z, clamp(loud * 3, 1, 4), 0xffb04a, 0.5, 0.08);
+      lastRingAt = now();
+      break;
     }
   }
   function bindNet(net) {

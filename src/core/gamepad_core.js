@@ -49,7 +49,7 @@ export function padGlyphMouse(button, kind = 'xbox') {
 export function actionLabel(action, keys, usingPad, kind = 'xbox') {
   if (usingPad) { const g = padGlyph(action, kind); if (g) return g; }
   const c = keys?.[action];
-  return c ? String(c).replace(/^Key|^Digit/, '').replace(/^Arrow/, '').replace('ShiftLeft', 'L-Shift').replace('ControlLeft', 'L-Ctrl').replace('Backquote', '`') : '';
+  return c ? String(c).replace(/^Key|^Digit/, '').replace(/^Arrow/, '').replace('ShiftLeft', 'L-Shift').replace('ControlLeft', 'L-Ctrl').replace('Backquote', '`').replace('Backslash', 'Backslash (\\)') : '';
 }
 
 const dz = (v, d) => { const a = Math.abs(v); return a < d ? 0 : Math.sign(v) * (a - d) / (1 - d); };

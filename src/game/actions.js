@@ -275,7 +275,13 @@ export const actionMethods = {
       }
       for (const d of fac.doors) {
         if (d.kind === 'vault' && d.locked && d.keypadPos) add({ pos: d.keypadPos, r: 0.6, label: t('Crack the vault keypad [E]'), action: () => this.startSafe(d) });
-        if (d.teleport) add({ pos: d.pos.clone().add(new THREE.Vector3(0, 1.3, 0)), r: 1.2, reach: 2.4, label: d.kind === 'entrance' ? t('Exit facility [E]') : t('Use fire exit [E]'), action: () => this.useExit(d.exitIndex, false) });
+        if (d.teleport) {
+          // Put the target in front of its own solid portal panel. A centre target
+          // was occluded at a downward angle by the panel's 15 cm half-depth.
+          const point = d.pos.clone().add(new THREE.Vector3(0, 1.3, 0));
+          if (d.spawn) { const inward = d.spawn.clone().sub(d.pos).setY(0); if (inward.lengthSq() > 0) point.addScaledVector(inward.normalize(), .22); }
+          add({ pos: point, r: 1.2, reach: 2.4, label: d.kind === 'entrance' ? t('Exit facility [E]') : t('Use fire exit [E]'), action: () => this.useExit(d.exitIndex, false) });
+        }
         if (d.kind === 'door' && d.open && d.t > 0.9) add({ pos: d.pos.clone().add(new THREE.Vector3(0, 1.2, 0)), r: 0.8, reach: 2.2, label: t('Close door [E]'), action: () => this.net.request('door', { id: d.id, open: false }) });
       }
       for (const v of this.creatures.views.values()) {
@@ -1098,7 +1104,8 @@ export const actionMethods = {
   },
   onSellResult(d) {
     const c = this.world.company;
-    if (d.pending) { if (c) { c.tentState = 'grab'; c.tentT = 0; } this.audio.play('company_tentacle', { volume: 0.9 }); return; }
+    if (d.pending) { if (c) { c.tentState = 'grab'; c.tentT = 0; } this.audio.play(c?.archiveIntake ? 'register' : 'company_tentacle', { volume: c?.archiveIntake ? 0.5 : 0.9 }); return; }
+    if (c?.archiveIntake) c.tentState = 'hidden';
     this.audio.play('coins', { volume: 0.8 });
     this.ui.showSale(d, this);
   },
@@ -1219,6 +1226,7 @@ export const actionMethods = {
       holding: !def ? 'none' : def.hands === 2 || def.kind === 'big' || held.type === 'body' ? 'twohand' : 'onehand',
       lookDelta: p.lookDelta || { x: 0, y: 0 }, time: this.time,
       item: held ? held.type : null, weapon: def?.kind === 'weapon', ranged: !!def?.ranged, player: p, reduceMotion: !!this.settings.reduceMotion,
+      useAge: this.time - (this.useStart ?? -Infinity),   // horn squeeze / utility button pose, independent of melee swings
       grip: this.fpbody?.gripOf(held) || null,   // [fpbody] arm IK targets for two-handed items
     });
   },

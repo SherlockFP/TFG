@@ -13,6 +13,7 @@ import { MOONS } from './moons.js';
 import { wrapMethod, combineEvents } from './dailyEvents.js';
 import { capOne } from './balance_rules.js';
 import { insideShip } from '../world/ship.js';
+import { attentionHot } from '../ui/hud_attention.js';
 import { t, tf } from '../core/i18n.js';
 import { RNG, hashString } from '../core/rng.js';
 import { AFFIX_BY_ID, MAX_AFFIX, RARITY_NAME, rollMap, addAffix, effectsOf, flagsOf, rewardOf, mapTitle, cleanMap } from './mapmods_core.js';
@@ -90,8 +91,10 @@ export function installMapmods(game) {
   // a resumed / late run may sit in orbit without a map: roll one (cheap poll, host only)
   offs.push(mods.on('update', (dt, g) => {
     if (g && g !== game) return;
-    if (S.wait > 0 && (S.wait -= dt) <= 0) buildCard();
-    if (S.card && (S.cardT -= dt) <= 0) hideCard();
+    const busy = attentionHot(game);
+    if (S.card) S.card.style.visibility = busy ? 'hidden' : '';
+    if (!busy && S.wait > 0 && (S.wait -= dt) <= 0) buildCard();
+    if (!busy && S.card && (S.cardT -= dt) <= 0) hideCard();
     if (!host() || (S.chkT -= dt) > 0) return;
     S.chkT = 2;
     const r = run(); if (r?.phase === 'orbit' && !mmOf()?.nxt) hostRollNext();
@@ -267,6 +270,7 @@ export function installMapmods(game) {
   function buildCard() {
     const r = run(), cur = r?.mm?.cur;
     S.wait = 0;
+    if (attentionHot(game)) { S.wait = 0.1; return; }
     if (!cur?.a?.length || !realMoon(r?.moon)) return;
     ensureCss();
     const el = document.createElement('div');

@@ -1,6 +1,7 @@
 // Game orchestrator: world loading, main loop, networking glue, players, items, creatures.
 // Host-only logic lives in host.js, local player actions in actions.js (mixed into the prototype).
 import * as THREE from 'three';
+import { installFleet13 } from './fleet13.js';
 import { installBossdress } from './bossdress.js';   // wave 8 night: themed sector boss names + lair dressing (docs/wave8/bossdress.md)
 import { installHerocontent } from './herocontent.js';   // wave 8: themed scrap tables for metro / greenhouse / prison / tower (docs/wave8/herocontent.md); early so every import-time SCRAP_TABLE walker sees them
 import { Physics, G } from '../physics/physics.js';
@@ -240,6 +241,17 @@ import { installLabyr12 } from './labyr12.js';   // [import:labyr12] wave 12: Da
 import { installMoons12 } from './moons12.js';
 import { installAtmos12 } from './atmos12.js';
 import { installCoop12 } from './coop12.js';
+import { installCompany13 } from './company13.js';
+import { installCasino13 } from './casino13.js';
+import { installThreats13 } from './threats13.js';
+import { installDistricts13 } from './districts13.js';
+import { installIndustry13 } from './industry13.js';
+import { installCargo13 } from './cargo13.js';
+import { installLife13 } from './life13.js';
+import { installArsenal13 } from './arsenal13.js';
+import { installExpedition13 } from './expedition13.js';
+import { installEscape14 } from './escape14.js';
+import { installMissions14 } from './missions14.js';
 import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
 
 
@@ -640,13 +652,25 @@ export class Game extends Emitter {
     this.useModule('moons12', installMoons12);
     this.useModule('atmos12', installAtmos12);
     this.useModule('coop12', installCoop12);
+    this.useModule('company13', installCompany13);
+    this.useModule('casino13', installCasino13);
+    this.useModule('threats13', installThreats13);
+    this.useModule('districts13', installDistricts13);
 
     this.useModule('onboard', installOnboard);   // [slot:onboard] wave 5: Hiring Day + staged unlocks (installed last: wraps hostLever / terminalCommand / objectives.compute)
     this.useModule('score', installScore);   // wave 7: adaptive procedural music + the Algorithm's jingle (docs/wave7/score.md)
     this.useModule('studio', installStudio);   // wave 8: item tips (installed after every module that registers items)
     this.useModule('onegoal', installOneGoal);   // [onegoal] one goal line (+1 warning) for every profile, message pacing for veterans
     this.useModule('algoslot', installAlgoSlot);   // wave 9: LIVE strip above HP + chat reactions (docs/wave9/algoslot.md)
+    this.useModule('fleet13', installFleet13);
     this.useModule('hudcalm', installHudCalm);   // wave 8: calm HUD (docs/wave8/declutter.md)
+    this.useModule('industry13', installIndustry13);
+    this.useModule('arsenal13', installArsenal13);
+    this.useModule('expedition13', installExpedition13);
+    this.useModule('escape14', installEscape14);
+    this.useModule('missions14', installMissions14);
+    this.useModule('cargo13', installCargo13);
+    this.useModule('life13', installLife13);
 
 
   }
@@ -994,10 +1018,12 @@ export class Game extends Emitter {
         npc.root.position.copy(c.npcPos); npc.root.rotation.y = -Math.PI / 2;
         c.group.add(npc.root);
         c.npc = npc;
-        const tent = createCreatureModel('company', { seed: 1 });
-        tent.root.position.copy(c.dropZone).add(new THREE.Vector3(0, -1.0, -1.2));
-        c.group.add(tent.root);
-        c.tentacles = tent; c.tentT = 0; c.tentState = 'hidden';
+        if (!c.archiveIntake) {
+          const tent = createCreatureModel('company', { seed: 1 });
+          tent.root.position.copy(c.dropZone).add(new THREE.Vector3(0, -1.0, -1.2));
+          c.group.add(tent.root); c.tentacles = tent;
+        }
+        c.tentT = 0; c.tentState = 'hidden';
       } catch (e) { console.warn('npc', e); }
     });
   }
@@ -1422,10 +1448,11 @@ export class Game extends Emitter {
       c.npc.root.lookAt(this.player.pos.x, c.npc.root.position.y, this.player.pos.z);
       void near;
     }
-    if (c.tentacles) {
-      c.tentT += dt;
+    if (c.tentacles || c.archiveIntake) {
+      c.tentT = (c.tentT || 0) + dt;
       const prog = c.tentState === 'grab' ? clamp(c.tentT / 3, 0, 1) : 0;
-      c.tentacles.update(dt, { state: c.tentState === 'grab' ? 'grab' : 'hidden', progress: prog, t: c.tentT, time: this.time, speed: 0 });
+      c.tentacles?.update(dt, { state: c.tentState === 'grab' ? 'grab' : 'hidden', progress: prog, t: c.tentT, time: this.time, speed: 0 });
+      c.archiveIntake?.update?.(dt, c.tentState === 'grab');
       if (c.tentState === 'grab' && c.tentT > 3.2) c.tentState = 'hidden';
     }
   }

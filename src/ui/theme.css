@@ -306,3 +306,15 @@ html.tfg-ui #ui .shop .tabs { gap: 2px; }
 
 /* wave 8: while the text chat is open, hide the Algorithm's live-chat feed and the hunger/survival widget */
 body.chat-typing [data-dock-id="a2feed"], body.chat-typing [data-dock-id="survival"] { display: none !important; }
+
+/* Wave 14: attention stays on the encounter; existing queues restore notices afterward. */
+html.tfg-ui #ui .hud.hud-alert-focus :is(.hud-xpfeed, .hud-chips, .hud-tr) { visibility: hidden; }
+html.tfg-ui #ui:has(.hud.hud-alert-focus) .kach-banner-host { visibility: hidden; }
+html.tfg-ui #ui:has(.hud.hud-alert-focus) .hc-off { display: none; }
+html.tfg-ui #ui .hud-toasts .toast { line-height: 1.3; max-width: min(330px, 42vw); font-size: 18px; padding: 6px 10px; }
+html.tfg-ui #ui .hud-toasts .toast:is(.bad, .warn, .warning, .danger) { border-left-color: var(--t-bad); }
+
+/* Wave 15: passive system history gives way to the encounter; deliberate chat and crew messages remain available. */
+html.tfg-ui #ui:has(.hud.hud-alert-focus) .chat:not(.open) .chat-line:not(:has(.cn)),
+html.tfg-ui #ui:has(.hud.hud-alert-focus) .chat:not(.open) .chat-line.old { display: none; }
+html.tfg-ui #ui:has(.hud.hud-alert-focus) .chat:not(.open) .chat-log { max-height: 62px; }

@@ -145,7 +145,7 @@ const game = new Proxy({
   later(fn, ms) { return setTimeout(fn, 0); },
   broadcastRun: noop, broadcast: noop, sendTo: noop, toast: noop, say: noop,
   net: ghost('net', { id: 'h', selfId: 'h', isHost: true, hostId: 'h', peers: ['p1', 'p2', 'p3'], broadcast: noop, send: noop, sendTo: noop, request: noop, on: noop, on_: noop, off: noop, handlers: {} }),
-  physics: ghost('physics', { lineOfSight: () => { C.phys++; return true; }, raycast: () => { C.phys++; return null; }, castRay: () => { C.phys++; return null; }, groundY: () => 0, sphereCast: () => { C.phys++; return null; } , addStaticBox: () => ({}), addBox: () => ({}), removeCollider: noop, addStaticMesh: () => ({}), addCollider: () => ({}) }),
+  physics: ghost('physics', { lineOfSight: () => { C.phys++; return true; }, raycast: () => { C.phys++; return null; }, castRay: () => { C.phys++; return null; }, groundY: () => 0, sphereCast: () => { C.phys++; return null; } , addStaticBox: () => ({ setTranslation: noop, setRotation: noop }), addBox: () => ({}), removeCollider: noop, addStaticMesh: () => ({}), addCollider: () => ({}) }),
   ui: ghost('ui'), audio: ghost('audio'), sfx: noop, hud: ghost('hud'),
   creatures: ghost('creatures', { list: views, all: views, views: viewMap, host: viewMap, game: null, nearest: () => ({ p: players[0], d: 10 }), noise: noop, nav: () => null, placeAt: noop, follow: noop, byType: () => [], hostList: () => views }),
   items: ghost('items', { list: [], all: () => [], values: () => [], get: () => null, held: () => null, forEach: noop, hostSpawn: () => 'i0', nearest: () => null, [Symbol.iterator]: function* () {} }),

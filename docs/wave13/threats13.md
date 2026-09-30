@@ -1,0 +1,17 @@
+# Wave 13: readable machine threats
+
+Install: import `installThreats13` from `./threats13.js` into game.js, then `this.useModule('threats13', installThreats13)` alongside creatures12. Existing cev spawn/state/sound and cs snapshots replicate both threats; no new packets or host allowlists needed.
+
+Two new roles, quota 2+, maxAlive 1 each:
+- Line Printer: stationary thermal machine. Locks its yaw and projects an amber 12 m lane for 1.4 s, then deals 26 base damage along that lane. Sidestep the 0.8 m half-width or use a wall. It cannot attack entrance safe zones. Four-second recovery.
+- Checksum: slow noise seeker (walking speed 2). Green 1.6 s verification scan; remain quiet for 0.55 s to cancel, or leave its 2.1 m strike reach. Base damage 22. Walls cancel scans. Four-second recovery. Works solo; does not require teammates.
+
+Definitions use generic damage scaling/stun/kill/XP and models show state on every peer. Specific positional machine audio owns the state cues; generic synthesized alert/attack voices are bypassed for these two ids. No generic ambient chatter; the machine wind-ups remain identifiable. Names, hints, lore and field notes have EN/TR/RU translations.
+
+Fairness: wave-12 Cookie/Echo/Lag now wait until quota 2, matching the existing early pacing contract; 404 already did. Curated new-rule cap now includes all four wave-12 perception creatures, previously missing, plus these two. At quotas 0–1 the selected resident pool teaches at most one new rule; quotas 2–3 at most two. This bounds selected headlines, not all ambient spawn budgets: rare out-of-pool spawns retain the existing 12% weight policy (24% on Hard). Baseline enemies/director remain governed by existing balance modules.
+
+Existing creature audio: idle detection range reduced 20%, hurt repeats require twice the former interval, and idle/chase/footstep level ducks smoothly as active creature voices increase. Threat alerts, attacks and deaths keep their original level and positional occlusion. Ambient layers no longer compete at full level in crowds.
+
+Validation: `node tools/harness/threats13.test.mjs` verifies lateral/backward/vertical lane exclusions, rotated lane, quiet cancellation/reset, 1,000 seeded early pools and finite bounded audio recipes. Syntax checks on installer/models pass. Browser and multiplayer perceptual validation is reserved for coordinator; no claim of real peer or headphone verification. New sounds are procedural original machine cues rather than recordings.
+
+Labyrinth compatibility follow-up: atmos12 now has distinct atmosphere profiles for Darkweb (cool cable/scorch), Hotel (warm dusty paper/stains), Echo Registry (mint archive paper), Ember Cache (amber foundry scorch/rubble/cooling vents). cycle_core preserves these interiors through core/gate generation with coherent existing boss aliases and `themedEntry` safe copies. Atmos12 passes all 44 facilities; cycle3_flow passes 168 checks. Cycle2_flow's outdated first-eight-theme sample was strengthened: derive all canonical boss IDs from BOSS_TABLE, sample seeded runs until every kit is represented, execute all collected themes including aliases, and require every canonical boss to finish its flow. All 236 checks pass, including 24 random runs / 720 operations. No gameplay mapping was changed to satisfy the coverage sample. Audio registration exceptions are bounded to one warning per install instead of retrying each frame.

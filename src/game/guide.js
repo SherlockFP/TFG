@@ -9,10 +9,12 @@
 //   * terminal     GUIDE [name|ALL|MUTE|UNMUTE], TIPS, ALGO TIPS, TUTORIAL [STATUS|SKIP|RESTART], "did you mean" on unknown words
 //   * tutorial     7 objectives (move, light, scrap, inventory, scan, back to ship, sell) via the 'objectives' hook, never blocking
 // Profile: profile.guide (see guide_core.js). Setting: settings.guideTips (default on). Docs: docs/wave4/guide.md.
+import { attentionHot } from '../ui/hud_attention.js';
 import { getLang, t } from '../core/i18n.js';
 import { saveSettings } from '../core/save.js';
 import { wrapMethod } from './dailyEvents.js';
-import { isSellable } from './items.js';
+import { isSellable, itemDef } from './items.js';
+import { threatNearNoise } from './stealth_core.js';
 import {
   FEATURES, CATS, UI, TUT_STEPS, TUT_DONE_SAY, HIDDEN_CMDS, pick, fmt,
 } from './guide_data.js';
@@ -146,7 +148,8 @@ export function installGuide(game) {
     if (def.grenade || def.throwable) use('grenades');
     if (String(it.type || '').startsWith('fd_') || it.type === 'medkit') use('food');
   });
-  on('itemState', (it) => { if ((it?.type === 'flashlight' || it?.type === 'proflash') && it.on) { use('flashlight'); tut('flash'); } });
+  // itemState also carries remote/world lamps: only credit a lamp in this player's hotbar.
+  on('itemState', (it) => { if ((it?.type === 'flashlight' || it?.type === 'proflash') && it.on && game.player?.slots?.includes(it.id)) { use('flashlight'); tut('flash'); } });
 
   // ---------------------------------------------------------------- tutorial
   function tut(ev, data) {
@@ -163,7 +166,7 @@ export function installGuide(game) {
     const s = tutCurrent(g);
     if (!s || g.tut.said[s.id]) return;
     g.tut.said[s.id] = 1;
-    if (s.id === 'move' && game.onboard?.controlsPinned?.()) { save(); return; }   // [algoctx] the stream overlay / Hiring Day already showed WASD, Shift and Ctrl
+    if (s.id === 'move' && game.onboard?.controlsPinned?.()) { save(); return; }   // [algoctx] the stream overlay / Hiring Day already showed WASD, Shift and C
     S.sayQ.push({ text: pick(s.say, lang()), at: S.t + delay, kind: 'tut', id: s.id, key: 'say:' + s.id, src: s.say, ctx: s.ctx });
     save();
   }
@@ -190,6 +193,13 @@ export function installGuide(game) {
     for (const id of p?.slots || []) { const it = id && game.items?.get?.(id); if (it && (it.type === 'flashlight' || it.type === 'proflash')) return true; }
     return false;
   }
+  const lightContext = () => ({
+    hasFlashlight: hasFlashlight(),
+    docked: !!game.fleet13?.docked?.(),
+    bagFlashlight: !!(game.inventory?.bagItems?.() || []).some(it => it.type === 'flashlight' || it.type === 'proflash'),
+    price: game.shop?.priceOf?.('flashlight') ?? itemDef('flashlight')?.price ?? 15,
+    key: (game.input?.key?.('flashlight') || 'KeyF').replace(/^Key/, '').replace(/^Digit/, ''),
+  });
   const holdsScrap = () => {
     const p = game.player;
     for (const id of p?.slots || []) { const it = id && game.items?.get?.(id); if (it && it.def && isSellable(it.def) && !it.soulbound && it.type !== 'body') return true; }
@@ -204,7 +214,7 @@ export function installGuide(game) {
     const s = tutCurrent(gs);
     if (!s) return;
     const idx = TUT_STEPS.indexOf(s) + 1;
-    const tutLine = add(T('tut_obj', { n: idx, total: TUT_TOTAL, text: stepObjective(s, lang(), { hasFlashlight: hasFlashlight() }) }), 'main', false, tutStepProgress(gs, s.id) || null);
+    const tutLine = add(T('tut_obj', { n: idx, total: TUT_TOTAL, text: stepObjective(s, lang(), lightContext()) }), 'main', false, tutStepProgress(gs, s.id) || null);
     if (tutLine && typeof tutLine === 'object') tutLine.pin = true;   // wave 8: never hidden by the calm HUD cut
     if (S.tutT < 300) add(T('tut_skip_hint'), 'hint');
     void phase;
@@ -255,7 +265,9 @@ export function installGuide(game) {
     return !!(a && (a.speaking || (a.state?.q?.length || 0) > 0));
   };
   function canSpeak() {
+    if (attentionHot(game) || game.ui?.centerCards?.busy?.()) return false;
     if (game.player?.dead || game.minigame || game.terminal?.active || game.ui?.panelOpen || game.ui?.chatOpen || game.ui?.fullscreenOpen?.()) return false;
+    if ((game.chase?.tension?.() || 0) > 0.12 || threatNearNoise(game.player, game.creatures?.views?.values?.(), 10)) return false;
     if (!game.run || game.run.phase === 'fired') return false;
     return !loreBusy() && S.quietT <= 0;
   }
@@ -423,7 +435,7 @@ export function installGuide(game) {
     term_.print(T('tut_usage'), 'err');
   }
   function tutStatus(g) {
-    if (tutRunning(g)) { const s = tutCurrent(g); return T('tut_status_run', { done: tutDoneCount(g), total: TUT_TOTAL, text: s ? stepObjective(s, lang(), { hasFlashlight: hasFlashlight() }) : '' }); }
+    if (tutRunning(g)) { const s = tutCurrent(g); return T('tut_status_run', { done: tutDoneCount(g), total: TUT_TOTAL, text: s ? stepObjective(s, lang(), lightContext()) : '' }); }
     return T(g.tut.s === 'done' ? 'tut_status_done' : 'tut_status_skip');
   }
   regCmd('guide', guideCmd, 'The Algorithm\'s tips: things you have not tried yet (GUIDE <name>, GUIDE ALL, GUIDE MUTE)');

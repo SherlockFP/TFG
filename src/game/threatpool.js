@@ -18,10 +18,11 @@ export const HEADLINE = Object.freeze([
   { id: 'lm_keeper', zone: 'in' }, { id: 'lm_masked', zone: 'in', minQ: 1 }, { id: 'lm_lootmimic', zone: 'in' },
   { id: 'cd_follower', zone: 'in', minQ: 1 }, { id: 'cd_dimmer', zone: 'in', minQ: 1 }, { id: 'cd_auditor', zone: 'in', minQ: 1 },
   { id: 'lm_hunter', zone: 'in', minQ: 1 }, { id: 'lm_witch', zone: 'out' },
-  { id: 'c12_404', zone: 'in', minQ: 2 }, { id: 'c12_cookie', zone: 'in', minQ: 1 }, { id: 'c12_echo', zone: 'in', minQ: 1 }, { id: 'c12_lag', zone: 'in', minQ: 1 },   // wave 12 creatures12 (docs/wave12/creatures12.md)
+  { id: 'c12_404', zone: 'in', minQ: 2 }, { id: 'c12_cookie', zone: 'in', minQ: 2 }, { id: 'c12_echo', zone: 'in', minQ: 2 }, { id: 'c12_lag', zone: 'in', minQ: 2 },   // wave 12 creatures12 (docs/wave12/creatures12.md)
   { id: 'c10_buffering', zone: 'in', minQ: C10.TUNE.minQuota.c10_buffering }, { id: 'c10_doomscroller', zone: 'in', minQ: C10.TUNE.minQuota.c10_doomscroller }, { id: 'c10_ratio', zone: 'in', minQ: C10.TUNE.minQuota.c10_ratio },   // wave 10 creatures10 (docs/wave10/creatures10.md); minQ = the creature's own spawn gate (wave 12 balance12 staggers them)
   { id: 'c11_captcha', zone: 'in', minQ: C11.TUNE.minQuota.c11_captcha }, { id: 'c11_shadowban', zone: 'in', minQ: C11.TUNE.minQuota.c11_shadowban }, { id: 'c11_recommender', zone: 'in', minQ: C11.TUNE.minQuota.c11_recommender },   // wave 11 creatures11 (docs/wave11/creatures11.md)
   { id: 'sw_scraper', zone: 'in' }, { id: 'sw_streamer', zone: 'in', minQ: S11.TUNE.minQuota.sw_streamer }, { id: 'sw_automod', zone: 'in', minQ: S11.TUNE.minQuota.sw_automod },   // wave 11 swarm11 (docs/wave11/swarm11.md)
+  { id: 'c13_printer', zone: 'in', minQ: 2 }, { id: 'c13_checksum', zone: 'in', minQ: 2 },
   { id: 'zombie', zone: 'out', minQ: 3 },   // Zombie Accounts: horde waves (crdirector gates them to quota 3+ anyway)
 ]);
 export const HEAD_IDS = new Set(HEADLINE.map((h) => h.id));
@@ -31,7 +32,7 @@ export const LM_KIND_ID = Object.freeze({ witch: 'lm_witch', keeper: 'lm_keeper'
 const BASELINE = new Set(['scuttler', 'yoinker', 'crawler', 'lurker', 'mannequin', 'sludge', 'spider', 'leech', 'jester', 'screamer', 'mimic', 'turret', 'mine', 'hound', 'giant', 'listener']);
 export const POOL_SIZE = 3;
 /** [balance12] wave 10 / 11 headliners ("new rules"): a pool holds at most newCap(q) of them - 1 before quota 2 (one lesson per landing), 2 at quota 2-3, then unlimited (the late game combines them) */
-export const NEW_IDS = new Set(['c10_buffering', 'c10_doomscroller', 'c10_ratio', 'c11_captcha', 'c11_shadowban', 'c11_recommender', 'sw_scraper', 'sw_streamer', 'sw_automod']);
+export const NEW_IDS = new Set(['c12_404', 'c12_cookie', 'c12_echo', 'c12_lag', 'c13_printer', 'c13_checksum', 'c10_buffering', 'c10_doomscroller', 'c10_ratio', 'c11_captcha', 'c11_shadowban', 'c11_recommender', 'sw_scraper', 'sw_streamer', 'sw_automod']);
 export const newCap = (q) => ((q | 0) < 2 ? 1 : (q | 0) < 4 ? 2 : 9);
 /** [balance12] pool size: 3 residents until quota 4, then 4 (more rules meet on one moon) */
 export const poolSize = (q) => ((q | 0) >= 4 ? POOL_SIZE + 1 : POOL_SIZE);

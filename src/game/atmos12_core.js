@@ -19,6 +19,11 @@ export const SIZES = {
 // shaft = { k: brightness, r: radius multiplier }; decals = per-cell weights; density = decals per floor cell; drips / vents = source counts
 const P = (tint, dust, shaft, density, decals, drips, vents, extra = {}) => ({ tint, dust, shaft, density, decals, drips, vents, spark: 0.5, ...extra });
 export const PROFILES = {
+  // Quiet archive motes, warm guest floors and scorched memory ceramics keep labyrinth identities distinct.
+  darkweb: P([0.91, 0.93, 1.10], 0.6, { k: 0.75, r: 0.85 }, 0.14, { cable: 5, scorch: 3, glass: 2, stain: 1 }, 2, 5, { spark: 0.55 }),
+  hotel: P([1.08, 1.01, 0.91], 1.2, { k: 1.1, r: 1.05 }, 0.14, { paper: 4, stain: 3, glass: 1, puddle: 1 }, 3, 2, { spark: 0.25 }),
+  echoregistry: P([0.93, 1.08, 1.02], 1.1, { k: 1.05, r: 0.85 }, 0.15, { paper: 7, cable: 2, glass: 1, stain: 1 }, 1, 3, { spark: 0.2 }),
+  embercache: P([1.10, 0.98, 0.87], 1.35, { k: 0.9, r: 1.05 }, 0.16, { scorch: 6, rubble: 4, cable: 2, puddle: 1 }, 4, 7, { spark: 0.8 }),
   factory: P([0.96, 1.0, 1.06], 0.9, { k: 1, r: 1 }, 0.16, { puddle: 3, stain: 3, cable: 4, paper: 1, scorch: 2 }, 6, 6, { spark: 0.9 }),
   mansion: P([1.09, 0.98, 0.86], 1.5, { k: 1.15, r: 1.15 }, 0.15, { leaf: 5, paper: 3, stain: 2, puddle: 1, rubble: 1 }, 3, 1),
   mineshaft: P([1.07, 0.97, 0.84], 1.6, { k: 0.8, r: 0.9 }, 0.15, { rubble: 5, puddle: 4, stain: 1, cable: 1 }, 8, 0, { spark: 0.6 }),

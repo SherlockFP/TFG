@@ -146,3 +146,51 @@ html.tfg-artdir .dmg-arc { left: -120px; top: -120px; width: 240px; height: 240p
   -webkit-mask: radial-gradient(circle, transparent 0 66%, #000 67% 76%, transparent 77%); mask: radial-gradient(circle, transparent 0 66%, #000 67% 76%, transparent 77%); }
 html.ad-calm.tfg-artdir .hud.hp-low .visor::after { animation: none; opacity: 0.7; }
 html.ad-calm.tfg-artdir .hud-health.crit, html.ad-calm.tfg-artdir .hud-stam.exhausted { animation: none; }
+
+/* Wave 13: quieter main-menu forms. Scope to menu-root so crew/game panels keep their own art direction. */
+html.tfg-artdir #ui .menu-root .menu-frame,
+html.tfg-artdir #ui .menu-root.over-crt .menu-frame {
+  --ph-dim: #b9a58e;
+  --ph-line: rgba(216, 178, 136, 0.28);
+  --ph-sel: rgba(255, 138, 61, 0.09);
+}
+html.tfg-artdir #ui .menu-root .menu-frame .cp-body { background-image: none; line-height: 1.35; }
+html.tfg-artdir #ui .menu-root .menu-frame .cp-head .menu-title { letter-spacing: 0.08em; }
+html.tfg-artdir #ui .menu-root .menu-frame .cp-head .ad-stamp { transform: none; border-width: 1px; opacity: 0.7; }
+html.tfg-artdir #ui .menu-root .menu-frame .cp-sec { letter-spacing: 0.1em; }
+html.tfg-artdir #ui .menu-root .menu-frame .cp-sec::after { background: var(--ph-line); }
+html.tfg-artdir #ui .menu-root .menu-frame .menu-list { gap: 5px; }
+html.tfg-artdir #ui .menu-root .menu-frame .menu-list .btn {
+  text-align: left; padding: 5px 14px; font-size: 24px; letter-spacing: 0.04em;
+  border-bottom-color: var(--ph-line);
+}
+html.tfg-artdir #ui .menu-root .menu-frame .menu-list .btn::after { content: none; }
+html.tfg-artdir #ui .menu-root .menu-frame .menu-list .btn.big { font-size: 28px; }
+html.tfg-artdir #ui .menu-root .menu-frame .menu-list .btn:focus-visible {
+  outline: 2px solid var(--ph-hi); outline-offset: 2px;
+}
+html.tfg-artdir #ui .menu-root .menu-frame :is(.btn.tab, .tabs > .btn, .chip) {
+  clip-path: none; padding-inline: 12px; border: 1px solid var(--ph-line);
+  font-size: 18px; letter-spacing: 0.04em;
+}
+html.tfg-artdir #ui .menu-root .menu-frame .tabs { border-bottom-width: 1px; flex-wrap: wrap; gap: 4px; }
+html.tfg-artdir #ui .menu-root .menu-frame :is(.btn.tab.sel, .tabs > .btn.sel, .chip.sel) { box-shadow: none; }
+html.tfg-artdir #ui .menu-root .menu-frame .form-row { padding-block: 6px; }
+html.tfg-artdir #ui .menu-root .menu-frame .form-row > label { letter-spacing: 0.02em; }
+html.tfg-artdir #ui .menu-root .menu-frame :is(input:not([type=checkbox]):not([type=range]):not([type=file]), select) {
+  min-height: 32px; border-bottom-width: 1px; background-color: #0b0907;
+}
+@media (max-width: 600px) {
+  html.tfg-artdir #ui .menu-root .menu-frame .cp-head .ad-stamp { display: none; }
+  html.tfg-artdir #ui .menu-root .menu-frame .menu-list .btn { font-size: 22px; }
+}
+
+/* Wave 14: audio activation is a quiet footer status on menus, clear of page titles. */
+html.tfg-artdir #ui:has(.menu-root:not(.hidden)) .sound-hint,
+html.tfg-artdir #ui:has(.overlay:not(.hidden)) .sound-hint {
+  left: auto; right: 16px; top: auto; bottom: 12px; transform: none;
+  max-width: min(320px, calc(100vw - 32px)); font-size: 15px; line-height: 1.25;
+  letter-spacing: 0.02em; text-transform: none; color: #baa99a;
+  background: rgba(12, 10, 8, 0.92); border: 1px solid rgba(185, 165, 142, 0.25);
+  padding: 5px 9px; box-shadow: none;
+}

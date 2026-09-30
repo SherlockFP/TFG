@@ -32,7 +32,7 @@ export const TEXT = {
   // ---- objectives (one per step)
   'obj.wake': ['Wake up. Listen to the Company announcement.', 'Uyan. Şirket duyurusunu dinle.', 'Проснись. Слушай объявление компании.'],
   'obj.walk': ['Walk out of Cell 07 [WASD]', '07 numaralı hücreden çık [WASD]', 'Выйди из камеры 07 [WASD]'],
-  'obj.crouch': ['Crouch under the duct [hold Ctrl]', 'Havalandırma kanalının altından çömelerek geç [Ctrl basılı]', 'Пройди под воздуховодом пригнувшись [удерживай Ctrl]'],
+  'obj.crouch': ['Crouch under the duct [hold C]', 'Havalandırma kanalının altından çömelerek geç [C basılı]', 'Пройди под воздуховодом пригнувшись [удерживай C]'],
   'obj.sprint': ['Sprint to the end of the hall before the shutter closes [hold Shift]', 'Panjur kapanmadan koridorun sonuna koş [Shift basılı]', 'Добеги до конца зала, пока не закрылся щит [удерживай Shift]'],
   'obj.locker': ['Open the company locker [E]', 'Şirket dolabını aç [E]', 'Открой шкафчик компании [E]'],
   'obj.flash': ['Switch the flashlight on [F]', 'El fenerini aç [F]', 'Включи фонарик [F]'],
@@ -51,7 +51,7 @@ export const TEXT = {
   skip_hint: ['Skip the orientation: hold Backspace', 'Oryantasyonu atla: Backspace basılı tut', 'Пропустить обучение: удерживай Backspace'],
   skip_prog: ['Skipping... {n}%', 'Atlanıyor... {n}%', 'Пропуск... {n}%'],
   // ---- Algorithm remarks while it happens
-  'say.crouch': ['Ducts. The Company builds them low on purpose. Crouch: hold Ctrl.', 'Kanallar. Şirket onları bilerek alçak yapar. Çömel: Ctrl basılı tut.', 'Воздуховоды. Компания нарочно строит их низкими. Присядь: удерживай Ctrl.'],
+  'say.crouch': ['Ducts. The Company builds them low on purpose. Crouch: hold C.', 'Kanallar. Şirket onları bilerek alçak yapar. Çömel: C basılı tut.', 'Воздуховоды. Компания нарочно строит их низкими. Присядь: удерживай C.'],
   'say.sprint': ['A shutter. It closes when you cross the line. Sprint: hold Shift. Punctuality is a virtue.', 'Bir panjur. Çizgiyi geçince kapanır. Koş: Shift basılı tut. Dakiklik bir erdemdir.', 'Щит. Он закроется, когда пересечёшь линию. Беги: удерживай Shift. Пунктуальность добродетель.'],
   'say.sprint_retry': ['Try again. I have nowhere to be.', 'Tekrar dene. Gidecek yerim yok.', 'Попробуй ещё. Мне некуда спешить.'],
   'say.sprint_free': ['Fine. The Company is feeling generous today.', 'Peki. Şirket bugün cömert.', 'Ладно. Компания сегодня щедра.'],
@@ -97,7 +97,7 @@ export const TEXT = {
   'sign.hangar': ['HANGAR', 'HANGAR', 'АНГАР'],
   'sign.hangar_h': ['MINI-SKELD: YOUR SHIP', 'MINI-SKELD: SENİN GEMİN', 'MINI-SKELD: ТВОЙ КОРАБЛЬ'],
   'sign.terminal': ['TERMINAL', 'TERMİNAL', 'ТЕРМИНАЛ'],
-  'sign.terminal2': ['Routes, store, info. Press E and type.', 'Rota, mağaza, bilgi. E\'ye bas ve yaz.', 'Маршруты, магазин, инфо. Нажми E и печатай.'],
+  'sign.terminal2': ['Routes and crew information. Press E and type.', 'Rota ve ekip bilgisi. E tuşuna bas ve yaz.', 'Маршруты и информация экипажа. Нажми E и печатай.'],
   'sign.lever': ['LEVER', 'KOL', 'РЫЧАГ'],
   'sign.lever2': ['Lands the ship. Pull it when the crew is aboard.', 'Gemiyi indirir. Ekip gemideyken çek.', 'Сажает корабль. Дёргай, когда команда на борту.'],
   'sign.door': ['DOOR', 'KAPI', 'ДВЕРЬ'],

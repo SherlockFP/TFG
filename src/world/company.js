@@ -4,7 +4,9 @@ import * as THREE from 'three';
 import { GeoBuilder, levelMaterial } from './geobuilder.js';
 import { createAnyProp as createProp } from './propfactory.js';
 import { getTexture, freeTree } from '../render/textures.js';
-import { G } from '../physics/physics.js';
+import { dressPort14 } from './port14.js';
+import { createAvatar } from '../models/avatar.js';
+import '../game/company13_text.js';
 
 export function buildCompany({ physics, lightPool }) {
   const group = new THREE.Group();
@@ -45,8 +47,7 @@ export function buildCompany({ physics, lightPool }) {
   box(bx + bw / 2 + 0.2, PY + bh / 2, bz, 0.5, bh, bd);
   box(bx, PY + bh + 0.5, bz, bw + 1, 1, bd + 0.5);
 
-  const levelMesh = gb.build((k) => levelMaterial(k));
-  group.add(levelMesh);
+
 
   // sea
   const sea = new THREE.Mesh(new THREE.PlaneGeometry(900, 900, 1, 1), new THREE.MeshLambertMaterial({ map: getTexture('water'), color: 0x3a5260 }));
@@ -74,14 +75,19 @@ export function buildCompany({ physics, lightPool }) {
 
   // sell counter at the back of the hall
   const counter = put('sell_counter', 0, PY, bz - bd / 2 + 2.2, 0);
+  // Preserve the authoritative physics/drop anchors; the Archive Intake replaces the inherited shutter visuals.
+  if(counter) counter.visible=false;
   const dz = counter?.userData.anchors?.dropZone;
   const dropZone = dz ? dz.getWorldPosition(new THREE.Vector3()) : new THREE.Vector3(0, PY + 1.1, bz - bd / 2 + 2.2);
   const bell = put('desk_bell', 2.2, dropZone.y - (PY) + PY, dropZone.z + 0.2, 0);
   if (bell) bell.position.y = dropZone.y - 0.02;
   interactables.push({ type: 'bell', pos: new THREE.Vector3(2.2, dropZone.y + 0.1, dropZone.z + 0.2) });
   interactables.push({ type: 'sellzone', pos: dropZone.clone(), size: new THREE.Vector3(5, 1.5, 1.6) });
-  put('company_sign', 0, PY + bh - 2.2, bz + bd / 2 - 0.1, 0);
-  put('company_sign', 0, PY + 2.8, bz - bd / 2 + 0.2, 0);
+
+  // Keep legacy sign collision/emitter registration exactly stable; new atlas replaces their visuals.
+  for(const [y,z] of [[PY+bh-2.2,bz+bd/2-.1],[PY+2.8,bz-bd/2+.2]]) {
+    const legacy=put('company_sign',0,y,z,0); if(legacy)legacy.visible=false;
+  }
 
   // market stall (right side inside the hall)
   const stall = put('vendor_stall', 11, PY, bz + 2, -Math.PI / 2);
@@ -89,18 +95,20 @@ export function buildCompany({ physics, lightPool }) {
   const npcPos = npcAnchor ? npcAnchor.getWorldPosition(new THREE.Vector3()) : new THREE.Vector3(12, PY, bz + 2);
   interactables.push({ type: 'market', pos: new THREE.Vector3(npcPos.x - 1.5, PY + 1.4, npcPos.z) });
 
-  // casino corner (left side) - three slot machines
-  const slots = [];
-  for (let k = 0; k < 3; k++) {
-    const o = put('slot_machine', -14.5, PY, bz - 4 + k * 2.2, Math.PI / 2);
-    slots.push(o);
-    interactables.push({ type: 'slots', pos: new THREE.Vector3(-13.6, PY + 1.3, bz - 4 + k * 2.2), obj: o });
+  // Dedicated casino annex: its machines are indoors, away from the freight/sale lane.
+  const casinoSpace = { center: new THREE.Vector3(-29, PY, -23), entrance: new THREE.Vector3(-29, PY, -12), bounds: { minX: -40, maxX: -18, minZ: -34, maxZ: -12 }, groundY: PY };
+  // Three continuous walls; south wall has a generous 6m entrance.
+  for (const [x,z,sx,sz] of [[-40,-23,.6,22],[-29,-34,22,.6],[-36,-12,8,.6],[-22,-12,8,.6],[-18,-23,.6,22]]) {
+    gb.box('metal_dark',x,PY+3,z,sx,6,sz,.35); box(x,PY+3,z,sx,6,sz);
   }
-  emitters.push(lightPool.add({ pos: new THREE.Vector3(-13, PY + 3.5, bz - 2), color: 0xff4fd8, intensity: 1.2, distance: 9, group: 'company' }));
+  gb.box('metal_dark',-29,PY+6.2,-23,22, .4,22,.35); box(-29,PY+6.2,-23,22,.4,22);
+  // casino machines
+  const slots = [];
+  emitters.push(lightPool.add({ pos: new THREE.Vector3(-29, PY + 4.5, -23), color: 0xff4fd8, intensity: 1.2, distance: 9, group: 'company' }));
 
   // bounty board near the entrance
-  const board = put('quest_board', -8, PY, bz + bd / 2 - 1.5, 0);
-  interactables.push({ type: 'bounties', pos: new THREE.Vector3(-8, PY + 1.6, bz + bd / 2 - 1.1), obj: board });
+  const board = put('quest_board', 27, PY, -6, 0);
+  interactables.push({ type: 'bounties', pos: new THREE.Vector3(27, PY + 1.6, -5.6), obj: board });
 
   // hall lights
   for (const x of [-10, 0, 10]) emitters.push(lightPool.add({ pos: new THREE.Vector3(x, PY + bh - 1.5, bz), color: 0xffe3b0, intensity: 2.0, distance: 20, group: 'company' }));
@@ -114,21 +122,59 @@ export function buildCompany({ physics, lightPool }) {
   box(-3, PY - 0.15, 51, 3, 0.3, 10);
   interactables.push({ type: 'pond', pos: fishPos.clone(), r: 6, sea: true });
 
+  // Content clearing district: a visible freight spine, archive towers and staffed counters.
+  // All architectural geometry shares the static material batches; no scene lights added.
+  for (const x of [-8, 8]) gb.box('hazard_stripes', x, PY + .015, -6, .3, .025, 28, .5);
+  for (let k = 0; k < 7; k++) {
+    const x = 24 + (k % 2) * 4, z = -34 + Math.floor(k / 2) * 6;
+    gb.box('metal_dark', x, PY + 4 + k % 3, z, 2.4, 8 + (k % 3)*2, 3, .4);
+    gb.box('computer', x, PY + 4, z + 1.56, 1.5, 6, .12, .3);
+    box(x, PY + 4 + k % 3, z, 2.4, 8 + (k % 3)*2, 3);
+  }
+  // Exchange canopy: forked lintels evoke packet routing rather than an industrial garage.
+  for (const x of [-11, 11]) {
+    gb.box('metal_dark', x, PY + 4, -18, 1.3, 8, 1.3,.4); box(x,PY+4,-18,1.3,8,1.3);
+    gb.box('hazard_stripes', x*.5, PY + 8, -18, 12, .6, 1.5,.3);
+  }
+  // Civil service annex / contract desk, open south toward the plaza.
+  for (const [x,z,sx,sz] of [[29,-9,18,.5],[20,-3,.5,12],[38,-3,.5,12]]) {
+    gb.box('concrete_dark',x,PY+2.5,z,sx,5,sz,.3); box(x,PY+2.5,z,sx,5,sz);
+  }
+  gb.box('metal_dark',29,PY+5.3,-3,18,.5,12,.3); box(29,PY+5.3,-3,18,.5,12);
+  put('vendor_stall', 33, PY, -6, 0);
+  const serviceNPCs = [];
+  for (const [id,x,z,color] of [['clerk',27,-7,'#759fa1'], ['auditor',-5.2,-36.45,'#c99b62']]) {
+    const avatar = createAvatar({suitColor:color});
+    avatar.root.position.set(x,PY,z); group.add(avatar.root);
+    serviceNPCs.push({id, pos:new THREE.Vector3(x,PY+1.3,z), avatar});
+  }
+  const levelMesh = gb.build((k) => levelMaterial(k));
+  group.add(levelMesh);
+
   // harbor dressing
   put('crane', 30, PY, 30, -Math.PI / 2);
   put('shipping_container', 34, PY, 0, 0.1, { variant: 1 });
   put('shipping_container', 34, PY + 2.6, 0.5, -0.05, { variant: 2 });
   put('shipping_container', -34, PY, 20, Math.PI / 2, { variant: 0 });
-  put('fish_crates', 20, PY, 12, 0.4);
+  put('fish_crates', 30, PY, 18, 0.4);
   put('fish_crates', -20, PY, 30, -0.3);
   put('oil_drum_stack', 25, PY, 38, 0);
   for (const [x, z] of [[-25, 5], [25, 5], [-25, 32], [25, 32], [0, 38]]) put('lamp_post', x, PY, z, 0);
   put('radio_tower', -38, PY, -20, 0);
 
+  // Archive registration booth and sorted packet bins sit outside the unchanged central sale approach.
+  box(-7.2,PY+1.65,-36.3,.3,3.3,2.4);
+  box(-5.2,PY+1.65,-37.4,4,3.3,.25);
+  box(-5.2,PY+.5,-35.25,3.8,1,.5);
+  for(const x of [4.7,6,7.3])box(x,PY+.65,-36.3,1.1,1.3,1.7);
+  const port14=dressPort14(group,'company',PY);
+
   return {
     group, colliders, emitters, interactables, dropZone, npcPos, fishPos, slots, board, counter,
-    groundY: PY,
+    groundY: PY, casinoSpace, serviceNPCs, archiveIntake: port14, district: 'content-clearing',
     dispose(physicsRef) {
+      port14.dispose();
+      for (const npc of serviceNPCs) npc.avatar.dispose?.();
       for (const c of colliders) physicsRef.removeCollider(c);
       for (const e of emitters) lightPool.remove(e);
       freeTree(group);   // [leak] geometry + uncached screen / water materials and canvases

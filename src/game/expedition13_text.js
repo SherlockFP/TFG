@@ -1,0 +1,28 @@
+import { addTranslations } from '../core/i18n.js';
+const lines = [
+ ['SIGNAL RUN', 'SİNYAL KOŞUSU', 'СИГНАЛЬНЫЙ МАРШРУТ'],
+ ['RELAY VAULT', 'RÖLE KASASI', 'ХРАНИЛИЩЕ РЕЛЕ'],
+ ['Accept the signal run [E]', 'Sinyal koşusunu kabul et [E]', 'Принять сигнальный маршрут [E]'],
+ ['Optional job: tune three path beacons, then return here for one salvage parcel.', 'İsteğe bağlı iş: yolun üç vericisini ayarla, sonra tek hurda paketi için buraya dön.', 'Необязательная работа: настрой три маяка на тропе, затем вернись за одной посылкой с хламом.'],
+ ['Tune beacon {n} [E]', 'Verici {n} ayarla [E]', 'Настроить маяк {n} [E]'],
+ ['Target band {target} | dial {dial}. Turn [E]; seal on the right control.', 'Hedef bant {target} | kadran {dial}. Çevir [E]; sağ kumandada sabitle.', 'Целевой диапазон {target} | шкала {dial}. Поверни [E]; подтверди правой ручкой.'],
+ ['Seal beacon {n} [E]', 'Verici {n} sabitle [E]', 'Подтвердить маяк {n} [E]'],
+ ['Collect the signal parcel [E]', 'Sinyal paketini al [E]', 'Забрать сигнальную посылку [E]'],
+ ['Accept the relay vault job [E]', 'Röle kasası işini kabul et [E]', 'Принять работу с хранилищем реле [E]'],
+ ['Three numbered relays open this bonus vault. No timer; crew can split up.', 'Üç numaralı röle bu bonus kasayı açar. Süre sınırı yok; ekip ayrılabilir.', 'Три пронумерованных реле откроют бонусное хранилище. Таймера нет; можно разделиться.'],
+ ['Activate relay {n} [E]', 'Röle {n} etkinleştir [E]', 'Активировать реле {n} [E]'],
+ ['Relay vault {n}/3 — optional', 'Röle kasası {n}/3 — isteğe bağlı', 'Хранилище реле {n}/3 — необязательно'],
+ ['Signal run {n}/3 — optional', 'Sinyal koşusu {n}/3 — isteğe bağlı', 'Сигнальный маршрут {n}/3 — необязательно'],
+ ['All relays online. Bonus vault stays open. Carry the salvage home.', 'Tüm röleler açık. Bonus kasa açık kalır. Hurdayı eve taşı.', 'Все реле включены. Бонусное хранилище остаётся открытым. Отнеси хлам домой.'],
+ ['All beacons tuned. Return to the first beacon for the parcel.', 'Tüm vericiler ayarlı. Paket için ilk vericiye dön.', 'Все маяки настроены. Вернись к первому маяку за посылкой.'],
+ ['Hire a helper drone: 35 credits [E]', 'Yardımcı drone kirala: 35 kredi [E]', 'Нанять дрон-помощник: 35 кредитов [E]'],
+ ['Drone needs 45 seconds in this landing. Explore while it checks the relays.', 'Drone bu inişte 45 saniyeye ihtiyaç duyar. Röleleri kontrol ederken keşfet.', 'Дрону нужно 45 секунд на этой высадке. Исследуй местность, пока он проверяет реле.'],
+ ['Helper drone is working. Scout cannot do two jobs at once.', 'Yardımcı drone çalışıyor. İzci aynı anda iki iş yapamaz.', 'Дрон-помощник работает. Разведчик не может выполнять две работы сразу.'],
+ ['The scout is busy or credits are short.', 'İzci meşgul ya da kredi yetersiz.', 'Разведчик занят или не хватает кредитов.'],
+ ['Band mismatch. Match the shown target; completed beacons stay tuned.', 'Bant uyuşmuyor. Gösterilen hedefi eşleştir; tamamlanan vericiler ayarlı kalır.', 'Диапазон не совпадает. Подбери указанную цель; настроенные маяки сохраняются.'],
+ ['The relay whispers back. Something is about to flicker. You can step away.', 'Röle geri fısıldıyor. Bir şey titreşmek üzere. Uzaklaşabilirsin.', 'Реле шепчет в ответ. Сейчас что-то мелькнёт. Можно отойти.'],
+ ['When a real stalker follows: crouch into hiding, break sight, close or jam a door.', 'Gerçek bir takipçi peşindeyse: çömelip saklan, görüşü kes, kapıyı kapat veya sıkıştır.', 'Если преследует настоящий охотник: присядь в укрытии, скройся из виду, закрой или заклинь дверь.'],
+ ['Drone finishes in {n}s', 'Drone {n} sn sonra bitirir', 'Дрон закончит через {n} с'],
+ ['The vault needs three relays; its keypad is disconnected.', 'Kasa üç röle gerektiriyor; tuş takımı bağlı değil.', 'Хранилищу нужны три реле; клавиатура отключена.'],
+];
+for (const [i, lang] of [[1, 'tr'], [2, 'ru']]) addTranslations(Object.fromEntries(lines.map(a => [a[0], a[i]])), lang);

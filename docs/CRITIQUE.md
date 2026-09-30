@@ -1,5 +1,74 @@
 # Honest critique log (updated every development round)
 
+## Current direction — wave 15 (2026-09-30)
+
+**Current independent assessment: 7/10**, unchanged from wave14's reviewed slice. The assessment and browser evidence belong to [wave15/REVIEW.md](wave15/REVIEW.md) and [wave15/PLAYTEST.md](wave15/PLAYTEST.md). Eight remains the quality target. Regression counts establish specific contracts, not enjoyment or retention.
+
+This round strengthens the places and decisions already added: the free starter is explicit, fitted ships show actual role/cost effects, supplies appear on a usable physical pickup tray, and cargo survives a hull downgrade. The exchange now looks like an archive registration/sorting machine and its receipt responds to real sale processing. Pursuit begins from reachable sight, respects closed doors and body-width cover, and reacquires a player instead of rewarding an interrupted search. Rewards and arrival cards yield during danger. GPU cleanup spreads orbit work across frames rather than moving the hitch to takeoff.
+
+The gauntlet caught two ordinary-input defects that simpler state fixtures missed: a facility exit's own solid panel blocked its centre interaction, and the auto-open route board swallowed a populated terminal command. Their fixes retain wall occlusion and native route confirmation respectively. Actual generated-map/Rapier and installed-input regressions cover both. Saved cargo also preserves its extraction flag, preventing a reload from booking old salvage as newly secured. The full 206-suite regression, focused final checks and production build passed.
+
+The original identity works best when the Algorithm has a visible consequence. The browser crew's 34-value wrench returned as 20 after the existing 40% surveillance tax; run.fcTax recorded 14. This is a meaningful reason to evade cameras and protect the haul. Keep that feedback clear: unexplained value loss would feel arbitrary even if its arithmetic is correct.
+
+The refreshed browser campaign completed the normal input-driven salvage-to-sale loop: copper carried aboard in the native bag survived field departure, then real inventory controls, pickup, drop and bell sold the same item for 25; credits rose from 65 to 90 and the item was removed. Centred portal E and typed HQ plus native CONFIRM passed in that campaign. A failed first expedition/time expiry remains recorded. Repeated starter tools and bag/active-hand ambiguity added friction; a clean first expedition and a natural Warden chase are still separate validation gaps. No QA money, inventory, phase or teleport edits were used in this campaign.
+
+The remaining weaknesses are visible. The intake tray/body are dark, its receipt dominates a close view, and a HUD goal can overlap its world label. Ordinary landing cards still compete with other information during safe arrival. Generated rooms remain visually repetitive and human teamwork, combat/audio quality and hardware frame times are unmeasured. Prioritize these observations and an unassisted two-person shift before adding another mandatory system. Broad expansion now has hub ships, staffed services, gambling, production, scouts, awkward cargo, district jobs, optional archive/pursuit encounters and appearance progression; filling more catalogues would not by itself make those choices clearer or more fun.
+
+## Wave 14 snapshot (2026-09-30)
+
+**Independent reviewed-slice assessment: 7/10**, up from wave13's 6/10. Eight remains the owner's quality target. [wave14/REVIEW.md](wave14/REVIEW.md) owns the score and [wave14/PLAYTEST.md](wave14/PLAYTEST.md) separates natural input from funded/teleported/debug encounter fixtures. A technical regression suite does not measure fun or retention.
+
+The strongest improvements connect actions to places: crews walk to a fleet office and buy/board the host vessel; completed field production needs physical calibration and parcel collection; nearby friends see the casino's actual deal; archive salvage requires carrying a real cell and defeating the exact existing guardian before taking one cache. The dock gantry, exchange archive silhouette and coloured service routes supply landmarks. Pursuit now has physical cover and free look while hiding. These support shared decisions instead of another disconnected menu.
+
+| Core area | Current evidence | Next material gap |
+| --- | --- | --- |
+| Navigation and onboarding | Actual keyboard/mouse/E fleet purchase, boarding and ship-to-company-sale route passed. Browser caught a blocked-facing boarding console and stale terminal-purchase tutorial. | Unassisted newcomer discovery and first-session pacing. |
+| Exploration and risk | Optional cell/guardian/cache mission uses real generated navigation, carried items and shared boss state; optional pursuit uses actual physical alcoves. | Naturally played boss fights, pursuit timing and an uninterrupted expedition-return-sale shift. |
+| Cooperative work | Two local peers agree on dealer results, workshop parcels, exact guardian and hiding state. | Human Internet latency, carrying ergonomics and host migration during these actions. |
+| Readability | Rewards defer during danger; urgent toast remains; guide rows are removed from the danger objective pair and return afterwards. | Observe clutter and warning perception during a full natural chase. |
+| Originality and world | Staffed ports, distinct archive/gantry landmarks, tactile production and surveillance-related challenges provide a stronger identity. | Repeated low-poly forms and flat generated routes still look like a prototype; the quota skeleton remains familiar. |
+| Economy | Explicit `--relay` simulation uses actual production/survey ledgers, finite exploration salvage and real purchase costs. Standard competent four-player median stays six quotas over 200 runs with and without the extension. | Gear combat power and encounter losses are not simulated; human campaign choices must guide tuning. |
+| Robustness and performance | Full 205-suite regression passed; actual-map fixes cover hidden workshop transforms, stale shelter query readiness and absent dock exit. GPU scanning/cargo CPU work is reduced. | Software-WebGL feedback warning is still being diagnosed. No representative hardware frame-time claim. |
+
+The reason to replay should be different team choices and outcomes: whom to rescue, which cargo to risk, whether to attempt the optional archive or pursuit, which ship fits the crew, and whether to invest field profits in tools or automation. More cosmetic entries alone will not improve those decisions. Keep beginner content gated, production calibration short, one optional high-pressure encounter per landing, and financial rewards finite. Do not add another compulsory upkeep meter or parallel currency merely to fill the game.
+
+The browser gauntlet is useful because it changes the product: it exposed unreachable workshop controls built while the company map was hidden, shelter construction before Rapier's query tree became ready, a hub radar reading a nonexistent exit and a lesson directing players to a disabled buying path. Those corrections are more valuable than increasing a score by assertion. Human headphone/combat feedback and representative GPU testing still determine whether the game reaches eight as an experience.
+
+## Wave 13 snapshot (2026-09-30)
+
+**Provisional technical/visual assessment: 6/10**, not a scored human playthrough. Detailed browser evidence and limitations: [wave13/PLAYTEST.md](wave13/PLAYTEST.md), [wave13/REVIEW.md](wave13/REVIEW.md); implemented scope: [wave13/README.md](wave13/README.md). Older entries below describe earlier snapshots.
+
+The game still visibly inherits Lethal Company's ship → expedition → salvage → quota structure. Adding a casino or many enemies alone cannot give it an original identity. Its strongest identity is the Algorithm's surveillance economy: the crew cuts feeds, works competing districts, bargains with staffed services, carries awkward cargo together, and invests in a vessel and equipment. Keep future systems connected to these decisions rather than introducing another unrelated wallet or mandatory chore.
+
+| Area | Provisional assessment | Concrete improvement this round | Remaining weakness |
+| --- | --- | --- | --- |
+| Originality | 6/10 | Walkable fleet hub, original exchange district, machine-creature counterplay, field brokers and rival surveyors | Quota skeleton remains familiar; scenery needs a stronger memorable landmark and consistent art language |
+| Core exploration | 6/10 | Two authored route identities, recovery/dial objectives, optional outdoor signal job or three-relay loot vault | Still mostly flat generated interiors; a full naturally navigated crew shift is needed |
+| Cooperation | 6.5/10 as system design | Host-owned vessel, shared cargo identity, split-up relay tasks, delayed robot assistance | Browser replication proves state consistency, not the quality of teamwork or latency under real internet conditions |
+| Readability / controls | 6/10 | C crouch, pointer-capture race fix, calmer menu chrome, contextual noise waves, guide/affix suppression near threats | Many inherited panels remain; physical wayfinding and first-session pacing need human observation |
+| Progression / economy | 6/10 | Bounded side income, NPC pickups, chip conservation, finite expedition rewards, gated cosmetics and weapons | All side incomes compound gear power; campaign-wide quota/survival tuning is not proven |
+| Art / tactile presentation | 5.5/10 | Staffed venues, more costume silhouettes, finishes, corrected horn grips, short casino/use feedback | Box-heavy hub props and menu-led manufacturing still look like a prototype |
+| Combat / audio | Unscored | Creature telegraphs, strict director budget, scan-target classification, ranged/melee tradeoffs, positional recipes | No headphone review or real human escape/combat session; do not equate spawn tests with fun |
+| Performance | Unscored on user hardware | Incremental resource scan, trolley scratch vectors/idle collider guard, repeated-map cleanup regression | First-load/shader spikes and unresolved software-WebGL feedback warning remain; no hardware FPS claim |
+
+### Is it fun, and why would someone return?
+
+The promising moments are group decisions with a visible cost: split up for three relays or spend credits on the helper, escort the trolley or grab a lighter item, board a specialist ship or buy tools, bank chips or risk them, escape a readable pursuer or protect a teammate. These can produce stories and skill growth. Merely increasing catalogue size cannot establish retention. Commissioning products is currently a field-shift ledger with world props, not a hands-on factory simulator; scouts are delayed survey jobs, not autonomous robots navigating every dungeon. The rare new scare uses the existing shadow encounter with warning and safe cancellation, not a new animated stalking species. Existing hiding, sight breaking, grab escape and door-jammer mechanics supply the escape tools.
+
+### Balance and complexity rules
+
+Keep extraction as the quota source. Production and rivals pay limited equipment credits; signal rewards are physical salvage that must return home. Robot assistance costs 35 credits and 45 active seconds, cannot run alongside the scout, and does not collect the room's loot. Cosmetics affect appearance only. New weapons start at quota 2 and have short-range/weight/ammo/recovery costs. Optional jobs are limited to one per eligible landing; beginner shifts do not receive the new late-game puzzle/scare workload. A strict enemy pressure cap fixes a measurable bug, but overlapping scripted spawners still require a whole-shift stress test.
+
+### Next director priorities
+
+1. Run a full shift with two humans: observe navigation, first death, task participation, reasons for abandoning loot and whether a second shift is wanted. Targeted automation is already recorded separately.
+2. Strengthen two or three landmark scenes and cargo/escape feedback before adding more systems. Make the hub walk understandable without teleports or instructions.
+3. Measure frame times during landing and repeated travel on normal GPU hardware; identify the material producing the feedback warning before changing rendering paths.
+4. Simulate the complete campaign economy with all legacy and new side incomes; adjust costs and availability only from observed power progression.
+5. Improve physical workshop collection and shared casino observation. Consolidate duplicate old systems/panels to prevent content density from becoming confusion.
+
+No claim that the game is now 8–9/10, bug-free, professionally finished or human-tested is supported by this session. The changes are concrete and reviewable; the remaining gaps are explicit.
+
 ## Round 1 snapshot (before the quality rounds)
 | Area | What is bad right now | Planned fix (round) |
 |---|---|---|

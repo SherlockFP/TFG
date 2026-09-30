@@ -115,8 +115,8 @@ export class ShipScreens {
       for (const d of fac.doors) if (d.code && !d.open) { const [sx, sy] = toS(d.pos.x, d.pos.z); ctx.fillRect(sx - 2, sy - 2, 4, 4); }
     } else if (g.world.outdoor) {
       ctx.strokeStyle = '#0d4a1d'; ctx.lineWidth = 1;
-      const e = g.world.outdoor.mainExit.pos;
-      const [ex, ey] = toS(e.x, e.z); ctx.strokeRect(ex - 4, ey - 4, 8, 8);
+      const e = g.world.outdoor.mainExit?.pos;
+      if (e) { const [ex, ey] = toS(e.x, e.z); ctx.strokeRect(ex - 4, ey - 4, 8, 8); }
       const [sx, sy] = toS(0, 0); ctx.fillStyle = '#1b6b8a'; ctx.fillRect(sx - 7, sy - 4, 14, 8);
     }
     // creatures

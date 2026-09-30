@@ -1,0 +1,6 @@
+export const ARSENAL13_DEFS=[
+ {id:'a13_rivet',name:'Pressure Riveter',kind:'weapon',shop:'weapons',price:390,weight:11,hands:2,dmg:42,cd:.95,reach:14,ammo:3,ammoItem:'rifleammo',reload:2.4,ranged:true,cfire:'hitscan',spread:.025,noise:2.8,fireSnd:'a13_rivet_fire',tracer:0xffbb68,knock:1.6,rarity:'rare',tier:'rare',minQuota:2,blurb:'Three heavy rivets, 14m range. Loud and slow to reload. Uses Rifle Rounds. Unlocks at quota 2.'},
+ {id:'a13_baton',name:'Pneumatic Baton',kind:'weapon',shop:'weapons',price:310,weight:7,hands:1,dmg:10,cd:1.1,reach:1.8,knock:.6,cclass:'a13_baton',heavyStun:1.3,rarity:'rare',tier:'rare',minQuota:2,value:[35,60],blurb:'Low damage, short reach. Charge a heavy strike to stagger for up to 1.3s. A rescue tool, not a boss killer. Unlocks at quota 2.'}
+];
+export const arsenalLock=(id,quota)=>ARSENAL13_DEFS.some(d=>d.id===id&&quota<d.minQuota);
+export const BATON_CLASS={L:[{arc:'cb:stabR',t:1.1,dmg:1,kb:1,half:.4,reach:1,stam:.8,cleave:1,stun:.15},{arc:'cb:stabL',t:1.15,dmg:1,kb:1,half:.4,reach:1,stam:.8,cleave:1,stun:.15},{arc:'cb:over',t:1.4,dmg:1.2,kb:1.2,half:.45,reach:1,stam:1,cleave:1,stun:.3}],H:{arc:'cb:thrustR',t:1.8,dmg:1.5,kb:1.5,half:.35,reach:1.1,stam:1.4,cleave:1,stun:1.3},chargeT:.65,guard:'cb:guard1',block:.35,parry:.14,backstab:1.1};

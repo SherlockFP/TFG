@@ -24,12 +24,14 @@ export class Input {
 
     window.addEventListener('keydown', (e) => {
       if (e.isTrusted !== false) this.usingPad = false;   // [a11y] a real key: prompts show key names again
+      if (e.code === 'Escape' && e.repeat) return;
+      if (this.locked && !this.isTyping() && (e.ctrlKey || e.metaKey)) e.preventDefault();
       if (this.onKeyAny && this.onKeyAny(e) === true) return;
       if (this.isTyping()) return;
       if (!this.down.has(e.code)) this.pressedSet.add(e.code);
       this.down.add(e.code);
       if (this.locked && ['Space', 'Tab', 'ArrowUp', 'ArrowDown', 'ControlLeft', 'KeyF', 'KeyS', 'KeyD', 'KeyW'].includes(e.code)) e.preventDefault();
-      if (e.code === 'Tab') e.preventDefault();
+      if (this.locked && e.code === 'Tab') e.preventDefault();
     });
     window.addEventListener('keyup', (e) => {
       this.down.delete(e.code);
@@ -53,8 +55,14 @@ export class Input {
     document.addEventListener('contextmenu', (e) => { if (this.locked || e.target === canvas) e.preventDefault(); });
     document.addEventListener('pointerlockchange', () => {
       this.locked = document.pointerLockElement === this.canvas;
+      // A panel may open while requestPointerLock is still pending. Cancel its late capture.
+      if (this.locked && !this.wantLock) {
+        this.intentionalUnlock = true; document.exitPointerLock(); return;
+      }
       if (!this.locked) { this.down.clear(); this.mouseButtons.clear(); }
-      this.onLockChange?.(this.locked);
+      const intentional = !this.locked && !!this.intentionalUnlock;
+      this.intentionalUnlock = false;
+      this.onLockChange?.(this.locked, intentional);
     });
     document.addEventListener('pointerlockerror', () => { this.onLockFail?.(); });   // [ux] browser refused (ESC cooldown): main shows click-to-resume
   }
@@ -64,16 +72,20 @@ export class Input {
   }
   lock() {
     if (this.locked) return;
+    this.wantLock = true;
+    const request = this.lockRequest = (this.lockRequest || 0) + 1;
+    const current = () => this.wantLock && request === this.lockRequest;
     try {   // pointer lock FIRST, synchronously inside the user gesture ([menufix]: requestFullscreen consumes the activation, so lock-after-fullscreen was refused)
       const p = this.canvas.requestPointerLock({ unadjustedMovement: true });
-      if (p && p.catch) p.catch(() => { try { const q = this.canvas.requestPointerLock(); if (q && q.catch) q.catch(() => this.onLockFail?.()); } catch { this.onLockFail?.(); } });
+      if (p && p.catch) p.catch(() => { if (!current()) return; try { const q = this.canvas.requestPointerLock(); if (q && q.catch) q.catch(() => { if (current()) this.onLockFail?.(); }); } catch { this.onLockFail?.(); } });
     } catch { try { this.canvas.requestPointerLock(); } catch { this.onLockFail?.(); } }   // [ux]
     // [ctrlw] then fullscreen (Settings: fullscreenPlay, default on): lets Keyboard Lock catch Ctrl+W instead of closing the tab
-    if (this.settings.fullscreenPlay !== false && !document.fullscreenElement && document.documentElement.requestFullscreen) {
+    if (!this.fullscreenAttempted && this.settings.fullscreenPlay !== false && !document.fullscreenElement && document.documentElement.requestFullscreen) {
+      this.fullscreenAttempted = true; // Esc may exit browser fullscreen; resuming must not force it back.
       try { document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(() => {}); } catch { /* not allowed */ }
     }
   }
-  unlock() { if (document.pointerLockElement) document.exitPointerLock(); }
+  unlock() { this.wantLock = false; this.lockRequest = (this.lockRequest || 0) + 1; if (document.pointerLockElement) { this.intentionalUnlock = true; document.exitPointerLock(); } }
   key(action) { return this.settings.keys[action] || action; }
   isDown(action) {
     if (this.settings.toggleHold?.[action]) return this.toggled(action, this.down.has(this.key(action)), this.pressedSet.has(this.key(action)));

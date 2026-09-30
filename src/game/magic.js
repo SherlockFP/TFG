@@ -88,7 +88,7 @@ addTranslations({
   'You already know this spell. Sell the book or give it to a crewmate.': 'Bu büyüyü zaten biliyorsun. Kitabı sat ya da bir ekip arkadaşına ver.',
   "You don't know that spell yet. Find its skillbook.": 'Bu büyüyü henüz bilmiyorsun. Kitabını bul.',
   'Hold V and SAY the word · or type it in chat · release C to cast': 'V\'ye basılı tut ve kelimeyi SÖYLE · ya da sohbete yaz · C\'yi bırakınca atılır',
-  'Voice spells are not supported in this browser (use Chrome / Edge). Type the spell word in chat or hold C.': 'Sesli büyüler bu tarayıcıda desteklenmiyor (Chrome / Edge kullan). Büyü kelimesini sohbete yaz ya da C\'ye basılı tut.',
+  'Voice spells are not supported in this browser (use Chrome / Edge). Type the spell word in chat or hold Backslash.': 'Sesli büyüler bu tarayıcıda desteklenmiyor (Chrome / Edge kullan). Büyü kelimesini sohbete yaz ya da Backslash tuşuna basılı tut.',
   'Voice spells need your microphone: turn it on in Settings > Voice.': 'Sesli büyüler için mikrofon gerekli: Ayarlar > Ses bölümünden aç.',
   'Voice spells: OFF (Settings > Voice) · type the word in chat': 'Sesli büyüler: KAPALI (Ayarlar > Ses) · kelimeyi sohbete yaz',
   'Your shield broke!': 'Kalkanın kırıldı!', 'Shield up.': 'Kalkan aktif.', 'Silence...': 'Sessizlik...', 'You feel the Algorithm stop listening.': 'Algoritma seni dinlemeyi bıraktı.',
@@ -892,7 +892,7 @@ export function installMagic(game) {
   const voiceEnabled = () => game.settings?.voiceSpells !== false;
   const micOk = () => game.settings?.micConsent === 'yes' && game.settings?.micEnabled !== false;
   function voiceStatusText() {
-    if (!speechSupported()) return t('Voice spells are not supported in this browser (use Chrome / Edge). Type the spell word in chat or hold C.');
+    if (!speechSupported()) return t('Voice spells are not supported in this browser (use Chrome / Edge). Type the spell word in chat or hold Backslash.');
     if (!voiceEnabled()) return t('Voice spells: OFF (Settings > Voice) · type the word in chat');
     if (!micOk()) return t('Voice spells need your microphone: turn it on in Settings > Voice.');
     return t('Hold V and SAY the word · or type it in chat · release C to cast');
@@ -919,7 +919,7 @@ export function installMagic(game) {
   function updateVoice() {
     const want = !!(game.input?.isDown?.('ptt') && !game.player.dead && voiceEnabled());
     if (want && !S.voiceHeld) {
-      if (!speechSupported()) { if (!S.voiceWarned) { S.voiceWarned = true; toast(t('Voice spells are not supported in this browser (use Chrome / Edge). Type the spell word in chat or hold C.'), 'info'); } }
+      if (!speechSupported()) { if (!S.voiceWarned) { S.voiceWarned = true; toast(t('Voice spells are not supported in this browser (use Chrome / Edge). Type the spell word in chat or hold Backslash.'), 'info'); } }
       else if (!micOk()) { if (!S.voiceWarned) { S.voiceWarned = true; toast(t('Voice spells need your microphone: turn it on in Settings > Voice.'), 'info'); } }
       else listener.start(speechLang());
     } else if (!want && S.voiceHeld) listener.stop();
@@ -939,7 +939,7 @@ export function installMagic(game) {
     if (from === game.selfId) cast(found[0].id, { source: 'chat', word: W });
   }
 
-  // ================================================================== wheel (hold C)
+  // ================================================================== wheel (hold Backslash)
   function wheelUsable() {
     const ui = game.ui, inp = game.input;
     return !S.disposed && game.run && !game.player.dead && !inp?.isTyping?.() && !ui?.chatOpen && !ui?.panelOpen && !ui?.marketOpen && !ui?.dialogEl && !game.minigame && !game.terminal?.active;
@@ -954,13 +954,13 @@ export function installMagic(game) {
     return cast(id, { source: 'key' });
   }
   const onKeyDown = (e) => {
-    if (e.code === (game.settings?.keys?.magicWheel || 'KeyC') && !e.repeat && !S.wheelOpen && game.input?.enabled !== false && wheelUsable()) { openWheel(); e.preventDefault(); return; }
+    if (e.code === (game.settings?.keys?.magicWheel || 'Backslash') && !e.repeat && !S.wheelOpen && game.input?.enabled !== false && wheelUsable()) { openWheel(); e.preventDefault(); return; }
     if (!S.wheelOpen) return;
     const m = /^Digit([1-8])$/.exec(e.code) || /^Numpad([1-8])$/.exec(e.code);
     if (m) { wheel.setHover(Number(m[1]) - 1); e.preventDefault(); e.stopImmediatePropagation(); }
     else if (e.code === 'Escape') closeWheel(false);
   };
-  const onKeyUp = (e) => { if (e.code === (game.settings?.keys?.magicWheel || 'KeyC') && S.wheelOpen) closeWheel(true); };
+  const onKeyUp = (e) => { if (e.code === (game.settings?.keys?.magicWheel || 'Backslash') && S.wheelOpen) closeWheel(true); };
   const onMouseMove = (e) => {
     if (!S.wheelOpen) return;
     if (Math.abs(e.movementX) < 400 && Math.abs(e.movementY) < 400) wheel.move(e.movementX, e.movementY);

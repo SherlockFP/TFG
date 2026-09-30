@@ -90,14 +90,14 @@ export function deltaE(a, b, kind = 'normal') {
 // ------------------------------------------------------------------ key bindings
 export const DEFAULT_KEYS = {
   forward: 'KeyW', back: 'KeyS', left: 'KeyA', right: 'KeyD',
-  jump: 'Space', crouch: 'ControlLeft', sprint: 'ShiftLeft',
+  jump: 'Space', crouch: 'KeyC', sprint: 'ShiftLeft',
   interact: 'KeyE', drop: 'KeyG', flashlight: 'KeyF', ptt: 'KeyV',
   chat: 'Enter', emote1: 'KeyZ', emote2: 'KeyX', menu: 'Tab', throwItem: 'KeyQ',
   ping: 'KeyP', sneak: 'AltLeft',   // [stealth]
   // wave 7 (a11y): everything that used to be a hard-coded key
   reload: 'KeyR', emoteWheel: 'KeyB', daily: 'F2', roleSkill1: 'KeyY', roleSkill2: 'KeyU',
   hotbar1: 'Digit1', hotbar2: 'Digit2', hotbar3: 'Digit3', hotbar4: 'Digit4',
-  inventory: 'KeyI', skillTree: 'KeyK', record: 'KeyJ', pets: 'KeyN', magicWheel: 'KeyC', radio: 'Backquote',
+  inventory: 'KeyI', skillTree: 'KeyK', record: 'KeyJ', pets: 'KeyN', magicWheel: 'Backslash', radio: 'Backquote',
 };
 
 export const ACTION_NAMES = {

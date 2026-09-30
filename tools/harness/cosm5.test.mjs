@@ -23,7 +23,7 @@ const ids = D.C5.map((e) => e.id), keys = D.C5.map(D.keyOf);
 ok(new Set(ids).size === ids.length, 'ids unique across slots');
 ok(new Set(keys).size === keys.length, 'keys unique');
 const cnt = (s) => D.bySlot(s).length;
-ok(cnt('suit') >= 20 && cnt('hat') >= 25 && cnt('back') >= 14 && cnt('skin') === 14 && cnt('emote') === 11, `counts suit ${cnt('suit')} hat ${cnt('hat')} back ${cnt('back')} skin ${cnt('skin')} emote ${cnt('emote')}`);
+ok(cnt('suit') >= 20 && cnt('hat') >= 25 && cnt('back') >= 14 && cnt('skin') === 18 && cnt('emote') === 11, `counts suit ${cnt('suit')} hat ${cnt('hat')} back ${cnt('back')} skin ${cnt('skin')} emote ${cnt('emote')}`);
 for (const e of D.C5) {
   ok(TIER_ORDER.includes(e.tier), 'tier ' + e.id);
   ok(['shop', 'crate', 'boss', 'secret'].includes(e.src), 'src ' + e.id);
@@ -38,7 +38,7 @@ for (const e of D.bySlot('suit')) { ok(!!M.C5_SUIT_BUILDERS[e.id], 'suit builder
 for (const e of D.bySlot('hat')) { const h = M.buildC5Hat(e.id); ok(h && h.children.length > 0, 'hat builder ' + e.id); ok(HATS.some((x) => x.id === e.id), 'hat in HATS ' + e.id); }
 for (const e of D.bySlot('back')) { ok(typeof M.C5_BACK_BUILDERS[e.id] === 'function', 'back builder ' + e.id); ok(BACK_ACCS.some((x) => x.id === e.id), 'back registered ' + e.id); }
 for (const e of D.bySlot('skin')) ok(W.SKIN_IDS.includes(e.id), 'skin id ' + e.id);
-ok(W.SKIN_IDS.length === 14 && W.SKIN_IDS.every((s) => D.C5_BY_ID[s]?.slot === 'skin'), 'skin tables agree');
+ok(W.SKIN_IDS.length === 18 && W.SKIN_IDS.every((s) => D.C5_BY_ID[s]?.slot === 'skin'), 'skin tables agree');
 for (const e of D.bySlot('emote')) { const d = EMOTE_BY_ID[e.id]; ok(d && typeof d.fx === 'function' && EMOTES.includes(d), 'emote ' + e.id); ok(!isEmoteUnlocked({ emotes: [] }, e.id), 'emote locked by default ' + e.id); ok(isEmoteUnlocked({ emotes: [e.id] }, e.id), 'emote unlock ' + e.id); }
 for (const id of M.C5_HAT_IDS) ok(D.C5_BY_ID[id]?.slot === 'hat', 'hat builder has data ' + id);
 for (const id of Object.keys(M.C5_SUIT_BUILDERS)) ok(D.C5_BY_ID[id]?.slot === 'suit', 'suit builder has data ' + id);

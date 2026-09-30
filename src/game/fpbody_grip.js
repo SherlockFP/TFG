@@ -132,6 +132,7 @@ const qFromEuler = (x, y, z, out = new THREE.Quaternion()) => out.setFromEuler(_
 /** Classify an item: 'body' | 'carry' (two-hand, in front) | 'long2h' (gun / hammer, left hand on the fore-end) | 'melee' | 'tool' | 'scrap'. */
 export function classify(def, geom, id) {
   const s = geom.size;
+  if (id === 'airhorn' || id === 'clownhorn') return 'tool';
   if (def?.kind === 'body' || id === 'body') return 'body';
   const two = def?.hands === 2 || def?.kind === 'big' || def?.hands === 0;
   if (two && (def?.kind === 'weapon' || def?.ranged)) return 'long2h';
@@ -180,7 +181,10 @@ export function fitGrip(geom, def, id = '', dp = 0) {
     if (longAxis === 'y' && s.y > 1.5 * s.z) auto.setFromAxisAngle(V(1, 0, 0), -Math.PI / 2);
     else if (longAxis === 'x' && s.x > 1.5 * s.z) auto.setFromAxisAngle(V(0, 1, 0), Math.PI / 2);
   }
-  if (cls === 'melee') q.copy(meleeQuat(id, dp)).multiply(auto);   // [ux]
+  // Horn bells are authored along +Z, opposite the camera-forward tool convention.
+  // Turning them here leaves dropped/world models and remote animations unchanged.
+  if (id === 'airhorn' || id === 'clownhorn') q.copy(qFromEuler(0, Math.PI, 0));
+  else if (cls === 'melee') q.copy(meleeQuat(id, dp)).multiply(auto);   // [ux]
   else if (cls === 'long2h') q.copy(def?.ranged ? qFromEuler(0.04, 0.16, 0) : meleeQuat(id)).multiply(auto);
   else if (cls === 'body') q.setFromAxisAngle(V(0, 1, 0), Math.PI / 2);
   else if (cls === 'carry') {
@@ -211,7 +215,16 @@ export function fitGrip(geom, def, id = '', dp = 0) {
     pos.set(ox - rc.x, cy - rc.y, cz - rc.z).sub(hand);
     G = null;
   } else {
-    if (geom.hasGrip && !(cls === 'scrap')) {
+    if (id === 'airhorn') {
+      // Palm around the canister, not the trumpet or its combined bounding centre.
+      G = V(geom.center.x, geom.box.min.y + 0.065, geom.box.min.z + 0.03);
+    } else if (id === 'clownhorn') {
+      // The squeezable bulb is at the rear of this centred scrap model.
+      G = V(geom.center.x, geom.center.y, geom.box.min.z + 0.054);
+    } else if (id === 'adblock' && geom.hasGrip) {
+      // This extinguisher's authored origin is the nozzle junction; grip the bottle.
+      G = geom.origin.clone().add(V(0, -0.05, 0.02));
+    } else if (geom.hasGrip && !(cls === 'scrap')) {
       G = geom.origin.clone();                               // tools: origin = grip
       // melee: choke up towards the butt so at most a few cm stick out below the fist (a long butt used to hit the sleeve and the
       // arm solver then shoved the whole weapon out of the hand)

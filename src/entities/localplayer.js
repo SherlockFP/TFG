@@ -194,7 +194,7 @@ export class LocalPlayer {
     this.maxHp = s.maxHp; this.maxStamina = s.maxStamina;
     // look
     const { dx, dy } = input.consumeMouse();
-    if (!this.frozen || this.dead) {
+    if (!this.frozen || this.dead || this.hiding) { // A shelter holds movement, but players can watch the search and choose their exit.
       const ct = this.carryTurn || 1;   // [carry2] heavy / bulky loot slows the turn
       this.yaw -= dx * ct; this.pitch = clamp(this.pitch - dy * ct, -1.5, 1.5);
     }
@@ -224,7 +224,7 @@ export class LocalPlayer {
     const wishZ = -mx * sin + mz * cos;
 
     // crouch
-    const wantCrouch = (canMove && input.isDown('crouch')) || !!this.downed;   // [downed] a downed player stays low
+    const wantCrouch = (canMove && input.isDown('crouch')) || !!this.downed || !!this.hiding;   // [downed] a downed player stays low
     if (wantCrouch && !this.crouch) { this.crouch = true; this.setCapsule(HALF_CROUCH); this.game.sfx('cloth_rustle', 0.22, 0.95 + Math.random() * 0.1); }
     else if (!wantCrouch && this.crouch) {
       // headroom check

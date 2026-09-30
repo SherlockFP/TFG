@@ -573,8 +573,14 @@ function metQuota(g) {
 {
   const seen = new Set();
   const byTheme = {};
-  for (let i = 0; i < 4000 && Object.keys(byTheme).length < 8; i++) { const th = P.coreTheme('TH' + i, 0); if (!byTheme[th]) byTheme[th] = 'TH' + i; }
-  ok(Object.keys(byTheme).length === 8, 'found a run for each of the 8 themes');
+  const expectedIds = new Set(Object.values(CORE.BOSS_TABLE).map(b => b.id));
+  const sampledIds = new Set();
+  for (let i = 0; i < 4000 && sampledIds.size < expectedIds.size; i++) {
+    const th = P.coreTheme('TH' + i, 0);
+    if (!byTheme[th]) byTheme[th] = 'TH' + i;
+    sampledIds.add(CORE.bossFor(th, 0).id);
+  }
+  ok([...expectedIds].every(id => sampledIds.has(id)), `found seeded runs covering every canonical boss (${sampledIds.size}/${expectedIds.size})`);
   for (const [theme, runId] of Object.entries(byTheme)) {
     const g = makeGame({ runId });
     metQuota(g); landOn(g);
@@ -591,8 +597,8 @@ function metQuota(g) {
     ok(cy(g).stage === 'days' && cy(g).sector === 1, `${theme}: cleared`);
     seen.add(info.id);
   }
-  // wave 8 hero content: metro / greenhouse (and prison, tower, the studio themes) map to existing themed bosses (cycle_core.js), so the 8 sampled themes give 7+ distinct bosses again
-  ok(seen.size >= 7, `bosses covered: ${[...seen].join(', ')}`);
+  // Theme aliases must run their own flow, while coverage must reach every canonical kit.
+  ok([...expectedIds].every(id => seen.has(id)), `every canonical boss completed its flow (${seen.size}/${expectedIds.size}): ${[...seen].join(', ')}`);
 }
 
 // ================================================================ H) never a soft-lock: "give up" policy from many states

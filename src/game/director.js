@@ -204,6 +204,9 @@ export function installDirector(game) {
   // c.data.targetId) and mod creatures with their own state names.
   function isChasing(c, pid, d) {
     const s = c.state;
+    // Machine scans are telegraphed strikes; quiet searching is ambient, not a chase.
+    if (c.type === 'c13_printer') return (s === 'windup' || s === 'attack') && d < 14;
+    if (c.type === 'c13_checksum') return (s === 'scan' || s === 'attack') && c.data?.target === pid && d < 5;
     if (s === 'sneak') return c.type === 'lurker' && c.target === pid && d < 12;
     if (CALM_STATES.has(s)) return false;
     if (s === 'latched') return c.extra === pid;
@@ -557,7 +560,7 @@ export function installDirector(game) {
     // Same time-of-day curve as hostSpawnWave (35 % at 8:00 -> 100 % at 14:00) plus a little extra, so early
     // pressure cannot eat the whole day's budget and starve the later waves.
     const tDay = ((run.time ?? 480) - 480) / 360;
-    const cap = Math.min(budget + 0.25, budget * clamp(0.35 + 0.65 * tDay, 0, 1) + PRESSURE_EXTRA);
+    const cap = Math.min(budget, budget * clamp(0.35 + 0.65 * tDay, 0, 1) + PRESSURE_EXTRA);
     if (!(used < budget) || !(used < cap)) { H.nextPressureT = H.t + 30; return false; }
     const moon = MOONS[run.moon];
     if (!moon?.creatures) return false;
@@ -567,13 +570,20 @@ export function installDirector(game) {
       const def = CREATURES[id];
       if (!def || def.hazard || def.boss || def.zone === 'out' || !(def.power > 0) || !(table[id] > 0)) continue;
       if (!canSpawnMore(id, game.creatures.host)) continue;   // per-type caps (one jester, one Parasocial, ...)
-      if (used + def.power > cap) continue;
-      entries.push({ id, w: table[id] });
+      // hostSpawnCreatureIndoor emits 2-4 Spam Bots, not one. Reserve the full pack.
+      const cost = id === 'scuttler' ? def.power * 4 : def.power;
+      if (used + cost > cap) continue;
+      entries.push({ id, w: table[id], cost });
     }
     if (!entries.length) { H.nextPressureT = H.t + 30; return false; }
     const pick = H.rng.weighted(entries);
-    hd.powerUsed = used + CREATURES[pick.id].power;
+    const beforeCount = game.creatures.host.size;
+    hd.powerUsed = used + pick.cost;
     if (!game.hostSpawnCreatureIndoor(pick.id)) { hd.powerUsed = used; H.nextPressureT = H.t + 10; return false; }   // no fair spot (early-game safety / players near): refund, retry soon
+    if (pick.id === 'scuttler') {
+      const spawned = game.creatures.host.size - beforeCount;
+      if (spawned > 0) hd.powerUsed = used + Math.min(pick.cost, spawned * CREATURES.scuttler.power);
+    }
     H.nextPressureT = H.t + PRESSURE_GAP * H.rng.float(0.85, 1.3) / pace;
     target.calmT = 35;
     markEvent();

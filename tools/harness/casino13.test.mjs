@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import { transact } from '../../src/game/casino13_core.js';
+const run={credits:100};
+assert.equal(transact(run,'crew',{action:'buy',amount:25,seq:0}).wallet.chips,25);
+assert.equal(run.credits,75);
+assert.equal(transact(run,'crew',{action:'buy',amount:25,seq:0}),null,'replay must be rejected');
+assert.equal(transact(run,'other',{action:'redeem',amount:25,seq:0}),null,'cannot redeem another peer wallet');
+assert.equal(transact(run,'crew',{action:'play',game:'packet',amount:10,seq:1}).wallet.chips,15);
+assert.equal(transact(run,'crew',{action:'redeem',amount:15,seq:2}),null,'cannot redeem during pending round');
+assert.equal(transact(run,'crew',{action:'push',seq:2},()=>0).wallet.round.pot,20);
+assert.equal(transact(run,'crew',{action:'cash',seq:3}).wallet.chips,35);
+assert.equal(transact(run,'crew',{action:'cash',seq:4}),null,'round cannot pay twice');
+assert.equal(transact(run,'crew',{action:'redeem',amount:35,seq:4}).credits,110);
+assert.equal(transact(run,'crew',{action:'buy',amount:-50,seq:5}),null);
+console.log('casino13: atomic buy / play / push / redeem, isolation and replay checks passed');

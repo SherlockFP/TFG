@@ -7,6 +7,18 @@
 //   TIPS                 short list for the guide registry (docs/wave4/stealth.md)
 export const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 
+// A brief warning close to a threat, rather than a permanent sonar effect.
+export function threatNearNoise(player, creatures, radius = 11) {
+  if (!player || player.dead || player.inShip || !creatures) return false;
+  for (const c of creatures) {
+    const pos = c?.pos;
+    if (!pos || c.dead || c.hidden || c.state === 'dead' || c.def?.harmless || c.def?.hazard || (Number.isFinite(c.hp) && c.hp <= 0)) continue;
+    if (Math.abs(pos.y - player.pos.y) > 5) continue;
+    if (Math.hypot(pos.x - player.pos.x, pos.z - player.pos.z) <= radius) return true;
+  }
+  return false;
+}
+
 /** continuous noise level of the player body (0..1). Creatures multiply it with their hearing radius. */
 export const NOISE = {
   sneak: 0.02,        // Alt held: near silent
@@ -166,7 +178,7 @@ export function makeRateLimiter(perSec = 10, burst = 12) {
 
 // ------------------------------------------------------------------------------------------------ guide tips (docs/wave4/stealth.md, for the guide registry)
 export const TIPS = [
-  { id: 'sneak', title: 'Sneaking', body: 'Hold Alt (or crouch-walk with Ctrl) to move almost silently. You are slow, but stamina recovers while you sneak.' },
+  { id: 'sneak', title: 'Sneaking', body: 'Hold Alt (or crouch-walk with C) to move almost silently. You are slow, but stamina recovers while you sneak.' },
   { id: 'noise_meter', title: 'Noise meter', body: 'The NOISE meter on the right shows how far a listening creature can hear you. Sprinting is loud, carpet is quiet, metal floors and water are loud.' },
   { id: 'listener', title: 'The Listener', body: 'The Listener has no eyes. It creeps slowly until it hears something, then it sprints to the sound. Stand still or sneak and it will walk right past.' },
   { id: 'crawler', title: 'Web Crawlers', body: 'Web Crawlers follow noise too: a Crawler that lost you searches the last sound. Break away quietly.' },

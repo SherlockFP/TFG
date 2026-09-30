@@ -80,9 +80,9 @@ const opts = { rng: () => 0.1, now: 1e12, has: () => true, level: 5 };
   ok(C.selectTip(g, F('orbit', 'rich'), session({ t: 30 }), opts) === null, 'no tip in the start grace');
   ok(C.selectTip(g, F('orbit', 'rich'), session({ muted: true }), opts) === null, 'muted -> no tip');
   ok(C.selectTip(g, F('orbit', 'rich'), session({ tutorial: true }), opts) === null, 'tutorial running -> no tip');
-  const p = C.selectTip(g, F('orbit', 'rich'), session(), opts);
-  ok(p && p.id === 'store', 'rich in orbit -> STORE tip, got ' + p?.id);
-  ok(/STORE/.test(C.tipText(p.feature, p.i, 'en')), 'store tip names the command');
+  const p = C.selectTip(g, F('company', 'rich'), session(), opts);
+  ok(p && p.id === 'store', 'rich at HQ -> broker equipment tip, got ' + p?.id);
+  ok(/field broker/.test(C.tipText(p.feature, p.i, 'en')) && /TOOLS/.test(C.tipText(p.feature, p.i, 'en')), 'equipment tip names physical broker and TOOLS action');
   // cooldown
   ok(C.selectTip(g, F('orbit', 'rich'), session({ t: 1100, lastTipT: 1000 }), opts) === null, 'inside the cooldown (100 s) -> null');
   ok(C.selectTip(g, F('orbit', 'rich'), session({ t: 1030, lastTipT: 1000 }), opts) === null, 'inside the relax gap -> null even for urgent');
@@ -136,8 +136,8 @@ const opts = { rng: () => 0.1, now: 1e12, has: () => true, level: 5 };
   for (const [id, sh] of Object.entries(g.shown)) ok(sh.n <= C.MAX_SHOWN, `${id} shown ${sh.n} > MAX_SHOWN`);
   const g5 = fresh();
   C.recordShown(g5, 'store', 0, 1e12);
-  ok(C.selectTip(g5, F('orbit', 'rich'), session(), { ...opts, now: 1e12 + 1000 })?.id !== 'store', 'tip shown 1 s ago is not repeated');
-  const t2 = C.selectTip(g5, F('orbit', 'rich'), session(), { ...opts, now: 1e12 + C.REPEAT_GAP_MS + 1 });
+  ok(C.selectTip(g5, F('company', 'rich'), session(), { ...opts, now: 1e12 + 1000 })?.id !== 'store', 'tip shown 1 s ago is not repeated');
+  const t2 = C.selectTip(g5, F('company', 'rich'), session(), { ...opts, now: 1e12 + C.REPEAT_GAP_MS + 1 });
   ok(t2 && t2.id === 'store' && t2.i === 1, 'the second showing rotates to the next variant: ' + JSON.stringify(t2 && [t2.id, t2.i]));
   // a full session simulation: over 3 hours of play the advisor never fires faster than the cooldown
   const g6 = fresh();

@@ -205,6 +205,7 @@ export function installOnboard(game) {
   }
   function decide() {
     S.decided = true;
+    if (game.fleet13?.docked?.()) return;
     const q = qsp();
     const forced = ['1', 'wing', 'stream'].includes(q.get('hiringday')) && !!game.isHost;
     const ctx = {

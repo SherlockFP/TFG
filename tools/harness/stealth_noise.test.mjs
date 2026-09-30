@@ -9,6 +9,12 @@ import * as S from '../../src/game/stealth_core.js';
 let pass = 0, fail = 0;
 const ok = (c, m) => { if (c) pass++; else { fail++; console.log('FAIL', m); } };
 const near = (a, b, e = 1e-6) => Math.abs(a - b) <= e;
+const walker = { pos: { x: 0, y: -300, z: 0 } };
+ok(!S.threatNearNoise(walker, []), 'no threat means no footstep wave');
+ok(S.threatNearNoise(walker, [{ pos: { x: 6, y: -300, z: 0 }, hp: 30 }]), 'nearby live threat allows a brief warning');
+ok(!S.threatNearNoise(walker, [{ pos: { x: 6, y: 0, z: 0 }, hp: 30 }]), 'outdoor creature cannot reveal indoor footstep wave');
+ok(!S.threatNearNoise(walker, [{ pos: { x: 6, y: -300, z: 0 }, hp: 0 }]), 'dead threats do not keep warnings active');
+ok(!S.threatNearNoise(walker, [{ pos: { x: 6, y: -300, z: 0 }, hidden: true }]), 'hidden threats are not revealed by footsteps');
 
 // ---- loudness
 const w = S.stepLoudness({}, 'concrete'), sp = S.stepLoudness({ sprint: true }, 'concrete'), cr = S.stepLoudness({ crouch: true }, 'concrete'), sn = S.stepLoudness({ sneak: true }, 'concrete');

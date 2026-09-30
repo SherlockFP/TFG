@@ -38,6 +38,12 @@ BOSS_TABLE.influencer = themedEntry(BOSS_TABLE.mansion, 'influencer');    // the
 BOSS_TABLE.academy = themedEntry(BOSS_TABLE.office, 'academy');           // the principal: detention-as-a-meeting
 BOSS_TABLE.museum = themedEntry(BOSS_TABLE.mansion, 'museum');            // the curator: exhibits that move when nobody looks
 BOSS_TABLE.colddata = themedEntry(BOSS_TABLE.serverfarm, 'colddata');     // the cold-storage Load Balancer: routes damage through the frozen nodes
+// Labyrinths retain their theme through core/gate generation. Existing kits are coherent aliases;
+// themedEntry safely retains the base display name until a dedicated boss dress exists.
+BOSS_TABLE.darkweb = { ...themedEntry(BOSS_TABLE.serverfarm, 'darkweb') };       // corrupted traffic routing
+BOSS_TABLE.hotel = { ...themedEntry(BOSS_TABLE.mansion, 'hotel') };             // the guest-host teleport kit
+BOSS_TABLE.echoregistry = { ...themedEntry(BOSS_TABLE.backrooms, 'echoregistry') }; // an archive that rewrites its own layout
+BOSS_TABLE.embercache = { ...themedEntry(BOSS_TABLE.factory, 'embercache') };    // foundry supervisor, readable slam kit
 export const LEGACY_BOSS = { id: 'legacybot', name: 'Legacy Bot', title: 'World Boss', rank: 'S', hp: 1500, dmg: 36, existing: true };
 export const CREW_MUL = [1, 1, 1.6, 2.1, 2.5];   // index = crew size (0 counts as 1)
 

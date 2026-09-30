@@ -20,6 +20,7 @@
 //     lamps: { corridor: propId, every, color, flicker }, lampColor, posters, landmarks, doorProp,
 //     corridorPipes, corridorScrap, footstep: {floorTex: surface}, ambience, atmosphere, steamRooms, noFlood,
 //     decorate(ctx) }
+import { LABYRINTH13_THEMES } from './labyrinth13.js';
 import { OFFICE } from './office.js';
 import { BACKROOMS } from './backrooms.js';
 import { SERVERFARM } from './serverfarm.js';
@@ -51,6 +52,7 @@ export const INTERIORS = {
   metro: METRO, greenhouse: GREENHOUSE, prison: PRISON, tower: TOWER,   // [labyrinths]
   ...LABYR10_THEMES,   // [labyr10]
   ...LABYR12_THEMES,   // [labyr12]
+  ...LABYRINTH13_THEMES,
 };
 export const THEMES_BY_ID = INTERIORS;
 export const INTERIOR_THEMES = Object.freeze(Object.keys(INTERIORS));

@@ -5,6 +5,7 @@
 //   4. moments: touchdown title card, sale count-up + register + Algorithm reaction, quota PA line, pickup pop, low-HP audio muffle (the heartbeat lives in feel.js / downed.js)
 //   5. voice: Algorithm + Company PA lines, <= 1 per 45 s, silent while chased, all EN/TR/RU (soul_core.js TX)
 // Everything is local presentation (no net messages, no host state): the beats are seeded by (moon, seed) so every peer sees the same ones.
+import { attentionHot } from '../ui/hud_attention.js';
 import * as THREE from 'three';
 import { MOONS, BIOMES } from './moons.js';
 import { G } from '../physics/physics.js';
@@ -406,12 +407,17 @@ export function installSoul(game) {
   const pickLine = (key) => C.pickIdx(C.TX[key].length, (game.run?.seed | 0) + (game.run?.day | 0) * 7 + S.lines * 3);
 
   // ================================================================== 5. moments
+  const cardContext = () => `${game.run?.seed}|${game.run?.day}|${game.run?.moon}`;
+  const deferCard = moonId => { S.pendingCard = { moonId, key: cardContext() }; };
   function showCard(moonId, late) {
-    if (typeof document === 'undefined') return;
+    if (disposed || game.destroyed || typeof document === 'undefined') return;
+    if (attentionHot(game)) { deferCard(moonId); return; }
     const cc = game.ui?.centerCards;   // [centercards] the moon title takes the one centre-card slot (priority over level up / achievements)
     if (cc) cc.request('moon', (done) => buildCard(moonId, late, done)); else buildCard(moonId, late, () => {});
   }
   function buildCard(moonId, late, done) {
+    if (disposed || game.destroyed) { done(); return; }
+    if (attentionHot(game)) { deferCard(moonId); done(); return; }
     if (game.onboard?.fr?.lease?.('card', 4.4, 2) === false) { done(); return; }   // [firstrun] one card at a time
     if (!late) { const d = game.onboard?.fr?.slot?.(4.4) || 0; if (d > 80) { done(); later(() => showCard(moonId, true), d); return; } }   // [qa] arrival cards queue behind each other
     S.card?.remove?.();
@@ -424,7 +430,9 @@ export function installSoul(game) {
     el.querySelector('.s').textContent = t(C.TX.skip[0][0]);
     (document.getElementById('ui') || document.body).appendChild(el);
     S.card = el;
-    const kill = () => { el.classList.remove('on'); later(() => el.remove(), 700); off(); done(); };
+    let closed = false;
+    const kill = () => { if (closed) return; closed = true; el.classList.remove('on'); el.style.visibility = 'hidden'; later(() => el.remove(), 700); off(); if (S.card === el) { S.card = null; S.cardKill = null; } done(); };
+    S.cardMoon = moonId; S.cardKey = cardContext(); S.cardKill = kill;
     const onKey = () => kill();
     const off = () => { window.removeEventListener('keydown', onKey, true); window.removeEventListener('mousedown', onKey, true); };
     window.addEventListener('keydown', onKey, true); window.addEventListener('mousedown', onKey, true);
@@ -522,6 +530,10 @@ export function installSoul(game) {
     if (!S.ship && game.ship?.group) { try { buildShipSoul(); } catch (e) { console.warn('[soul] ship', e); } }
     const p = game.player, ph = game.run?.phase;
     if (!p) return;
+    if (S.cardKill && (p.dead || !['moon','company'].includes(ph) || S.cardKey !== cardContext())) S.cardKill();
+    if (attentionHot(game) && S.cardKill) { deferCard(S.cardMoon); S.cardKill(); }
+    if (S.pendingCard && (!['moon','company'].includes(ph) || p.dead || S.pendingCard.key !== cardContext())) S.pendingCard = null;
+    if (S.pendingCard && !attentionHot(game)) { const pending = S.pendingCard; S.pendingCard = null; showCard(pending.moonId, true); }
     // low-HP audio muffle (the heartbeat + red vignette are feel.js; the downed lowpass is downed.js): a soft high-shelf cut on the master tone stage
     const a = game.audio;
     if (a?.tone && a.ctx) {
@@ -570,7 +582,7 @@ export function installSoul(game) {
       for (const r of restores.splice(0).reverse()) { try { r(); } catch { /* ignore */ } }
       for (const [o, k, v] of backup.splice(0).reverse()) { if (v === undefined) delete o[k]; else o[k] = v; }
       setSat(1);
-      S.card?.remove?.(); popEl?.remove?.(); style?.remove?.();
+      S.cardKill?.(); S.pendingCard = null; S.card?.remove?.(); popEl?.remove?.(); style?.remove?.();
       try { const a = game.audio; if (a?.tone && a.ctx) { a.tone.frequency.setTargetAtTime(6500, a.ctx.currentTime, 0.1); a.tone.gain.setTargetAtTime(-3, a.ctx.currentTime, 0.1); } } catch { /* ignore */ }
     },
   };

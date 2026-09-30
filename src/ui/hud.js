@@ -1,6 +1,7 @@
 // In-game HUD (helmet visor style): health figure, stamina, weight, clock, inventory, prompts,
 // scan labels (with item icons), floating damage numbers, XP/level, coins, toasts, death/spectate
 // overlays, run chips (daily event / favor / streak), outdoor compass, and the landing briefing card.
+import { attentionHot, toastUrgent } from './hud_attention.js';
 import { spreadLabels } from './compass_labels.js';
 export const TOAST_MAX = 2, TOAST_MS = 4000, TOAST_LONG_MS = 9000;   // [lanes] lane 2 (toasts): right column, max 2 visible, 4 s; ms >= TOAST_LONG_MS is the opt-in for the few must-read ones (lobby code)
 import * as THREE from 'three';
@@ -188,19 +189,23 @@ export class HUD {
     this.nextFlush = 0;
     this.briefOn = false;
   }
+  attentionBusy() { return attentionHot(this.game); }
+  toastLimit() { return this.attentionBusy() ? 1 : TOAST_MAX; }
   show(v) { this.el.classList.toggle('hidden', !v); }
 
   setRun(run) { this.run = run; }
   pulse(what) { if (what === 'credits') { this.$.quota.classList.remove('pulse'); void this.$.quota.offsetWidth; this.$.quota.classList.add('pulse'); } }
 
   bigText(main, sub, kind = 'big') {
+    if (kind === 'level') { this.toast([main, sub].filter(Boolean).join(' · '), 'good'); return; }
     // the landing briefing card already shows the moon name + weather
     if (this.run?.phase === 'landing' && main && main === MOONS[this.run.moon]?.name) return;
-    if (this.gate?.()) { this.pendingBig = [main, sub, kind]; return; }
-    if (this.cc) { this.cc.request(kind, (done, o) => this.showBig(main, sub, done, o.compact ? 2600 : 5200)); return; }   // [centercards] one centre card at a time
-    this.showBig(main, sub);
+    if (this.gate?.() || this.attentionBusy()) { this.pendingBig = [main, sub, kind]; return; }
+    if (this.cc) { this.cc.request(kind, (done, o) => this.attentionBusy() ? (this.pendingBig = [main, sub, kind], done()) : this.showBig(main, sub, done, o.compact ? 2600 : 5200, kind)); return; }   // [centercards] one centre card at a time
+    this.showBig(main, sub, undefined, undefined, kind);
   }
-  showBig(main, sub, done, ms = 5200) {
+  showBig(main, sub, done, ms = 5200, kind = 'big') {
+    this.bigData = [main, sub, kind];
     this.$.bigMain.textContent = typeof main === 'string' ? t(main) : main; this.$.bigSub.textContent = typeof sub === 'string' ? t(sub) : (sub || '');   // t(): [i18n8] safety net for literal cinematic text
     this.$.big.classList.remove('hidden');
     this.$.big.classList.remove('anim'); void this.$.big.offsetWidth; this.$.big.classList.add('anim');
@@ -291,7 +296,7 @@ export class HUD {
   }
 
   toast(text, kind = 'info', ms) {
-    if (this.gate?.()) {
+    if (this.gate?.() || ((this.attentionBusy() || this.cc?.busy?.()) && !toastUrgent(kind))) {
       // queue (no duplicates, bounded) until the report / cinematic is gone
       if (!this.pendingToasts.some((p) => p[0] === text)) this.pendingToasts.push([text, kind, ms]);
       if (this.pendingToasts.length > 8) this.pendingToasts.shift();
@@ -300,19 +305,26 @@ export class HUD {
     this.showToast(text, kind, ms);
   }
   showToast(text, kind = 'info', ms = TOAST_MS) {
+    if (this.attentionBusy() && !toastUrgent(kind)) { this.toast(text, kind, ms); return; }
     ms = ms >= TOAST_LONG_MS ? TOAST_LONG_MS : Math.min(ms || TOAST_MS, TOAST_MS);
     // [lanes] lane 2: right column, at most TOAST_MAX on screen, TOAST_MS each. Never evict an unread one: extra toasts queue until a slot frees.
     const txt = typeof text === 'string' ? t(text) : text;
     const box = this.$.toasts, label = typeof txt === 'string' ? txt : null;
     if (label) for (const k of box.children) if (k._tx === label && !k.classList.contains('out')) { clearTimeout(k._t1); clearTimeout(k._t2); this.armToast(k, ms); return; }
     const q = this.toastQ || (this.toastQ = []);
-    if (box.children.length >= TOAST_MAX) {
-      if (!q.some((p) => p[0] === txt)) q.push([txt, kind, ms]);
+    // A warning takes the visible slot before routine rewards/messages.
+    if (toastUrgent(kind)) for (const node of [...box.children]) {
+      if (toastUrgent(node._kind)) continue;
+      if (node._tx && !q.some(p => p[0] === node._tx)) q.push([node._tx, node._kind || 'info', node._ms]);
+      clearTimeout(node._t1); clearTimeout(node._t2); node.remove();
+    }
+    if (box.children.length >= this.toastLimit()) {
+      if (!q.some((p) => p[0] === txt)) toastUrgent(kind) ? q.unshift([txt, kind, ms]) : q.push([txt, kind, ms]);
       if (q.length > 8) q.shift();
       return;
     }
     const e = el('div', { class: 'toast ' + kind }, txt);
-    e._tx = label;
+    e._tx = label; e._kind = kind; e._ms = ms;
     box.appendChild(e);
     this.armToast(e, ms);
   }
@@ -323,18 +335,28 @@ export class HUD {
   }
   drainToastQ() {
     const q = this.toastQ;
-    while (q?.length && this.$.toasts.children.length < TOAST_MAX) { const [txt, kind, ms] = q.shift(); this.showToast(txt, kind, ms); }
+    if (this.gate?.()) return;
+    while (q?.length && this.$.toasts.children.length < this.toastLimit()) {
+      const index = (this.attentionBusy() || this.cc?.busy?.()) ? q.findIndex(p => toastUrgent(p[1])) : 0;
+      if (index < 0) break;
+      const [txt, kind, ms] = q.splice(index, 1)[0]; this.showToast(txt, kind, ms);
+    }
   }
   flushPending() {
     if (this.toastQ?.length) this.drainToastQ();
-    if (this.$.toasts.children.length >= TOAST_MAX) return;   // [lanes] both slots busy: keep gated toasts queued instead of pushing one out unread
+    if (this.$.toasts.children.length >= this.toastLimit()) return;   // [lanes] both slots busy: keep gated toasts queued instead of pushing one out unread
     if ((!this.pendingToasts.length && !this.pendingBig) || this.gate?.()) return;
+    if (this.attentionBusy() || this.cc?.busy?.()) {
+      const urgent = this.pendingToasts.findIndex(p => toastUrgent(p[1]));
+      if (urgent >= 0) this.showToast(...this.pendingToasts.splice(urgent, 1)[0]);
+      return;
+    }
     const now = performance.now();
     if (now < this.nextFlush) return;
-    if (this.pendingBig) { const [m, s, k] = this.pendingBig; this.pendingBig = null; this.bigText(m, s, k); this.nextFlush = now + 700; return; }
+    if (this.pendingBig) { const [m, s, k] = this.pendingBig; this.pendingBig = null; this.bigText(m, s, k); this.nextFlush = now + 2200; return; }
     const [text, kind, ms] = this.pendingToasts.shift();
     this.showToast(text, kind, ms);
-    this.nextFlush = now + 420;
+    this.nextFlush = now + 1100;
   }
 
   setDead(dead, text, tip) {
@@ -548,6 +570,28 @@ export class HUD {
   }
 
   update(dt, game) {
+    this.game = game;
+    const hot = this.attentionBusy();
+    this.el.classList.toggle('hud-alert-focus', hot);
+    if (hot && !this.attentionWasHot) {
+      // Existing notifications wait intact while the player needs a clear sightline.
+      for (const node of [...this.$.toasts.children]) if (!toastUrgent(node._kind)) {
+        this.toast(node._tx || node.textContent, node._kind || 'info', node._ms);
+        clearTimeout(node._t1); clearTimeout(node._t2); node.remove();
+      }
+      const warnings = [...this.$.toasts.children].filter(node => toastUrgent(node._kind));
+      for (const node of warnings.slice(1)) {
+        const q = this.toastQ || (this.toastQ = []);
+        if (!q.some(p => p[0] === node._tx)) q.unshift([node._tx || node.textContent, node._kind, node._ms]);
+        clearTimeout(node._t1); clearTimeout(node._t2); node.remove();
+      }
+      if (!this.$.big.classList.contains('hidden')) {
+        this.pendingBig = this.bigData;
+        clearTimeout(this.bigT); this.$.big.classList.add('hidden'); this.el.classList.remove('big-on');
+        const done = this.bigDone; this.bigDone = null; done?.();
+      }
+    }
+    this.attentionWasHot = hot;
     const p = game.player;
     const run = this.run || {};
     const W = window.innerWidth, H = window.innerHeight;

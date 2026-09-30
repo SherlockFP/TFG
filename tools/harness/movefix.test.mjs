@@ -29,6 +29,19 @@ function inputOf(down = [], jump = false) {
 }
 const still = inputOf();
 
+// Shelter holds position while preserving look; other frozen scenes still lock look.
+{
+  const { p, physics } = mk(null, [0, .03, 0]);
+  p.frozen = true; p.hiding = true;
+  const peek = { ...inputOf(['forward', 'sprint']), consumeMouse: () => ({ dx: .03, dy: -.01 }) };
+  for (let i = 0; i < 10; i++) { p.update(1 / 60, peek); physics.step(1 / 60); }
+  ok(Math.hypot(p.pos.x, p.pos.z) < .01, 'shelter keeps WASD movement held');
+  ok(p.crouch && p.yaw < -.2 && p.pitch > .05, 'shelter lets crouched players look around');
+  const yaw = p.yaw; p.hiding = false;
+  p.update(1 / 60, peek);
+  ok(p.yaw === yaw, 'ordinary frozen states still hold camera look');
+}
+
 // ---- 1. idle bounce -------------------------------------------------------------------------------------------------------------------
 function idleRange(setup, start, fps, noPropagate = false) {
   const { p, physics } = mk(setup, start);

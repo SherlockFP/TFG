@@ -5,6 +5,7 @@
 //               one card at a time (game.onboard.fr delegates here once a profile is past the first-run budget). Settings > Chatty Algorithm = off.
 //   core verb   while you are TAGGED by a feed camera the goal is "get to the ship or kill that camera".
 // Net: none (reads run.fc, which feedcams already syncs).
+import { attentionHot, encounterObjectives } from '../ui/hud_attention.js';
 import { t, tf } from '../core/i18n.js';
 import { isSellable } from './items.js';
 import * as OG from './onegoal_core.js';
@@ -52,7 +53,7 @@ export function installOneGoal(game) {
   return {
     emit, carriedValues, preview: () => OG.carryPreview(carriedValues()),
     /** the lines the HUD shows for a density ('full' = the whole list in priority order, max 7) */
-    shown(lines, dens) { return dens === 'full' ? OG.sortAll(lines).slice(0, 7) : OG.resolve(lines, dens === 'minimal' ? 1 : 2); },
+    shown(lines, dens) { const visible = encounterObjectives(game, lines); return dens === 'full' && !attentionHot(game) ? OG.sortAll(visible).slice(0, 7) : OG.resolve(visible, dens === 'minimal' ? 1 : 2); },
     sortAll: OG.sortAll,
     resolve: OG.resolve,
     /** quiet right now (chase / director peak)? */

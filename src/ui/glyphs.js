@@ -53,6 +53,7 @@ const P = {
   flag: 'M5 21V3 M5 4h13l-3 4 3 4H5',
 };
 const EMOJI = {
+  '★': 'star', // Service Record prestige icon; numeric counts remain ordinary text.
   '🪳': 'bug', '🦝': 'person', '🕷️': 'spider', '🕷': 'spider', '👁️': 'eye', '👁': 'eye', '🧍': 'person', '🟢': 'blob', '🎁': 'gift',
   '🕸️': 'web', '🕸': 'web', '🩸': 'bug', '😱': 'skull', '🎭': 'mask', '🐺': 'hound', '🗿': 'person', '🪱': 'worm', '🔫': 'turret',
   '💣': 'mine', '🚪': 'door', '🏗️': 'crane', '🏗': 'crane', '👹': 'skull', '👾': 'bug', '📦': 'box', '🏢': 'building', '🪐': 'planet',

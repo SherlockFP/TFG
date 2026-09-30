@@ -6,6 +6,7 @@
 //             CONTEXTUAL: it shows when its content changes, fades after FLASH_S seconds, and is always reachable with HOLD TAB
 //   minimal   same, 1 objective line, shorter flashes, and the widgets marked `min:'hide'` only exist in the Tab card
 // Contextual = the widget's own module is untouched; this file only toggles class `.hc-off` on its dock item / HUD block.
+import { attentionHot } from '../ui/hud_attention.js';
 import { t, tf } from '../core/i18n.js';
 import { escapeHtml } from '../core/util.js';
 import { MOONS } from './moons.js';
@@ -88,6 +89,7 @@ export function installHudCalm(game) {
     return s || (el.querySelector('canvas') ? 'canvas' : '');
   };
   function decide(el, rule, d, tnow) {
+    if (attentionHot(game) && rule.f) return false;
     if (d === 'full') return true;
     if (rule.min === 'hide' && d === 'minimal') return false;
     if (rule.c) return !!el.querySelector(rule.c);

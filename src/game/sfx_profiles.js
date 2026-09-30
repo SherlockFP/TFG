@@ -138,6 +138,8 @@ export const VOICES = {
 const P = (voice, foot, o = {}) => ({ voice, foot, pitch: 1, vol: 1, idle: [10, 22], range: [3, 45], stride: 1.1, keep: [], ...o });
 
 export const PROFILES = {
+  c13_printer: P('secbot', 'none', { idle: [0, 0], range: [3, 32], vol: 0.55 }),
+  c13_checksum: P('loadbalancer', 'none', { idle: [0, 0], range: [3, 32], vol: 0.55 }),
   // ---- base facility / outdoor creatures
   scuttler: P('spambot', 'skitter', { idle: [4, 9], range: [2, 28], stride: 0.35, crowd: true }),
   yoinker: P('hoarder', 'pad', { idle: [5, 11], range: [2, 32], stride: 0.6 }),

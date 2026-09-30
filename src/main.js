@@ -92,8 +92,8 @@ class App {
     this.mods = new ModManager();
     this.ui = new UI(this);
     this.game = null;
-    addTranslations({ 'Fullscreen when playing': 'Oynarken tam ekran', 'stops Ctrl+W (crouch + forward) from closing the tab': 'Ctrl+W (eğil + ileri) sekmeyi kapatmasın', 'Ask before leaving the page': 'Sayfadan çıkmadan önce sor' }, 'tr');
-    addTranslations({ 'Fullscreen when playing': 'Полный экран в игре', 'stops Ctrl+W (crouch + forward) from closing the tab': 'Ctrl+W (присесть + вперёд) не закроет вкладку', 'Ask before leaving the page': 'Спрашивать перед уходом со страницы' }, 'ru');
+    addTranslations({ 'Fullscreen when playing': 'Oynarken tam ekran', 'Use fullscreen for an immersive view': 'Daha sürükleyici bir görünüm için tam ekran', 'Ask before leaving the page': 'Sayfadan çıkmadan önce sor' }, 'tr');
+    addTranslations({ 'Fullscreen when playing': 'Полный экран в игре', 'Use fullscreen for an immersive view': 'Полный экран для погружения', 'Ask before leaving the page': 'Спрашивать перед уходом со страницы' }, 'ru');
     addTranslations({ 'Loading models {d}/{n}': 'Modeller yükleniyor {d}/{n}' }, 'tr');   // [fastmenu]
     addTranslations({ 'Loading models {d}/{n}': 'Загрузка моделей {d}/{n}' }, 'ru');
     // [ctrlw] Ctrl+W (crouch + forward) closes the tab and browsers don't let a page cancel it. 1) ask before leaving while in a game;
@@ -190,11 +190,14 @@ class App {
 
   bindKeys() {
     const input = this.input;
-    input.onLockChange = (locked) => {
+    input.onLockChange = (locked, intentional) => {
       const g = this.game;
       if (!g) return;
       this.ui.clickHint.classList.toggle('hidden', locked || !!this.ui.panelOpen || !!g.minigame || g.terminal.active || this.ui.chatOpen);
-      if (!locked && !this.ui.panelOpen && !g.minigame && !g.terminal.active && !this.ui.chatOpen) this.ui.openPause();
+      if (!locked && !intentional && !this.ui.panelOpen && !g.minigame && !g.terminal.active && !this.ui.chatOpen && !this.ui.fullscreenOpen?.()) {
+        this.pauseFromUnlockAt = performance.now();
+        this.ui.openPause();
+      }
     };
     this.engine.canvas.addEventListener('click', () => {
       if (this.game && !this.ui.panelOpen && !this.ui.chatOpen && !this.game.minigame && !this.game.terminal.active) input.lock();
@@ -208,13 +211,23 @@ class App {
     document.addEventListener('mousedown', (e) => { if (idle() && !input.locked && !e.target.closest?.('button,input,select,textarea,a')) input.lock(); }, true);
     window.addEventListener('keydown', (e) => { if (e.code !== 'Escape' && idle() && !input.locked && !e.repeat) input.lock(); }, true);
     setInterval(() => { if (this.game && idle() && !input.locked && document.hasFocus?.() !== false) this.ui.clickHint.classList.remove('hidden'); else if (input.locked) this.ui.clickHint.classList.add('hidden'); }, 400);
+    // Escape can release pointer lock before its key event is delivered. Consume that same gesture once.
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Escape' && e.repeat && this.game && !input.isTyping()) {
+        e.preventDefault(); e.stopImmediatePropagation();
+      }
+    }, true);
     window.addEventListener('keydown', (e) => {
       const g = this.game;
-      if (!g || input.isTyping()) return;
+      if (!g || input.isTyping() || e.defaultPrevented || e.repeat) return;
       const k = this.settings.keys;
       if (e.code === 'Escape') {
-        if (this.ui.panelOpen) { this.ui.closePanel(); e.preventDefault(); }
+        if (this.ui.panelOpen) {
+          if (!this.pauseFromUnlockAt || performance.now() - this.pauseFromUnlockAt > 250) this.ui.closePanel();
+          this.pauseFromUnlockAt = 0; e.preventDefault();
+        }
         else if (g.terminal.active) { g.terminal.close(); e.preventDefault(); }   // terminal input lost focus (Tab, HUD click)
+        else if (!g.minigame && !this.ui.chatOpen && !this.ui.fullscreenOpen?.()) { this.ui.openPause(); e.preventDefault(); }
         return;
       }
       if (g.minigame || g.terminal.active) return;

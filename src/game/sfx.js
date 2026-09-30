@@ -125,10 +125,11 @@ export function installSfx(game) {
     const L = listener();
     const dx = pos.x - L.x, dy = pos.y - L.y, dz = pos.z - L.z;
     const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-    const reach = prof.range[1] * EVENT_REACH[event];
+    const background = event === 'idle' || event === 'chase' || event === 'step';
+    const reach = prof.range[1] * EVENT_REACH[event] * (event === 'idle' ? 0.8 : 1);
     if (dist > reach) { stats.skipped++; return false; }
     if (!opts.force) {
-      const cd = EVENT_COOLDOWN[event] * s.gap;
+      const cd = EVENT_COOLDOWN[event] * s.gap * (event === 'hurt' ? 2 : 1);
       if (cd && clock - (s.last[event] ?? -99) < cd) return false;
       const ck = view.type + '|' + event, gap = CROWD_GAP[event] * (prof.crowd ? 2.2 : 1);
       if (gap && clock - (crowdLast.get(ck) ?? -99) < gap) return false;
@@ -154,6 +155,8 @@ export function installSfx(game) {
     // level: profile x event x per-creature wobble, dipped a little through walls, quieter when the stock sound plays too
     let vol = EVENT_VOL[event] * prof.vol * (opts.volume ?? 1) * (0.9 + 0.2 * s.r());
     if (opts.keep) vol *= 0.6;
+    // Background creatures recede when the room fills; attack/alert tells retain their level.
+    if (background) vol *= Math.max(0.4, 1 / Math.sqrt(1 + live.size * 0.65));
     if (event === 'step' && prof.sil) vol *= prof.sil;
     let occl = 0;
     try { occl = audio.occluder ? audio.occluder(pos) || 0 : 0; } catch { occl = 0; }
@@ -191,6 +194,8 @@ export function installSfx(game) {
   // ------------------------------------------------------------------ hooks called by creatures.js
   function onState(view, prev, stt) {
     try {
+      // These machines own their precise wind-up cues; a generic robot voice would mask counterplay.
+      if (view.type === 'c13_printer' || view.type === 'c13_checksum' || view.type === 'e14_warden') return false;
       const ev = stateEvent(stt);
       if (!ev || disposed || !audio?.ctx) return false;
       const s = state(view);

@@ -1,0 +1,76 @@
+import assert from 'node:assert/strict';
+import { transactIndustry, completeIndustryShift, industryOf } from '../../src/game/industry13_core.js';
+const run = { runId:'qa13', day:1, credits:100, quota:330, moon:'hamsi', forecast:{hamsi:'rainy'} };
+assert.equal(transactIndustry(run,{op:'produce',product:'cells'}).ok,true);
+assert.equal(run.credits,88);
+assert.equal(transactIndustry(run,{op:'sell',product:'cells'}).ok,false);
+assert.equal(completeIndustryShift(run,'hamsi',1),true);
+assert.equal(completeIndustryShift(run,'hamsi',1),false,'replayed takeoff cannot finish twice');
+assert.equal(industryOf(run).goods.cells,1);
+assert.equal(transactIndustry(run,{op:'sell',product:'cells'}).ok,true);
+assert.equal(run.credits,111);
+assert.equal(transactIndustry(run,{op:'sell',product:'cells'}).ok,false,'already sold batch cannot pay twice');
+assert.equal(run.sold,undefined,'passive output is not quota scrap');
+assert.equal(transactIndustry(run,{op:'robot',target:'hamsi'}).ok,true);
+assert.equal(transactIndustry(run,{op:'robot',target:'hamsi'}).ok,false);
+completeIndustryShift(run,'lufer',2);
+assert.equal(industryOf(run).report,null);
+completeIndustryShift(run,'hamsi',3);
+assert.ok(industryOf(run).report.salvage>=52&&industryOf(run).report.salvage<=68);
+assert.equal(transactIndustry(run,{op:'collect'}).report.weather,'rainy');
+const credits=run.credits;
+assert.equal(transactIndustry(run,{op:'collect'}).ok,false);
+assert.equal(run.credits,credits);
+const limited={runId:'limit',credits:1000,quota:330};
+for(let i=0;i<3;i++)assert.equal(transactIndustry(limited,{op:'produce',product:'culture'}).ok,true);
+assert.equal(transactIndustry(limited,{op:'produce',product:'cells'}).ok,false);
+completeIndustryShift(limited,'hamsi',1);
+assert.equal(transactIndustry(limited,{op:'sell',product:'culture'}).ok,true);
+assert.equal(transactIndustry(limited,{op:'sell',product:'culture'}).ok,false,'broker per-shift cap prevents compounding income');
+assert.equal(transactIndustry(run,{op:'produce',product:'__proto__'}).ok,false);
+console.log('industry13: commissions, field-only progress, replay safety, scout lifecycle and income caps passed');
+// Hull repairs can defer the core takeoff completion beyond the wrapper return.
+const { Emitter } = await import('../../src/core/events.js');
+const { installIndustry13 } = await import('../../src/game/industry13.js');
+const mods=new Emitter(), fieldRun={runId:'async',phase:'moon',moon:'hamsi',day:1,credits:80,quota:330};
+const game={mods,run:fieldRun,isHost:true,broadcastRun(){},hostSave(){},hostBeginTakeoff(){this.run.phase='takeoff';mods.emit('phase','takeoff',this);},shop:{open(){},hostCart(){}},terminal:{hostExecute(){}}};
+const api=installIndustry13(game);
+transactIndustry(fieldRun,{op:'produce',product:'cells'});
+game.hostBeginTakeoff();
+assert.equal(industryOf(fieldRun).shift,0);
+// The actual phase event happens later, after the original takeoff incremented the day.
+fieldRun.day=2;fieldRun.phase='orbit';mods.emit('phase','orbit',game);
+assert.equal(industryOf(fieldRun).shift,1);
+assert.equal(industryOf(fieldRun).goods.cells,1);
+mods.emit('phase','orbit',game);
+assert.equal(industryOf(fieldRun).shift,1,'duplicate orbit event cannot mature another batch');
+api.dispose();
+console.log('industry13: deferred hull takeoff regression passed');
+// Fault repairs bypass outer takeoff wrappers: only the real phase event is reliable.
+const faultMods=new Emitter(),faultRun={runId:'fault',phase:'moon',moon:'hamsi',day:1,credits:80,quota:330};
+const faultGame={...game,mods:faultMods,run:faultRun,hostBeginTakeoff(){}};
+const faultApi=installIndustry13(faultGame);
+transactIndustry(faultRun,{op:'produce',product:'cells'});
+faultGame.hostBeginTakeoff();
+assert.equal(industryOf(faultRun).departure,undefined,'blocked repair does not count as departure');
+faultRun.phase='takeoff';faultMods.emit('phase','takeoff',faultGame);
+assert.equal(industryOf(faultRun).departure.day,1,'captured original launch records actual phase');
+faultApi.dispose();
+// A replacement host restores the serialized run while a takeoff is underway.
+faultGame.run=JSON.parse(JSON.stringify(faultRun));
+const migratedApi=installIndustry13(faultGame);
+faultGame.run.day=2;faultGame.run.phase='orbit';faultMods.emit('phase','orbit',faultGame);
+assert.equal(industryOf(faultGame.run).shift,1,'migrated delayed takeoff progresses once');
+assert.equal(industryOf(faultGame.run).goods.cells,1);
+faultMods.emit('phase','orbit',faultGame);
+assert.equal(industryOf(faultGame.run).shift,1,'migration settlement cannot repeat');
+migratedApi.dispose();
+console.log('industry13: fault-delayed and migrated takeoff regressions passed');
+// Actual module checkout wrapper suppresses repeated UI clicks and attaches
+// a host replay token without changing prices or manufacturing money.
+const orderMods=new Emitter(),requests=[];
+const orderGame={...game,mods:orderMods,run:{runId:'orders15',credits:60,phase:'orbit'},net:{request(...args){requests.push(args)},sendTo(){},on_(){}},shop:{buy(){throw new Error('old UI checkout should be wrapped')},open(){},hostCart(){throw new Error('distant purchase must not reach original')}},terminal:{hostExecute(){}}};
+const orderApi=installIndustry13(orderGame);orderGame.shop.buy([{id:'flashlight',n:1}]);orderGame.shop.buy([{id:'flashlight',n:1}]);assert.equal(requests.length,1,'double click only sends one order');assert.equal(typeof requests[0][1].cmd.orderId,'string');
+orderMods.emit('fx',{k:'sh',t:'shopres',ok:true});orderGame.shop.buy([{id:'walkie',n:1}]);assert.equal(requests.length,2);assert.notEqual(requests[0][1].cmd.orderId,requests[1][1].cmd.orderId,'separate purchases use separate nonce');
+let farFailure=false;orderGame.shop.hostCart({lines:[{id:'flashlight',n:1}]},'far',(msg,err)=>{farFailure=err;});assert.equal(farFailure,true);assert.equal(orderGame.run.credits,60);orderApi.dispose();
+console.log('industry15 actual checkout double-click and physical host binding passed');

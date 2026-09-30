@@ -2,6 +2,8 @@
 // Opened from the ship mirror + suit rack (E), the WARDROBE button on the character sheet, or game.cosmetics.open().
 // Works in-game (game given: equips via game.cosmetics, syncs to the crew) and from the main menu (game null: edits
 // the saved profile only). Clicking a tile TRIES it on in the preview; EQUIP / BUY act on the selection.
+import { curateWardrobe } from '../../game/wardrobe13_core.js';
+import '../../game/wardrobe13_data.js';
 import { el } from '../../core/util.js';
 import { t, tf } from '../../core/i18n.js';
 import { unlockAt, claimable } from '../../game/wallet.js';
@@ -31,8 +33,9 @@ const CSS = `
 .wd-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
 .wd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;overflow:auto;padding:4px 4px 4px 0;min-height:0;flex:1;align-content:start}
 .wd-tile{position:relative;border:1px solid var(--ph-line);background:rgba(0,0,0,.35);padding:6px 8px 6px 10px;cursor:pointer;user-select:none;min-height:58px;border-left:4px solid var(--tc,#888)}
-.wd-tile:hover,.wd-tile:focus{outline:none;background:rgba(255,138,61,.13)}
-.wd-tile.sel{background:rgba(255,138,61,.2);box-shadow:0 0 12px var(--tc,#ff8a3d) inset}
+.wd-tile:hover{background:rgba(255,138,61,.13)}
+.wd-tile:focus-visible{outline:2px solid var(--ph-hi);outline-offset:2px}
+.wd-tile.sel{background:rgba(255,138,61,.14);box-shadow:inset 0 0 0 1px var(--tc,#ff8a3d)}
 .wd-tile.locked{opacity:.55}
 .wd-tile .n{font-family:var(--cond);font-weight:bold;font-size:20px;color:var(--tc,#ddd);line-height:1.05;padding-right:20px}
 .wd-tile .s{font-size:16px;opacity:.85;margin-top:2px}
@@ -72,6 +75,7 @@ export function openWardrobe({ game = null, profile, ui, from = null } = {}) {
   const pv = getCharPreview();
   const cos = game?.cosmetics;
   let tab = 'suit';
+  let filter = 'ready';
   const tryOn = { suit: profile.suit, hat: profile.hat || 'none', face: profile.face || 'none', back: profile.back || 'none' };
   const tryProfile = Object.create(profile);       // reads fall through to the real profile (name, title, ...)
   const applyTry = () => { Object.assign(tryProfile, { suit: tryOn.suit, hat: tryOn.hat, face: tryOn.face, back: tryOn.back }); pv.follow(tryProfile); };
@@ -101,7 +105,12 @@ export function openWardrobe({ game = null, profile, ui, from = null } = {}) {
       el('span', { class: 'cp-cursor' }, '█'), el('span', { class: 'cp-sub' }, `◈ ${profile.coins} · Lv.${profile.level}`)));
     const X = WARDROBE_EXT[tab] || null;   // [cosm5]
     const ctx = { game, profile, pv, ui, tryOn, applyTry, render, close };
-    const items = X ? X.list(profile) : listFor(tab);
+    const allItems = X ? X.list(profile) : listFor(tab);
+    const ownsEntry = e => X ? !!X.owned(profile,e) : (e.id === 'none' || isOwned(e.slot || tab,e.id));
+    const priceEntry = e => X?.price ? X.price(e) : (e.price || 0);
+    const items = curateWardrobe(allItems, profile, ownsEntry, priceEntry, filter);
+    if (!items.length) items.push(...allItems.slice(0,1));
+    if (sel && !items.some(e => e.id === sel.id)) sel = null;
     if (!sel || sel.slot !== tab) sel = { slot: tab, id: X ? items[0]?.id : (tab === 'suit' ? tryOn.suit : tryOn[tab]) };
     const cur = items.find((e) => e.id === sel.id) || items[0];
     const owned = X ? !!X.owned(profile, cur) : (isOwned(cur.slot || tab, cur.id) || cur.id === 'none');
@@ -116,6 +125,8 @@ export function openWardrobe({ game = null, profile, ui, from = null } = {}) {
       el('div', { class: 'wd-name', style: { color: col } }, t(cur.name)),
       el('div', { class: 'wd-tier', style: { color: col } }, `${t(tierDef(cur.tier || 'common').name)} · ${X ? t(X.slotLabel ? X.slotLabel(cur) : X.label) : t(tab === 'suit' ? 'Suits' : tab === 'hat' ? 'Hats' : tab === 'face' ? 'Face' : 'Back')}`),
       el('div', { class: 'wd-desc' }, t(cur.desc || '')),
+      el('div', { class: 'wd-note' }, t('Appearance only. No combat bonuses.')),
+      !isEq ? el('div', { class: 'wd-note' }, t('Preview only — equip to save')) : null,
       owned ? el('div', { class: 'wd-how ok' }, glyphEl('check'), ' ' + (isEq ? t('Equipped') : t('Owned')))
         : el('div', { class: 'wd-how' }, glyphEl('lock'), ` ${t('Unlock')}: ${t(cur.how || '?')}`),
       prog ? el('div', { class: 'wd-bar' }, el('i', { style: { width: Math.round(Math.min(1, prog[0] / prog[1]) * 100) + '%' } })) : null,
@@ -132,7 +143,7 @@ export function openWardrobe({ game = null, profile, ui, from = null } = {}) {
     });
     actions.appendChild(equipBtn);
     if (!owned && price) {
-      const buyBtn = el('button', { class: 'btn' + (claimable(profile.coins, price) ? ' primary' : ' disabled'), type: 'button', 'data-nav': 'wd:buy' }, claimable(profile.coins, price) ? t('Claim') : `◈ ${unlockAt(price)}`);
+      const buyBtn = el('button', { class: 'btn' + (claimable(profile.coins, price) && profile.level >= (cur.minLevel || 1) ? ' primary' : ' disabled'), type: 'button', 'data-nav': 'wd:buy' }, claimable(profile.coins, price) ? t('Claim') : `◈ ${unlockAt(price)}`);
       buyBtn.addEventListener('click', () => {
         const r = X ? (X.buy ? X.buy(ctx, cur) : { ok: false }) : doBuy(cur);
         if (r.ok) { ui.sfx?.('ui_buy', 0.7); render(); } else { ui.sfx?.('ui_error', 0.5); ui.toast?.(t(r.why || 'Locked'), 'bad'); }
@@ -165,14 +176,23 @@ export function openWardrobe({ game = null, profile, ui, from = null } = {}) {
       tile.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); pick(); } });
       grid.appendChild(tile);
     }
-    const right = el('div', { class: 'wd-right' }, tabs, X?.extra?.(ctx) || null, grid,
+    const filters = el('div', { class: 'wd-tabs', role: 'group', 'aria-label': t('WARDROBE') },
+      ...[['ready','Ready & next'],['owned','Owned only'],['all','Full catalog']].map(([id,label]) => {
+        const b=el('button',{class:'btn small'+(filter===id?' primary':''),type:'button','aria-pressed':String(filter===id),'data-nav':'wd:filter:'+id},t(label));
+        b.addEventListener('click',()=>{ filter=id; sel=null; render(); }); return b;
+      }));
+    const reset = el('button', {class:'btn small',type:'button','data-nav':'wd:reset'},t('Reset preview'));
+    reset.addEventListener('click',()=>{ for(const slot of SLOTS) tryOn[slot]=equippedId(slot); sel=null; applyTry(); render(); });
+    detail.appendChild(reset);
+    const kit=el('div',{class:'wd-note'},t('Current kit')+': '+SLOTS.map(slot=>t(entry(slot,equippedId(slot))?.name || equippedId(slot))).join(' · '));
+    const right = el('div', { class: 'wd-right' }, tabs, filters, kit, X?.extra?.(ctx) || null, grid,
       el('div', { class: 'wd-note' }, t('Drag to rotate') + ' · ' + (X?.note ? X.note() : (cos ? t('Your look syncs to the whole crew.') : t('Saved to your profile.')))));
     const closeBtn = el('button', { class: 'btn back', type: 'button', 'data-nav': 'wd:close' }, t('Close'));
     closeBtn.addEventListener('click', close);
     wrap.append(el('div', { class: 'cp-body' }, left, right), el('div', { class: 'cp-foot' }, el('span', {}, el('kbd', {}, 'ESC'), ' ' + t('BACK')), closeBtn));
     applyTry();
     pv.kick();   // re-attaching the canvas stops its loop: restart it
-    if (focusKey) wrap.querySelector(`[data-nav="${CSS.escape(focusKey)}"]`)?.focus?.({ preventScroll: true });
+    if (focusKey) [...wrap.querySelectorAll('[data-nav]')].find(node => node.dataset.nav === focusKey)?.focus?.({ preventScroll: true });
   };
   // the shared preview canvas lives in exactly one panel: give it back to the character sheet underneath (main menu)
   // however the wardrobe gets closed (CLOSE button, ESC, another panel replacing it)

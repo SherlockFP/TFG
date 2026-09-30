@@ -6,6 +6,7 @@
 //
 // Soft interface (game.cosmetics): unlocked() -> { suit:[ids], hat:[], face:[], back:[] } · equip(slot, id) -> bool ·
 // current() -> { suit, hat, face, back } · plus owns / unlock / catalog / price / open (the wardrobe panel).
+import { C13 } from './wardrobe13_data.js';
 import { SUIT_COLORS, HATS } from '../models/avatar.js';
 import { OUTFITS, OUTFIT_BY_ID, FACE_ACCS, BACK_ACCS, HATS_EXTRA, catalogue } from '../models/cosmetics.js';
 import { MARKET } from './progression.js';
@@ -28,6 +29,8 @@ export const PRICES = {
   'suit:modarmor': 900, 'suit:soviet': 350, 'suit:tracksuit': 200, 'suit:knight': 1100, 'suit:viking': 700,   // [ux] wave 3
 };
 const MIN_LEVEL = { 'suit:clown': 5, 'suit:hazmat': 4, 'hat:wizard': 10, 'face:shades': 6, 'back:plushie': 6, 'suit:modarmor': 12, 'suit:soviet': 6, 'suit:tracksuit': 3, 'suit:knight': 15, 'suit:viking': 10 };
+
+for (const e of C13) if (e.slot !== 'skin') { PRICES[e.slot + ':' + e.id] = e.price; MIN_LEVEL[e.slot + ':' + e.id] = e.minLevel; }
 
 // [ux] wave-3 suit names / descriptions (Turkish + Russian)
 const W3_TR = {

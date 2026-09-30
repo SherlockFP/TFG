@@ -15,11 +15,18 @@ import * as D from '../../src/audio/dsp.js';
 import * as B from '../../src/audio/sfx_beds.js';
 import * as PF from '../../src/game/sfx_profiles.js';
 import * as C from '../../src/audio/soundpack_core.js';
+import { registerEscape14 } from '../../src/game/escape14.js';
+import { installThreats13 } from '../../src/game/threats13.js';
 import { SoundPack } from '../../src/audio/soundpack.js';
 
 let fails = 0, checks = 0;
 const ok = (c, m) => { checks++; if (!c) { fails++; console.log('FAIL', m); } };
 const src = (f) => fs.readFileSync(new URL('../../src/game/' + f, import.meta.url), 'utf8');
+
+// Register the real machine threat definitions exactly as the game installer does.
+const threats13 = installThreats13({ run: { quotaIndex: 2 }, mods: { on: () => () => {}, creatureModels: new Map() } });
+threats13.dispose();
+registerEscape14();
 
 // ------------------------------------------------------------------------------------------------ every creature type
 const ids = new Set(Object.keys(CREATURES));

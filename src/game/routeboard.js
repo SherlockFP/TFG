@@ -219,6 +219,9 @@ export function installRouteboard(game) {
     const onKey = (e) => {
       if (!visible()) return;
       const k = e.key;
+      // Pasted/history-restored commands can exist while the auto-open board is still up.
+      // Let the input's real submit handler consume them before any board shortcut.
+      if (e.target === term.inp && String(term.inp.value || '').trim()) { hide(); return; }
       const n = /^[1-9]$/.test(k) ? +k - 1 : -1;
       if (n >= 0 && n <= cards.length) { sel = n; sfx('ui_click', 0.3); render(); }
       else if (k === 'ArrowRight' || k === 'ArrowDown') { sel = (sel + 1) % (cards.length + 1); render(); }

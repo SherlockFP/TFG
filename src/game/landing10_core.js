@@ -32,12 +32,12 @@ export class LandingSeq {
   constructor(cfg = {}) {
     this.cfg = { ...CFG, ...cfg };
     this.stage = 'idle'; this.key = null; this.lines = []; this.n = 0;
-    this.t0 = 0; this.touchAt = 0; this.shownAt = 0; this.hideAt = 0; this.dirty = false;
+    this.t0 = 0; this.touchAt = 0; this.shownAt = 0; this.hideAt = 0; this.dirty = false; this.pausedAt = null;
   }
   /** a landing starts. Same key twice = ignored (a resume / duplicate phase message must not restart it). `touched` = the moon phase is already here. */
   begin(key, now, touched = false) {
     if (key != null && key === this.key && this.stage !== 'idle') return false;
-    this.key = key; this.stage = touched ? 'wait' : 'landing'; this.lines = []; this.n = 0; this.t0 = now; this.touchAt = touched ? now : 0; this.shownAt = 0; this.hideAt = 0; this.dirty = false;
+    this.key = key; this.stage = touched ? 'wait' : 'landing'; this.lines = []; this.n = 0; this.t0 = now; this.touchAt = touched ? now : 0; this.shownAt = 0; this.hideAt = 0; this.dirty = false; this.pausedAt = null;
     return true;
   }
   /** true while the sequence owns the screen (toasts / big banners of other systems wait) */
@@ -81,6 +81,16 @@ export class LandingSeq {
     const { phase, centerBusy, dead } = env;
     const wasPanel = this.stage === 'panel';
     if (now - this.t0 > this.cfg.hardMs || phase === 'takeoff' || phase === 'orbit' || phase === 'fired') { this.stage = 'done'; return wasPanel ? { type: 'hide' } : null; }
+    // Safety overrides the force-show deadline. Retain the same sequence and unread duration.
+    if (env.danger) {
+      if (this.pausedAt === null) { this.pausedAt = now; return wasPanel ? { type: 'pause' } : null; }
+      return null;
+    }
+    if (this.pausedAt !== null) {
+      const paused = Math.max(0, now - this.pausedAt); this.pausedAt = null;
+      this.touchAt += paused; this.hideAt += paused; this.shownAt += paused;
+      if (wasPanel) return { type: 'resume', ms: this.hideAt - now, ...this.view() };
+    }
     if (this.stage === 'landing') {
       if (phase === 'moon' || phase === 'company') { this.stage = 'wait'; this.touchAt = now; }
       return null;

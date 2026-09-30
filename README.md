@@ -1,7 +1,8 @@
 # TFG
 
-Co-op PSX horror scavenging game for the browser — Lethal Company + R.E.P.O. with an MMO-style
-progression layer, minigames, mods, proximity voice chat and serverless P2P multiplayer.
+Co-op industrial horror and extraction for the browser. A company crew explores abandoned server moons
+inside the Algorithm's hostile broadcast, carries salvage home and invests in vessels, tools and workshops.
+PSX visuals, proximity voice chat, minigames and serverless P2P multiplayer.
 
 > "Engagement is love." — The Algorithm
 
@@ -37,14 +38,20 @@ HTTPS comes for free, so voice chat (microphone) works.
 
 ## How to play
 
-WASD move · Shift sprint · Ctrl crouch · Space jump · E interact · LMB use / attack / grab big loot ·
-RMB scan · G drop · Q throw · F flashlight · 1-4 slots · R reload · V push-to-talk · Z/X emotes ·
+WASD move · Shift sprint · C crouch · Space jump · E interact · LMB use / attack / grab big loot ·
+RMB scan · G drop · Q throw · F flashlight · 1-5 slots · R reload · V push-to-talk · Z/X emotes ·
 Enter chat · Tab character sheet · Esc menu
 
-Route to a moon on the ship **terminal** (`MOONS`, `ROUTE`, `STORE`, `BUY`, `SCAN`, `BESTIARY`, door/turret
-codes…), pull the **lever**, loot the facility, get back before midnight, sell at **0-Algorithm HQ**, meet the
-quota. Level up, spend skill points, buy soulbound gear from Phish Dayı's Black Market, take bounties,
-fish, gamble, play FLAPPY PHISH.
+Start at **Relay Dock**. The host chooses a vessel at the fleet office, then boards it at the departure
+kiosk with the crew. The Packet Courier is the free starter. Buy equipment from a **Field Broker**:
+press E, choose **TOOLS**, then collect your order from the blue pickup tray with E.
+
+Use the ship **terminal** for `MOONS`, `ROUTE`, `SCAN`, `BESTIARY` and route information. Pull the **lever**,
+explore the facility and outdoors, carry salvage back before midnight, and sell it at the **Archive Intake**
+on 0-Algorithm HQ to meet the quota. Production advances after completed field shifts; return to a broker's
+physical workshop to calibrate and collect batches. Casino chips, robot surveys, cargo trolleys and optional
+late-game archive/pursuit encounters offer other crew choices. Levels, faction work and appearance unlocks
+carry progression between runs.
 
 ## Project layout
 

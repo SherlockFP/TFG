@@ -8,9 +8,9 @@
 // One program per skin id (customProgramCacheKey); clones are cached per (skin, source material) and never disposed while alive.
 import * as THREE from 'three';
 
-export const SKIN_IDS = ['camo', 'carbon', 'damascus', 'bubblegum', 'circuit', 'lava', 'frost', 'holo', 'bone', 'rusted', 'hazard', 'static', 'neongrid', 'voidstar'];   // wave 8 appended (patterns 11-14)
+export const SKIN_IDS = ['camo', 'carbon', 'damascus', 'bubblegum', 'circuit', 'lava', 'frost', 'holo', 'bone', 'rusted', 'hazard', 'static', 'neongrid', 'voidstar', 'issuedsteel13', 'dockoxide13', 'redacted13', 'porcelain13'];   // wave 8 appended (patterns 11-14)
 const PAT = Object.fromEntries(SKIN_IDS.map((id, i) => [id, i + 1]));
-export const SKIN_ACCENT = { camo: 0x8a9a4a, carbon: 0x5a6a8a, damascus: 0xcfd6e0, bubblegum: 0xff6ac8, circuit: 0x2affb0, lava: 0xff6a10, frost: 0x7fd4ff, holo: 0xff88ff, bone: 0xe8dfc4, hazard: 0xffcc00, static: 0xb0b8c0, neongrid: 0xff2fd0, voidstar: 0x6a5aff, rusted: 0xc8641e };
+export const SKIN_ACCENT = { camo: 0x8a9a4a, carbon: 0x5a6a8a, damascus: 0xcfd6e0, bubblegum: 0xff6ac8, circuit: 0x2affb0, lava: 0xff6a10, frost: 0x7fd4ff, holo: 0xff88ff, bone: 0xe8dfc4, hazard: 0xffcc00, static: 0xb0b8c0, neongrid: 0xff2fd0, voidstar: 0x6a5aff, rusted: 0xc8641e, issuedsteel13: 0x8d979a, dockoxide13: 0x688c83, redacted13: 0xbd493d, porcelain13: 0xdad4c6 };
 export const skinClock = { value: 0 };
 
 const GLSL = /* glsl */`
@@ -102,6 +102,23 @@ vec3 c5skin(vec3 p, vec3 base) {
     float neb = c5f(p * 6.0 + vec3(uC5T * 0.03));
     col = vec3(0.01, 0.01, 0.03) + vec3(0.12, 0.05, 0.25) * smoothstep(0.4, 0.8, neb);
     c5e = vec3(0.9, 0.95, 1.0) * st * tw * 1.4 + vec3(0.05, 0.02, 0.12) * neb;
+  } else if (C5P == 15) {    // issued steel: brushed inspection bands
+    float brush = c5n(vec3(p.x * 180.0, p.y * 9.0, p.z * 180.0));
+    col = vec3(0.29, 0.33, 0.35) + brush * 0.13;
+    col = mix(col, vec3(0.08, 0.09, 0.10), step(0.91, fract(p.y * 13.0)));
+  } else if (C5P == 16) {    // dock oxide: copper islands under aged patina
+    float patina = smoothstep(0.36, 0.62, c5f(p * 19.0));
+    col = mix(vec3(0.51, 0.28, 0.14), vec3(0.21, 0.40, 0.35), patina);
+    col *= 0.85 + 0.25 * c5n(p * 60.0);
+  } else if (C5P == 17) {    // redacted: narrow red bands on matte archive black
+    float band = step(0.82, fract((p.y + p.x * 0.15) * 12.0));
+    col = mix(vec3(0.045, 0.047, 0.05), vec3(0.58, 0.12, 0.09), band);
+  } else if (C5P == 18) {    // ceramic proof: porcelain panels, dark joints, blue control ticks
+    vec3 cell = fract(p * 16.0);
+    float seam = step(0.94, max(cell.x, cell.y));
+    float tick = step(0.77, cell.z) * step(0.78, cell.y);
+    col = mix(vec3(0.79, 0.77, 0.70), vec3(0.16, 0.17, 0.18), seam);
+    col = mix(col, vec3(0.15, 0.32, 0.55), tick * (1.0 - seam));
   } else {                   // rusted
     float n = c5f(p * 17.0); float pit = step(0.86, c5n(p * 45.0));
     col = mix(vec3(0.42, 0.20, 0.09), vec3(0.72, 0.34, 0.12), smoothstep(0.3, 0.7, n));

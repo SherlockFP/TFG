@@ -256,8 +256,11 @@ export function resetTutorial(profile) {
 }
 /** the text of a step for the current situation (objective line) */
 export function stepObjective(step, lang, cond = {}) {
-  if (step.obj2 && cond.hasFlashlight) return pick(step.obj2, lang);
-  return pick(step.obj, lang);
+  const vars = { price: 15, key: 'F', ...cond };
+  if (step.objDock && cond.docked) return fmt(pick(step.objDock, lang), vars);
+  if (step.obj2 && cond.hasFlashlight) return fmt(pick(step.obj2, lang), vars);
+  if (step.objBag && cond.bagFlashlight) return fmt(pick(step.objBag, lang), vars);
+  return fmt(pick(step.obj, lang), vars);
 }
 
 // ------------------------------------------------------------------ text helpers

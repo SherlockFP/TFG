@@ -940,6 +940,18 @@ export function createViewModel({ suitColor = '#d9642b' } = {}) {
       const tr = ch > 0.75 ? Math.sin(localTime * 55) * 0.012 * (ch - 0.75) * 4 : 0;
       D.py += tr; D.px += tr;
     }
+    // Utility use stays in the grip: horns squeeze/lift and torches click their
+    // switch instead of swinging like melee weapons. Keep the centre of view free.
+    const useAge = a.useAge;
+    if (Number.isFinite(useAge) && useAge >= 0 && useAge < 0.38) {
+      const press = Math.sin(Math.PI * useAge / 0.38) * (a.reduceMotion ? 0.35 : 1);
+      if (a.item === 'airhorn' || a.item === 'clownhorn') {
+        D.py += 0.065 * press; D.px -= 0.018 * press;
+        D.e -= 0.06 * press; D.wr += 0.035 * press;
+      } else if (a.item === 'flashlight' || a.item === 'proflash' || a.item === 'walkie') {
+        D.wr += 0.045 * press; D.py += 0.01 * press;
+      }
+    }
     // ranged recoil: instant kick, springy settle
     if (recoilT > 0) {
       recoilT = Math.max(0, recoilT - dt / recoil.dur);

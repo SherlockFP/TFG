@@ -51,7 +51,7 @@ export const hostMethods = {
     this.env.landingT = 0;
     // restore ship items
     for (const s of runData?.shipItems || []) {
-      this.items.onEvent({ e: 'sp', id: this.items.hostSpawnId?.() || ('i' + Math.random().toString(36).slice(2, 9)), ty: s.ty, v: s.v, bv: s.bv ?? s.v, p: s.p, q: s.q, b: s.b, c: s.c, am: s.am, af: s.af, bg: s.bg, ...this.inventory?.loadFields?.(s) });
+      this.items.onEvent({ e: 'sp', id: this.items.hostSpawnId?.() || ('i' + Math.random().toString(36).slice(2, 9)), ty: s.ty, v: s.v, bv: s.bv ?? s.v, p: s.p, q: s.q, b: s.b, c: s.c, am: s.am, af: s.af, bg: s.bg, col: s.col, ...this.inventory?.loadFields?.(s) });
     }
     this.registerHandlers();
     this.spawnInShip();

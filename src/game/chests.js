@@ -131,6 +131,7 @@ export function installChests(game, api) {
 
   // ---- map build: landmark chests + random outdoor chests + facility chests (all deterministic) --------------------------
   function outdoorSpecs(world) {
+    if (world.moonId === '__relay13') return []; // A social dock has no random expedition loot or Terrain path API.
     const out = world.outdoor, terrain = out.terrain, moon = MOONS[world.moonId] || {};
     const specs = (out.landmarks?.chests || []).map((c) => ({ ...c, y: c.y }));
     const R = new RNG(((world.seed | 0) ^ 0xc4e57) >>> 0);

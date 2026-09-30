@@ -14,7 +14,7 @@ export const TUNE = Object.freeze({
   ck: { walk: 2.6, run: 4.4, prime: 0.8, primeR: 1.3, latchR: 1.9, retry: 2.5, ping: 1.6, loud: 3.4, ribbon: 6, pull: 1.2, pullR: 2.6, hostPullR: 3.4, seek: 40, back: 0.3, up: 1.2 },
   echo: { ear: 22, need: 6, max: 16, tape: 3.0, replay: 5.5, lead: 1.0, cool: 8, spotMin: 18, spotAway: 12, weakMul: 2.5, stepMin: 0.4, voiceMin: 0.28, stepGap: 0.55, voiceGap: 0.6 },
   lag: { zone: 6, zoneDy: 3.5, trigger: 9, shimmer: 1.5, active: 12, off: 5, rest: [8, 14], walk: 1.3, seek: 16, hover: 1.5, snapBack: 0.8, snapEvery: 1.5, snapFirst: 0.7, delay: 0.28, hist: 3 },
-  minQuota: { c12_404: 2, c12_cookie: 1, c12_echo: 1, c12_lag: 1 },
+  minQuota: { c12_404: 2, c12_cookie: 2, c12_echo: 2, c12_lag: 2 },
   spawn: {
     c12_404: { zone: 'in', w: [0, 2, 4, 5], interior: { serverfarm: 1.3, hospital: 1.2, office: 1.1 } },
     c12_cookie: { zone: 'in', w: [0, 4, 5, 6], interior: { office: 1.3, mansion: 1.1 } },

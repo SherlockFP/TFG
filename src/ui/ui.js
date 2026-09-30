@@ -923,7 +923,7 @@ export class UI {
         body.append(section(t('General')), row(t('Language'), lang),
           section(t('Comfort')),
           check(t('Reduce motion'), 'reduceMotion', t('less camera shake, bob and screen warp; calmer menus')),
-          check(t('Fullscreen when playing'), 'fullscreenPlay', t('stops Ctrl+W (crouch + forward) from closing the tab'), true),   // [ctrlw]
+          check(t('Fullscreen when playing'), 'fullscreenPlay', t('Use fullscreen for an immersive view'), true),   // [ctrlw]
           check(t('Ask before leaving the page'), 'confirmLeave', null, true),   // [ctrlw]
           check(t('Art direction'), 'artDir', t('Company stamps, memo ticker, animated logo and panel art. Off = plain panels'), true),   // [artdir]
           check(t('Head bob'), 'headBob', null, true),
@@ -1084,7 +1084,7 @@ export class UI {
     const txt = [
       `<b>THE JOB</b><br>You are a contract content janitor for <b>The Algorithm</b>. Fly to the server moons, clear out the abandoned facilities and bring the lost content back to the ship. Sell it at <b>0-Algorithm HQ</b> to meet the <b>engagement quota</b> every 3 days. Miss it and you are deplatformed.`,
       `<b>THE SHIP</b><br>The <b>terminal</b> takes typed commands (MOONS, ROUTE, STORE, BUY, SCAN, BESTIARY, door codes). Pull the <b>lever</b> to land or take off. The ship leaves at <b>midnight</b>, with or without you.`,
-      `<b>CONTROLS</b><br>WASD move · Shift sprint · Ctrl crouch · Alt sneak (quiet) · Space jump · E interact / pick up · LMB use / attack / grab big loot · RMB scan · MMB / P ping · G drop · Q throw · F flashlight · 1-4 slots · R reload · V push-to-talk · Z/X emotes · Enter chat · I inventory · K passive tree · hold C spell wheel (or say / type the spell word) · J service record · hold B emote wheel · Tab character · Esc menu`,
+      `<b>CONTROLS</b><br>WASD move · Shift sprint · C crouch · Alt sneak (quiet) · Space jump · E interact / pick up · LMB use / attack / grab big loot · RMB scan · MMB / P ping · G drop · Q throw · F flashlight · 1-4 slots · R reload · V push-to-talk · Z/X emotes · Enter chat · I inventory · K passive tree · hold Backslash spell wheel (or say / type the spell word) · J service record · hold B emote wheel · Tab character · Esc menu`,
       `<b>SURVIVAL</b><br>Every creature has a rule. <i>Scan</i> them and read the BESTIARY. Sound matters: sprinting, horns and <b>your voice</b> attract things. Some exits are not what they seem.`,
       `<b>PROGRESSION</b><br>You earn XP and <b>Followers</b> from scrap, kills, bounties, fishing and minigames. Every level gives a skill point for the passive tree [K]. The Black Market at HQ, run by <b>Phish Dayı</b>, unlocks soulbound weapons, armor and cosmetics as your Followers grow (they are never spent). Higher-tier moons and later quotas hurt more and pay more.`,
       `<b>MINIGAMES</b><br>Crack vault keypads, rewire fuse boxes, pick locks, fish at ponds and the HQ dock, play FLAPPY PHISH on the ship's arcade, and gamble table chips at the GACHA MACHINE.`,
@@ -1530,5 +1530,5 @@ function row(label, input) { return el('div', { class: 'form-row' }, el('label',
 function pct(v) { return Math.round(v * 100) + '%'; }
 function actionName(a) { return t(ACTION_NAMES[a] || a); }
 function prettyKey(code) {
-  return String(code || '—').replace(/^Key/, '').replace(/^Digit/, '').replace(/^Arrow/, '').replace('ShiftLeft', 'L-Shift').replace('ControlLeft', 'L-Ctrl');
+  return String(code || '—').replace(/^Key/, '').replace(/^Digit/, '').replace(/^Arrow/, '').replace('ShiftLeft', 'L-Shift').replace('ControlLeft', 'L-Ctrl').replace('Backslash', 'Backslash (\\)');
 }

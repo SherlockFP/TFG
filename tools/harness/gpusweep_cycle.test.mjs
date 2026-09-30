@@ -112,6 +112,54 @@ ok(known.geos.size === 0 && known.texs.size === 0, 'known set cleared after swee
   unloadMap(m2, []); run(4);
   ok(sweep.stats().sweeps === s0 + 1, 'sweep runs after the following orbit');
 }
+// A wide scene is walked over frames, including root child iteration (not one giant push).
+{
+  const group = new THREE.Group(), geo = new THREE.BoxGeometry(1, 1, 1), mat = new THREE.MeshBasicMaterial();
+  for (let i = 0; i < 1500; i++) group.add(new THREE.Mesh(geo, mat));
+  scene.add(group); game.world.moonId = 'scan-budget';
+  const before = sweep.stats().scanVisits; tick(5);
+  ok(sweep.stats().scanVisits - before <= 128 && sweep.stats().scanPending > 0, 'wide scene scan bounded to <=128 visits per frame');
+  run(2); ok(sweep.stats().scanPending === 0, 'incremental scan eventually finishes');
+  // A material already drawn in a previous epoch still contributes its texture after known sets clear.
+  const reusedTex = tex(), reusedMat = new THREE.MeshBasicMaterial({ map: reusedTex });
+  const m = new THREE.Mesh(geo, reusedMat); scene.add(m); render(scene); sweep.sweepNow();
+  render(scene); scene.remove(m); group.removeFromParent(); game.world.moonId = null; run(4);
+  ok(!resident.texs.has(reusedTex), 'draw hook discovers reused material textures again after sweep epoch');
+  mat.dispose(); reusedMat.dispose(); geo.dispose(); reusedTex.dispose();
+}
+// A large orbit cleanup budgets both its remaining-scene walk and resource frees.
+// A relanding midway must protect cached resources reused by the new map.
+{
+  const orbitScene = new THREE.Scene(), updates = [], map = new THREE.Group(), living = new THREE.Group();
+  const mat = new THREE.MeshBasicMaterial(), liveGeo = new THREE.BoxGeometry(1, 1, 1);
+  const g = { engine: { scene: orbitScene }, world: { moonId: 'big' }, mods: { on: (ev, fn) => { updates.push(fn); return () => updates.splice(updates.indexOf(fn), 1); } } };
+  const s = installGpuSweep(g), owned = []; let disposed = 0, liveDisposed = false;
+  liveGeo.addEventListener('dispose', () => { liveDisposed = true; });
+  for (let i = 0; i < 2400; i++) {
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute([0,0,0,1,0,0,0,1,0], 3));
+    geo.addEventListener('dispose', () => disposed++); owned.push(geo); map.add(new THREE.Mesh(geo, mat));
+  }
+  for (let i = 0; i < 900; i++) living.add(new THREE.Mesh(liveGeo, mat));
+  orbitScene.add(map, living);
+  const step = dt => { for (const h of updates) h(dt, g); orbitScene.traverse(o => { if (o.geometry) o.onBeforeRender(null, orbitScene, null, o.geometry, o.material, null); }); };
+  step(0.1); map.removeFromParent(); g.world.moonId = null;
+  for (let i = 0; i < 28; i++) step(0.1);
+  ok(s.stats().cleanupPending && s.stats().sweeps === 0 && disposed === 0, 'large orbit collector spans frames before resource disposal');
+  for (let i = 0; i < 120 && s.stats().cleanupStage !== 'geos'; i++) step(0.1);
+  ok(s.stats().cleanupStage === 'geos' && disposed < owned.length, 'large removed-resource disposal also spans frames');
+  const reuse = new THREE.Mesh(owned.at(-1), mat); let reusedDisposed = false;
+  owned.at(-1).addEventListener('dispose', () => { reusedDisposed = true; });
+  orbitScene.add(reuse); g.world.moonId = 'reland'; step(0.1);
+  ok(!s.stats().cleanupPending && !reusedDisposed && !liveDisposed, 'reland cancels pending cleanup and protects newly reused map resource');
+  step(0.1); reuse.removeFromParent(); g.world.moonId = null;
+  let maxFreed = 0;
+  for (let i = 0; i < 200 && s.stats().sweeps === 0; i++) { const before = disposed; step(0.1); maxFreed = Math.max(maxFreed, disposed - before); }
+  ok(s.stats().sweeps === 1 && disposed === owned.length, 'cancelled cleanup eventually frees every removed geometry exactly once');
+  ok(maxFreed <= 128 && s.stats().cleanupWorkMax <= 128, 'orbit cleanup bounds tree iteration and frees to 128 operations per update');
+  ok(!liveDisposed, 'live orbit scene geometry survives incremental cleanup');
+  console.log('bounded orbit cleanup:', { maxFreed, cleanupWorkMax: s.stats().cleanupWorkMax, cleanupMaxMs: Number(s.stats().cleanupMaxMs.toFixed(3)) });
+  s.dispose(); mat.dispose(); liveGeo.dispose(); for (const geo of owned) geo.dispose();
+}
 const protoBefore = THREE.Object3D.prototype.onBeforeRender; sweep.dispose(); ok(handlers.length === 0, 'dispose detaches the update hook'); ok(THREE.Object3D.prototype.onBeforeRender !== protoBefore, 'dispose restores Object3D.onBeforeRender');
 
 console.log('cycles (geos resident: during / before sweep / after):', snapshots.map((s) => `${s.during}/${s.beforeSweep}/${s.after}`).join('  '), '| base', base, 'texs', baseTex + '->' + last.texs);

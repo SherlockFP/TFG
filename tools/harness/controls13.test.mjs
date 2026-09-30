@@ -1,0 +1,35 @@
+import assert from 'node:assert/strict';
+import { DEFAULT_KEYS } from '../../src/core/a11y_core.js';
+import { loadSettings } from '../../src/core/save.js';
+import { Input } from '../../src/core/input.js';
+let saved = {};
+globalThis.localStorage = { getItem: () => JSON.stringify(saved) };
+assert.equal(DEFAULT_KEYS.crouch, 'KeyC');
+assert.equal(DEFAULT_KEYS.magicWheel, 'Backslash');
+saved = { settingsVersion: 3, keys: { crouch: 'ControlLeft', magicWheel: 'KeyC', flashlight: 'KeyL' } };
+let settings = loadSettings();
+assert.equal(settings.keys.crouch, 'KeyC'); assert.equal(settings.keys.magicWheel, 'Backslash'); assert.equal(settings.keys.flashlight, 'KeyL');
+saved.keys.crouch = 'KeyZ'; assert.equal(loadSettings().keys.crouch, 'KeyZ');
+saved.keys = { crouch: 'ControlLeft', magicWheel: 'KeyO' }; assert.equal(loadSettings().keys.magicWheel, 'KeyO'); assert.equal(loadSettings().keys.crouch, 'KeyC');
+saved.keys = { crouch: 'ControlLeft', magicWheel: 'KeyC', flashlight: 'Backslash' }; assert.equal(loadSettings().keys.crouch, 'ControlLeft');
+const win = new EventTarget(), doc = new EventTarget();
+globalThis.window = win; globalThis.document = doc;
+doc.activeElement = null; doc.pointerLockElement = null;
+let fullscreenRequests = 0;
+doc.documentElement = { requestFullscreen: () => { fullscreenRequests++; return Promise.resolve(); } };
+const canvas = { requestPointerLock: () => Promise.resolve() };
+const input = new Input(canvas, settings); input.locked = true;
+function key(code, props = {}) { const e = new Event('keydown', { cancelable: true }); Object.assign(e, { code, ...props }); win.dispatchEvent(e); return e; }
+assert.equal(key('KeyW', { ctrlKey: true }).defaultPrevented, true);
+doc.activeElement = { tagName: 'INPUT' }; assert.equal(key('KeyW', { ctrlKey: true }).defaultPrevented, false);
+doc.activeElement = null; key('Escape', { repeat: true }); assert.equal(input.down.has('Escape'), false);
+input.locked = false; input.lock(); input.lock(); assert.equal(fullscreenRequests, 1);
+let intentional; input.onLockChange = (_, reason) => { intentional = reason; };
+doc.pointerLockElement = canvas; doc.exitPointerLock = () => { doc.pointerLockElement = null; doc.dispatchEvent(new Event('pointerlockchange')); };
+input.unlock(); assert.equal(intentional, true);
+// Deferred capture from a closed panel must not grab the pointer after the next panel opens.
+input.lock(); input.unlock(); let escapedLateCapture = false;
+doc.pointerLockElement = canvas;
+doc.exitPointerLock = () => { escapedLateCapture = true; doc.pointerLockElement = null; doc.dispatchEvent(new Event('pointerlockchange')); };
+doc.dispatchEvent(new Event('pointerlockchange')); assert.equal(escapedLateCapture, true); assert.equal(input.locked, false);
+console.log('controls13: defaults, saved-binding migration, captured Ctrl, text focus, Esc repeat, fullscreen resume and intentional unlock passed');

@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import { G, xf, merged, lam, bas, mk, pv, clamp, PI, TAU } from './modelkit.js';
 import { C5, bySlot } from '../game/cosm5_data.js';
 import { MYST_HATS } from './mystery10_models.js';   // wave 10: mystery10 hat
+import { C13_SUITS, C13_BACKS } from './wardrobe13_models.js';
 import { C8_SUITS, C8_BACKS, C8_HATS, C8_BACK_HIDES } from './cosm8_models.js';   // wave 8 (+8 suits, +8 hats, +6 backs)
 
 const flat = (c) => lam(c);
@@ -588,6 +589,7 @@ const HAT_BUILD = {
     tick(disc, (t) => { disc.rotation.z = t * 1.4; ring2.rotation.z = -t * 2.2; disc.position.y = ring2.position.y = 0.2 + Math.sin(t * 1.5) * 0.015; });
   },
 };
+Object.assign(C5_SUIT_BUILDERS, C13_SUITS); Object.assign(C5_BACK_BUILDERS, C13_BACKS); C5_BACK_HIDES.push(...Object.keys(C13_BACKS));
 Object.assign(C5_SUIT_BUILDERS, C8_SUITS); Object.assign(C5_BACK_BUILDERS, C8_BACKS); Object.assign(HAT_BUILD, C8_HATS); C5_BACK_HIDES.push(...C8_BACK_HIDES);
 Object.assign(HAT_BUILD, MYST_HATS);   // wave 10: mystery10
 export const C5_HAT_IDS = Object.keys(HAT_BUILD);

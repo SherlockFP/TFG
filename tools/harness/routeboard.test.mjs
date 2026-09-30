@@ -110,5 +110,23 @@ setLang('en');
   ok(routed.includes('palamut'), 'dispose restores hostExecute');
 }
 
+// Real installed capture listener: pasted/history-filled terminal input wins over board selection.
+{
+  const oldDocument = globalThis.document;
+  const element = () => { const classes = new Set(); return { innerHTML:'', style:{}, set className(v) { for(const c of v.split(' ')) classes.add(c); }, classList:{contains:c=>classes.has(c),add:c=>classes.add(c),remove:c=>classes.delete(c)}, appendChild(){},addEventListener(){},remove(){} }; };
+  globalThis.document = { createElement:element, head:{appendChild(){}} };
+  const screen=element(), capture=new Map(), printed=[];
+  const inp={value:'',focus(){}};
+  const term={active:true,inp,el:{querySelector:()=>screen,addEventListener:(key,fn)=>capture.set(key,fn),removeEventListener(){}},exec(){},open(){this.active=true;},print:text=>printed.push(text)};
+  const game={terminal:term,mods:{on:()=>()=>{}},run:{phase:'orbit',moon:'hamsi',day:1,seed:5},settings:{}};
+  const api=installRouteboard(game);api.show();
+  let prevented=false,stopped=false;
+  inp.value='route hq';capture.get('keydown')({target:inp,key:'Enter',preventDefault(){prevented=true;},stopPropagation(){stopped=true;}});
+  ok(!prevented&&!stopped&&!api.visible()&&inp.value==='route hq'&&printed.length===0,'nonempty real command reaches input submit unchanged; board does not route');
+  inp.value='';api.show();capture.get('keydown')({target:inp,key:'Enter',preventDefault(){prevented=true;},stopPropagation(){stopped=true;}});
+  ok(prevented&&stopped&&printed.some(v=>v.includes('Already routed')),'empty Enter still selects the board current route');
+  api.dispose();if(oldDocument===undefined)delete globalThis.document;else globalThis.document=oldDocument;
+}
+
 console.log(fails ? `FAILED ${fails}/${checks}` : `routeboard: all ${checks} checks passed`);
 process.exit(fails ? 1 : 0);
