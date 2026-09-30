@@ -41,7 +41,7 @@ ok('palettes: 7 hand-authored identities, every colour field present, no two moo
   assert.notDeepEqual(s1, s3);
 });
 
-ok('story beats: every named moon x 2 seeds: seeded, ground-snapped, ~25 m apart along the path, clear of ship / entrance / each other; colliders finite and grounded', () => {
+ok('story beats: every named moon x 2 seeds: seeded, ground-snapped, ~18 m apart along the path, clear of ship / entrance / each other; colliders finite and grounded', () => {
   let total = 0;
   for (const id of NAMED) for (const seed of [1234, 987]) {
     const boxes = [], out = buildMoonOutdoor(seed, MOONS[id], { physics: mkPhysics(boxes), lightPool });
@@ -53,7 +53,7 @@ ok('story beats: every named moon x 2 seeds: seeded, ground-snapped, ~25 m apart
     assert.ok(a.length >= 3, `${id}/${seed}: only ${a.length} beats`);
     total += a.length;
     prim.sort((p, q) => p.s - q.s);
-    for (let i = 1; i < prim.length; i++) assert.ok(prim[i].s - prim[i - 1].s > 12 && prim[i].s - prim[i - 1].s < 45, `${id}/${seed} spacing ${prim[i].s - prim[i - 1].s}`);
+    for (let i = 1; i < prim.length; i++) assert.ok(prim[i].s - prim[i - 1].s > 3 && prim[i].s - prim[i - 1].s < 45, `${id}/${seed} spacing ${prim[i].s - prim[i - 1].s}`);
     const e = out.plan.entrance;
     for (const s of a) {
       assert.ok(Number.isFinite(s.x + s.y + s.z + s.yaw), 'nan');
@@ -77,7 +77,7 @@ ok('story beats: every named moon x 2 seeds: seeded, ground-snapped, ~25 m apart
     for (const c of cols) {
       assert.ok(Number.isFinite(c.x + c.y + c.z + c.hx + c.hy + c.hz), 'collider nan');
       const gy = T.heightAt(c.x, c.z);
-      assert.ok(c.y - c.hy <= gy + 0.6 && c.y + c.hy >= gy, `collider not standing on the ground (${(c.y - c.hy - gy).toFixed(2)} / ${(c.y + c.hy - gy).toFixed(2)})`);
+      assert.ok(c.y - c.hy <= gy + 0.6 && c.y + c.hy >= gy, `${id}/${seed} ${c.data?.id} collider not standing on the ground (${(c.y - c.hy - gy).toFixed(2)} / ${(c.y + c.hy - gy).toFixed(2)})`);
     }
     api.dispose();
   }

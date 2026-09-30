@@ -128,7 +128,7 @@ export function installSoul(game) {
         const [wx, wz] = W(lx, lz), skirt = y0 < 0.15 && !rx && !rz ? 0.4 : 0;
         g.box(wx, base + y0 + (sy - skirt) / 2, wz, sx, sy + skirt, sz, color, s.yaw + ry, rx, rz);
       };
-      const K = (lx, y0, lz, sx, sy, sz, ry = 0) => { const [wx, wz] = W(lx, lz); colliders.push({ x: wx, y: base + y0 + sy / 2 - 0.2, z: wz, sx, sy: sy + 0.4, sz, ry: s.yaw + ry, data: { kind: 'prop', id: 'soul:' + s.id } }); };
+      const K = (lx, y0, lz, sx, sy, sz, ry = 0) => { const [wx, wz] = W(lx, lz), gb = Math.max(base, h(wx, wz) - 0.3); colliders.push({ x: wx, y: gb + y0 + sy / 2 - 0.2, z: wz, sx, sy: sy + 0.4, sz, ry: s.yaw + ry, data: { kind: 'prop', id: 'soul:' + s.id } }); };
       const Q = (text, lx, y0, lz, w, hh, ry, o = {}) => {
         const tex = panelTex(text, o.W || 256, o.H || Math.round((o.W || 256) * hh / w), o);
         const mat = new THREE.MeshBasicMaterial({ map: tex || undefined, color: tex ? 0xffffff : 0x404050, side: THREE.DoubleSide, fog: true });
@@ -256,6 +256,7 @@ export function installSoul(game) {
     try { for (const sp of game.mapart?.plan?.() || []) if (Number.isFinite(sp.x)) others.push({ x: sp.x, z: sp.z, r: sp.r || 2 }); } catch { /* mapart optional */ }
     const extraOk = (px, pz, r) => {
       if (terrain.lavaDepthAt && terrain.lavaDepthAt(px, pz) > -0.6) return false;
+      if (out.solidAt && out.solidAt(px, pz, Math.min(r, 2.5))) return false;   // [pacing] compact maps are denser: keep off rocks / POI solids too
       for (const tr of trees) if (Math.abs(tr.x - px) < r + 2 && Math.abs(tr.z - pz) < r + 2 && Math.hypot(tr.x - px, tr.z - pz) < r + 1.6) return false;
       for (const s of scrap) if (Math.hypot(s.x - px, s.z - pz) < r + 2.5) return false;
       return true;

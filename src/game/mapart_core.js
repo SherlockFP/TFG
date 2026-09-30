@@ -40,7 +40,7 @@ const d2 = (ax, az, bx, bz) => Math.hypot(ax - bx, az - bz);
  */
 export function planMapArt(o) {
   const R = new RNG(hashString(`mapart|${o.moonId}|${o.seed | 0}`));
-  const sc = Math.max(1, +o.sc || 1), big = sc > 1.2;
+  const sc = Math.max(0.6, +o.sc || 1), big = sc > 1.2;   // [pacing] compact maps have sc < 1
   const plan = o.plan || {};
   const lim = 118 * sc;
   const specs = [];

@@ -722,6 +722,9 @@ Emitter no per-emit copy, gpusweep scan 1.5->5 s (92 ms traverse), docklayout on
 
 ### 5.24 Wave 8 - REWARDVIZ (module `rewardviz`, docs/wave8/rewardviz.md; node: rewardviz.test.mjs + resto / mining / facjobs / mapmods / lcmonsters / soul / hudcalm / ui3; build ok; NOT browser-run)
 Day-summary block "INCOME BY SOURCE" (job / crate / pocket / MAP BONUS / diner / ore / Clout, fees in red, count-up), lever warning "Job not started: -fee" (press E again), "ORE n/240 today" on the pickaxe prompt, diner till toast on the homeworld, `+N % VALUE` / `CURSED x1.6` scan chips, reward pop >= 100. Net: `rvpk` (host), `mnd` k:'ore'.
+### 5.x Wave 8 - PACING (docs/wave8/pacing.md; node: pacing.test.mjs + geomfix / mapart / soul / mining / worlds3 / labyrinths / maps2 / maps2_rules)
+Outdoor moons ~46 % smaller area: `mapScaleOf` = mapScale x tier compaction (0.68-0.76), explicit `PACE` ship->entrance table (tier 1-2 ~45-55 m, tier 3-4 ~60-70 m, was 75-108), smooth ship path (no per-point jitter), fog capped so the entrance is visible from the ship (`fogCapFor`, `env.fogCap`), soul `BEAT` spacing tightened. Independent of `moon.size` (worlds3 unchanged). Guard test: `tools/harness/pacing.test.mjs`.
+
 ### 5.x Wave 8 - small gap closers
 Key priority: an open RPS wager prompt blocks role skills (`game.rpsPromptOpen()`); an open distress-vote prompt (`game.voyage.votePromptOpen()`) owns B/M (trade decline and emote wheel yield, vote stops propagation). Downed: Medic revives 40 % faster (`RULES.reviveMedic`), medkit/adrenaline used on a downed crewmate stands them up at 40 % (`dnreq k:'kit'`), off-screen edge arrow on the marker. rewardviz drops its viewer-tax row when `run.fc.tx > 0`. mapmods chat lines build the affix title on each receiver (`mm` msg with `sys`). `Game.deathText()` now goes through t() (new `deathtext_i18n.js`, TR + RU). Lockdown gates have no damage cause. Not run in browser.
 

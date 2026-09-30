@@ -115,6 +115,7 @@ export class Environment {
   setMoon(biome, weather, mode = 'moon') {
     this.mode = mode;
     this.biome = biome;
+    this.fogCap = null;        // [pacing] max clear-weather fog density (game.js sets it from the ship->entrance distance)
     this.weather = weather;
     this.eclipse = weather === 'eclipsed';
     this.stars.visible = false;
@@ -253,7 +254,7 @@ export class Environment {
     const horizon = skyC.clone().lerp(duskC, duskF * 0.6).lerp(nightC, night);
     const top = horizon.clone().multiplyScalar(0.7);
     let fogC = new THREE.Color(b.fog ?? 0x7d8f95).lerp(duskC, duskF * 0.4).lerp(nightC, night * 0.95);
-    let fogD = (b.fogDensity ?? 0.015) * (this.weather === 'foggy' ? 2.6 : this.weather === 'rainy' ? 1.4 : this.weather === 'stormy' ? 1.6 : 1);
+    let fogD = Math.min(b.fogDensity ?? 0.015, this.fogCap ?? 1) * (this.weather === 'foggy' ? 2.6 : this.weather === 'rainy' ? 1.4 : this.weather === 'stormy' ? 1.6 : 1);
     fogD *= 1 + night * 0.4;
     // corrupted biomes: short sky/fog glitch flashes (visual only)
     if (b.glitch && !this.indoor) {
