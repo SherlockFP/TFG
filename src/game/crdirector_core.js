@@ -94,7 +94,7 @@ export function costOf(type, def) {
 }
 const SLEEPING = new Set(['hidden', 'dormant', 'statue', 'box', 'ceiling', 'off', 'dead', 'lurk_wait']);
 export const isAwake = (st) => !SLEEPING.has(st);
-const CALM = new Set(['idle', 'walk', 'wander', 'patrol', 'roam', 'sleep', 'rest', 'home', 'return', 'flee', 'stunned', 'follow', 'cry', 'rocked', 'hide', 'hidden', 'ceiling', 'dormant', 'box', 'lurk', 'sniff', 'armed', 'off', 'calm', 'scan', 'reload', 'boot', 'fly', 'feed']);
+const CALM = new Set(['idle', 'walk', 'wander', 'patrol', 'roam', 'sleep', 'rest', 'home', 'return', 'flee', 'stunned', 'follow', 'cry', 'rocked', 'hide', 'hidden', 'ceiling', 'dormant', 'box', 'lurk', 'sniff', 'armed', 'off', 'calm', 'scan', 'reload', 'boot', 'fly', 'feed', 'stare']);   // stare: the staged first sighting (firstsight.js), never an attack
 /** a state in which a creature is coming for somebody */
 export const isHunting = (st) => !!st && !CALM.has(st) && st !== 'dead';
 

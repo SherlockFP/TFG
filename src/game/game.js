@@ -256,6 +256,7 @@ import { installMapmods } from './mapmods.js';
 import { installHeadline } from './headline.js';
 import { installWorlds3 } from './worlds3.js';   // wave 8: wrong door + alternate Backrooms worlds + facility size/dressing (docs/wave8/worlds3.md)
 import { installCrdirector } from './crdirector.js';
+import { installFirstSight } from './firstsight.js';   // wave 8 morning: staged first sighting of each new pool creature
 import { installFacjobs } from './facjobs.js';
 import { installLcmonsters } from './lcmonsters.js';
 import { installRewardviz } from './rewardviz.js';   // wave 8: reward visibility (docs/wave8/rewardviz.md)
@@ -557,6 +558,7 @@ export class Game extends Emitter {
     this.useModule('crdirector', installCrdirector);
     this.useModule('facjobs', installFacjobs);
     this.useModule('lcmonsters', installLcmonsters);
+    this.useModule('firstSight', installFirstSight);   // after crdirector + lcmonsters: stages each new pool creature's first sighting (game.firstSight)
     this.useModule('labyrinths', installLabyrinths);   // [labyrinths]
     this.useModule('bossdress', installBossdress);   // wave 8 night: themed boss names + lair dressing
     this.useModule('herocontent', installHerocontent);   // wave 8: hero-content scrap tables + models

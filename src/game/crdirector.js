@@ -368,8 +368,8 @@ export function installCrdirector(game) {
   }
 
   /** facility lights dip around the player (same emitter trick as the horror director) */
-  function dipLights(dur = 1.4, r = 12) {
-    const fac = game.world?.facility; const p = game.player?.pos;
+  function dipLights(dur = 1.4, r = 12, at = null) {
+    const fac = game.world?.facility; const p = at ? new THREE.Vector3(at.x, at.y, at.z) : game.player?.pos;
     if (!fac || !p || game.lights?.globalDim === 0) return;
     for (const e of fac.emitters || []) {
       if (e.group !== 'facility' || !e.pos || e.pos.distanceToSquared(p) > r * r) continue;
@@ -495,7 +495,9 @@ export function installCrdirector(game) {
       if (!K.isAwake(v.state)) { setEyes(v, null, false, time); continue; }
       const d = Math.hypot(v.pos.x - cam.x, v.pos.z - cam.z), tell = K.tellOf(v.type);
       if (Math.abs(v.pos.y - cam.y) > 9 && !def.boss && d > 12) continue;   // another floor
-      setEyes(v, tell.eye, !!tell.eye && d < 26 && (K.isHunting(v.state) || v.type === 'cd_follower'), time);
+      const staged = v.id === S.stageId;   // [firstsight] the staged first sighting: eyes on while it stares, its tell + caption come from firstsight.js
+      setEyes(v, tell.eye || (staged ? game.creatureRead?.tellColour?.(v.type) : null), staged ? v.state === 'stare' : !!tell.eye && d < 26 && (K.isHunting(v.state) || v.type === 'cd_follower'), time);
+      if (staged) { S.told.set(v.id, time); continue; }
       if (v.type === 'cd_dimmer' && d < 14) dimmerNear = true;
       if (d > tell.r) continue;
       const last = S.told.get(v.id) || -99;
@@ -564,6 +566,17 @@ export function installCrdirector(game) {
     wavesOk() { return K.wavesAllowed(run()?.quotaIndex | 0); },
     /** feedcams (host, 10 Hz): current ON AIR heat 0-100; the director remembers the highest value since the last peak */
     onFeedHeat(h) { if (!S.st) return; S.fhNow = +h || 0; S.fh = Math.max(S.fh ?? 0, S.fhNow); },
+    /** [firstsight] client helpers for the staged first sighting (firstsight.js): mark the staged body, rule caption through the one gate, a cue, a light dip */
+    stage(id) { S.stageId = id || null; },
+    teach(type, id) {
+      const known = S.seen[type] || game.profile?.bestiary?.[type]?.kills > 0;
+      S.seen[type] = 1; saveSeen();
+      if (known || !CREATURES[type]) return false;
+      caption(ruleLine(type, game.creatures?.views?.get(id) || { def: CREATURES[type] }), false, 'teach');
+      return true;
+    },
+    cue(list, opts) { return play(list, opts); },
+    dip(dur, r, at) { dipLights(dur, r, at); },
     debug() { return { phase: S.st?.phase, t: S.st ? Math.round(S.st.t) : 0, len: S.st ? Math.round(S.st.len) : 0, cycle: S.st?.cycle, queue: S.q.map((e) => e.type || e.zone), stats: { ...S.stats }, cues: S.cues }; },
     dispose() {
       if (disposed) return;
