@@ -44,7 +44,11 @@ function bobInto(o, phase, speed) {
   const k = clamp(speed / 3, 0, 1), sn = Math.sin(phase);
   o.dy = Math.abs(sn) * READ.bob * k; o.pitch = READ.lean * clamp(speed / 6, 0, 1); o.roll = sn * 0.035 * k; return o;
 }
-const _wp = { pitch: 0, crouch: 0, phase: 'none' }, _bp = { dy: 0, pitch: 0, roll: 0 };
+/** [firstsight] the staged stare (state 'stare', firstsight.js): over ~1 s a slow forward lean, a hunch and a head tilt; the added eye dots flare */
+export const STARE = { lean: 0.12, crouch: 0.35, tilt: 0.16, flare: 0.9, t: 1.1 };
+export function starePose(t) { return stareInto({ pitch: 0, crouch: 0, roll: 0, flare: 0 }, t); }
+function stareInto(o, t) { const u = easeOut(clamp(t / STARE.t, 0, 1)); o.pitch = STARE.lean * u; o.crouch = STARE.crouch * u; o.roll = STARE.tilt * u; o.flare = STARE.flare * u; return o; }
+const _wp = { pitch: 0, crouch: 0, phase: 'none' }, _bp = { dy: 0, pitch: 0, roll: 0 }, _sp = { pitch: 0, crouch: 0, roll: 0, flare: 0 };
 /** big bodies lean less (a 8 m giant tipping 0.3 rad would sweep 2.4 m) */
 export const sizeK = (height) => clamp(1.9 / Math.max(height || 1.5, 0.5), 0.2, 1.4);
 
@@ -140,15 +144,16 @@ export function apply(view, dt) {
   const speed = view.state === 'stunned' || view.state === 'idle' ? 0 : sp;
   s.ph = (s.ph + speed * dt / (0.9 * Math.sqrt(Math.max(h, 0.6)) ) * 6.2832) % 6.2832;
   const b = bobInto(_bp, s.ph, speed), w = windupInto(_wp, view.state, view.stateT);
-  const pitch = clamp((w.pitch + b.pitch + flinchPitch(view.hitFlash)) * k, -READ.amax, READ.amax);
+  const st = view.state === 'stare' ? stareInto(_sp, view.stateT) : null;
+  const pitch = clamp((w.pitch + b.pitch + flinchPitch(view.hitFlash) + (st ? st.pitch : 0)) * k, -READ.amax, READ.amax);
   root.rotation.x = pitch;
-  root.rotation.z = b.roll * k;
-  root.position.y += b.dy * h - w.crouch * 0.05 * h - clamp(view.hitFlash, 0, 1) * 0.02 * h;
-  if (s.tellMesh) s.tellMesh.scale.setScalar(clamp(h / 1.7, 0.5, 2.5) * (1 + (w.phase === 'windup' ? 0.7 * clamp(view.stateT / (RULES.windup || 0.4), 0, 1) : 0)));
+  root.rotation.z = (b.roll + (st ? st.roll : 0)) * k;
+  root.position.y += b.dy * h - (w.crouch + (st ? st.crouch : 0)) * 0.05 * h - clamp(view.hitFlash, 0, 1) * 0.02 * h;
+  if (s.tellMesh) s.tellMesh.scale.setScalar(clamp(h / 1.7, 0.5, 2.5) * (1 + (w.phase === 'windup' ? 0.7 * clamp(view.stateT / (RULES.windup || 0.4), 0, 1) : 0) + (st ? st.flare : 0)));
 }
 
 export function installCreatureRead(game) {
   const mm = (typeof window !== 'undefined' ? window.__kefalMods : null) || game?.mods;
   if (mm?.creatureModels) for (const [id, fn] of Object.entries(VARIANT_MODELS)) if (!mm.creatureModels.has(id)) mm.creatureModels.set(id, (T, o) => fn(o || {}));
-  return { dress, apply, ensureTell, windupPose, bobPose, tellColour, dispose() {} };
+  return { dress, apply, ensureTell, windupPose, bobPose, starePose, tellColour, dispose() {} };
 }
