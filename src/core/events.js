@@ -1,4 +1,17 @@
 // Tiny event emitter used across systems (and exposed to mods).
+
+/** [errbudget] handler / module errors: counted and deduped (a throw in an 'update' handler would log 60x a second);
+ *  only the first 3 of each kind reach the console. The last 20 distinct kinds are in kefal.game.perfInfo().errors. */
+export const errLog = { ring: [], counts: new Map(), total: 0 };
+export function noteError(where, e) {
+  const key = where + ': ' + String(e?.message || e).slice(0, 160);
+  const n = (errLog.counts.get(key) || 0) + 1;
+  errLog.counts.set(key, n); errLog.total++;
+  if (n === 1) { errLog.ring.push(key); if (errLog.ring.length > 20) errLog.counts.delete(errLog.ring.shift()); }
+  if (n <= 3) console.error(`[${where}]`, e);
+  else if (n === 4) console.warn(`[${where}] same error repeats; muted (see perfInfo().errors)`);
+  return n;
+}
 export class Emitter {
   constructor() { this._h = new Map(); this._a = new Map(); }
   on(ev, fn) {
@@ -19,7 +32,7 @@ export class Emitter {
     if (!set) return;
     [...set].forEach((fn, i) => add(`${ev}:${fn._tag || fn.name || i}`, () => {
       if (!this._h.get(ev)?.has(fn)) return;
-      try { fn(...args); } catch (e) { console.error(`[event ${ev}]`, e); }
+      try { fn(...args); } catch (e) { noteError('event ' + ev, e); }
     }));
   }
   off(ev, fn) { this._h.get(ev)?.delete(fn); this._a.delete(ev); }
@@ -33,7 +46,7 @@ export class Emitter {
     const n = args.length, a0 = args[0], a1 = args[1], a2 = args[2];
     for (let i = 0; i < arr.length; i++) {
       const fn = arr[i];
-      try { if (n === 2) fn(a0, a1); else if (n === 1) fn(a0); else if (n === 0) fn(); else if (n === 3) fn(a0, a1, a2); else fn(...args); } catch (e) { console.error(`[event ${ev}]`, e); }
+      try { if (n === 2) fn(a0, a1); else if (n === 1) fn(a0); else if (n === 0) fn(); else if (n === 3) fn(a0, a1, a2); else fn(...args); } catch (e) { noteError('event ' + ev, e); }
     }
   }
   clear() { this._h.clear(); this._a.clear(); }

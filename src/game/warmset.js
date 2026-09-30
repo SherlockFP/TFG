@@ -12,6 +12,7 @@ import { scrapTableFor, bigTableFor } from './items.js';
 import { createCreatureModel } from '../models/creatures.js';
 import { createItemModel, hasItemModel } from '../models/items.js';
 import { warmPlan } from './warmset_core.js';
+import { errLog } from '../core/events.js';   // [errbudget]
 
 const TEX_KEYS = ['map', 'emissiveMap', 'alphaMap', 'lightMap', 'aoMap', 'normalMap', 'bumpMap'];
 const FAR_Y = -4000;
@@ -120,6 +121,7 @@ export function installWarmSet(game) {
     return {
       programs: i?.programs?.length ?? null, programNames: names, geometries: i?.memory?.geometries ?? null, textures: i?.memory?.textures ?? null,
       calls: i?.render?.calls ?? null, triangles: i?.render?.triangles ?? null,
+      errors: { total: errLog.total, last: errLog.ring.map((k) => ({ k, n: errLog.counts.get(k) || 0 })) },   // [errbudget]
       warm: { built: S.built.length, models: S.built.slice(0, 80), ms: Math.round(S.ms * 10) / 10, programsBefore: S.programsBefore, programsAfter: S.programsAfter, plan: S.plan },
     };
   };

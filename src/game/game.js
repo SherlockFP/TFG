@@ -26,7 +26,7 @@ import { itemDef } from './items.js';
 import { CREATURES } from './creatures.js';
 import { derivedStats, hasPerk } from './progression.js';
 import { createViewModel } from '../models/avatar.js';
-import { Emitter } from '../core/events.js';
+import { Emitter, noteError } from '../core/events.js';
 import { hostMethods } from './host.js';
 import { actionMethods } from './actions.js';
 import { Terminal } from './terminal.js';
@@ -1506,7 +1506,7 @@ export class Game extends Emitter {
   useModule(name, fn) {
     const objBefore = new Set(this.mods?._h?.get?.('objectives') || []);   // [onegoal] tag the module's objective listeners with their source
     try { this[name] = fn(this) || null; if (this[name]) this.wave1.push(name); }
-    catch (e) { console.warn('module ' + name, e); this[name] = null; }
+    catch (e) { noteError('module ' + name, e); this[name] = null; }
     for (const f of this.mods?._h?.get?.('objectives') || []) if (!objBefore.has(f) && !f._src) f._src = name;   // [onegoal]
     return this[name];
   }
