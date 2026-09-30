@@ -227,6 +227,21 @@ export function installDowned(game) {
       }
     });
   }));
+  // late join / resume: the joiner never saw the 'on' broadcast, so replay every open entry to them (marker + revive ring + bleed clock)
+  offs.push(mods.on('playerJoin', (id, info, g) => {
+    if (g !== game || !host() || id === game.selfId) return;
+    for (const e of S.book.e.values()) {
+      try { game.net.sendTo(id, 'dn', { k: 'on', id: e.id, dur: e.dur, fast: e.fast ? 1 : 0, p: e.pos, c: e.cause }); game.net.sendTo(id, 'dn', { k: 'pg', id: e.id, p: +e.prog.toFixed(2), by: e.by, l: +e.left.toFixed(1) }); } catch { /* joiner gone */ }
+    }
+  }));
+  // host migration: the old host's DownBook died with it; every peer mirrors S.down, so the new host rebuilds the book from its own mirror
+  offs.push(mods.on('hostMigrated', (g, info) => {
+    if (g !== game || !info?.self || !host()) return;
+    for (const [id, e] of S.down) {
+      if (S.book.e.has(id)) continue;
+      S.book.e.set(id, { id, dur: e.dur, left: Math.max(1, e.left), prog: 0, by: null, holdAt: -99, pos: e.p || [0, 0, 0], cause: 'down', fast: false });
+    }
+  }));
   // ship reaches orbit: everybody still lying down is picked up (same idea as the old "crew revives in orbit"); a new landing forgets the second-down penalty
   offs.push(mods.on('phase', (ph, g) => {
     if (g && g !== game) return;

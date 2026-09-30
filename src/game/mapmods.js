@@ -17,6 +17,8 @@ import { t, tf } from '../core/i18n.js';
 import { RNG, hashString } from '../core/rng.js';
 import { AFFIX_BY_ID, MAX_AFFIX, RARITY_NAME, rollMap, addAffix, effectsOf, flagsOf, rewardOf, mapTitle, cleanMap } from './mapmods_core.js';
 import './mapmods_i18n.js';
+import { HOST_ONLY } from '../net/session.js';
+HOST_ONLY.add('mm');   // host -> client text (terminal / chat): a peer must not be able to print into other players' terminals
 
 export const MAP_ITEM = 'sectormap';
 const BOOM_DMG = 22, BOOM_R = 3.2, BOOM_FUSE_MS = 1500, BOOM_MAX_PER_DAY = 6;

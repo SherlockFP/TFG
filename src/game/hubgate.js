@@ -20,6 +20,8 @@ import { listRuns } from '../core/save.js';
 import { SPOTS } from '../world/shiplayout.js';
 import { TEXT as OB } from './onboard_text.js';
 import { NET, SYSTEMS, HUB_ORDER, requirement, hiddenDocks, zoneOwner, hubOf, sameHub, hubOpen, openIds, QUICK, quickFields, quickResult, quickReward } from './hubgate_core.js';
+import { HOST_ONLY } from '../net/session.js';
+HOST_ONLY.add(NET);   // 'hg' {k:'close'} is host -> crew only: a client could otherwise dismiss everybody's end card
 
 const TEXT = {
   'hg.lock': ['Unlocks at quota {n}: {@name}', 'Kota {n}\'de açılır: {@name}', 'Откроется на квоте {n}: {@name}'],

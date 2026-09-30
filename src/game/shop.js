@@ -281,7 +281,7 @@ export function installShop(game) {
     const run = g.run;
     const fail = (msg) => { reply(msg, true); result(from, false, msg); };
     if (!run || !Array.isArray(cmd.lines) || !cmd.lines.length || cmd.lines.length > 14) return fail(t('Nothing to order.'));
-    const st = new Map(stockFor(run, lore()).map((e) => [e.id, e]));
+    const st = new Map(stockFor(run, lore(), g.hubgate?.shopLock).map((e) => [e.id, e]));   // [hubgate] the host enforces the lock too (the client store only greys the card)
     const plan = [];
     let total = 0;
     const taken = new Map();
@@ -340,7 +340,7 @@ export function installShop(game) {
   };
   api.hostCoin = (cmd, from, reply) => {
     const run = g.run;
-    const e = run ? stockFor(run, lore()).find((x) => x.id === String(cmd.id)) : null;
+    const e = run ? stockFor(run, lore(), g.hubgate?.shopLock).find((x) => x.id === String(cmd.id)) : null;
     const n = Math.max(1, Math.min(3, cmd.n | 0 || 1));
     const refund = (why) => { reply(why, true); result(from, false, why, { refund: e ? e.price * n : 0 }); };
     if (!e || e.currency !== 'clout' || e.ship) return refund(t('Not sold here.'));
