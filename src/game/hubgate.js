@@ -25,11 +25,12 @@ HOST_ONLY.add(NET);   // 'hg' {k:'close'} is host -> crew only: a client could o
 
 const TEXT = {
   'hg.lock': ['Unlocks at quota {n}: {@name}', 'Kota {n}\'de açılır: {@name}', 'Откроется на квоте {n}: {@name}'],
+  'hg.lock_sale': ['Unlocks after your first sale: {@name}', 'İlk satışından sonra açılır: {@name}', 'Откроется после первой продажи: {@name}'],
   'hg.lock_boss': ['Unlocks after the first sector boss: {@name}', 'İlk sektör patronundan sonra açılır: {@name}', 'Откроется после первого босса сектора: {@name}'],
   'hg.card': ['UNLOCKED: {@name}', 'AÇILDI: {@name}', 'ОТКРЫТО: {@name}'],
   'hg.door': ['Hub door [E]', 'Hub kapısı [E]', 'Дверь Хаба [E]'],
   'hg.door_sub': ['{a} of {b} systems open', '{b} sistemden {a} tanesi açık', 'Открыто систем: {a} из {b}'],
-  'hg.door_first': ['Opens at quota 1', 'Kota 1\'de açılır', 'Откроется на квоте 1'],
+  'hg.door_first': ['Opens after your first sale', 'İlk satışından sonra açılır', 'Откроется после первой продажи'],
   'hg.title': ['HUB', 'HUB', 'ХАБ'],
   'hg.sub': ['Side systems open one by one as quotas are met. Settings: Unlock everything.', 'Yan sistemler kotalar tutturuldukça tek tek açılır. Ayarlar: Her şeyin kilidini aç.', 'Побочные системы открываются по одной с выполнением квот. Настройки: открыть всё.'],
   'hg.open': ['OPEN', 'AÇIK', 'ОТКРЫТО'],
@@ -99,14 +100,14 @@ export function installHubgate(game) {
   const LOCK_NEAR = 1.5;
   const locked = (id) => !!ob()?.locked?.(id);
   const lockedIds = () => HUB_ORDER.filter(locked);
-  const needText = (id) => { const r = requirement(id); return r?.boss ? tx('hg.lock_boss', { name: sysName(id) }) : tx('hg.lock', { n: r?.q || 1, name: sysName(id) }); };
+  const needText = (id) => { const r = requirement(id); return r?.boss ? tx('hg.lock_boss', { name: sysName(id) }) : r?.sale ? tx('hg.lock_sale', { name: sysName(id) }) : tx('hg.lock', { n: r?.q || 1, name: sysName(id) }); };
   const ensureStyle = () => { if (style || typeof document === 'undefined') return; style = document.createElement('style'); style.textContent = CSS; document.head.appendChild(style); };
 
   // ---------------------------------------------------------------------------------------------------------------- ladder
   /** the host's ladder for a joiner (run.hub); null on the host / when the host has not published one */
   const remoteHub = () => (game.isHost ? null : game.run?.hub || null);
-  /** shop.js hook: rare+ stock (and ship upgrades) wait for quota 1 -> a lock reason or '' */
-  function shopLock(e) { return locked('shop') && (tierIndex(e.tier) >= 2 || e.currency === 'clout' || e.followersAt) ? tx('hg.lock', { n: 1, name: sysName('shop') }) : ''; }
+  /** shop.js hook: rare+ stock (and ship upgrades) wait for the first sale -> a lock reason or '' */
+  function shopLock(e) { return locked('shop') && (tierIndex(e.tier) >= 2 || e.currency === 'clout' || e.followersAt) ? tx('hg.lock_sale', { name: sysName('shop') }) : ''; }
   function publishHub() {
     if (!game.isHost || !game.run || !ob()) return;
     const u = ob().unlocks?.();
@@ -116,9 +117,9 @@ export function installHubgate(game) {
     S.hub = hub;
   }
   /** unlock card: one big banner per new system (onboard.js announceGift calls it). true = shown */
-  function card(id) {
+  function card(id, extra = '') {
     if (disposed || !SYSTEMS[id]) return false;
-    try { game.ui?.hud?.bigText?.(tx('hg.card', { name: sysName(id) }), hintOf(id)); sfx('hub_unlock', 0.6); return true; } catch { return false; }   // [sound2] unlock sting
+    try { game.ui?.hud?.bigText?.(tx('hg.card', { name: sysName(id) }), hintOf(id) + (extra ? '  |  ' + extra : '')); sfx('hub_unlock', 0.6); return true; } catch { return false; }   // [sound2] unlock sting
   }
 
   // ---------------------------------------------------------------------------------------------------------------- locked docks + fixtures
@@ -218,7 +219,7 @@ export function installHubgate(game) {
     ensureStyle();
     const wrap = ui.panel('hg-hub');
     const list = el('div', { class: 'hg-hub' });
-    const reqKey = (id) => { const r = requirement(id); return r?.boss ? 'boss' : r?.q; };
+    const reqKey = (id) => { const r = requirement(id); return r?.boss ? 'boss' : r?.sale ? 'sale' : r?.q; };
     const nextKey = reqKey(HUB_ORDER.find((id) => locked(id)));   // [trim] the panel lists what is open + only the NEXT unlock step (no advert for the whole roadmap)
     for (const id of HUB_ORDER) {
       const open = !locked(id);

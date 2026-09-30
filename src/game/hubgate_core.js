@@ -51,10 +51,10 @@ export function zoneOwner(x, z, lockedIds) {
 /** the host's ladder as run.hub = { mode, q, boss } (joiners are ruled by it); pure open test for a joiner */
 export function hubOf(u, prog) {
   if (!u) return null;
-  return { mode: u.mode === 'all' ? 'all' : 'staged', q: Math.max(u.q | 0, prog?.q | 0), boss: !!(u.boss || prog?.boss) };
+  return { mode: u.mode === 'all' ? 'all' : 'staged', q: Math.max(u.q | 0, prog?.q | 0), boss: !!(u.boss || prog?.boss), sale: !!(u.sale || prog?.sale) };
 }
-export const hubOpen = (id, hub, unlockAll = false) => isOpen(id, hub ? { mode: hub.mode, q: hub.q | 0, boss: !!hub.boss } : null, { q: 0, boss: false }, unlockAll);
-export const sameHub = (a, b) => !!a && !!b && a.mode === b.mode && a.q === b.q && a.boss === b.boss;
+export const hubOpen = (id, hub, unlockAll = false) => isOpen(id, hub ? { mode: hub.mode, q: hub.q | 0, boss: !!hub.boss, sale: !!hub.sale } : null, { q: 0, boss: false }, unlockAll);
+export const sameHub = (a, b) => !!a && !!b && a.mode === b.mode && a.q === b.q && a.boss === b.boss && !!a.sale === !!b.sale;
 /** ids that are open under `hub` (Hub door lamp, panel) */
 export const openIds = (hub, unlockAll = false) => HUB_ORDER.filter((id) => hubOpen(id, hub, unlockAll));
 
