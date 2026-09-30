@@ -18,7 +18,7 @@ import {
 } from './guide_data.js';
 import {
   ensureState, markUsed, isUsed, usedCount, visibleFeatures, featureById, canon, selectTip, recordShown, untried, findFeature, suggestCommand,
-  classifyPanel, PANEL_MAP, CMD_MAP, KEY_MAP, EVT_MAP, tutInit, tutRunning, tutCurrent, tutEvent, tutSkip, tutDoneCount, tutStepProgress,
+  classifyPanel, PANEL_MAP, CMD_MAP, KEY_MAP, EVT_MAP, tutInit, tutRunning, tutCurrent, tutEvent, tutCredit, tutSkip, tutDoneCount, tutStepProgress,
   resetTutorial, stepObjective, needsOk, tipText, firstSentence, COOLDOWN_S, TUT_TOTAL,
 } from './guide_core.js';
 
@@ -305,6 +305,7 @@ export function installGuide(game) {
     if (pos) S.lastPos = { x: pos.x, z: pos.z };
     if (tutRunning(g)) {
       S.tutT += dt;
+      if (!S.obCredit && game.profile?.onboard?.s === 'done') { S.obCredit = true; const r = tutCredit(g, ['move', 'light', 'scrap']); if (r.steps.length) { save(); if (r.finished) finishTutorial(); } }   // [onegoal] Hiring Day already taught these
       let fl = false; try { fl = !!game.flashlightOn?.(); } catch { /* optional */ }
       if (fl) { use('flashlight'); tut('flash'); }
       const carrying = holdsScrap();

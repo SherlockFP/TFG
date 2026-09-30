@@ -495,9 +495,11 @@ export function installOnboard(game) {
     allow: (kind) => FR.allow(kind, frStage(), game.run?.day),
     calm: (kind) => !FR.allow(kind, frStage(), game.run?.day),
     /** one Algorithm line per 45 s while budgeted (priority lines always pass); true = show it */
-    algoOk(pri = false) { const now = performance.now(); if (!FR.algoOk(frStage(), now, frAlgoAt, pri)) return false; if (frStage() !== 'free') frAlgoAt = now; return true; },
+    algoOk(pri = false) { if (frStage() === 'free') return game.onegoal?.algoOk?.(pri) ?? true;   // [onegoal] past the budget: the same calm pacing for every profile
+      if (!pri && game.onegoal?.hot?.()) return false;   // [onegoal] quiet during a chase / director peak
+      const now = performance.now(); if (!FR.algoOk(frStage(), now, frAlgoAt, pri)) return false; frAlgoAt = now; return true; },
     /** one card / caption on screen at a time while budgeted; true = you may show yours */
-    lease(kind, secs, pri = 1) { return frStage() === 'free' || FR.lease(frLease, kind, performance.now(), secs, pri); },
+    lease(kind, secs, pri = 1) { return frStage() === 'free' ? (game.onegoal?.lease?.(kind, secs, pri) ?? true) : FR.lease(frLease, kind, performance.now(), secs, pri); },   // [onegoal] one card at a time for veterans too
     /** ONE objective at a time while budgeted (the same list when free) */
     only: (lines) => (frStage() === 'free' ? lines : FR.only(lines)),
     /** after Hiring Day, with scrap aboard and nothing sold yet, the orbit objective becomes "sell it" (the first sale beat) */

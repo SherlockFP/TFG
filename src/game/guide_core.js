@@ -190,6 +190,7 @@ export function classifyPanel(el) {
 // ------------------------------------------------------------------ tutorial
 export const TUT_TOTAL = TUT_STEPS.length;
 const MOVE_DIST = 8;
+export const MOVE_FREE = 40;   // [onegoal] walking this far proves you can move: the step no longer waits for a crouch forever ("TUTORIAL 1/7" stuck)
 /**
  * First call for a profile decides whether the player gets the tutorial: veterans (they already played) are skipped silently.
  * s: 'run' | 'done' | 'skip'
@@ -230,10 +231,18 @@ export function tutEvent(g, ev, data = {}) {
   }
   for (const s of TUT_STEPS) {
     if (T.done[s.id] || !s.ev.includes(ev)) continue;
-    if (s.id === 'move' && !((T.prog.dist || 0) >= MOVE_DIST && T.prog.sprint && T.prog.crouch)) continue;
+    if (s.id === 'move' && !((T.prog.dist || 0) >= MOVE_DIST && ((T.prog.sprint && T.prog.crouch) || (T.prog.dist || 0) >= MOVE_FREE))) continue;
     T.done[s.id] = Date.now();
     out.steps.push(s.id);
   }
+  if (out.steps.length && tutDoneCount(g) >= TUT_TOTAL) { T.s = 'done'; T.finishedAt = Date.now(); out.finished = true; }
+  return out;
+}
+/** [onegoal] credit steps another teacher already covered (Hiring Day teaches move / light / scrap). Returns tutEvent's shape. */
+export function tutCredit(g, ids) {
+  const T = g.tut, out = { steps: [], finished: false };
+  if (T.s !== 'run') return out;
+  for (const id of ids) if (!T.done[id] && TUT_STEPS.some((s) => s.id === id)) { T.done[id] = Date.now(); out.steps.push(id); }
   if (out.steps.length && tutDoneCount(g) >= TUT_TOTAL) { T.s = 'done'; T.finishedAt = Date.now(); out.finished = true; }
   return out;
 }

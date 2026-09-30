@@ -864,6 +864,7 @@ export class UI {
           check(t('Loading screen tips'), 'loadingTips', null, true),
           check(t('Live stream chat feed'), 'a2Feed', t('fake viewers react to your stunts (cosmetic)'), false),   // [algo2]
           check(guidePick(GUIDE_UI.set_tips, getLang()), 'guideTips', guidePick(GUIDE_UI.set_tips_note, getLang()), true),   // [guide]
+          check(t('Chatty Algorithm'), 'chattyAlgo', t('Off (recommended): at most one Algorithm line every 45 s, one card at a time, quiet during chases. On: the old non-stop commentary.'), false),   // [onegoal]
           row(guidePick(GUIDE_UI.set_replay, getLang()), this.button(guidePick(GUIDE_UI.set_replay, getLang()), () => {   // [guide]
             const gd = this.app.game?.guide;
             if (gd?.restartTutorial) { gd.restartTutorial(); this.toast(guidePick(GUIDE_UI.set_replay_now, getLang()), 'good'); }

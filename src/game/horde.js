@@ -20,6 +20,7 @@ import { applyNameTagTitle, titleOf } from './achievements.js';
 import { suitColor } from '../entities/remote.js';
 import { installCamera } from './camera_item.js';
 import { G } from '../physics/physics.js';
+import { wavesAllowed } from './crdirector_core.js';   // [onegoal] no swarm waves before quota 3
 
 addTranslations({
   'SWARM INCOMING': 'SÜRÜ GELİYOR', 'WAVE {i}/{n}': 'DALGA {i}/{n}', '{c} zombie accounts': '{c} zombi hesap', 'SWARM CLEARED': 'SÜRÜ TEMİZLENDİ',
@@ -76,8 +77,9 @@ export function installHorde(game) {
   const livePlayers = (zone) => game.aiPlayers().filter((p) => !p.dead && !p.inShip && (!zone || p.zone === zone));
 
   // ================================================================================== host: swarm waves
-  function startWaves(reason = 'night', zone = null) {
+  function startWaves(reason = 'night', zone = null, force = false) {
     if (!isHost() || S.disposed || S.waves || game.run?.phase !== 'moon') return false;
+    if (!force && !wavesAllowed(sector())) return false;   // [onegoal] quota 0-2: no swarm waves at all (night / alarm / extraction); force = debug / harness
     if (!zone) { const ps = livePlayers(); const ins = ps.filter((p) => p.zone === 'in').length; zone = ps.length && ins > ps.length / 2 ? 'in' : 'out'; }
     if (zone === 'in' && !game.world.facility) zone = 'out';
     const sec = sector(), th = threat();

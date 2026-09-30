@@ -58,6 +58,9 @@ export function sourceCaps(q) {
   const i = q >= 6 ? 3 : q >= 4 ? 2 : q >= 2 ? 1 : 0;
   return { swarmAlive: [8, 14, 24, 40][i], swarmBurst: [4, 7, 12, 20][i], shambler: [4, 7, 14, 14][i], warden: [2, 4, 6, 6][i], siegeAlive: [12, 12, 20, 40][i] };
 }
+/** [onegoal] swarm / horde waves and sieges only after quota 3 is met (quotaIndex >= 3) for every profile: a stealth / camera verb dies when a wave spawns on arrival */
+export const WAVE_MIN_Q = 3;
+export const wavesAllowed = (q) => (q | 0) >= WAVE_MIN_Q;
 /** siege: wave power and wave count ceilings (siege starts at quota 2 at the earliest): 1.0 x 3 waves / 1.5 x 4 / vanilla */
 export const siegeCaps = (q) => (q >= 6 ? { power: 3.4, waves: 5 } : q >= 4 ? { power: 1.5, waves: 4 } : { power: 1.0, waves: 3 });
 export const SIEGE_TYPES = Object.freeze(['sg_swarmer', 'sg_runner', 'sg_brute']);

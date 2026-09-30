@@ -189,6 +189,7 @@ import { installDance } from './lazymods.js';   // [import:dance] wave 6: 21 dan
 import { installRoledays } from './roledays.js';   // [import:roledays] wave 6: role constraint days (docs/wave6/roledays.md)
 import { installA11y } from './a11y.js';   // [import:a11y] wave 7 accessibility runtime (docs/wave7/a11y.md)
 import { installHardmode } from './hardmode.js';   // [import:hardmode] wave 5: Casual / Standard / Hard difficulty rules (docs/wave5/hardmode.md)
+import { installOneGoal } from './onegoal.js';   // [onegoal] wave 8 night: one goal line + calm Algorithm pacing for every profile (docs/wave8/onegoal.md)
 import { installOnboard } from './onboard.js';   // [import:onboard] wave 5: Hiring Day first-time start + staged unlocks (docs/wave5/onboard.md)
 import { installAlgo2 } from './algo2.js';   // [import:algo2] wave 6: live stream hype + ghost replay + glitch exploits (docs/wave6/algo2.md)
 import { installLandQ } from './landingq.js';   // [import:landq] wave 8 perf4: landing job queue (build steps + mapLoaded handlers spread over frames)
@@ -589,6 +590,7 @@ export class Game extends Emitter {
     this.useModule('onboard', installOnboard);   // [slot:onboard] wave 5: Hiring Day + staged unlocks (installed last: wraps hostLever / terminalCommand / objectives.compute)
     this.useModule('score', installScore);   // wave 7: adaptive procedural music + the Algorithm's jingle (docs/wave7/score.md)
     this.useModule('studio', installStudio);   // wave 8: item tips (installed after every module that registers items)
+    this.useModule('onegoal', installOneGoal);   // [onegoal] one goal line (+1 warning) for every profile, message pacing for veterans
     this.useModule('hudcalm', installHudCalm);   // wave 8: calm HUD (docs/wave8/declutter.md)
 
 
@@ -1483,8 +1485,10 @@ export class Game extends Emitter {
 
   /** Install a self-contained feature module: fn(game) -> api with optional dispose(). Errors never break the game. */
   useModule(name, fn) {
+    const objBefore = new Set(this.mods?._h?.get?.('objectives') || []);   // [onegoal] tag the module's objective listeners with their source
     try { this[name] = fn(this) || null; if (this[name]) this.wave1.push(name); }
     catch (e) { console.warn('module ' + name, e); this[name] = null; }
+    for (const f of this.mods?._h?.get?.('objectives') || []) if (!objBefore.has(f) && !f._src) f._src = name;   // [onegoal]
     return this[name];
   }
 

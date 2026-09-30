@@ -36,7 +36,7 @@ KefalAPI.defineMod({
       },
       hunt: {
         w: 4, pay: 50,
-        make(game, pid, ctx) { const goal = ctx.tier >= 3 ? 2 : 1; return { goal, base: ctx.per(pid).kills, text: goal > 1 ? `Take down ${goal} creatures` : 'Take down a creature' }; },
+        make(game, pid, ctx) { if ((ctx.qi | 0) < 3) return null; const goal = ctx.tier >= 3 ? 2 : 1; return { goal, base: ctx.per(pid).kills, text: goal > 1 ? `Take down ${goal} creatures` : 'Take down a creature' }; },   // [onegoal] kill-count waits for quota 3
         prog: (game, a, ctx) => ctx.per(a.pid).kills - a.base,
       },
       deep: {
@@ -67,7 +67,7 @@ KefalAPI.defineMod({
       },
       carcass: {
         w: 2, pay: 45,
-        make(game, pid, ctx) { return api.featureOn('sell-bodies') && ctx.tier >= 2 ? { goal: 1, base: 0, text: 'Bring a creature carcass to the ship' } : null; },
+        make(game, pid, ctx) { return api.featureOn('sell-bodies') && ctx.tier >= 2 && (ctx.qi | 0) >= 3 ? { goal: 1, base: 0, text: 'Bring a creature carcass to the ship' } : null; },
         prog: (game, a, ctx) => ctx.securedBy(a.pid, (it) => String(it.type).startsWith('corpse_')),
       },
       hoarder: {
@@ -188,6 +188,7 @@ KefalAPI.defineMod({
 .tfg-asg .pay { font-size: 16px; color: #ffe08a; }
 .tfg-asg .crew { font-size: 15px; opacity: 0.75; margin-top: 2px; }
 .tfg-asg.pop { animation: tfgAsgPop 0.6s ease-out; }
+html[data-hud="standard"] .tfg-asg, html[data-hud="minimal"] .tfg-asg { display: none; }
 @keyframes tfgAsgPop { 0% { transform: scale(1.25); filter: brightness(2); } 100% { transform: scale(1); filter: none; } }`;
     let card = null, state = [], lastHtml = '';
     const ensure = (game) => {
@@ -239,6 +240,14 @@ KefalAPI.defineMod({
         game.ui.hud?.bigText('ASSIGNMENT COMPLETE', `+▮${Number(d.pay) || 0} for the crew`);
         if (card) { card.classList.remove('pop'); void card.offsetWidth; card.classList.add('pop'); }
       }
+    });
+    // [onegoal] the assignment is ONE tracker line (category job): the Standard HUD shows it only when nothing more urgent is on, the
+    // hold-Tab card always lists it. The big card stays for the Full HUD density. Kill-count kinds (hunt, carcass) wait for quota 3.
+    api.on('objectives', (add, game, phase) => {
+      const me = state.find((a) => a.pid === game?.selfId);
+      if (phase !== 'moon' || !me || me.st !== 'active') return;
+      const o = add((api.tf ? api.tf('Assignment: {text}', { text: me.text }) : `Assignment: ${me.text}`) + ` (▮${me.pay})`, 'sub', false, me.goal > 1 ? Math.min(1, me.prog / me.goal) : null);
+      if (o && typeof o === 'object') o.cat = 'job';
     });
     api.on('sessionEnd', () => { state = []; list = []; card?.remove(); card = null; lastHtml = ''; });
   },
