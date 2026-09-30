@@ -239,7 +239,7 @@ import { installGear11 } from './gear11.js';
 // [import:labyr12]
 // [import:moons12]
 // [import:atmos12]
-// [import:coop12]
+import { installCoop12 } from './coop12.js';
 // [import:balance12]
 import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
 
@@ -640,7 +640,7 @@ export class Game extends Emitter {
     // [slot:labyr12]
     // [slot:moons12]
     // [slot:atmos12]
-    // [slot:coop12]
+    this.useModule('coop12', installCoop12);
     // [slot:balance12]
 
     this.useModule('onboard', installOnboard);   // [slot:onboard] wave 5: Hiring Day + staged unlocks (installed last: wraps hostLever / terminalCommand / objectives.compute)

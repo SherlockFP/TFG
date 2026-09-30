@@ -214,7 +214,7 @@ export function installDowned(game) {
       } else if (d.k === 'hold') {
         const e = S.book.e.get(d.id), rp = rawPlayer(from), vp = rawPlayer(d.id);
         if (!e || !rp || rp.dead || !vp) return;
-        const r = S.book.hold(d.id, from, S.clock, rp.pos.distanceTo(vp.pos), d.m ? RULES.reviveMedic : 1);
+        const r = S.book.hold(d.id, from, S.clock, rp.pos.distanceTo(vp.pos), (d.m ? RULES.reviveMedic : 1) * (game.coop12?.bondMul?.(from, d.id) ?? 1));   // [coop12] buddies revive x0.65 faster
         if (!r) return;
         if (r.done) {
           send({ k: 'up', id: r.id, by: from, hp: RULES.reviveHp });
