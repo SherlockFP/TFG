@@ -274,6 +274,7 @@ export default {
   "Only the host can switch crew features.": "Только хост может переключать функции экипажа.",
   "{name} is now {n} for the crew. Some effects apply from the next landing.": "{name} теперь {n} для экипажа. Часть эффектов вступит в силу со следующей посадки.",
   "Unknown moon \"{moonId}\" - the autopilot will abort the landing.": "Неизвестная луна «{moonId}» — автопилот отменит посадку.",
+  "{n} feature commands: >HELP ALL": "{n} команд функций: >HELP ALL",
   "FEATURE & MOD COMMANDS:\n{n}": "КОМАНДЫ ФУНКЦИЙ И МОДОВ:\n{n}",
   "Mod error: {message}": "Ошибка мода: {message}",
   "CAM-01 · LIVE": "КАМ-01 · В ЭФИРЕ",

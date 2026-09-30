@@ -274,6 +274,7 @@ export default {
   "Only the host can switch crew features.": "Ekip özelliklerini yalnızca host değiştirebilir.",
   "{name} is now {n} for the crew. Some effects apply from the next landing.": "{name} artık ekip için {n}. Bazı etkiler bir sonraki inişten itibaren geçerli.",
   "Unknown moon \"{moonId}\" - the autopilot will abort the landing.": "Bilinmeyen ay \"{moonId}\" - otopilot inişi iptal edecek.",
+  "{n} feature commands: >HELP ALL": "{n} özellik komutu: >HELP ALL",
   "FEATURE & MOD COMMANDS:\n{n}": "ÖZELLİK VE MOD KOMUTLARI:\n{n}",
   "Mod error: {message}": "Mod hatası: {message}",
   "CAM-01 · LIVE": "KAM-01 · CANLI",
