@@ -346,7 +346,8 @@ export function installIdentify(game, ctx = {}) {
     const el = st.aimEl;
     if (!el) return;
     const hud = game.ui?.hud?.el?.classList?.contains('hidden');
-    if (!v || !gate || hud || game.player?.dead) { if (el.style.display !== 'none') el.style.display = 'none'; return; }
+    if (!v || !gate || hud || game.player?.dead || (unk && game.firstSight?.labelHold?.(v.id))) {   // wave 9: the staged first sighting keeps its label back for 2 s
+      if (el.style.display !== 'none') el.style.display = 'none'; return; }
     el.style.display = 'block';
     const n = el.children[0], s = el.children[1], bar = el.children[2];
     if (unk) {

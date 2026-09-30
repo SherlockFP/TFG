@@ -1,7 +1,7 @@
 // FIRST SIGHTING (wave 8 morning review task 2, docs/wave8/firstsight.md). Module `firstSight`, net type 'fsight'. Host-authoritative.
 //   HOST   once per landing, when the moon's threat pool (threatpool.js) holds a creature this run has not met yet (run.fsSeen), in a calm
 //          moment (director not at a peak, nothing hunting within 40 m of the crew, the one budget gate crdirector.canSpawn(type, pos,
-//          'firstsight') says yes) and a crewmate has been in that creature's zone for a few seconds: the creature is placed 12-20 m ahead in
+//          'firstsight') says yes) and a crewmate has been in that creature's zone for a few seconds: the creature is placed 6-10 m ahead in
 //          that crewmate's view cone (end of a corridor, across a room, a ridge outdoors), side-on. Its AI stays frozen for the whole beat
 //          (stunT: CreatureManager skips the behaviour), it turns to stare (state 'stare'), holds 2-4 s (seeded per run), walks off round a
 //          corner and is removed. It never attacks: a crewmate walking up to it (5 m), hurting it, a peak or a chase ends the beat at once.
@@ -21,7 +21,7 @@ export function installFirstSight(game) {
   const offs = [];
   let disposed = false, boundNet = null;
   const H = { key: null, done: false, inT: new Map(), beat: null, searchT: 0, metT: 0, stats: { staged: 0, left: 0, abort: 0, blink: 0, vetoed: 0 } };
-  const C = { b: null, zoom: 1, losT: 0, los: false };
+  const C = { b: null, zoom: 1, losT: 0, los: false, lift: null };
   const V1 = new THREE.Vector3(), V2 = new THREE.Vector3();
 
   const enabled = () => game.config?.firstSight !== false && game.config?.crdirector !== false;
@@ -67,7 +67,7 @@ export function installFirstSight(game) {
     return F.findSpot({
       eye: p.eye, look: p.look, feetY: p.pos.y, out, ground, rnd,
       los: (x, y, z) => los(p.eye, x, y, z),
-      lit: em ? (x, z) => { let k = 0; for (const e of em) { const r = 0.55 * (e.distance || 8), d = Math.hypot(e.pos.x - x, e.pos.z - z); if (d < r) k = Math.max(k, Math.min(1, e.intensity ?? 1) * (1 - d / r)); } return k; } : null,
+      lit: em ? (x, z) => { let k = 0; for (const e of em) { const r = 0.7 * (e.distance || 8), d = Math.hypot(e.pos.x - x, e.pos.z - z); if (d < r) k = Math.max(k, Math.min(1, e.intensity ?? 1) * (1 - d / r)); } return k; } : null,
     });
   }
   /** where it walks off to: a floor cell out of the crewmate's view (round a corner) reachable in a short path; outdoors: straight away */
@@ -195,7 +195,7 @@ export function installFirstSight(game) {
       game.crdirector?.stage?.(m.id);   // the director's scan leaves this body alone: the beat plays its own tell + caption
       if (nearMe(m.p)) { game.crdirector?.dip?.(0.9, 9); game.crdirector?.dip?.(0.9, 8, { x: m.p[0], y: m.p[1], z: m.p[2] }); dust(m.p); }
     } else if (m.k === 'out' && C.b && C.b.id === m.id) {
-      const b = C.b; C.b = null;
+      const b = C.b; C.b = null; liftOff();
       game.crdirector?.stage?.(null);
       if (m.p && nearMe(m.p)) { dust(m.p); if (m.why === 'blink') game.crdirector?.dip?.(0.8, 8, { x: m.p[0], y: m.p[1], z: m.p[2] }); }
       if (b.stared && !b.taught && nearMe(b.p)) game.crdirector?.teach?.(b.ty, b.id);
@@ -223,6 +223,25 @@ export function installFirstSight(game) {
     if (ndc > 0.75) return 1;
     return F.zoomFor(cam.position.distanceTo(V1), h, Math.max(2 * rad, 0.45 * h), cam.fov, cam.aspect, ndc);
   }
+  /** the 'practical': a warm emissive lift on the staged body (no light) so it reads as a lit silhouette, not two eyes. The model calls
+   *  setHitFlash every frame (it rewrites emissive), so the lift wraps it and is added on top; restored when the beat ends. */
+  function liftOn(v, b) {
+    if (C.lift || !v?.model || !v.root) return;
+    const mats = new Set();
+    v.root.traverse((o) => { if (!o.isMesh || o.userData?.tell) return; for (const m of [].concat(o.material)) if (m?.emissive && !m.isMeshBasicMaterial) mats.add(m); });
+    const orig = v.model.setHitFlash, L = { v, mats: [...mats], base: [...mats].map((m) => m.emissive.clone()), orig, own: Object.prototype.hasOwnProperty.call(v.model, 'setHitFlash'), k: 0 };
+    v.model.setHitFlash = function (f) {   // damage ends the beat, so the flash colour is not needed while the lift is on
+      orig?.call(this, f);
+      L.mats.forEach((m, i) => m.emissive.setRGB(L.base[i].r + FS.lift[0] * L.k, L.base[i].g + FS.lift[1] * L.k, L.base[i].b + FS.lift[2] * L.k));
+    };
+    C.lift = L; b.lifted = true;
+  }
+  function liftOff() {
+    const L = C.lift; C.lift = null;
+    if (!L) return;
+    if (L.own) L.v.model.setHitFlash = L.orig; else delete L.v.model.setHitFlash;
+    L.mats.forEach((m, i) => m.emissive.copy(L.base[i]));
+  }
   function setZoom(z) {
     const cam = game.camera; if (!cam) return;
     C.zoom = z;
@@ -236,6 +255,8 @@ export function installFirstSight(game) {
     if (b) {
       b.t += dt;
       const near = nearMe(b.p);
+      if (!b.lifted && near) { const v = game.creatures?.views?.get(b.id); if (v) liftOn(v, b); }
+      if (C.lift) C.lift.k = Math.min(1, b.t / 0.6);
       if (!b.stared && b.t >= b.at) { b.stared = true; if (near) tell(b); }
       if (b.stared && !b.taught && b.t >= b.at + b.h) { b.taught = true; if (near) game.crdirector?.teach?.(b.ty, b.id); }   // the rule line follows the beat
       if (b.stared && b.t < b.at + b.h + 0.3 && near) want = zoomWant(b, dt);
@@ -255,7 +276,7 @@ export function installFirstSight(game) {
       if (game.isHost) { try { hostTick(dt); } catch (e) { console.warn('[firstsight] host', e); } }
       try { clientUpdate(dt); } catch (e) { console.warn('[firstsight] client', e); }
     }));
-    offs.push(mods.on('phase', (ph, g) => { if (g === game && ph !== 'moon') { H.beat = null; H.key = null; if (C.b) game.crdirector?.stage?.(null); C.b = null; if (C.zoom !== 1) setZoom(1); } }));
+    offs.push(mods.on('phase', (ph, g) => { if (g === game && ph !== 'moon') { H.beat = null; H.key = null; if (C.b) game.crdirector?.stage?.(null); C.b = null; liftOff(); if (C.zoom !== 1) setZoom(1); } }));
   }
   if (game.net) bindNet(game.net);
 
@@ -265,6 +286,8 @@ export function installFirstSight(game) {
     /** the beat running now (host: full state, client: what the host announced) */
     beat() { const b = H.beat || C.b; return b ? { id: b.id, type: b.type || b.ty, t: +b.t.toFixed(2), hold: b.hold || b.h, phase: H.beat ? F.beatPhase(b.t, b.hold) : (b.stared ? 'stare' : 'in') } : null; },
     zoom() { return C.zoom; },
+    /** identify.js: hold the '??? UNKNOWN ENTITY' aim label while the staged body is younger than FS.labelAfter (2 s) */
+    labelHold(id) { return !!C.b && C.b.id === id && C.b.t < FS.labelAfter; },
     seen() { return seenList().slice(); },
     debug() { return { key: H.key, done: H.done, beat: this.beat(), stats: { ...H.stats }, seen: seenList().slice(), zoom: +C.zoom.toFixed(2) }; },
     dispose() {
@@ -272,7 +295,7 @@ export function installFirstSight(game) {
       disposed = true;
       if (H.beat && game.isHost) { try { end('abort'); } catch { /* shutting down */ } }
       for (const o of offs) { try { o(); } catch { /* ignore */ } }
-      boundNet?.off?.('msg:fsight', onMsg); boundNet = null;
+      boundNet?.off?.('msg:fsight', onMsg); boundNet = null; liftOff();
       if (C.zoom !== 1) setZoom(1);
       C.b = null;
     },

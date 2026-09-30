@@ -2,28 +2,31 @@
 // (tools/harness/firstsight.test.mjs). The game glue (host staging, client tell / zoom) is src/game/firstsight.js.
 
 export const FS = Object.freeze({
-  dMin: 12, dMax: 20,       // m: the creature stands 12-20 m ahead of the crewmate
-  dPref: 13.5,              // m: preferred distance (the near end reads best; a long corridor is not used to its full 20 m)
-  dists: Object.freeze([12, 13.5, 15]),   // m: distances scored along each direction (plus the corridor end when it is closer than dFar)
-  dFar: 15.5,               // m: farther than this a 2 m body is too small to read, even with the autofocus
+  dMin: 5.5, dMax: 10,        // m: the creature stands 5.5-10 m ahead of the crewmate (wave 9: near enough to read as a body, not two dots)
+  dPref: 6,               // m: preferred distance (the near end reads best: at 6 m and 1.8x a 2.3 m body fills ~half the frame height; 5.5 m is the nearest that can reach ~8 % of the frame at <= 1.8x)
+  dists: Object.freeze([5.5, 6, 7, 8, 9, 10]),   // m: distances scored along each direction (plus the corridor end when it is closer than dFar)
+  dFar: 10.5,               // m: the corridor end is scored as an extra spot when it is closer than this
   cone: Object.freeze([0, 6, -6, 12, -12, 18, -18]),   // deg off the look direction that are tried (inside the view cone, centre first)
   step: 0.5,                // m: floor march step along each direction
   wallPad: 0.7,             // m: keep this far off the wall that ends a corridor
-  wallBonus: 2,             // m: a spot this close to the wall ending its line reads as "at the end of the corridor / across the room"
-  litBonus: 0.6,            // score for standing right under a lamp (lit() 0..1): a lit body reads, an unlit one is two eyes
+  wallBonus: 1.5,             // m: a spot this close to the wall ending its line reads as "at the end of the corridor / across the room"
+  litBonus: 1.1,            // score for standing right under a lamp (lit() 0..1; ~7 m of distance): a lit body reads, an unlit one is two eyes
+  litMin: 0.15,             // lit() below this = no lamp; if any candidate has one, the unlit ones are dropped (the body-lift below covers a room without a lamp)
+  labelAfter: 2,            // s after it appears before the '??? UNKNOWN ENTITY' aim label may show (identify.js asks firstSight.labelHold)
+  lift: Object.freeze([0.26, 0.17, 0.11]),   // warm emissive 'practical' added to the staged body (client, emissive only, no light) so the body reads even without a lamp
   inDelay: 5,               // s a crewmate must have been in the creature's zone (inside / outside) before the beat
   stareAt: 0.8,             // s after it appears it turns to stare: tell sound + eyes + stare pose
   hold: Object.freeze([2, 4]),   // s the stare lasts (seeded per run)
   turnRate: 2.6,            // rad/s: the head-turn toward the crewmate is slow and deliberate
   leaveMax: 4.5,            // s it may walk off before it is removed anyway
   leaveR: 9, leaveLen: 14,  // m: where it walks to (a hidden floor cell within leaveR, path at most leaveLen)
-  near: 5,                  // m: a crewmate this close ends the beat at once (it never becomes a melee)
+  near: 3.5,                // m: a crewmate this close ends the beat at once (it never becomes a melee)
   chaseR: 40,               // m: a hunting creature this close to any crewmate = a chase: no beat
   metR: 18,                 // m: a pool creature this close to a crewmate counts as met (no beat for it later)
   nearbyR: 34,              // m: clients this close get the flicker / sound / caption
   searchGap: 0.5,           // s between two spot searches (host)
-  zoomMax: 3.6,             // bodycam autofocus: max zoom (1 = off). 12-15 m at the default 72 deg fov: a 2 m body covers ~3-4 % of the frame
-  zoomCover: 0.05,          // share of the frame the autofocus aims the body at
+  zoomMax: 1.8,             // bodycam autofocus: max zoom (1 = off). Wave 9: gentler (was 3.6) because the body now stands 6-10 m away
+  zoomCover: 0.08,          // share of the frame the autofocus aims the body at
   ndcKeep: 0.55,            // the body's centre stays inside this share of the half-screen while zoomed
   disguise: Object.freeze(['lm_lootmimic', 'lm_masked', 'mimic', 'mr_copy']),   // the disguise IS their rule: a staged sighting would spoil it
 });
@@ -69,11 +72,13 @@ export function findSpot(o) {
       const x = o.eye.x + dx * d, z = o.eye.z + dz * d, y = o.ground(x, z);
       if (y == null) continue;
       const atWall = wall && end - d < FS.wallBonus;
-      const score = -0.08 * Math.abs(d - FS.dPref) - 0.05 * Math.abs(deg) + (atWall ? 0.4 : 0) + FS.litBonus * clamp(+(o.lit?.(x, z)) || 0, 0, 1)
-        + (o.out ? 0.12 * clamp(y - (o.feetY ?? y), 0, 4) : 0) + 0.02 * (o.rnd ? o.rnd() : 0);
-      cands.push({ x, y, z, d, a: deg, wall: atWall, score, heading: a });
+      const lit = clamp(+(o.lit?.(x, z)) || 0, 0, 1);
+      const score = -0.15 * Math.abs(d - FS.dPref) - 0.05 * Math.abs(deg) + (atWall ? 0.4 : 0) + FS.litBonus * lit
+        + (o.out ? 0.2 * clamp(y - (o.feetY ?? y), 0, 4) : 0) + 0.02 * (o.rnd ? o.rnd() : 0);
+      cands.push({ x, y, z, d, a: deg, wall: atWall, lit, score, heading: a });
     }
   }
+  if (o.lit && cands.some((c) => c.lit >= FS.litMin)) for (let i = cands.length - 1; i >= 0; i--) if (cands[i].lit < FS.litMin) cands.splice(i, 1);   // a lamp somewhere in the cone: only lamp spots
   cands.sort((p, q) => q.score - p.score);
   for (const c of cands.slice(0, 10)) if (o.los(c.x, c.y + 1.3, c.z) && o.los(c.x, c.y + 0.5, c.z)) return c;   // props / a shut door in the way: next best
   return null;

@@ -19,20 +19,24 @@ chk(F.pickType({ all: ['lm_witch', 'spider'] }, [], (id) => id === 'spider', ok)
 chk(F.poolDone({ all: ['lm_masked', 'spider'] }, ['spider'], ok) && !F.poolDone({ all: ['spider'] }, [], ok), 'poolDone');
 const eye = { x: 0, y: 1.6, z: 0 }, look = { x: 0, z: -1 };
 const corridor = (len) => (x, z) => (Math.abs(x) < 1 && z <= 1 && z >= -len ? 0 : null);
-const s1 = F.findSpot({ eye, look, ground: corridor(16), los: ok, rnd: () => 0.5 });
-chk(s1 && s1.d >= F.FS.dMin && s1.d <= F.FS.dMax && s1.wall && Math.abs(s1.a) <= 18, 'corridor: end of the corridor, 12-20 m, in the cone ' + JSON.stringify(s1));
-chk(F.findSpot({ eye, look, ground: corridor(9), los: ok, rnd: () => 0 }) === null, 'short room: no spot');
-const s2 = F.findSpot({ eye, look, ground: corridor(30), los: (x, y, z) => z > -14, rnd: () => 0 });
-chk(s2 && s2.d >= 12 && s2.d < 14, 'blocked view: steps back toward the crewmate');
-const s4 = F.findSpot({ eye, look, ground: corridor(30), los: ok, rnd: () => 0, lit: (x, z) => (Math.abs(z + 12) < 1 ? 1 : 0) });
-chk(s4 && Math.abs(s4.d - 12) < 0.01, 'prefers the spot under a lamp');
-const ridge = (x, z) => Math.max(0, (-z - 10) * 0.3);
+const s1 = F.findSpot({ eye, look, ground: corridor(9), los: ok, rnd: () => 0.5 });
+chk(s1 && s1.d >= F.FS.dMin && s1.d <= F.FS.dMax && s1.wall && Math.abs(s1.a) <= 18, 'corridor: end of the corridor, 6-10 m, in the cone ' + JSON.stringify(s1));
+chk(F.findSpot({ eye, look, ground: corridor(6), los: ok, rnd: () => 0 }) === null, 'short room: no spot');
+const s0 = F.findSpot({ eye, look, ground: corridor(30), los: ok, rnd: () => 0 });
+chk(s0 && s0.d < 6.6, 'no lamp: the near end (6-7 m) reads best ' + JSON.stringify(s0));
+const s2 = F.findSpot({ eye, look, ground: corridor(30), los: (x, y, z) => z > -8, rnd: () => 0 });
+chk(s2 && s2.d >= 6 && s2.d < 8, 'blocked view: steps back toward the crewmate');
+const s4 = F.findSpot({ eye, look, ground: corridor(30), los: ok, rnd: () => 0, lit: (x, z) => (Math.abs(z + 9) < 1 ? 1 : 0) });
+chk(s4 && s4.d > 8.4 && s4.d < 9.6 && s4.lit > 0.9, 'prefers the spot under a lamp (even 9 m out)');
+const ridge = (x, z) => Math.max(0, (-z - 6) * 1);
 const s3 = F.findSpot({ eye, look, ground: ridge, los: ok, rnd: () => 0, out: true, feetY: 0 });
-chk(s3 && s3.y > 0.5 && s3.d >= 12, 'outdoors: prefers the ridge');
+chk(s3 && s3.y > 1.5 && s3.d >= 5.5, 'outdoors: prefers the ridge');
 chk(F.beatPhase(0.2, 3) === 'in' && F.beatPhase(2, 3) === 'stare' && F.beatPhase(4, 3) === 'go', 'timeline');
 chk(F.holdFor(0) === 2 && F.holdFor(1) === 4, 'hold 2-4 s');
-const z13 = F.zoomFor(13.5, 2.25, 1, 72, 16 / 9), z15 = F.zoomFor(15, 2.25, 1, 72, 16 / 9);
-chk(F.coverOf(13.5, 2.25, 1, 72, 16 / 9) < 0.01 && F.coverOf(13.5, 2.25, 1, 72, 16 / 9, z13) >= 0.03 && F.coverOf(15, 2.25, 1, 72, 16 / 9, z15) >= 0.028, `autofocus: >= 3 % of the frame at 12-15 m (z ${z13.toFixed(2)} / ${z15.toFixed(2)})`);
+const z6 = F.zoomFor(6, 2.25, 1.3, 72, 16 / 9), z10 = F.zoomFor(10, 2.25, 1.3, 72, 16 / 9);
+chk(z6 <= 1.8 + 1e-9 && z10 <= 1.8 + 1e-9 && F.FS.zoomMax <= 1.8 && F.FS.dMin >= 5.5 && F.FS.dMax <= 10, `autofocus is gentle: <= 1.8x at 6-10 m (z ${z6.toFixed(2)} / ${z10.toFixed(2)})`);
+chk(F.coverOf(6, 2.25, 1.3, 72, 16 / 9, z6) >= 0.065 && F.coverOf(6, 2.25, 1.3, 72, 16 / 9, z6) > 4 * F.coverOf(15, 2.25, 1.3, 72, 16 / 9, 1), 'a 2.3 m body covers >= 6.5 % (box) at 6 m, 4x the old 15 m frame');
+chk(F.FS.labelAfter === 2 && F.FS.lift.every((v) => v > 0 && v < 0.5), 'label after 2 s, warm body lift');
 chk(F.zoomFor(13, 2, 1, 72, 16 / 9, 0.4) <= 0.55 / 0.4 + 1e-9 && F.zoomFor(13, 2, 1, 72, 16 / 9, 0, 0.05, 1) === 1, 'autofocus keeps the body in frame; zoomMax 1 = off');
 const p0 = starePose(0), p1 = starePose(3);
 chk(p0.pitch === 0 && Math.abs(p1.pitch - STARE.lean) < 1e-9 && p1.flare > 0, 'stare pose eases in');
@@ -73,7 +77,7 @@ function stub(o = {}) {
 }
 let T = stub(), maxZoom = 1, spawnD = 0, spawnA = 99, phases = new Set(), frozen = true;
 for (let i = 0; i < 300; i++) {
-  if (i === 120) T.pl.pos.z = -3;   // the crewmate walks 3 m toward it mid-stare: still no bite (and not inside the 5 m abort)
+  if (i === 120) T.pl.pos.z = -1;   // the crewmate walks 1 m toward it mid-stare: still no bite (and not inside the 3.5 m abort)
   T.tick(0.05);
   const b = T.api.beat(); if (b) phases.add(b.phase);
   for (const c of T.hs.values()) if (c.data.fs) { frozen &&= c.stunT > 100; if (!spawnD) { spawnD = Math.hypot(c.pos.x, c.pos.z); spawnA = Math.abs(Math.atan2(c.pos.x, -c.pos.z)) * 180 / Math.PI; } }
@@ -81,12 +85,12 @@ for (let i = 0; i < 300; i++) {
 }
 const ins = T.msgs.filter(([t, d]) => t === 'fsight' && d.k === 'in'), outs = T.msgs.filter(([t, d]) => t === 'fsight' && d.k === 'out');
 chk(ins.length === 1 && ins[0][1].ty === 'spider', 'one beat, the pool creature (disguise skipped) ' + JSON.stringify(ins.map((m) => m[1].ty)));
-chk(spawnD >= 12 && spawnD <= 20 && spawnA <= 18.5, `placed 12-20 m in the view cone (${spawnD.toFixed(1)} m, ${spawnA.toFixed(1)} deg)`);
+chk(spawnD >= 5.5 && spawnD <= 10 && spawnA <= 18.5, `placed 5.5-10 m in the view cone (${spawnD.toFixed(1)} m, ${spawnA.toFixed(1)} deg)`);
 chk(phases.has('in') && phases.has('stare') && phases.has('go'), 'in -> stare -> go ' + [...phases]);
 chk(outs.length === 1 && outs[0][1].why === 'left' && ![...T.hs.values()].some((c) => c.data.fs), 'walks off round the corner and is removed ' + JSON.stringify(outs.map((m) => m[1].why)));
 chk(frozen && T.hurt.length === 0, 'AI frozen for the whole beat: no damage');
 chk(T.cues.length >= 1 && T.taught.includes('spider'), 'tell cue at the stare, rule caption follows');
-chk(maxZoom > 1.5 && T.api.zoom() === 1 && T.g.camera.zoom === 1 && T.g.viewModel.root.scale.x === 1, `autofocus zooms (max ${maxZoom.toFixed(2)}) and restores the camera + hands`);
+chk(maxZoom > 1.3 && maxZoom <= 1.8 + 1e-9 && T.api.zoom() === 1 && T.g.camera.zoom === 1 && T.g.viewModel.root.scale.x === 1, `autofocus zooms (max ${maxZoom.toFixed(2)}) and restores the camera + hands`);
 chk(JSON.stringify(T.g.run.fsSeen) === '["spider"]', 'run remembers the creature');
 T.g.run.day = 2; for (let i = 0; i < 200; i++) T.tick(0.05);
 chk(T.msgs.filter(([t, d]) => t === 'fsight' && d.k === 'in').length === 1, 'a met creature gets no second beat on a later landing');
@@ -95,8 +99,9 @@ T = stub({ phase: 'peak' }); for (let i = 0; i < 200; i++) T.tick(0.05);
 chk(!T.msgs.some(([t]) => t === 'fsight'), 'never at a peak'); T.api.dispose();
 T = stub({ hunter: true }); for (let i = 0; i < 200; i++) T.tick(0.05);
 chk(!T.msgs.some(([t]) => t === 'fsight'), 'never during a chase'); T.api.dispose();
+let spawnD0 = 8;
 T = stub(); for (let i = 0; i < 130; i++) T.tick(0.05);
-const busy = T.api.debug(); T.pl.pos.z = -11; for (let i = 0; i < 20; i++) T.tick(0.05);
+const busy = T.api.debug(); T.pl.pos.z = -(spawnD0 - 2); for (let i = 0; i < 20; i++) T.tick(0.05);
 chk(busy.done && T.msgs.some(([t, d]) => t === 'fsight' && d.k === 'out' && d.why === 'abort') && T.hurt.length === 0, 'walking up to it ends the beat, no bite'); T.api.dispose();
 
 // ---- wiring
