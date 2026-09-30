@@ -41,8 +41,10 @@ await both(14);
 for (let i = 0; i < 20 && !(await cli.evaluate(() => kefal.game.run.phase === 'moon' && !kefal.game.landQ?.pending)); i++) await both(3);
 const ph = { h: await host.evaluate(() => kefal.game.run.phase), c: await cli.evaluate(() => kefal.game.run.phase) };
 chk('landing: both peers reach phase moon', ph.h === 'moon' && ph.c === 'moon', ph);
-const gy = await host.evaluate(() => kefal.game.world.terrain?.heightAt?.(0, 14) ?? kefal.game.world.outdoor?.terrain?.heightAt?.(0, 14) ?? 0);
-const place = (p, x, z, yaw, pitch = 0.05) => p.evaluate(([x, z, yaw, pitch, gy]) => { const g = kefal.game; g.player.teleport(new THREE.Vector3(x, gy + 0.3, z), yaw); g.player.yaw = yaw; g.player.pitch = pitch; g.player.inShip = false; g.player.hp = g.player.maxHp || 100; }, [x, z, yaw, pitch, gy]);
+// ground height PER POINT (the moon seed is random each run: a fixed gy from (0, 14) buried or floated the players on slopes -> flaky aim / grip / tag)
+const place = (p, x, z, yaw, pitch = 0.05) => p.evaluate(([x, z, yaw, pitch]) => { const g = kefal.game, W = g.world, gy = W.terrain?.heightAt?.(x, z) ?? W.outdoor?.terrain?.heightAt?.(x, z) ?? 0; g.player.teleport(new THREE.Vector3(x, gy + 0.3, z), yaw); g.player.yaw = yaw; g.player.pitch = pitch; g.player.inShip = false; g.player.hp = g.player.maxHp || 100; }, [x, z, yaw, pitch]);
+// turn a tab's player toward another peer's chest (yaw / pitch from the real eye position), so the interact ray finds it whatever the slope is
+const aimAt = (p, dy = 0.6) => p.evaluate((dy) => { const g = kefal.game, r = [...g.remotes.values()][0]; if (!r) return false; const e = g.camera.position, dx = r.pos.x - e.x, dz = r.pos.z - e.z; g.player.yaw = Math.atan2(-dx, -dz); g.player.pitch = Math.atan2(r.pos.y + dy - e.y, Math.hypot(dx, dz)); return true; }, dy);
 const HID = IDS.host, CID = IDS.cli;
 
 // ---- 1. client DOWN -> host revives (ring)
@@ -55,20 +57,21 @@ await shot(cli, 'n2_mp_downed_client');
 // host looks at the body and holds E
 await host.evaluate(() => { const g = kefal.game; if (!g.__qaIsDown) { g.__qaIsDown = g.input.isDown.bind(g.input); g.input.isDown = (a) => (g.__qaHold && a === 'interact') || g.__qaIsDown(a); } g.__qaHold = true; });
 let tid = null;
-for (const pit of [-0.4, -0.55, -0.3, -0.7, -0.2, -0.85]) {
-  await host.evaluate((p) => { kefal.game.player.pitch = p; }, pit); await tick(host, 3); await tick(cli, 1);
+for (const pit of [0.15, -0.1, -0.3, -0.5, 0.35, -0.7]) {
+  await aimAt(host, 0.15 - pit); await tick(host, 3); await tick(cli, 1);
   tid = await host.evaluate(() => kefal.game.interactTarget?.action?.__dn || null);
   if (tid) { out.revivePitch = pit; break; }
 }
 chk('revive: host aim finds the downed interactable', !!tid, { tid, label: await host.evaluate(() => kefal.game.interactTarget?.label && String(typeof kefal.game.interactTarget.label === 'function' ? kefal.game.interactTarget.label() : kefal.game.interactTarget.label).slice(0, 60)) });
-let prog = 0, ring = null;
+let prog = 0, ring = null, ring2 = null;
 for (let i = 0; i < 30; i++) {
   await tick(host, 6); await tick(cli, 6); await host.waitForTimeout(40);
   prog = await host.evaluate((id) => kefal.game.downed.S.down.get(id)?.prog || 0, CID);
-  if (prog > 1.2 && !ring) { await unpause(host); ring = await host.evaluate(() => { const e = document.querySelector('.dn-mid'); if (!e) return null; const r = e.getBoundingClientRect(); const cs = getComputedStyle(e); return { rect: [r.left, r.top, r.width, r.height].map(Math.round), op: cs.opacity, disp: cs.display, text: e.innerText.slice(0, 60) }; }); await shot(host, 'n2_mp_revive_host'); }
+  if (prog > 1.2 && !ring) { await unpause(host); ring = await host.evaluate(() => { const e = document.querySelector('.dn-mid'); if (!e) return null; const r = e.getBoundingClientRect(); const cs = getComputedStyle(e); return { rect: [r.left, r.top, r.width, r.height].map(Math.round), op: cs.opacity, disp: cs.display, text: e.innerText.slice(0, 60) }; }); ring2 = await cli.evaluate(() => { const bar = document.querySelector('.dn-bar'), r = bar?.getBoundingClientRect(); return { bar: !!bar && getComputedStyle(bar.parentElement || bar).display !== 'none' && r.width > 20, text: (bar?.innerText || '').slice(0, 40) }; }); await shot(host, 'n2_mp_revive_host'); }
   if (!(await cli.evaluate(() => !!kefal.game.downed?.S.me))) break;
 }
 chk('revive: ring (.dn-mid) visible on the host while holding E', ring && ring.disp !== 'none' && +ring.op > 0.05, ring);
+chk('revive: the downed client sees its own bleed-out / revive UI while the host holds E', ring2 && ring2.bar, ring2);
 await host.evaluate(() => { kefal.game.__qaHold = false; });
 await both(4);
 const d2 = { cUp: !(await cli.evaluate(() => !!kefal.game.downed?.S.me)), hp: await cli.evaluate(() => Math.round(kefal.game.player.hp)), max: await cli.evaluate(() => kefal.game.player.maxHp), hDown: await host.evaluate((id) => kefal.game.downed.isDowned(id), CID) };
@@ -87,10 +90,13 @@ await cli.evaluate(([id, hid]) => { const g = kefal.game; if (!g.__qaIsDown) { g
 for (let i = 0; i < 14; i++) { await tick(host, 6); await tick(cli, 6); await host.waitForTimeout(40); }
 const duo = { co: await host.evaluate(() => [...kefal.game.carry2.state.co.entries()]), hMul: await host.evaluate(() => +kefal.game.player.carryMul.toFixed(2)), cMul: await cli.evaluate(() => +kefal.game.player.carryMul.toFixed(2)), cGrip: await cli.evaluate(() => !!kefal.game.carry2.state.grip), seen: cSeen };
 chk('carry: helper registered on host + client sees the co-carry, speed ~0.92', duo.co.length === 1 && duo.co[0][1] === CID && duo.hMul > 0.85 && duo.cGrip, duo);
+const strapQ = (p) => p.evaluate(() => { const out = []; kefal.game.scene.traverse((o) => { if (o.isLine && o.material?.color?.getHex?.() === 0xf2c230) out.push(o.visible); }); return { n: out.length, vis: out.filter(Boolean).length, co: kefal.game.carry2.state.co.size }; });
+const strap = { host: await strapQ(host), cli: await strapQ(cli) };
+chk('carry: the strap line is visible on BOTH peers', strap.host.vis >= 1 && strap.cli.vis >= 1, strap);
 await unpause(host); await unpause(cli);
-await host.evaluate(() => { kefal.game.player.yaw = -0.5; }); await tick(host, 2);
+await tick(host, 2);
 await shot(host, 'n2_mp_carry_host');
-await cli.evaluate(() => { const g = kefal.game; const r = [...g.remotes.values()][0]; if (r) { const dx = r.pos.x - g.player.pos.x, dz = r.pos.z - g.player.pos.z; g.player.yaw = Math.atan2(-dx, -dz); g.player.pitch = 0.05; } });
+await aimAt(cli, 0.3);
 await tick(cli, 2); await shot(cli, 'n2_mp_carry_client');
 await cli.evaluate(() => { kefal.game.__qaHold = false; });
 for (let i = 0; i < 12; i++) { await tick(host, 6); await tick(cli, 6); await host.waitForTimeout(40); }
@@ -107,22 +113,42 @@ for (let i = 0; i < 60 && !tagged; i++) {
   tagged = await host.evaluate((id) => !!kefal.game.run.fc?.p?.[id]?.[2], CID);
 }
 await both(4);
-const tg = { host: await host.evaluate((id) => kefal.game.run.fc?.p?.[id] || null, CID), cli: await cli.evaluate(() => kefal.game.run.fc?.p?.[kefal.game.selfId] || null), goals: await cli.evaluate(() => [...document.querySelectorAll('.objectives *')].filter((e) => e.children.length === 0 && e.textContent.trim()).map((e) => e.textContent.trim().slice(0, 90))) };
+const tg = { host: await host.evaluate((id) => kefal.game.run.fc?.p?.[id] || null, CID), cli: await cli.evaluate(() => kefal.game.run.fc?.p?.[kefal.game.selfId] || null), goals: await cli.evaluate(() => (document.querySelector('.objectives')?.innerText || '').split('\n').map((s) => s.trim()).filter(Boolean)) };
 chk('tagged: host marks the client TAGGED', tagged, tg.host);
 chk('tagged: client HUD shows the TAGGED goal line', tg.goals.some((s) => /TAGGED|ETİKET|ПОМЕТ/i.test(s)), tg.goals);
 await unpause(cli); await shot(cli, 'n2_mp_tagged_client');
 await cli.evaluate(() => { const g = kefal.game; g.player.teleport(new THREE.Vector3(0, 1, 0)); g.player.inShip = true; });
 await both(8);
-const after = { host: await host.evaluate((id) => kefal.game.run.fc?.p?.[id] || null, CID), cli: await cli.evaluate(() => kefal.game.run.fc?.p?.[kefal.game.selfId] || null), goals: await cli.evaluate(() => [...document.querySelectorAll('.objectives *')].filter((e) => e.children.length === 0 && e.textContent.trim()).map((e) => e.textContent.trim().slice(0, 90))) };
-chk('tagged: reaching the ship clears the tag (host + client)', !(after.host && after.host[2]) && !(after.cli && after.cli[2]) && !after.goals.some((s) => /TAGGED/i.test(s)), after);
+// fc.p[id] = [meter %, on air, tagged]: the tag is paid off only once the ON AIR window (FC.hold = 10 s after the last exposure) has ended
+const fcOf = async () => ({ host: await host.evaluate((id) => kefal.game.run.fc?.p?.[id] || null, CID), cli: await cli.evaluate(() => kefal.game.run.fc?.p?.[kefal.game.selfId] || null), goals: await cli.evaluate(() => (document.querySelector('.objectives')?.innerText || '').split('\n').map((s) => s.trim()).filter(Boolean)) });
+const early = await fcOf();
+chk('tagged: still on air right after reaching the ship (tag held until the window ends)', !!(early.host && early.host[1] && early.host[2]), early.host);
+let after = early;
+for (let i = 0; i < 12 && (after.host?.[2] || after.cli?.[2]); i++) { await both(10); after = await fcOf(); }
+chk('tagged: reaching the ship clears the tag (host + client, after the on-air window)', !(after.host && after.host[2]) && !(after.cli && after.cli[2]) && !after.goals.some((s) => /TAGGED/i.test(s)), after);
 
 // ---- 4. host migration mid-landing
-await host.evaluate(() => { const g = kefal.game; g.player.teleport(new THREE.Vector3(0, 1, 0)); g.player.inShip = true; g.hostBeginTakeoff('lever'); });
-for (let i = 0; i < 20; i++) { await host.evaluate(() => { const g = kefal.game; if (g.run.phase !== 'orbit') g.hostFinishTakeoff(); }); await both(2); if ((await cli.evaluate(() => kefal.game.run.phase)) === 'orbit' && (await host.evaluate(() => kefal.game.run.phase)) === 'orbit') break; }
+const tkState = () => host.evaluate(() => { const g = kefal.game, f = g.gameplay2?.parts?.faults; return { phase: g.run.phase, faultsAct: !!f?.state.host.act, faults: f?.state.host.list.map((x) => x.ty + (x.done ? ':done' : '')), launchAt: f?.state.host.launchAt ?? null, downed: g.downed?.S.book.e.size, dead: g.player.dead }; });
+// force the pre-flight-fault branch (it rolls 35 % at quota 0, otherwise the takeoff is instant): Math.random -> 0.99 for the one call
+await host.evaluate(() => { const g = kefal.game, r0 = Math.random; g.downed?.S.book.e.clear(); g.player.teleport(new THREE.Vector3(0, 1, 0)); g.player.inShip = true; Math.random = () => 0.99; try { g.hostBeginTakeoff('lever'); } finally { Math.random = r0; } });
+await both(4);
+out.takeoff = { first: await tkState() };
+chk('takeoff: the lever alone does NOT launch while pre-flight faults are open (module gating, not a bug)', out.takeoff.first.phase === 'moon' && out.takeoff.first.faultsAct && out.takeoff.first.faults.length > 0, out.takeoff.first);
+// the pre-flight ship faults (shipfaults.js) legitimately hold the ship: ~35 % of first-quota takeoffs and most later ones start a fault
+// checklist ("Takeoff blocked: N faults left") and the lever only fires once everything is fixed. Fix them like the crew would (fixAll = the
+// debug hook of the real fix path), then the module runs the ORIGINAL takeoff after its "ignition in 3" countdown.
+if (out.takeoff.first.phase === 'moon' && out.takeoff.first.faultsAct) {
+  await host.evaluate(() => kefal.game.gameplay2.parts.faults.fixAll());
+  for (let i = 0; i < 16 && (await host.evaluate(() => kefal.game.run.phase)) === 'moon'; i++) await both(4);
+  out.takeoff.afterFix = await tkState();
+}
+for (let i = 0; i < 20; i++) { await host.evaluate(() => { const g = kefal.game; if (g.run.phase === 'takeoff') g.hostFinishTakeoff(); }); await both(2); if ((await cli.evaluate(() => kefal.game.run.phase)) === 'orbit' && (await host.evaluate(() => kefal.game.run.phase)) === 'orbit') break; }
+out.takeoff.last = await tkState();
 const orb = { h: await host.evaluate(() => kefal.game.run.phase), c: await cli.evaluate(() => kefal.game.run.phase) };
-chk('takeoff: both peers back in orbit', orb.h === 'orbit' && orb.c === 'orbit', orb);
-await host.evaluate(() => { const g = kefal.game; g.run.moon = 'levrek'; g.run.daysLeft = 3; g.player.inShip = true; g.hostLever(g.selfId); });
-await both(3);
+chk('takeoff: both peers back in orbit (host lever, faults fixed if they held the ship)', orb.h === 'orbit' && orb.c === 'orbit', { ...orb, ...out.takeoff });
+// freeze the 9 s wall-clock landing timer on the host (hostFinishLanding is looked up when the timeout fires) so the host really dies MID-landing
+await host.evaluate(() => { const g = kefal.game; g.hostFinishLanding = () => {}; g.run.moon = 'levrek'; g.run.daysLeft = 3; g.player.inShip = true; g.hostLever(g.selfId); });
+for (let i = 0; i < 10 && (await cli.evaluate(() => kefal.game.run.phase)) !== 'landing'; i++) await both(1, 4);
 const mid = { h: await host.evaluate(() => kefal.game.run.phase), c: await cli.evaluate(() => kefal.game.run.phase) };
 chk('landing: both peers are mid-landing when the host leaves', mid.h === 'landing' && mid.c === 'landing', mid);
 await host.evaluate(() => kefal.game.net.leave()); await host.close();

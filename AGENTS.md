@@ -382,6 +382,7 @@ First look at everything merged after QA night 1: stream overlay, route board, p
 
 ### 5.37 Wave 8 night - FEELFIX2 (docs/wave8/feelfix2.md; node test `tools/harness/feelfix2.test.mjs`; NOT re-shot in the browser)
 Fixes from QA night 2: stream end faces the terminal + locked-fixture prompt only within 1.5 m (`hubgate.js LOCK_NEAR`) + tarp hides lids in its footprint; drone cone round/soft (`feedcams2.js softCone/softDisc`), camera floor cone 20 slices; bulky held items slide low/right, scaled + ghosted so they cover <= 25 % (`fpbody_grip.js boxCover/COVER_MAX`, `fpbody.js ghostTick`); carry2 holder `carryMul` = 0.92 (weight penalty cancelled via `P.carryCancel` in localplayer); metro platform / influencer corridor palette + practicals (`practicals.corridor` theme knob); day report hides the top quota banner (`docklayout.js`).
+MP rerun of QA night 2 (wave 8): `tools/harness/qa_night2_mp.mjs` passes 17/17 (takeoff to orbit, tag clear at the ship, migration in `landing`, strap + revive UI on both peers); all 4 earlier failures were harness bugs (takeoff held by the pre-flight ship faults, tag clears only after the 10 s on-air window, wall-clock landing timer, per-seed slope placement), no game change; see docs/wave8/qa_night2.md section 7.
 
 ## 6. Roadmap (next steps, in priority order)
 1. **Stabilise:** browser smoke test of the round-3 content (§5.8-5.10): land on gen0_0..2 and every interior theme, van,
