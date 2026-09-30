@@ -837,3 +837,12 @@ First sighting restaged at 5.5-10 m under a lamp (lamp spots win), warm emissive
 
 ### 2026-09-30 — Multiplayer hotfix (Codex)
 One PLAY → browser + public Host; duplicate Join/start guards; wait for applied welcome; host-peer routed gameplay (P2P retained), admission roster and revive visibility healing; real discovery refresh, signaling redundancy/retry and async cancellation. Rejected joins release slots. Follow-up reduces the cutoff from 30 to 4 in-flight 12-KiB packets, preserves event order while shedding stale state per slow peer, splits large row snapshots under the byte cap, and measures UTF-8 bytes. Wire v0.11.0. See `docs/MULTIPLAYER_HOTFIX.md` for historical comparisons and precise scope. Eight relevant node suites and build pass. Real-game bytes/sec, browser rendering, two-computer WebRTC and voice remain unverified; no GitHub write access in this session, so not deployed.
+
+### 2026-09-30 evening — P2P follow-up (Claude, on the owner's PC)
+Real Nostr test (host tab + `?autojoin&net=nostr` tab + lobby-browser tab): sync both ways, lobby listed in 0.5 s, and a
+real internet stranger joined the public test lobby (ICE `srflx->srflx`, 62 ms) — the protocol works over the internet.
+Fixed the 29-09 rejoin regression (joiner left the room after 10 s, host rejoined and dropped everyone mid-handshake):
+first-join rejoin 35 s, lost-host 25 s, host never rejoins. NAT/SDP failures now show a clear message; settings v3 puts
+everyone on Nostr; lobby browser shows real peer/relay counts; NETSTATS shows relays, TURN and per-peer ICE path.
+**Owner action still needed:** a TURN account + `VITE_TURN_*` on Render for friends behind CGNAT/mobile (no free
+public TURN works). Details: `docs/MULTIPLAYER_HOTFIX.md` → "Follow-up".

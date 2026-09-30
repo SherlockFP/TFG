@@ -19,8 +19,12 @@ export const NET = {
   HB_MS: 2000,            // app-level heartbeat (independent of the game loop, keeps flowing from throttled hidden tabs)
   STALL_MS: 20000,        // no packet from a linked peer for this long -> 'peerStall' warning
   DEAD_MS: 75000,         // ...and this long -> the link is a zombie: rejoin the room (client) / drop the peer (host)
-  REJOIN_AFTER_MS: 10000, // a lost peer that has not come back after this long -> force a fresh signalling announce
-  REJOIN_EVERY_MS: 20000,
+  // A lost HOST link that has not come back after this long -> the client forces a fresh signalling announce. Must stay
+  // above Trystero's own handshake windows (answer TTL 23.3 s, disconnected-peer grace 7.5 s): leaving the room earlier
+  // aborts a handshake that was about to succeed, and on slow relays / real NATs the joiner never got in (2026-09-29 regression).
+  REJOIN_AFTER_MS: 25000,
+  FIRST_JOIN_REJOIN_MS: 35000, // a joiner that has not heard from any host yet (the first Nostr handshake can take 10-20 s)
+  REJOIN_EVERY_MS: 30000,
   PACKET_CAP: 12000,      // batched packets are split above ~12 KB (a single bigger message goes alone; Trystero chunks at 16 KB)
 };
 // Latest-wins state streams: dropped (never queued) for a peer whose datachannel is backed up. Keyframes heal them.
@@ -189,21 +193,24 @@ export class Session extends Emitter {
         else if (id === this.hostId) { this.peerGone(id, false); this._rejoin(); }
       }
     }
-    if (!this.isHost && !this.connected && !this.hostId && now - (this._startedAt ?? now) > NET.REJOIN_AFTER_MS) this._rejoin();
+    if (!this.isHost && !this.connected && !this.hostId && now - (this._startedAt ?? now) > NET.FIRST_JOIN_REJOIN_MS) this._rejoin();
     // joiner that never got its welcome (snapshot chunks can be dropped after a 10 s datachannel stall): ask again, the host re-welcomes
     if (!this.isHost && !this.connected && this.hostId && t.peers.has(this.hostId) && (this._hellos || 0) < 4) {
       this._helloT ??= now;
       if (now - this._helloT > 8000 * ((this._hellos || 0) + 1)) { this._hellos = (this._hellos || 0) + 1; t.send({ t: 'hello', d: { ...this.helloData, ver: GAME_VERSION, host: false } }, this.hostId); }
     }
+    // Only a CLIENT re-enters the room, and only for its host link. The host never does: leaving the room drops every
+    // other crewmate and aborts the handshakes of players who are joining right now; Trystero keeps announcing the
+    // host on the relays by itself, so a lost client finds it again without help.
     for (const [id, L] of this.lost) {
       if (now - L.t < NET.REJOIN_AFTER_MS) continue;
-      if ((!this.isHost && id === this.hostId) || !t.peers.size) this._rejoin();
+      if (!this.isHost && id === this.hostId) this._rejoin();
     }
   }
   _rejoin() {
     const t = this.transport;
     const now = performance.now();
-    if (!t?.rejoin || this.leaving || now - (this._lastRejoin ?? -1e9) < NET.REJOIN_EVERY_MS) return;
+    if (this.isHost || !t?.rejoin || this.leaving || now - (this._lastRejoin ?? -1e9) < NET.REJOIN_EVERY_MS) return;
     this._lastRejoin = now;
     this.stats.rejoins++;
     t.rejoin().then((ok) => { if (ok) this.emit('rejoined'); }).catch(() => {});

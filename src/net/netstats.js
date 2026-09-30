@@ -10,6 +10,13 @@ addTranslations({
   'Reconnected - world state resynced.': 'Yeniden bağlandın - dünya durumu eşitlendi.',
   'Lost connection to the host (network problem, could not reconnect). Session ended.': 'Host ile bağlantı koptu (ağ sorunu, yeniden bağlanılamadı). Oturum bitti.',
   'The host has left. Session ended.': 'Host ayrıldı. Oturum bitti.',
+  'P2P connection blocked even through the TURN relay (check the TURN settings).': 'P2P bağlantısı TURN relay üzerinden bile kurulamadı (TURN ayarlarını kontrol et).',
+  'P2P connection blocked by a router / mobile network (NAT). A TURN relay is needed - see docs/MULTIPLAYER_HOTFIX.md.': 'P2P bağlantısını modem / mobil ağ (NAT) engelledi. TURN relay gerekiyor - docs/MULTIPLAYER_HOTFIX.md.',
+  'A player could not connect:': 'Bir oyuncu bağlanamadı:',
+  'Could not connect to the host:': "Host'a bağlanılamadı:",
+  'Signal relays reachable: {open}/{total}': 'Ulaşılabilen sinyal relay: {open}/{total}',
+  'Players online in the lobby network: {n}': 'Lobi ağında çevrimiçi oyuncu: {n}',
+  'No signal relay reachable from this network - servers cannot be listed or joined.': "Bu ağdan hiçbir sinyal relay'e ulaşılamıyor - sunucular listelenemez ve katılınamaz.",
 }, 'tr');
 addTranslations({
   'Connection to the host lost - trying to reconnect...': 'Связь с хостом потеряна - переподключение...',
@@ -20,6 +27,13 @@ addTranslations({
   'Reconnected - world state resynced.': 'Переподключено - состояние мира синхронизировано.',
   'Lost connection to the host (network problem, could not reconnect). Session ended.': 'Связь с хостом потеряна (проблема сети). Сессия завершена.',
   'The host has left. Session ended.': 'Хост вышел. Сессия завершена.',
+  'P2P connection blocked even through the TURN relay (check the TURN settings).': 'P2P-соединение не прошло даже через TURN (проверьте настройки TURN).',
+  'P2P connection blocked by a router / mobile network (NAT). A TURN relay is needed - see docs/MULTIPLAYER_HOTFIX.md.': 'P2P-соединение заблокировано роутером / мобильной сетью (NAT). Нужен TURN-сервер - см. docs/MULTIPLAYER_HOTFIX.md.',
+  'A player could not connect:': 'Игрок не смог подключиться:',
+  'Could not connect to the host:': 'Не удалось подключиться к хосту:',
+  'Signal relays reachable: {open}/{total}': 'Доступно сигнальных реле: {open}/{total}',
+  'Players online in the lobby network: {n}': 'Игроков в сети лобби: {n}',
+  'No signal relay reachable from this network - servers cannot be listed or joined.': 'Из этой сети недоступно ни одно сигнальное реле - серверы не видны и к ним нельзя подключиться.',
 }, 'ru');
 
 export function installNetStats(game) {
@@ -52,11 +66,18 @@ export function installNetStats(game) {
       `NETSTATS link: reconnects ${net.stats.reconnects}  lost ${net.stats.lost} (now ${net.lost?.size || 0})  grace-expired ${net.stats.graceExpired}  rejoins ${net.stats.rejoins}  stalls ${net.stats.stalls}  dropped ${net.stats.dropped}  split-packets ${net.stats.splits}`,
       'top types: ' + last.types.slice(0, 6).map(([k, v]) => `${k} ${v.toFixed(1)}/s`).join('  '),
     ];
+    const rs = net.transport.relayStatus?.();
+    if (rs) lines.push(`signal relays open: ${rs.open}/${rs.total}  strategy: ${net.strategy}  TURN: ${net.transport.hasTurn ? 'yes' : 'no'}`);
+    let links = {};
+    try { links = (await net.transport.linkInfo?.()) || {}; } catch { /* ignore */ }
     for (const id of net.peerIds()) {
       let ms = -1;
       try { ms = await net.transport.ping?.(id); } catch { /* ignore */ }
-      lines.push(`ping ${(net.players.get(id)?.name || id).slice(0, 14)}: ${ms >= 0 ? Math.round(ms) + ' ms' : 'n/a'}`);
+      const L = links[id];
+      // path host->host = same LAN, srflx = direct through NAT (STUN), relay = through the TURN server
+      lines.push(`ping ${(net.players.get(id)?.name || id).slice(0, 14)}: ${ms >= 0 ? Math.round(ms) + ' ms' : 'n/a'}${L ? `  ice ${L.ice}  path ${L.path}` : ''}${net.players.has(id) ? '' : '  (not admitted)'}`);
     }
+    if (net.lost?.size) lines.push('lost (grace): ' + [...net.lost.keys()].map((id) => net.players.get(id)?.name || id).join(', '));
     return lines.join('\n');
   };
   const api = window.KefalAPI;

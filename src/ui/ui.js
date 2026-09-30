@@ -575,12 +575,21 @@ export class UI {
     const code = el('input', { maxlength: 6, placeholder: 'ABC123', class: 'code-in', autocomplete: 'off', spellcheck: 'false' });
     code.addEventListener('input', () => { code.value = code.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); });
     const pw = el('input', { placeholder: t('password'), maxlength: 24, class: 'pw-in' });
+    const renderStatus = () => {
+      const dir = this.app.lobbyDir;
+      status.innerHTML = '';
+      if (!dir) return;
+      // real link counts, not just "joined the room": 0 peers for a long time = this network cannot open P2P links
+      const peers = dir.transport?.peers?.size || 0;
+      const rs = dir.transport?.relayStatus?.();
+      status.append(el('i', { class: 'lb-dot ' + String(dir.status || '').toLowerCase() }), `${String(dir.status || '').toUpperCase()} · ${dir.list().length} ${t('lobbies')} · ` + tf('Players online in the lobby network: {n}', { n: peers }) + (rs && rs.total ? ' · ' + tf('Signal relays reachable: {open}/{total}', rs) : ''));
+      if (rs && rs.total && rs.open === 0) status.append(el('div', { class: 'bad' }, t('No signal relay reachable from this network - servers cannot be listed or joined.')));
+    };
     const render = () => {
       const dir = this.app.lobbyDir;
       const lobbies = dir ? dir.list() : [];
       const focusedCode = document.activeElement?.dataset?.code;
-      status.innerHTML = '';
-      if (dir) status.append(el('i', { class: 'lb-dot ' + String(dir.status || '').toLowerCase() }), `${String(dir.status || '').toUpperCase()} · ${lobbies.length} ${t('lobbies')}`);
+      renderStatus();
       list.innerHTML = '';
       list.appendChild(el('div', { class: 'lobby-row head' }, ...[t('Lobby'), t('Host'), t('Players'), t('Phase'), t('Quota'), t('Mods'), ''].map((h) => el('div', {}, h))));
       if (!lobbies.length) list.appendChild(el('div', { class: 'dim empty' }, t('No lobbies found yet. Host one, or ask a friend for their code.')));
@@ -616,6 +625,8 @@ export class UI {
     );
     start();
     render();
+    // relay sockets / peer links change without a lobby event: refresh the status line while this screen is open
+    const statusTimer = setInterval(() => { if (!status.isConnected) { clearInterval(statusTimer); return; } renderStatus(); }, 2000);
     this.focusFirst(this.menuEl, '.lobby-row[tabindex="0"], .code-in');
   }
 

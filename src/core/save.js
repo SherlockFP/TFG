@@ -44,7 +44,7 @@ export function defaultSettings() {
     micEnabled: true,
     micConsent: 'ask',      // 'ask' | 'yes' | 'no'  (never grab the mic without asking)
     voiceMode: 'ptt',       // 'open' | 'ptt'  (hold V to talk, like R.E.P.O.)
-    settingsVersion: 2,
+    settingsVersion: 3,
     micGain: 1.0,
     micDevice: '',
     outputDevice: '',       // AudioContext.setSinkId target ('' = system default)
@@ -76,6 +76,9 @@ export function loadSettings() {
   const out = { ...d, ...s, keys: { ...d.keys, ...(s.keys || {}) } };
   // migrations
   if ((s.settingsVersion || 1) < 2) { out.voiceMode = 'ptt'; out.settingsVersion = 2; }
+  // v3 (2026-09-30): every player back on the same signalling network. Hosts and joiners on different modes
+  // (an old MQTT / torrent / local pick) never see each other's lobbies and a code join silently times out.
+  if ((s.settingsVersion || 1) < 3) { out.netStrategy = 'nostr'; out.settingsVersion = 3; }
   // [a11y] range checks (a hand-edited / old save must not give a 5 degree or 300 degree FOV)
   out.fov = clampFov(out.fov);
   out.uiScale = clampRange(out.uiScale, UI_SCALE_MIN, UI_SCALE_MAX, 1);

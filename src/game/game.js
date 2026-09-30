@@ -701,6 +701,18 @@ export class Game extends Emitter {
     });
     net.on('peerStall', (id, idle) => { if (id === net.hostId && !net.isHost) this.ui.toast(t('Network unstable: no data from the host...'), 'bad'); });
     net.on('error', (e) => {
+      // No ICE path between two peers that did find each other on the relays (symmetric NAT / CGNAT / firewall): say so
+      // instead of a silent 45 s "could not reach the host". Only fatal for a joiner whose failed peer is the host.
+      if (e?.kind === 'nat') {
+        const why = e.turn ? t('P2P connection blocked even through the TURN relay (check the TURN settings).') : t('P2P connection blocked by a router / mobile network (NAT). A TURN relay is needed - see docs/MULTIPLAYER_HOTFIX.md.');
+        if (net.isHost || net.connected) { this.ui.toast(t('A player could not connect:') + ' ' + why, 'bad'); return; }
+        if (this._natErrTimer) return;
+        this._natErrTimer = setTimeout(() => {   // Trystero reports it per attempt; the host may still answer through another relay
+          this._natErrTimer = null;
+          if (this.net === net && !net.connected && !this.destroyed) { clearTimeout(this.joinTimeout); this.emit('fatal', t('Could not connect to the host:') + ' ' + why); }
+        }, 8000);
+        return;
+      }
       // Trystero reports a wrong lobby password as a join error; without this the joiner waits 25 s for a misleading timeout
       const msg = String(e?.error || e || '');
       if (this.net !== net || net.isHost || net.connected || !/password/i.test(msg) || this._pwErrTimer) return;

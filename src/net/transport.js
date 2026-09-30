@@ -56,8 +56,16 @@ export class TrysteroTransport extends BaseTransport {
     if (urls) cfg.relayConfig.urls = urls.split(',').map(s => s.trim()).filter(Boolean);
     const turn = turnServers();
     if (turn.length) cfg.turnConfig = turn;
+    this.hasTurn = turn.length > 0;
     this.room = mod.joinRoom(cfg, roomId, {
-      onJoinError: (d) => { console.warn('join error', d); this.onError?.(d); },
+      onJoinError: (d) => {
+        console.warn('join error', d);
+        // Trystero: "could not connect to peer X after exchanging SDP; configure TURN servers ..." = both sides found each
+        // other through the relays but no ICE path exists (symmetric NAT / CGNAT / firewall). Tag it so the UI can say so.
+        const msg = String(d?.error || d || '');
+        if (/after exchanging SDP/i.test(msg)) this.onError?.({ kind: 'nat', peerId: d?.peerId || (msg.match(/peer (\S+)/) || [])[1] || null, error: msg, turn: this.hasTurn });
+        else this.onError?.(d);
+      },
     });
     const msg = this.room.makeAction('m');
     const bin = this.room.makeAction('b');
@@ -127,6 +135,31 @@ export class TrysteroTransport extends BaseTransport {
   addStream(stream) { this.stream = stream; try { this.room?.addStream(stream); } catch (e) { console.warn(e); } }
   removeStream(stream) { try { this.room?.removeStream(stream); } catch { /* ignore */ } this.stream = null; }
   async ping(id) { try { return await this.room.ping(id); } catch { return -1; } }
+  // Per-peer WebRTC path: 'host' (same LAN), 'srflx' (direct through NAT via STUN) or 'relay' (TURN). For NETSTATS / bug reports.
+  async linkInfo() {
+    const out = {};
+    let pcs = {};
+    try { pcs = this.room?.getPeers?.() || {}; } catch { /* ignore */ }
+    for (const [id, pc] of Object.entries(pcs)) {
+      const info = { ice: pc?.iceConnectionState || '?', path: '?' };
+      try {
+        const st = await pc.getStats();
+        const byId = new Map(); let pair = null;
+        st.forEach((r) => { byId.set(r.id, r); if (r.type === 'candidate-pair' && r.state === 'succeeded' && (r.nominated || r.selected)) pair = r; });
+        if (pair) { const l = byId.get(pair.localCandidateId)?.candidateType, r = byId.get(pair.remoteCandidateId)?.candidateType; info.path = `${l}->${r}`; if (pair.currentRoundTripTime != null) info.rtt = Math.round(pair.currentRoundTripTime * 1000); }
+      } catch { /* ignore */ }
+      out[id] = info;
+    }
+    return out;
+  }
+  // Relay sockets currently open (Nostr only): 0 means signalling cannot reach anybody from this network.
+  relayStatus() {
+    try {
+      const socks = this.mod?.getRelaySockets?.() || {};
+      const all = Object.values(socks);
+      return { open: all.filter((s) => s?.readyState === 1).length, total: all.length };
+    } catch { return null; }
+  }
   leave() { this._generation = (this._generation || 0) + 1; this._msg = null; this._bin = null; try { const p = this.room?.leave(); p?.catch?.(() => {}); } catch { /* ignore */ } this.room = null; this.peers.clear(); this.inflight.clear(); }
 }
 

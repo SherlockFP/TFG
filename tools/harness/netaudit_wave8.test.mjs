@@ -3,6 +3,7 @@
 //     every client request has a handler, wave-8 run fields are broadcast.
 //  B. behavioural: real Session objects on an in-memory wire (host H + clients C, D) with stub games: downed (down -> confirm -> revive, late join,
 //     host migration), feedcams (client cuts a camera, spray NaN, viewer-tax sale line, host migration clock), late join with a queued landing.
+import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import path from 'node:path';
 globalThis.window = globalThis;
@@ -15,7 +16,7 @@ const { LandingQueue } = await import('../../src/game/landingq.js');
 
 let fails = 0, checks = 0;
 const ok = (c, m) => { checks++; if (!c) { fails++; console.log('FAIL', m); } };
-const root = path.resolve(new URL('../../src', import.meta.url).pathname);
+const root = fileURLToPath(new URL('../../src', import.meta.url));   // fileURLToPath: .pathname gives /D:/... on Windows
 const rd = (f) => fs.readFileSync(path.join(root, f), 'utf8');
 
 // ================================================================================================ A. static
