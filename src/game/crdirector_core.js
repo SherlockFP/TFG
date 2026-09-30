@@ -143,6 +143,21 @@ export function mayRelease(s, o, active, cost, ex = {}) {
 }
 export const gapFor = (phase) => TUNE.gap[phase] || 99;
 
+// ------------------------------------------------------------------------------------------------ feedcams heat (docs/wave8/feedcams2.md)
+// The Algorithm's cameras feed the director: `hMem` = highest ON AIR heat (0-100) since the last peak ended.
+//   a hot stream makes the next peak bigger (+35 % cap at heat 100) and the calm before it shorter (-50 %);
+//   a crew that stayed off the feed (heat < 10) gets a calmer build (x0.8). Other phases untouched.
+export const FEED = Object.freeze({ peakAdd: 0.35, calmCut: 0.5, quiet: 10, buildQuiet: 0.8, buildAdd: 0.15 });
+export function feedMul(phase, hMem) {
+  if (hMem == null || !(hMem >= 0)) return 1;
+  const x = Math.max(0, Math.min(1, hMem / 100));
+  if (phase === 'peak') return 1 + FEED.peakAdd * x;
+  if (phase === 'build') return hMem < FEED.quiet ? FEED.buildQuiet : 1 + FEED.buildAdd * x;
+  return 1;
+}
+/** calm length multiplier after a hot stream */
+export const feedCalmMul = (hMem) => (hMem > 0 ? 1 - FEED.calmCut * Math.max(0, Math.min(1, hMem / 100)) : 1);
+
 // ------------------------------------------------------------------------------------------------ queue
 /** bounded FIFO of wanted spawns [{zone, type?, t}]; dedupes by keeping at most TUNE.queueMax, drops stale entries */
 export function enqueue(q, e, now) {

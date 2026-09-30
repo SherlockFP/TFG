@@ -3,9 +3,11 @@
 //   Seen for ~3 s = ON AIR: viewers up (algo1 bump), heat up (lures / a faster creature wave), scrap carried into the ship while ON AIR pays a 25 % VIEWER TAX.
 //   Counter-play: blind spots (under the camera, behind walls / doors / props), spray the lens (40 s), melee / shoot it (dead), Zap Gun (25 s),
 //   a loud noise turns a camera toward it for 5 s (bait), the CUT THE FEED job (facjobs) blacks the network out for 150 s, a mapart pylon too.
-// Net (prefix 'fc'): 'fcreq' client -> host {op:'hit'|'zap', i}; 'fcfx' host -> everyone (HOST_ONLY) {k:'live'|'juke'|'tax'|'sale'|'smash'|'zap'|'spray'|'say', ...}.
+// Net (prefix 'fc'): 'fcreq' client -> host {op:'hit'|'zap'|'cut', i}; 'fcfx' host -> everyone (HOST_ONLY) {k:'live'|'juke'|'tax'|'sale'|'smash'|'zap'|'spray'|'cut'|'untag'|'say', ...}.
+// feedcams2 (wave 8 pass 2): TAGGED trips (going live tags you until you reach the ship; kill the camera that tagged you to clear it), sprint draws the eye,
+//   junction-box cable cut, Watched affix = +2 cameras, host API for drones / Lantern Keeper / Follower / jammer (expose, sees, blind), host mods event 'feedcams'.
 // State = game.run.fc (host-authoritative, synced with broadcastRun(['fc'])): { ck host clock, c: [[st, until, baitH, baitT0, baitT1, seeing]...],
-//   p: { playerId: [meter %, live] }, h heat, tx tax (this day), tn taxed items, lv times live, as seconds on air, off network-dark-until }; run.fcTax = tax since the last sale.
+//   p: { playerId: [meter %, live, tagged] }, h heat, tx tax (this day), tn taxed items, lv times live, as seconds on air, off network-dark-until }; run.fcTax = tax since the last sale.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { t, tf } from '../core/i18n.js';
@@ -16,6 +18,7 @@ import { insideShip } from '../world/ship.js';
 import { G } from '../physics/physics.js';
 import * as K from './feedcams_core.js';
 import './feedcams_i18n.js';
+import './feedcams2_i18n.js';
 
 HOST_ONLY.add('fcfx');
 const { FC, ST } = K;
@@ -24,16 +27,17 @@ const TIPS = [
   'Camera lock. You have three seconds before the stream goes live. Break line of sight.',
   'You are ON AIR. Scrap you carry to the ship now pays a viewer tax. Cut the feed, smash a lens or spray it.',
   'Blind spot: right under a camera, behind walls, doors and crates. Hug the wall and slip past.',
+  'That grey box on the wall feeds a camera. Cut its cable and the camera dies quietly.',
 ];
 const CSS = `#fc-vig{position:fixed;inset:0;pointer-events:none;z-index:3;opacity:0;transition:opacity .18s;box-shadow:inset 0 0 120px 30px rgba(255,20,20,.75)}
-.algo-live.fc-onair{color:#ff4040!important;animation:fcb .7s steps(2) infinite}.algo-live.fc-onair::after{content:' | ' attr(data-fc)}@keyframes fcb{50%{opacity:.45}}`;
+.algo-live.fc-onair{color:#ff4040!important;animation:fcb .7s steps(2) infinite}.algo-live.fc-onair::after,.algo-live.fc-tag::after{content:' | ' attr(data-fc)}.algo-live.fc-tag{color:#ff9a40!important}@keyframes fcb{50%{opacity:.45}}`;
 
 export function installFeedcams(game) {
   const mods = game.mods;
   if (!mods) return null;
   const offs = [], V3 = THREE.Vector3;
   let disposed = false, boundNet = null, tickT = 0, sendT = 0, itemT = 0, tipT = 0, vigT = 0, lastFp = '';
-  const S = { fac: null, plan: [], vis: null, off: 0, ck: -1, mt: new Map(), mark: new Set(), hp: [], pingAt: 0, waveAt: 0, jukeAt: -99, baitAt: [], noiseCm: null, noiseOrig: null, said: 0, sum: null, vig: null, style: null, taxT: 0, taxSum: 0 };
+  const S = { fac: null, plan: [], vis: null, off: 0, ck: -1, mt: new Map(), mark: new Map(), ext: new Map(), fjBait: 0, hp: [], pingAt: 0, waveAt: 0, jukeAt: -99, baitAt: [], noiseCm: null, noiseOrig: null, said: 0, sum: null, vig: null, style: null, taxT: 0, taxSum: 0 };
   const run = () => game.run, fc = () => game.run?.fc || null, host = () => !!game.isHost;
   const toast = (s, k = 'info') => { try { game.ui?.toast?.(s, k); } catch { /* ui optional */ } };
   const fx = (d) => { try { game.net.broadcast('fcfx', d); } catch { /* net closing */ } };
@@ -42,18 +46,20 @@ export function installFeedcams(game) {
   const netOff = () => { const F = fc(); return !!((F && game.time < (F.off || 0)) || game.mapart?.offStream?.()); };
   const camPos = (c) => new V3(c.x, c.y, c.z);
   const stOf = (i) => (fc()?.c?.[i]?.[0]) | 0;
+  const emit = (ev) => { try { mods.emit('feedcams', ev, game); } catch (e) { console.warn('[feedcams] emit', e); } };   // host-side hook for feedcams2 / other modules
 
   // ------------------------------------------------------------------ build (every peer): plan + instanced meshes + floor cones
   function clearVis() {
     const v = S.vis; if (!v) return;
-    for (const m of [v.body, v.lamp, v.env, v.cone]) { m.removeFromParent(); m.geometry.dispose(); m.material.dispose(); }
+    for (const m of [v.body, v.lamp, v.env, v.cone, v.jb]) { if (!m) continue; m.removeFromParent(); m.geometry.dispose(); m.material.dispose(); }
     S.vis = null;
   }
   function build(F) {
     clearVis(); S.plan = []; S.hp = [];
     const r = run(), L = F?.layout;
     if (!L || !r) return;
-    S.plan = K.planCams(L, { seed: r.seed, day: r.day, quotaIndex: r.quotaIndex, size: L.size });
+    const watched = (r.dailyEvent?.mm || []).includes('watched');   // mapmods 'Watched' affix: the Algorithm streams this floor (+2 cameras)
+    S.plan = K.planCams(L, { seed: r.seed, day: r.day, quotaIndex: r.quotaIndex, size: L.size, extra: watched ? 2 : 0 });
     const n = S.plan.length; if (!n) return;
     const box = (sx, sy, sz, x, y, z, col) => {
       const g = new THREE.BoxGeometry(sx, sy, sz); g.translate(x, y, z);
@@ -95,8 +101,22 @@ export function installFeedcams(game) {
     const M = 8, coneP = new Float32Array(n * M * 18), coneC = new Float32Array(n * M * 24);
     const env = mkMesh(envP, envC), cone = mkMesh(coneP, coneC);
     cone.geometry.attributes.position.setUsage(THREE.DynamicDrawUsage); cone.geometry.attributes.color.setUsage(THREE.DynamicDrawUsage);
-    F.group.add(body, lamp, env, cone);
-    S.vis = { body, lamp, env, cone, tabs, M, lampKey: new Array(n).fill(''), coneOn: new Array(n).fill(true), floorY, dummy: new THREE.Object3D(), col: new THREE.Color() };
+    // junction boxes + cables (static, one merged mesh): the quiet way to kill a camera ([E] on the box)
+    const jbg = [];
+    for (const c of S.plan) {
+      jbg.push(box(0.3, 0.4, 0.3, c.jb.x, c.jb.y, c.jb.z, 0x4a4f44), box(0.08, 0.06, 0.08, c.jb.x, c.jb.y + 0.12, c.jb.z, 0xd8b030));
+      const P = c.jb.path;
+      for (let k = 0; k + 1 < P.length; k++) {
+        const a = P[k], b = P[k + 1], len = Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]);
+        if (len < 0.05) continue;
+        const g = box(0.035, len, 0.035, 0, 0, 0, 0x151515), q = new THREE.Quaternion().setFromUnitVectors(new V3(0, 1, 0), new V3(b[0] - a[0], b[1] - a[1], b[2] - a[2]).normalize());
+        g.applyQuaternion(q); g.translate((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2); jbg.push(g);
+      }
+    }
+    const jb = new THREE.Mesh(mergeGeometries(jbg), new THREE.MeshLambertMaterial({ vertexColors: true }));
+    for (const g of jbg) g.dispose();
+    F.group.add(body, lamp, env, cone, jb);
+    S.vis = { jb, body, lamp, env, cone, tabs, M, lampKey: new Array(n).fill(''), coneOn: new Array(n).fill(true), floorY, dummy: new THREE.Object3D(), col: new THREE.Color() };
   }
   function ensure() {
     const F = game.world?.facility, r = run();
@@ -164,10 +184,18 @@ export function installFeedcams(game) {
   function initFc() {
     const r = run(); if (!r) return;
     r.fc = { ck: game.time, c: S.plan.map(() => [0, 0, 0, 0, 0, 0]), p: {}, h: 0, tx: 0, tn: 0, lv: 0, as: 0, off: 0 };
-    S.mt.clear(); S.mark.clear(); S.hp = S.plan.map(() => FC.hp); S.pingAt = S.waveAt = 0; S.said = 0; S.feedDone = false; lastFp = '';
+    S.mt.clear(); S.mark.clear(); S.ext.clear(); S.hp = S.plan.map(() => FC.hp); S.pingAt = S.waveAt = S.fjBait = 0; S.said = 0; S.feedDone = false; lastFp = '';
     game.broadcastRun?.(['fc']);
   }
-  function setState(i, st, until = 0) { const e = fc()?.c?.[i]; if (e) { e[0] = st; e[1] = Math.round(until * 10) / 10; } }
+  function setState(i, st, until = 0) {
+    const e = fc()?.c?.[i]; if (!e) return;
+    e[0] = st; e[1] = Math.round(until * 10) / 10;
+    if (st === ST.DEAD || st === ST.CUT) untag('c' + i);   // the recording is gone: whoever this camera tagged is clean again
+  }
+  /** clear the tag of every player tagged by `src` ('c3' camera, 'd1' drone, '*' = everyone) */
+  function untag(src) {
+    for (const [id, m] of S.mt) if (m.tag && (src === '*' || m.tag === src)) { m.tag = ''; fx({ k: 'untag', to: id }); }
+  }
   function hostTick(dt) {
     const F = fc(), r = run(), now = game.time;
     if (!F || r?.phase !== 'moon' || !S.plan.length) return;
@@ -175,7 +203,9 @@ export function installFeedcams(game) {
     const inFac = all.filter((p) => p.zone === 'in' && !p.inShip);
     // CUT THE FEED job (facjobs): the whole network goes dark
     const fj = r.fj?.j?.find?.((j) => j.id === 'feed');
-    if (fj && fj.st === 1 && !S.feedDone) { S.feedDone = true; F.off = now + FC.off; for (const m of S.mt.values()) { m.m = 0; m.air = 0; } feedLine('The feed is cut. Every camera goes dark for a while.'); }
+    if (fj && fj.st === 1 && !S.feedDone) { S.feedDone = true; F.off = now + FC.off; untag('*'); for (const m of S.mt.values()) { m.m = 0; m.air = 0; } feedLine('The feed is cut. Every camera goes dark for a while.'); }
+    // somebody is at the feed splitter: the Algorithm turns every camera in earshot toward the panel (every 3 s)
+    if (fj && fj.st !== 1 && fj.ex?.on && Array.isArray(fj.pos) && now >= S.fjBait) { S.fjBait = now + 3; bait({ x: fj.pos[0], y: fj.pos[1], z: fj.pos[2] }, true); if (!(S.said & 4)) { S.said |= 4; feedLine('Somebody is touching my cables. Smile for the cameras.'); } }
     const off = netOff();
     const exp = new Map();
     for (const c of S.plan) {
@@ -189,21 +219,31 @@ export function installFeedcams(game) {
         const cr = !!p.crouch, q = K.inCone(c, yaw, p.pos.x, p.pos.z, cr);
         if (!q.ok || Math.abs(p.pos.y - (c.y - 2)) > 9) continue;
         if (!game.physics.lineOfSight(lens, { x: p.pos.x, y: p.pos.y + (cr ? 0.7 : 1.1), z: p.pos.z }, G.STATIC | G.DOOR)) continue;
-        const x = exp.get(p.id) || { d: 99, n: 0, cr }; x.d = Math.min(x.d, q.d); x.n++; exp.set(p.id, x); e[5] = 1;
+        const x = exp.get(p.id) || { d: 99, n: 0, cr, src: '' }; if (q.d < x.d) { x.d = q.d; x.src = 'c' + c.i; } x.n++; exp.set(p.id, x); e[5] = 1;
       }
+    }
+    // mobile cameras (feedcams2 drones, the Lantern Keeper's beam) report through expose(): same meter, same rules
+    for (const [id, e] of S.ext) {
+      if (e.until < now) { S.ext.delete(id); continue; }
+      const p = all.find((q) => q.id === id); if (!p || off) continue;
+      const x = exp.get(id) || { d: 99, n: 0, cr: !!p.crouch, src: '' }; if (e.d < x.d) { x.d = e.d; x.src = e.src; } x.n++; exp.set(id, x);
     }
     let nAir = 0;
     for (const p of all) {
-      const mt = S.mt.get(p.id) || { m: 0, air: 0 }; S.mt.set(p.id, mt);
-      const x = exp.get(p.id), res = K.meterStep(mt.m, x ? K.exposureRate(x.d, x.cr, x.n) : 0, dt, mt.pk || 0);
+      const mt = S.mt.get(p.id) || { m: 0, air: 0, tag: '' }; S.mt.set(p.id, mt);
+      const v = mt.lx != null ? Math.hypot(p.pos.x - mt.lx, p.pos.z - mt.lz) / Math.max(0.02, dt) : 0; mt.lx = p.pos.x; mt.lz = p.pos.z;
+      const pk0 = mt.pk || 0, x = exp.get(p.id), res = K.meterStep(mt.m, x ? K.exposureRate(x.d, x.cr, x.n, v >= FC.sprintV && v < 20) : 0, dt, mt.pk || 0);
       mt.m = res.m; mt.pk = res.pk;
       if (res.live) {
         mt.air = now + FC.hold; F.lv++; F.h = Math.min(FC.heat.max, F.h + FC.heat.spike);
-        fx({ k: 'live', id: p.id });
+        const fresh = !mt.tag; mt.tag = x?.src || mt.tag || 'x';
+        fx({ k: 'live', id: p.id, tag: fresh ? 1 : 0 });
+        emit({ k: 'live', id: p.id, src: mt.tag, pos: p.pos });
         try { game.algo1?.bump?.('onair', 'onair'); } catch { /* algo1 optional */ }
         if (!(S.said & 1)) { S.said |= 1; feedLine("You're live. Chat is loving it. Try not to die on camera."); }
       } else if (mt.m >= 1) mt.air = now + FC.hold;
       if (mt.air && now >= mt.air) { mt.air = 0; mt.m = Math.min(mt.m, 0.5); }
+      if (res.juke) emit({ k: 'juke', id: p.id, pk: pk0 });
       if (res.juke && now - S.jukeAt > 45) { S.jukeAt = now; fx({ k: 'juke', to: p.id }); try { game.algo1?.bump?.('escape', 'escape'); } catch { /* optional */ } }
       if (mt.air > now) nAir++;
     }
@@ -217,47 +257,54 @@ export function installFeedcams(game) {
       S.waveAt = now + H.waveEvery;
       let ok = true; try { ok = game.crdirector?.canSpawn?.('feedcams', live[0].pos) !== false; } catch { /* director optional */ }
       if (ok && game.hostData) game.hostData.spawnT = Math.min(game.hostData.spawnT || 0, 4);
+      if (ok) emit({ k: 'fans', id: live[0].id, h: F.h });
       if (!(S.said & 2)) { S.said |= 2; feedLine('Your numbers are through the roof. I am sending some fans.'); }
     }
     try { game.crdirector?.onFeedHeat?.(F.h, live.map((p) => p.pos)); } catch { /* optional */ }
-    F.p = {}; for (const [id, m] of S.mt) if (m.m > 0.01 || m.air > now) F.p[id] = [Math.round(m.m * 100), m.air > now ? 1 : 0];
+    F.p = {}; for (const [id, m] of S.mt) if (m.m > 0.01 || m.air > now || m.tag) F.p[id] = [Math.round(m.m * 100), m.air > now ? 1 : 0, m.tag ? 1 : 0];
     // sync (4 Hz on change, plus a clock refresh every 5 s)
     F.ck = Math.round(now * 100) / 100;
     sendT += dt;
     const fp = JSON.stringify([F.c, F.p, Math.round(F.h), F.off, F.tx, F.lv]);
     if ((fp !== lastFp && sendT >= 0.25) || sendT >= 5) { sendT = 0; lastFp = fp; game.broadcastRun?.(['fc']); }
   }
-  /** every 0.5 s: scrap held by someone ON AIR is marked; marked scrap that reaches the ship pays the viewer tax */
+  /** every 0.5 s: scrap held by someone ON AIR or TAGGED is marked; marked scrap that reaches the ship pays the viewer tax; reaching the ship clears the tag */
   function taxTick() {
     const F = fc(), now = game.time; if (!F || !game.items) return;
     const players = game.aiPlayers?.() || [];
-    const airId = new Set([...S.mt].filter(([, m]) => m.air > now).map(([id]) => id));
+    const hot = new Set([...S.mt].filter(([, m]) => m.air > now || m.tag).map(([id]) => id));
     for (const it of game.items.all()) {
       const ok = isSellable(it.def) && !it.soulbound && it.type !== 'body' && it.value > 1;
       if (!ok) continue;
-      if (it.holder && airId.has(it.holder)) S.mark.add(it.id);
+      if (it.holder && hot.has(it.holder)) S.mark.set(it.id, it.holder);
     }
     let cut = 0, n = 0;
-    for (const id of [...S.mark]) {
+    for (const [id, by] of [...S.mark]) {
       const it = game.items.get?.(id);
       if (!it || it.value <= 1) { S.mark.delete(id); continue; }
       const carrier = it.holder ? players.find((p) => p.id === it.holder) : null;
       const inShip = carrier ? carrier.inShip : it.obj && insideShip(it.obj.position);
       if (!inShip) continue;
       S.mark.delete(id);
-      const r = K.taxOf(it.value); if (r.cut <= 0) continue;
+      const v0 = it.value, r = K.taxOf(v0); if (r.cut <= 0) continue;
       game.net.broadcast('it', { e: 'val', id, v: r.v });
       cut += r.cut; n++;
+      emit({ k: 'tax', item: id, type: it.type, name: it.def?.name || it.type, v: v0, cut: r.cut, by });
     }
     if (cut > 0) { F.tx += cut; F.tn += n; run().fcTax = (run().fcTax | 0) + cut; game.broadcastRun?.(['fc', 'fcTax']); fx({ k: 'tax', cut, n }); }
+    for (const p of players) { const m = S.mt.get(p.id); if (m?.tag && p.inShip && !(m.air > now)) { m.tag = ''; } }   // home: the tag is paid off
   }
   // noise bait: a loud sound turns nearby cameras toward it for a few seconds
   function onNoise(pos, loud) {
-    const F = fc(), now = game.time;
-    if (!F || S.selfNoise || loud < FC.baitLoud || run()?.phase !== 'moon' || netOff()) return;
+    if (!fc() || S.selfNoise || loud < FC.baitLoud || run()?.phase !== 'moon') return;
+    emit({ k: 'noise', pos: { x: pos.x, y: pos.y, z: pos.z }, loud });   // feedcams2 drones listen too
+    if (!netOff()) bait(pos, false);
+  }
+  function bait(pos, force) {
+    const F = fc(), now = game.time; if (!F) return;
     for (const c of S.plan) {
       const e = F.c[c.i];
-      if (e[0] !== ST.OK || now < e[4] + FC.baitGap || Math.abs(pos.y - (c.y - 2)) > 9 || Math.hypot(pos.x - c.x, pos.z - c.z) > FC.baitRange) continue;
+      if (e[0] !== ST.OK || (!force && now < e[4] + FC.baitGap) || Math.abs(pos.y - (c.y - 2)) > 9 || Math.hypot(pos.x - c.x, pos.z - c.z) > FC.baitRange) continue;
       e[2] = Math.round(K.baitHeading(c, Math.atan2(pos.z - c.z, pos.x - c.x)) * 100) / 100; e[3] = Math.round(now * 10) / 10; e[4] = Math.round((now + FC.bait) * 10) / 10;
     }
   }
@@ -280,8 +327,11 @@ export function installFeedcams(game) {
     if (e[0] === ST.DEAD || e[0] === ST.CUT) return;
     if (d.op === 'hit' && dist <= 5) {
       S.hp[c.i] = (S.hp[c.i] ?? FC.hp) - 1;
-      if (S.hp[c.i] <= 0) { setState(c.i, ST.DEAD); fx({ k: 'smash', i: c.i }); noise(camPos(c), 1.2); } else fx({ k: 'spark', i: c.i });
+      if (S.hp[c.i] <= 0) { const m = S.mt.get(from)?.m || 0; setState(c.i, ST.DEAD); fx({ k: 'smash', i: c.i }); emit({ k: 'smash', i: c.i, by: from, m }); noise(camPos(c), 1.2); } else fx({ k: 'spark', i: c.i });
       game.broadcastRun?.(['fc']);
+    } else if (d.op === 'cut' && Math.hypot(pp.x - c.jb.x, pp.z - c.jb.z) <= 2.8 && Math.abs(pp.y + 1 - c.jb.y) < 2.5) {
+      setState(c.i, ST.CUT); fx({ k: 'cut', i: c.i, by: from }); emit({ k: 'cut', i: c.i, by: from, m: S.mt.get(from)?.m || 0 }); game.broadcastRun?.(['fc']);
+      if (!(S.said & 8)) { S.said |= 8; feedLine('Hey. That cable was load-bearing.'); }
     } else if (d.op === 'zap' && dist <= 16) {
       setState(c.i, ST.BLIND, now + FC.zap); fx({ k: 'zap', i: c.i }); game.broadcastRun?.(['fc']);
     }
@@ -300,7 +350,7 @@ export function installFeedcams(game) {
       const pp = posOf(from); if (!pp || Math.hypot(pp.x - d.a[0], pp.z - d.a[2]) > 6) return;
       for (const c of S.plan) {
         if (F.c[c.i][0] >= ST.DEAD || !K.segNear(d.a, d.b, [c.x, c.y, c.z], 0.8)) continue;
-        setState(c.i, ST.DEAD); fx({ k: 'smash', i: c.i }); game.broadcastRun?.(['fc']);
+        setState(c.i, ST.DEAD); fx({ k: 'smash', i: c.i }); emit({ k: 'smash', i: c.i, by: from, m: S.mt.get(from)?.m || 0 }); game.broadcastRun?.(['fc']);
       }
     }
   }
@@ -327,7 +377,8 @@ export function installFeedcams(game) {
   function onFxMsg(d) {
     if (disposed || !d) return;
     const c = S.plan[d.i | 0], me = game.selfId;
-    if (d.k === 'live') { if (d.id === me) { snd('ui_error', null, 0.5); toast(t('ON AIR - you are live'), 'bad'); } else toast(tf('{name} went live', { name: game.playerName?.(d.id) || '?' }), 'warn'); }
+    if (d.k === 'live') { if (d.id === me) { snd('ui_error', null, 0.5); toast(t(d.tag ? 'ON AIR - you are TAGGED until you reach the ship. Kill that camera to clear it.' : 'ON AIR - you are live'), 'bad'); } else toast(tf('{name} went live', { name: game.playerName?.(d.id) || '?' }), 'warn'); }
+    else if (d.k === 'untag') { if (d.to === me) toast(t('Tag cleared. The recording is gone.'), 'good'); }
     else if (d.k === 'juke') { if (d.to === me) toast(t('Clean dodge. The stream lagged behind you.'), 'good'); }
     else if (d.k === 'tax') { S.taxSum = d.cut; toast(tf('The Algorithm took its cut: -▮{n} viewer tax', { n: d.cut }), 'bad'); }
     else if (d.k === 'sale') toast(tf('Viewer tax on this haul: -▮{n} (scrap carried while ON AIR)', { n: d.cut }), 'warn');
@@ -337,6 +388,7 @@ export function installFeedcams(game) {
       if (d.k === 'smash' || d.k === 'spark') { snd('hit_metal', p, 0.9); game.particles?.burst?.(p, 'sparks', new V3(0, -1, 0), d.k === 'smash' ? 1.2 : 0.5); }
       else if (d.k === 'zap') { snd('taser_zap', p, 0.8); game.particles?.burst?.(p, 'sparks', new V3(0, -1, 0), 0.8); }
       else if (d.k === 'spray') snd('spray_paint', p, 0.7);
+      else if (d.k === 'cut') { const j = new V3(c.jb.x, c.jb.y, c.jb.z); snd('hit_metal', j, 0.4); game.particles?.burst?.(j, 'sparks', new V3(0, 1, 0), 0.4); if (d.by === me) toast(t('Cable cut. That camera is dead for today.'), 'good'); }
     }
   }
   function onSell(d) {
@@ -365,7 +417,7 @@ export function installFeedcams(game) {
   }
   function clientTick(dt) {
     ensureUi();
-    const F = fc(), me = F?.p?.[game.selfId], m = me ? me[0] / 100 : 0, live = me ? me[1] : 0;
+    const F = fc(), me = F?.p?.[game.selfId], m = me ? me[0] / 100 : 0, live = me ? me[1] : 0, tag = me ? me[2] : 0;
     if (S.vig) {
       const a = Math.min(1, m * 0.55 + (live ? 0.3 : 0) + (F ? F.h / 100 * 0.15 : 0));
       const key = Math.round(a * 20);
@@ -374,17 +426,27 @@ export function installFeedcams(game) {
     vigT += dt;
     if (vigT >= 0.5) {
       vigT = 0;
-      if (typeof document !== 'undefined') for (const el of document.querySelectorAll('.algo-live')) { el.classList.toggle('fc-onair', !!live); if (live) el.dataset.fc = t('ON AIR'); }
+      if (typeof document !== 'undefined') for (const el of document.querySelectorAll('.algo-live')) { el.classList.toggle('fc-onair', !!live); el.classList.toggle('fc-tag', !live && !!tag); if (live || tag) el.dataset.fc = t(live ? 'ON AIR' : 'TAGGED'); }
       const p = game.player;
       if (p && !p.dead && S.plan.length && F) {
         if (live) tip(4); else if (m > 0.3) tip(2);
         for (const c of S.plan) {
           const d = Math.hypot(p.pos.x - c.x, p.pos.z - c.z);
-          if (stOf(c.i) === ST.OK && d < 16 && Math.abs(p.pos.y - (c.y - 2)) < 6 && !p.inShip) { tip(1); if (c.tut && d < 9 && (run()?.day | 0) <= 1) tip(8); break; }
+          if (stOf(c.i) === ST.OK && d < 16 && Math.abs(p.pos.y - (c.y - 2)) < 6 && !p.inShip) { tip(1); if (c.tut && d < 9 && (run()?.day | 0) <= 1) tip(8); if (Math.hypot(p.pos.x - c.jb.x, p.pos.z - c.jb.z) < 4) tip(16); break; }
         }
       }
     }
   }
+  // junction box: [E] cuts the camera cable (quiet kill; the host checks reach)
+  offs.push(mods.on('interactables', (out, g) => {
+    const p = game.player;
+    if (g !== game || disposed || !S.plan.length || !p || p.dead || !fc() || run()?.phase !== 'moon') return;
+    for (const c of S.plan) {
+      if (stOf(c.i) >= ST.DEAD || Math.hypot(p.pos.x - c.jb.x, p.pos.z - c.jb.z) > 3.2 || Math.abs(p.pos.y + 1 - c.jb.y) > 2.5) continue;
+      out.push({ pos: new V3(c.jb.x, c.jb.y, c.jb.z), r: 0.5, reach: 2.4, label: () => t('Camera junction box: cut the cable [E]'), sub: () => t('Kills this camera quietly for the rest of the day.'),
+        action: () => { try { game.net.request('fcreq', { op: 'cut', i: c.i }); } catch { /* net closing */ } } });
+    }
+  }));
   offs.push(mods.on('daySummary', (d, extra, g) => {
     if (g !== game || d.company) return;
     const F = S.sum || fc(); if (!F || !(F.n > 0)) return;
@@ -422,7 +484,29 @@ export function installFeedcams(game) {
   }));
 
   return {
-    state: S, plan: () => S.plan, hostTick, hostReq, onNoise, taxTick,
+    state: S, plan: () => S.plan, hostTick, hostReq, onNoise, taxTick, untag,
+    /** HOST: a mobile camera (drone, Lantern Keeper beam) sees player `id` from `d` metres this tick; src = tag source ('d0', 'x') */
+    expose(id, d, src = 'x') { if (host() && id) S.ext.set(id, { d: Math.max(0.5, +d || 8), src, until: game.time + 0.35 }); },
+    /** HOST: does a working camera see this point right now? (The Follower counts cameras as watchers.) Cached 0.25 s per 2 m cell. */
+    sees(pos) {
+      const F = fc(); if (!host() || !F || !pos || !S.plan.length || netOff()) return false;
+      const key = Math.round(pos.x / 2) + ',' + Math.round(pos.z / 2), now = game.time, hit = (S.seeC ||= new Map()).get(key);
+      if (hit && now - hit.t < 0.25) return hit.v;
+      let v = false;
+      for (const c of S.plan) {
+        const e = F.c[c.i]; if (e[0] !== ST.OK || Math.abs(pos.y - (c.y - 2)) > 9) continue;
+        const yaw = K.camYaw(c, now, e[4] > 0 && now <= e[4] + 0.7 ? { h: e[2], t0: e[3], t1: e[4] } : null);
+        if (!K.inCone(c, yaw, pos.x, pos.z, false).ok) continue;
+        try { if (game.physics.lineOfSight({ x: c.x, y: c.y - 0.1, z: c.z }, { x: pos.x, y: pos.y + 1.2, z: pos.z }, G.STATIC | G.DOOR)) { v = true; break; } } catch { /* physics gone */ }
+      }
+      if (S.seeC.size > 200) S.seeC.clear();
+      S.seeC.set(key, { t: now, v }); return v;
+    },
+    /** HOST: meter 0..1 / live / tagged of a player */
+    meter(id) { const m = S.mt.get(id); return m ? { m: m.m, live: m.air > game.time, tag: m.tag || '' } : { m: 0, live: false, tag: '' }; },
+    /** HOST: blind camera i for `secs` (feedcams2 jammer); never shortens a longer blind or revives a dead camera */
+    blind(i, secs) { const e = fc()?.c?.[i]; if (!host() || !e || e[0] >= ST.DEAD || (e[0] === ST.BLIND && e[1] > game.time + secs)) return; const was = e[0]; setState(i, ST.BLIND, game.time + secs); if (was !== ST.BLIND) game.broadcastRun?.(['fc']); },
+    netOff,
     dispose() {
       disposed = true;
       for (const o of offs.splice(0)) { try { o?.(); } catch { /* ignore */ } }

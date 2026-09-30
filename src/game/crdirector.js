@@ -81,6 +81,7 @@ export function installCrdirector(game) {
     const mm = game.mapmods;
     const mmMul = typeof mm?.threatMul === 'function' ? mm.threatMul() : (Number(mm?.threatMul) || 1);   // optional (wave 8 mapmods); dailyEvent.dangerMul already carries its numbers
     let pressure = 1; try { pressure = game.balance?.scale?.().spawn || 1; } catch { /* balance optional */ }
+    pressure *= K.feedMul(S.st?.phase, S.fh);   // feedcams: ON AIR heat raises the next peak, an off-feed crew gets a calmer build
     return K.ctxOf({ q: r.quotaIndex | 0, tier: moon.tier, hard: getMode() === 'hard', danger: (game.config?.dangerMul || 1) * (r.dailyEvent?.dangerMul || 1) * (mmMul || 1), pressure });
   }
   const send = (d, to) => { try { if (to) game.net.sendTo(to, 'cd', d); else game.net.broadcast('cd', d); } catch { /* net closing */ } };
@@ -96,6 +97,7 @@ export function installCrdirector(game) {
     S.rng = new RNG(((run().seed | 0) ^ 0xcd11 ^ ((run().day | 0) * 7919)) >>> 0);
     S.st = K.newState(c, () => S.rng.float(0, 1));
     S.q.length = 0; S.now = 0; S.acc = 0; S.trk.clear(); S.trkGap.clear(); S.bursts.clear(); S.evt = false; S.evtT = -99;
+    S.fh = null; S.fhNow = 0;
     S.residents = K.residentsFor(c.q); S.newThisLanding = 0; S.newThisCycle = 0; S.lastStage = 0; S.cullT = 0;
     S.stats = { spawned: 0, queued: 0, dropped: 0, released: 0, culled: 0, peaks: 0, featured: 0 };
     send({ k: 'ph', p: 'calm', n: 0 });
@@ -298,6 +300,8 @@ export function installCrdirector(game) {
       if (!S.evt) { S.evt = true; if (S.st.phase !== 'peak') { S.st.phase = 'peak'; S.st.t = 0; S.st.len = 240; S.st.overT = 0; onPhase('peak', crew, act.sum, cap, true); } }
     } else if (S.evt) { S.evt = false; if (S.st.phase === 'peak') S.st.len = S.st.t; }
     const ph = K.step(S.st, step, c, () => S.rng.float(0, 1), { active: act.sum, cap, stress: !S.evt && stressed(crew), evt: S.evt });
+    if (ph === 'calm' && S.fh > 0) S.st.len *= K.feedCalmMul(S.fh);   // a hot stream calls the next wave sooner
+    if (ph === 'relax' && S.fh != null) S.fh = S.fhNow;               // the peak spent the heat memory
     if (ph) onPhase(ph, crew, act.sum, cap);
     K.expire(S.q, S.now);
     if (!S.evt) release(act, crew);
@@ -538,6 +542,8 @@ export function installCrdirector(game) {
     /** siege.js: wave power / count ceilings for the current quota */
     siegeCaps() { return enabled() && S.st ? K.siegeCaps(run().quotaIndex | 0) : null; },
     phase() { return S.st?.phase || null; },
+    /** feedcams (host, 10 Hz): current ON AIR heat 0-100; the director remembers the highest value since the last peak */
+    onFeedHeat(h) { if (!S.st) return; S.fhNow = +h || 0; S.fh = Math.max(S.fh ?? 0, S.fhNow); },
     debug() { return { phase: S.st?.phase, t: S.st ? Math.round(S.st.t) : 0, len: S.st ? Math.round(S.st.len) : 0, cycle: S.st?.cycle, queue: S.q.map((e) => e.type || e.zone), stats: { ...S.stats }, cues: S.cues }; },
     dispose() {
       if (disposed) return;

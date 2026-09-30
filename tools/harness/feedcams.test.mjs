@@ -50,12 +50,12 @@ ok(Math.abs(K.camYaw(cam, 12, bait) - 1.0) < 1e-9 && Math.abs(K.camYaw(cam, 9, b
 ok(K.baitHeading(cam, Math.PI) <= 1.25 + 1e-9 && K.baitHeading({ ...cam, lim: null }, Math.PI) === Math.PI, 'wall cam cannot look back into its wall');
 let m = 0, t = 0, live = false;
 while (!live && t < 10) { const r = K.meterStep(m, K.exposureRate(9, false, 1), 0.1); m = r.m; live = r.live; t += 0.1; }
-ok(live && t > 2.8 && t < 3.3, `3 s stream delay (${t.toFixed(1)})`);
+ok(live && t > K.FC.acquire - 0.2 && t < K.FC.acquire + 0.3, `stream delay = FC.acquire (${t.toFixed(1)})`);
 ok(K.exposureRate(4, false, 1) > K.exposureRate(9, false, 1) && K.exposureRate(9, true, 1) < K.exposureRate(9, false, 1), 'close faster, crouch slower');
 let jm = 0, jp = 0, jr; for (let i = 0; i < 6; i++) { jr = K.meterStep(jm, 1, 0.1, jp); jm = jr.m; jp = jr.pk; } for (let i = 0; i < 40 && !jr.juke; i++) { jr = K.meterStep(jm, 0, 0.1, jp); jm = jr.m; jp = jr.pk; }
 ok(jr?.juke, 'juke fires when a near miss decays to 0'); ok(!K.meterStep(0.1, 0, 0.5, 0.2).juke, 'tiny brush is not a juke');
 ok(K.heatStep(0, 1, 10) === 30 && Math.abs(K.heatStep(50, 0, 10) - 38) < 1e-9 && K.heatStep(99, 4, 10) === 100, 'heat');
-ok(K.taxOf(100).v === 75 && K.taxOf(100).cut === 25 && K.taxOf(1).cut === 0 && K.taxOf(2).v >= 1, 'viewer tax 25 %, never below 1');
+ok(K.taxOf(100).cut === Math.round(100 * K.FC.tax) && K.taxOf(100).v === 100 - K.taxOf(100).cut && K.taxOf(1).cut === 0 && K.taxOf(2).v >= 1, 'viewer tax = FC.tax, never below 1');
 ok(K.stateNow({ st: 1, until: 5 }, 6) === 0 && K.stateNow({ st: 1, until: 5 }, 4) === 1 && K.stateNow({ st: 2, until: 0 }, 99) === 2, 'timed states');
 ok(K.segNear([0, 0, 0], [10, 0, 0], [5, 0.5, 0], 0.9) && !K.segNear([0, 0, 0], [10, 0, 0], [5, 2, 0], 0.9), 'segNear');
 // strings

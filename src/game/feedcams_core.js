@@ -10,15 +10,16 @@ export const FC = {
     wall: { fov: 0.8, R: 13, r0: 1.5, amp: 0.7, per: [8, 12], lim: 1.25 },    // wall cam: narrow, long, ~40 deg sweep each way, cannot look back into its wall
     ceil: { fov: 0.95, R: 10, r0: 2.0, amp: 0.85, per: [9, 13], lim: null },  // ceiling dome: wider, shorter, free to turn
   },
-  acquire: 3.0,        // seconds of full exposure before the stream goes live (the 3 s stream delay you can juke inside)
+  acquire: 2.5,        // seconds of full exposure before the stream goes live (the stream delay you can juke inside; sim-tuned, docs/wave8/feedcams2.md)
   closeD: 6, closeMul: 1.6,   // inside 6 m the camera locks on faster
   crouchMul: 0.55, crouchRange: 0.8,   // a sneaking / crouched player is harder to see (slower lock, shorter range)
   multiMul: 1.3,       // two cameras on you at once
-  decay: 0.4,          // meter falls per second while unseen
-  hold: 8,             // seconds ON AIR after the last exposure
+  sprintMul: 1.8, sprintV: 6.5,   // movement draws the eye: a player moving faster than 6.5 m/s (sprint) locks 1.8x faster
+  decay: 0.3,          // meter falls per second while unseen
+  hold: 10,            // seconds ON AIR after the last exposure
   juke: 0.5,           // meter that counts as a near miss when it falls back to 0
-  heat: { up: 3, down: 1.2, spike: 8, ping: 30, pingEvery: 20, pingLoud: 3, wave: 65, waveEvery: 60, max: 100 },
-  tax: 0.25,           // viewer tax: share of a scrap item's value the Algorithm takes when it is carried into the ship while ON AIR
+  heat: { up: 3, down: 1.2, spike: 8, ping: 30, pingEvery: 20, pingLoud: 3, wave: 70, waveEvery: 60, max: 100 },
+  tax: 0.35,           // viewer tax: share of a scrap item's value the Algorithm takes when a TAGGED player brings it into the ship
   hp: 2,               // melee hits to smash a camera
   blind: 40, zap: 25,  // seconds a spray-painted lens / a zapped camera stays out
   off: 150,            // seconds the whole network is dark after the CUT THE FEED job (and 60 s from a mapart pylon, handled by mapart)
@@ -33,8 +34,9 @@ const DX = [1, 0, -1, 0], DZ = [0, 1, 0, -1];
 const HEAD = [0, Math.PI / 2, Math.PI, -Math.PI / 2];
 
 /** how many cameras this landing gets: 1 on the very first landing (the tutorial), 3-4 early, up to 10 by facility size */
-export function camCount(size, day, quotaIndex) {
+export function camCount(size, day, quotaIndex, extra = 0) {
   if ((day | 0) <= 1 && (quotaIndex | 0) <= 0) return 1;
+  if (extra > 0) return Math.min(12, camCount(size, day, quotaIndex) + (extra | 0));   // mapmods 'Watched': +2
   let n = clamp(Math.round(2.5 + (Number(size) || 1) * 4), 4, 10);
   if ((quotaIndex | 0) <= 0) n = Math.min(n, (day | 0) <= 2 ? 3 : 4);
   else if ((quotaIndex | 0) === 1) n = Math.min(n, 6);
@@ -83,13 +85,13 @@ function junctionWall(L, r, prefer) {
 }
 
 /**
- * Deterministic camera plan. opts: { seed, day, quotaIndex, size }. Each camera:
+ * Deterministic camera plan. opts: { seed, day, quotaIndex, size, extra (Watched affix: +2) }. Each camera:
  * { i, kind, x, y, z, h (base heading), amp, per, ph, fov, R, r0, lim, room, tut, jb: { x, y, z, path: [[x,y,z],...] } }
  */
 export function planCams(L, opts = {}) {
   if (!L || !L.rooms || !L.open) return [];
   const rng = new RNG(((opts.seed | 0) ^ 0xfeedca11 ^ Math.imul((L.seed | 0) || 1, 31) ^ Math.imul((opts.day | 0) + 3, 7919)) >>> 0);
-  const n = camCount(opts.size ?? L.size, opts.day, opts.quotaIndex);
+  const n = camCount(opts.size ?? L.size, opts.day, opts.quotaIndex, opts.extra | 0);
   const floorY = L.y;
   const entRoom = L.entrance?.room;
   const cand = L.rooms.filter((r) => r !== entRoom && !['entrance', 'vault'].includes(r.type) && !r.treasure && r.w * r.h >= 2 && r.height);
@@ -169,10 +171,11 @@ export function inCone(cam, yaw, px, pz, crouch) {
   return { d, ok: Math.abs(angDiff(yaw, Math.atan2(dz, dx))) <= cam.fov / 2 };
 }
 /** meter gain per second for one exposure (d metres away) */
-export function exposureRate(d, crouch, cams = 1) {
+export function exposureRate(d, crouch, cams = 1, sprint = false) {
   let r = 1 / FC.acquire;
   if (d < FC.closeD) r *= FC.closeMul;
   if (crouch) r *= FC.crouchMul;
+  else if (sprint) r *= FC.sprintMul;
   if (cams > 1) r *= FC.multiMul;
   return r;
 }
