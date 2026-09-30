@@ -6964,3 +6964,13 @@ baska ai gelirse konusma logunu goster tamamen sonra handoff falan birak devam y
 extra icerik yaratik cesitliligi gizem i arttirmak icin yeni lokasyonlar yeni labirentler yeni icerik bi suru eklesene
 
 → Lead: owner overrides the director's "no more creatures / no new systems" rule for CONTENT. Workflow w10-content: 3 scouts (creatures / places / mystery) → 2 design angles (dread vs variety) → synthesis into 6 disjoint packages (≈2 creature packs, 2 place packs incl. new labyrinths + new moons on the route board, 1 cross-moon mystery thread, 1 anomalies/rare variants) → build in worktrees → adversarial review → fix. Docs land in docs/wave10/.
+
+### OWNER (2026-09-30, MP problems)
+
+baskalarina katilamiyorum sunuculara falan bi bak kontrol et
+
+arkadasim kodla baglanirsa onu goremiyorum modelini falan buglaniyo onu  da fixle cok acil sonnet5.5
+
+p2p de de problem var eski lobi sistemi iyiydi server browseri gorup kendin kurabiliyodunda bi suru menuye yazi eklemissin oynat oyun kur hizli vardiya oyuna katil falan sadece oyna butonu olsun o butonlari kaldir oynadan katilabilirsin oto public acilsin sunucular zaten falan ggibi ayarla
+
+→ Lead (decisions now binding): (1) URGENT workflow mp-remote-avatar-fix (Sonnet 5.5): the friend who joins by code must be visible with a working model on both sides; (2) workflow mp-join-investigate: Trystero picks the same 5 obscure nostr relays for every player (appId-seeded shuffle) and there is no TURN → a GitHub Actions real-internet probe (tools/netprobe) decides the pinned relay list; (3) workflow menu-one-play (Sonnet 5.5): the main menu has ONE PLAY button → SERVERS list (join a listed server, or CREATE SERVER = public by default; options incl. private / password / Quick Shift toggle; join by code stays); HOST GAME / QUICK SHIFT / JOIN GAME entries removed. This reverses the W9 "PLAY private, Public off" decision.
