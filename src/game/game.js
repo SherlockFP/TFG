@@ -113,6 +113,7 @@ import { installFeel } from './feel.js';   // wave 7: game feel (hitstop, class 
 import { installCreatureRead } from './creature_read.js';   // wave 8: creature readability (emissive tell, wind-up / bob / flinch pose layer, Dimmer / Follower / Auditor models)
 import { installScore } from './score.js';   // wave 7: adaptive score
 import { installStudio } from './studio.js';   // wave 8: studio text pass (item tips EN/TR/RU)
+import { installAlgoSlot } from './algoslot.js';   // wave 9: LIVE strip + one react-only Algorithm slot (docs/wave9/algoslot.md)
 import { installHudCalm } from './hudcalm.js';   // wave 8: calm HUD (density setting, contextual widgets, hold-Tab status)
 import { installSfx } from './sfx.js';   // wave 4: creature voices + footsteps + biome beds (docs/wave4/sfx.md)
 
@@ -605,6 +606,7 @@ export class Game extends Emitter {
     this.useModule('score', installScore);   // wave 7: adaptive procedural music + the Algorithm's jingle (docs/wave7/score.md)
     this.useModule('studio', installStudio);   // wave 8: item tips (installed after every module that registers items)
     this.useModule('onegoal', installOneGoal);   // [onegoal] one goal line (+1 warning) for every profile, message pacing for veterans
+    this.useModule('algoslot', installAlgoSlot);   // wave 9: LIVE strip above HP + chat reactions (docs/wave9/algoslot.md)
     this.useModule('hudcalm', installHudCalm);   // wave 8: calm HUD (docs/wave8/declutter.md)
 
 

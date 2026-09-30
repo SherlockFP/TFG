@@ -7,7 +7,7 @@
 //        event 'tfg:algo' so balance / horde / director modules can react. During the day it may "adapt" twice at most:
 //        a director scare matching the focus (game.director.trigger) plus a line. Every intercom line is chosen by the
 //        host (pool + index) and broadcast, so every peer shows the same line in its own language.
-// CLIENT the intercom: glitchy subtitle with a procedural face, typewriter reveal, optional robot voice
+// CLIENT the intercom: ONE react-only subtitle under the compass (wave 9: no face card, hidden while calm), typewriter reveal, optional robot voice
 //        (speechSynthesis, terminal ALGO VOICE ON, off by default), line queue, cinematic-aware.
 import { LINES, FACTIONS, pickLang } from './loredata.js';
 import { isSellable } from './items.js';
@@ -116,19 +116,15 @@ export function drawAlgoFace(ctx, w, h, t, o = {}) {
 // ------------------------------------------------------------------ intercom DOM
 const STYLE_ID = 'tfg-algo-style';
 const CSS = `
-.algo-sub{position:fixed;left:50%;top:120px;transform:translateX(-50%);z-index:15;display:flex;gap:8px;align-items:center;
- max-width:min(560px,70vw);padding:4px 10px 4px 4px;background:linear-gradient(90deg,rgba(12,4,10,.92),rgba(12,4,10,.78));border:1px solid rgba(255,61,127,.55);
- box-shadow:0 0 14px rgba(255,61,127,.22);pointer-events:none;font-family:var(--font,monospace);opacity:0;transition:opacity .15s}
+.algo-sub{position:fixed;left:50%;top:112px;transform:translateX(-50%);z-index:15;max-width:min(560px,70vw);text-align:center;pointer-events:none;
+ font-family:var(--font,monospace);opacity:0;transition:opacity .2s}
 .algo-sub.on{opacity:1}
-.algo-sub::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px);pointer-events:none}
 .algo-sub.glitch{animation:algoJit .18s steps(2) 2}
-@keyframes algoJit{0%{transform:translateX(-50%) skewX(0)}50%{transform:translateX(calc(-50% + 6px)) skewX(-8deg);filter:hue-rotate(60deg)}100%{transform:translateX(-50%)}}
-.algo-face{width:42px;height:32px;image-rendering:pixelated;flex:none;border:1px solid rgba(255,61,127,.35)}
+@keyframes algoJit{0%{transform:translateX(-50%) skewX(0)}50%{transform:translateX(calc(-50% + 4px)) skewX(-6deg)}100%{transform:translateX(-50%)}}
 .algo-body{min-width:0}
-.algo-who{display:flex;gap:10px;align-items:baseline;font-family:var(--font2,monospace);font-size:10px;letter-spacing:2px;color:#ff3d7f;text-shadow:0 0 8px rgba(255,61,127,.6)}
-.algo-live{color:#ff2a2a;animation:algoBlink 1s steps(1) infinite}
-@keyframes algoBlink{50%{opacity:.2}}
-.algo-text{font-size:17px;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;color:#ffe9f2;margin-top:4px;text-shadow:-1px 0 rgba(255,32,80,.7),1px 0 rgba(32,224,255,.7),0 0 10px rgba(255,61,127,.35);min-height:19px}
+.algo-name{display:none;font-family:var(--font2,monospace);font-size:12px;letter-spacing:.14em;margin-bottom:1px}
+.algo-sub.fac .algo-name{display:block}
+.algo-text{font-size:18px;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;color:#ffe9f2;text-shadow:0 1px 3px #000,0 0 8px rgba(0,0,0,.9),-1px 0 rgba(255,32,80,.45),1px 0 rgba(32,224,255,.45);min-height:21px}
 .algo-text i{font-style:normal;color:#ff3d7f;opacity:.8}
 `;
 function ensureStyle() {
@@ -142,7 +138,7 @@ export function installAlgorithm(core) {
   const st = {
     t: 0, lastSay: -99, keyAt: {}, bags: {}, seen: [], seenDay: '', dangerAt: 0,
     // client intercom
-    q: [], cur: null, el: null, face: null, faceCtx: null, speakingT: 0, faceT: 0,
+    q: [], cur: null, el: null, speakingT: 0,
     // host
     tickT: 0, nudgesToday: 0, nextNudgeT: 0, orbitT: 60, lastQuotaIndex: null, spellTimes: [],
     alone: new Map(), cells: new Map(),
@@ -201,9 +197,9 @@ export function installAlgorithm(core) {
     ensureStyle();
     const el = document.createElement('div');
     el.className = 'algo-sub';
-    el.innerHTML = '<canvas class="algo-face" width="64" height="48"></canvas><div class="algo-body"><div class="algo-who"><span class="algo-name">THE ALGORITHM</span><span class="algo-live">● LIVE</span></div><div class="algo-text"></div></div>';
+    el.innerHTML = '<div class="algo-body"><div class="algo-name"></div><div class="algo-text"></div></div>';   // [algoslot] ONE react-only subtitle: no face card, no pink box; the LIVE strip (algoslot.js) carries the identity
     (document.getElementById('ui') || document.body).appendChild(el);
-    st.el = el; st.face = el.querySelector('canvas'); st.faceCtx = st.face.getContext('2d');
+    st.el = el;
     st.nameEl = el.querySelector('.algo-name'); st.textEl = el.querySelector('.algo-text');
   }
   function textOf(d) {
@@ -226,6 +222,7 @@ export function installAlgorithm(core) {
     const day = `${game.run?.runId ?? ''}:${game.run?.day ?? ''}`;
     if (st.seenDay !== day) { st.seenDay = day; st.seen = []; }
     if (!death && OG.nearDup(text, st.seen)) return;   // [trim] the same line (numbers / case aside) once per day
+    if (OG.calmDrop(d, !!game.settings?.chattyAlgo)) return;   // [algoslot] idle chatter is not an event: the slot stays empty while calm
     if (!death) {
       const nowMs = typeof performance !== 'undefined' ? performance.now() : Date.now();
       if (cls === 'danger') { if (!OG.dangerOk(nowMs, st.dangerAt, !!game.settings?.chattyAlgo)) return; st.dangerAt = nowMs; }
@@ -246,8 +243,8 @@ export function installAlgorithm(core) {
     if (!st.el) return;
     const f = n.voice && FACTIONS[n.voice];
     st.cur = { ...n, shown: 0, t: 0, dur: 1.2 + n.text.length * 0.034 + 1.8 };
-    st.nameEl.textContent = f ? `${f.name.toUpperCase()} · ${f.leader.toUpperCase()}` : t('THE ALGORITHM');
-    st.el.style.borderColor = f ? f.color : '';
+    st.nameEl.textContent = f ? `${f.name.toUpperCase()} · ${f.leader.toUpperCase()}` : '';
+    st.el.classList.toggle('fac', !!f);
     st.nameEl.style.color = f ? f.color : '';
     st.el.classList.add('on');
     st.el.classList.remove('glitch'); void st.el.offsetWidth; st.el.classList.add('glitch');
@@ -290,13 +287,6 @@ export function installAlgorithm(core) {
         if (tail) { const i = document.createElement('i'); i.textContent = tail; st.textEl.append(i); }
       }
       if (c.t > c.dur || busy) { st.el.classList.remove('on'); st.cur = null; }
-    }
-    // face (20 fps while visible)
-    st.faceT -= dt;
-    if (st.el && st.faceCtx && (st.cur || st.el.classList.contains('on')) && st.faceT <= 0) {
-      st.faceT = 0.05;
-      const talking = st.cur && st.cur.shown < st.cur.text.length ? 1 : 0.15;
-      drawAlgoFace(st.faceCtx, 64, 48, st.t, { talk: talking, mood: st.cur?.mood || game.run?.algo?.mood, glitch: st.cur?.voice ? 0.5 : 0.25 });
     }
     st.speakingT = st.cur ? st.cur.t : 0;
   }

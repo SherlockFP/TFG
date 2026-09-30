@@ -28,7 +28,6 @@ const DOCK_RULES = {
 const HUD_RULES = [
   { sel: '.hud-tr', f: 1, digits: 1, strip: 1, min: 'hide' },   // strip: the transient "· ◈ clout" tail is not a change (the clout flash itself keeps the block up)
   { sel: '.hud-chips', f: 1, min: 'hide' },
-  { sel: '.hud-quota', f: 1, digits: 1, phases: ['orbit', 'company'] },
   { sel: '.hud-weight', fn: 'weight' },                       // [hud6] only when heavy (> 30 lb)
   { sel: '.tfg-asg', f: 1, digits: 1 },                      // [hud6] the ASSIGNMENT card: on change + on Tab
 ];
@@ -140,6 +139,8 @@ export function installHudCalm(game) {
       [tf('Day {n}', { n: run.day ?? 1 }), escapeHtml(moon)],
       [t('QUOTA'), `▮${run.sold || 0} / ▮${run.quota || 0}`],
       [t('Days left'), String(run.daysLeft ?? '')],
+      [t('CREDITS'), `▮${run.credits ?? 0}`],   // [algoslot] CREDITS / ROUTE left the top bar
+      ...(run.phase === 'orbit' && moon ? [[t('ROUTE'), escapeHtml(moon)]] : []),
       [t('Clock'), txt('.clock-time')],
       [`${txt('.lvl')} ${txt('.rank')}`, walletRowOf(game)],   // [hud6] the Tab card is where Clout lives
       [t('Weight'), txt('.hud-weight')],

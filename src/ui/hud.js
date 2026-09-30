@@ -555,16 +555,8 @@ export class HUD {
     this.$.rank.textContent = rankOf(prof.level) + (prof.skillPoints ? ` (+${prof.skillPoints})` : '');
     this.$.xp.style.width = (prof.xp / xpForLevel(prof.level) * 100) + '%';
     if (!this.coinsInit || (run.credits ?? 0) !== this.creditsVal) { this.coinsInit = true; this.creditsVal = run.credits ?? 0; this.setCoins(prof.coins); }
-    // quota banner (in ship)
-    const showQ = p.inShip && !p.dead && run.phase !== 'landing';
-    this.$.quota.classList.toggle('hidden', !showQ);
-    if (showQ) {
-      const moon = MOONS[run.moon];
-      let s = `${t('QUOTA')} ▮${run.sold ?? 0}/${run.quota ?? 0} · ${run.daysLeft ?? 3} ${t('DAYS LEFT')} · ${t('CREDITS')} ▮${run.credits ?? 0}`;
-      if (run.phase === 'orbit') s += ` · ${t('ROUTE')}: ${moon?.name || '-'}`;
-      if (run.phase === 'company') s += ` · ${t('BUYING AT')} ${Math.round((run.buyRate || 0) * 100)}%`;
-      if (this.$.quota.textContent !== s) this.$.quota.textContent = s;
-    }
+    // [algoslot] QUOTA / CREDITS / ROUTE left the top bar: they live on the hold-Tab card (hudcalm.js) and the terminal header (terminal.js). The LIVE strip (algoslot.js) sits above HP.
+    if (!this.quotaOff) { this.quotaOff = true; this.$.quota.classList.add('hidden'); }
     // right column stack (cheap: a few rect reads, 8x a second)
     this.stackT = (this.stackT || 0) - dt;
     if (this.stackT <= 0) { this.stackT = 0.12; this.layoutRight(); }

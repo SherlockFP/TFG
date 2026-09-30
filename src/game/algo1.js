@@ -12,7 +12,7 @@ import { t, tf } from '../core/i18n.js';
 import { CREATURES, spawnTable } from './creatures.js';
 import { MOONS } from './moons.js';
 import * as K from './algo1_core.js';
-import { fmtLive } from './onegoal_core.js';
+import { liveText } from './onegoal_core.js';
 import './algo1_i18n.js';
 
 const CSS = `.a1-vote{position:fixed;left:50%;top:clamp(56px,9vh,110px);transform:translateX(-50%);z-index:60;width:min(780px,94vw);background:#12130d;border:2px solid #f2c230;color:#e8e6d0;font:600 13px/1.3 'Bahnschrift','Arial Narrow',Arial,sans-serif;letter-spacing:.03em;box-shadow:0 6px 30px #000c;user-select:none}
@@ -93,7 +93,7 @@ export function installAlgo1(game) {
   }
   function paintViewers() {
     if (typeof document === 'undefined') return;
-    const txt = '● LIVE  ' + fmtLive(S.viewers.n);
+    const txt = liveText(S.viewers.n);   // [algoslot] the ONE number, painted into the LIVE strip (algoslot.js)
     for (const el of document.querySelectorAll('.algo-live')) if (el.textContent !== txt) el.textContent = txt;
   }
 

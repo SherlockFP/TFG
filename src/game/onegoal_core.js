@@ -150,3 +150,21 @@ export function prune(q, now, tags) { return (q || []).filter((x) => !(x.exp > 0
 // ------------------------------------------------------------------------------------------ one viewer count (algo1 owns it; overlay / tag read it)
 /** 1470 -> "1,470" (no locale surprises); 10k+ -> "12K" */
 export const fmtLive = (n) => { n = Math.max(0, Math.round(n || 0)); return n >= 10000 ? Math.round(n / 1000) + 'K' : String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); };
+
+// ------------------------------------------------------------------------------------------ ONE Algorithm slot + LIVE strip (wave 9, docs/wave9/algoslot.md)
+/** pool keys that are idle chatter, not a reaction to something that happened: dropped by the slot unless Settings > Chatty Algorithm is on */
+export const CALM_KEYS = Object.freeze(['orbit_idle']);
+export const calmDrop = (d, chatty = false) => !chatty && !!d && CALM_KEYS.includes(d.key);
+/** the LIVE strip text: the ONE viewer number (algo1) in the ONE format */
+export const liveText = (n) => '\u25CF LIVE ' + fmtLive(n);
+/** "+300" pop next to the strip (only for a positive jump caused by an event) */
+export const liveDeltaText = (d) => (d > 0 ? '+' + fmtLive(d) : '');
+/** occasional one-line chat reaction: min gap between two (s) and the events that may trigger one */
+export const REACT_GAP = 40;
+export const REACT_KINDS = Object.freeze({ onair: 'tagged', death: 'downed', escape: 'escape', boss_hit: 'boss', dodge: 'dodge', closet: 'closet' });
+/** kind = tfg:viewers reason, since = seconds since the last reaction (or Infinity), r01 = random 0..1. Returns a pool key or null */
+export function reactKey(kind, since, r01) {
+  const k = REACT_KINDS[kind];
+  if (!k || !(since >= REACT_GAP) || r01 > 0.6) return null;
+  return k;
+}
