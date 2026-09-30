@@ -14,6 +14,7 @@ import * as D from './dsp.js';
 import { installW8 } from './sfxlib_w8.js';   // [sound2] wave-8 sounds (recipes live in sfxlib_w8.js)
 import { installL10 } from './sfxlib_l10.js';   // [labyr10] wave-10 mall / funhouse ambience + one-shots
 import { installL11 } from './sfxlib_l11.js';   // [loop11] wave-11 re-onboarding corridor sounds
+import { installS11 } from './sfxlib_s11.js';   // [shift11] wave-11 recycle bin sounds
 
 const TAU = D.TAU;
 const DEFS = Object.create(null);
@@ -2561,3 +2562,4 @@ danceLoop('dance_metal', 150, { kick: 'X . X . X . X . X . X . X . X X', clap: '
 installW8(def, { nburst, thud, metal, click, hiss, creak, bubble, beep, vox, norm }, (c) => { CAT = c; });   // [sound2]
 installL10(def, {}, (c) => { CAT = c; });   // [labyr10]
 installL11(def, {}, (c) => { CAT = c; });   // [loop11]
+installS11(def, {}, (c) => { CAT = c; });   // [shift11]

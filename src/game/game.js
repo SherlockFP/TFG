@@ -233,7 +233,8 @@ import { installSwarm11 } from './swarm11.js';
 // [import:creatures11]
 import { installLoop11 } from './loop11.js';
 // [import:swarm11]
-// [import:shift11]
+import { installShift11 } from './shift11.js';
+// [import:loop11]
 // [import:events11]
 // [import:gear11]
 import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
@@ -630,7 +631,8 @@ export class Game extends Emitter {
     // [slot:creatures11]
     this.useModule('loop11', installLoop11);
     // [slot:swarm11]
-    // [slot:shift11]
+    this.useModule('shift11', installShift11);
+    // [slot:loop11]
     // [slot:events11]
     // [slot:gear11]
 
