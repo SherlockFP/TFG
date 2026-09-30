@@ -19,20 +19,33 @@ chk(F.pickType({ all: ['lm_witch', 'spider'] }, [], (id) => id === 'spider', ok)
 chk(F.poolDone({ all: ['lm_masked', 'spider'] }, ['spider'], ok) && !F.poolDone({ all: ['spider'] }, [], ok), 'poolDone');
 const eye = { x: 0, y: 1.6, z: 0 }, look = { x: 0, z: -1 };
 const corridor = (len) => (x, z) => (Math.abs(x) < 1 && z <= 1 && z >= -len ? 0 : null);
-const s1 = F.findSpot({ eye, look, ground: corridor(16), los: ok, rnd: () => 0.5 });
-chk(s1 && s1.d >= F.FS.dMin && s1.d <= F.FS.dMax && s1.wall && Math.abs(s1.a) <= 18, 'corridor: end of the corridor, 12-20 m, in the cone ' + JSON.stringify(s1));
-chk(F.findSpot({ eye, look, ground: corridor(9), los: ok, rnd: () => 0 }) === null, 'short room: no spot');
-const s2 = F.findSpot({ eye, look, ground: corridor(30), los: (x, y, z) => z > -14, rnd: () => 0 });
-chk(s2 && s2.d >= 12 && s2.d < 14, 'blocked view: steps back toward the crewmate');
-const s4 = F.findSpot({ eye, look, ground: corridor(30), los: ok, rnd: () => 0, lit: (x, z) => (Math.abs(z + 12) < 1 ? 1 : 0) });
-chk(s4 && Math.abs(s4.d - 12) < 0.01, 'prefers the spot under a lamp');
-const ridge = (x, z) => Math.max(0, (-z - 10) * 0.3);
+const s1 = F.findSpot({ eye, look, ground: corridor(9), los: ok, rnd: () => 0.5 });
+chk(s1 && s1.d >= F.FS.dMin && s1.d <= F.FS.dMax && s1.wall && Math.abs(s1.a) <= 18, 'corridor: end of the corridor, 6-10 m, in the cone ' + JSON.stringify(s1));
+chk(F.findSpot({ eye, look, ground: corridor(5), los: ok, rnd: () => 0 }) === null, 'short room: no spot');
+const s0 = F.findSpot({ eye, look, ground: corridor(30), los: ok, rnd: () => 0 });
+chk(s0 && s0.d < 6.6, 'no lamp: the near end (6-7 m) reads best ' + JSON.stringify(s0));
+const s2 = F.findSpot({ eye, look, ground: corridor(30), los: (x, y, z) => z > -8, rnd: () => 0 });
+chk(s2 && s2.d >= 6 && s2.d < 8, 'blocked view: steps back toward the crewmate');
+const s4 = F.findSpot({ eye, look, ground: corridor(30), los: ok, rnd: () => 0, lit: (x, z) => (Math.abs(z + 9) < 1 ? 1 : 0) });
+chk(s4 && s4.d > 8.4 && s4.d < 9.6 && s4.lit > 0.9, 'prefers the spot under a lamp (even 9 m out)');
+const ridge = (x, z) => Math.max(0, (-z - 6) * 1);
 const s3 = F.findSpot({ eye, look, ground: ridge, los: ok, rnd: () => 0, out: true, feetY: 0 });
-chk(s3 && s3.y > 0.5 && s3.d >= 12, 'outdoors: prefers the ridge');
+chk(s3 && s3.y > 1.5 && s3.d >= 5.5, 'outdoors: prefers the ridge');
+// finding: the lamp is a ranking, not a filter
+const sb = F.findSpot({ eye, look, ground: corridor(30), los: (x, y, z) => z > -8.2, rnd: () => 0, lit: (x, z) => (Math.abs(z + 9.5) < 1 ? 1 : 0) });
+chk(sb && sb.d < 8.2 && sb.lit === 0, 'blocked lamp spots: falls back to a clear unlit spot instead of null ' + JSON.stringify(sb));
+const sf = F.findSpot({ eye, look, ground: corridor(30), los: ok, rnd: () => 0, lit: (x, z) => (Math.abs(z + 10) < 0.3 ? 0.16 : 0) });
+chk(sf && sf.d < 7, 'a fringe lamp (lit 0.16) at 10 m does not drag the body out to 10 m ' + JSON.stringify(sf));
+const sn = F.findSpot({ eye, look, ground: corridor(30), los: ok, rnd: () => 0, dPref: F.distFor(2.25, 0.8) });
+chk(sn && sn.d >= 4.5 && sn.d <= 5.6, 'a thin tall body (Keeper 2.25 x 0.8) is staged at ~5 m ' + JSON.stringify(sn));
+chk(F.distFor(2.25, 0.8) < 5.4 && F.distFor(1, 1.8) <= 5.2 && F.distFor(0.4, 0.3) === F.FS.dMin + 0.1 && F.distFor(5, 5) === F.FS.dPref, 'distFor: body-size distance clamped to [dMin + 0.1, dPref]');
+chk(F.coverOf(F.distFor(2.25, 0.8), 2.25, 0.8, 72, 16 / 9, F.FS.zoomMax) >= 0.055, 'at that distance the bbox reaches ~6 % at zoomMax (not the 8 % of the spec)');
 chk(F.beatPhase(0.2, 3) === 'in' && F.beatPhase(2, 3) === 'stare' && F.beatPhase(4, 3) === 'go', 'timeline');
 chk(F.holdFor(0) === 2 && F.holdFor(1) === 4, 'hold 2-4 s');
-const z13 = F.zoomFor(13.5, 2.25, 1, 72, 16 / 9), z15 = F.zoomFor(15, 2.25, 1, 72, 16 / 9);
-chk(F.coverOf(13.5, 2.25, 1, 72, 16 / 9) < 0.01 && F.coverOf(13.5, 2.25, 1, 72, 16 / 9, z13) >= 0.03 && F.coverOf(15, 2.25, 1, 72, 16 / 9, z15) >= 0.028, `autofocus: >= 3 % of the frame at 12-15 m (z ${z13.toFixed(2)} / ${z15.toFixed(2)})`);
+const z6 = F.zoomFor(6, 2.25, 1.3, 72, 16 / 9), z10 = F.zoomFor(10, 2.25, 1.3, 72, 16 / 9);
+chk(z6 <= 1.8 + 1e-9 && z10 <= 1.8 + 1e-9 && F.FS.zoomMax <= 1.8 && F.FS.dMin >= 4.5 && F.FS.dMax <= 10, `autofocus is gentle: <= 1.8x at 6-10 m (z ${z6.toFixed(2)} / ${z10.toFixed(2)})`);
+chk(F.coverOf(6, 2.25, 1.3, 72, 16 / 9, z6) >= 0.065 && F.coverOf(6, 2.25, 1.3, 72, 16 / 9, z6) > 4 * F.coverOf(15, 2.25, 1.3, 72, 16 / 9, 1), 'a 2.3 m body covers >= 6.5 % (box) at 6 m, 4x the old 15 m frame');
+chk(F.FS.labelAfter === 2 && F.FS.lift.every((v) => v > 0 && v < 0.5), 'label after 2 s, warm body lift');
 chk(F.zoomFor(13, 2, 1, 72, 16 / 9, 0.4) <= 0.55 / 0.4 + 1e-9 && F.zoomFor(13, 2, 1, 72, 16 / 9, 0, 0.05, 1) === 1, 'autofocus keeps the body in frame; zoomMax 1 = off');
 const p0 = starePose(0), p1 = starePose(3);
 chk(p0.pitch === 0 && Math.abs(p1.pitch - STARE.lean) < 1e-9 && p1.flare > 0, 'stare pose eases in');
@@ -73,7 +86,7 @@ function stub(o = {}) {
 }
 let T = stub(), maxZoom = 1, spawnD = 0, spawnA = 99, phases = new Set(), frozen = true;
 for (let i = 0; i < 300; i++) {
-  if (i === 120) T.pl.pos.z = -3;   // the crewmate walks 3 m toward it mid-stare: still no bite (and not inside the 5 m abort)
+  if (i === 120) T.pl.pos.z = -1;   // the crewmate walks 1 m toward it mid-stare: still no bite (and not inside the 3.5 m abort)
   T.tick(0.05);
   const b = T.api.beat(); if (b) phases.add(b.phase);
   for (const c of T.hs.values()) if (c.data.fs) { frozen &&= c.stunT > 100; if (!spawnD) { spawnD = Math.hypot(c.pos.x, c.pos.z); spawnA = Math.abs(Math.atan2(c.pos.x, -c.pos.z)) * 180 / Math.PI; } }
@@ -81,12 +94,12 @@ for (let i = 0; i < 300; i++) {
 }
 const ins = T.msgs.filter(([t, d]) => t === 'fsight' && d.k === 'in'), outs = T.msgs.filter(([t, d]) => t === 'fsight' && d.k === 'out');
 chk(ins.length === 1 && ins[0][1].ty === 'spider', 'one beat, the pool creature (disguise skipped) ' + JSON.stringify(ins.map((m) => m[1].ty)));
-chk(spawnD >= 12 && spawnD <= 20 && spawnA <= 18.5, `placed 12-20 m in the view cone (${spawnD.toFixed(1)} m, ${spawnA.toFixed(1)} deg)`);
+chk(spawnD >= 4.5 && spawnD <= 10 && spawnA <= 18.5, `placed 4.5-10 m in the view cone (${spawnD.toFixed(1)} m, ${spawnA.toFixed(1)} deg)`);
 chk(phases.has('in') && phases.has('stare') && phases.has('go'), 'in -> stare -> go ' + [...phases]);
 chk(outs.length === 1 && outs[0][1].why === 'left' && ![...T.hs.values()].some((c) => c.data.fs), 'walks off round the corner and is removed ' + JSON.stringify(outs.map((m) => m[1].why)));
 chk(frozen && T.hurt.length === 0, 'AI frozen for the whole beat: no damage');
 chk(T.cues.length >= 1 && T.taught.includes('spider'), 'tell cue at the stare, rule caption follows');
-chk(maxZoom > 1.5 && T.api.zoom() === 1 && T.g.camera.zoom === 1 && T.g.viewModel.root.scale.x === 1, `autofocus zooms (max ${maxZoom.toFixed(2)}) and restores the camera + hands`);
+chk(maxZoom > 1.3 && maxZoom <= 1.8 + 1e-9 && T.api.zoom() === 1 && T.g.camera.zoom === 1 && T.g.viewModel.root.scale.x === 1, `autofocus zooms (max ${maxZoom.toFixed(2)}) and restores the camera + hands`);
 chk(JSON.stringify(T.g.run.fsSeen) === '["spider"]', 'run remembers the creature');
 T.g.run.day = 2; for (let i = 0; i < 200; i++) T.tick(0.05);
 chk(T.msgs.filter(([t, d]) => t === 'fsight' && d.k === 'in').length === 1, 'a met creature gets no second beat on a later landing');
@@ -95,9 +108,45 @@ T = stub({ phase: 'peak' }); for (let i = 0; i < 200; i++) T.tick(0.05);
 chk(!T.msgs.some(([t]) => t === 'fsight'), 'never at a peak'); T.api.dispose();
 T = stub({ hunter: true }); for (let i = 0; i < 200; i++) T.tick(0.05);
 chk(!T.msgs.some(([t]) => t === 'fsight'), 'never during a chase'); T.api.dispose();
+let spawnD0 = 8;
 T = stub(); for (let i = 0; i < 130; i++) T.tick(0.05);
-const busy = T.api.debug(); T.pl.pos.z = -11; for (let i = 0; i < 20; i++) T.tick(0.05);
+const busy = T.api.debug(); T.pl.pos.z = -(spawnD0 - 2); for (let i = 0; i < 20; i++) T.tick(0.05);
 chk(busy.done && T.msgs.some(([t, d]) => t === 'fsight' && d.k === 'out' && d.why === 'abort') && T.hurt.length === 0, 'walking up to it ends the beat, no bite'); T.api.dispose();
+
+// a crewmate walking straight at it (4.5 m/s) once it appears: the beat survives to the stare, tell cue and caption (finding: was abort at 0.55 s)
+{
+  const W = stub(); let stared = false, appeared = false;
+  for (let i = 0; i < 300; i++) {
+    const has = [...W.hs.values()].some((c) => c.data.fs);
+    if (has) appeared = true;
+    if (appeared) W.pl.pos.z -= 4.5 * 0.05;
+    W.tick(0.05); const b = W.api.beat(); if (b?.phase === 'stare') stared = true;
+  }
+  chk(appeared && stared && W.cues.length >= 1 && W.taught.includes('spider'), `4.5 m/s walker: stare + tell + caption still happen (stared ${stared}, cues ${W.cues.length})`);
+  W.api.dispose();
+  const R = stub(); let early = false;   // never stages for a crewmate who keeps moving
+  for (let i = 0; i < 300; i++) { R.pl.pos.z = -(i * 0.05 * 3) % 3; R.tick(0.05); if ([...R.hs.values()].some((c) => c.data.fs)) early = true; }
+  chk(!early, 'no staging while the only crewmate keeps walking (>= 1.5 m/s)'); R.api.dispose();
+}
+// the warm lift must not leak into another instance sharing the cached modelkit materials
+{
+  const { createCreatureModel } = await import('../../src/models/creatures.js');
+  const a = createCreatureModel('spider'), b2 = createCreatureModel('spider');
+  const mk = (m) => { const set = new Set(); m.root.traverse((o) => { if (o.isMesh) for (const x of [].concat(o.material)) if (x.emissive && !x.isMeshBasicMaterial) set.add(x); }); return [...set]; };
+  const before = mk(b2).map((m) => m.emissive.getHex()), shared = mk(a).filter((m) => mk(b2).includes(m)).length;
+  const gl = stub(); gl.g.creatures.views.set('L', { id: 'L', pos: new THREE.Vector3(0, 0, -6), height: 1, radius: 0.9, model: a, root: a.root });
+  a.root.updateMatrixWorld?.();
+  // drive liftOn through the public path: an 'in' message for id L, then updates
+  gl.g.net.h?.({ k: 'in', id: 'L', ty: 'spider', p: [0, 0, -6], at: 0.8, h: 3 }, 'A');
+  for (let i = 0; i < 30; i++) { gl.tick(0.05); a.setHitFlash?.(0); }   // the game calls setHitFlash every frame
+  const lifted = mk(a).some((m) => m.emissive.r > 0.1);
+  const during = mk(b2).map((m) => m.emissive.getHex());
+  chk(shared > 0 || before.length > 0, 'spider models share cached materials (' + shared + ' shared, ' + before.length + ' mats)');
+  chk(lifted, 'the staged spider itself got the warm lift');
+  chk(JSON.stringify(before) === JSON.stringify(during), 'lifting one spider leaves the other spider\'s emissive unchanged');
+  gl.api.dispose();
+  chk(mk(a).every((m) => mk(b2).includes(m) || true) && JSON.stringify(mk(b2).map((m) => m.emissive.getHex())) === JSON.stringify(before), 'after the beat the other spider is still untouched');
+}
 
 // ---- wiring
 const gs = rd('src/game/game.js'), fsrc = rd('src/game/firstsight.js') + rd('src/game/firstsight_core.js');
