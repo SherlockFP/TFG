@@ -21,6 +21,7 @@ import {
 } from './siege_core.js';
 import { installDeployables, SIEGE_BLUEPRINTS, DEPS } from './deployables.js';
 import { createSiegeHud } from '../ui/siegehud.js';
+import { wavesAllowed } from './crdirector_core.js';   // [onegoal]
 
 // ---------------------------------------------------------------------------------------------- creatures (registered on every peer)
 for (const [id, s] of Object.entries(SG)) {
@@ -259,6 +260,7 @@ export function installSiege(game) {
     if (run.phase !== 'moon' || MOONS[run.moon]?.company || !game.world?.terrain) return false;
     if (force) return true;
     if ((run.quotaIndex || 0) < TUNE.minQuotaIndex) return false;
+    if (!wavesAllowed(run.quotaIndex)) return false;   // [onegoal] no siege before quota 3 is met (every profile)
     if (run.siegeDay === run.day) return false;
     if (!game.aiPlayers().some((p) => !p.dead)) return false;
     return true;
@@ -519,7 +521,7 @@ export function installSiege(game) {
     const qi = run.quotaIndex || 0, time = run.time || 0;
     const threat = Number(game.balance?.threat?.() ?? run.threat ?? 0) || 0;
     const late = time >= TUNE.nightFrom;
-    const blocked = qi < TUNE.minQuotaIndex ? 'not before quota 2' : run.siegeDay === run.day ? 'already had one today' : null;
+    const blocked = qi < TUNE.minQuotaIndex ? 'not before quota 2' : !wavesAllowed(qi) ? 'not before quota 3 is met' : run.siegeDay === run.day ? 'already had one today' : null;
     let risk = 'LOW';
     if (!blocked) {
       if (run.daysLeft === 1) risk = 'HIGH (BREACH NIGHT: last quota day, from 18:00)';

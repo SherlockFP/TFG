@@ -318,7 +318,7 @@ export function installCrdirector(game) {
   function onMsg(m, from) {
     if (disposed || !m || typeof m.k !== 'string') return;
     if (from !== game.selfId && from !== game.net?.hostId) return;   // host-authoritative: ignore anybody else
-    if (m.k === 'ph') onPhaseCue(m.p, m.n | 0);
+    if (m.k === 'ph') { S.cph = m.p; onPhaseCue(m.p, m.n | 0); }   // [onegoal] S.cph: the phase as clients know it (Algorithm quiet at a peak)
     else if (m.k === 'tr') onTrack(m);
     else if (m.k === 'dim') { if (m.to === game.selfId) onDim(+m.ms || 6000); }
     else if (m.k === 'seize') { if (m.to === game.selfId) onSeize(); }
@@ -526,7 +526,7 @@ export function installCrdirector(game) {
       if (host()) { try { hostUpdate(dt); } catch (e) { console.warn('[crdirector] host', e); S.bypass = false; } }
       clientUpdate(dt);
     }));
-    offs.push(mods.on('phase', (ph, g) => { if (g === game && ph !== 'moon') { S.st = null; S.q.length = 0; S.told.clear(); S.phCaps = 0; restoreLights(); } }));
+    offs.push(mods.on('phase', (ph, g) => { if (g === game && ph !== 'moon') { S.st = null; S.cph = null; S.q.length = 0; S.told.clear(); S.phCaps = 0; restoreLights(); } }));
   }
   if (game.net) bindNet(game.net);
   installWrappers();
@@ -544,6 +544,10 @@ export function installCrdirector(game) {
     /** siege.js: wave power / count ceilings for the current quota */
     siegeCaps() { return enabled() && S.st ? K.siegeCaps(run().quotaIndex | 0) : null; },
     phase() { return S.st?.phase || null; },
+    /** [onegoal] a director peak is on (host: own state, clients: the last 'ph' cue) - the Algorithm stays quiet */
+    peakNow() { return enabled() && game.run?.phase === 'moon' && (S.st?.phase || S.cph) === 'peak'; },
+    /** [onegoal] may swarm / horde waves and sieges start? (only after quota 3 is met) */
+    wavesOk() { return K.wavesAllowed(run()?.quotaIndex | 0); },
     /** feedcams (host, 10 Hz): current ON AIR heat 0-100; the director remembers the highest value since the last peak */
     onFeedHeat(h) { if (!S.st) return; S.fhNow = +h || 0; S.fh = Math.max(S.fh ?? 0, S.fhNow); },
     debug() { return { phase: S.st?.phase, t: S.st ? Math.round(S.st.t) : 0, len: S.st ? Math.round(S.st.len) : 0, cycle: S.st?.cycle, queue: S.q.map((e) => e.type || e.zone), stats: { ...S.stats }, cues: S.cues }; },

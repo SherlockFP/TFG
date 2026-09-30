@@ -72,7 +72,7 @@ await sim(0.5);
   await sim(0.3);
   cull();
   const f0 = performance.now(); for (let i = 0; i < 8; i++) kefal.tick(1, 1 / 30, true); const base = (performance.now() - f0) / 8;
-  const started = H.startWaves('night', 'out');
+  const started = H.startWaves('night', 'out', true);
   let peak = 0, maxIdx = 0;
   const waves = [];
   const offWave = g.mods.on('fx', (d) => { if (d?.k === 'hwave') waves.push(d.s + (d.i ? d.i : '')); });

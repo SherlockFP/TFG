@@ -86,7 +86,8 @@ export function installContracts(core) {
     const q = run.quotaIndex | 0;
     const f = FACTIONS[fid];
     const step = chainStep !== null ? CHAINS[fid].steps[chainStep] : null;
-    const type = step?.type || rng.pick(f.types);
+    let type = step?.type || rng.pick(f.types);
+    if (type === 'cleanup' && !step && q < 3) type = rng.pick(f.types.filter((x) => x !== 'cleanup')) || 'salvage';   // [onegoal] no kill-count contract before quota 3 (it contradicts "stay unseen")
     const c = { id: '', faction: fid, type, n: 1, chain: chainStep, rival: f.rival };
     let tkey = type;
     if (type === 'salvage') {
@@ -135,7 +136,7 @@ export function installContracts(core) {
     // one chain step per day: the best-standing faction on the board whose next step is unlocked
     const ch = chapterOf(run.quotaIndex).n;
     const chainF = [...new Set(chosen)].sort((a, b) => (run.signed?.f === b) - (run.signed?.f === a) || rep(b) - rep(a))
-      .find((id) => { const s = run.chains?.[id] | 0; return s < 5 && rep(id) >= CHAIN_REQ[s].rep && ch >= CHAIN_REQ[s].ch; });
+      .find((id) => { const s = run.chains?.[id] | 0; return s < 5 && rep(id) >= CHAIN_REQ[s].rep && ch >= CHAIN_REQ[s].ch && !(CHAINS[id]?.steps?.[s]?.type === 'cleanup' && (run.quotaIndex | 0) < 3); });   // [onegoal] a kill-count chain step waits for quota 3
     let chainUsed = false;
     const offers = chosen.map((fid) => {
       const useChain = !chainUsed && fid === chainF;

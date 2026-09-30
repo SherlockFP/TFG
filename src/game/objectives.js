@@ -45,7 +45,7 @@ export class Objectives {
             const d = Math.hypot(s.x - p.pos.x, s.z - p.pos.z);
             return !best || d < best.d ? { s, d } : best;
           }, null);
-          if (nearest && nearest.d > 5) add(tf('Nearby lead: {name} ({d} m) - check it for supplies', { name: nearest.s.name, d: Math.round(nearest.d) }), 'sub');
+          if (nearest && nearest.d > 5) add(tf('Nearby lead: {name} ({d} m) - check it for supplies', { name: nearest.s.name, d: Math.round(nearest.d) }), 'sub').cat = 'other';   // [onegoal] detours never take the goal slot
         }
         const time = run.time || 480;
         if (time > 23 * 60) add(t('THE SHIP LEAVES AT MIDNIGHT - RUN BACK NOW'), 'warn');
@@ -54,12 +54,12 @@ export class Objectives {
         const today = g.hostData?.dayStats?.collected ?? this.clientCollected();
         add(tf('Bring scrap to the ship: ▮{a} / ▮{b} today', { a: today, b: target }), 'main', today >= target && target > 0, target ? Math.min(1, today / target) : 1);
         const carrying = p.slots.filter((id) => id && isSellable(g.items.get(id)?.def || {})).length;
-        if (carrying && !p.inShip) add(tf(carrying > 1 ? 'Carrying {n} items - get them to the ship' : 'Carrying {n} item - get it to the ship', { n: carrying }), 'sub');
+        if (carrying && !p.inShip) add(tf(carrying > 1 ? 'Carrying {n} items - get them to the ship' : 'Carrying {n} item - get it to the ship', { n: carrying }), 'sub').lead = true;   // [onegoal] loot in hand = the goal
         if (!p.indoor && g.world.outdoor) {
           const e = g.world.outdoor.mainExit.pos;
           const d = Math.round(Math.hypot(e.x - p.pos.x, e.z - p.pos.z));
           if (!this.enteredToday) { const ent = add(tf('Find the facility entrance ({d} m)', { d }), 'sub'); if (ent && typeof ent === 'object') ent.first = true; }   // [firstrun] 'first' = the one goal shown while budgeted
-          else if (!p.inShip) add(tf('Ship: {d} m', { d: Math.round(Math.hypot(p.pos.x, p.pos.z)) }), 'sub');
+          else if (!p.inShip) add(tf('Ship: {d} m', { d: Math.round(Math.hypot(p.pos.x, p.pos.z)) }), 'sub').cat = 'other';
         }
         if (p.indoor) {
           this.enteredToday = true;
@@ -72,18 +72,18 @@ export class Objectives {
             if (deep.length) {
               const s = deep.reduce((a, b) => Math.hypot(a.x - p.pos.x, a.z - p.pos.z) < Math.hypot(b.x - p.pos.x, b.z - p.pos.z) ? a : b);
               const d = Math.round(Math.hypot(s.x - p.pos.x, s.z - p.pos.z));
-              if (d > 5) add(tf('Deep haul: high-value room nearby ({d} m)', { d }), 'sub');
+              if (d > 5) add(tf('Deep haul: high-value room nearby ({d} m)', { d }), 'sub').cat = 'other';
             }
             const vault = (fac.vaultSpots || []).find((s) => !s.opened);
             if (vault) {
               const d = Math.round(Math.hypot(vault.x - p.pos.x, vault.z - p.pos.z));
-              if (d > 5 && d < 90) add(tf('Vault route: secured loot {d} m away', { d }), 'sub');
+              if (d > 5 && d < 90) add(tf('Vault route: secured loot {d} m away', { d }), 'sub').cat = 'other';
             }
           }
         }
         for (const it of g.items.all()) {
           if (it.type !== 'body') continue;
-          if (it.holder === g.selfId) { if (!insideShip(p.pos)) { add(tf("Carry {name}'s body to the ship (smaller fine)", { name: it.label || t('a crewmate') }), 'sub'); break; } }
+          if (it.holder === g.selfId) { if (!insideShip(p.pos)) { add(tf("Carry {name}'s body to the ship (smaller fine)", { name: it.label || t('a crewmate') }), 'sub').lead = true; break; } }
           else if (it.state === 'world' && !insideShip(it.obj.position)) { add(tf("Recover {name}'s body (smaller fine)", { name: it.label || t('a crewmate') }), 'sub'); break; }
         }
         break;
@@ -91,7 +91,7 @@ export class Objectives {
       case 'takeoff': add(t('Taking off...'), 'hint'); break;
       case 'company': {
         if (shipValue > 0) add(tf('Put scrap on the COUNTER, ring the BELL (▮{v} on board)', { v: shipValue }), 'main');
-        add(tf('Quota: ▮{a} / ▮{b} · buying at {r}%', { a: run.sold || 0, b: run.quota || 0, r: Math.round((run.buyRate || 0) * 100) }), 'sub', (run.sold || 0) >= (run.quota || 0));
+        add(tf('Quota: ▮{a} / ▮{b} · buying at {r}%', { a: run.sold || 0, b: run.quota || 0, r: Math.round((run.buyRate || 0) * 100) }), 'sub', (run.sold || 0) >= (run.quota || 0)).cat = 'other';
         add(tf('Spend your ◈{c} clout at Phish Dayı', { c: g.profile.coins }), 'hint');
         break;
       }
@@ -100,10 +100,12 @@ export class Objectives {
     }
     if (run.phase !== 'moon') this.enteredToday = false;
     else if (moon?.expedition) { try { g.expeditions?.filterLines?.(out); } catch (e) { console.warn('expeditions filter', e); } }   // [expeditions] no facility lines on the special moons
-    try { g.mods?.emit('objectives', add, g, run.phase); } catch (e) { console.warn('objectives hook', e); }   // wave-1 modules add lines here
-    for (const b of (g.profile.bounties || []).slice(0, out.length >= 6 ? 0 : 2)) add(`${b.done ? '✔ ' : ''}${bountyText(b)} ${b.done ? t('(claim at HQ)') : `${Math.min(b.progress, b.n)}/${b.n}`}`, 'bounty', b.done, b.n ? Math.min(1, b.progress / b.n) : 0);
+    for (const o of out) o.src = o.src || 'core';   // [onegoal] every line knows its source (module lines are tagged in onegoal.emit)
+    try { if (g.onegoal?.emit) g.onegoal.emit(add, g, run.phase); else g.mods?.emit('objectives', add, g, run.phase); } catch (e) { console.warn('objectives hook', e); }   // wave-1 modules add lines here
+    for (const b of (g.profile.bounties || []).slice(0, out.length >= 6 ? 0 : 2)) add(`${b.done ? '✔ ' : ''}${bountyText(b)} ${b.done ? t('(claim at HQ)') : `${Math.min(b.progress, b.n)}/${b.n}`}`, 'bounty', b.done, b.n ? Math.min(1, b.progress / b.n) : 0).src = 'bounty';
     // keep the tracker readable: warnings and main goals first, at most 7 lines
     const rank = (o) => (o.pin ? -1 : o.kind === 'warn' ? 0 : o.kind === 'main' ? 1 : o.kind === 'bounty' ? 3 : 2);   // pin: the tutorial step always makes the calm 2-line cut
+    if (g.onegoal?.sortAll) return g.onegoal.sortAll(out).slice(0, 10);   // [onegoal] the whole list in priority order (Tab card); update() shows ONE goal (+1 warning)
     const one = g.onboard?.fr?.only;   // [firstrun] a budgeted new player sees ONE goal (+ a warning), never the whole tracker
     if (one) { const kept = one(out); if (kept !== out) return kept; }
     return out.map((o, i) => [o, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).slice(0, 7).map((x) => x[0]);
@@ -123,7 +125,8 @@ export class Objectives {
     const all = this.compute();
     this.full = all;   // [hudcalm] the Tab status card shows every line; the HUD keeps 1 (Minimal) / 2 (Standard) / 7 (Full)
     const dens = document.documentElement.dataset.hud;
-    const list = dens === 'full' ? all : all.slice(0, dens === 'minimal' ? 1 : 2);
+    const og = this.game.onegoal;   // [onegoal] Standard = ONE goal (+1 warning) for every profile; a budgeted new player gets it even in Full
+    const list = og?.shown ? og.shown(all, dens === 'full' && this.game.onboard?.fr?.active?.() ? 'standard' : dens) : dens === 'full' ? all : all.slice(0, dens === 'minimal' ? 1 : 2);
     const html = list.map((o) => `<div class="obj ${o.kind}${o.done ? ' done' : ''}"><span class="obj-dot">${o.done ? '✔' : o.kind === 'warn' ? '!' : '◆'}</span>${escapeHtml(o.text)}${o.progress !== null && !o.done ? `<div class="obj-bar"><div style="width:${Math.round(o.progress * 100)}%"></div></div>` : ''}</div>`).join('');
     if (html !== this.last) { this.el.innerHTML = html; this.last = html; }
     const hidden = this.game.ui.hud?.el.classList.contains('hidden');
