@@ -227,6 +227,13 @@ import { installMoons10 } from './moons10.js';
 import { installOutlife10 } from './outlife10.js';
 import { installLanding10 } from './landing10.js';
 import { installMystery10 } from './mystery10.js';
+// wave 11 (mechanics + variety) placeholders
+// [import:creatures11]
+// [import:swarm11]
+// [import:loop11]
+// [import:shift11]
+// [import:events11]
+// [import:gear11]
 import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
 
 
@@ -616,6 +623,12 @@ export class Game extends Emitter {
     this.useModule('outlife10', installOutlife10);
     this.useModule('landing10', installLanding10);
     this.useModule('mystery10', installMystery10);
+    // [slot:creatures11]
+    // [slot:swarm11]
+    // [slot:loop11]
+    // [slot:shift11]
+    // [slot:events11]
+    // [slot:gear11]
 
     this.useModule('onboard', installOnboard);   // [slot:onboard] wave 5: Hiring Day + staged unlocks (installed last: wraps hostLever / terminalCommand / objectives.compute)
     this.useModule('score', installScore);   // wave 7: adaptive procedural music + the Algorithm's jingle (docs/wave7/score.md)
