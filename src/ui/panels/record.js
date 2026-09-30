@@ -130,6 +130,7 @@ function card(on, icon, name, tag, lines) {
 
 let lastTab = 'codex';
 let lastSub = 'bestiary';
+const codexExt = () => (typeof window !== 'undefined' && Array.isArray(window.__tfgCodexExt) ? window.__tfgCodexExt : []);   // [wave10 mystery10] extra codex sub-tabs { id, label(p), render(body, p, ctx) }
 
 /**
  * Build the panel. opts: { game, profile, tab, onClose }. Returns the root element (put it in ui.openPanel()).
@@ -185,6 +186,7 @@ export function createServiceRecord({ game = null, profile = game?.profile, tab,
     const subList = [['bestiary', `${L('Bestiary')} ${k.seen}/${k.seenTotal}`], ['scrap', `${L('Scrap')} ${k.scrapFound}/${k.scrapTotal}`], ['moons', `${L('Moons')} ${k.moons}`],
       ['interiors', `${L('Interiors')} ${k.interiors}/${k.interiorTotal}`], ['events', `${L('Events')} ${k.events}/${k.eventTotal}`], ['emotes', L('Emotes')],
       ['milestones', `${L('Milestones')} ${MILESTONES.filter((m) => p.codex.claimed[m.id]).length}/${MILESTONES.length}`]];
+    for (const ex of codexExt()) { try { subList.push([ex.id, ex.label(p)]); } catch { /* extension is optional */ } }   // [wave10 mystery10] extra codex tabs
     for (const [id, label] of subList) {
       const c = mk('span', 'rec-chip' + (lastSub === id ? ' sel' : ''), label);
       c.addEventListener('click', (e) => { e.stopPropagation(); lastSub = id; sfx(); render(); });
@@ -193,6 +195,8 @@ export function createServiceRecord({ game = null, profile = game?.profile, tab,
     body.appendChild(subs);
     const grid = mk('div', 'rec-grid');
     body.appendChild(grid);
+    const extTab = codexExt().find((ex) => ex.id === lastSub);
+    if (extTab) { grid.remove(); extTab.render(body, p, { game, refresh: render }); return; }   // [wave10 mystery10]
     if (lastSub === 'bestiary') {
       const ids = bestiaryIds().sort((a, b) => (CREATURES[a].hazard ? 1 : 0) - (CREATURES[b].hazard ? 1 : 0));
       for (const id of ids) {

@@ -7,6 +7,8 @@
 //         'secret' earned by a hidden rule (see RULES in cosm5.js); `how` is shown only as a hint
 // Ids are globally unique across slots (test: tools/harness/cosm5.test.mjs).
 import { TIER_ORDER } from './tiers.js';
+import { COSM as C10_MYST } from './mystery10_core.js';   // wave 10: mystery10 (The First Upload) hat
+import './mystery10_text.js';   // registers its TR / RU strings (the wardrobe reads them through t())
 import { C8 } from './cosm8_data.js';   // wave 8: +31 rows (8 suits, 8 hats, 6 back items, 4 skins, 5 emotes)
 
 export const SLOTS5 = ['suit', 'hat', 'back', 'skin', 'emote'];
@@ -85,6 +87,7 @@ export const C5 = [
 ];
 
 C5.push(...C8);
+C5.push(...C10_MYST.map((r) => ({ ...r })));   // wave 10: mystery10
 
 export const BOSS_NAMES = { foreman: 'The Foreman', loadbalancer: 'The Load Balancer', middlemanager: 'Middle Manager', hydra: 'Comment Section Hydra', surgeon: 'The Head Surgeon', host: 'The Host', excavator: 'The Excavator', lobbymanager: 'The Lobby Manager', legacybot: 'Legacy Bot' };
 // how-to-get text (English keys; translated in cosm5_i18n.js): shop / crate are fixed strings, boss / secret say where

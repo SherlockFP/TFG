@@ -846,3 +846,7 @@ first-join rejoin 35 s, lost-host 25 s, host never rejoins. NAT/SDP failures now
 everyone on Nostr; lobby browser shows real peer/relay counts; NETSTATS shows relays, TURN and per-peer ICE path.
 **Owner action still needed:** a TURN account + `VITE_TURN_*` on Render for friends behind CGNAT/mobile (no free
 public TURN works). Details: `docs/MULTIPLAYER_HOTFIX.md` → "Follow-up".
+
+### Wave 10 — mystery10
+"The First Upload": 12 lore fragments (child's first video, voicemails, tickets) as glowing floppy pickups, 0-1 per landing, host-planned, shared to the whole crew and stored per profile (`profile.mystery`). Read via terminal `UPLOAD [n]` or the J codex tab; milestones 4 (terminal glitch + message), 8 (room that should not exist + hat `hat:firstview`), 12 (ending scene + title First Viewer).
+Net prefix `myst`; shared-file hooks in `cosm5_data.js`, `cosm5_models.js`, `ui/panels/record.js` (`window.__tfgCodexExt`). Docs `docs/wave10/mystery10.md`, test `node tools/harness/mystery10.test.mjs`. NOT browser-verified: run `kefal.game.mystery10.spawnHere('f01', true)` on a moon first.
