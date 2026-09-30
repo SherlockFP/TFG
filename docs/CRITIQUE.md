@@ -338,3 +338,6 @@ Wave-8 follow-up: migration leftovers and the charge / elevator / kit exploit ga
 "Creatures must be readable": all 72 model-backed hostiles now have an emissive tell, walk bob, a 0.4 s attack wind-up lean and a hit flinch, and the Dimmer / Follower / Auditor are no longer re-skins. Node-verified only; glow strength and lean on big bodies still need eyes in the browser.
 ## Wave 8 - carry comedy (docs/wave8/carry2.md)
 The R.E.P.O. carry fun now lives inside the camera verb: heavy loot sways, fragile loot cracks on bumps and bad throws, bulky loot wants two people, and the Algorithm clips the breakage. Node-verified only; sway strength, the "hold E" grip and the catch window need real 2-player hands-on tuning.
+
+## Wave 8 - highlights clip (docs/wave8/highlights.md)
+The Algorithm now edits the day's best on-air moment into a ~9 s CRT replay (top-down paths, REC, LIVE viewers, dark-humour captions) after the day report: shareable, skippable, never blocking. Node-verified only; the look at 1280x720, the L-key / summary-button clicks under pointer lock, and a real 2-player payload are untested. The replay is a schematic path view, not the 3D map.

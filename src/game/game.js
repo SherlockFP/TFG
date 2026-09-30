@@ -269,6 +269,7 @@ import { installSoul } from './soul.js';   // [import:soul] wave 8: palettes, st
 // [import:arcade2]
 // [import:mapmods]
 import { installRepomaps } from './repomaps.js';   // [import:repomaps] wave 8: themed interiors (Influencer Mansion, Content Academy, Cold Storage Data Station, Museum of Deleted Content) (docs/wave8/repomaps.md)
+import { installHighlights } from './highlights.js';   // [import:highlights] wave 8: the Algorithm's highlight clip (docs/wave8/highlights.md)
 import { installCarry2 } from './carry2.js';   // [import:carry2] wave 8: carry comedy (docs/wave8/carry2.md)
 import { installResto } from './resto.js';   // [import:resto] wave 8: alien restaurant tycoon on the homeworld
 
@@ -554,6 +555,7 @@ export class Game extends Emitter {
     this.useModule('hubgate', installHubgate);   // [slot:hubgate] wave 8: Hub door, unlock cards, Quick Shift
     this.useModule('soul', installSoul);   // [slot:soul]
     this.useModule('rewardviz', installRewardviz);   // wave 8: reward ledger / warnings / pop
+    this.useModule('highlights', installHighlights);   // [slot:highlights] wave 8: end-of-day highlight clip (CRT replay)
     this.useModule('carry2', installCarry2);   // [slot:carry2] wave 8: heavy sway, bump losses, two-person carry, throw & catch
     // [slot:mapmods]
     // [slot:worlds3]
