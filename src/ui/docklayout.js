@@ -58,6 +58,13 @@ export function layoutDocks(docks) {
   const botEls = BOTTOM_BANNERS.map((sel) => { const e = document.querySelector(sel); return e ? [e, shown(e)] : null; });
   const R = docks.right, L = docks.left, B = docks.bottom;
   const asgB = Math.max(0, ...[...document.querySelectorAll('.tfg-asg, [data-hud-right]')].map((e) => shown(e)?.bottom + 8 || 0));   // [qa1] mod widgets (assignment card) sit at the top right: the right dock started under them
+  // [qa2] toasts (right column) must not slide under the Algorithm ticker (centre top, up to 560 px wide): push them below it when they overlap horizontally
+  const toastEl = document.querySelector('.hud-toasts'), algoR = shown(document.querySelector('.algo-sub'));
+  let toastMt = null;
+  if (toastEl) {
+    const mt = parseFloat(toastEl.style.marginTop) || 0, baseTop = toastEl.getBoundingClientRect().top - mt, tLeft = innerWidth - 30 - Math.min(520, innerWidth * 0.36);
+    toastMt = algoR && algoR.right > tLeft - 8 ? Math.max(0, Math.round(algoR.bottom + 8 - baseTop)) : 0;
+  }
   const chatEl = document.querySelector('.chat');
   let chatTop = null;
   if (chatEl) {
@@ -99,6 +106,7 @@ export function layoutDocks(docks) {
     by += r.height + 8;
   }
   // ---- write
+  if (toastEl && toastMt !== null) toastEl.style.marginTop = toastMt ? toastMt + 'px' : '';
   if (quotaEl) { if (quotaTop !== null) pinTo(quotaEl, 'top', quotaTop); else if (!quota || !comp) unpin(quotaEl, 'top'); }
   for (const [e, v] of topPins) { if (v === null) unpin(e, 'top'); else pinTo(e, 'top', v); }
   if (R) { R.style.top = Math.round(rTop) + 'px'; R.style.maxHeight = Math.round(rAvail) + 'px'; R.style.overflow = 'hidden'; applyClip(R, clipR, rAvail); }
