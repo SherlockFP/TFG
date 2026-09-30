@@ -8,7 +8,7 @@ Loop rule: 2-3 Sonnet agents at a time (1 browser/QA agent max) → merge with t
 |---|---|---|
 | 1 | perf4 (landing hitch + oscillator warnings) | merged 8b6fdd6: landing built by a sliced job queue (`game.landQ`, report via `landQ.report()`), shader prewarm, oscillator freq clamp. Unmeasured in browser. |
 | 1 | econ8 | merged f77d20f: sim models all wave-8 income; median 7 quotas (pre-w8 7-8); side income 8.9 %; Level Fun loot 2→1.6, Sector Map 110→200; museum door blockers fixed. |
-| 1 | QA night1 | running |
+| 1 | QA night1 | merged 67a65ca: FALL CHECK PASSED (4 real + ~12 instant landings, map complete before moving), landQ top job horror.js 0.7-3.5 s, 16 screenshots in docs/wave8/qa_shots/, THREAT dock vs mod card overlap fixed, oscillator spam gone. Findings → qafix1. |
 | 2 | feedcams2 (Opus) | merged 2cdd759: TAGGED until the ship, sprint locks faster, junction-box cable cut, Watched +2 cams, heat → bigger/earlier director peaks, Follower/Lantern tie-ins, go-live-on-purpose sponsor tips, downed-on-camera hype, day Highlights line, night patrol drones, Signal Jammer (40). Sim: taxed share careful 1.5 % / average 8 % / sloppy 17 %. |
 | 2 | rewardviz | merged de6693a: day summary 'income by source' block, lever job-fee confirm, ORE n/240, diner till toast, +% VALUE / CURSED scan chips, reward pop ≥100. (Hit the usage limit once; resumed.) |
 | 3 | fixbundle | merged f947a76: Y/B/M key priority, Medic +40 % revive, medkit/adrenaline revive a downed crewmate, off-screen arrow, tax row de-dup, translated affix chat + all death lines TR/RU. |
@@ -24,3 +24,4 @@ Loop rule: 2-3 Sonnet agents at a time (1 browser/QA agent max) → merge with t
 | 8 | expeditions | merged 3988eda: 3 adventure moons — Sunken Server Barge (oxygen, 3 data cores, trench eel), Dune Relay Caravan (heat, escort/repair crawler before the sandstorm), Rooftop Blackout City (power cell, relight 4 billboards, zip-lines/planks, drones). Terminal after quota 5 or 14 % contract offer from quota 1. |
 | 9 | sound2 | merged 1f4d357: 64 procedural sounds for all wave-8 features, fixed 5 non-existent sound ids (LC monster cues fell back to generic), mix-policy categories, game.sound2 helper, atmos beds for labyrinth/repomaps/expedition themes. |
 | 9 | full regression (lead) | all node tests pass except cycle2_flow (bosses coverage + exceptions) and ship2_install (timeout) → regress fixer agent running. |
+| 10 | regress (cycle2_flow + ship2_install), qafix1 (horror.js slicing, museum render cost, dark facilities, arrival banner queue + garbled map card, palette vs clock, downed bar/font, lantern beam, hub door count) | running |
