@@ -232,7 +232,7 @@ import { installMystery10 } from './mystery10.js';
 // [import:swarm11]
 // [import:loop11]
 // [import:shift11]
-// [import:events11]
+import { installEvents11 } from './events11.js';
 // [import:gear11]
 import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
 
@@ -627,7 +627,7 @@ export class Game extends Emitter {
     // [slot:swarm11]
     // [slot:loop11]
     // [slot:shift11]
-    // [slot:events11]
+    this.useModule('events11', installEvents11);
     // [slot:gear11]
 
     this.useModule('onboard', installOnboard);   // [slot:onboard] wave 5: Hiring Day + staged unlocks (installed last: wraps hostLever / terminalCommand / objectives.compute)
