@@ -68,3 +68,6 @@ Loop rule: 2-3 Sonnet agents at a time (1 browser/QA agent max) → merge with t
 | 25 | qafix3 | merged: melee tools tipped so shovel/pipe heads are in frame, roof city plank/stair glow + lit billboard frames + tower window grids, thicker dune beam + halo, edge-marker de-overlap + clear of hotbar, empty-visual placeholder guard, levrek morning palette softened. Shots n3fix_*.jpg. |
 | 25 | leak | merged: per-landing GPU leaks fixed (outdoor 17 instanced geometries/landing, facility 3-5, company 5 materials + 1 canvas, expedition kit 3) via freeTree() in dispose; node leak test loads/unloads 5×. Takeoff OOM not found in code (likely software-GL memory ceiling). |
 | 26 | lead | hotbarRect cached (perf5 DOM budget regression from qafix3 markers) — 46a96f5. Full regression of every tools/harness/*.test.mjs: **all green**. |
+| 27 | Opus morning review | merged 882c382: docs/REVIEW_W8_MORNING.md — **5.6/10 on screen**; clarity 6, identity 6, visuals 6; not moved: audio unheard, no human playtest, no creature in any shot, stale Algorithm lines. Next 10 tasks listed. |
+| 27 | i18n8 (fill ~370+ missing TR/RU strings) | running |
+| 28 | algoctx (context-true Algorithm + dev-language sweep), firstsight (Opus: designed first creature sighting) | running |
