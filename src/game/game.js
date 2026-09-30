@@ -235,7 +235,7 @@ import { installShift11 } from './shift11.js';
 import { installEvents11 } from './events11.js';
 import { installGear11 } from './gear11.js';
 // wave 12 placeholders
-// [import:creatures12]
+import { installCreatures12 } from './creatures12.js';
 // [import:labyr12]
 // [import:moons12]
 // [import:atmos12]
@@ -636,7 +636,7 @@ export class Game extends Emitter {
     this.useModule('shift11', installShift11);
     this.useModule('events11', installEvents11);
     this.useModule('gear11', installGear11);
-    // [slot:creatures12]
+    this.useModule('creatures12', installCreatures12);
     // [slot:labyr12]
     // [slot:moons12]
     // [slot:atmos12]
