@@ -38,9 +38,9 @@ export const NEW_TYPES = Object.freeze(Object.keys(DEFS));
 
 /** sounds for the states the CreatureView plays automatically (game/sfx.js cvoice may take them over) */
 export const STATES_SND = {
-  cd_dimmer: { run: [['lights_buzz', 'spark'], 0.7, 0.7], feed: [['spark', 'lights_buzz'], 0.6, 0.6], attack: [['spark'], 0.7, 0.8], dead: [['power_down', 'creature_death'], 0.9] },
-  cd_follower: { chase: [['mannequin_step', 'walkie_static'], 0.7, 0.7], attack: [['hit_flesh', 'lurker_snap'], 0.8], dead: [['creature_death'], 0.8] },
-  cd_auditor: { run: [['coins', 'bell_ding'], 0.35, 0.7], attack: [['impact_punch', 'hit_flesh'], 0.9], audit: [['bell_ding', 'coins'], 0.7, 0.8], dead: [['creature_death'], 0.8] },
+  cd_dimmer: { run: [['cd_dimmer_hum', 'lights_buzz'], 0.7, 1], feed: [['spark', 'lights_buzz'], 0.6, 0.6], attack: [['spark'], 0.7, 0.8], dead: [['power_down', 'creature_death'], 0.9] },
+  cd_follower: { chase: [['cd_follower_static', 'mannequin_step'], 0.7, 1], attack: [['hit_flesh', 'lurker_snap'], 0.8], dead: [['creature_death'], 0.8] },
+  cd_auditor: { run: [['cd_auditor_stamp', 'bell_ding'], 0.35, 1], attack: [['impact_punch', 'hit_flesh'], 0.9], audit: [['cd_auditor_stamp', 'bell_ding'], 0.7, 1], dead: [['creature_death'], 0.8] },
 };
 export const LOOPS_SND = {
   cd_dimmer: [['*', 'lights_buzz', 0.28, 0.55]],

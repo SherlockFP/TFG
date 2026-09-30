@@ -45,7 +45,7 @@ export function installLcFx(game, { cursed }) {
     for (const m of [ring, fill, sigil]) { m.renderOrder = 3; g.add(m); }
     g.scale.set(d.r, d.r, 1); scene.add(g);
     circles.set(d.id, { g, ring, fill, sigil, t: 0, castS: d.castS, life: d.life, x: d.x, z: d.z, r: d.r });
-    snd(['whisper', 'mimic_voice_1'], new THREE.Vector3(d.x, d.y + 1.5, d.z), 0.9, 0.55, 70);
+    snd(['lm_witch_chant', 'mimic_voice_1'], new THREE.Vector3(d.x, d.y + 1.5, d.z), 0.9, 1, 70);
   }
   function clearCircle(id) { const c = circles.get(id); if (!c) return; scene.remove(c.g); c.ring.material.dispose(); c.fill.material.dispose(); c.sigil.material.dispose(); circles.delete(id); }
   const inAnyCircle = () => { const p = game.player.pos; for (const c of circles.values()) if (c.t >= c.castS && C.inCircle(p.x, p.z, c.x, c.z, c.r)) return true; return false; };
@@ -104,7 +104,7 @@ export function installLcFx(game, { cursed }) {
       OS.sign = buildSign(); OS.sign.position.copy(OS.p).addScaledVector(new THREE.Vector3(Math.sin(OS.yaw), 0, Math.cos(OS.yaw)), 0.07).add(new THREE.Vector3(Math.cos(OS.yaw) * 1.2, 2.8, -Math.sin(OS.yaw) * 1.2)); OS.sign.rotation.y = OS.yaw; scene.add(OS.sign);
       snd(['light_flicker', 'lights_buzz'], OS.p.clone().add(new THREE.Vector3(0, 2, 0)), 0.9, 0.8, 80);
     }
-    if (d.ph !== OS.ph && d.ph === 'rift') snd(['rumble', 'sandkefal_rumble'], OS.p.clone().add(new THREE.Vector3(0, 1, 0)), 1, 0.7, 90);
+    if (d.ph !== OS.ph && d.ph === 'rift') snd(['lm_rift_rumble', 'sandkefal_rumble'], OS.p.clone().add(new THREE.Vector3(0, 1, 0)), 1, 1, 90);
     OS.ph = d.ph;
   }
   function osEnd() {
@@ -135,12 +135,12 @@ export function installLcFx(game, { cursed }) {
     switch (d.k) {
       case 'ci': addCircle(d); break;
       case 'cx': clearCircle(d.id); break;
-      case 'bl': if (d.to === me) { E.bleed = Math.max(E.bleed, d.t); toast(t('The Blood Witch cursed you: you are bleeding. Break her line of sight!'), 'bad'); sfx2d(['heartbeat', 'heart_monitor_beep'], 0.8, 0.9); } break;
-      case 'mk': if (d.to === me) { if (E.mark <= 0) toast(t('The lantern MARKED you. Everything nearby can find you.'), 'bad'); E.mark = Math.max(E.mark, d.t); sfx2d(['bell_ding', 'glass'], 0.5, 0.7); } break;
+      case 'bl': if (d.to === me) { E.bleed = Math.max(E.bleed, d.t); toast(t('The Blood Witch cursed you: you are bleeding. Break her line of sight!'), 'bad'); sfx2d(['heart_monitor_beep', 'heartbeat'], 0.6, 1); } break;
+      case 'mk': if (d.to === me) { if (E.mark <= 0) toast(t('The lantern MARKED you. Everything nearby can find you.'), 'bad'); E.mark = Math.max(E.mark, d.t); sfx2d(['lm_mark_bell', 'bell_ding'], 0.6, 1); } break;
       case 'os': osSet(d); break;
       case 'tt': if (d.to === me) ttResult(d); break;
       case 'sn': if (d.by === me) toast(t('You snatched the Keeper\'s lantern!'), 'good'); break;
-      case 'mw': if (d.to === me) { E.maskT = Math.max(0, T.maskLatchS - T.maskWarnS); toast(t('The mask is warm. It is watching you. Sell it or drop it.'), 'warn'); sfx2d(['mimic_voice_1', 'whisper'], 0.7, 0.75); } break;
+      case 'mw': if (d.to === me) { E.maskT = Math.max(0, T.maskLatchS - T.maskWarnS); toast(t('The mask is warm. It is watching you. Sell it or drop it.'), 'warn'); sfx2d(['lm_mask_weep', 'mimic_voice_1'], 0.7, 1); } break;
       case 'ml': if (d.to === me) { E.maskT = 0; toast(t('The mask called a friend.'), 'bad'); sfx2d(['sting_violin', 'jumpscare_2'], 0.6, 0.8); } break;
       case 'cu': cursed.set(d.id, d.c); break;
       case 'cc': cursed.delete(d.id); break;
@@ -151,7 +151,7 @@ export function installLcFx(game, { cursed }) {
     }
   }
   function ttResult(d) {
-    if (d.r === 'treat') { toast(d.what === 'credits' ? tf('TREAT: +{n} credits!', { n: d.n }) : t('TREAT: a piece of loot!'), 'good'); sfx2d(['bell_ding', 'coin'], 0.7, 1.2); }
+    if (d.r === 'treat') { toast(d.what === 'credits' ? tf('TREAT: +{n} credits!', { n: d.n }) : t('TREAT: a piece of loot!'), 'good'); sfx2d(['lm_treat_jingle', 'bell_ding'], 0.7, 1); }
     else { toast({ teleport: t('TRICK: you were sent somewhere else!'), scuttlers: t('TRICK: bugs!'), drop: t('TRICK: your hands went numb!'), static: t('TRICK: static!') }[d.what] || t('TRICK!'), 'bad'); sfx2d(['sting_violin_glitch', 'mimic_voice_2'], 0.7, 1); }
   }
 
@@ -211,20 +211,20 @@ export function installLcFx(game, { cursed }) {
     // curse from what is in your hands
     const held = p.heldItem?.();
     const k = held ? cursed.get(held.id) || null : null;
-    if (k !== E.curseKind) { E.curseKind = k; E.invNext = 20 + Math.random() * 20; E.whisperT = 8 + Math.random() * 8; if (k) sfx2d(['whisper', 'mimic_voice_1'], 0.5, 0.7); }
+    if (k !== E.curseKind) { E.curseKind = k; E.invNext = 20 + Math.random() * 20; E.whisperT = 8 + Math.random() * 8; if (k) sfx2d(['whisper_1', 'mimic_voice_1'], 0.5, 0.8); }
     const mv = game.lmMove;
     mv.speedMul = k === 'heavy' ? C.heavyMul() : 1;
     if (k === 'whisper') {
       E.whisperT -= dt;
-      if (E.whisperT <= 0) { E.whisperT = T.whisperEvery[0] + Math.random() * (T.whisperEvery[1] - T.whisperEvery[0]); const f = p.forward(); tmp.copy(p.pos).addScaledVector(f, -1.6).add(UPV); tmp.x += (Math.random() - 0.5); snd(['whisper', 'mimic_voice_1', 'mimic_voice_2'], tmp, 0.6, 0.85 + Math.random() * 0.2, 16); }
+      if (E.whisperT <= 0) { E.whisperT = T.whisperEvery[0] + Math.random() * (T.whisperEvery[1] - T.whisperEvery[0]); const f = p.forward(); tmp.copy(p.pos).addScaledVector(f, -1.6).add(UPV); tmp.x += (Math.random() - 0.5); snd(['whisper_1', 'whisper_2', 'whisper_3', 'mimic_voice_1'], tmp, 0.6, 0.85 + Math.random() * 0.2, 16); }
     }
     if (k === 'invert') {
       if (E.invT > 0) { E.invT -= dt; if (E.invT <= 0) { mv.invert = false; } }
       else if (E.invWarn > 0) { E.invWarn -= dt; if (E.invWarn <= 0) { mv.invert = true; E.invT = T.invertT; toast(t('Everything is backwards!'), 'warn'); } }
-      else { E.invNext -= dt; if (E.invNext <= 0) { E.invNext = T.invertEvery[0] + Math.random() * (T.invertEvery[1] - T.invertEvery[0]); E.invWarn = T.invertWarn; sfx2d(['whisper', 'sting_violin_glitch'], 0.7, 0.8); game.engine?.flash?.(0x6a4aff, 0.35); } }
+      else { E.invNext -= dt; if (E.invNext <= 0) { E.invNext = T.invertEvery[0] + Math.random() * (T.invertEvery[1] - T.invertEvery[0]); E.invWarn = T.invertWarn; sfx2d(['whisper_2', 'sting_violin_glitch'], 0.7, 0.9); game.engine?.flash?.(0x6a4aff, 0.35); } }
     } else if (mv.invert) { mv.invert = false; E.invT = 0; E.invWarn = 0; }
     // held Fan Mask: faint laughing / crying and the countdown chip
-    if (held?.def?.mask) { E.maskLocalT = (E.maskLocalT || 6) - dt; if (E.maskLocalT <= 0) { E.maskLocalT = 9 + Math.random() * 8; sfx2d([held.type === 'lm_mask_smile' ? 'mimic_voice_2' : 'mimic_voice_1'], 0.22, held.type === 'lm_mask_smile' ? 1.3 : 0.7); } }
+    if (held?.def?.mask) { E.maskLocalT = (E.maskLocalT || 6) - dt; if (E.maskLocalT <= 0) { E.maskLocalT = 9 + Math.random() * 8; sfx2d([held.type === 'lm_mask_smile' ? 'lm_mask_laugh' : 'lm_mask_weep'], 0.3, 1); } }
     if (E.maskT > 0) E.maskT -= dt;
     // bleed (local: HP never drops below the floor, so the curse cannot finish you)
     if (E.bleed > 0) {

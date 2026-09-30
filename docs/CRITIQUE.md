@@ -345,3 +345,6 @@ The Algorithm now edits the day's best on-air moment into a ~9 s CRT replay (top
 ## Wave 8 - expedition moons (docs/wave8/expeditions.md)
 Three special moons (flooded barge: oxygen, dune relay: heat + escort, rooftop blackout: power cell + zip-lines) with a need, a goal and a payout scaled to the quota, unlocked with the voyage or as a one-day contract. Node-verified only (layouts over 60 seeds, host goal flows, geomfix support checks); the look, the zip-line / current / heat feel, the sandstorm timing and a real 2-player run are untested, and the crawler is not solid while it moves.
 
+
+## Wave 8 - sound pass 2 (docs/wave8/sound2.md)
+64 procedural sounds + mix-policy categories for everything added in wave 8 (feed cams, downed, carry, CRT replay, labyrinths, expeditions, one distinct cue per LC / director creature, resto, mining, arcade 2, hub unlock, coin pop) and atmos beds for the 4 labyrinth themes, 4 repomap themes and 3 expedition moons; missing ids (`battery_charge`, `bell`, `door_knock`) and always-fallback candidate lists fixed. Node-verified only (every referenced id exists, has a category, renders non-silent); nothing was heard in a browser, so every level, the underwater muffle and the positional drone / jammer loops need an ear-check.

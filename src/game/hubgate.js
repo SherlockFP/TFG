@@ -116,7 +116,7 @@ export function installHubgate(game) {
   /** unlock card: one big banner per new system (onboard.js announceGift calls it). true = shown */
   function card(id) {
     if (disposed || !SYSTEMS[id]) return false;
-    try { game.ui?.hud?.bigText?.(tx('hg.card', { name: sysName(id) }), hintOf(id)); return true; } catch { return false; }
+    try { game.ui?.hud?.bigText?.(tx('hg.card', { name: sysName(id) }), hintOf(id)); sfx('hub_unlock', 0.6); return true; } catch { return false; }   // [sound2] unlock sting
   }
 
   // ---------------------------------------------------------------------------------------------------------------- locked docks + fixtures

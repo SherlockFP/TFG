@@ -215,13 +215,13 @@ export function installCarry2(game) {
         S.fly.set(d.id, { by: d.by, t: 0, spd: 9, last: null });
       } else if (d.k === 'brk') {
         const p = Array.isArray(d.p) ? new V3(d.p[0], d.p[1], d.p[2]) : null;
-        if (p) { snd('glass_break', p, d.n >= C.BUMP.big ? 0.9 : 0.55); if (d.n >= C.BUMP.big) snd('item_drop', p, 0.7); }
+        if (p) { if (d.n >= C.BUMP.big) { snd('glass_break', p, 0.9); snd('item_drop', p, 0.7); } else snd('fragile_crunch', p, 0.7); }   // [sound2] small losses crunch, big ones shatter
         if (d.by === game.selfId) { if (d.n >= C.BUMP.big) pop(d.n); game.engine?.shake?.(Math.min(0.5, 0.15 + d.n / 120)); game.engine?.punch?.(-0.03, 0, (Math.random() - 0.5) * 0.05); }
         if (d.ln >= 0 && C.LINES[d.ln]) game.lore?.say?.(tf(C.LINES[d.ln], { name: nameOf(d.by), n: d.n }), { mood: 'curious' });
       } else if (d.k === 'catch') {
         S.fly.delete(d.id);
         if (d.by === game.selfId) toast(t('Nice catch. Not a crack.'), 'good');
-        const it = game.items?.get?.(d.id); if (it) snd('item_pickup', it.obj.position, 0.5);
+        const it = game.items?.get?.(d.id); if (it) snd('catch_thump', it.obj.position, 0.6);   // [sound2]
       }
     } catch (e) { console.warn('[carry2] fx', e); }
   }
@@ -242,6 +242,8 @@ export function installCarry2(game) {
       S.swayT += dt;
       const mv = Math.min(1, Math.max(0.2, (P.hSpeed || 0) / 4)), a = f.sway * mv, w = S.swayT * 2.6;
       game.engine?.punch?.(0.05 * dt * a * Math.cos(w * 0.7), 0, 0.18 * dt * a * Math.sin(w));
+      S.creakT = (S.creakT ?? 2) - dt * mv;   // [sound2] a rope / wood creak every few steps while a heavy load swings
+      if (S.creakT <= 0 && mv > 0.5) { S.creakT = 2.6 + Math.random() * 2; game.sound2?.cue('carry_creak', null, Math.min(0.6, 0.2 + a * 0.25)); }
     }
     return held;
   }

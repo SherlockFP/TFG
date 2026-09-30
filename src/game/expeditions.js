@@ -246,10 +246,15 @@ export function installExpeditions(game) {
     const pocket = K.pocketAt(P, p.pos.x, p.pos.y + 1, p.pos.z), vent = K.ventNear(P, p.pos.x, p.pos.z) && p.pos.y < K.BARGE.water + 1;
     const air = !!pocket || vent;
     S.subNow = sub && !air;
+    if (S.subNow && game.sound2) {   // [sound2] underwater: muffled mix, a deep water bed, occasional bubbles, a repeating low-air pip
+      game.sound2.muffle(1100); game.sound2.hold('uw', 'uw_loop', { vol: 0.9, lease: 0.3 });
+      S.bubT = (S.bubT ?? 2) - dt; if (S.bubT <= 0) { S.bubT = 3 + Math.random() * 4; game.sound2.cue('uw_bubbles', null, 0.5); }
+    }
     if (!p.downed) {
       const r = K.oxyStep(S.oxy, dt, { sub, air, tank: S.tank }); S.oxy = r.v; S.tank = false;
       if (r.hurt) { S.hurtT -= dt; if (S.hurtT <= 0) { S.hurtT = 1; try { game.damageLocal?.(K.OXY.hurt, 'drown', null); } catch { /* not ready */ } } } else S.hurtT = 0.4;
-      if (S.oxy <= K.OXY.warn && S.subNow && !S.lowSaid) { S.lowSaid = true; toast(t('AIR LOW: find a bubble vent or a cabin'), 'warn'); sfx('ui_error', 0.4); }
+      if (S.oxy <= K.OXY.warn && S.subNow && !S.lowSaid) { S.lowSaid = true; toast(t('AIR LOW: find a bubble vent or a cabin'), 'warn'); }
+      if (S.oxy <= K.OXY.warn && S.subNow) { S.airT = (S.airT ?? 0) - dt; if (S.airT <= 0) { S.airT = 3.5; sfx('air_warning', 0.5); } }   // [sound2]
       if (S.oxy > K.OXY.warn + 6) S.lowSaid = false;
     }
     p.exMul = feet ? K.OXY.slow : 1;
@@ -272,6 +277,7 @@ export function installExpeditions(game) {
     }
     p.exMul = S.heat >= K.HEAT.hot ? K.HEAT.slow : 1;
     p.exPush = S.storm > 0.35 && !shade ? { x: -0.9 * S.storm, z: 0.35 * S.storm } : null;
+    if (!p.inShip && game.sound2) game.sound2.hold('sand', S.storm > 0.3 ? 'sand_storm' : 'sand_wind', { vol: (0.35 + 0.65 * S.storm) * (shade ? 0.5 : 1), lease: 0.3 });   // [sound2] steady dune wind, the storm bed above 0.3
     fogSet(0, 'dune');
   }
 
@@ -288,7 +294,7 @@ export function installExpeditions(game) {
   }
   function startZip(zp, end) {
     const p = me(); if (S.zip || S.zipCd > 0 || p.dead || p.downed) return;
-    S.zip = { zp, end, t: 0, dur: K.zipDur(zp) }; sfx('cloth_rustle', 0.5); sfx('lever_pull', 0.3);
+    S.zip = { zp, end, t: 0, dur: K.zipDur(zp) }; sfx('zip_line', 0.5);   // [sound2]
   }
 
   // ------------------------------------------------------------------------------------------ interactables
@@ -545,7 +551,7 @@ export function installExpeditions(game) {
     if (p.dead) { clearPlayer(); hideUi(); return; }
     if (S.kind === 'barge') { bargeNeed(dt); beaconTick(); }
     else if (S.kind === 'dune') { duneNeed(dt); cwTick(dt); }
-    else if (S.kind === 'roof') { zipTick(dt); boardsTick(); }
+    else if (S.kind === 'roof') { zipTick(dt); boardsTick(); const g = S.P?.gen, pl = me(); if (g && pl && Math.hypot(g.x - pl.pos.x, g.z - pl.pos.z) < 26) game.sound2?.hold('gen', 'generator_loop', { pos: new V3(g.x, g.y + 0.8, g.z), vol: 0.8, lease: 0.3, ref: 3, max: 28 }); }   // [sound2] the cell generator putters
     S.uiT -= dt; if (S.uiT <= 0) { S.uiT = 0.2; hudTick(); }
     overlayTick(dt);
     if (host()) hostTick(dt);

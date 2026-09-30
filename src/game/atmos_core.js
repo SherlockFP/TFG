@@ -41,12 +41,29 @@ export const BEDS = {
   company: { level: 0.4, gap: [10, 26], layers: [noise('brown', 'bandpass', 280, 0.6, 0.3, [0.05, 100, 0.5]), hum([[55, 0.2]], 260, 0.25)], events: [['relay', 1], ['ping', 1], ['gust', 2]] },
   ship: { level: 0.45, gap: [8, 18], layers: [noise('brown', 'lowpass', 110, 0.7, 0.6, [0.03, 10, 0.1]), hum([[55, 0.3], [110, 0.14]], 300, 0.35), { t: 'tone', f: 4100, g: 0.005 }], events: [['relay', 2], ['ping', 1], ['vent', 1], ['groan', 1]] },
   outdoor: { level: 0.45, gap: [8, 22], layers: [], events: [] },   // built by outdoorBed()
+  // [sound2] wave-8 labyrinths (metro / greenhouse / prison / tower) and repomaps themes (academy / museum / influencer / colddata): sparse, low, long silences
+  metro: { level: 0.5, gap: [8, 22], layers: [hum([[40, 0.5], [60, 0.2]], 200, 0.5), noise('brown', 'lowpass', 160, 0.7, 0.35, [0.05, 30, 0.3]), noise('white', 'bandpass', 900, 2, 0.015, [0.2, 100, 0.6])], events: [['rumble', 3], ['drip', 3], ['groan', 1], ['ping', 1], ['vent', 1]] },
+  greenhouse: { level: 0.42, gap: [7, 20], layers: [noise('white', 'bandpass', 2200, 0.5, 0.02, [0.08, 300, 0.5]), hum([[52, 0.25]], 260, 0.3), noise('brown', 'bandpass', 300, 0.8, 0.18, [0.05, 60, 0.4])], events: [['drip', 4], ['bubble', 2], ['chirps', 2], ['creak', 1], ['vent', 1]] },
+  prison: { level: 0.45, gap: [10, 26], layers: [{ t: 'buzz', f: 100, g: 0.1 }, hum([[50, 0.3], [100, 0.1]], 350, 0.35), noise('brown', 'bandpass', 300, 1, 0.15)], events: [['ping', 3], ['door', 2], ['relay', 2], ['groan', 1], ['drip', 1]] },
+  tower: { level: 0.45, gap: [8, 20], layers: [hum([[55, 0.4], [110, 0.2], [165, 0.05]], 400, 0.5), noise('brown', 'lowpass', 200, 0.7, 0.35, [0.06, 40, 0.3]), noise('white', 'bandpass', 1400, 1.5, 0.012)], events: [['creak', 3], ['groan', 2], ['vent', 2], ['ping', 1]] },
+  academy: { level: 0.4, gap: [10, 26], layers: [{ t: 'buzz', f: 120, g: 0.12 }, hum([[60, 0.2]], 300, 0.25), noise('brown', 'bandpass', 350, 0.9, 0.1)], events: [['chime', 2], ['door', 2], ['creak', 1], ['relay', 1], ['flicker', 1]] },
+  museum: { level: 0.32, gap: [12, 30], layers: [hum([[45, 0.2]], 200, 0.25), noise('brown', 'bandpass', 400, 0.8, 0.1, [0.04, 80, 0.4])], events: [['creak', 3], ['ping', 1], ['drip', 1], ['chime', 1], ['groan', 1]] },
+  influencer: { level: 0.42, gap: [9, 22], layers: [{ t: 'buzz', f: 100, g: 0.16 }, hum([[60, 0.3], [120, 0.2]], 500, 0.35), noise('white', 'bandpass', 1800, 0.5, 0.02, [0.1, 200, 0.4])], events: [['relay', 3], ['ping', 2], ['flicker', 2], ['vent', 1]] },
+  colddata: { level: 0.5, gap: [8, 20], layers: [hum([[60, 0.4], [120, 0.3]], 600, 0.4), noise('brown', 'bandpass', 600, 0.7, 0.3, [0.11, 40, 0.15]), noise('white', 'bandpass', 2600, 0.7, 0.03, [0.13, 80, 0.3])], events: [['ice', 3], ['vent', 2], ['relay', 2], ['gust', 1], ['ping', 1]] },
+};
+
+/** [sound2] the three expedition moons (biome ids ex_barge / ex_dune / ex_roof): underwater hush, a dune wind bed, a dead city at night */
+const EX_BEDS = {
+  ex_barge: () => ({ level: 0.5, gap: [7, 18], layers: [noise('brown', 'lowpass', 180, 0.7, 0.55, [0.05, 30, 0.3]), hum([[42, 0.3]], 200, 0.3), noise('white', 'bandpass', 700, 2, 0.015, [0.3, 100, 0.6])], events: [['bubble', 4], ['groan', 2], ['ping', 1]] }),
+  ex_dune: () => ({ level: 0.45, gap: [7, 18], layers: [noise('brown', 'bandpass', 420, 0.6, 0.34, [0.05, 180, 0.6]), noise('white', 'bandpass', 2600, 0.8, 0.02, [0.1, 300, 0.7])], events: [['gust', 4], ['creak', 0.5]] }),
+  ex_roof: (night) => ({ level: 0.42, gap: night ? [9, 24] : [8, 20], layers: [noise('brown', 'bandpass', 260, 0.7, 0.24, [0.04, 80, 0.5]), hum([[50, 0.25]], 260, 0.3)], events: [['gust', 2], ['relay', 2], ['rumble', 1], ['ping', 1], ['vent', 1]] }),
 };
 
 /** outdoor bed for a biome / weather / time: wind first, insects by day or night where they belong, distant thunder in storms */
 export function outdoorBed(sub) {
   const [biome, a, b] = String(sub || 'hills:clear').split(':');
   const night = a === 'night', weather = night ? b : a;
+  if (EX_BEDS[biome]) return EX_BEDS[biome](night);
   const windy = weather === 'stormy' ? 1 : weather === 'rainy' ? 0.6 : biome === 'desert' || biome === 'snow' ? 0.8 : 0.45;
   const wf = biome === 'snow' ? 520 : biome === 'desert' ? 420 : biome === 'blackforest' ? 300 : 360;
   const layers = [noise('brown', 'bandpass', wf, 0.7, 0.28 * windy + 0.06, [0.05, wf * 0.4, 0.6])];

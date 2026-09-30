@@ -185,6 +185,27 @@ export function installAtmos(game) {
       m.gain.setValueAtTime(1, v.t); for (let k = 1; k < 4; k++) m.gain.linearRampToValueAtTime(R(0.4, 1), v.t + v.dur * k / 4);
       s.connect(m).connect(v.g);
     },
+    // [sound2] events of the wave-8 beds
+    chime(bed) {   // a far PA / school-bell chime: two soft falling notes
+      const f = R(420, 640), v = voice(3, { wet: 1.1, lp: 2200, peak: 0.1 }); v.env(0.01);
+      [[1, 0], [0.75, R(0.5, 0.8)]].forEach(([r, dt]) => { const o = osc(v, 'sine', f * r, dt, 2.2), g = v.ctx.createGain(); g.gain.setValueAtTime(0, v.t + dt); g.gain.linearRampToValueAtTime(1, v.t + dt + 0.01); g.gain.exponentialRampToValueAtTime(0.001, v.t + dt + 2); o.connect(g).connect(v.g); });
+    },
+    ice(bed) {   // cold snap: a tick of noise and a short high glide
+      const v = voice(0.5, { wet: 0.9, lp: 3500, peak: 0.1 }); v.env(0.003);
+      const s = noiseSrc('white', v.t, 0.12), bp = v.ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = R(2200, 3400); bp.Q.value = 3; s.connect(bp).connect(v.g);
+      const f = R(700, 1100), o = osc(v, 'sine', f); o.frequency.exponentialRampToValueAtTime(f * 0.5, v.t + 0.3); o.connect(v.g);
+    },
+    bubble(bed) {   // gurgling water: three to five rising blips
+      const n = 3 + Math.floor(Math.random() * 3);
+      for (let k = 0; k < n; k++) {
+        const v = voice(0.25, { wet: 0.9, lp: 1800, peak: 0.12 }); v.t += k * R(0.08, 0.3); v.env(0.004);
+        const f = R(300, 800), o = osc(v, 'sine', f); o.frequency.exponentialRampToValueAtTime(f * 1.8, v.t + 0.12); o.connect(v.g);
+      }
+    },
+    rumble(bed) {   // something huge and far away rolls past (a train in the tunnels, city traffic)
+      const v = voice(R(4, 7), { wet: 0.8, lp: 180, peak: 0.34 }); v.env(1.5);
+      const s = noiseSrc('brown', v.t, v.dur + 0.1); s.connect(v.g);
+    },
   };
 
   function fire(name) {

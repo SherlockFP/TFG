@@ -15,6 +15,7 @@ import { RECIPES } from './recipes.js';
 import { G } from '../physics/physics.js';
 import { createArtModel } from '../models/artpass.js';
 import * as C from './mining_core.js';
+import { minePick } from './sound2_core.js';   // [sound2]
 
 HOST_ONLY.add('mnd');
 const { M, MATS, MN, CELL, DUG, pack } = C;
@@ -201,7 +202,10 @@ export function installMining(game) {
   const fx = (cv, i) => { cv.vol.center(i, V); game.particles?.burst?.(V, 'landpuff', null, 0.9); };
   function hitFx(cv, i, m) {
     cv.vol.center(i, V);
-    try { game.audio?.at?.(m >= M.COPPER && m <= M.CRYSTAL ? 'hit_metal' : 'hit_wall', V, 0.6, { refDistance: 4, maxDistance: 55, pitch: 0.8 + Math.random() * 0.3 }); } catch { /* audio optional */ }
+    try {   // [sound2] pick / drill sound per material (the drill only reads as a drill for the local player's own hits)
+      const drill = game.player?.heldItem?.()?.type === 'tool_drill' && game.player.pos.distanceTo(V) < 4;
+      game.audio?.at?.(drill ? 'mine_drill' : minePick(m === M.CRYSTAL ? 'crystal' : m >= M.COPPER && m <= M.QUARTZ ? 'ore' : 'stone'), V, 0.6, { refDistance: 4, maxDistance: 55 });
+    } catch { /* audio optional */ }
     game.particles?.burst?.(V, m >= M.COPPER && m <= M.CRYSTAL ? 'sparks' : 'landpuff', null, 0.45);
   }
 
@@ -292,11 +296,11 @@ export function installMining(game) {
         if (d.cave && n++ < 5) fx(cv, i);
         if (d.pl && n++ < 1) { cv.vol.center(i, V); try { game.audio?.at?.('hit_wall', V, 0.5, { refDistance: 4, maxDistance: 30, pitch: 1.3 }); } catch { /* audio optional */ } }
       }
-      if (d.cave) { cv.vol.center((d.e[0] - (d.e[0] & 15)) / 16, V); try { game.audio?.at?.('hit_wall', V, 1, { refDistance: 8, maxDistance: 70, pitch: 0.55 }); } catch { /* audio optional */ } if (game.player?.pos.distanceTo(V) < 14) { game.engine?.shake?.(0.3); game.ui?.toast?.(t('Cave-in!'), 'bad'); } }
+      if (d.cave) { cv.vol.center((d.e[0] - (d.e[0] & 15)) / 16, V); try { game.audio?.at?.('hit_wall', V, 1, { refDistance: 8, maxDistance: 70, pitch: 0.55 }); game.audio?.at?.('cave_creak', V, 0.8, { refDistance: 8, maxDistance: 70, delay: 0.05 }); } catch { /* audio optional */ } if (game.player?.pos.distanceTo(V) < 14) { game.engine?.shake?.(0.3); game.ui?.toast?.(t('Cave-in!'), 'bad'); } }
     } else if (d.k === 'warn') {
       cv.vol.center(d.c, V); V.y += 1.2;
       warns.push({ pos: V.clone(), until: time + d.ms / 1000, next: 0, v: d.v });
-      try { game.audio?.at?.('door_creak', V, 0.9, { refDistance: 8, maxDistance: 45, pitch: 0.5 }); } catch { /* audio optional */ }
+      try { game.audio?.at?.('cave_creak', V, 0.9, { refDistance: 8, maxDistance: 45 }); } catch { /* audio optional */ }
       if (game.player && game.player.pos.distanceTo(V) < 10) game.ui?.toast?.(t('The ceiling groans - place a support beam!'), 'bad');
     } else if (d.k === 'ok') { warns.length = 0; }
   }

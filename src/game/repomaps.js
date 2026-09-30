@@ -68,7 +68,7 @@ export function installRepomaps(game) {
     if (d.k === 'set') { if (n !== S.step) applyStep(n, true); return; }
     if (d.k === 'warn') {
       g.ui?.toast?.(t('CLASS BELL: the shelves are about to shift'), 'warn');
-      const s = S.shelves[0]; if (s) snd('bell', new THREE.Vector3(s.x[0], s.y + 1.5, s.z), 0.8);
+      const s = S.shelves[0]; if (s) snd('shift_bell', new THREE.Vector3(s.x[0], s.y + 1.5, s.z), 0.8);
       return;
     }
     if (d.k === 'go') applyStep(n, false);
@@ -93,7 +93,7 @@ export function installRepomaps(game) {
     for (const s of S.shelves) {
       s.tgt = C.shelfAt(s.at0, n);
       if (instant) { dropCollider(s); s.cur = s.x[s.tgt]; s.obj.position.x = s.cur; s.obj.updateMatrixWorld(true); placeCollider(s); s.moving = false; }
-      else if (Math.abs(s.cur - s.x[s.tgt]) > 0.01) { dropCollider(s); s.moving = true; snd('door_close', new THREE.Vector3(s.cur, s.y + 1, s.z), 0.7); }
+      else if (Math.abs(s.cur - s.x[s.tgt]) > 0.01) { dropCollider(s); s.moving = true; snd('shelf_slide', new THREE.Vector3(s.cur, s.y + 1, s.z), 0.7); }
     }
     if (!instant) S.stats.shifts++;
   }

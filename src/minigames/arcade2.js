@@ -40,7 +40,7 @@ function makeFish(E) {
     pipes.push({ x, gy: lastGap, done: false });
   };
   for (let x = W + 30; x < W + 30 + SPACING * 3; x += SPACING) addPipe(x);
-  const flap = () => { if (!over) { vy = -118 * gdir; E.sfx('arcade_jump'); } };
+  const flap = () => { if (!over) { vy = -118 * gdir; E.sfx('arcade2_flap'); } };
   return {
     key: (code, down) => { if (down && (code === 'Space' || code === 'ArrowUp' || code === 'KeyW')) { flap(); return true; } return false; },
     press: flap, move() {},
@@ -52,11 +52,11 @@ function makeFish(E) {
       vy = clamp(vy + 330 * gdir * dt, -190, 190); y += vy * dt;
       // the Algorithm's donation: a 1 s warning, then gravity flips (and flips back 5 s later)
       nextFlip -= dt;
-      if (warn === 0 && nextFlip <= 0) { warn = 1; E.sfx('arcade_score'); }
+      if (warn === 0 && nextFlip <= 0) { warn = 1; E.sfx('arcade2_tick'); }
       if (warn > 0) { warn -= dt; if (warn <= 0) { warn = 0; gdir = -gdir; flipped = gdir < 0; vy = 0; nextFlip = flipped ? 5 : 8 + rng() * 5; E.mg.flash('#ff5a4a', 0.25); E.mg.glitch(0.2); } }
       for (const p of pipes) {
         p.x -= sp * dt;
-        if (!p.done && p.x + PW < FX - 4) { p.done = true; score++; E.sfx('arcade_score'); floatText(E.parts, '+1', FX + 10, y - 8, C.amber); }
+        if (!p.done && p.x + PW < FX - 4) { p.done = true; score++; E.sfx('arcade2_pass'); floatText(E.parts, '+1', FX + 10, y - 8, C.amber); }
         if (FX + 4 > p.x && FX - 4 < p.x + PW && (y - 3 < p.gy - GAP / 2 || y + 3 > p.gy + GAP / 2)) { over = true; cause = 'pipe'; }
       }
       while (pipes.length && pipes[0].x < -PW - 4) pipes.shift();
@@ -113,8 +113,8 @@ function makeCable(E) {
         if (h.x < 0 || h.y < 0 || h.x >= COLS || h.y >= ROWS || body.some((b, i) => i < body.length - (grow > 0 ? 0 : 1) && b.x === h.x && b.y === h.y)) { over = true; E.mg.shake(4); break; }
         body.unshift(h);
         if (grow > 0) grow--; else body.pop();
-        if (h.x === plug.x && h.y === plug.y) { score++; grow += 1; plug = free(); E.sfx('arcade_score'); sparkBurst(E.parts, X0 + h.x * CS + 4, Y0 + h.y * CS + 4, 6, ['#39ff6a', '#ffffff'], 40); }
-        else if (gold && h.x === gold.x && h.y === gold.y) { score += 3; grow += 2; floatText(E.parts, '+3', X0 + h.x * CS + 4, Y0 + h.y * CS, C.amber); gold = null; E.sfx('arcade_score'); }
+        if (h.x === plug.x && h.y === plug.y) { score++; grow += 1; plug = free(); E.sfx('arcade2_pass'); sparkBurst(E.parts, X0 + h.x * CS + 4, Y0 + h.y * CS + 4, 6, ['#39ff6a', '#ffffff'], 40); }
+        else if (gold && h.x === gold.x && h.y === gold.y) { score += 3; grow += 2; floatText(E.parts, '+3', X0 + h.x * CS + 4, Y0 + h.y * CS, C.amber); gold = null; E.sfx('arcade2_pass'); }
       }
     },
     draw(ctx) {
@@ -144,13 +144,13 @@ function makeStack(E) {
   const spawn = () => { const k = next || draw7(); next = draw7(); cur = { k, c: SHAPES[k].map((c) => c.slice()), x: 3, y: -1, n: k === 'I' ? 4 : k === 'O' ? 4 : 3 }; if (!fits(cur)) over = true; };
   const rot = (p) => ({ ...p, c: p.k === 'O' ? p.c : p.c.map(([x, y]) => [p.n - 1 - y, x]) });
   const tryMove = (dx, dy) => { const p = { ...cur, x: cur.x + dx, y: cur.y + dy }; if (fits(p)) { cur = p; return true; } return false; };
-  const tryRot = () => { const r = rot(cur); for (const k of [0, -1, 1, -2, 2]) { const p = { ...r, x: r.x + k }; if (fits(p)) { cur = p; E.sfx('arcade_jump'); return; } } };
+  const tryRot = () => { const r = rot(cur); for (const k of [0, -1, 1, -2, 2]) { const p = { ...r, x: r.x + k }; if (fits(p)) { cur = p; E.sfx('arcade2_tick'); return; } } };
   function lock() {
     for (const [x, y] of cells(cur)) { if (y < 0) { over = true; return; } grid[y][x] = cur.k; }
     let n = 0;
     for (let y = ROWS - 1; y >= 0; y--) if (grid[y].every(Boolean)) { grid.splice(y, 1); grid.unshift(Array(COLS).fill(null)); n++; y++; }
     score += 1 + [0, 8, 20, 40, 70][n]; lines += n;
-    if (n) { E.sfx('arcade_score'); E.mg.flash('#39ff6a', 0.18); floatText(E.parts, `+${[0, 8, 20, 40, 70][n]}`, X0 + COLS * CS / 2, Y0 + 30, C.amber); }
+    if (n) { E.sfx('arcade2_pass'); E.mg.flash('#39ff6a', 0.18); floatText(E.parts, `+${[0, 8, 20, 40, 70][n]}`, X0 + COLS * CS / 2, Y0 + 30, C.amber); }
     spawn();
   }
   const drop = () => { if (!tryMove(0, 1)) lock(); };
@@ -207,7 +207,7 @@ function makeInvaders(E) {
   let foes = [], gx = 12, gy = 16;
   const spawnWave = () => { foes = []; for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) foes.push({ r, c, w: HATE[Math.floor(rng() * HATE.length)], alive: true }); gx = 12; gy = 16; edge = 1; };
   spawnWave();
-  const shoot = () => { if (cd > 0 || over) return; cd = 0.3; shots.push({ x: px, y: H - 20 }); E.sfx('arcade_jump'); };
+  const shoot = () => { if (cd > 0 || over) return; cd = 0.3; shots.push({ x: px, y: H - 20 }); E.sfx('arcade2_flap'); };
   return {
     key(code, down) {
       if (code === 'ArrowLeft' || code === 'KeyA') keys.l = down; else if (code === 'ArrowRight' || code === 'KeyD') keys.r = down;
@@ -230,7 +230,7 @@ function makeInvaders(E) {
       for (const b of bolts) b.y += (48 + wave * 4) * dt;
       for (const s of shots) for (const f of alive) {
         if (f.alive && s.y > 0 && Math.abs(s.x - (gx + f.c * CW + 13)) < 13 && Math.abs(s.y - (gy + f.r * RH + 4)) < 6) {
-          f.alive = false; s.y = -9; const pts = 3 + (ROWS - 1 - f.r); score += pts; E.sfx('arcade_score'); sparkBurst(E.parts, gx + f.c * CW + 13, gy + f.r * RH + 4, 8, ['#ff5a4a', '#ffb000', '#fff'], 45); floatText(E.parts, `+${pts}`, gx + f.c * CW + 13, gy + f.r * RH - 4, C.amber, { life: 0.6 });
+          f.alive = false; s.y = -9; const pts = 3 + (ROWS - 1 - f.r); score += pts; E.sfx('arcade2_pass'); sparkBurst(E.parts, gx + f.c * CW + 13, gy + f.r * RH + 4, 8, ['#ff5a4a', '#ffb000', '#fff'], 45); floatText(E.parts, `+${pts}`, gx + f.c * CW + 13, gy + f.r * RH - 4, C.amber, { life: 0.6 });
         }
       }
       for (let i = shots.length - 1; i >= 0; i--) if (shots[i].y < -8) shots.splice(i, 1);
@@ -299,7 +299,7 @@ export function createArcade2(rawOpts) {
     try { opts.onScore?.(gid, score, Math.round(playT * 1000)); } catch (e) { console.warn('arcade2 onScore', e); }
     mg.setStatus(last.hit ? t('TARGET BEATEN') : last.best ? t('NEW BEST') : t('GAME OVER'), last.best || last.hit ? 'good' : 'bad');
     mg.setHelp(t('[ENTER] again   [ESC] menu'));
-    mg.sfx(last.best ? 'arcade_score' : 'arcade_die');
+    mg.sfx(last.best ? 'arcade2_pass' : 'arcade2_crash');
   }
   menuStatus();
 

@@ -86,7 +86,7 @@ function keeper(c, dt, M) {
   if (c.state === 'idle') { c.yaw += 0.55 * d.dir * dt; if (c.t > 3 + rnd()) { d.dir = -d.dir; M.wander(c, 18); c.setState('walk'); } }
   else if (M.follow(c, dt, c.def.walk)) c.setState('idle');
   d.clink -= dt;
-  if (d.clink <= 0) { d.clink = 3.4 + rnd() * 1.6; csnd(M, c, ['glass', 'bell_ding'], 0.32, 1.9, 3, 30); }   // telegraph: a faint chime of the lantern cage
+  if (d.clink <= 0) { d.clink = 3.4 + rnd() * 1.6; csnd(M, c, ['lm_cage_chime', 'glass_break'], 0.32, 1, 3, 30); }   // telegraph: a faint chime of the lantern cage
   d.beamT -= dt;
   if (d.beamT <= 0) {
     d.beamT = 0.2;
@@ -115,7 +115,7 @@ function treater(c, dt, M) {
   if (!n) return;
   face(c, n.p.pos.x, n.p.pos.z, dt, 6);
   if (c.state === 'idle') { if (n.d > T.treatReach + 0.8) c.setState('walk'); return; }   // holds the bucket out until you step away
-  if (n.d <= T.treatReach - 0.6) { c.setState('idle'); csnd(M, c, ['mimic_voice_1', 'whisper'], 0.5, 1.5, 4, 25); return; }
+  if (n.d <= T.treatReach - 0.6) { c.setState('idle'); csnd(M, c, ['lm_giggle', 'mimic_voice_1'], 0.5, 1, 4, 25); return; }
   c.setState('walk'); M.moveToward(c, n.p.pos, dt, c.def.walk);
 }
 
@@ -142,7 +142,7 @@ function lootMimic(c, dt, M) {
     else {
       d.creak -= dt;
       const n = M.nearest(c, pl, 14);
-      if (d.creak <= 0 && n) { d.creak = 14 + rnd() * 16; csnd(M, c, ['door_creak_1', 'door_creak', 'squeak'], 0.26, 1.7, 2, 14); }   // audio tell (the visual tell is breathing + a twitch)
+      if (d.creak <= 0 && n) { d.creak = 14 + rnd() * 16; csnd(M, c, ['lm_mimic_creak', 'door_creak_1'], 0.4, 1, 2, 14); }   // audio tell (the visual tell is breathing + a twitch)
       return;
     }
   }
@@ -170,7 +170,7 @@ function masked(c, dt, M) {
   d.voiceT -= dt;
   const pl = M.playersFor(c).filter((p) => !p.dead && !p.inShip);
   const nn = M.nearest(c, pl, 40);
-  if (d.voiceT <= 0 && nn) { d.voiceT = 7 + rnd() * 9; csnd(M, c, [c.seed % 2 ? 'mimic_voice_2' : 'mimic_voice_1'], 0.4, c.seed % 2 ? 1.25 : 0.7, 3, 26); }   // laughing (smile) / crying (cry): the tell
+  if (d.voiceT <= 0 && nn) { d.voiceT = 7 + rnd() * 9; csnd(M, c, [c.seed % 2 ? 'lm_mask_laugh' : 'lm_mask_weep'], 0.4, 1, 3, 26); }   // laughing (smile) / crying (cry): the tell
   if (c.state === 'grab') {
     const p = pl.find((q) => q.id === c.target);
     const free = !p || M.game.balRules?.book?.isFree?.(p.id, M.game.time);
@@ -200,12 +200,12 @@ export function registerLcContent() {
   for (const def of Object.values(ITEM_DEFS)) if (!ITEMS[def.id]) registerItem({ ...def });
   for (const tbl of Object.values(SCRAP_TABLE)) if (Array.isArray(tbl) && !tbl.some((e) => e[0] === 'lm_mask_smile')) tbl.push(['lm_mask_smile', 0.9], ['lm_mask_cry', 0.9]);
   Object.assign(STATE_SOUNDS, {
-    lm_witch: { ritual: [['whisper', 'mimic_voice_1'], 0.9, 0.55], dead: [['creature_death'], 1, 0.6], stunned: ['hit_flesh', 0.7, 0.7] },
+    lm_witch: { ritual: [['lm_witch_chant', 'mimic_voice_1'], 0.9, 1], dead: [['creature_death'], 1, 0.6], stunned: ['hit_flesh', 0.7, 0.7] },
     lm_keeper: { dark: [['glass_break', 'glass'], 0.8, 0.8], dead: [['glass_break', 'creature_death'], 0.9, 0.7], stunned: ['hit_flesh', 0.7, 0.7] },
     lm_treater: { dead: [['creature_death'], 0.7, 1.4] },
     lm_hunter: { emerge: [['mon_scream', 'jester_scream'], 0.9, 0.7], attack: [['lurker_growl', 'hound_growl'], 1, 0.7], run: [['hound_growl'], 0.7, 0.55], dead: [['creature_death'], 1, 0.6], stunned: ['hit_flesh', 0.7, 0.7] },
     lm_lootmimic: { attack: [['lurker_snap', 'hound_bark'], 1, 1.25], run: [['hound_growl'], 0.6, 1.5], dead: [['creature_death'], 0.8, 1.3], stunned: ['hit_flesh', 0.7, 1] },
-    lm_masked: { grab: [['mimic_voice_2', 'whisper'], 0.9, 0.6], dead: [['creature_death'], 0.8, 0.9], stunned: ['hit_flesh', 0.7, 0.8] },
+    lm_masked: { grab: [['lm_mask_laugh', 'mimic_voice_2'], 0.9, 0.8], dead: [['creature_death'], 0.8, 0.9], stunned: ['hit_flesh', 0.7, 0.8] },
   });
   LOOPS.lm_witch = [['ritual', 'heartbeat', 0.8, 0.75]];
   LOOPS.lm_hunter = [['*', 'lights_buzz', 0.32, 0.6]];

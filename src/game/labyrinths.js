@@ -102,12 +102,13 @@ export function installLabyrinths(game) {
       L.warn.color.setHex(Math.sin(tr.t * 9) > 0 ? 0xff2a1a : 0x2a0000);
       if (!tr.horn && tr.t > 0.2) {
         tr.horn = true; toast(t('GHOST TRAIN INBOUND - get into an alcove!'), 'warn');
-        for (const z of [L.zA + 2, L.zB - 2]) { try { game.audio?.at?.('ship_horn', new V3(L.xC, L.y + 2, z), 1, { maxDistance: 140 }); } catch { /* audio optional */ } }
+        for (const z of [L.zA + 2, L.zB - 2]) { try { game.audio?.at?.('train_horn', new V3(L.xC, L.y + 2, z), 1, { maxDistance: 140 }); } catch { /* audio optional */ } }
       }
       return;
     }
     if (st.done) { S.train = null; L.train.visible = false; L.warn.color.setHex(0x140000); return; }
     L.warn.color.setHex(0x140000);
+    game.sound2?.hold('train', 'train_rumble', { pos: new V3(L.xC, L.y + 1, st.z), vol: 0.9, lease: 0.3, ref: 8, max: 90 });   // [sound2] rail rumble follows the train
     L.train.visible = true; L.train.position.set(L.xC, L.y, st.z); L.train.rotation.y = tr.dir < 0 ? Math.PI : 0;
     const near = Math.abs(((p?.pos?.z) ?? 1e9) - st.z);
     if (near < 30) { try { game.engine?.shake?.(Math.min(0.35, (30 - near) / 90)); } catch { /* engine optional */ } }
@@ -133,7 +134,7 @@ export function installLabyrinths(game) {
     try { game.physics?.removeCollider(v.col); } catch { /* already gone */ }
     fac()?.nav?.blockedEdges?.delete(v.key);
     if (quiet) return;
-    try { game.particles?.burst(new V3(v.x, v.y, v.z), 'goo', null, 1.6); game.sfx?.('cloth_rustle', 0.8, 0.8); } catch { /* fx optional */ }
+    try { game.particles?.burst(new V3(v.x, v.y, v.z), 'goo', null, 1.6); game.sfx?.('vine_cut', 0.8); } catch { /* fx optional */ }   // [sound2]
     if (Math.hypot((game.player?.pos.x ?? 1e9) - v.x, (game.player?.pos.z ?? 1e9) - v.z) < 9) toast(t('Vine wall cut. A shortcut opens.'), 'good');
   }
   /** melee swing: does the view ray hit an intact vine wall? */
@@ -176,7 +177,8 @@ export function installLabyrinths(game) {
     let k = 0;
     for (const s of L.spores) {
       const u = ((base + s.phase) % K.SPORE.period) / K.SPORE.life;
-      if (u >= 1) { s.puff.visible = false; s.pod.scale.setScalar(1); continue; }
+      if (u >= 1) { s.puff.visible = false; s.pod.scale.setScalar(1); s.snd = false; continue; }
+      if (!s.snd) { s.snd = true; if (p && Math.hypot(p.pos.x - s.x, p.pos.z - s.z) < 16) game.sound2?.cue('spore_puff', new V3(s.x, s.y, s.z), 0.7); }   // [sound2]
       const e = Math.min(1, u * 5) * Math.pow(1 - u, 0.6);
       s.puff.visible = true; s.puff.scale.setScalar(0.4 + u * K.SPORE.radius); s.puff.material.opacity = 0.34 * e;
       s.pod.scale.setScalar(1 + 0.6 * Math.sin(u * 3));
@@ -224,8 +226,8 @@ export function installLabyrinths(game) {
     lk.t += dt;
     L.alarm.color.setHex(Math.sin(lk.t * 8) > 0 ? 0xff2a1a : 0x300000);
     lk.siren -= dt;
-    if (lk.t < K.LOCK.warn + K.LOCK.sec && lk.siren <= 0) { lk.siren = 2.4; try { game.sfx?.('ship_alarm', 0.55); } catch { /* audio optional */ } }
-    if (!lk.on && lk.t >= K.LOCK.warn) { lk.on = true; setGates(L, true); try { game.sfx?.('blast_door', 0.8); } catch { /* audio optional */ } toast(t('LOCKDOWN - the cell doors slam shut for 20 s'), 'warn'); }
+    if (lk.t < K.LOCK.warn + K.LOCK.sec && lk.siren <= 0) { lk.siren = 2.4; try { game.sfx?.('lockdown_siren', 0.6); } catch { /* audio optional */ } }
+    if (!lk.on && lk.t >= K.LOCK.warn) { lk.on = true; setGates(L, true); try { game.sfx?.('gate_slam', 0.9); } catch { /* audio optional */ } toast(t('LOCKDOWN - the cell doors slam shut for 20 s'), 'warn'); }
     if (lk.t >= K.LOCK.warn + K.LOCK.sec) { setGates(L, false); S.lock = null; L.alarm.color.setHex(0x2a0000); try { game.sfx?.('door_open', 0.6); } catch { /* audio optional */ } }
     else if (lk.t < 0.3 && !lk.warned) { lk.warned = true; toast(t('LOCKDOWN INBOUND - get out of the cells!'), 'warn'); }
   }
@@ -262,11 +264,12 @@ export function installLabyrinths(game) {
     const E = S.elev, p = game.player;
     if (!E.moving) return;
     E.t += dt;
+    if (!(E.stalled && E.t < E.ride.dur / 2 + E.ride.stall)) game.sound2?.hold('elev', 'elevator_hum', { pos: new V3(L.cx, L.cab.position.y + 1, L.cz), vol: E.rider ? 0.5 : 0.9, lease: 0.3, ref: 5, max: 40 });   // [sound2] motor hum, silent while the cab is stalled
     const total = E.ride.dur + E.ride.stall, pr = K.elevProgress(E.ride, Math.min(E.t, total));
     const y = L.ys[E.from] + (L.ys[E.to] - L.ys[E.from]) * pr;
     L.cab.position.y = y;
     if (E.ride.stall && !E.stalled && E.t >= E.ride.dur / 2) {
-      E.stalled = true; try { game.sfx?.('power_down', 0.8); } catch { /* audio optional */ }
+      E.stalled = true; try { game.sfx?.('elevator_stall', 0.8); } catch { /* audio optional */ }
       if (E.rider) { toast(t('The elevator stalls...'), 'warn'); try { game.net.request('noise', { p: [L.cx, L.ys[0] + 1, L.cz], loud: 0.9 }); } catch { /* net closing */ } }
     }
     L.cabLamp.color.setHex(E.stalled && E.t < E.ride.dur / 2 + E.ride.stall && Math.sin(E.t * 14) > 0 ? 0x223344 : 0xdff4ff);

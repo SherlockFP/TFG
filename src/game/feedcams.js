@@ -412,7 +412,7 @@ export function installFeedcams(game) {
   function onFxMsg(d) {
     if (disposed || !d) return;
     const c = S.plan[d.i | 0], me = game.selfId;
-    if (d.k === 'live') { if (d.id === me) { try { game.onboard?.fr?.camDone?.(); } catch { /* onboard optional */ } snd('ui_error', null, 0.5); toast(t(d.tag ? 'ON AIR - you are TAGGED until you reach the ship. Kill that camera to clear it.' : 'ON AIR - you are live'), 'bad'); } else toast(tf('{name} went live', { name: game.playerName?.(d.id) || '?' }), 'warn'); }
+    if (d.k === 'live') { if (d.id === me) { try { game.onboard?.fr?.camDone?.(); } catch { /* onboard optional */ } snd('onair_sting', null, 0.65); toast(t(d.tag ? 'ON AIR - you are TAGGED until you reach the ship. Kill that camera to clear it.' : 'ON AIR - you are live'), 'bad'); } else toast(tf('{name} went live', { name: game.playerName?.(d.id) || '?' }), 'warn'); }
     else if (d.k === 'tut') { toast(tf('Clean pass. The Algorithm saw nothing: +▮{n}', { n: d.n }), 'good'); snd('ui_confirm', null, 0.5); try { game.onboard?.fr?.camDone?.(); } catch { /* onboard optional */ } }
     else if (d.k === 'untag') { if (d.to === me) toast(t('Tag cleared. The recording is gone.'), 'good'); }
     else if (d.k === 'juke') { if (d.to === me) toast(t('Clean dodge. The stream lagged behind you.'), 'good'); }
@@ -421,10 +421,10 @@ export function installFeedcams(game) {
     else if (d.k === 'say') { try { game.lore?.say?.(t(d.s), { mood: 'curious' }); } catch { /* lore optional */ } }
     else if (c) {
       const p = camPos(c);
-      if (d.k === 'smash' || d.k === 'spark') { snd('hit_metal', p, 0.9); game.particles?.burst?.(p, 'sparks', new V3(0, -1, 0), d.k === 'smash' ? 1.2 : 0.5); }
+      if (d.k === 'smash' || d.k === 'spark') { snd(d.k === 'smash' ? 'cam_smash' : 'spark', p, 0.9); game.particles?.burst?.(p, 'sparks', new V3(0, -1, 0), d.k === 'smash' ? 1.2 : 0.5); }
       else if (d.k === 'zap') { snd('taser_zap', p, 0.8); game.particles?.burst?.(p, 'sparks', new V3(0, -1, 0), 0.8); }
-      else if (d.k === 'spray') snd('spray_paint', p, 0.7);
-      else if (d.k === 'cut') { const j = new V3(c.jb.x, c.jb.y, c.jb.z); snd('hit_metal', j, 0.4); game.particles?.burst?.(j, 'sparks', new V3(0, 1, 0), 0.4); if (d.by === me) toast(t('Cable cut. That camera is dead for today.'), 'good'); }
+      else if (d.k === 'spray') snd('cam_spray', p, 0.7);
+      else if (d.k === 'cut') { const j = new V3(c.jb.x, c.jb.y, c.jb.z); snd('junction_cut', j, 0.6); game.particles?.burst?.(j, 'sparks', new V3(0, 1, 0), 0.4); if (d.by === me) toast(t('Cable cut. That camera is dead for today.'), 'good'); }
     }
   }
   function onSell(d) {
@@ -451,6 +451,13 @@ export function installFeedcams(game) {
     try { localStorage.setItem('tfg.fc.tips', String(got | bit)); } catch { /* storage optional */ }
     try { game.lore?.say?.(t(TIPS[Math.log2(bit)]), { mood: 'curious', pri: true }); } catch { /* lore optional */ }
   }
+  // [sound2] servo whirr of the nearest working camera (quiet, positional)
+  function soundTick() {
+    const p = game.player; if (!p || p.dead || p.inShip || !S.plan.length || !game.sound2) return;
+    let best = null, bd = 14;
+    for (const c of S.plan) { const d = Math.hypot(p.pos.x - c.x, p.pos.z - c.z); if (d < bd && stOf(c.i) === ST.OK && Math.abs(p.pos.y - (c.y - 2)) < 6) { bd = d; best = c; } }
+    if (best) game.sound2.hold('camservo', 'cam_servo_loop', { pos: camPos(best), vol: 0.55, lease: 1.1, ref: 3, max: 16 });
+  }
   function clientTick(dt) {
     ensureUi();
     const F = fc(), me = F?.p?.[game.selfId], m = me ? me[0] / 100 : 0, live = me ? me[1] : 0, tag = me ? me[2] : 0;
@@ -459,9 +466,11 @@ export function installFeedcams(game) {
       const key = Math.round(a * 20);
       if (key !== S.vigKey) { S.vigKey = key; S.vig.style.opacity = String(key / 20); }
     }
+    if (m > 0.04 && !live && game.sound2) game.sound2.hold('rec', 'rec_lock', { vol: 0.15 + 0.6 * m, pitch: 0.8 + 0.9 * Math.min(1, m), lease: 0.25 });   // [sound2] REC lock: rises with the meter
     vigT += dt;
     if (vigT >= 0.5) {
       vigT = 0;
+      soundTick();
       if (typeof document !== 'undefined') for (const el of document.querySelectorAll('.algo-live')) { el.classList.toggle('fc-onair', !!live); el.classList.toggle('fc-tag', !live && !!tag); if (live || tag) el.dataset.fc = t(live ? 'ON AIR' : 'TAGGED'); }
       const p = game.player;
       if (p && !p.dead && S.plan.length && F) {

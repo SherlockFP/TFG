@@ -256,6 +256,7 @@ import { installRewardviz } from './rewardviz.js';   // wave 8: reward visibilit
 import { installLabyrinths } from './labyrinths.js';   // [labyrinths] metro ghost train + greenhouse vines / spores (docs/wave8/labyrinths.md)
 // [import:lcmonsters]
 import { installAtmos } from './atmos.js';   // [import:atmos]
+import { installSound2 } from './sound2.js';   // [import:sound2] wave 8 sound pass 2 (docs/wave8/sound2.md)
 import { installArcade2 } from './arcade2.js';
 import { installFeedcams } from './feedcams.js';   // [import:feedcams]
 import { installFeedcams2 } from './feedcams2.js';   // [import:feedcams2] wave 8 pass 2: showcase, drones, jammer, highlights
@@ -549,6 +550,7 @@ export class Game extends Emitter {
     this.useModule('labyrinths', installLabyrinths);   // [labyrinths]
     // [slot:lcmonsters]
     this.useModule('atmos', installAtmos);   // [slot:atmos]
+    this.useModule('sound2', installSound2);   // [slot:sound2]
     this.useModule('arcade2', installArcade2);
     this.useModule('feedcams', installFeedcams);   // [slot:feedcams]
     this.useModule('feedcams2', installFeedcams2);   // [slot:feedcams2]

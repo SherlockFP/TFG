@@ -170,7 +170,7 @@ export function installLcmonsters(game) {
     mark(pid, keeper) {
       const m = H.marks.get(pid), fresh = !m || m.until < H.clock;
       H.marks.set(pid, { until: H.clock + T.markT, next: m && !fresh ? m.next : H.clock + 0.4, sent: fresh ? H.clock : m.sent });
-      if (fresh || H.clock - m.sent > 6) { H.marks.get(pid).sent = H.clock; g.net.sendTo(pid, 'lm', { k: 'mk', to: pid, t: T.markT }); if (keeper) csnd(g.creatures, keeper, ['bell_ding', 'glass'], 0.6, 0.8, 6, 40); }
+      if (fresh || H.clock - m.sent > 6) { H.marks.get(pid).sent = H.clock; g.net.sendTo(pid, 'lm', { k: 'mk', to: pid, t: T.markT }); if (keeper) csnd(g.creatures, keeper, ['lm_mark_bell', 'bell_ding'], 0.6, 1, 6, 40); }
     },
     maskedHit(pid) { H.hit.set(pid, H.clock); },
     despawn,
@@ -309,9 +309,9 @@ export function installLcmonsters(game) {
             let r = Math.random() * tot, id = table[0][0]; for (const e of table) { r -= e[1]; if (r <= 0) { id = e[0]; break; } }
             g.items.hostSpawn(id, p.pos.clone().add(new THREE.Vector3(0, 1.2, 0)).addScaledVector(p.look, 0.8), { value: res.value });
           }
-          csnd(g.creatures, c, ['bell_ding', 'mimic_voice_1'], 0.8, 1.4, 5, 30);
+          csnd(g.creatures, c, ['lm_treat_jingle', 'bell_ding'], 0.8, 1, 5, 30);
         } else {
-          csnd(g.creatures, c, ['mimic_voice_2', 'sting_violin_glitch'], 0.9, 0.7, 5, 40);
+          csnd(g.creatures, c, ['sting_violin_glitch', 'mimic_voice_2'], 0.9, 1, 5, 40);
           if (res.what === 'teleport') {
             const spots = (fac()?.scrapSpots || []).filter((s) => !s.elevated && Math.hypot(s.x - p.pos.x, s.z - p.pos.z) > 25);
             const s = spots[Math.floor(Math.random() * spots.length)];

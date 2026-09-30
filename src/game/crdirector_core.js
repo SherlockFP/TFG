@@ -202,9 +202,9 @@ export const TELLS = Object.freeze({
   clickbait: { s: ['ui_notify', 'bell_ding'], p: 1.1, v: 0.5, r: 26 },
   replyguy: { s: ['voice_bat_anger', 'animal_crow'], p: 0.8, v: 0.5, r: 30 },
   listener: { s: ['breath_heavy'], p: 0.45, v: 0.5, r: 22 },
-  cd_dimmer: { s: ['lights_buzz'], p: 0.6, v: 0.6, r: 22, fx: 'flicker', eye: '#ffb347' },
-  cd_follower: { s: ['walkie_static'], p: 0.5, v: 0.6, r: 28, eye: '#ffffff' },
-  cd_auditor: { s: ['coins', 'bell_ding'], p: 0.6, v: 0.5, r: 26, eye: '#ffd24a' },
+  cd_dimmer: { s: ['cd_dimmer_hum', 'lights_buzz'], p: 1, v: 0.6, r: 22, fx: 'flicker', eye: '#ffb347' },
+  cd_follower: { s: ['cd_follower_static', 'walkie_static'], p: 1, v: 0.6, r: 28, eye: '#ffffff' },
+  cd_auditor: { s: ['cd_auditor_stamp', 'bell_ding'], p: 1, v: 0.5, r: 26, eye: '#ffd24a' },
 });
 export const DEFAULT_TELL = Object.freeze({ s: ['heartbeat'], p: 1, v: 0.35, r: 22 });
 export const tellOf = (type) => TELLS[type] || DEFAULT_TELL;

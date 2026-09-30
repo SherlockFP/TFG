@@ -162,7 +162,7 @@ export function installDowned(game) {
       S.down.set(id, { dur: +m.dur || 20, left: +m.dur || 20, prog: 0, by: null, p: m.p || null, name: nameOf(id) });
       if (S.me && id === game.selfId) S.me.seen = true;
       try { mods.emit('tfg:downed', { id, name: nameOf(id), cause: m.c || 'down', fast: !!m.fast }, game); } catch (e) { console.warn('[downed] emit', e); }
-      if (id !== game.selfId) { game.ui?.systemMessage?.(tf('{name} is down! Hold [E] on them to revive.', { name: nameOf(id) }), 'warn'); game.sfx?.('heartbeat', 0.5, 0.8); }
+      if (id !== game.selfId) { game.ui?.systemMessage?.(tf('{name} is down! Hold [E] on them to revive.', { name: nameOf(id) }), 'warn'); game.sound2?.cue('down_thud', m.p ? { x: m.p[0], y: m.p[1], z: m.p[2] } : null, 0.7); }
     } else if (m.k === 'pg') {
       const e = S.down.get(id);
       if (e) { e.prog = +m.p || 0; e.by = m.by || null; if (Number.isFinite(m.l)) e.left = m.l; }
@@ -269,7 +269,7 @@ export function installDowned(game) {
     game.grab?.stop?.(); game.closeMinigame?.(); game.terminal?.close?.(); game.inventory?.close?.();
     game.engine.hurt?.(Math.min(1, Math.max(0.25, dmg / 50)));
     p.onHurt?.(dmg, fromPos);
-    game.sfx?.(game.audio?.variant?.('hurt') || 'heartbeat', 0.8);
+    game.sfx?.(game.audio?.variant?.('hurt') || 'heartbeat', 0.6); game.sound2?.cue('down_thud', null, 0.8);
     game.engine.flash?.(0x550000, 0.7);
     if (fromPos) game.ui?.hud?.damageDirection?.(fromPos, game);
     game.lastHurtT = game.time;
@@ -286,7 +286,7 @@ export function installDowned(game) {
     try { game.net.send('pst', { hp: Math.round(p.hp) }); } catch { /* net closing */ }
     game.engine.flash?.(0xffffff, 0.6);
     game.ui?.toast?.(by ? tf('You were revived by {name}.', { name: nameOf(by) }) : t('You are back on your feet.'), 'good');
-    game.sfx?.('heal', 0.6);
+    game.sound2?.cue('stand_up', null, 0.6); game.sfx?.('heal', 0.4);
   }
   function localBleed(cause) {
     const p = game.player;
@@ -435,6 +435,9 @@ export function installDowned(game) {
     if (g !== game || disposed) return;
     S.clock += dt;
     const p = game.player;
+    if (S.down.size && game.sound2) {   // [sound2] revive progress: a soft pulse that speeds up while somebody is being lifted
+      for (const e of S.down.values()) if (e.by && e.prog > 0) { const f = Math.min(1, e.prog / RULES.reviveS); game.sound2.hold('revive', 'revive_loop', { vol: 0.4 + 0.5 * f, pitch: 0.85 + 0.45 * f, lease: 0.6, pos: e.p ? { x: e.p[0], y: e.p[1], z: e.p[2] } : undefined }); break; }
+    }
     // host: bleed timers, revive progress broadcast, cleanup of players who left / died
     if (host() && S.book.e.size) {
       for (const e of S.book.tick(dt, S.clock)) send({ k: 'bleed', id: e.id, c: e.cause });

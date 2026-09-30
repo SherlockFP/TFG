@@ -56,7 +56,7 @@ export function installRewardviz(game) {
   function pop(n) {
     n = Math.round(+n);
     if (disposed || !C.shouldPop(n)) return false;
-    try { game.audio?.play?.('coins', { volume: 0.5, pitch: 0.9 + Math.min(0.5, n / 800) }); } catch { /* audio optional */ }
+    try { game.audio?.play?.('coin_pop', { volume: 0.6, pitch: 0.9 + Math.min(0.5, n / 800) }); game.audio?.play?.('coins', { volume: 0.3, pitch: 0.9 + Math.min(0.5, n / 800), delay: 0.05 }); } catch { /* audio optional */ }   // [sound2] pop + a soft coin tail
     if (typeof document === 'undefined') return true;
     const el = document.createElement('div'); el.className = 'rv-pop'; el.textContent = '+' + fmtMoney(n);
     (document.getElementById('ui') || document.body).appendChild(el);

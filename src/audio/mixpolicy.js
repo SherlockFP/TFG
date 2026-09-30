@@ -18,6 +18,20 @@ export const RULES = [
   [/^(crickets|rain|spider_skitter|reel_loop|walkie_static)$/, { lp: 5500 }],
   [/^heartbeat$/, { max: 1, cool: 0.4 }],
   [/^(drip_\d|distant_bang_\d|vent_rattle|whisper_\d)/, { cool: 0.8, max: 1, vary: [0.08, 0.2], key: 'ambient_one_shot' }],
+  // [sound2] wave-8 sounds: every id gets a category (cat) so the mix stays readable: loops sit under cues, stings and creature cues own the space
+    [/^(cam_servo_loop|rec_lock|jammer_hum|drone_rotor|revive_loop|train_rumble|elevator_hum|uw_loop|sand_wind|sand_storm|generator_loop)$/, { cat: 'loop', gain: 1, cool: 0.5, max: 2 }],
+    [/^(onair_sting|hub_unlock|lockdown_siren|air_warning|lm_mark_bell|shift_bell|battery_charge)$/, { cat: 'sting', gain: 0.8, cool: 1.2, max: 1, lp: 8000 }],
+  [/^train_horn$/, { cat: 'sting', gain: 0.8, cool: 0.05, max: 2, lp: 8000 }],   // one horn at each tunnel end
+    [/^lm_rift_rumble$/, { cat: 'creature_cue', gain: 0.9, cool: 4, max: 1, lp: 6000 }],
+    [/^(door_knock|light_flicker|heart_monitor_beep|lm_(witch_chant|cage_chime|giggle|treat_jingle|mimic_creak|mask_laugh|mask_weep)|cd_(dimmer_hum|follower_static|auditor_stamp))$/, { cat: 'creature_cue', gain: 0.9, cool: 0.3, max: 2, vary: [0.03, 0.06], lp: 7500 }],
+    [/^(mine_pick_stone|mine_pick_ore|mine_pick_crystal)$/, { cat: 'mining', cool: 0.08, max: 3, vary: [0.07, 0.12] }],
+    [/^mine_drill$/, { cat: 'mining', gain: 0.8, cool: 0.25, max: 2, vary: [0.04, 0.08], lp: 6500 }],
+    [/^(down_thud|stand_up|carry_creak|fragile_crunch|catch_thump|cam_smash|cam_spray|junction_cut|gate_slam|elevator_stall|vine_cut|spore_puff|zip_line|uw_bubbles|cave_creak|shelf_slide)$/, { cat: 'foley', cool: 0.12, max: 3, vary: [0.05, 0.1], lp: 8000 }],
+    [/^chat_blip$/, { cat: 'ui_soft', gain: 0.5, cool: 0.35, max: 1, vary: [0.08, 0.15], lp: 5000 }],
+    [/^(crt_on|crt_off|coin_pop)$/, { cat: 'ui_soft', gain: 0.6, cool: 0.08, max: 2, vary: [0.04, 0.1], lp: 7000 }],
+    [/^arcade2_/, { cat: 'minigame', gain: 0.6, cool: 0.04, max: 4, lp: 8000 }],
+    [/^alien_chatter$/, { cat: 'resto', gain: 0.6, cool: 2.5, max: 1, vary: [0.15, 0.2], lp: 6000 }],
+    [/^resto_(sizzle|bell)$/, { cat: 'resto', gain: 0.6, cool: 1, max: 1, vary: [0.04, 0.1], lp: 7500 }],
 ];
 const DEFAULT = { cool: 0.02, max: 8 };
 const cache = new Map();

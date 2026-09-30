@@ -286,7 +286,7 @@ export function installFeedcams2(game) {
     else if (d.k === 'dd' || d.k === 'dz') {
       const dr = S.drones[d.i | 0]; if (!dr || !S.ground) return;
       const p = dronePos(dr, hostNow()), v = new V3(p.x, p.y, p.z);
-      try { game.audio?.at?.(d.k === 'dd' ? 'hit_metal' : 'taser_zap', v, 0.9, { refDistance: 8, maxDistance: 70 }); game.particles?.burst?.(v, 'sparks', new V3(0, -1, 0), 1.2); } catch { /* fx optional */ }
+      try { game.audio?.at?.(d.k === 'dd' ? 'cam_smash' : 'taser_zap', v, 0.9, { refDistance: 8, maxDistance: 70 }); game.particles?.burst?.(v, 'sparks', new V3(0, -1, 0), 1.2); } catch { /* fx optional */ }
       if (d.k === 'dd') toast(t('Drone down. The night feed lost an eye.'), 'good');
     }
   }
@@ -327,6 +327,18 @@ export function installFeedcams2(game) {
     extra.push(`<b>${esc(t('HIGHLIGHT'))}</b> ${esc(tf(HL_TEXT[h[0]], { name: h[1], v: h[2], x: t(h[3] || '') }))}`);
   }));
 
+  // [sound2] jammer hum + the rotor / searchlight ballast of the nearest live drone (leased loops, refreshed at 2 Hz)
+  function soundTick() {
+    const p = game.player, s2 = game.sound2; if (!p || p.dead || !s2) return;
+    let jb = null, jd = 14;
+    for (const j of S.jams || []) { const d = Math.hypot(p.pos.x - j.x, p.pos.z - j.z); if (d < jd) { jd = d; jb = j; } }
+    if (jb) s2.hold('jam', 'jammer_hum', { pos: new V3(jb.x, jb.y, jb.z), vol: 0.6, lease: 1.1, ref: 2, max: 14 });
+    if (!S.drones.length || !night() || p.inShip) return;
+    let db = null, dd = 42;
+    for (const d of S.drones) { const e = F2()?.dr?.[d.i]; if (e && e[0] === ST.DEAD) continue; const q = dronePos(d, hostNow()), m = Math.hypot(p.pos.x - q.x, p.pos.z - q.z); if (m < dd) { dd = m; db = q; } }
+    if (db) s2.hold('drone', 'drone_rotor', { pos: new V3(db.x, db.y, db.z), vol: 0.7, lease: 1.1, ref: 5, max: 42 });
+  }
+
   offs.push(mods.on('update', (dt, g) => {
     if (g !== game || disposed) return;
     try {
@@ -335,7 +347,7 @@ export function installFeedcams2(game) {
       if (!host()) { S.jamT -= dt; if (S.jamT <= 0) { S.jamT = 0.5; S.jams = jamList(); } }
       if (S.vis) visuals();
       if (host() && onMoon()) { S.tick += dt; if (S.tick >= 0.1) { const d = S.tick; S.tick = 0; hostTick(d); } }
-      S.tipT -= dt; if (S.tipT <= 0) { S.tipT = 0.5; clientTips(); }
+      S.tipT -= dt; if (S.tipT <= 0) { S.tipT = 0.5; clientTips(); soundTick(); }
     } catch (e) { if (!S.warned) { S.warned = true; console.warn('[feedcams2] update', e); } }
   }));
 

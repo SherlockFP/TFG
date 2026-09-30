@@ -62,13 +62,13 @@ export function playClip(o) {
   const k = W / sx, X = (x) => W / 2 + (x - cx) * k, Z = (z) => Hh / 2 + (z - cz) * k;
 
   const say = (s) => {
-    const d = doc.createElement('div'); d.innerHTML = `<b>${escapeHtml(t('ALGORITHM'))}</b>`; d.appendChild(doc.createTextNode(s)); chat.appendChild(d);
+    const d = doc.createElement('div'); d.innerHTML = `<b>${escapeHtml(t('ALGORITHM'))}</b>`; d.appendChild(doc.createTextNode(s)); chat.appendChild(d); o.sfx?.('chat_blip', 0.35);   // [sound2] quiet chat tick
     while (chat.children.length > 3) chat.firstChild.remove();
   };
   const lines = [[0.3, () => say(t(H.pickCaption(INTRO, seed)))], [Math.max(0.9, H.clipWall(ev, ev) - 0.3), () => say(tf(cap(clip.k, seed), { name: clip.s, v: clip.v }))],
     [Math.max(2.5, wall - 1.4), () => say(t(H.pickCaption(OUTRO, seed + 1)))]];
   let li = 0, t0 = performance.now(), raf = 0, done = false, ended = 0;
-  o.sfx?.('ui_hover', 0.4);
+  o.sfx?.('crt_on', 0.45);   // [sound2] CRT power-on
 
   function draw(u, el) {
     ctx.fillStyle = PAL.bg; ctx.fillRect(0, 0, W, Hh);
@@ -124,6 +124,7 @@ export function playClip(o) {
   function stop() {
     if (done) return; done = true;
     cancelAnimationFrame(raf); doc.removeEventListener('keydown', onKey, true);
+    o.sfx?.('crt_off', 0.4);   // [sound2]
     root.classList.add('out'); clearTimeout(ended); ended = setTimeout(() => root.remove(), 450);
     try { o.onDone?.(); } catch { /* caller gone */ }
   }
