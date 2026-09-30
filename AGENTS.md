@@ -846,3 +846,7 @@ first-join rejoin 35 s, lost-host 25 s, host never rejoins. NAT/SDP failures now
 everyone on Nostr; lobby browser shows real peer/relay counts; NETSTATS shows relays, TURN and per-peer ICE path.
 **Owner action still needed:** a TURN account + `VITE_TURN_*` on Render for friends behind CGNAT/mobile (no free
 public TURN works). Details: `docs/MULTIPLAYER_HOTFIX.md` → "Follow-up".
+
+### Wave 10 - outlife10
+`src/game/outlife10{,_core,_art}.js`: outdoor life for every moon (boulders / tufts / snags, 5 Company-debris POIs with sound + one line, fog pools, ONE pooled particle field per biome, a second paler skyline ring with beacons + the Algorithm's watcher tower). Seeded, ~10 draw calls, built as landing jobs after mapart + soul, colliders for <= 12 big boulders only.
+Test: `node tools/harness/outlife10.test.mjs`. Docs: `docs/wave10/outlife10.md`. Not seen in a browser yet (lead verifies).

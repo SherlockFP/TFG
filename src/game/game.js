@@ -224,7 +224,7 @@ import { installStory } from './lazymods.js';   // [import:story] wave 6: two pa
 // [import:creatures10]
 // [import:labyr10]
 // [import:moons10]
-// [import:outlife10]
+import { installOutlife10 } from './outlife10.js';
 // [import:landing10]
 // [import:mystery10]
 import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
@@ -613,7 +613,7 @@ export class Game extends Emitter {
     // [slot:creatures10]
     // [slot:labyr10]
     // [slot:moons10]
-    // [slot:outlife10]
+    this.useModule('outlife10', installOutlife10);
     // [slot:landing10]
     // [slot:mystery10]
 
