@@ -64,6 +64,19 @@ class MenuScene {
   }
 }
 
+// [fastmenu] tiny corner line on the title menu while the ext models load in the background (cleared when done)
+function setAssetLine(text) {
+  let el = document.getElementById('asset-line');
+  if (!text) { el?.remove(); return; }
+  if (!el) {
+    el = document.createElement('div'); el.id = 'asset-line';
+    el.style.cssText = "position:fixed;right:14px;bottom:10px;z-index:11;pointer-events:none;font:18px var(--font,'VT323',monospace);color:var(--green-dim,#1c8f3b);opacity:.8;letter-spacing:1px;text-shadow:0 0 6px rgba(57,255,106,.25)";
+    el.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(el);
+  }
+  el.textContent = text;
+}
+
 class App {
   constructor() {
     this.settings = loadSettings();
@@ -81,6 +94,8 @@ class App {
     this.game = null;
     addTranslations({ 'Fullscreen when playing': 'Oynarken tam ekran', 'stops Ctrl+W (crouch + forward) from closing the tab': 'Ctrl+W (eğil + ileri) sekmeyi kapatmasın', 'Ask before leaving the page': 'Sayfadan çıkmadan önce sor' }, 'tr');
     addTranslations({ 'Fullscreen when playing': 'Полный экран в игре', 'stops Ctrl+W (crouch + forward) from closing the tab': 'Ctrl+W (присесть + вперёд) не закроет вкладку', 'Ask before leaving the page': 'Спрашивать перед уходом со страницы' }, 'ru');
+    addTranslations({ 'Loading models {d}/{n}': 'Modeller yükleniyor {d}/{n}' }, 'tr');   // [fastmenu]
+    addTranslations({ 'Loading models {d}/{n}': 'Загрузка моделей {d}/{n}' }, 'ru');
     // [ctrlw] Ctrl+W (crouch + forward) closes the tab and browsers don't let a page cancel it. 1) ask before leaving while in a game;
     // 2) in fullscreen, Keyboard Lock (Chromium) lets the game receive Ctrl+W / Ctrl+T etc. instead of the browser.
     window.addEventListener('beforeunload', (e) => {
@@ -120,18 +135,18 @@ class App {
     this.ui.showLoading(t('Loading assets...'));
     await loadExtManifest();
     registerExtSounds(this.audio);
-    await preloadExtModels(EXT_PRELOAD, (d, n) => this.ui.showLoading(tf('Loading models... {d}/{n}', { d, n })));
-    registerExtContent();
-    this.ui.showLoading(t('Loading mods...'));
-    await this.mods.loadAll();
+    // [fastmenu] the title menu no longer waits for the 174 GLBs: ext models -> registerExtContent -> mods run in the background
+    // (same order as before, so item registration / SCRAP_TABLE are identical) and startGame() awaits this.assetsReady before any Game exists.
     this.mods.maxPlayersAllowed = () => this.mods.maxPlayers || 4;
-    this.mods.emit('boot', this);
+    this.assetsDone = false;
+    this.assetsProgress = { d: 0, n: 0 };
+    this.assetsReady = this.loadAssetsBg();
     this.menu = new CRTMenu(this.engine, this);
     this.ui.hideLoading();
     this.ui.showMenu('title');
     this.bindKeys();
     this.booted = true;
-    if (this.settings.quality === 'auto' && !this.settings.qualityAuto && !navigator.webdriver) this.qprobe = new FpsProbe(3);   // [perf2] first boot: 3 s fps probe on the menu scene
+    if (this.settings.quality === 'auto' && !this.settings.qualityAuto && !navigator.webdriver) this.assetsReady.then(() => { if (!this.game) this.qprobe = new FpsProbe(3); });   // [perf2] first boot: 3 s fps probe on the menu scene ([fastmenu] after the background GLB parsing, which would skew it)
     setTimeout(() => preloadLazyModules(), 1200);   // [perf2] prefetch the lazy chunks while the player reads the menu
     try { installHub(this); this.hubNotifier = createHubNotifier(this); } catch (e) { console.warn('[social] hub', e); }   // [social] optional, never blocks the game
     if (this.audio.ctx && !this.game) this.startMenuAudio();
@@ -155,6 +170,22 @@ class App {
     if (qs.has('autohost')) this.hostGame({ strategy: qs.get('autohost') || 'local', isPublic: qs.get('autohost') !== 'local', slot: 3, lobbyName: 'Test crew', maxPlayers: 4, code: qs.get('code') || undefined });
     else if (qs.has('autojoin')) this.joinGame({ code: qs.get('autojoin').toUpperCase(), strategy: qs.get('net') || 'local' });
     else { const j = parseJoin(location.search, this.settings.netStrategy); if (j) this.joinGame(j); }   // [joinplay] ?join=CODE&net=X: the link carries the net mode
+  }
+
+  /** [fastmenu] background half of boot: ext GLBs -> registerExtContent() -> mods.loadAll() -> 'boot'. Never rejects. */
+  async loadAssetsBg() {
+    try {
+      await preloadExtModels(EXT_PRELOAD, (d, n) => {
+        this.assetsProgress = { d, n };
+        if (this.assetsWaiting) this.ui.showLoading(tf('Loading models... {d}/{n}', { d, n }));
+        else setAssetLine(tf('Loading models {d}/{n}', { d, n }));
+      });
+      registerExtContent();
+      await this.mods.loadAll();
+      this.mods.emit('boot', this);
+    } catch (e) { console.error('[fastmenu] background load', e); }
+    this.assetsDone = true;
+    setAssetLine('');
   }
 
   bindKeys() {
@@ -232,6 +263,13 @@ class App {
 
   async startGame(opts) {
     this.ui.showLoading(opts.host ? t('Preparing the ship...') : tf('Connecting to {code}...', { code: opts.code }));
+    if (!this.assetsDone && this.assetsReady) {   // [fastmenu] PLAY / host / join / join link all pass here: wait for the background load (no delay when already done)
+      this.assetsWaiting = true;
+      const { d, n } = this.assetsProgress;
+      this.ui.showLoading(tf('Loading models... {d}/{n}', { d, n }));
+      try { await this.assetsReady; } finally { this.assetsWaiting = false; }
+      this.ui.showLoading(opts.host ? t('Preparing the ship...') : tf('Connecting to {code}...', { code: opts.code }));
+    }
     await this.audio.init();
     this.audio.resume();
     this.audio.stopAll();

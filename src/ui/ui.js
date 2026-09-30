@@ -554,6 +554,7 @@ export class UI {
       pass = await this.dialog({ title: t('Lobby password'), text: t('This lobby is locked. Enter the password:'), input: { type: 'password', max: 24, placeholder: t('password') }, buttons: [{ label: t('CANCEL'), value: null }, { label: t('Join'), value: '$input', primary: true }] });
       if (pass === null) return;
     }
+    await this.app.assetsReady;   // [fastmenu] mods finish loading in the background: enabledIds() is empty before that
     const mine = this.app.mods.enabledIds();
     const missing = (l.mods || []).filter((m) => !mine.includes(m));
     if (missing.length && !(await this.confirmBox(t('Missing mods'), `${t('The host uses mods you do not have enabled:')}\n${missing.join('\n')}\n\n${t('Join anyway?')}`, t('Join')))) return;
@@ -962,6 +963,7 @@ export class UI {
   }
 
   screen_mods() {
+    if (this.app.assetsDone === false) { const pw = this.panel('wide mods'); pw.append(el('div', {}, t('Loading mods...')), el('div', { class: 'menu-row' }, this.backButton(() => this.showMenu('title')))); this.menuEl.appendChild(pw); this.app.assetsReady.then(() => { if (this.currentScreen === 'mods') this.showMenu('mods'); }); return; }   // [fastmenu] mods load in the background
     if (this.app.mods?.buildScreen) { this.menuEl.appendChild(this.app.mods.buildScreen(this)); return; }   // TFG FEATURES + OPTIONAL MODS tabs (src/mods/modscreen.js)
     const mm = this.app.mods;
     const wrap = this.panel('wide mods');
