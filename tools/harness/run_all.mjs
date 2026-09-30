@@ -53,7 +53,9 @@ await Promise.all(Array.from({ length: Math.min(jobs, files.length) }, worker));
 const fails = results.filter((r) => !r.ok);
 for (const r of fails) {
   console.log(`\n── ${r.file} ${r.timedOut ? '(timeout)' : ''}`);
-  console.log(r.out.trim().split('\n').slice(-15).join('\n'));
+  const lines = r.out.trim().split('\n');
+  const bad = lines.filter((l) => /FAIL|not ok|✗|Error|assert|Timeout|expected/i.test(l) && !/^\s*ok\b/.test(l)).slice(0, 12);
+  console.log((bad.length ? bad : lines.slice(-15)).join('\n'));
 }
 const slow = [...results].sort((a, b) => b.ms - a.ms).slice(0, 5).map((r) => `${r.file.replace(/^tools\/\w+\//, '')} ${(r.ms / 1000).toFixed(0)}s`);
 console.log(`\n${results.length - fails.length}/${results.length} passed in ${((Date.now() - t0) / 1000).toFixed(0)}s (-j ${jobs}). slowest: ${slow.join(', ')}`);
