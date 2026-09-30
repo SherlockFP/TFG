@@ -13,6 +13,7 @@ import { hudDensityOf } from '../ui/hudcalm_ui.js';
 import { walletRowOf } from './wallet.js';
 import { quotaState } from './progression.js';   // [econ9] one quota source
 import { followerCard } from './followers.js';
+import { isVeteran } from './onboard_core.js';
 
 const FLASH_S = { standard: 6, minimal: 3 };
 // dock item id -> rule.  f: shown for FLASH_S s after each change of its text (digits ignored, so ticking timers do not re-trigger)
@@ -48,6 +49,7 @@ html:not([data-hud="full"]) .tfg-threat .tt-foot{display:none}
   display:none;grid-template-columns:1fr 1fr;gap:14px 26px;padding:16px 20px 12px;background:rgba(10,7,4,.9);border:1px solid var(--t-line-hi,#6b4a2a);
   border-top:4px solid var(--amber,#ffb15a);color:var(--text,#f2d8b0);font-family:var(--font,'VT323',monospace);font-size:20px;line-height:1.15;box-shadow:6px 6px 0 rgba(0,0,0,.55)}
 .hc-tab.on{display:grid}
+.hc-tab.hc-compact{grid-template-columns:1fr;gap:4px;width:min(560px,92vw);padding:12px 18px 10px}   /* [lanes] Standard / Minimal: head + 5 lines */
 .hc-tab h4{margin:0 0 6px;font:700 15px/1 var(--font2,'VT323',monospace);letter-spacing:.14em;text-transform:uppercase;color:var(--amber,#ffb15a)}
 .hc-tab .hc-head{grid-column:1/-1;display:flex;justify-content:space-between;font-family:var(--font2,'VT323',monospace);font-weight:700;font-size:16px;letter-spacing:.12em;text-transform:uppercase;color:#fff3e6}
 .hc-tab .hc-head i{font-style:normal;color:var(--amber-dim,#a8722f);font-size:14px}
@@ -137,7 +139,10 @@ export function installHudCalm(game) {
     const fc = followerCard(game.profile);
     const keyName = keyCode().replace(/^Key/, '').replace(/^Digit/, '');
     const moon = MOONS[run.moon]?.name || run.moon || '';
-    const objs = (game.objectives?.full || []).map((o) => `<div class="hc-o ${o.kind}${o.done ? ' done' : ''}">${o.done ? '✔' : o.kind === 'warn' ? '!' : '◆'} ${escapeHtml(o.text)}</div>`).join('');
+    const full = dens() === 'full', vet = isVeteran(game.profile);
+    // [lanes] veterans never see the TUTORIAL step or hint lines on the card
+    const olist = (game.objectives?.full || []).filter((o) => !(vet && (o.pin || o.kind === 'hint')));
+    const objs = olist.map((o) => `<div class="hc-o ${o.kind}${o.done ? ' done' : ''}">${o.done ? '✔' : o.kind === 'warn' ? '!' : '◆'} ${escapeHtml(o.text)}</div>`).join('');
     const rows = [
       [tf('Day {n}', { n: run.day ?? 1 }), escapeHtml(moon)],
       [t('QUOTA'), quotaState(run).text],
@@ -151,11 +156,26 @@ export function installHudCalm(game) {
     ].filter((r) => r[1] || r[0].trim());
     const crew = [`<div class="hc-r"><span>${escapeHtml(game.playerName?.(game.selfId) || '')} (${t('you')})</span><b>${p ? Math.round(p.hp || 0) + '/' + Math.round(p.maxHp || 100) : ''}</b></div>`];
     for (const r of game.remotes?.values?.() || []) crew.push(`<div class="hc-r${r.dead ? ' hc-dead' : ''}"><span>${escapeHtml(r.name || '?')}</span><b>${r.dead ? t('dead') : ''}</b></div>`);
+    card.classList.toggle('hc-compact', !full);
+    if (!full) {   // [lanes] exactly 5 lines: goal / day + quota / wallet + next milestone / crew / (warning or clock)
+      const alive = [...(game.remotes?.values?.() || [])];
+      const line = (a, b) => `<div class="hc-r"><span>${a}</span><b>${b}</b></div>`;
+      const goal = olist.find((o) => o.kind === 'warn') || olist.find((o) => !o.done && o.kind !== 'hint') || olist[0];
+      const lines = [
+        goal ? `<div class="hc-o ${goal.kind}">${goal.kind === 'warn' ? '!' : '◆'} ${escapeHtml(goal.text)}</div>` : `<div class="hc-none">${t('Nothing else to report.')}</div>`,
+        line(escapeHtml(tf('Day {n}', { n: run.day ?? 1 }) + (moon ? ' · ' + moon : '')), `${escapeHtml(t('QUOTA'))} ${quotaState(run).text}`),
+        line(t('CREDITS') + ' · ' + t('Followers'), walletRowOf(game)),
+        line(t('Next milestone'), fc.next ? escapeHtml(`${fc.next.name ? t(fc.next.name) + ' · ' : ''}${fc.next.at}`) : '-'),
+        line(`${escapeHtml(game.playerName?.(game.selfId) || '')} (${t('you')})${alive.length ? ' +' + alive.length : ''}`, p ? Math.round(p.hp || 0) + '/' + Math.round(p.maxHp || 100) : ''),
+      ];
+      card.innerHTML = `<div class="hc-head"><span>${t('FULL STATUS')}</span><i>${escapeHtml(tf('hold {key} for the full status', { key: keyName }))}</i></div>${lines.join('')}`;
+      return;
+    }
     const cells = [];
     for (const el of document.querySelectorAll('.hud-dock-item')) {
       const id = el.dataset.dockId;
       if (!DOCK_RULES[id] || !sigOf(el, 1) || el.querySelector('canvas') || el.querySelector('.off')) continue;
-      cells.push(`<div class="hc-cell">${el.innerHTML}</div>`);
+      cells.push(`<div class="hc-cell">${el.innerHTML}</div>`);   // FACILITY STATUS ('facility') + PATRON ('story') only exist here: Full density
     }
     card.innerHTML = `<div class="hc-head"><span>${t('FULL STATUS')}</span><i>${escapeHtml(tf('hold {key} for the full status', { key: keyName }))}</i></div>
       <div><h4>${t('OBJECTIVES')}</h4>${objs || `<div class="hc-none">${t('Nothing else to report.')}</div>`}<h4 style="margin-top:12px">${t('CREW')}</h4>${crew.join('')}</div>

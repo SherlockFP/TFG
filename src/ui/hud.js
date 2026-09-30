@@ -2,6 +2,7 @@
 // scan labels (with item icons), floating damage numbers, XP/level, coins, toasts, death/spectate
 // overlays, run chips (daily event / favor / streak), outdoor compass, and the landing briefing card.
 import { spreadLabels } from './compass_labels.js';
+export const TOAST_MAX = 2, TOAST_MS = 4000;   // [lanes] lane 2 (toasts): right column, max 2 visible, 4 s
 import * as THREE from 'three';
 import { iconHTML, typeFromName } from './icons.js';
 import { glyph } from './glyphs.js';   // [ui2]
@@ -292,12 +293,23 @@ export class HUD {
     }
     this.showToast(text, kind, ms);
   }
-  showToast(text, kind = 'info', ms = 3800) {
-    const e = el('div', { class: 'toast ' + kind }, typeof text === 'string' ? t(text) : text);   // t(): [i18n8] safety net (ui.toast already translates)
-    this.$.toasts.appendChild(e);
-    setTimeout(() => e.classList.add('out'), ms);
-    setTimeout(() => e.remove(), ms + 600);
-    while (this.$.toasts.children.length > 6) this.$.toasts.firstChild.remove();
+  showToast(text, kind = 'info', ms = TOAST_MS) {
+    ms = Math.min(ms || TOAST_MS, TOAST_MS);
+    // [lanes] lane 2: right column, at most TOAST_MAX visible, TOAST_MS each, a repeat only refreshes the live one
+    const txt = typeof text === 'string' ? t(text) : text;
+    const box = this.$.toasts, label = typeof txt === 'string' ? txt : null;
+    if (label) for (const k of box.children) if (k._tx === label && !k.classList.contains('out')) { clearTimeout(k._t1); clearTimeout(k._t2); this.armToast(k, ms); return; }
+    const e = el('div', { class: 'toast ' + kind }, txt);
+    e._tx = label;
+    box.appendChild(e);
+    this.armToast(e, ms);
+    const live = [...box.children].filter((k) => !k.classList.contains('out'));
+    for (let i = 0; i < live.length - TOAST_MAX; i++) { clearTimeout(live[i]._t1); clearTimeout(live[i]._t2); live[i].remove(); }
+  }
+  armToast(e, ms) {
+    e.classList.remove('out');
+    e._t1 = setTimeout(() => e.classList.add('out'), ms - 500);
+    e._t2 = setTimeout(() => e.remove(), ms);
   }
   flushPending() {
     if ((!this.pendingToasts.length && !this.pendingBig) || this.gate?.()) return;

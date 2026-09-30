@@ -13,10 +13,12 @@ import { dropPoint } from '../world/shiplayout.js';
 import { copyJoinLink } from '../net/joinlink.js';   // [joinplay]
 import { escapeHtml } from '../core/util.js';
 const n0 = (v) => Math.round(v || 0).toLocaleString('en-US');   // credits are always shown with thousands separators (docs/wave8/studio_style.md)
-import { t, tf, tfIn, sysMsg } from '../core/i18n.js';
+import { t, tf, tfIn, sysMsg, addTranslations } from '../core/i18n.js';
 import { tNum } from '../i18n/tnum.js';   // [i18n8] safety net for literal terminal lines that were not wrapped
 import { LAB_HINT } from './labyrinths_core.js';   // [labyrinths]
 
+addTranslations({ '>HELP ALL     every command': '>HELP ALL     tüm komutlar' }, 'tr');
+addTranslations({ '>HELP ALL     every command': '>HELP ALL     все команды' }, 'ru');
 const BANNER = [
   '  _  _______ _____ _    _',
   ' | |/ / ____|  ___/ \\  | |',
@@ -155,18 +157,21 @@ export class Terminal {
     if (this.pending && (w0 === 'deny' || w0 === 'd' || w0 === 'no' || w0 === 'n')) { this.pending = null; this.print(t('Cancelled.')); return; }
     this.pending = null;
     switch (w0) {
-      case 'help': case '?':
-        this.print([
+      case 'help': case '?': {
+        // [lanes] no vocabulary dump: HELP prints the 8 everyday commands, HELP ALL the rest
+        const core = [
           t('>MOONS        route board (MOONS ALL: the full list)'),   // [routeboard]
-          t('>SECTOR       map of the current uncharted sector'),
-          t('>INFO <moon>  details: biome, interior, risk, modifiers'),
           t('>ROUTE <moon> set the autopilot destination (or ROUTE #2)'),
+          t('>INFO <moon>  details: biome, interior, risk, modifiers'),
           t('>STORE        open the Company Store (STORE LIST: plain text)'),
           t('>BUY <item> [n]'),
-          t('>BUY VAN      order the Uplink Van (4 seats + cargo bed)'),
           t('>SCAN         scrap remaining on this moon'),
           t('>QUOTA        quota, deadline, credits'),
           t('>CREW         crew status'),
+        ];
+        const more = [
+          t('>SECTOR       map of the current uncharted sector'),
+          t('>BUY VAN      order the Uplink Van (4 seats + cargo bed)'),
           t('>BESTIARY     creature entries  (>BESTIARY <name>)'),
           t('>SWITCH [name] change the radar target'),
           t('>CODES        list secure door / turret / mine codes'),
@@ -174,8 +179,10 @@ export class Terminal {
           t('>TRANSMIT <msg>  (Signal Translator)'),
           t('>TELEPORT [name] (Teleporter)'),
           t('>CLEAR'),
-        ].join('\n'));
+        ];
+        this.print((String(arg || '').toLowerCase() === 'all' ? [...core, ...more] : [...core, '', t('>HELP ALL     every command')]).join('\n'));
         return;
+      }
       case 'clear': this.clear(); return;
       case 'moons': case 'moon': {
         const sector = ensureSector(run);
@@ -191,13 +198,7 @@ export class Terminal {
         }
         const gen = sectorMoons();
         if (gen.length) {
-          out.push('', tf('UNCHARTED: {name}  ({n} servers)', { name: sector?.name || t('SECTOR'), n: gen.length }));
-          gen.forEach((m, i) => {
-            const cur = m.id === run.moon ? '>' : '*';
-            out.push(`${cur} #${i + 1} ${m.name.padEnd(28)} T${m.tier} ${costText(m).padEnd(6)} (${weatherName(run, m)}) ${t(m.risk)}${g.routeboard?.lockTag?.(m) || ''}`);
-            out.push(`       ${t(biomeName(m.biome))} / ${interiorName(m.interior)} / ${sizeLabel(m.size)}${m.mods.length ? '  +' + m.mods.map((k) => MODIFIERS[k]?.name || k).join(' +') : ''}`);
-          });
-          out.push('', t('Type SECTOR for the map, INFO <moon> for details.'));
+          out.push('', tf('UNCHARTED: {name}  ({n} servers)', { name: sector?.name || t('SECTOR'), n: gen.length }) + '  ' + t('Type SECTOR for the map, INFO <moon> for details.'));   // [lanes] the servers are listed ONCE, by SECTOR
         }
         this.print(out.join('\n'));
         return;

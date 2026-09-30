@@ -45,6 +45,32 @@ function applyClip(d, plan, avail) {
   for (let j = 0; j < kids.length; j++) if (cut[j] !== kids[j].classList.contains('hud-clip')) kids[j].classList.toggle('hud-clip', cut[j]);
 }
 
+
+/** [lanes] where the centre interact prompt (lane 3) ends: nothing else may be planned into this column (px from the top). */
+export const promptBottom = (H) => H * 0.5 + 46 + 64 + 8;
+/** [lanes] toasts (lane 2) slide under the Algorithm slot (lane 1) when they overlap horizontally: the extra margin-top in px (pure, unit-tested). */
+export function toastPush(algo, baseTop, W) {
+  if (!algo) return 0;
+  const tLeft = W - 30 - Math.min(520, W * 0.36);
+  return algo.right > tLeft - 8 ? Math.max(0, Math.round(algo.bottom + 8 - baseTop)) : 0;
+}
+/**
+ * [lanes] the dock budgets, pure (layoutDocks() feeds it measured numbers, tools/harness/hud_overlap.test.mjs feeds it the 1280x720 CSS model).
+ * o = { inv: hotbar top | null, tr, xpf, toasts, obj, tl (bottoms | null), asgB, chatTop: top of the first visible chat line | null }
+ * -> { rTop, rAvail (right dock), lBottom, lAvail (left dock), bb, bAvail (bottom dock; ends under the centre prompt) }
+ */
+export function planDocks(H, o) {
+  const invTop = o.inv != null ? o.inv : H - 120;
+  const rTop = Math.min(Math.max(o.tr != null ? o.tr + 10 : 96, o.xpf != null ? o.xpf + 6 : 0, o.toasts != null ? o.toasts + 8 : 0, o.asgB || 0), H * 0.5);
+  const rAvail = Math.max(0, invTop - 12 - rTop);
+  let lBottom = 100;
+  if (o.chatTop != null) lBottom = Math.max(lBottom, H - o.chatTop + 10);
+  const lAvail = Math.max(0, H - lBottom - Math.max(o.obj != null ? o.obj + 8 : 0, (o.tl || 0) + 8));
+  const bb = Math.max(92, o.inv != null ? H - o.inv + 8 : 92);
+  const bAvail = Math.max(0, Math.min(H * 0.34, H - bb - promptBottom(H)));
+  return { rTop, rAvail, lBottom, lAvail, bb, bAvail };
+}
+
 export function layoutDocks(docks) {
   if (typeof document === 'undefined' || window.__hcLayout === false) return;
   const hud = document.querySelector('.hud');
@@ -62,8 +88,8 @@ export function layoutDocks(docks) {
   const toastEl = document.querySelector('.hud-toasts'), algoR = shown(document.querySelector('.algo-sub'));
   let toastMt = null;
   if (toastEl) {
-    const mt = parseFloat(toastEl.style.marginTop) || 0, baseTop = toastEl.getBoundingClientRect().top - mt, tLeft = innerWidth - 30 - Math.min(520, innerWidth * 0.36);
-    toastMt = algoR && algoR.right > tLeft - 8 ? Math.max(0, Math.round(algoR.bottom + 8 - baseTop)) : 0;
+    const mt = parseFloat(toastEl.style.marginTop) || 0, baseTop = toastEl.getBoundingClientRect().top - mt;
+    toastMt = toastPush(algoR, baseTop, innerWidth);
   }
   const chatEl = document.querySelector('.chat');
   let chatTop = null;
@@ -75,7 +101,6 @@ export function layoutDocks(docks) {
   const bH = B && shown(B) ? B.offsetHeight : 0;
   const clipR = R && clipPlan(R), clipL = L && clipPlan(L), clipB = B && clipPlan(B);
   // ---- compute
-  const invTop = inv ? inv.top : H - 120;
   let topY = Math.max(clock ? clock.bottom : 0, comp ? comp.bottom : 0);
   let quotaTop = null;
   if (quota) { if (comp) { quotaTop = comp.bottom + 4; topY = Math.max(topY, quotaTop + quota.height); } else topY = Math.max(topY, quota.bottom); }
@@ -89,12 +114,9 @@ export function layoutDocks(docks) {
     topPins.push([e, y + r.height * mid]);
     y += r.height + 8;
   }
-  const rTop = R ? Math.min(Math.max(tr ? tr.bottom + 10 : 96, xpf ? xpf.bottom + 6 : 0, toasts ? toasts.bottom + 8 : 0, asgB), H * 0.5) : 0;
-  const rAvail = Math.max(0, invTop - 12 - rTop);
-  let lBottom = 100;
-  if (chatTop) lBottom = Math.max(lBottom, H - chatTop.top + 10);
-  const lAvail = Math.max(0, H - lBottom - Math.max(obj ? obj.bottom + 8 : 0, (tl?.bottom || 0) + 8));
-  const bb = Math.max(92, inv ? H - inv.top + 8 : 92), bAvail = Math.max(0, H * 0.34);
+  const plan = planDocks(H, { inv: inv ? inv.top : null, tr: tr ? tr.bottom : null, xpf: xpf ? xpf.bottom : null, toasts: toasts ? toasts.bottom : null, asgB,
+    obj: obj ? obj.bottom : null, tl: tl ? tl.bottom : null, chatTop: chatTop ? chatTop.top : null });
+  const rTop = R ? plan.rTop : 0, rAvail = plan.rAvail, lBottom = plan.lBottom, lAvail = plan.lAvail, bb = plan.bb, bAvail = plan.bAvail;
   let by = bb + (bH ? Math.min(bH, bAvail) + 8 : 0);
   if (!B) by = 92;
   const botPins = [];

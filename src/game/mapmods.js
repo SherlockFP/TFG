@@ -232,16 +232,7 @@ export function installMapmods(game) {
     term.print(readout());
   };
   if (mods.commands?.set) { mods.commands.set('atlas', { fn: atlas, help, owner: null }); mods.commands.set('affix', { fn: atlas, help, owner: null }); }
-  if (game.terminal) {
-    let inExec = false;   // [qa2] MOONS re-enters exec (voyage passthrough / route board): print the readout once, from the outermost call only
-    restores.push(wrapMethod(game.terminal, 'exec', (orig) => function (cmd, ...a) {
-      const nested = inExec; inExec = true;
-      let r; try { r = orig.call(this, cmd, ...a); } finally { inExec = nested; }
-      const w0 = String(cmd || '').trim().toLowerCase().split(/\s+/)[0];
-      if (!nested && (w0 === 'moon' || w0 === 'moons') && run()?.phase === 'orbit' && mmOf()?.nxt && mmGate(run())) this.print('\n' + readout());
-      return r;
-    }));
-  }
+  // [lanes] MOONS no longer appends the SECTOR MAP readout (it doubled the terminal wall); the ATLAS command prints it.
   // holding the map: point at the terminal
   offs.push(mods.on('useItem', (it, hk) => {
     if (it?.type !== MAP_ITEM || hk.handled) return;
