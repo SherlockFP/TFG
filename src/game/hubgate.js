@@ -96,6 +96,7 @@ export function installHubgate(game) {
   const sfx = (n, v = 0.6) => { try { game.sfx?.(n, v); } catch { /* unknown sound */ } };
   const unlockAll = () => !!game.settings?.unlockAll;
   const ob = () => game.onboard;
+  const LOCK_NEAR = 1.5;
   const locked = (id) => !!ob()?.locked?.(id);
   const lockedIds = () => HUB_ORDER.filter(locked);
   const needText = (id) => { const r = requirement(id); return r?.boss ? tx('hg.lock_boss', { name: sysName(id) }) : tx('hg.lock', { n: r?.q || 1, name: sysName(id) }); };
@@ -144,7 +145,8 @@ export function installHubgate(game) {
         if (owner) { if (!first.has(owner)) first.set(owner, it); } else kept.push(it);
       }
       if (!first.size) return out;
-      for (const [id, it] of first) kept.push({ pos: it.pos, r: it.r, reach: it.reach, label: needText(id), action: () => { toast(needText(id), 'bad'); sfx('ui_error', 0.4); } });
+      const pp = this.player.pos;   // [feelfix2] a locked prompt only fires from up close (LOCK_NEAR), never across the room
+      for (const [id, it] of first) if (Math.hypot(it.pos.x - pp.x, it.pos.z - pp.z) <= LOCK_NEAR) kept.push({ pos: it.pos, r: it.r, reach: it.reach, label: needText(id), action: () => { toast(needText(id), 'bad'); sfx('ui_error', 0.4); } });
       return kept;
     } catch (e) { warn('interactables', e); return out; }
   }));
@@ -179,6 +181,13 @@ export function installHubgate(game) {
   }
   // [threatmerge] locked ship fixtures (arcade cabinet, chess table, stove, brewing stand, planter) are hidden under a grey tarp block until their Hub system opens
   const tarps = new Map();
+  /** (dx, dz) from the spot rotated into fixture-local space lies within the footprint box (a little slack) and the object sits below the tarp top */
+  function inFoot(dx, dz, ry, dm, o) {
+    const c = Math.cos(ry), sn = Math.sin(ry), lx = dx * c - dz * sn, lz = dx * sn + dz * c;
+    if (!(o.position.y < dm.h + 0.3 && lx > dm.x0 - 0.05 && lx < dm.x1 + 0.05 && lz > dm.z0 - 0.05 && lz < dm.z1 + 0.05)) return false;
+    const sz = new THREE.Box3().setFromObject(o).getSize(new THREE.Vector3());   // never hide a room-sized group that merely has its origin inside
+    return Math.max(sz.x, sz.z) <= Math.max(dm.x1 - dm.x0, dm.z1 - dm.z0) + 0.6;
+  }
   function coverTick() {
     const sg = game.ship?.group;
     if (!sg) return;
@@ -196,7 +205,11 @@ export function installHubgate(game) {
         grp.userData.hgTarp = true; sg.add(grp);
         e = { grp, hidden: new Set() }; tarps.set(key, e);
       }
-      for (const o of sg.children) if (o !== e.grp && !o.userData.hgTarp && o.visible && Math.hypot(o.position.x - spot.x, o.position.z - spot.z) < 0.06) { o.visible = false; e.hidden.add(o); }   // fixture roots stand exactly on their spot
+      for (const o of sg.children) {   // fixture roots stand exactly on their spot; [feelfix2] a lid / part parented next to it is hidden too when its centre is inside the tarp footprint
+        if (o === e.grp || o.userData.hgTarp || !o.visible || !o.isObject3D) continue;
+        const dx = o.position.x - spot.x, dz = o.position.z - spot.z;
+        if (Math.hypot(dx, dz) < 0.06 || inFoot(dx, dz, spot.ry || 0, dm, o)) { o.visible = false; e.hidden.add(o); }
+      }
     }
   }
   function openPanel() {

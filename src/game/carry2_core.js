@@ -43,8 +43,8 @@ export function carryFeel(def, mode = 'solo') {
   if (bulky) return { sway: Math.max(0.7, w), turn: FEEL.soloTurn, speed: FEEL.soloSpeed };
   return { sway: w * 0.8, turn: FEEL.heavyTurn + (1 - w) * 0.2, speed: 1 };
 }
-/** the holder's speed multiplier while helped: cancels the plain weight penalty so the pair walks at ~coopSpeed (capped) */
-export const coopHolderMul = (weightMul) => clamp(FEEL.coopSpeed / clamp(num(weightMul, 1), 0.5, 1), FEEL.coopSpeed, 1.2);
+/** the holder's carryMul while helped: exactly coopSpeed (never > 1; was weight-compensated up to 1.2). The plain weight penalty is cancelled separately (P.carryCancel, localplayer) so the pair still walks at ~coopSpeed */
+export const coopHolderMul = () => FEEL.coopSpeed;
 
 // ------------------------------------------------------------------------------------------------ bumps
 export const BUMP = {

@@ -20,7 +20,7 @@ ok(C.carryFeel(mug).sway === 0 && C.carryFeel(mug).speed === 1 && C.carryFeel(nu
 const solo = C.carryFeel(rack, 'solo'), co = C.carryFeel(rack, 'co'), heavy = C.carryFeel(sofa, 'solo');
 ok(solo.speed < 0.6 && co.speed > 0.9 && co.sway < solo.sway && co.turn > solo.turn, 'bulky: crawl solo, near-normal with a helper, calmer sway');
 ok(heavy.sway > 0 && heavy.turn < 1 && heavy.turn >= C.FEEL.heavyTurn && heavy.speed === 1, 'heavy 2-hand loot sways + slower turn, speed left to the weight penalty');
-ok(Math.abs(0.8 * C.coopHolderMul(0.8) - C.FEEL.coopSpeed) < 1e-9 && C.coopHolderMul(1) === C.FEEL.coopSpeed, 'holder speed cancels the weight penalty');
+ok(C.coopHolderMul(0.6) === C.FEEL.coopSpeed && C.coopHolderMul(1) === C.FEEL.coopSpeed && C.coopHolderMul(0.5) <= 1, 'holder carryMul reads coopSpeed (never 1.2); weight penalty cancelled via P.carryCancel');
 ok(C.bumpPct(2, 1) === 0 && C.bumpPct(9, 0) === 0, 'soft bump / non-fragile: no loss');
 ok(C.bumpPct(3, 0.35) >= 0.05 && C.bumpPct(20, 1.2) <= 0.25 && C.bumpPct(6, 1) > C.bumpPct(3.5, 1), 'fragile bump 5..25 %, grows with speed');
 ok(C.lossOf(200, 200, 0.25) === 50 && C.lossOf(200, 80, 0.25) === 10 && C.lossOf(200, 70, 0.25) === 0 && C.lossOf(0, 0, 0.25) === 0, 'loss: pct of base, floor 35 %');
