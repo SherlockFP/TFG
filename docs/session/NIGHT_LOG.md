@@ -30,4 +30,6 @@ Loop rule: 2-3 Sonnet agents at a time (1 browser/QA agent max) → merge with t
 | 11 | solorevive | merged 2cd895e: solo players get one slow self stand-up per landing (hold E 6 s → 25 % HP); second down = old rules. |
 | 11 | onegoal (Opus) | merged 7a992de: one priority resolver for every objective source (escape > loot out > job > tutorial > rest), Standard = 1 goal + 1 warning, TAGGED line, stuck TUTORIAL 1/7 fixed, no swarm/siege/kill-N contracts before quota 3 for all profiles, calm Algorithm pacing for veterans too + 'Chatty Algorithm' toggle. |
 | 12 | hud6 (Standard HUD = 6 areas, one currency, torch viewmodel/beam fix, screenshots) | running |
-| 13 | threatmerge (crdirector sole gate + curated 3-4 creature pools per moon + small AI tells), routeboard (Opus: ≤90 s Hiring Day on the stream, 3 route cards instead of the moon wall, 3 hero moons start) | running |
+| 13 | threatmerge | merged 718ed21: crdirector.canSpawn is the single gate (horde/siege/mirror/zombies need quota 3+; scripted spawners fit a phase-scaled cap), per-moon pool of 3 headline creatures + theme creature (terminal 'KNOWN RESIDENTS'), '[E] X [E]' fixed, no 'fired' line while downed, locked ship fixtures tarped. |
+| 13 | routeboard (Opus: ≤90 s Hiring Day on the stream, 3 route cards instead of the moon wall, 3 hero moons start) | running |
+| 14 | cam90 (outdoor camera/drone on the ship→entrance path every landing, heat visibly pulls the director, indoor tutorial becomes 'cut the feed') | running |
