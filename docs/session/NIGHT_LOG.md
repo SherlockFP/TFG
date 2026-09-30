@@ -70,4 +70,6 @@ Loop rule: 2-3 Sonnet agents at a time (1 browser/QA agent max) → merge with t
 | 26 | lead | hotbarRect cached (perf5 DOM budget regression from qafix3 markers) — 46a96f5. Full regression of every tools/harness/*.test.mjs: **all green**. |
 | 27 | Opus morning review | merged 882c382: docs/REVIEW_W8_MORNING.md — **5.6/10 on screen**; clarity 6, identity 6, visuals 6; not moved: audio unheard, no human playtest, no creature in any shot, stale Algorithm lines. Next 10 tasks listed. |
 | 27 | i18n8 (fill ~370+ missing TR/RU strings) | running |
-| 28 | algoctx (context-true Algorithm + dev-language sweep), firstsight (Opus: designed first creature sighting) | running |
+| 28 | algoctx | merged 54e5e12: Algorithm lines carry context + 12 s expiry (stale terminal/HR/WASD lines dropped), one shared live viewer count, 'Host revived Client' once as a toast, TUTORIAL SKIP line removed, ship-loot-tracker plain wording. |
+| 28 | firstsight (Opus) | running |
+| 29 | heroprops (vending machine/rack/statue/pipe models, horror-safe loot glint instead of blue pillars, route-card interior label) | running |
