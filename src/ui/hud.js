@@ -193,17 +193,23 @@ export class HUD {
   setRun(run) { this.run = run; }
   pulse(what) { if (what === 'credits') { this.$.quota.classList.remove('pulse'); void this.$.quota.offsetWidth; this.$.quota.classList.add('pulse'); } }
 
-  bigText(main, sub) {
+  bigText(main, sub, kind = 'big') {
     // the landing briefing card already shows the moon name + weather
     if (this.run?.phase === 'landing' && main && main === MOONS[this.run.moon]?.name) return;
-    if (this.gate?.()) { this.pendingBig = [main, sub]; return; }
+    if (this.gate?.()) { this.pendingBig = [main, sub, kind]; return; }
+    if (this.cc) { this.cc.request(kind, (done, o) => this.showBig(main, sub, done, o.compact ? 2600 : 5200)); return; }   // [centercards] one centre card at a time
+    this.showBig(main, sub);
+  }
+  showBig(main, sub, done, ms = 5200) {
     this.$.bigMain.textContent = typeof main === 'string' ? t(main) : main; this.$.bigSub.textContent = typeof sub === 'string' ? t(sub) : (sub || '');   // t(): [i18n8] safety net for literal cinematic text
     this.$.big.classList.remove('hidden');
     this.$.big.classList.remove('anim'); void this.$.big.offsetWidth; this.$.big.classList.add('anim');
     // while the banner is up, the side columns (objectives, event chips, assignment) step back so nothing overlaps it
     this.el.classList.add('big-on');
     clearTimeout(this.bigT);
-    this.bigT = setTimeout(() => { this.$.big.classList.add('hidden'); this.el.classList.remove('big-on'); }, 5200);
+    this.bigDone?.();
+    this.bigDone = done;
+    this.bigT = setTimeout(() => { this.$.big.classList.add('hidden'); this.el.classList.remove('big-on'); this.bigDone = null; done?.(); }, ms);
   }
 
   // Right column stack: level / coins (hud-tr) -> mod widgets (assignment...) -> XP feed -> toasts.
@@ -280,7 +286,7 @@ export class HUD {
     while (this.$.xpfeed.children.length > 5) this.$.xpfeed.firstChild.remove();
   }
   levelUp(level, rank) {
-    this.bigText(t('LEVEL UP!') + ' ' + level, tf('{rank} · +1 {t} [K]', { rank, t: t('skill point') }));
+    this.bigText(t('LEVEL UP!') + ' ' + level, tf('{rank} · +1 {t} [K]', { rank, t: t('skill point') }), 'level');
     this.$.lvl.parentElement.classList.remove('pulse'); void this.$.lvl.offsetWidth; this.$.lvl.parentElement.classList.add('pulse');
   }
 
@@ -325,7 +331,7 @@ export class HUD {
     if ((!this.pendingToasts.length && !this.pendingBig) || this.gate?.()) return;
     const now = performance.now();
     if (now < this.nextFlush) return;
-    if (this.pendingBig) { const [m, s] = this.pendingBig; this.pendingBig = null; this.bigText(m, s); this.nextFlush = now + 700; return; }
+    if (this.pendingBig) { const [m, s, k] = this.pendingBig; this.pendingBig = null; this.bigText(m, s, k); this.nextFlush = now + 700; return; }
     const [text, kind, ms] = this.pendingToasts.shift();
     this.showToast(text, kind, ms);
     this.nextFlush = now + 420;
