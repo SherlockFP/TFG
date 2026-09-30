@@ -145,7 +145,9 @@ export class LightPool {
         b.lookAt(r.target);
         b.scale.set(rad, rad, len);
         b.material.color.copy(s.color);
-        b.material.opacity = r.priority === 0 ? 0.035 : 0.06;
+        // [hud6] your own torch (priority < 1) has NO fake volume: you stand at the apex, so the cone reads as a grey slab across the view; the lit pool is the beam. Other people's torches keep a faint, distance-faded haze
+        const dCam = r.priority < 1 ? 0 : Math.max(0, Math.min(1, 1.4 - r.pos.distanceTo(camPos || r.pos) / 30));
+        b.material.opacity = r.priority < 1 ? 0 : 0.032 * dCam;
       }
     }
     this.spotRequests.length = 0;

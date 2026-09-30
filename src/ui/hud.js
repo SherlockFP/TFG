@@ -251,7 +251,11 @@ export class HUD {
 
   setCoins(c, delta) {
     this.coinsVal = c;
-    this.$.coins.textContent = walletRow(this.creditsVal || 0, c);   // [unify] ▮ credits · ◈ clout (crew money + personal money; everything else is a material)
+    // [hud6] ONE currency on the HUD: credits. Clout joins the row for ~6 s when it changes (and always in Full / on the Tab card).
+    if (this.cloutSeen != null && c !== this.cloutSeen) { this.cloutUntil = performance.now() + 6000; clearTimeout(this.cloutT); this.cloutT = setTimeout(() => this.setCoins(this.coinsVal), 6100); }
+    this.cloutSeen = c;
+    const both = document.documentElement.dataset.hud === 'full' || performance.now() < (this.cloutUntil || 0);
+    this.$.coins.textContent = both ? walletRow(this.creditsVal || 0, c) : walletRow(this.creditsVal || 0, c).split(' · ')[0];   // [unify] ▮ credits · ◈ clout
     if (delta) { this.$.coins.classList.remove('pulse'); void this.$.coins.offsetWidth; this.$.coins.classList.add('pulse'); }
   }
 

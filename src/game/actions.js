@@ -13,6 +13,7 @@ import { MINIGAMES } from '../minigames/index.js';
 import { applyAffixes, applyAffixEffects, affixCooldown, affixDisplayName, affixColor, describeAffix } from './loot.js';
 import { TIERS } from './tiers.js';
 import { plusMul } from './enhance.js';   // [forge]
+const FLASH_AHEAD = 0.62;   // [hud6] metres in front of the camera the pooled torch spot starts (viewmodel hand + torch end ~0.5-0.6 m out)
 
 /** Weapon damage multiplier of an item's tier (tiers.js statMul; plain / store weapons are Common = 1). */
 // Relative to the definition's own tier: def.dmg is the damage at def.tier/def.rarity, a better roll scales it up.
@@ -692,7 +693,7 @@ export const actionMethods = {
     if (flashReq && !p.dead) {
       const cam = this.camera;
       const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(cam.quaternion);
-      const pos = cam.position.clone().add(new THREE.Vector3(0.18, -0.12, 0).applyQuaternion(cam.quaternion));
+      const pos = cam.position.clone().add(new THREE.Vector3(0.16, -0.1, -FLASH_AHEAD).applyQuaternion(cam.quaternion));   // [hud6] the lamp sits AHEAD of the hand + torch model: a Lambert hand 0.5 m from a 38 cd spot was blown out to a white blob
       this.lights.requestSpot({ pos, target: pos.clone().addScaledVector(fwd, 10), priority: 0, intensity: flashReq.intensity, distance: flashReq.distance, angle: flashReq.angle, penumbra: 0.5 });
     }
     // glowsticks lying around

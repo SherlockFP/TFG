@@ -248,6 +248,7 @@ export function installBalance(game) {
     els.val.textContent = Math.round(S.shown);
     const d = S.shown - S.prevShown;
     els.trend.textContent = d > 0.25 ? '▲' : d < -0.25 ? '▼' : '';
+    els.root.classList.toggle('up', S.lvShown >= 1);   // [hud6] above CALM (hudcalm shows the box only then in Standard)
     els.root.classList.toggle('hot', S.lvShown >= 2);
     els.root.classList.toggle('max', S.lvShown >= 3);
     void force;

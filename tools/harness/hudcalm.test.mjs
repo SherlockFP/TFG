@@ -21,7 +21,7 @@ for (const lang of ['tr', 'ru']) {
 setLang('en');
 
 // every dock id named in the rules is really created by some module
-const all = [...fs.readdirSync(new URL('../../src/game/', import.meta.url)).map((f) => 'src/game/' + f), ...fs.readdirSync(new URL('../../src/ui/', import.meta.url)).filter((f) => f.endsWith('.js')).map((f) => 'src/ui/' + f)]
+const all = [...fs.readdirSync(new URL('../../src/game/', import.meta.url)).map((f) => 'src/game/' + f), ...fs.readdirSync(new URL('../../src/ui/', import.meta.url)).filter((f) => f.endsWith('.js')).map((f) => 'src/ui/' + f), ...fs.readdirSync(new URL('../../src/ui/panels/', import.meta.url)).filter((f) => f.endsWith('.js')).map((f) => 'src/ui/panels/' + f)]
   .filter((f) => f.endsWith('.js')).map((f) => rd(f)).join('\n');
 const rules = src.match(/const DOCK_RULES = \{([\s\S]*?)\n\};/)[1];
 for (const id of [...rules.matchAll(/(?:^|[\s,{])'?([a-z0-9][\w-]*)'?:\s*\{/g)].map((m) => m[1])) chk(new RegExp(`hudDock\\('(?:left|right|bottom)', '${id}'`).test(all), 'unknown dock id in rules: ' + id);
