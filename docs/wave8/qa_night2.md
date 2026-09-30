@@ -89,6 +89,39 @@ The opening (stream, route board, one goal line, drone with a named lesson, revi
 ## 6. Not verified / next
 
 - Expedition maps: look at them on a real GPU first (bug 1), then the need bars in play.
-- Two-player: takeoff to orbit in the harness, tag clear after the on-air window, host migration in phase `landing`, the strap line (not visible).
+- Two-player: DONE, see section 7 (takeoff, tag clear, migration in `landing`, strap).
 - Fixes that were not re-shot: stream HUD hide, MOONS ALL duplicate, beam, revive ring position, highlight pill, TAGGED indoors.
 - Eye tells: spawn a creature in view (freeze at the correct yaw) and shoot it with no torch; the current frames do not show the spawned type.
+
+## 7. MP rerun (`qa_night2_mp.mjs`, two tabs, 17 / 17 PASS)
+
+The first rerun on current main reproduced the 4 failures (tag HUD line, tag clear, takeoff, mid-landing). **All four were harness bugs; no game bug.** The script now passes end to end (0 pageerrors), and it also proved flaky-by-seed on two rows until fixed (see the last two lines of "root causes").
+
+Root causes:
+- **Takeoff stayed in `moon` = the pre-flight ship faults working as designed.** `shipfaults.js` wraps `hostBeginTakeoff`: at quota 0 it rolls 35 % (`Math.random() < 0.65` lets the ship go at once), otherwise it starts a checklist (`F.act`, "Takeoff blocked: N faults left") and only runs the original takeoff after everything is fixed and the "ignition in 3" countdown ends. The old script called `hostBeginTakeoff` once and waited. Not blockers (checked by reading): rewardviz lever confirm (only on `hostLever`), hubgate, carry2, landingq, expeditions, feedcams (they only listen to the `takeoff` phase). The script now forces the fault branch (`Math.random = 0.99` for that one call), asserts the lever does NOT launch (`faults: ["jam"]`), calls `gameplay2.parts.faults.fixAll()` and waits: both peers reach `orbit`.
+- **"TAGGED goal line" read only the `◆` leaf**: the goal text is a text node beside the marker span. Now reads `.objectives` innerText: `TAGGED: get to the ship (23 m) or kill the camera that tagged you`.
+- **"reaching the ship clears the tag" needs the ON AIR window to end** (`feedcams.js taxTick`: `m.tag` clears when `inShip && !(air > now)`, `FC.hold` = 10 s after the last exposure). Right after arriving fc.p is `[0,1,1]` (meter 0, on air, tagged); the script now asserts that, then ticks until `[..,..,0]` on host and client: cleared on both, goal line back to `Find the facility entrance`.
+- **Mid-landing timing**: the landing timer is a wall-clock `setTimeout` (9 s), so the tab had already finished landing when the check ran. The script freezes `hostFinishLanding` on the host, waits for the client to see `landing`, then kills the host: the migrated client finishes the landing (phase `moon`, terrain + facility, 10 creatures, epoch 1, player valid).
+- **Seed flakiness**: the moon seed is random per run and placements used the ground height of (0, 14) for every spot, so on slopes the aim ray missed ("Ship table [E]" target) and the grip lapsed. Placement is now per-point `heightAt`, aim is computed from the real eye position (`aimAt`).
+
+| # | check | result | numbers |
+|---|---|---|---|
+| 1 | connect + landing on hamsi | PASS | both `moon` |
+| 2 | client DOWN, host sees it | PASS | hp 1, not dead |
+| 3 | host aim finds the downed interactable | PASS | "HOLD [E] TO REVIVE" |
+| 4 | revive ring `.dn-mid` on the host | PASS | 86x90, "REVIVING Client" |
+| 5 | downed client sees its own revive UI while the host holds E | PASS (new) | `.dn-bar` "BLEEDING OUT 15 S" |
+| 6 | client back up ~30 % | PASS | 32 / 106 |
+| 7 | solo bulky carrier x0.55 | PASS | carryMul 0.55, turn 0.6 |
+| 8 | helper grip: host `co` + both see it, speed | PASS | host 0.92 (the 1.2 bug is fixed by feelfix2), client 0.92 |
+| 9 | strap line visible on BOTH peers | PASS (new) | 1 visible yellow `THREE.Line` on host and client, `co` size 1 each |
+| 10 | let go of E | PASS | co 0, back to 0.55 |
+| 11 | client TAGGED, host marks it | PASS | fc.p `[25,1,1]` |
+| 12 | client HUD TAGGED goal line | PASS | text above |
+| 13 | tag held while still on air at the ship | PASS (new) | `[0,1,1]` |
+| 14 | tag cleared on host + client after the window | PASS | `null` on both |
+| 15 | lever does NOT launch with open faults (gating) | PASS (new) | `faults ["jam"]`, phase `moon` |
+| 16 | fixAll -> both peers in `orbit` | PASS | host + client `orbit` |
+| 17 | host migration mid-landing | PASS | both `landing` when the host left; `HOST LEFT` prompt, `accept()`, new host phase `moon`, map built |
+
+Nit for a designer, not a bug: a tagged player who is already in the ship keeps the red TAGGED state for up to 10 s (the on-air window), which reads as "the ship did not save me"; the goal line switches only when the tag clears. Shots refreshed: `n2_mp_carry_client.jpg` (strap on the host avatar), `n2_mp_revive_host.jpg`.
