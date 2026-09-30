@@ -16,6 +16,7 @@ export const HEADLINE = Object.freeze([
   { id: 'cd_follower', zone: 'in', minQ: 1 }, { id: 'cd_dimmer', zone: 'in', minQ: 1 }, { id: 'cd_auditor', zone: 'in', minQ: 1 },
   { id: 'lm_hunter', zone: 'in', minQ: 1 }, { id: 'lm_witch', zone: 'out' },
   { id: 'c10_buffering', zone: 'in', minQ: 1 }, { id: 'c10_doomscroller', zone: 'in', minQ: 1 }, { id: 'c10_ratio', zone: 'in', minQ: 2 },   // wave 10 creatures10 (docs/wave10/creatures10.md)
+  { id: 'c11_captcha', zone: 'in', minQ: 1 }, { id: 'c11_shadowban', zone: 'in', minQ: 2 }, { id: 'c11_recommender', zone: 'in', minQ: 2 },   // wave 11 creatures11 (docs/wave11/creatures11.md)
   { id: 'zombie', zone: 'out', minQ: 3 },   // Zombie Accounts: horde waves (crdirector gates them to quota 3+ anyway)
 ]);
 export const HEAD_IDS = new Set(HEADLINE.map((h) => h.id));
