@@ -162,7 +162,7 @@ export const WARP = { chance: 0.12, pityChance: 0.2, pityDays: 6, cooldownDays: 
  */
 export function warpChance(s) {
   if (!s || s.mode === 'off') return 0;
-  if (s.company || s.home || s.instance || s.voyage) return 0;   // HQ, homeworld, cycle instances, and a moon that is already a voyage
+  if (s.company || s.home || s.instance || s.voyage || s.expedition) return 0;   // HQ, homeworld, cycle instances, and a moon that is already a voyage
   if ((s.daysLeft | 0) <= 0) return 0;                            // deadline day: the Company pulls the ship in
   if ((s.quotaIndex | 0) < WARP.minQuotaIndex && s.mode !== 'early') return 0;
   const since = s.sinceDays == null ? 99 : s.sinceDays;
@@ -230,7 +230,7 @@ export function boardFor(runKey, day, quotaIndex, moons, signalIds = null) {
   const R = new RNG(hashString(`vyboard:${runKey}|${day | 0}|${quotaIndex | 0}`));
   const sig = signalIds || signalsFor(runKey, day, quotaIndex);
   const dests = [];
-  const charted = moons.filter((m) => m && !m.company && !m.home && !m.instance && !m.stale);
+  const charted = moons.filter((m) => m && !m.company && !m.home && !m.instance && !m.stale && !m.expedition);
   const pool = R.shuffle(charted.slice());
   for (const m of pool.slice(0, 2)) dests.push({ id: m.id, tier: m.tier || 1 });
   for (const id of sig.slice(0, 4 - dests.length)) dests.push({ id, tier: parseVoyageId(id)?.tier || 1 });

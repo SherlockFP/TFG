@@ -13,7 +13,9 @@ const THREE = await import('three');
 const { buildMoonOutdoor } = await import('../../src/world/terrain.js');
 const { generateLayout, buildFacility, INTERIOR_NAMES } = await import('../../src/world/facility.js');
 const { NavGrid } = await import('../../src/world/nav.js');
-const { MOONS } = await import('../../src/game/moons.js');
+const { MOONS, BIOMES } = await import('../../src/game/moons.js');
+const EXK = await import('../../src/game/expeditions_core.js');
+await import('../../src/game/expeditions.js');   // [expeditions] registers the three custom-map moons (ex_barge / ex_dune / ex_roof)
 const argv = process.argv.slice(2);
 const VERBOSE = argv.includes('--verbose');
 const NSEED = +(argv[argv.indexOf('--seeds') + 1]) || 3;
@@ -216,7 +218,7 @@ const { generateSector } = await import('../../src/game/moongen.js');
 const GEN = {};   // a few generated sectors: big mapScale + the generated-only biomes
 for (let i = 0; i < 3; i++) for (const m of generateSector('geomfix', i).moons) GEN[m.id] = m;
 Object.assign(MOONS, GEN);
-const moonIds = Object.keys(MOONS).filter((k) => !MOONS[k].company && !MOONS[k].home);
+const moonIds = Object.keys(MOONS).filter((k) => !MOONS[k].company && !MOONS[k].home && !MOONS[k].customMap);
 let nMaps = 0;
 for (const id of moonIds) for (const seed of SEEDS) {
   const boxes = [], props = [];
@@ -256,6 +258,30 @@ for (const id of moonIds) for (const seed of SEEDS) {
   }
   if (seed === SEEDS[0]) { await modulePass(out, null, { moonId: id, seed }, ctx, null); }
   auditUnits(out.group, ctx, 'outdoorUnits');
+  out.dispose?.(physicsStub());
+}
+// ---------------------------------------------------------------- expedition moons (custom maps: Sunken Barge / Dune Relay / Rooftop Blackout City)
+// every spot of the plan must stand on real support (terrain or a collider top: deck, roof, plank), inside the map; no NaN / zero scale
+let nEx = 0;
+for (const kind of EXK.KINDS) for (const seed of SEEDS) {
+  const moon = MOONS[EXK.MOON_IDS[kind]], boxes = [];
+  let out;
+  try { out = moon.customMap(seed, moon, { physics: mkPhysics(boxes), lightPool, biome: BIOMES[moon.biome] }); } catch (e) { flag('buildError', 'expeditions', `${kind}/${seed} ${e.message}`); continue; }
+  nEx++;
+  const T = out.terrain, half = T.half + 1, ctx = { tag: kind + '/' + seed, mod: 'expeditions', ground: (x, z) => T.heightAt(x, z), outside: (x, z) => Math.abs(x) > half || Math.abs(z) > half };
+  auditObjects(out.group, ctx);
+  const tops = boxes.filter((b) => b.data?.kind !== 'terrain' && !(b.rot && typeof b.rot === 'object') && b.hy > 0.05);
+  const support = (x, z, y) => { let best = T.heightAt(x, z); for (const b of tops) if (Math.abs(x - b.x) <= b.hx && Math.abs(z - b.z) <= b.hz) { const top = b.y + b.hy; if (top <= y + 0.06 && top > best) best = top; } return best; };
+  for (const sp of EXK.spotsOf(out.ex.plan)) {
+    if (bad(sp.x + sp.z + (sp.y ?? 0))) { flag('nan', 'expeditions', sp.id); continue; }
+    if (ctx.outside(sp.x, sp.z)) flag('outsideMap', 'expeditions', `${kind}/${seed} ${sp.id} @${f2(sp.x)},${f2(sp.z)}`);
+    if (sp.y != null) {
+      const s = support(sp.x, sp.z, sp.y);
+      if (sp.y - s > 0.15) flag('floating', 'expeditions', `${kind}/${seed} ${sp.id} @${f2(sp.x)},${f2(sp.z)} gap ${f2(sp.y - s)}`);
+      if (sp.y < s - 0.1) flag('buried', 'expeditions', `${kind}/${seed} ${sp.id} @${f2(sp.x)},${f2(sp.z)} sunk ${f2(s - sp.y)}`);
+    }
+  }
+  if (seed === SEEDS[0]) await modulePass(out, null, { moonId: EXK.MOON_IDS[kind], seed }, ctx, null);   // mapart / eggs / worldx / survival / worlds2 / soul on the custom map (must not crash or misplace)
   out.dispose?.(physicsStub());
 }
 function auditUnits(group, ctx, name) {
@@ -308,7 +334,7 @@ for (const theme of themes) for (const seed of SEEDS.slice(0, 2)) for (const siz
 
 // ---------------------------------------------------------------- report
 const cats = ['nan', 'zeroScale', 'floating', 'buried', 'slopeGap', 'slopeSunk', 'outsideMap', 'propOverlap', 'wallOverlap', 'blocking', 'buildError'];
-console.log(`geomfix: ${nMaps} outdoor maps, ${nFac} facilities, seeds ${SEEDS.join(',')}`);
+console.log(`geomfix: ${nMaps} outdoor maps, ${nEx} expedition maps, ${nFac} facilities, seeds ${SEEDS.join(',')}`);
 let hard = 0;
 for (const c of cats) {
   const m = stat[c] || {};

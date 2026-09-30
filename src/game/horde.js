@@ -209,7 +209,7 @@ export function installHorde(game) {
   function hostOnMoonPopulated() {
     if (!isHost() || S.disposed) return;
     const run = game.run, moon = MOONS[run?.moon];
-    if (!run || run.phase !== 'moon' || !moon || moon.company) return;
+    if (!run || run.phase !== 'moon' || !moon || moon.company || moon.expedition) return;   // [expeditions] no swarm director on the special moons
     const key = run.seed + ':' + run.moon;
     if (S.dayKey === key) return;
     S.dayKey = key; S.day = {}; S.waves = null;
