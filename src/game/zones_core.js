@@ -78,7 +78,7 @@ export function minerBonus(moon, mn) {
 
 // ------------------------------------------------------------------ eligibility + zone partition
 export function zonesEligible(moon) {
-  return !!(moon && moon.id && moon.biome && !moon.company && !moon.home && !moon.instance && !moon.core && !moon.raid && !moon.gate && !moon.stale && moon.tier !== 0);
+  return !!(moon && moon.id && moon.biome && !moon.company && !moon.home && !moon.instance && !moon.core && !moon.raid && !moon.gate && !moon.stale && !moon.expedition && moon.tier !== 0);
 }
 const LETTERS = 'ABCDEF';
 /** stable partition of a moon into 3-6 zones (no terrain needed): outdoor fields around the ship + facility wings (entrance, fire exits) */

@@ -130,7 +130,7 @@ export function installVoyage(game) {
   const isVoyage = (id = run()?.moon) => V.isVoyageId(id);
   const moonName = (id) => MOONS[id]?.name || (V.isVoyageId(id) ? V.generateVoyageMoon(id)?.name : id) || id;
   const contentName = (c) => (c ? V.CONTENT[c]?.name || c : '');
-  const charted = () => MOON_ORDER.map((id) => MOONS[id]).filter((m) => m && !m.company && !m.home && !m.instance && !m.stale);
+  const charted = () => MOON_ORDER.map((id) => MOONS[id]).filter((m) => m && !m.company && !m.home && !m.instance && !m.stale && !m.expedition);
   const signals = () => V.signalsFor(runKey(), run()?.day | 0, run()?.quotaIndex | 0);
 
   // ============================================================================================ HOST: routing (signals + random)

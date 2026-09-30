@@ -262,6 +262,7 @@ import { installFeedcams2 } from './feedcams2.js';   // [import:feedcams2] wave 
 import { installDowned } from './downed.js';   // [import:downed] wave 8: 0 HP = downed, crew revives (docs/wave8/downed.md)
 import { installHubgate } from './hubgate.js';   // [import:hubgate]
 import { installSoul } from './soul.js';   // [import:soul] wave 8: palettes, story beats, ship soul, moments, voice (docs/wave8/soul.md)
+import { installExpeditions } from './expeditions.js';   // [import:expeditions] wave 8: Sunken Barge / Dune Relay / Rooftop Blackout moons (docs/wave8/expeditions.md)
 // [import:mapmods]
 // [import:worlds3]
 // [import:resto]
@@ -554,6 +555,7 @@ export class Game extends Emitter {
     this.useModule('downed', installDowned);   // [slot:downed]
     this.useModule('hubgate', installHubgate);   // [slot:hubgate] wave 8: Hub door, unlock cards, Quick Shift
     this.useModule('soul', installSoul);   // [slot:soul]
+    this.useModule('expeditions', installExpeditions);   // [slot:expeditions]
     this.useModule('rewardviz', installRewardviz);   // wave 8: reward ledger / warnings / pop
     this.useModule('highlights', installHighlights);   // [slot:highlights] wave 8: end-of-day highlight clip (CRT replay)
     this.useModule('carry2', installCarry2);   // [slot:carry2] wave 8: heavy sway, bump losses, two-person carry, throw & catch
@@ -1087,6 +1089,7 @@ export class Game extends Emitter {
       sludge: 'was dissolved.', yoinker: 'touched the wrong pile of junk.', crewmate: 'was bonked by a crewmate.', electric: 'was electrocuted.',
       lightning: 'was struck by lightning.', kefalshark: 'was eaten by a land shark.', foreman: 'was flattened by the Foreman.',
       steam: 'was boiled alive by a steam vent.', train: 'was flattened by the ghost train.',   // [labyrinths]
+      drown: 'ran out of air.', heat: 'collapsed from the heat.',   // [expeditions]
       laser: 'walked into a laser grid.', collapse: 'was buried by a cave-in.', toxic: 'dissolved in toxic sludge.',
       cruiser: 'was run over by the Uplink Van.',
     };

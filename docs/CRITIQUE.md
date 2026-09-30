@@ -341,3 +341,7 @@ The R.E.P.O. carry fun now lives inside the camera verb: heavy loot sways, fragi
 
 ## Wave 8 - highlights clip (docs/wave8/highlights.md)
 The Algorithm now edits the day's best on-air moment into a ~9 s CRT replay (top-down paths, REC, LIVE viewers, dark-humour captions) after the day report: shareable, skippable, never blocking. Node-verified only; the look at 1280x720, the L-key / summary-button clicks under pointer lock, and a real 2-player payload are untested. The replay is a schematic path view, not the 3D map.
+
+## Wave 8 - expedition moons (docs/wave8/expeditions.md)
+Three special moons (flooded barge: oxygen, dune relay: heat + escort, rooftop blackout: power cell + zip-lines) with a need, a goal and a payout scaled to the quota, unlocked with the voyage or as a one-day contract. Node-verified only (layouts over 60 seeds, host goal flows, geomfix support checks); the look, the zip-line / current / heat feel, the sandstorm timing and a real 2-player run are untested, and the crawler is not solid while it moves.
+

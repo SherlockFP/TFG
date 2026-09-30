@@ -73,7 +73,7 @@ const num = (v) => (typeof v === 'number' && isFinite(v) ? v : 0);
 export function bestiaryIds() { return Object.keys(CREATURES).filter((id) => id !== 'kefaldayi' && id !== 'company'); }
 /** The scrap universe: every sellable item (bodies excluded). Grows with mods / generated content. */
 export function scrapIds() { return Object.keys(ITEMS).filter((id) => { const d = ITEMS[id]; return d && id !== 'body' && d.kind !== 'body' && isSellable(d); }); }
-const baseMoonIds = () => MOON_ORDER.filter((id) => MOONS[id]);
+const baseMoonIds = () => MOON_ORDER.filter((id) => MOONS[id] && !MOONS[id].expedition);   // [expeditions] special moons are not part of the base set
 
 /** Counters used by the milestones and the panel. */
 export function codexCounts(p) {

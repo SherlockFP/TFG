@@ -54,7 +54,7 @@ export function installWorlds2(game) {
   };
   const run = () => g.run;
   const moonOf = () => MOONS[g.run?.moon];
-  const isMoonPhase = () => run()?.phase === 'moon' && !moonOf()?.company && !moonOf()?.home;
+  const isMoonPhase = () => run()?.phase === 'moon' && !moonOf()?.company && !moonOf()?.home && !moonOf()?.expedition;   // [expeditions] the special moons have their own rules
   const hostOn = () => g.isHost && isMoonPhase() && !!g.world?.outdoor;
   const say = (key, vars, kind = 'info') => g.net?.broadcast?.('sys', sysMsg(key, vars, kind));
   const big = (a, b, vars) => g.net?.broadcast?.('fx', { k: 'w2big', a, b, v: vars || undefined });

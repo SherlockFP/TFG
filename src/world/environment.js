@@ -244,7 +244,7 @@ export class Environment {
     // sun path
     const sunAng = lerp(0.35, Math.PI - 0.05, clamp(t * 1.25, 0, 1));
     this.sunDir.set(Math.cos(sunAng) * 0.8, Math.sin(sunAng), 0.35).normalize();
-    const dayF = clamp(Math.sin(sunAng) * 1.6, 0, 1) * (1 - clamp((t - 0.62) / 0.2, 0, 1));
+    const dayF = clamp(Math.sin(sunAng) * 1.6, 0, 1) * (1 - clamp((t - 0.62) / 0.2, 0, 1)) * (1 - (b.minNight || 0));   // [expeditions] a moon that is always night (Rooftop Blackout City)
     const duskF = clamp(1 - Math.abs(t - 0.62) / 0.12, 0, 1);
     let night = 1 - dayF;
     if (this.eclipse) night = Math.max(night, 0.75);
