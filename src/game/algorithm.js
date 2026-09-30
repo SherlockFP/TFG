@@ -133,7 +133,7 @@ function ensureStyle() {
   if (typeof document === 'undefined' || document.getElementById(STYLE_ID)) return;
   const s = document.createElement('style'); s.id = STYLE_ID; s.textContent = CSS; document.head.appendChild(s);
 }
-const GLYPHS = '#%&@$*+=?/\\|<>▮▯░▒▓01';
+const GLYPHS = '#%&@$*+=?/\\|<>01';   // ASCII only: block glyphs (▯ ░) rendered as tofu in the HUD font
 
 export function installAlgorithm(core) {
   const { game } = core;

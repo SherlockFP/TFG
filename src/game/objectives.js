@@ -127,6 +127,7 @@ export class Objectives {
     const dens = document.documentElement.dataset.hud;
     const og = this.game.onegoal;   // [onegoal] Standard = ONE goal (+1 warning) for every profile; a budgeted new player gets it even in Full
     const list = og?.shown ? og.shown(all, dens === 'full' && this.game.onboard?.fr?.active?.() ? 'standard' : dens) : dens === 'full' ? all : all.slice(0, dens === 'minimal' ? 1 : 2);
+    this.goalSrc = (list.find((o) => o.kind !== 'warn' && o.kind !== 'hint') || {}).src || '';   // [shotfix] the module owning the ONE goal (tasks.js floats a world label only when it is 'tasks')
     const html = list.map((o) => `<div class="obj ${o.kind}${o.done ? ' done' : ''}"><span class="obj-dot">${o.done ? '✔' : o.kind === 'warn' ? '!' : '◆'}</span>${escapeHtml(o.text)}${o.progress !== null && !o.done ? `<div class="obj-bar"><div style="width:${Math.round(o.progress * 100)}%"></div></div>` : ''}</div>`).join('');
     if (html !== this.last) { this.el.innerHTML = html; this.last = html; }
     const hidden = this.game.ui.hud?.el.classList.contains('hidden');

@@ -422,18 +422,33 @@ export function installTasks(game) {
     const want = new Set();
     if (show) {
       const W = window.innerWidth, H = window.innerHeight;
+      // [shotfix] one-goal rule: a named world label floats only for the nearest open task AND only while tasks own the ONE goal
+      // (objectives.goalSrc); every other open task is a small icon + distance on the screen edge, never mid-view, never cut off.
+      const isGoal = game.objectives?.goalSrc === 'tasks';
+      let nearest = null, nd = 1e9;
+      const cam = game.camera.position;
+      for (const a of myList()) {
+        if (a.done) continue;
+        const s = stationOf(a.sid);
+        if (!s) continue;
+        const dd = Math.hypot(s.x - cam.x, s.z - cam.z);
+        if (dd < nd) { nd = dd; nearest = a.sid; }
+      }
       for (const a of myList()) {
         if (a.done) continue;
         const s = stationOf(a.sid);
         if (!s) continue;
         const def = TASK_TYPES[s.type];
+        const named = isGoal && a.sid === nearest;
         _p.set(s.x, s.y + 2.1, s.z);
         const d = _p.distanceTo(game.camera.position);
         if (d < 3) continue;
         toScreen(_p, game.camera, W, H, sp);
+        const mx = named ? 90 : 34;   // keeps the text inside the screen
         let x = sp.x, y = sp.y, edge = false;
-        if (sp.behind) { x = sp.cx < 0 ? 24 : W - 24; y = H - 90; edge = true; }
-        else if (x < 24 || x > W - 24 || y < 24 || y > H - 24) { x = Math.min(W - 24, Math.max(24, x)); y = Math.min(H - 90, Math.max(24, y)); edge = true; }
+        if (sp.behind) { x = sp.cx < 0 ? mx : W - mx; y = H - 90; edge = true; }
+        else if (x < mx || x > W - mx || y < 24 || y > H - 24) { x = Math.min(W - mx, Math.max(mx, x)); y = Math.min(H - 90, Math.max(24, y)); edge = true; }
+        if (!named && !edge) continue;   // on-screen and not the goal: the station's own marker is enough
         let e = markEls.get(a.sid);
         if (!e) {
           e = document.createElement('div');
@@ -441,7 +456,7 @@ export function installTasks(game) {
           marks.appendChild(e); markEls.set(a.sid, e);
         }
         e.style.left = x + 'px'; e.style.top = y + 'px'; e.style.color = def.color; e.style.opacity = edge ? '0.75' : '0.95';
-        const html = `${def.icon} ${edge ? '' : def.name}<br><span style="font-size:16px;color:#fff">${Math.round(d)} m</span>`;
+        const html = `${def.icon} ${named ? def.name : ''}<br><span style="font-size:16px;color:#fff">${Math.round(d)} m</span>`;
         if (e._html !== html) { e.innerHTML = html; e._html = html; }
         want.add(a.sid);
       }

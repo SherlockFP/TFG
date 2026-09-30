@@ -713,9 +713,9 @@ export const VM_REST = {
   //            base pos (x mirrored per side)   sh rot x, y (mirrored), z (mirrored), elbow
   // one hand: shoulder low and back, elbow bent ~58 deg -> the hand rests in the lower-right of the view (NDC ~0.36, -0.62) about 0.45 m
   // out instead of reaching 0.55 m towards the screen centre (owner: items looked "far away" and crooked)
-  onehand: { p: [0.26, -0.42, 0.08], r: [-0.062, -0.072, 0.332], el: 0.904 },
+  onehand: { p: [0.27, -0.42, 0.08], r: [-0.062, -0.072, 0.332], el: 0.904 },
   twohand: { p: [0.25, -0.33, 0.04], r: [0.22, 0.3, -0.25], el: 0.3 },
-  none: { p: [0.26, -0.42, 0.08], r: [-0.062, -0.072, 0.332], el: 0.904 },
+  none: { p: [0.27, -0.42, 0.08], r: [-0.062, -0.072, 0.332], el: 0.904 },
 };
 
 // Pose deltas from the rest pose: x/y/z shoulder rotation, e elbow, px/py/pz arm position,
@@ -871,23 +871,22 @@ export function createViewModel({ suitColor = '#d9642b' } = {}) {
   const baseMap = suitTex();
   const sleeveMat = lamI(suitColor, { map: baseMap });
   const round = !CLASSIC;                     // [avatar2] round mitten gloves in light grey (the classic model keeps the dark boxy ones)
-  const gloveBase = round ? A2.GLOVE : C.dark;
+  const gloveBase = round ? '#26282c' : C.dark;   // [glove] dark work glove (Lethal Company look), cuff in suit colour
   const vmGloveMat = lamI(gloveBase);
   const sway = pv(root, null, null, 'sway');
 
   const mkArm = (side) => { // side +1 = right (screen right, +X), -1 = left
     const base = pv(sway);
     const sh = pv(base);
-    mk(sh, merged('vm_upper', () => [xf(G.segZ(0.3, 0.088, 0.076, 7), [0, 0, 0], [0, PI, 0])]), sleeveMat);
+    mk(sh, merged('vm_upper', () => [xf(G.segZ(0.3, 0.07, 0.06, 7), [0, 0, 0], [0, PI, 0])]), sleeveMat);
     const el = pv(sh, [0, 0, -0.3]);
     mk(el, merged('vm_fore', () => [
-      xf(G.segZ(0.24, 0.074, 0.064, 7), [0, 0, 0], [0, PI, 0]),
-      xf(G.cyl(0.078, 0.078, 0.035, 7), [0, 0, -0.235], [PI / 2, 0, 0]),
+      xf(G.segZ(0.24, 0.058, 0.05, 7), [0, 0, 0], [0, PI, 0]),
+      xf(G.cyl(0.062, 0.062, 0.045, 8), [0, 0, -0.245], [PI / 2, 0, 0]),
     ]), sleeveMat);
     mk(el, round ? merged('vm_gloveR' + side, () => [
-      xf(G.sph(0.062, 8, 6), [0, 0, -0.325], [0, 0, 0], [1.12, 0.95, 1.3]),
-      xf(G.sph(0.03, 5, 4), [-side * 0.06, 0.008, -0.3]),
-      xf(G.cyl(0.084, 0.084, 0.04, 8, true), [0, 0, -0.262], [PI / 2, 0, 0]),
+      xf(G.sph(0.05, 8, 6), [0, 0, -0.325], [0, 0, 0], [1.1, 0.92, 1.3]),
+      xf(G.sph(0.024, 5, 4), [-side * 0.05, 0.008, -0.3]),
     ]) : merged('vm_glove' + side, () => [
       xf(G.box(0.095, 0.075, 0.12), [0, 0, -0.31]),
       xf(G.box(0.04, 0.035, 0.08), [-side * 0.055, 0.01, -0.3], [0, side * 0.4, 0]),
