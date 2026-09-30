@@ -5,6 +5,7 @@
 //   cards    the 3 route cards of the day: current route first, then the routes that just opened, then a seeded daily order.
 //   numbers  scrap-on-site payout range, danger pips; hooks (one line per moon, EN / TR / RU) and the interior silhouettes for the card art.
 import { RNG, hashString } from '../core/rng.js';
+import { camCount } from './feedcams_core.js';
 
 /** the campaign's first three routes (docs/wave8/routeboard.md "why these three"):
  *  hamsi  56K-Dialup     tier 1 hills + Data Center factory: outdoor + indoor basics, free, the Hiring Day moon
@@ -78,6 +79,8 @@ export function tableAvg(table, valueOf) {
   for (const [id, wt] of table || []) { const v = valueOf(id); if (!Array.isArray(v)) continue; w += wt; lo += v[0] * wt; hi += v[1] * wt; }
   return w ? [lo / w, hi / w] : [20, 40];
 }
+/** [camloot] how many Algorithm cameras the route's facility will carry on this day / quota (the card's CAMS row); most of them watch the loot rooms */
+export const camsOf = (m, day, q) => (!m || exempt(m) ? 0 : camCount(m.size, day, q));
 export const pips = (n, max = 5) => Array.from({ length: max }, (_, i) => i < (n | 0));
 
 /** the moon's hook: one line, what makes this route different (EN, TR, RU). Unknown moons fall back to the first sentence of their desc. */
