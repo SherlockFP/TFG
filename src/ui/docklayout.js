@@ -143,4 +143,15 @@ export function spreadMarkers(items, hb, gx = 74, gy = 40) {
   return items;
 }
 /** the hotbar rect (visible `.hud-inv`), or null */
-export function hotbarRect() { const r = typeof document !== 'undefined' ? shown(document.querySelector('.hud-inv')) : null; return r ? { left: r.left, right: r.right, top: r.top } : null; }
+let hbEl = null, hbRect = null, hbAt = -1;
+/** hotbar rect for marker placement — element + rect cached (re-measured at most 4x/s; called per frame by marker code) */
+export function hotbarRect() {
+  if (typeof document === 'undefined') return null;
+  const now = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+  if (hbAt >= 0 && now - hbAt < 250) return hbRect;
+  hbAt = now;
+  if (!hbEl || !hbEl.isConnected) hbEl = document.querySelector('.hud-inv');
+  const r = hbEl ? shown(hbEl) : null;
+  hbRect = r ? { left: r.left, right: r.right, top: r.top } : null;
+  return hbRect;
+}
