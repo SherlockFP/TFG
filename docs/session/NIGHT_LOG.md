@@ -19,4 +19,5 @@ Loop rule: 2-3 Sonnet agents at a time (1 browser/QA agent max) → merge with t
 | 4 | firstrun | merged 4d4dfad: first-run message budget (one objective, ≤1 Algorithm line / 45 s, one card at a time), no affixes/daily modifier/job fee/wrong door/drone before the first sale/day 2, designed tutorial camera between entrance and first loot room with a green blind-spot ring + clean-pass reward. |
 | 5 | hostmig | merged bd5212d: facjobs/chess/arcade2 rebuild on host migration (resto/lcmonsters/crdirector already graceful), charge + elevator range checks, kit revive verified host-side (141 checks). |
 | 5 | creatureart | merged 8336791: 72 hostile types audited; emissive eye tells for all, walk/run lean + 0.4 s wind-up lean + strike snap + hit flinch pose layer, distinct Dimmer/Follower/Auditor models, Mannequin wind-up visible. |
-| 6 | carry2 (R.E.P.O.-style carry comedy: sway, fragile bumps, two-person bulky loot, throw & catch, Algorithm reactions) | running |
+| 6 | carry2 | merged c8da40e: heavy-item sway + slower turn, fragile bump value loss (5-25 %, floor 35 %), bulky vending machine/server rack/statue + facjobs core: solo crawl 0.55× or two-person carry 0.92× (hold E), throw & catch fragile items, Algorithm lines + crack/catch highlights. |
+| 7 | highlights (end-of-day Algorithm replay clip of the best on-air moment, CRT stream overlay) | running |
