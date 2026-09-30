@@ -29,6 +29,7 @@ const CSS = `.ob-pa{position:fixed;left:50%;top:clamp(48px,8vh,96px);transform:t
 .ob-pa .t{padding:10px 14px}
 .ob-st{position:fixed;inset:0;z-index:57;pointer-events:none;opacity:0;transition:opacity .45s;font:600 16px/1.3 var(--font2,'Arial Narrow',Arial,sans-serif);color:var(--t-paper,#ffd9b8)}
 .ob-st.on{opacity:1}
+body:has(.ob-st) :is(.hud,.algo-sub,.hud-toasts){visibility:hidden}
 .ob-st .fr{position:absolute;inset:12px;border:1px solid var(--t-line-hi,#c96)}
 .ob-st .lv{position:absolute;left:24px;top:22px;display:flex;align-items:center;gap:10px}
 .ob-st .live{background:var(--t-bad,#ff5a48);color:#140404;font-weight:800;letter-spacing:.12em;padding:2px 10px}

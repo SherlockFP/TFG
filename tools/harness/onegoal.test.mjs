@@ -56,6 +56,8 @@ ok(out.find((l) => l.text === 'Job line')?.src === 'facjobs' && out.find((l) => 
 const tag = out.find((l) => /TAGGED/.test(l.text));
 ok(tag && tag.cat === 'escape' && /50 m/.test(tag.text), 'TAGGED line with the distance to the ship');
 ok(api.shown([...out, L('Bring scrap', 'main', { src: 'core' })], 'standard')[0] === tag, 'TAGGED is the goal');
+game.player.indoor = true; const outIn = []; api.emit((tx, kd) => { const o = { text: tx, kind: kd }; outIn.push(o); return o; }, game, 'moon'); game.player.indoor = false;   // [qa2] the facility is offset: no bogus metre count indoors
+ok(outIn.find((l) => /TAGGED/.test(l.text)) && !/\d+ m/.test(outIn.find((l) => /TAGGED/.test(l.text)).text), 'TAGGED indoors carries no distance');
 ok(api.lease('card', 4, 2) && !api.lease('caption', 6, 1) && api.lease('hub', 4, 3), 'one card at a time for veterans');
 game.settings.chattyAlgo = true; ok(api.lease('caption', 6, 1), 'chatty: cards may stack');
 api.dispose();

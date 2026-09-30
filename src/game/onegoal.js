@@ -5,7 +5,7 @@
 //               one card at a time (game.onboard.fr delegates here once a profile is past the first-run budget). Settings > Chatty Algorithm = off.
 //   core verb   while you are TAGGED by a feed camera the goal is "get to the ship or kill that camera".
 // Net: none (reads run.fc, which feedcams already syncs).
-import { tf } from '../core/i18n.js';
+import { t, tf } from '../core/i18n.js';
 import * as OG from './onegoal_core.js';
 import * as FR from './firstrun_core.js';
 import './onegoal_i18n.js';
@@ -35,7 +35,7 @@ export function installOneGoal(game) {
     if (disposed || (g && g !== game) || phase !== 'moon') return;
     const p = game.player, fp = game.run?.fc?.p?.[game.selfId];
     if (!p || p.dead || p.inShip || !fp?.[2]) return;
-    const o = add(tf('TAGGED: get to the ship ({d} m) or kill the camera that tagged you', { d: Math.round(Math.hypot(p.pos.x, p.pos.z)) }), 'main');
+    const o = add(p.indoor ? t('TAGGED: get out to the ship or kill the camera that tagged you') : tf('TAGGED: get to the ship ({d} m) or kill the camera that tagged you', { d: Math.round(Math.hypot(p.pos.x, p.pos.z)) }), 'main');   // [qa2] indoors the x/z distance is meaningless (the facility is offset)
     if (o && typeof o === 'object') { o.cat = 'escape'; o.lead = true; }
   }));
 

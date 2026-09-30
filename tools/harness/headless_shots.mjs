@@ -18,6 +18,8 @@ const logs = new Map();
 const add = (s) => logs.set(s, (logs.get(s) || 0) + 1);
 p.on('console', (m) => { if (m.text().startsWith('QA:')) { console.log(m.text()); return; }   // console.log('QA: ...') in a script = live progress line
   if (m.type() === 'error' || m.type() === 'warning') add(m.type() + ': ' + m.text().slice(0, 400)); });
+p.on('crash', () => { console.log('QA: PAGE CRASH'); setTimeout(() => process.exit(3), 500); });   // a crashed renderer would leave page.evaluate hanging and hold the browser lock
+p.on('close', () => console.log('QA: PAGE CLOSED'));
 p.on('pageerror', (e) => add('pageerror: ' + String(e.stack || e.message).slice(0, 800)));
 // name ending in .jpg -> JPEG (quality --q, default 55), else PNG
 await p.exposeFunction('__shot', async (name) => { await p.screenshot(/\.jpe?g$/.test(name) ? { path: `${shotDir}/${name}`, type: 'jpeg', quality: Number(arg('q', '55')), timeout: 150000 } : { path: `${shotDir}/${name}.png` }); return true; });

@@ -219,10 +219,12 @@ export function installMapmods(game) {
   };
   if (mods.commands?.set) { mods.commands.set('atlas', { fn: atlas, help, owner: null }); mods.commands.set('affix', { fn: atlas, help, owner: null }); }
   if (game.terminal) {
+    let inExec = false;   // [qa2] MOONS re-enters exec (voyage passthrough / route board): print the readout once, from the outermost call only
     restores.push(wrapMethod(game.terminal, 'exec', (orig) => function (cmd, ...a) {
-      const r = orig.call(this, cmd, ...a);
+      const nested = inExec; inExec = true;
+      let r; try { r = orig.call(this, cmd, ...a); } finally { inExec = nested; }
       const w0 = String(cmd || '').trim().toLowerCase().split(/\s+/)[0];
-      if ((w0 === 'moon' || w0 === 'moons') && run()?.phase === 'orbit' && mmOf()?.nxt) this.print('\n' + readout());
+      if (!nested && (w0 === 'moon' || w0 === 'moons') && run()?.phase === 'orbit' && mmOf()?.nxt) this.print('\n' + readout());
       return r;
     }));
   }

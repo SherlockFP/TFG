@@ -1291,7 +1291,7 @@ export class UI {
         const t0 = performance.now(), dur = v ? 650 : 1;
         game.sfx?.('ui_hover', 0.35);
         const step = (now) => {
-          const k = Math.min(1, (now - t0) / dur);
+          const k = Math.max(0, Math.min(1, (now - t0) / dur));   // [qa2] rAF stamps can precede t0 (k < 0 counted the rows to -3,422)
           b.textContent = pre + Math.round(v * (1 - Math.pow(1 - k, 3))).toLocaleString('en-US');
           if (k < 1 && box.isConnected) requestAnimationFrame(step);
         };
@@ -1358,7 +1358,7 @@ export class UI {
     setTimeout(() => {
       const t0 = performance.now();
       const step = (now) => {
-        const k = Math.min(1, (now - t0) / 1400);
+        const k = Math.max(0, Math.min(1, (now - t0) / 1400));
         next.textContent = fmtMoney(d.prev + (d.quota - d.prev) * (1 - Math.pow(1 - k, 3)));
         if (k < 1 && box.isConnected) requestAnimationFrame(step); else next.classList.add('done');
       };

@@ -25,7 +25,7 @@ export const CSS = `
 .hc-scan{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px);mix-blend-mode:multiply;animation:hcflick 4s linear infinite}
 @keyframes hcflick{0%,100%{opacity:1}50%{opacity:.86}92%{opacity:1}94%{opacity:.7}}
 @media (prefers-reduced-motion:reduce){.hc-scan,.hc-rec i{animation:none}}
-.hc-offer{position:fixed;right:16px;bottom:92px;z-index:59000;background:#08110b;border:1px solid #2c4a36;border-left:4px solid #ff3b30;color:#9dffb4;font:13px/1.3 ui-monospace,Consolas,monospace;padding:9px 14px;border-radius:6px;cursor:pointer;animation:hcin .3s ease-out;max-width:260px}
+.hc-offer{position:fixed;right:16px;top:42%;z-index:59000;background:#08110b;border:1px solid #2c4a36;border-left:4px solid #ff3b30;color:#9dffb4;font:13px/1.3 ui-monospace,Consolas,monospace;padding:9px 14px;border-radius:6px;cursor:pointer;animation:hcin .3s ease-out;max-width:260px}
 .hc-offer small{display:block;opacity:.7;margin-top:2px}
 .hc-sum{display:flex;align-items:center;gap:10px;margin-top:6px}
 .hc-watch{background:#0d1c12;border:1px solid #2c4a36;border-left:4px solid #ff3b30;color:#9dffb4;font:inherit;font-weight:700;letter-spacing:.06em;padding:5px 12px;border-radius:4px;cursor:pointer}

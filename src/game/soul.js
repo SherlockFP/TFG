@@ -459,7 +459,7 @@ export function installSoul(game) {
         let lastTick = 0;
         const step = (now) => {
           if (disposed || !box.isConnected) return;
-          const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+          const k = Math.max(0, Math.min(1, (now - t0) / dur)), e = 1 - Math.pow(1 - k, 3);
           tot.textContent = fmtMoney(total * e);
           if (now - lastTick > 70 && k < 1) { lastTick = now; snd('sl_tick', 0.35, 0.9 + 0.5 * k); }
           if (k < 1) requestAnimationFrame(step);

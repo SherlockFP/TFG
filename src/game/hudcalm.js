@@ -54,6 +54,8 @@ html:not([data-hud="full"]) .tfg-threat .tt-foot{display:none}
 .hc-tab .hc-r{display:flex;justify-content:space-between;gap:12px}.hc-tab .hc-r b{font-weight:400;color:#fff3e6}
 .hc-tab .hc-cell{margin-bottom:8px;max-width:340px}.hc-tab .hc-cell .hud-dock-item{display:block}
 .hc-tab .hc-cell svg{width:1.1em;height:1.1em;vertical-align:-.15em}   /* [hud6] copied dock glyphs lost their sizing rule (a giant bolt in the card) */
+.hc-tab .fh-s{display:flex;align-items:center;gap:6px;line-height:1.3}.hc-tab .fh-s .dim{color:#8a7a6a}.hc-tab .fh-s b{font-weight:400}.hc-tab .fh-t{display:flex;gap:10px;align-items:baseline}.hc-tab .fh-t i{font-style:normal;color:var(--amber-dim,#a8722f)}   /* [qa2] copied facility rows lost their flex + gap (POWERLOW, STATUSDATA CORE) */
+:root.hc-tab-on .objectives,:root.hc-tab-on .hud-tl{opacity:0}   /* [qa2] the left goal text bled through the card */
 .hc-tab .hc-dead{opacity:.55}
 .hc-tab .hc-none{opacity:.55}
 @media (max-height:760px){.hc-tab{font-size:18px;gap:10px 22px;padding:12px 16px 8px}}
@@ -155,7 +157,7 @@ export function installHudCalm(game) {
       <div><h4>${t('RUN')}</h4>${rows.map(([a, b]) => `<div class="hc-r"><span>${escapeHtml(a)}</span><b>${b}</b></div>`).join('')}
       <h4 style="margin-top:12px">${t('STATUS')}</h4>${cells.join('') || `<div class="hc-none">${t('Nothing else to report.')}</div>`}</div>`;
   }
-  const showTab = (v) => { if (v === tabOn) return; tabOn = v; if (v) render(); card.classList.toggle('on', v); };
+  const showTab = (v) => { if (v === tabOn) return; tabOn = v; if (v) render(); card.classList.toggle('on', v); document.documentElement.classList.toggle('hc-tab-on', !!v); };
   const onDown = (e) => {
     if (e.code !== keyCode() || e.repeat) return;
     if (canShow()) { e.preventDefault(); showTab(true); }
