@@ -230,7 +230,7 @@ import { installMystery10 } from './mystery10.js';
 // wave 11 (mechanics + variety) placeholders
 // [import:creatures11]
 // [import:swarm11]
-// [import:loop11]
+import { installLoop11 } from './loop11.js';
 // [import:shift11]
 // [import:events11]
 // [import:gear11]
@@ -625,7 +625,7 @@ export class Game extends Emitter {
     this.useModule('mystery10', installMystery10);
     // [slot:creatures11]
     // [slot:swarm11]
-    // [slot:loop11]
+    this.useModule('loop11', installLoop11);
     // [slot:shift11]
     // [slot:events11]
     // [slot:gear11]
