@@ -846,3 +846,6 @@ first-join rejoin 35 s, lost-host 25 s, host never rejoins. NAT/SDP failures now
 everyone on Nostr; lobby browser shows real peer/relay counts; NETSTATS shows relays, TURN and per-peer ICE path.
 **Owner action still needed:** a TURN account + `VITE_TURN_*` on Render for friends behind CGNAT/mobile (no free
 public TURN works). Details: `docs/MULTIPLAYER_HOTFIX.md` → "Follow-up".
+
+### Wave 10 — creatures10
+Three internet-horror creatures, one rule each: **Buffering** (moves only while its loading ring spins, freezes to buffer every 4-6.5 s = your window), **The Doomscroller** (ceiling chain of phones, drops on whoever stands still under it; scroll-tick ramps, ping + 1 s hover before the drop), **The Ratio** (mirrored twin pair: a twin only moves unwatched and rushes while you stare at the other). Files `src/game/creatures10*.js`, `src/models/creatures10_models.js`, test `tools/harness/creatures10.test.mjs` (12 checks); spawn weights in `TUNE.spawn` (tier >= 2, quota >= 1 / 2), threatpool HEADLINE +3 rows, no net messages. Not seen in a browser yet: `kefal.game.creatures10.debugSpawn("buffering"|"doom"|"ratio")`. See `docs/wave10/creatures10.md`.
