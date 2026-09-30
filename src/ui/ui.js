@@ -1267,6 +1267,14 @@ export class UI {
     clearTimeout(this.cineGuard);
     if (!this.app.game) { this.cineQ.length = 0; if (this.cineActive) this.centerCards?.end(); this.cineActive = null; this.root.classList.remove('cine-open'); return; }
     const c = this.cineQ.shift();
+    // [centercards] a centre card (moon title / level up / achievement) is already up: let it finish first (max ~6 s) instead of drawing over it
+    if (!this.cineActive && c && this.centerCards?.active && (this._cineWait = (this._cineWait || 0) + 1) < 40) {
+      this.cineQ.unshift(c);
+      clearTimeout(this._cineWaitT);
+      this._cineWaitT = setTimeout(() => { if (!this.cineActive) this.nextCinematic(); }, 150);
+      return;
+    }
+    this._cineWait = 0;
     if (this.cineActive && !c) this.centerCards?.end();   // [centercards] last cinematic gone
     else if (!this.cineActive && c) this.centerCards?.begin('cine');
     this.cineActive = c ? c.kind : null;
