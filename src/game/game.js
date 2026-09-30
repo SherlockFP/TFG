@@ -224,12 +224,9 @@ import { installStory } from './lazymods.js';   // [import:story] wave 6: two pa
 import { installCreatures10 } from './creatures10.js';
 import { installLabyr10 } from './labyr10.js';   // [import:labyr10] wave 10: Dead Mall + Mirror Funhouse life
 import { installMoons10 } from './moons10.js';
-// [import:moons10]
 import { installOutlife10 } from './outlife10.js';
 import { installLanding10 } from './landing10.js';
-// [import:outlife10]
 import { installMystery10 } from './mystery10.js';
-// [import:landing10]
 import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
 
 
@@ -616,12 +613,9 @@ export class Game extends Emitter {
     this.useModule('creatures10', installCreatures10);
     this.useModule('labyr10', installLabyr10);   // [slot:labyr10]
     this.useModule('moons10', installMoons10);
-    // [slot:moons10]
     this.useModule('outlife10', installOutlife10);
     this.useModule('landing10', installLanding10);
-    // [slot:outlife10]
     this.useModule('mystery10', installMystery10);
-    // [slot:landing10]
 
     this.useModule('onboard', installOnboard);   // [slot:onboard] wave 5: Hiring Day + staged unlocks (installed last: wraps hostLever / terminalCommand / objectives.compute)
     this.useModule('score', installScore);   // wave 7: adaptive procedural music + the Algorithm's jingle (docs/wave7/score.md)

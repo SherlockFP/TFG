@@ -71,8 +71,10 @@ function planFun(ctx) {
   line(ent.cx, ent.cz, ent.cx, mZ1);
   const tun = addRoom(cx, tZ0, 1, tLen, 'fun_spin'); tun.hub = true; tun.fun = 'spin';
   line(cx, mZ0, cx, tZ1);
-  const maze = addRoom(cx - (kw >> 1), kZ0, kw, kh, 'fun_maze'); maze.fun = 'maze'; maze.maze = true; maze.mazeStyle = 'braid'; maze.hub = true;
-  mazeRooms.push(maze);
+  const maze = addRoom(cx - (kw >> 1), kZ0, kw, kh, 'fun_maze'); maze.fun = 'maze'; maze.hub = true;
+  // a theme-variety maze (like the stealth variety mazes): flagged varMaze, and left out in campaign / cycle layouts,
+  // which place their own single labyrinth (opts.labyrinth / arena / wings) and count mazes exactly
+  if (!ctx.cycleMode) { maze.maze = true; maze.varMaze = true; maze.mazeStyle = 'braid'; mazeRooms.push(maze); }
   line(cx, tZ0, cx, kZ1);
   // side rooms that are always there: one crooked room each side of the midway, joined by a straight stub through the hall's middle row
   const cz = mZ0 + 2, hw = mw >> 1;

@@ -129,7 +129,7 @@ export function generateLayout(seed, theme = 'factory', size = 1, opts = null) {
   // [facjobs] archetype spines (atrium / ring): drawn before any other room so everything else keeps clear of them
   const spines = [];
   const mazeRooms = [];   // [labyr10] declared before the theme layout plan (the funhouse plan pushes its mirror maze here)
-  const archDone = O.arch ? (R.arch ? planLabArch({ arch: O.arch, W, H, ent, cells, idx, addRoom, line, spines, open, edgeKey, size, mazeRooms }) : planArch({ arch: O.arch, W, H, ent, cells, idx, canPlace, addRoom, line, spines, nodes })) : false;   // [labyrinths] R.arch = theme plan
+  const archDone = O.arch ? (R.arch ? planLabArch({ arch: O.arch, W, H, ent, cells, idx, addRoom, line, spines, open, edgeKey, size, mazeRooms, cycleMode: !!(O.labyrinth || O.arena || O.wings) }) : planArch({ arch: O.arch, W, H, ent, cells, idx, canPlace, addRoom, line, spines, nodes })) : false;   // [labyrinths] R.arch = theme plan
 
   // landmark hub: a big, tall, readable room near the middle (always for themes that ask, else big maps)
   if (!archDone && R.hub && (R.hubAlways || size >= 1.6)) {
