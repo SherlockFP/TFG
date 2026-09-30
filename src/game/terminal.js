@@ -142,7 +142,7 @@ export class Terminal {
     switch (w0) {
       case 'help': case '?':
         this.print([
-          t('>MOONS        list moons, weather & routing costs'),
+          t('>MOONS        route board (MOONS ALL: the full list)'),   // [routeboard]
           t('>SECTOR       map of the current uncharted sector'),
           t('>INFO <moon>  details: biome, interior, risk, modifiers'),
           t('>ROUTE <moon> set the autopilot destination (or ROUTE #2)'),
@@ -172,14 +172,14 @@ export class Terminal {
           if (!m || m.generated) continue;
           const w = m.company ? '' : ` (${weatherName(run, m)})`;
           const rate = m.company ? '  ' + tf('buying at {r}%', { r: Math.round(buyRate(run.daysLeft, run.buyRnd) * 100) }) : '';
-          out.push(`* ${m.name.padEnd(14)} ${m.company ? '' : 'T' + m.tier} ${costText(m)}${w}${rate}`);
+          out.push(`* ${m.name.padEnd(14)} ${m.company ? '' : 'T' + m.tier} ${costText(m)}${w}${rate}${g.routeboard?.lockTag?.(m) || ''}`);   // [routeboard] campaign ladder
         }
         const gen = sectorMoons();
         if (gen.length) {
           out.push('', tf('UNCHARTED: {name}  ({n} servers)', { name: sector?.name || t('SECTOR'), n: gen.length }));
           gen.forEach((m, i) => {
             const cur = m.id === run.moon ? '>' : '*';
-            out.push(`${cur} #${i + 1} ${m.name.padEnd(28)} T${m.tier} ${costText(m).padEnd(6)} (${weatherName(run, m)}) ${t(m.risk)}`);
+            out.push(`${cur} #${i + 1} ${m.name.padEnd(28)} T${m.tier} ${costText(m).padEnd(6)} (${weatherName(run, m)}) ${t(m.risk)}${g.routeboard?.lockTag?.(m) || ''}`);
             out.push(`       ${t(biomeName(m.biome))} / ${interiorName(m.interior)} / ${sizeLabel(m.size)}${m.mods.length ? '  +' + m.mods.map((k) => MODIFIERS[k]?.name || k).join(' +') : ''}`);
           });
           out.push('', t('Type SECTOR for the map, INFO <moon> for details.'));

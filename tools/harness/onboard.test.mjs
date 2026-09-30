@@ -284,7 +284,7 @@ const eq = (a, b, m) => ok(JSON.stringify(a) === JSON.stringify(b), `${m}: got $
 
   // ---- forced Hiring Day
   for (const k of Object.keys(profile)) if (k === 'unlocks' || k === 'onboard') delete profile[k];
-  globalThis.location = { search: '?hiringday=1' };
+  globalThis.location = { search: '?hiringday=wing' };
   game.run = { phase: 'orbit', quotaIndex: 0, day: 1, quota: 130, moon: 'hamsi' };
   api = installOnboard(game);
   tick(0.1, 2);
@@ -412,18 +412,30 @@ const eq = (a, b, m) => ok(JSON.stringify(a) === JSON.stringify(b), `${m}: got $
   api.dispose();
   // ---- a fresh host: starts, then skip by Backspace hold
   const p3 = { id: 'y', stats: {}, level: 1 }; game.profile = p3; game.isHost = true; game.settings = {};
-  api = installOnboard(game); tick(0.1, 3); ok(api.active() && !!api.wing(), 'fresh host runs Hiring Day');
+  api = installOnboard(game); tick(0.1, 3); ok(api.active() && !api.wing() && api.debug().stream !== null, 'fresh host runs Hiring Day (wave 8: opens on the stream, no wing)');
   game.onboard = api;
   game.input.codeDown = (c) => c === 'Backspace'; tick(0.25, 12);
-  ok(!api.active() && !api.wing() && p3.onboard.s === 'skip' && p3.onboard.why === 'skipped', 'holding Backspace skips (wing removed, flagged)');
+  ok(!api.active() && !api.wing() && api.debug().stream === null && p3.onboard.s === 'skip' && p3.onboard.why === 'skipped', 'holding Backspace skips (stream removed, flagged)');
   ok(colliders.size === 0, 'no colliders left after the skip');
   game.input.codeDown = () => false;
   api.dispose();
   // ---- interruption: somebody lands the ship while the host is in the wing
   const p4 = { id: 'z', stats: {}, level: 1 }; game.profile = p4; game.run = { phase: 'orbit', quotaIndex: 0, day: 1 };
-  api = installOnboard(game); tick(0.1, 3); ok(api.active() && !!api.wing(), 'again fresh');
+  api = installOnboard(game); tick(0.1, 3); ok(api.active() && api.debug().stream !== null, 'again fresh');
   game.run.phase = 'landing'; mods.emit('phase', 'landing', game);
-  ok(!api.wing() && api.step() === 'door', 'landing during orientation: the host is put back in the ship, flow jumps to the door');
+  ok(api.debug().stream === null && !player.frozen && api.step() === 'door', 'landing during the stream: overlay gone, flow jumps to the door');
+  api.dispose();
+  // ---- wave 8: the stream opening is short (<= 13 s) and lands on the terminal step (route board); SPACE cuts it
+  const p5 = { id: 'w', stats: {}, level: 1, name: 'Nova' }; game.profile = p5; game.run = { phase: 'orbit', quotaIndex: 0, day: 1 };
+  api = installOnboard(game); tick(0.1, 3);
+  ok(api.debug().stream !== null && player.frozen === true, 'stream: overlay on, player held');
+  tick(0.25, 52);
+  ok(api.debug().stream === null && !player.frozen && api.step() === 'terminal' && api.active(), 'stream ends by itself within 13 s at the terminal step');
+  api.dispose();
+  const p6 = { id: 'v', stats: {}, level: 1 }; game.profile = p6; game.run = { phase: 'orbit', quotaIndex: 0, day: 1 };
+  api = installOnboard(game); tick(0.5, 4);
+  game.input.codeDown = (c) => c === 'Space'; tick(0.2, 5); game.input.codeDown = () => false;
+  ok(api.debug().stream === null && api.step() === 'terminal', 'SPACE cuts the stream to the ship');
   api.dispose();
 }
 

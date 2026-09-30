@@ -1,6 +1,6 @@
-// Wave 5 onboard smoke (body of an async fn for headless_shots.mjs): Hiring Day starts on a forced fresh host (?hiringday=1), the wing is built, and screenshots
+// Wave 5 onboard smoke (body of an async fn for headless_shots.mjs): Hiring Day starts on a forced fresh host (?hiringday=wing), the wing is built, and screenshots
 // of Cell 07, the corridor (lit / blackout), the locker room and the hangar are taken. Also checks the unlock guards and that no THREE light was added.
-//   flock /tmp/tfg-browser.lock node tools/harness/headless_shots.mjs --port PORT --url '/?autohost=local&code=T1&name=Tester&hiringday=1' --script tools/harness/wave5_onboard.js --shotdir /tmp/ob
+//   flock /tmp/tfg-browser.lock node tools/harness/headless_shots.mjs --port PORT --url '/?autohost=local&code=T1&name=Tester&hiringday=wing' --script tools/harness/wave5_onboard.js --shotdir /tmp/ob
 const g = kefal.game, T = window.THREE, out = {};
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const ob = g.onboard;

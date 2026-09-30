@@ -264,6 +264,7 @@ import { installFeedcams } from './feedcams.js';   // [import:feedcams]
 import { installFeedcams2 } from './feedcams2.js';   // [import:feedcams2] wave 8 pass 2: showcase, drones, jammer, highlights
 import { installDowned } from './downed.js';   // [import:downed] wave 8: 0 HP = downed, crew revives (docs/wave8/downed.md)
 import { installHubgate } from './hubgate.js';   // [import:hubgate]
+import { installRouteboard } from './routeboard.js';   // wave 8: route board (3 route cards) + campaign route ladder (docs/wave8/routeboard.md)
 import { installSoul } from './soul.js';   // [import:soul] wave 8: palettes, story beats, ship soul, moments, voice (docs/wave8/soul.md)
 import { installExpeditions } from './expeditions.js';   // [import:expeditions] wave 8: Sunken Barge / Dune Relay / Rooftop Blackout moons (docs/wave8/expeditions.md)
 // [import:mapmods]
@@ -559,6 +560,7 @@ export class Game extends Emitter {
     this.useModule('feedcams2', installFeedcams2);   // [slot:feedcams2]
     this.useModule('downed', installDowned);   // [slot:downed]
     this.useModule('hubgate', installHubgate);   // [slot:hubgate] wave 8: Hub door, unlock cards, Quick Shift
+    this.useModule('routeboard', installRouteboard);   // wave 8: route board + 3 hero moons at the campaign start
     this.useModule('soul', installSoul);   // [slot:soul]
     this.useModule('expeditions', installExpeditions);   // [slot:expeditions]
     this.useModule('rewardviz', installRewardviz);   // wave 8: reward ledger / warnings / pop
