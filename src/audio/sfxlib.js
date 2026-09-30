@@ -13,6 +13,7 @@
 import * as D from './dsp.js';
 import { installW8 } from './sfxlib_w8.js';   // [sound2] wave-8 sounds (recipes live in sfxlib_w8.js)
 import { installL10 } from './sfxlib_l10.js';   // [labyr10] wave-10 mall / funhouse ambience + one-shots
+import { installL11 } from './sfxlib_l11.js';   // [loop11] wave-11 re-onboarding corridor sounds
 
 const TAU = D.TAU;
 const DEFS = Object.create(null);
@@ -2559,3 +2560,4 @@ danceLoop('dance_disco', 120, { kick: 'X . . . X . . . X . . . X . . .', clap: '
 danceLoop('dance_metal', 150, { kick: 'X . X . X . X . X . X . X . X X', clap: '. . . . X . . . . . . . X . . .', hat: 'x . x . x . x . x . x . x . x .', bass: 'E2 E2 . E2 E2 . E2 . G2 G2 . G2 A2 . A2 .', lead: 'E4 . . G4 . . B4 . E5 . D5 . B4 . G4 .', cut: 2400, wave: 'saw', drive: 2.2 });
 installW8(def, { nburst, thud, metal, click, hiss, creak, bubble, beep, vox, norm }, (c) => { CAT = c; });   // [sound2]
 installL10(def, {}, (c) => { CAT = c; });   // [labyr10]
+installL11(def, {}, (c) => { CAT = c; });   // [loop11]

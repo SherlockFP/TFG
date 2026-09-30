@@ -231,7 +231,8 @@ import { installMystery10 } from './mystery10.js';
 import { installCreatures11 } from './creatures11.js';
 import { installSwarm11 } from './swarm11.js';
 // [import:creatures11]
-// [import:loop11]
+import { installLoop11 } from './loop11.js';
+// [import:swarm11]
 // [import:shift11]
 // [import:events11]
 // [import:gear11]
@@ -627,7 +628,8 @@ export class Game extends Emitter {
     this.useModule('creatures11', installCreatures11);
     this.useModule('swarm11', installSwarm11);
     // [slot:creatures11]
-    // [slot:loop11]
+    this.useModule('loop11', installLoop11);
+    // [slot:swarm11]
     // [slot:shift11]
     // [slot:events11]
     // [slot:gear11]
