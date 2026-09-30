@@ -356,26 +356,26 @@ export const HIDDEN_CMDS = new Set(['iconaudit', 'netstats', 'noclip', 'kefal', 
 
 // ------------------------------------------------------------------ tutorial (first landing) ---------------------------------
 // Each step completes on its own when the player does the thing (events fed through guide_core.tutEvent), in ANY order.
-// obj = the objective line, obj2 = alternative line when a condition holds (see guide.js stepText), say = the Algorithm's line.
+// obj = the objective line, obj2 = alternative line when a condition holds (see guide.js stepText), say = the Algorithm's line, ctx = where that line makes sense (onegoal_core.ctxOk).
 export const TUT_STEPS = [
-  { id: 'move', ev: ['move'], obj: ['Move: WASD, hold Shift to sprint, Ctrl to crouch', 'Hareket: WASD, koşmak için Shift, çömelmek için Ctrl', 'Движение: WASD, Shift — бег, Ctrl — присесть'],
+  { id: 'move', ctx: 'any', ev: ['move'], obj: ['Move: WASD, hold Shift to sprint, Ctrl to crouch', 'Hareket: WASD, koşmak için Shift, çömelmek için Ctrl', 'Движение: WASD, Shift — бег, Ctrl — присесть'],
     say: ['Welcome, Employee. WASD to walk, Shift to run, Ctrl to crouch. Try all three. I am watching.', 'Hoş geldin, Çalışan. WASD yürür, Shift koşar, Ctrl çömelir. Üçünü de dene. İzliyorum.', 'Добро пожаловать, Сотрудник. WASD — идти, Shift — бежать, Ctrl — присесть. Попробуй всё. Я слежу.'] },
-  { id: 'light', ev: ['flash'], obj: ['Get light: terminal STORE FLASHLIGHT (▮15), then press F', 'Işık al: terminalde STORE FLASHLIGHT (▮15), sonra F\'ye bas', 'Добудь свет: терминал STORE FLASHLIGHT (▮15), затем F'],
+  { id: 'light', ctx: ['ship','orbit'], ev: ['flash'], obj: ['Get light: terminal STORE FLASHLIGHT (▮15), then press F', 'Işık al: terminalde STORE FLASHLIGHT (▮15), sonra F\'ye bas', 'Добудь свет: терминал STORE FLASHLIGHT (▮15), затем F'],
     obj2: ['Press F to switch your flashlight on', 'Fenerini açmak için F\'ye bas', 'Нажми F, чтобы включить фонарик'],
     say: ['It is dark out there. The terminal sells flashlights: E on it, STORE. Then F. Light is a courtesy, not a right.', 'Dışarısı karanlık. Terminal fener satıyor: E ile aç, STORE. Sonra F. Işık bir nezaket, hak değil.', 'Там темно. Терминал продаёт фонари: E на нём, STORE. Потом F. Свет — любезность, а не право.'] },
-  { id: 'scrap', ev: ['scrap'], obj: ['Land (lever), go into the facility and pick up scrap (E)', 'İn (kol), tesise gir ve hurda topla (E)', 'Посадка (рычаг), зайди в комплекс и подбери хлам (E)'],
+  { id: 'scrap', ctx: ['ship','orbit'], ev: ['scrap'], obj: ['Land (lever), go into the facility and pick up scrap (E)', 'İn (kol), tesise gir ve hurda topla (E)', 'Посадка (рычаг), зайди в комплекс и подбери хлам (E)'],
     say: ['Pull the lever and land. Scrap is anything that used to matter to someone. Pick it up with E.', 'Kolu çek ve in. Hurda, bir zamanlar birileri için önemli olan her şeydir. E ile al.', 'Дёрни рычаг и садись. Хлам — это всё, что когда-то кому-то было важно. Подбирай на E.'] },
-  { id: 'inv', ev: ['inv'], obj: ['Open your inventory: press I', 'Envanterini aç: I tuşu', 'Открой инвентарь: клавиша I'],
+  { id: 'inv', ctx: 'any', ev: ['inv'], obj: ['Open your inventory: press I', 'Envanterini aç: I tuşu', 'Открой инвентарь: клавиша I'],
     say: ['Pockets full? Press I. Hotbar, gear, a backpack. Yes, there is a backpack.', 'Cepler dolu mu? I\'ya bas. Hızlı erişim, ekipman, sırt çantası. Evet, sırt çantası var.', 'Карманы полны? Нажми I. Хотбар, снаряжение, рюкзак. Да, тут есть рюкзак.'] },
-  { id: 'scan', ev: ['scan'], obj: ['Scan: right-click to reveal scrap and creatures', 'Tara: hurdaları ve yaratıkları görmek için sağ tık', 'Скан: ПКМ показывает хлам и существ'],
+  { id: 'scan', ctx: ['outdoor','facility'], ev: ['scan'], obj: ['Scan: right-click to reveal scrap and creatures', 'Tara: hurdaları ve yaratıkları görmek için sağ tık', 'Скан: ПКМ показывает хлам и существ'],
     say: ['Right click scans. Scrap glows, creatures get names. Knowing is half of surviving. The other half is running.', 'Sağ tık tarar. Hurdalar parlar, yaratıkların adı çıkar. Bilmek hayatta kalmanın yarısı. Diğer yarısı kaçmak.', 'ПКМ сканирует. Хлам светится, у существ появляются имена. Знание — половина выживания. Вторая половина — бег.'] },
-  { id: 'ship', ev: ['ship'], obj: ['Bring the scrap back to the ship before midnight', 'Hurdayı gece yarısından önce gemiye geri getir', 'Верни хлам на корабль до полуночи'],
+  { id: 'ship', ctx: ['outdoor','facility'], ev: ['ship'], obj: ['Bring the scrap back to the ship before midnight', 'Hurdayı gece yarısından önce gemiye geri getir', 'Верни хлам на корабль до полуночи'],
     say: ['Take the haul back to the ship. Midnight is a hard deadline. The ship does not do sentiment.', 'Ganimeti gemiye geri götür. Gece yarısı kesin bir son. Gemi duygusallık bilmez.', 'Верни добычу на корабль. Полночь — жёсткий срок. Корабль не знает сентиментов.'] },
-  { id: 'sell', ev: ['sell'], obj: ['Sell at 0-Algorithm HQ: terminal ROUTE HQ, land, scrap on the counter, ring the bell', '0-Algorithm HQ\'da sat: terminalde ROUTE HQ, in, hurdayı tezgâha koy, zili çal', 'Продай в 0-Algorithm HQ: терминал ROUTE HQ, посадка, хлам на прилавок, звонок'],
+  { id: 'sell', ctx: ['ship','orbit'], ev: ['sell'], obj: ['Sell at 0-Algorithm HQ: terminal ROUTE HQ, land, scrap on the counter, ring the bell', '0-Algorithm HQ\'da sat: terminalde ROUTE HQ, in, hurdayı tezgâha koy, zili çal', 'Продай в 0-Algorithm HQ: терминал ROUTE HQ, посадка, хлам на прилавок, звонок'],
     say: ['Sell it at HQ: ROUTE HQ at the terminal, land, scrap on the counter, ring the bell. Quota is love.', 'HQ\'da sat: terminalde ROUTE HQ, in, hurdayı tezgâha koy, zili çal. Kota sevgidir.', 'Продай в штабе: ROUTE HQ на терминале, посадка, хлам на прилавок, звонок. Квота — это любовь.'] },
 ];
 export const TUT_DONE_SAY = ['Onboarding complete. I will keep suggesting things you have not tried. Type GUIDE any time. Or mute me in Settings. You will not.', 'Oryantasyon tamam. Denemediğin şeyleri önermeye devam edeceğim. İstediğin zaman GUIDE yaz. Ya da Ayarlardan beni sustur. Susturmayacaksın.', 'Ввод в должность завершён. Я продолжу подсказывать то, что ты не пробовал. Введи GUIDE в любой момент. Или заглуши меня в Настройках. Не заглушишь.'];
-export const TUT_START_SAY = ['Optional onboarding started. Follow the objectives, or ignore me: TUTORIAL SKIP at the terminal ends it.', 'İsteğe bağlı oryantasyon başladı. Hedefleri izle ya da beni yok say: terminalde TUTORIAL SKIP bitirir.', 'Необязательное обучение начато. Следуй целям или игнорируй меня: TUTORIAL SKIP на терминале завершает его.'];
+// [algoctx] TUT_START_SAY (the dev-speak 'optional onboarding started' line) is gone: the objective card already says what to do.
 
 // ------------------------------------------------------------------ UI strings (terminal + settings) ----------------------------
 export const UI = {

@@ -56,7 +56,7 @@ export function installStory(game) {
 
   const stx = (d) => game.net?.broadcast('stx', d);
   const say = (key, vars, kind = 'info') => game.net?.broadcast('sys', sysMsg(key, vars || {}, kind));
-  const intercom = (key, vars) => stx({ k: 'say', s: key, v: vars || {} });
+  const intercom = (key, vars, ctx) => stx({ k: 'say', s: key, v: vars || {}, c: ctx });   // [algoctx] ctx: where the line makes sense ('orbit' = story beats in the ship; HR: lines default to it)
   const replyTo = (to, text, err, vars) => game.net?.sendTo(to, 'term', { to, text: tfIn('en', text, vars || {}), k: vars ? text : undefined, v: vars, err, cls: err ? 'err' : '' });
   const pushSt = () => { if (host()) game.broadcastRun(['st']); };
   const nameOf = (id) => { try { return game.playerName(id); } catch { return 'Someone'; } };
@@ -268,19 +268,19 @@ export function installStory(game) {
     const s = st();
     if (b === 'hire') {
       stx({ k: 'banner', main: 'ACT I: HIRED', sub: 'Welcome to the Company. Your position is the same as everyone else\'s.' });
-      later(() => intercom('HR: Congratulations on your employment. Your benefits are described in a document we will not show you.'), 2500);
-      later(() => intercom('HR: Take contracts from the board (CONTRACTS) and patron jobs (JOBS). The Company pays little, but it always pays.'), 9000);
+      later(() => intercom('HR: Congratulations on your employment. Your benefits are described in a document we will not show you.', null, 'orbit'), 2500);
+      later(() => intercom('HR: Take contracts from the board (CONTRACTS) and patron jobs (JOBS). The Company pays little, but it always pays.', null, 'orbit'), 9000);
     } else if (b === 'offer') {
       stx({ k: 'banner', main: 'ACT II: THE OFFER', sub: 'The Algorithm has read your file.' });
-      later(() => intercom('The Algorithm: I have watched you work. It was adorable. It was also profitable.'), 2500);
-      later(() => intercom('The Algorithm: The Company pays you in credits. I pay in attention, which is worth more and can never be withdrawn.'), 9000);
-      later(() => intercom('The Algorithm: Do my jobs. They are strange. They are well paid. Type JOBS. Type PATRON to see who owns you.'), 16000);
+      later(() => intercom('The Algorithm: I have watched you work. It was adorable. It was also profitable.', null, 'orbit'), 2500);
+      later(() => intercom('The Algorithm: The Company pays you in credits. I pay in attention, which is worth more and can never be withdrawn.', null, 'orbit'), 9000);
+      later(() => intercom('The Algorithm: Do my jobs. They are strange. They are well paid. Type JOBS. Type PATRON to see who owns you.', null, 'orbit'), 16000);
     } else if (b === 'choice') {
       const g = C.endingStatus(s, eggsCtx()).grid;
       stx({ k: 'banner', main: 'ACT III: THE CHOICE', sub: 'Two contracts. One signature.' });
-      later(() => intercom('HR: It is time to make your employment permanent. Type CHOOSE COMPANY. There is no probation. There is no end.'), 2500);
-      later(() => intercom('The Algorithm: Or type CHOOSE ALGORITHM and let me wear you. I will be gentle. I will be everywhere.'), 9000);
-      if (!g.hidden) later(() => intercom('Somewhere on the org chart a third door appeared. It has no handle. It has your name on it, crossed out.'), 16000);
+      later(() => intercom('HR: It is time to make your employment permanent. Type CHOOSE COMPANY. There is no probation. There is no end.', null, 'orbit'), 2500);
+      later(() => intercom('The Algorithm: Or type CHOOSE ALGORITHM and let me wear you. I will be gentle. I will be everywhere.', null, 'orbit'), 9000);
+      if (!g.hidden) later(() => intercom('Somewhere on the org chart a third door appeared. It has no handle. It has your name on it, crossed out.', null, 'orbit'), 16000);
     }
     try { mods.emit('tfg:story', { k: 'beat', beat: b }, game); } catch { /* listeners */ }
   }
@@ -490,7 +490,7 @@ export function installStory(game) {
   function onStx(m) {
     if (disposed || !m) return;
     switch (m.k) {
-      case 'say': { const line = tf(m.s, m.v || {}); if (game.lore?.say) game.lore.say(line); else game.ui?.toast?.(line, 'info'); break; }
+      case 'say': { const line = tf(m.s, m.v || {}); if (game.lore?.say) game.lore.say(line, m.c ? { ctx: m.c } : {}); else game.ui?.toast?.(line, 'info'); break; }
       case 'banner': game.ui?.hud?.bigText?.(tf(m.main, m.v || {}), m.sub ? tf(m.sub, m.v || {}) : ''); game.sfx?.('ship_alarm', 0.25); break;
       case 'unlock':
         for (const id of m.ids || []) {

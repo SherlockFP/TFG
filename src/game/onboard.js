@@ -18,6 +18,7 @@ import { sysMsg } from '../core/i18n.js';
 import { wrapMethod } from './dailyEvents.js';
 import * as K from './onboard_core.js';
 import * as FR from './firstrun_core.js';   // wave 8: the first-run message budget (game.onboard.fr)
+import { fmtLive } from './onegoal_core.js';   // [algoctx] one number format for every LIVE count
 import { TEXT, x, xf } from './onboard_text.js';
 import { buildWing, SHUTTER } from './onboard_world.js';
 import { HUB_CMDS, hubOpen } from './hubgate_core.js';   // wave 8: what each locked id switches off
@@ -66,7 +67,9 @@ export function installOnboard(game) {
   };
   const warn = (tag, e) => { try { console.warn('[onboard] ' + tag, e); } catch { /* ignore */ } };
   const save = () => { try { game.progress?.save?.(); } catch { /* optional */ } };
-  const say = (id, vars) => { const s = xf(id, vars); try { if (game.lore?.say) game.lore.say(s, { pri: true }); else game.ui?.toast?.(s, 'info'); } catch { /* optional */ } };
+  // [algoctx] lines that only make sense in the ship / on the moon carry that context (dropped when stale, see onegoal_core.inferCtx)
+  const SAY_CTX = { 'say.terminal': ['ship', 'orbit'], 'say.hangar': ['ship', 'orbit'], 'say.land': 'moon', 'say.goal': 'moon' };
+  const say = (id, vars) => { const s = xf(id, vars); try { if (game.lore?.say) game.lore.say(s, { pri: true, ctx: SAY_CTX[id] }); else game.ui?.toast?.(s, 'info'); } catch { /* optional */ } };
   const sfx = (n, v = 0.7) => { try { game.sfx?.(n, v); } catch { /* unknown sound */ } };
   const toast = (s, kind = 'info') => { try { game.ui?.toast?.(s, kind); } catch { /* optional */ } };
   const qsp = () => { try { return new URLSearchParams(location.search); } catch { return new URLSearchParams(''); } };
@@ -263,7 +266,7 @@ export function installOnboard(game) {
     at(0.8, () => cap('st.l1'));
     at(1.4, () => chat(CHATTERS[0], 'st.c1'));
     at(2.4, () => chat(CHATTERS[1], 'st.c2'));
-    at(3.2, () => chat(x('st.mod'), 'st.pin', true));
+    at(3.2, () => { S.pinned = true; chat(x('st.mod'), 'st.pin', true); });   // [algoctx] the controls are on screen now: the guide skips its WASD line
     at(4.4, () => cap('st.l2', { names }));
     at(5.0, () => chat(CHATTERS[2], 'st.c3'));
     at(6.4, () => chat(CHATTERS[3], 'st.c4'));
@@ -281,7 +284,7 @@ export function installOnboard(game) {
     if (S.stream !== st) return;
     st.v += (st.vT - st.v) * Math.min(1, dt * 0.5) + dt * 6;   // the viewer count climbs fast, then keeps creeping
     const n = Math.round(st.v);
-    if (n !== st.vShown) { st.vShown = n; const vw = st.el.querySelector('.vw'); if (vw) vw.textContent = xf('st.viewers', { n: n.toLocaleString('en-US') }); }
+    if (n !== st.vShown) { st.vShown = n; const vw = st.el.querySelector('.vw'); if (vw) vw.textContent = xf('st.viewers', { n: fmtLive(n) }); }
     if (!st.cut && st.t > 1.5 && (game.input?.codeDown?.('Space') || game.input?.codeDown?.('Enter'))) {   // cut to the ship
       st.cut = true;
       st.tl = [{ at: st.t + 0.05, fn: () => st.el.classList.remove('on') }, { at: st.t + 0.5, fn: () => endStream() }];
@@ -292,6 +295,7 @@ export function installOnboard(game) {
     const st = S.stream;
     if (!st) return;
     S.stream = null;
+    try { if (st.t > 3) game.algo1?.seedViewers?.(Math.round(st.v)); } catch { /* algo1 optional */ }   // [algoctx] ONE viewer count: the overlay's number carries on in the LIVE tag
     st.el?.remove();
     try { game.player.frozen = false; game.engine.fadeTarget = 0; } catch { /* engine gone */ }
     if (quiet || !flowActive()) return;
@@ -627,6 +631,8 @@ export function installOnboard(game) {
   const api = {
     /** Hiring Day is running (the guide holds its tutorial lines) */
     active: () => !disposed && flowActive(),
+    /** [algoctx] the stream overlay pinned the controls (or Hiring Day taught them): the guide's WASD / sprint / crouch line is redundant */
+    controlsPinned: () => !!S.pinned || game.profile?.onboard?.s === 'done',
     stage, step, flow: () => S.flow, fr,
     locked, deny, routeBlocked, lockedText,
     unlocks: () => { const u = U(); return u ? { mode: u.mode, q: u.q, boss: u.boss, given: { ...u.given }, open: K.UNLOCK_IDS.filter((id) => !locked(id)) } : null; },

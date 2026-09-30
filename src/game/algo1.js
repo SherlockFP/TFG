@@ -12,6 +12,7 @@ import { t, tf } from '../core/i18n.js';
 import { CREATURES, spawnTable } from './creatures.js';
 import { MOONS } from './moons.js';
 import * as K from './algo1_core.js';
+import { fmtLive } from './onegoal_core.js';
 import './algo1_i18n.js';
 
 const CSS = `.a1-vote{position:fixed;left:50%;top:clamp(56px,9vh,110px);transform:translateX(-50%);z-index:60;width:min(780px,94vw);background:#12130d;border:2px solid #f2c230;color:#e8e6d0;font:600 13px/1.3 'Bahnschrift','Arial Narrow',Arial,sans-serif;letter-spacing:.03em;box-shadow:0 6px 30px #000c;user-select:none}
@@ -63,7 +64,7 @@ export function installAlgo1(game) {
     else if (m.k === 'tally') { if (S.vote) { S.vote.counts = m.c; renderVote(); } }
     else if (m.k === 'result') { S.rule = m.win ? { win: m.win, debt: m.debt || null, half: m.half || null } : null; hideVote(); }
     else if (m.k === 'say') { try { game.lore?.say?.(tf(m.s, m.v || {})); } catch { /* lore optional */ } }
-    else if (m.k === 'view') { const d = m.n - S.viewers.n; S.viewers.n = m.n; try { mods.emit('tfg:viewers', { viewers: m.n, delta: d, reason: m.r || null }, game); } catch { /* listeners */ } paintViewers(); }
+    else if (m.k === 'view') { const d = m.n - S.viewers.n; S.viewers.n = m.n; if (Number.isFinite(m.f)) S.viewers.floor = m.f; try { mods.emit('tfg:viewers', { viewers: m.n, delta: d, reason: m.r || null }, game); } catch { /* listeners */ } paintViewers(); }
   }
   function bindNet(net) {
     if (!net || boundNet === net) return;
@@ -84,9 +85,15 @@ export function installAlgo1(game) {
     const d = K.addViewers(S.viewers, kind);
     if (d) { send({ k: 'view', n: S.viewers.n, r: why || kind }); S.lastSent = S.viewers.n; }
   }
+  /** [algoctx] host: the stream overlay's audience carries on as the running count (floor 60 %); peers get it in the next 'view' message */
+  function seedViewers(n) {
+    if (!host()) return;
+    K.seedViewers(S.viewers, n);
+    send({ k: 'view', n: S.viewers.n, f: S.viewers.floor, r: 'stream' }); S.lastSent = S.viewers.n;
+  }
   function paintViewers() {
     if (typeof document === 'undefined') return;
-    const txt = '● LIVE  ' + K.fmtViewers(S.viewers.n);
+    const txt = '● LIVE  ' + fmtLive(S.viewers.n);
     for (const el of document.querySelectorAll('.algo-live')) if (el.textContent !== txt) el.textContent = txt;
   }
 
@@ -353,14 +360,15 @@ export function installAlgo1(game) {
       }   // [qa] never during Hiring Day or a minigame
     }
     K.decayViewers(S.viewers, dt);
+    K.driftViewers(S.viewers, dt, Math.random());
     S.viewT += dt;
-    if (S.viewT >= 2) { S.viewT = 0; if (Math.abs(S.viewers.n - S.lastSent) >= 1) { S.lastSent = S.viewers.n; send({ k: 'view', n: Math.round(S.viewers.n), r: null }); } }
+    if (S.viewT >= 2) { S.viewT = 0; if (Math.abs(S.viewers.n - S.lastSent) >= 1) { S.lastSent = S.viewers.n; send({ k: 'view', n: Math.round(S.viewers.n), f: S.viewers.floor, r: null }); } }
   }
   offs.push(mods.on('update', (dt, g) => { if (!g || g === game) update(dt); }));
   const paintT = setInterval(paintViewers, 1500);
 
   return {
-    state: S, fx, bump,
+    state: S, fx, bump, seedViewers, viewers: () => Math.round(S.viewers.n),
     /** debug: force the vote / a viewer spike / read the tracker */
     debug: { openVote: hostOpenVote, closeVote: hostCloseVote, profile: () => S.prof, pending: () => S.pend },
     dispose() {

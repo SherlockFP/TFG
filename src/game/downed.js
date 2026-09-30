@@ -166,7 +166,7 @@ export function installDowned(game) {
       S.down.set(id, { dur: +m.dur || 20, left: +m.dur || 20, prog: 0, by: null, p: m.p || null, name: nameOf(id) });
       if (S.me && id === game.selfId) S.me.seen = true;
       try { mods.emit('tfg:downed', { id, name: nameOf(id), cause: m.c || 'down', fast: !!m.fast }, game); } catch (e) { console.warn('[downed] emit', e); }
-      if (id !== game.selfId) { game.ui?.systemMessage?.(tf('{name} is down! Hold [E] on them to revive.', { name: nameOf(id) }), 'warn'); game.sound2?.cue('down_thud', m.p ? { x: m.p[0], y: m.p[1], z: m.p[2] } : null, 0.7); }
+      if (id !== game.selfId) { game.ui?.toast?.(tf('{name} is down! Hold [E] on them to revive.', { name: nameOf(id) }), 'warn'); game.sound2?.cue('down_thud', m.p ? { x: m.p[0], y: m.p[1], z: m.p[2] } : null, 0.7); }
     } else if (m.k === 'pg') {
       const e = S.down.get(id);
       if (e) { e.prog = +m.p || 0; e.by = m.by || null; if (Number.isFinite(m.l)) e.left = m.l; }
@@ -175,7 +175,7 @@ export function installDowned(game) {
       const nm = e?.name || nameOf(id);
       try { mods.emit('tfg:revived', { id, name: nm, by: m.by || null, self: false }, game); } catch (err) { console.warn('[downed] emit', err); }
       if (id === game.selfId) localRevive(+m.hp || RULES.reviveHp, m.by === id ? null : m.by);
-      else game.ui?.systemMessage?.(tf('{by} revived {name}.', { by: nameOf(m.by), name: nm }), 'good');
+      else game.ui?.toast?.(tf('{by} revived {name}.', { by: nameOf(m.by), name: nm }), 'good');   // [algoctx] ONE message (systemMessage = chat line + toast = the same sentence twice); the revived player gets 'You were revived by ...'
     } else if (m.k === 'bleed') {
       S.down.delete(id);
       if (id === game.selfId && S.me) localBleed(m.c);

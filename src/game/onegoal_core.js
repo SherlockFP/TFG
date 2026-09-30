@@ -104,3 +104,49 @@ export function nearDup(text, seen) {
   }
   return false;
 }
+
+// ------------------------------------------------------------------------------------------ context-true lines (wave 8 morning, docs/wave8/algoctx.md)
+// Every queued Algorithm line carries a context (where it makes sense) and an expiry (seconds it may wait in the queue). A line whose context no
+// longer matches (queued in orbit, the ship has landed) is dropped instead of being served late. Pure: the caller passes what the game knows.
+export const QUEUE_TTL = 12;   // s a line may wait in the ticker queue (default)
+/** the tags true right now: 'orbit' | 'moon' | 'company' (phase) + 'ship' | 'outdoor' | 'facility' | 'expedition' (place). `any` is always true. */
+export function ctxTags(o) {
+  const { phase = '', inShip = false, indoor = false, expedition = false } = o || {};
+  const s = new Set(['any']);
+  if (phase === 'orbit') { s.add('orbit'); s.add('ship'); }
+  else if (phase === 'moon' || phase === 'company') {
+    s.add(phase);
+    if (inShip) s.add('ship'); else if (indoor) s.add('facility'); else { s.add('outdoor'); if (expedition) s.add('expedition'); }
+  }
+  return s;
+}
+/** ctx = undefined | 'any' | tag | [tags]: true when it matches one of `tags` */
+export function ctxOk(ctx, tags) {
+  if (ctx === undefined || ctx === null || ctx === 'any') return true;
+  const l = Array.isArray(ctx) ? ctx : [ctx];
+  if (!l.length || l.includes('any')) return true;
+  return l.some((c) => tags && tags.has(c));
+}
+const KEY_CTX = {   // Algorithm LINES pools (loredata.js) that only make sense on a moon / in orbit
+  brief_none: 'moon', brief_noise: 'moon', brief_light: 'moon', brief_greed: 'moon', brief_split: 'moon', brief_doors: 'moon', brief_coward: 'moon',
+  first_scrap: 'moon', first_kill: 'moon', alone: 'moon', alarm: 'moon', midnight: 'moon', greed: 'moon', spell_spam: 'moon', extraction: 'moon',
+  nudge_noise: 'moon', nudge_light: 'moon', nudge_split: 'moon', nudge_doors: 'moon', nudge_greed: 'moon', nudge_coward: 'moon', orbit_idle: 'orbit',
+};
+/** the context of a line: explicit d.ctx, else by pool key, else by wording ("HR:" = story beats in orbit; the terminal is in the ship) */
+export function inferCtx(d) {
+  if (!d) return 'any';
+  if (d.ctx !== undefined && d.ctx !== null) return d.ctx;
+  if (d.key && KEY_CTX[d.key]) return KEY_CTX[d.key];
+  const tx = String(d.text || '');
+  if (/^(HR|İK|Отдел кадров)\s?:/.test(tx)) return 'orbit';
+  if (/\b(terminal|терминал\w*)/i.test(tx) || /\bterminal(de|i|in|e)?\b/i.test(tx)) return ['ship', 'orbit'];
+  return 'any';
+}
+/** seconds a line may wait: explicit d.ttl, else QUEUE_TTL */
+export const ttlOf = (d) => (d && Number.isFinite(d.ttl) && d.ttl > 0 ? d.ttl : QUEUE_TTL);
+/** drop expired (item.exp <= now) and out-of-context items. Returns a new array. */
+export function prune(q, now, tags) { return (q || []).filter((x) => !(x.exp > 0 && x.exp <= now) && ctxOk(x.ctx, tags)); }
+
+// ------------------------------------------------------------------------------------------ one viewer count (algo1 owns it; overlay / tag read it)
+/** 1470 -> "1,470" (no locale surprises); 10k+ -> "12K" */
+export const fmtLive = (n) => { n = Math.max(0, Math.round(n || 0)); return n >= 10000 ? Math.round(n / 1000) + 'K' : String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); };

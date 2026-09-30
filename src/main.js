@@ -32,6 +32,7 @@ import { preloadExtModels, EXT_PRELOAD } from './world/extmodels.js';
 import { registerExtContent } from './game/extcontent.js';
 import './i18n/display.js';   // display-name path: item / creature / moon names go through t()
 
+const DEV_NAME_ALIAS = { Host: 'Janitor101', Client: 'Intern202', Tester: 'Temp303' };   // [algoctx] dev-URL names -> crew-style handles (save.js defaultHandle)
 class MenuScene {
   constructor(engine) {
     this.engine = engine;
@@ -70,7 +71,7 @@ class App {
     setLang(this.settings.lang);
     this.profile = loadProfile();
     const devName = new URLSearchParams(location.search).get('name');
-    if (devName) this.profile = { ...defaultProfile(), name: devName, id: 'dev-' + devName, _noSave: true };
+    if (devName) this.profile = { ...defaultProfile(), name: DEV_NAME_ALIAS[devName] || devName, id: 'dev-' + devName, _noSave: true };   // [algoctx] harness names never reach the screen ("Host revived Client.")
     this.engine = new Engine(document.getElementById('game'), this.settings);
     this.input = new Input(this.engine.canvas, this.settings);
     this.audio = new AudioManager(this.settings);
