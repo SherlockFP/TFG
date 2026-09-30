@@ -52,6 +52,7 @@ uniform float uGamma;
 uniform float uHurt;
 uniform float uWarp;
 uniform float uSat;
+uniform vec3 uTint;      // [atmos12] per-interior-theme colour grade multiplier (1,1,1 = off)
 uniform float uBloom;
 uniform vec3 uHurtDir;   // xy = screen direction of the last hit (x right, y up), z = strength
 uniform float uLowHp;    // 0..1 low-health heartbeat effect
@@ -131,6 +132,7 @@ ${MIR ? MIRROR_FS_UV : ''}   // [mirror]
   col = toSRGB(col) * uGamma;
   float l = dot(col, vec3(0.299, 0.587, 0.114));
   col = mix(vec3(l), col, uSat * (1.0 - 0.55 * uLowHp));
+  col *= uTint;   // [atmos12]
 ${MIR ? MIRROR_FS_GRADE : ''}   // [mirror]
 
   // scan wave: a bright shell sweeping over every surface, concentric scanlines inside it
@@ -225,7 +227,7 @@ export class Engine {
         uTime: { value: 0 }, uFlash: { value: new THREE.Vector4(1, 1, 1, 0) },
         uFade: { value: 0 }, uNoise: { value: 0 }, uBlind: { value: 0 },
         uVignette: { value: 0.55 }, uGamma: { value: 1.08 }, uHurt: { value: 0 }, uWarp: { value: 0 },
-        uSat: { value: 1.0 }, uBloom: { value: 1.0 },
+        uSat: { value: 1.0 }, uBloom: { value: 1.0 }, uTint: { value: new THREE.Vector3(1, 1, 1) },   // [atmos12]
         uHurtDir: { value: new THREE.Vector3(0, 1, 0) }, uLowHp: { value: 0 }, uBeat: { value: 0 },
         uScan: { value: new THREE.Vector4(0, 0, 0, 0) }, uScanA: { value: 0 }, uScanCol: { value: new THREE.Color(0.35, 0.72, 1.0) },
         uProj: { value: new THREE.Vector2(1, 1) },
