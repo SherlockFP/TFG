@@ -149,7 +149,7 @@ export function installRouteboard(game) {
     return {
       id: m.id, name: m.$name || m.name, hook: t(C.hookOf(m)), interior: interiorName(m), weather: t(w.name), wcol: w.color || '#ccc',
       danger, dname: dangerName(danger), cams: C.camsOf(m, r.day, q), pay: C.payout(m, q, avgOf(m.interior || 'factory'), scrapCountFor, scrapValueMul), fee: feeOf(m),
-      bands: C.bands(BIOMES[m.biome]), sil: C.silhouetteOf(m.interior), cur: m.id === r.moon, fresh: (hub()?.q | 0) > 0 && C.routeQ(m) === (hub()?.q | 0),
+      bands: C.bands(BIOMES[m.biome]), sil: C.silhouetteOf(m.cardSil || m.interior), cur: m.id === r.moon, fresh: (hub()?.q | 0) > 0 && C.routeQ(m) === (hub()?.q | 0),
     };
   }
   function strip() {

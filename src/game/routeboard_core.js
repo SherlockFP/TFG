@@ -28,6 +28,13 @@ export const CARDS = 3;
 
 const LADDER_Q = {};
 for (const step of LADDER) for (const id of step.ids) LADDER_Q[id] = step.q;
+/** [moons10] a later module slots a moon into an existing rung (q >= 1), so routeQ / nextStep / the "NEW" toast all see it */
+export function ladderAdd(q, ids) {
+  const s = LADDER.find((x) => x.q === q);
+  if (!s || Object.isFrozen(s.ids)) return false;
+  for (const id of ids) if (!s.ids.includes(id)) { s.ids.push(id); LADDER_Q[id] = q; }
+  return true;
+}
 
 /** moons this ladder never touches (their own module decides) */
 export const exempt = (m) => !m || !!(m.company || m.home || m.instance || m.voyage || m.core || m.gate || m.raid);
