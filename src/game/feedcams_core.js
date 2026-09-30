@@ -10,7 +10,7 @@ export const FC = {
     wall: { fov: 0.8, R: 13, r0: 1.5, amp: 0.7, per: [8, 12], lim: 1.25 },    // wall cam: narrow, long, ~40 deg sweep each way, cannot look back into its wall
     ceil: { fov: 0.95, R: 10, r0: 2.0, amp: 0.85, per: [9, 13], lim: null },  // ceiling dome: wider, shorter, free to turn
   },
-  acquire: 2.5,        // seconds of full exposure before the stream goes live (the stream delay you can juke inside; sim-tuned, docs/wave8/feedcams2.md)
+  acquire: 2,          // seconds of full exposure before the stream goes live (the stream delay you can juke inside; sim-tuned, docs/wave8/feedcams2.md)
   closeD: 6, closeMul: 1.6,   // inside 6 m the camera locks on faster
   crouchMul: 0.55, crouchRange: 0.8,   // a sneaking / crouched player is harder to see (slower lock, shorter range)
   multiMul: 1.3,       // two cameras on you at once
@@ -19,9 +19,14 @@ export const FC = {
   hold: 10,            // seconds ON AIR after the last exposure
   juke: 0.5,           // meter that counts as a near miss when it falls back to 0
   heat: { up: 3, down: 1.2, spike: 8, ping: 30, pingEvery: 20, pingLoud: 3, wave: 70, waveEvery: 60, max: 100 },
-  tax: 0.35,           // viewer tax: share of a scrap item's value the Algorithm takes when a TAGGED player brings it into the ship
+  tax: 0.4,            // viewer tax: share of a scrap item's value the Algorithm takes when a TAGGED player brings it into the ship
   hp: 2,               // melee hits to smash a camera
   blind: 40, zap: 25,  // seconds a spray-painted lens / a zapped camera stays out
+  // [camloot] every counter costs something (docs/wave9/camloot.md): spray = quiet but only `blind` s; junction cut = a 2 s hold that makes a little noise, the camera REBOOTS after 90-120 s
+  // (a warning flicker for the last `rebootWarn` s); smash = permanent but loud (creatures come to look)
+  cutHold: 2, cutNoise: 0.9, cutNoiseEvery: 0.7, reboot: [90, 120], rebootWarn: 6, smashLoud: 2.5,
+  lootShare: 0.6,      // share of the non-tutorial cameras that sit in the rooms holding the top loot spots (planCams)
+  lootTop: 0.3,        // ...where "top" = the deepest 30 % of the scrap spots (min 3)
   off: 150,            // seconds the whole network is dark after the CUT THE FEED job (and 60 s from a mapart pylon, handled by mapart)
   bait: 5, baitLoud: 1.5, baitRange: 22, baitGap: 3,   // a loud noise turns a camera toward it for 5 s
   hz: 10,              // host vision rate
@@ -111,6 +116,24 @@ export function tutorialRoom(L, cand, entRoom, spots, dOf) {
   return best;
 }
 
+/** [camloot] rooms of the top loot spots (deepest 30 %, min 3, not sealed / elevated), best first, unique, never the entrance. spots = [{ room, dist, sealed, elevated }] */
+export function lootRooms(L, spots, entRoom) {
+  if (!L?.rooms || !Array.isArray(spots) || !spots.length) return [];
+  const ok = spots.filter((s) => s && !s.sealed && !s.elevated && s.room >= 0).sort((a, b) => (b.dist || 0) - (a.dist || 0));
+  const top = ok.slice(0, Math.max(3, Math.ceil(ok.length * FC.lootTop)));
+  const out = [];
+  for (const s of top) { const r = L.rooms.find((q) => q.id === s.room); if (r && r !== entRoom && r.type !== 'entrance' && !out.includes(r)) out.push(r); }
+  return out;
+}
+/** [camloot] does the room keep a cell the camera's sweep envelope never covers (behind / beside the mount, or under the lens)? then there is a blind route in */
+export function blindFlank(L, cam, r) {
+  for (let z = r.z; z < r.z + r.h; z++) for (let x = r.x; x < r.x + r.w; x++) {
+    const px = cellX(L, x), pz = cellZ(L, z), d = Math.hypot(px - cam.x, pz - cam.z);
+    if (d < cam.r0 || d > cam.R || Math.abs(angDiff(cam.h, Math.atan2(pz - cam.z, px - cam.x))) > cam.amp + cam.fov / 2) return true;
+  }
+  return false;
+}
+
 /**
  * Deterministic camera plan. opts: { seed, day, quotaIndex, size, extra (Watched affix: +2) }. Each camera:
  * { i, kind, x, y, z, h (base heading), amp, per, ph, fov, R, r0, lim, room, tut, jb: { x, y, z, path: [[x,y,z],...] } }
@@ -123,6 +146,7 @@ export function planCams(L, opts = {}) {
   const entRoom = L.entrance?.room;
   const cand = L.rooms.filter((r) => r !== entRoom && !['entrance', 'vault'].includes(r.type) && !r.treasure && r.w * r.h >= 2 && r.height);
   if (!cand.length) return [];
+  const loot = lootRooms(L, opts.spots, entRoom);   // [camloot] rooms of the top loot spots, best first (treasure / vault rooms included: the cameras guard the money now)
   const dOf = (r) => L.distOf?.[L.idx(r.cx, r.cz)] ?? 0;
   const entDist = (r) => Math.hypot(r.cx - (entRoom?.cx ?? r.cx), r.cz - (entRoom?.cz ?? r.cz));
   const list = [];
@@ -161,6 +185,17 @@ export function planCams(L, opts = {}) {
   list.push(c0);
   // 2) the rest: rooms with long sightlines, spread out
   const spread = (r, minD) => list.every((c) => Math.hypot(r.cx - c.cx, r.cz - c.cz) >= minD);
+  // 2a) [camloot] ~60 % of the non-tutorial cameras go to the loot rooms (best first); a room is only guarded when it keeps a blind flank (a way in the lens cannot see)
+  const wantLoot = loot.length ? Math.min(loot.length, Math.ceil(FC.lootShare * (n - 1))) : 0;
+  for (const minD of [4, 2.5, 1.5, 0]) {
+    for (const r of loot) {
+      if (list.length > wantLoot || list.length >= n) break;
+      if (r === first || !r.height || r.w * r.h < 2 || list.some((c) => c.room === r.id) || !spread(r, minD)) continue;
+      const c = build(r, false);
+      if (!blindFlank(L, c, r)) continue;
+      list.push(c);
+    }
+  }
   const scored = cand.filter((r) => r !== first).map((r) => {
     let run = 0; for (let d = 0; d < 4; d++) run = Math.max(run, runLen(L, r.cx, r.cz, d));
     return { r, s: 1 + run * 0.5 + (r.w * r.h >= 6 ? 1 : 0) + (dOf(r) > 6 ? 0.8 : 0) + rng.float(0, 2) };
@@ -227,9 +262,13 @@ export function taxOf(v) {
 }
 /** camera state at host time now: ST.OK when a timed state has expired */
 export function stateNow(c, now) {
-  if (c.st === ST.BLIND && now >= c.until) return ST.OK;
+  if ((c.st === ST.BLIND || c.st === ST.CUT) && now >= c.until) return ST.OK;   // [camloot] a cut cable is spliced back (the camera reboots)
   return c.st;
 }
+/** [camloot] seconds a cut camera stays dark: 90-120 s, `u` in [0, 1) picks the point */
+export const rebootIn = (u = 0.5) => FC.reboot[0] + (FC.reboot[1] - FC.reboot[0]) * clamp(u, 0, 0.999);
+/** [camloot] a CUT camera is about to reboot: the lamp flickers for the last FC.rebootWarn s */
+export const rebootWarn = (c, now) => c.st === ST.CUT && c.until > 0 && now < c.until && c.until - now <= FC.rebootWarn;
 /** distance from point p to segment a-b (3D arrays) */
 export function segNear(a, b, p, r) {
   const ab = [b[0] - a[0], b[1] - a[1], b[2] - a[2]], ap = [p[0] - a[0], p[1] - a[1], p[2] - a[2]];

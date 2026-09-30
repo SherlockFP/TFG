@@ -23,6 +23,7 @@ const TEXT = {
   today: ['TODAY', 'BUGÜN', 'СЕГОДНЯ'],
   nextmap: ['NEXT LANDING', 'SONRAKİ İNİŞ', 'СЛЕДУЮЩАЯ ПОСАДКА'],
   danger: ['DANGER', 'TEHLİKE', 'ОПАСНОСТЬ'],
+  cams: ['CAMS', 'KAMERA', 'КАМЕРЫ'],   // [camloot] the Algorithm's cameras guard the loot rooms
   payout: ['SCRAP ON SITE', 'SAHADAKİ HURDA', 'ХЛАМ НА МЕСТЕ'],
   interior: ['INTERIOR', 'İÇ MEKÂN', 'ИНТЕРЬЕР'],
   int_hamsi: ['Abandoned Web Host', 'Terk Edilmiş Web Host', 'Заброшенный веб-хостинг'],   // moons.js hamsi.interiorName (the card used to read "Data Center" on 56K-Dialup)
@@ -146,7 +147,7 @@ export function installRouteboard(game) {
     const danger = dangerOf(m, { ...r, weather: wid }, ev);
     return {
       id: m.id, name: m.$name || m.name, hook: t(C.hookOf(m)), interior: interiorName(m), weather: t(w.name), wcol: w.color || '#ccc',
-      danger, dname: dangerName(danger), pay: C.payout(m, q, avgOf(m.interior || 'factory'), scrapCountFor, scrapValueMul), fee: feeOf(m),
+      danger, dname: dangerName(danger), cams: C.camsOf(m, r.day, q), pay: C.payout(m, q, avgOf(m.interior || 'factory'), scrapCountFor, scrapValueMul), fee: feeOf(m),
       bands: C.bands(BIOMES[m.biome]), sil: C.silhouetteOf(m.interior), cur: m.id === r.moon, fresh: (hub()?.q | 0) > 0 && C.routeQ(m) === (hub()?.q | 0),
     };
   }
@@ -166,6 +167,7 @@ export function installRouteboard(game) {
       <div class="rb-art" style="background:linear-gradient(${sky} 0 56%,${fog} 56% 72%,${gnd} 72%)"><svg viewBox="0 0 120 40" preserveAspectRatio="xMidYMax meet" aria-hidden="true"><path fill-rule="evenodd" d="${c.sil}"/></svg><kbd class="tfg-kbd rb-key">${i + 1}</kbd>${flag}</div>
       <div class="rb-body"><div class="rb-name">${escapeHtml(c.name)}</div><div class="rb-hook">${escapeHtml(c.hook)}</div>
       <div class="rb-rows"><span>${escapeHtml(x('danger'))}</span><b><span class="rb-pips">${pip}</span>${escapeHtml(c.dname)}</b>
+      <span>${escapeHtml(x('cams'))}</span><b class="tfg-num">${c.cams}</b>
       <span>${escapeHtml(x('payout'))}</span><b class="tfg-num">▮${c.pay[0]}–${c.pay[1]}</b>
       <span>${escapeHtml(x('interior'))}</span><b>${escapeHtml(c.interior)}</b>
       <span>${escapeHtml(x('weather'))}</span><b style="color:${escapeHtml(c.wcol)}">${escapeHtml(c.weather)}</b></div>

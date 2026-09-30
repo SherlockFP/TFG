@@ -223,6 +223,8 @@ const warns = []; const cw = console.warn; console.warn = (...a) => { warns.push
   // in reach: the host cuts, everyone hears it, the run state syncs
   world.C.set(jb.x, jb.y - 1, jb.z); gH.time += 1;
   C.request('fcreq', { op: 'cut', i: 0 }); await tick();
+  ok(gH.run.fc.c[0][0] !== ST.CUT, 'feedcams: a cut is a hold, not instant');   // [camloot]
+  gH.time += 2.5; gH.mods.emit('update', 0.2, gH); await tick();   // ...2 s later the host completes it
   ok(gH.run.fc.c[0][0] === ST.CUT && gC.run.fc.c[0][0] === ST.CUT && gD.run.fc.c[0][0] === ST.CUT, 'feedcams: client cut the camera; host + both clients agree');
   // forged fcfx from a client is dropped (HOST_ONLY)
   const before = gD.toasts.length; D.receive({ t: 'fcfx', d: { k: 'tax', cut: 999 } }, 'C'); ok(gD.toasts.length === before, 'feedcams: fcfx from a client is ignored');

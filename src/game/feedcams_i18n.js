@@ -22,6 +22,15 @@ const ROWS = [
   ['The feed is cut. Every camera goes dark for a while.', 'Yayın kesildi. Bütün kameralar bir süre kapalı.', 'Трансляция отключена. Все камеры на время слепы.'],
   ["You're live. Chat is loving it. Try not to die on camera.", 'Yayındasın. Sohbet bayıldı. Kamera önünde ölmemeye çalış.', 'Вы в эфире. Чату нравится. Постарайтесь не умереть на камеру.'],
   ['Your numbers are through the roof. I am sending some fans.', 'Rakamların tavan yaptı. Birkaç hayran gönderiyorum.', 'Ваши цифры зашкаливают. Отправляю несколько фанатов.'],
+  // [camloot] the counters cost something (docs/wave9/camloot.md)
+  ['Cutting the cable... hold still.', 'Kablo kesiliyor... kıpırdama.', 'Режем кабель... не двигайтесь.'],
+  ['Cutting the cable... {p}%', 'Kablo kesiliyor... %{p}', 'Режем кабель... {p}%'],
+  ['Cut interrupted.', 'Kesme yarıda kaldı.', 'Резка прервана.'],
+  ['Cable cut. The camera is dark for a minute or two, then it reboots.', 'Kablo kesildi. Kamera bir iki dakika kapalı kalır, sonra yeniden açılır.', 'Кабель перерезан. Камера слепа минуту-две, потом перезагрузится.'],
+  ['Hold still for 2 s (it is noisy). The camera reboots after 90-120 s.', '2 sn kıpırdama (gürültülü). Kamera 90-120 sn sonra yeniden açılır.', 'Стойте 2 с (шумно). Камера перезагрузится через 90-120 с.'],
+  ['A camera reboots. The Algorithm rerouted the feed.', 'Bir kamera yeniden açılıyor. Algoritma yayını yeniden yönlendirdi.', 'Камера перезагружается. Алгоритм перенаправил трансляцию.'],
+  ['The Algorithm rerouted the feed. Did you miss me?', 'Algoritma yayını yeniden yönlendirdi. Beni özledin mi?', 'Алгоритм перенаправил трансляцию. Скучали по мне?'],
+  ['Smashed for good. That was loud: something will come to look.', 'Kalıcı olarak kırıldı. Çok gürültülüydü: bir şey bakmaya gelecek.', 'Разбита навсегда. Это было громко: кто-то придёт посмотреть.'],
 ];
 
 const TR = {}, RU = {};
