@@ -223,7 +223,7 @@ import { installStory } from './lazymods.js';   // [import:story] wave 6: two pa
 // wave 10 (content + soul) placeholders
 // [import:creatures10]
 // [import:labyr10]
-// [import:moons10]
+import { installMoons10 } from './moons10.js';
 // [import:outlife10]
 // [import:landing10]
 // [import:mystery10]
@@ -612,7 +612,7 @@ export class Game extends Emitter {
     this.useModule('mapart', installMapArt);
     // [slot:creatures10]
     // [slot:labyr10]
-    // [slot:moons10]
+    this.useModule('moons10', installMoons10);
     // [slot:outlife10]
     // [slot:landing10]
     // [slot:mystery10]

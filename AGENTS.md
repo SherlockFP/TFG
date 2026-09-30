@@ -846,3 +846,7 @@ first-join rejoin 35 s, lost-host 25 s, host never rejoins. NAT/SDP failures now
 everyone on Nostr; lobby browser shows real peer/relay counts; NETSTATS shows relays, TURN and per-peer ICE path.
 **Owner action still needed:** a TURN account + `VITE_TURN_*` on Render for friends behind CGNAT/mobile (no free
 public TURN works). Details: `docs/MULTIPLAYER_HOTFIX.md` → "Follow-up".
+
+### Wave 10 — moons10
+Two new outdoor-identity moons: **503-SERVICE UNAVAILABLE** (`x503`, tier 4, Deep Feed, tundra of dead data centers: cooling towers with steam, roofless data halls, fallen satellite dish + technician's hut) and **∞-FEED** (`x8feed`, tier 3, quota-3 rung, dunes of fallen phone screens, colossal cracked phone, plug + cable, notification badges, seated figure). Interiors `funhouse` / `deadmall` are feature-detected (getter `moon.interior`, falls back to `factory`).
+Files: `src/game/moons10{,_core,_text}.js`, `src/world/moons10_decor.js`, test `tools/harness/moons10.test.mjs`, doc `docs/wave10/moons10.md`. Shared one-liners: `routeboard_core.js` (`ladderAdd`), `routeboard.js` (`cardSil`), `game.js` slot. No net messages. NOT browser-verified: all looks, scale and flicker feel.
