@@ -2,6 +2,7 @@
 // fire exits, props, lights, scrap spots, vents, hazards. Deterministic from seed.
 import * as THREE from 'three';
 import { RNG } from '../core/rng.js';
+import { addPracticals } from './interiors/practicals.js';
 import { GeoBuilder, levelMaterial, mergeStaticMeshes, compactSubtree } from './geobuilder.js';
 import { NavGrid } from './nav.js';
 import { createAnyProp as createProp } from './propfactory.js';
@@ -1399,6 +1400,7 @@ export function buildFacility(layout, { physics, lightPool }) {
   };
   let themeOut = null, heroOut = null;   // [labyrinths] decorate() may return { lab } (runtime data for src/game/labyrinths.js)
   if (typeof def.decorate === 'function') themeOut = def.decorate({ ...themeCtx, rng: new RNG((L.seed ^ 0x7de1c0) >>> 0) }) || null;
+  try { addPracticals({ ...themeCtx, def }); } catch (e) { console.warn('practicals', e); }   // [qa] emissive strips + exit signs: rooms read without a torch
   try { heroOut = decorateHeroes({ ...themeCtx, rng: new RNG((L.seed ^ 0x4e70c1) >>> 0), theme }); } catch (e) { console.warn('hero rooms', e); }   // [labyrinths]
   // gameplay set pieces shared by every theme: laser grids, breaker rooms, cave-ins, vent shortcuts, sludge
   const hazards = buildHazards({ ...themeCtx, rng: new RNG((L.seed ^ 0x4a2a7d) >>> 0), interior: def });

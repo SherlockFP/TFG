@@ -10,7 +10,7 @@ const _m = new THREE.Matrix4(), _c = new THREE.Color();
 function glyphTexture(kind, fake, variant) {
   if (typeof document === 'undefined') return null;
   const c = document.createElement('canvas'); c.width = c.height = 64;
-  const x = c.getContext('2d');
+  const x = c.getContext('2d', { willReadFrequently: true });
   let s = 1234 + variant * 977 + (fake ? 4242 : 0) + kind * 31;
   const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
   x.clearRect(0, 0, 64, 64);
@@ -40,7 +40,12 @@ export class ChalkView {
   constructor(scene) {
     this.scene = scene; this.group = new THREE.Group(); this.group.name = 'hr_chalk'; scene.add(this.group);
     this.geo = new THREE.PlaneGeometry(0.6, 0.6);
-    this.sets = [];   // { kind, fake, variant, mesh, ids: [] }
+    this.sets = [];   // { kind, fake, variant, mesh, ids: [] }  (built on the first mark: the 8 canvas glyphs cost 0.7-2.8 s on the first landing of a session - QA night 1)
+    this.byId = new Map();
+    this.marks = new Map();
+  }
+  build() {
+    if (this.sets.length) return;
     const defs = [[0, 0, 0], [0, 0, 1], [0, 0, 2], [0, 0, 3], [1, 0, 0], [1, 0, 1], [0, 1, 0], [1, 1, 0]];
     for (const [kind, fake, variant] of defs) {
       const tex = glyphTexture(kind, fake, variant);
@@ -50,10 +55,9 @@ export class ChalkView {
       this.group.add(mesh);
       this.sets.push({ kind, fake, variant, mesh, ids: [] });
     }
-    this.byId = new Map();
-    this.marks = new Map();
   }
   setFor(m) {
+    this.build();
     const kind = m.k, fake = m.f;
     const cands = this.sets.filter((s) => s.kind === kind && !!s.fake === !!fake);
     return cands[m.v % cands.length];

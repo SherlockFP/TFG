@@ -29,6 +29,7 @@ const TEXT = {
   'hg.card': ['UNLOCKED: {@name}', 'AÇILDI: {@name}', 'ОТКРЫТО: {@name}'],
   'hg.door': ['Hub door [E]', 'Hub kapısı [E]', 'Дверь Хаба [E]'],
   'hg.door_sub': ['{a} of {b} systems open', '{b} sistemden {a} tanesi açık', 'Открыто систем: {a} из {b}'],
+  'hg.door_first': ['Opens at quota 1', 'Kota 1\'de açılır', 'Откроется на квоте 1'],
   'hg.title': ['HUB', 'HUB', 'ХАБ'],
   'hg.sub': ['Side systems open one by one as quotas are met. Settings: Unlock everything.', 'Yan sistemler kotalar tutturuldukça tek tek açılır. Ayarlar: Her şeyin kilidini aç.', 'Побочные системы открываются по одной с выполнением квот. Настройки: открыть всё.'],
   'hg.open': ['OPEN', 'AÇIK', 'ОТКРЫТО'],
@@ -73,13 +74,13 @@ const hintOf = (id) => { const h = SYSTEMS[id]?.hint; return h ? t(TEXT[h] ? TEX
 /** systems the Hub panel can open directly: id -> game api path */
 const GO = { tree: (g) => g.rpg?.open?.(), pets: (g) => g.pets?.open?.(), season: (g) => g.daily?.open?.() };
 
-const CSS = `.hg-end{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;background:rgba(4,6,4,.78);font:600 15px/1.4 'Bahnschrift','Arial Narrow',Arial,sans-serif;color:#e8e6d0}
+const CSS = `.hg-end{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;background:rgba(4,6,4,.78);font:600 15px/1.4 var(--font2,'Arial Narrow',Arial,sans-serif);color:#e8e6d0}
 .hg-end .box{width:min(560px,92vw);background:#12130d;border:2px solid #f2c230;box-shadow:0 8px 40px #000c}
 .hg-end .h{padding:6px 14px;background:repeating-linear-gradient(-45deg,#f2c230 0 10px,#15150f 10px 20px);color:#111;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
 .hg-end .h b{background:#f2c230;padding:1px 10px}
 .hg-end .b{padding:14px 18px}.hg-end .b div{margin:4px 0}.hg-end .pay{color:#9fd49f}
 .hg-end .r{display:flex;gap:10px;padding:12px 18px 16px;flex-wrap:wrap}
-.hg-end button{flex:1;min-width:140px;padding:10px 12px;background:#1b1c12;border:1px solid #f2c230;color:#f2c230;font:800 14px 'Bahnschrift','Arial Narrow',Arial,sans-serif;letter-spacing:.06em;cursor:pointer}
+.hg-end button{flex:1;min-width:140px;padding:10px 12px;background:#1b1c12;border:1px solid #f2c230;color:#f2c230;font:800 14px var(--font2,'Arial Narrow',Arial,sans-serif);letter-spacing:.06em;cursor:pointer}
 .hg-end button:hover{background:#f2c230;color:#111}.hg-end .w{padding:0 18px 16px;opacity:.75}
 .hg-hub .hg-row{display:flex;gap:12px;align-items:center;padding:6px 8px;border-bottom:1px solid #ffffff18}
 .hg-hub .hg-row.lk{opacity:.5}.hg-hub .hg-n{width:170px;font-weight:800;letter-spacing:.04em}.hg-hub .hg-d{flex:1;font-size:13px;opacity:.85}`;
@@ -198,7 +199,7 @@ export function installHubgate(game) {
     if (g !== game || disposed || !door || !game.player?.inShip || game.player.dead) return;
     const D = SPOTS.hubDoor;
     const nOpen = openIds(S.hub || remoteHub() || hubOf(ob()?.unlocks?.(), null), unlockAll()).length;
-    list.push({ pos: new THREE.Vector3(D.x, 1.2, D.z), r: 0.9, reach: 3.2, label: tx('hg.door'), sub: tx('hg.door_sub', { a: nOpen, b: HUB_ORDER.length }), action: openPanel });
+    list.push({ pos: new THREE.Vector3(D.x, 1.2, D.z), r: 0.9, reach: 3.2, label: tx('hg.door'), sub: nOpen > 0 ? tx('hg.door_sub', { a: nOpen, b: HUB_ORDER.length }) : tx('hg.door_first'), action: openPanel });
   }));
 
   // ---------------------------------------------------------------------------------------------------------------- QUICK SHIFT

@@ -216,7 +216,7 @@ export function installAlgorithm(core) {
     // [firstrun] a brand-new player hears at most one Algorithm line per 45 s; teaching lines (d.pri) and deaths always pass
     if (d.key !== 'death' && game.onboard?.fr?.algoOk?.(!!d.pri) === false) return;
     if (st.q.length >= 3) st.q.shift();
-    st.q.push({ text, voice: d.voice || null, mood: d.mood || game.run?.algo?.mood });
+    st.q.push({ text, pri: !!d.pri, voice: d.voice || null, mood: d.mood || game.run?.algo?.mood });
   }
   function startNext() {
     const n = st.q.shift();
@@ -254,7 +254,7 @@ export function installAlgorithm(core) {
   }
   function clientUpdate(dt) {
     const busy = game.ui?.fullscreenOpen?.();
-    if (!st.cur && st.q.length && !busy) startNext();
+    if (!st.cur && st.q.length && !busy && (st.q[0].pri || !(game.onboard?.fr?.busy?.() > 0))) startNext();   // [qa] the Algorithm box waits for the arrival cards (soul / sector map / wave)
     const c = st.cur;
     if (c && st.el) {
       c.t += dt;

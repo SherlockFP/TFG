@@ -58,7 +58,7 @@ export function createWitchModel(o = {}) {
 export function createKeeperModel(o = {}) {
   const K = kit(), root = new THREE.Group();
   const coat = K.L(0x2a2620), dark = K.L(0x100e0c), glowM = K.B(0xffb45a), cage = K.L(0x3a2a14);
-  const beamM = K.B(0xffc878, { transparent: true, opacity: 0.11, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
+  const beamM = K.B(0xffc878, { transparent: true, opacity: 0.07, depthWrite: false, depthTest: true, blending: THREE.AdditiveBlending, side: THREE.FrontSide, vertexColors: true });   // [qa1] additive, low alpha, front faces only (no wall of light from inside), fades apex -> far end
   const body = K.pivot(root, 0, 0, 0);
   const legs = [-1, 1].map((sx) => { const l = K.pivot(body, sx * 0.13, 0.85, 0); K.box(l, dark, 0.13, 0.85, 0.15, 0, -0.42, 0); return l; });
   K.box(body, coat, 0.44, 1.05, 0.3, 0, 1.3, 0);
@@ -74,6 +74,8 @@ export function createKeeperModel(o = {}) {
   const core = K.box(lantern, glowM, 0.15, 0.22, 0.15, 0, 0, 0);
   const beam = K.cone(root, beamM, 4.1, 9.5, 0.32, 1.02, 5.3, 14, true);   // apex at the lantern, opens forward: the hazard zone the host tests (inBeam)
   beam.rotation.x = -PI / 2;
+  { const g = beam.geometry, p = g.attributes.position, c = new Float32Array(p.count * 3); for (let i = 0; i < p.count; i++) { const f = clamp(p.getY(i) / 9.5 + 0.5, 0, 1); c[i * 3] = c[i * 3 + 1] = c[i * 3 + 2] = f * f; } g.setAttribute('color', new THREE.BufferAttribute(c, 3)); }   // 1 at the lantern, 0 at the far rim
+  beam.renderOrder = 5;
   let lit = 1, dead = 0;
   const update = (dt, a) => {
     dt = clamp(dt || 0, 0, 0.1); const st = a.state, tm = a.time || 0;
@@ -84,7 +86,7 @@ export function createKeeperModel(o = {}) {
     body.rotation.x = dead * -1.4; body.position.y = Math.abs(Math.sin(gait)) * 0.03 * sw;
     lantern.rotation.z = Math.sin(tm * 2.4) * 0.12 * lit;
     core.material.color.setRGB(1, 0.62 + 0.1 * Math.sin(tm * 9), 0.3).multiplyScalar(0.25 + 0.75 * lit);
-    beam.visible = lit > 0.05; beam.material.opacity = 0.11 * lit * (0.85 + 0.15 * Math.sin(tm * 7));
+    beam.visible = lit > 0.05; beam.material.opacity = 0.07 * lit * (0.85 + 0.15 * Math.sin(tm * 7));
     head.rotation.y = Math.sin(tm * 0.5) * 0.3 * lit;
   };
   return api(K, root, { head, lantern, beam }, 2.25, 0.4, update);

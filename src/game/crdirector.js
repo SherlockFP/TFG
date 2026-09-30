@@ -347,8 +347,9 @@ export function installCrdirector(game) {
     for (const k of ['f', 'b', 'l', 'r']) { const i = document.createElement('i'); i.className = k; edgeEl.appendChild(i); edgeKids[k] = i; }
     root.appendChild(edgeEl);
   }
-  function caption(text) {
+  function caption(text, late) {
     ensureUi(); if (!capEl) return;
+    if (!late) { const d = game.onboard?.fr?.slot?.(CAPTION_S) || 0; if (d > 80) { clearTimeout(S.capWait); S.capWait = setTimeout(() => { if (capEl) caption(text, true); }, d); return; } }   // [qa] arrival cards queue
     if (game.onboard?.fr?.lease?.('caption', CAPTION_S, 1) === false) return;   // [firstrun] never on top of the touchdown card
     const i = text.indexOf(' — ');
     capEl.textContent = '';

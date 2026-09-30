@@ -75,3 +75,18 @@ Method notes (read before trusting a shot): interiors are pitch black without a 
 ## 5. Not verified
 
 Revive ring, unlock card look, ghost train hit / horn, vines / spores, lockdown gates, elevator ride, Masked model, feedcam junction box, tower lower floors, Quick Shift menu button, 2-player anything. The x2.8 brightness hides how dark the real interiors are.
+
+## 6. Fixed column (QA fixes pass, branch commit after 67a65ca)
+
+| # | finding | fixed | how |
+|---|---|---|---|
+| 1 | `mapLoaded:horror.js` one 0.2-3.5 s job | FIXED | `horror.js` build is now one landQ sub-job per closet / pocket / fake closet / trap / host install (`LandingQueue.addNext`: parts run right after the handler, same order, stale ones dropped by a generation counter; instant loads still run synchronously). The first-landing spike itself was the 8 canvas glyph textures of `ChalkView` (a fresh 2D canvas + `getImageData` in the first landing of a session, 0.7-2.8 s on software GL): now built on the first chalk mark and `willReadFrequently`. |
+| 2 | museum "~10x slower" | FOUND, part fixed | Static comparison museum vs prison: meshes 4188 / 3898, triangles 243k / 279k, transparent 195 / 174, lights 17 / 17, lasers 5 / 0 (thin boxes). A timed render in the museum sculpture hall (305 calls, 54k tris) is ~50 ms in the same browser, so the 10x is NOT geometry, glass or lasers: what is museum-only is the landing (facility build 0.8-1.7 s at size 1.8 + the horror job above). Hiding the transparent, laser or additive meshes changed the frame time by less than the noise. No draw-call change was made because none is needed; the horror spike is gone (see 1). |
+| 3 | pitch-black facilities | FIXED | `environment.js` interior baseline: hemi 0.02 -> 0.16, ambient 0.012 -> 0.045, tinted by the theme haze (per-theme `atmosphere.hemi/ambient` override); new `interiors/practicals.js`: one merged emissive mesh per facility (ceiling strip in every room, dim corridor strips, green exit sign in the entrance + hub), no scene lights. `loaner.js`: first landing of a budgeted profile (firstrun stage != free, day 1, quota 0) puts one weak (70 s) "Company loaner torch" per crew member on the ship floor, removed at takeoff. Flashlights are still bought. |
+| 4 | arrival banner pile-up + garbled sector card | FIXED | `firstrun_core.slot / busyMs` + `onboard.fr.slot()`: soul card, sector-map card, horde wave banner and director captions reserve a slot on one card timeline (all stages) and show one after the other; the Algorithm box waits for the timeline (teaching lines still pass). Sector card: title uses the short moon name ("HOARDER 404 OF STATIC"), rows read "Name: description", balanced wrapping, 6 s instead of 9 s. |
+| 5 | soul palettes vs clock | FIXED | `palBlend` flag (set by soul on the patched biomes and generated sectors) -> `environment.js` blends sky / fog / sun 45 % palette in the morning to 100 % at dusk (t = 0.62), night capped at 0.82, night colour lifted, hemi floor 0.24. |
+| 6 | downed bar overlaps caption; Bahnschrift | FIXED | `.cd-cap` is a `docklayout` bottom banner (stacked above the bottom dock); downed bar / end card use `var(--font2)`. |
+| 7 | opaque Keeper beam | FIXED | additive, opacity 0.07, front faces only, vertex-colour fade lantern -> far rim, depthWrite off. |
+| 8 | hub door "0 of 12" | FIXED | shows "Opens at quota 1" until the first system is open. |
+
+Not changed: solo players cannot be downed (by design), Masked framing, unknown-entity shapes.

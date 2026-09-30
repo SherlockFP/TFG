@@ -109,17 +109,17 @@ const RU = {
 addTranslations(TR, 'tr');
 addTranslations(RU, 'ru');
 
-const CSS = `.dn-bar{background:#12130d;border:2px solid #ff4a3a;color:#ffe9d0;font:700 15px/1.2 'Bahnschrift','Arial Narrow',sans-serif;letter-spacing:.06em;text-transform:uppercase;padding:4px 14px;display:flex;flex-direction:column;gap:3px;align-items:center;box-shadow:0 0 0 2px #12130d,0 0 18px rgba(255,74,58,.35);min-width:260px}
-.dn-bar i{font:600 12px/1.2 'Bahnschrift','Arial Narrow',sans-serif;letter-spacing:.04em;text-transform:none;color:#d8c9b4;font-style:normal;text-align:center;max-width:340px}
+const CSS = `.dn-bar{background:#12130d;border:2px solid #ff4a3a;color:#ffe9d0;font:700 15px/1.2 var(--font2,'Arial Narrow',sans-serif);letter-spacing:.06em;text-transform:uppercase;padding:4px 14px;display:flex;flex-direction:column;gap:3px;align-items:center;box-shadow:0 0 0 2px #12130d,0 0 18px rgba(255,74,58,.35);min-width:260px}
+.dn-bar i{font:600 12px/1.2 var(--font2,'Arial Narrow',sans-serif);letter-spacing:.04em;text-transform:none;color:#d8c9b4;font-style:normal;text-align:center;max-width:340px}
 .dn-bar u{display:block;height:6px;width:100%;background:#2a1410;text-decoration:none}.dn-bar u b{display:block;height:100%;background:#ff4a3a}
 .dn-vig{position:fixed;inset:0;pointer-events:none;z-index:5;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 38%,rgba(70,0,0,.55) 78%,rgba(20,0,0,.9) 100%);animation:dnpulse 1.1s ease-in-out infinite}
 @keyframes dnpulse{50%{opacity:.62}}
 .dn-root{position:fixed;inset:0;pointer-events:none;z-index:7;overflow:hidden}
 .dn-mark em{font-style:normal;color:#ff6a4a;font-size:16px;line-height:1}
-.dn-mark{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;font:700 12px/1 'Bahnschrift','Arial Narrow',sans-serif;color:#ffe9d0;text-transform:uppercase;letter-spacing:.05em;text-shadow:0 0 4px #000}
+.dn-mark{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;font:700 12px/1 var(--font2,'Arial Narrow',sans-serif);color:#ffe9d0;text-transform:uppercase;letter-spacing:.05em;text-shadow:0 0 4px #000}
 .dn-ring{width:46px;height:46px;border-radius:50%;background:conic-gradient(#7dff9b var(--p,0%),#3a1410 0);display:flex;align-items:center;justify-content:center}
 .dn-ring b{width:34px;height:34px;border-radius:50%;background:#12130d;display:flex;align-items:center;justify-content:center;font-size:15px;color:#ff8a7a}
-.dn-mid{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);display:none;flex-direction:column;align-items:center;gap:3px;font:700 13px/1 'Bahnschrift','Arial Narrow',sans-serif;color:#ffe9d0;letter-spacing:.06em;text-shadow:0 0 4px #000}
+.dn-mid{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);display:none;flex-direction:column;align-items:center;gap:3px;font:700 13px/1 var(--font2,'Arial Narrow',sans-serif);color:#ffe9d0;letter-spacing:.06em;text-shadow:0 0 4px #000}
 .dn-mid .dn-ring{width:74px;height:74px}.dn-mid .dn-ring b{width:60px;height:60px;color:#7dff9b;font-size:17px}`;
 
 const arr3 = (v) => [+v.x.toFixed(2), +v.y.toFixed(2), +v.z.toFixed(2)];
