@@ -773,3 +773,4 @@ REVIEW_W8_NIGHT backlog 12 (CRITIQUE_W8 P13). **Hiring Day** now opens ON THE ST
 
 ### 5.34 Wave 8 - SHOT FIXES (docs/wave8/shotfix.md; node: shotfix.test.mjs + onegoal/hudcalm/hud6/artpass/algo2/feedcams/a11y + build; 1 headless run)
 Algorithm typewriter scramble is ASCII only (block glyphs were tofu); crew-task world labels only for the goal's nearest task (`objectives.goalSrc`), others edge icons with margins; algo2 freeze glitch = dead CRT on a crate (no floating magenta cube, phosphor palette); torch model chunkier + pushed out of the mitten (`fpbody_grip.js TORCH_FWD`).
+- [glove] wave8: first-person hand = small dark work glove + suit-colour cuff, slimmer sleeve (docs/wave8/glove.md).
