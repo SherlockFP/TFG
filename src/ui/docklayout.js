@@ -124,3 +124,23 @@ export function startLayout(docks) {
   timer = setInterval(() => { if (!document.hidden) { try { layoutDocks(docks); } catch { /* never break the HUD */ } } }, 250);
   timer?.unref?.();   // node harness tests: the HUD poll must not keep the process alive
 }
+
+/**
+ * [n3fix] De-overlap HUD edge markers (tasks.js). items: [{ x, y, d, first? }] in px (d = distance, first = keep in place). A marker over the hotbar row is
+ * lifted above it, then any marker within (gx, gy) of an already placed one is stacked upward in gy steps; after 3 tries the (far) marker is hidden
+ * (item.hide = true), so two distance labels never print over each other. `hb` = the hotbar rect ({ left, right, top }) or null. Returns the same array.
+ */
+export function spreadMarkers(items, hb, gx = 74, gy = 40) {
+  const order = items.slice().sort((a, b) => (b.first ? 1 : 0) - (a.first ? 1 : 0) || a.d - b.d);
+  const placed = [];
+  for (const it of order) {
+    if (hb && it.x > hb.left - 26 && it.x < hb.right + 26 && it.y > hb.top - 44) it.y = hb.top - 44;
+    let tries = 0;
+    while (tries < 3 && placed.some((o) => Math.abs(o.x - it.x) < gx && Math.abs(o.y - it.y) < gy)) { it.y -= gy; tries++; }
+    it.hide = tries >= 3 || it.y < 30;
+    if (!it.hide) placed.push(it);
+  }
+  return items;
+}
+/** the hotbar rect (visible `.hud-inv`), or null */
+export function hotbarRect() { const r = typeof document !== 'undefined' ? shown(document.querySelector('.hud-inv')) : null; return r ? { left: r.left, right: r.right, top: r.top } : null; }

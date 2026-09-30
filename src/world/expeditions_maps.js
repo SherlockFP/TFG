@@ -81,9 +81,9 @@ function cableGeo(pts, r = 0.05) {
   for (const g of parts) if (g.attributes.uv) g.deleteAttribute('uv');
   return mergeGeometries(parts, false);
 }
-const stairsInto = (K0, B, plan, color, { solid = true } = {}) => {
+const stairsInto = (K0, B, plan, color, { solid = true, tread = 0 } = {}) => {
   emitStairs(plan, {
-    vis: (s) => K0.box(s.cx, s.y0, s.cz, s.sx, s.top - s.y0, s.sz, color),
+    vis: (s) => { K0.box(s.cx, s.y0, s.cz, s.sx, s.top - s.y0, s.sz, color); if (tread) K0.box(s.cx, s.top, s.cz, s.sx * 0.96, 0.04, s.sz * 0.96, tread, { glow: true }); },   // [n3fix] dim emissive tread (roof)
     col: (b) => B.addBox(b.cx, b.cy, b.cz, b.sx, b.sy, b.sz, 0, { kind: 'wall' }),
     ramp: (r) => B.addBox(r.cx, r.cy, r.cz, r.sx, r.sy, r.sz, r.q, { kind: 'wall' }),
   });
@@ -220,12 +220,14 @@ export function buildDune(seed, moon, { physics, lightPool, biome }) {
     B.addBox(r.x, y + r.h * 0.4, r.z, r.r * 1.5, r.h * 0.8, r.r * 1.5, 0, { kind: 'prop', id: 'ex_rock' });
   }
   // relay pylons at C1..C3: a mast + a top lamp (dynamic: red -> green when the crawler gets there)
-  const lampGeo = new THREE.SphereGeometry(0.42, 8, 6), lamps = [], beamGeo = new THREE.CylinderGeometry(0.35, 0.35, 60, 6, 1, true); env.own(beamGeo);
+  const lampGeo = new THREE.SphereGeometry(0.42, 8, 6), lamps = [], beamGeo = new THREE.CylinderGeometry(0.85, 1.05, 60, 10, 1, true), haloGeo = new THREE.CylinderGeometry(3.2, 3.8, 60, 12, 1, true); env.own(beamGeo); env.own(haloGeo);
   for (let i = 1; i <= 3; i++) {
     const p = P.route[i], y = terrain.heightAt(p.x, p.z), ox = 5, oz = 0;
     k.box(p.x + ox, y, p.z + oz, 0.7, 9, 0.7, 0x4a4f55, { solid: true, data: { kind: 'prop', id: 'ex_pylon' } }); k.box(p.x + ox, y + 9, p.z + oz, 1.6, 0.4, 1.6, 0x2a2e33);
     const m = new THREE.MeshBasicMaterial({ color: 0xff3a24, fog: true }), mesh = new THREE.Mesh(lampGeo, m); mesh.position.set(p.x + ox, y + 9.6, p.z + oz); mesh.scale.setScalar(1.8); env.add(mesh); env.mat(m); lamps.push(mesh);
-    const bm = new THREE.MeshBasicMaterial({ color: 0xff3a24, transparent: true, opacity: 0.4, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }), beam = new THREE.Mesh(beamGeo, bm);   // [expedfix2] tall checkpoint beam
+    // [n3fix] wider, stronger core (normal blend so it reads against the bright sunset sky) + a soft additive halo
+    const bm = new THREE.MeshBasicMaterial({ color: 0xff3a24, transparent: true, opacity: 0.62, depthWrite: false, fog: false, side: THREE.DoubleSide }), beam = new THREE.Mesh(beamGeo, bm);   // [expedfix2] tall checkpoint beam
+    const hm = new THREE.MeshBasicMaterial({ color: 0xff3a24, transparent: true, opacity: 0.16, depthWrite: false, blending: THREE.AdditiveBlending, fog: false, side: THREE.DoubleSide }); beam.add(new THREE.Mesh(haloGeo, hm)); env.mat(hm);
     beam.position.set(p.x + ox, y + 10, p.z + oz); env.add(beam); env.mat(bm); mesh.userData.beam = beam;
   }
   env.own(lampGeo);
@@ -268,7 +270,7 @@ export function buildDune(seed, moon, { physics, lightPool, biome }) {
   ex.setCrawler = (s, mode, rep, cp) => {
     cwSet(s, mode);
     for (let i = 0; i < 3; i++) cwLamps[i].material.color.setHex(i < cp ? 0x40ff70 : (i === cp && mode === 'park' ? (Math.sin(t * 6) > 0 ? 0xffb020 : 0x552200) : 0xff3a24));
-    for (let i = 0; i < 3; i++) { lamps[i].material.color.setHex(i < cp ? 0x40ff70 : 0xff3a24); lamps[i].userData.beam.material.color.setHex(i < cp ? 0x40ff70 : 0xff3a24); }
+    for (let i = 0; i < 3; i++) { lamps[i].material.color.setHex(i < cp ? 0x40ff70 : 0xff3a24); const bc = i < cp ? 0x40ff70 : 0xff3a24; lamps[i].userData.beam.material.color.setHex(bc); lamps[i].userData.beam.children[0]?.material.color.setHex(bc); }
     void rep;
   };
   ex.setCollider = (on, physics2) => {   // the chassis is solid only while parked
@@ -344,8 +346,16 @@ export function buildRoof(seed, moon, { physics, lightPool, biome }) {
     }
   }
   // stairs (visual steps + ramp collider), planks, zip-line poles + cables
-  for (const st of P.stairs) { const sp = planStairs({ x: st.x, z: st.z, y: st.y, dir: st.dir, width: st.width, rise: st.rise, run: st.run }); const er = checkStairs(sp); if (er.length) console.warn('[roof] stairs', er); stairsInto(k, B, sp, 0x4c5058); }
-  for (const p of P.planks) boxOf(k, p, 0x6a5238, { data: { kind: 'prop', id: 'ex_plank' } });
+  for (const st of P.stairs) { const sp = planStairs({ x: st.x, z: st.z, y: st.y, dir: st.dir, width: st.width, rise: st.rise, run: st.run }); const er = checkStairs(sp); if (er.length) console.warn('[roof] stairs', er); stairsInto(k, B, sp, 0x4c5058, { tread: 0x3a4a8a }); }
+  for (const p of P.planks) {
+    boxOf(k, p, 0x6a5238, { data: { kind: 'prop', id: 'ex_plank' } });
+    // [n3fix] dim emissive edge strips along the long sides of every plank (readable from the street)
+    const lx = (p.x1 - p.x0) >= (p.z1 - p.z0), cx = (p.x0 + p.x1) / 2, cz = (p.z0 + p.z1) / 2;
+    for (const sg of [-1, 1]) {
+      if (lx) k.box(cx, p.y1, cz + sg * ((p.z1 - p.z0) / 2 - 0.06), p.x1 - p.x0, 0.05, 0.12, 0x4a5ad0, { glow: true });
+      else k.box(cx + sg * ((p.x1 - p.x0) / 2 - 0.06), p.y1, cz, 0.12, 0.05, p.z1 - p.z0, 0x4a5ad0, { glow: true });
+    }
+  }
   const cables = [];
   for (const zp of P.zips) {
     for (const pole of [zp.a, zp.b]) { k.box(pole.x, pole.y, pole.z, 0.36, K.ROOFC.pole, 0.36, 0x555b63, { solid: true, data: { kind: 'prop', id: 'ex_pole' } }); k.box(pole.x, pole.y + K.ROOFC.pole, pole.z, 0.6, 0.16, 0.6, 0x40e8ff, { glow: true }); }
@@ -380,6 +390,13 @@ export function buildRoof(seed, moon, { physics, lightPool, biome }) {
   env.own(panelGeo); env.own(ledGeo);
   // plaza lamps + skyline (dark towers beyond the walls, a few lit windows)
   const sk = new Kit(env, 0, 0, 0, 0);   // one kit (2 meshes) for the plaza lamps + the skyline
+  // [n3fix] billboard frames are lit from the start (dim emissive bars round each panel); the panel itself still lights up on relight
+  for (const q of P.bbs) {
+    const fc = new THREE.Color().setHSL(q.hue, 0.7, 0.38).getHex(), ax = !!q.out.x, cx = q.x + (q.out.x || 0) * 0.06, cz = q.z + (q.out.z || 0) * 0.06, cy = q.y + 5.5, W = 11.9, H = 5.9, T = 0.28;
+    const th = ax ? 0.62 : T, tz = ax ? T : 0.62;
+    for (const by of [cy + H / 2 - T, cy - H / 2]) sk.box(cx, by, cz, ax ? th : W, T, ax ? W : tz, fc, { glow: true });
+    for (const sg of [-1, 1]) sk.box(ax ? cx : cx + sg * (W / 2 - T / 2), cy - H / 2, ax ? cz + sg * (W / 2 - T / 2) : cz, ax ? th : T, H, ax ? T : tz, fc, { glow: true });
+  }
   for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + 0.5, x = Math.cos(a) * 21, z = Math.sin(a) * 21; sk.box(x, K.SHIP_Y, z, 0.3, 4.4, 0.3, 0x30353b, { solid: true, data: { kind: 'prop', id: 'ex_lamp' } }); sk.box(x, K.SHIP_Y + 4.4, z, 0.9, 0.2, 0.9, 0xffa040, { glow: true }); }
   emitters.push({ pos: new V3(0, K.SHIP_Y + 4.5, 21), color: 0xffa040, intensity: 0.9, distance: 26, group: 'outdoor' }, { pos: new V3(0, K.SHIP_Y + 4.5, -21), color: 0xffa040, intensity: 0.9, distance: 26, group: 'outdoor' });
   {
@@ -389,6 +406,13 @@ export function buildRoof(seed, moon, { physics, lightPool, biome }) {
       if (Math.abs(x) < terrain.playHalf + 6 && Math.abs(z) < terrain.playHalf + 6) continue;
       sk.box(x, K.SHIP_Y - 0.5, z, w, h, w, 0x1c1f2c); sk.box(x, K.SHIP_Y + 1, z, w + 0.2, 4, w + 0.2, i % 2 ? 0x5a2f6a : 0x6a4a2a, { glow: true });   // [expedfix2] faint city glow at the tower feet lights the fog
       for (let r = 0; r < 4; r++) if (R.chance(0.6)) sk.box(x, K.SHIP_Y + 4 + r * (h - 8) / 4, z + w / 2 + 0.03, w * 0.5, 0.6, 0.05, R.pick([0xffc070, 0x7fd8ff]), { glow: true });
+      // [n3fix] window grid on the face toward the plaza: the towers read as buildings, not black slabs (dim, about a third lit)
+      { const fx = Math.abs(x) > Math.abs(z), sg = fx ? -Math.sign(x || 1) : -Math.sign(z || 1), nc = Math.floor(w / 3.2), nr = Math.floor((h - 8) / 3.6);
+        for (let c = 0; c < nc; c++) for (let r = 0; r < nr; r++) {
+          if (!R.chance(0.34)) continue;
+          const u = (c - (nc - 1) / 2) * 3.2, wy = K.SHIP_Y + 4 + r * 3.6, col = R.pick([0x8a6a3c, 0x3c6a80, 0x8a7c58]);
+          if (fx) sk.box(x + sg * (w / 2 + 0.03), wy, z + u, 0.05, 1.6, 1.4, col, { glow: true }); else sk.box(x + u, wy, z + sg * (w / 2 + 0.03), 1.4, 1.6, 0.05, col, { glow: true });
+        } }
     }
     sk.finish();
   }

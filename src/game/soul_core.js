@@ -18,7 +18,7 @@ export const PALETTES = {
   // 33-Guestbook: cold teal snow with a blood-red dusk (the beacon colour)
   palamut: { biome: 'snow', sky: 0x62c0cc, fog: 0x90ccd6, night: 0x05192a, sun: 0xdaf6ff, dusk: 0xd8405a, fogDensity: 0.0155, hemiG: 0x123044, hemiW: 0.18, tint: 0xc4eaf4, pathTint: 0x9ac0d0, rockTint: 0x86a8c0, sat: 1.16 },
   // 88-Chatroom: blood-terracotta desert, rose dusk
-  levrek: { biome: 'desert', sky: 0xc85a3c, fog: 0xb8482e, night: 0x220a0e, sun: 0xffa458, dusk: 0xff2e48, fogDensity: 0.0098, hemiG: 0x46160e, hemiW: 0.2, tint: 0xffb094, pathTint: 0xe08064, rockTint: 0xc0644c, sat: 1.2 },
+  levrek: { biome: 'desert', sky: 0xc85a3c, fog: 0xb8482e, night: 0x220a0e, sun: 0xffa458, dusk: 0xff2e48, fogDensity: 0.0098, hemiG: 0x3c1c12, hemiW: 0.24, tint: 0xf2c0a8, pathTint: 0xd89478, rockTint: 0xb87860, sat: 1.1, morn: 0.28 },   // [n3fix] morn = palette weight at 8:00 (default 0.45): levrek mornings read neutral-warm, not red-brown
   // 666-Creepypasta: bruised violet storm moor
   cipura: { biome: 'moor', sky: 0x4c3a72, fog: 0x3e3060, night: 0x0b0618, sun: 0xbaa8ff, dusk: 0x9a2a72, fogDensity: 0.017, hemiG: 0x1c1034, hemiW: 0.2, tint: 0xb4a0d8, pathTint: 0x8c78b0, rockTint: 0x7a6aa0, sat: 0.98 },
   // 404-Not Found: black forest under a dead red sun
@@ -26,7 +26,7 @@ export const PALETTES = {
   // 0-Algorithm HQ: fluorescent Company teal
   hq: { biome: 'pier', sky: 0x3a6068, fog: 0x466e74, night: 0x041014, sun: 0xd2f6ee, dusk: 0x38b0a0, fogDensity: 0.0135, hemiG: 0x10282c, hemiW: 0.3, sat: 1.05 },
 };
-const GRADE_KEYS = ['sky', 'fog', 'night', 'sun', 'dusk', 'fogDensity', 'hemiG', 'hemiW', 'tint', 'pathTint', 'rockTint'];
+const GRADE_KEYS = ['sky', 'fog', 'night', 'sun', 'dusk', 'fogDensity', 'hemiG', 'hemiW', 'tint', 'pathTint', 'rockTint', 'morn'];
 
 const hex2 = (h) => [(h >> 16 & 255) / 255, (h >> 8 & 255) / 255, (h & 255) / 255];
 const toHex = (r, g, b) => (Math.round(Math.max(0, Math.min(1, r)) * 255) << 16) | (Math.round(Math.max(0, Math.min(1, g)) * 255) << 8) | Math.round(Math.max(0, Math.min(1, b)) * 255);

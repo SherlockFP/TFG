@@ -19,6 +19,7 @@ import { MINIGAMES } from '../minigames/index.js';
 import { createSwipe } from '../minigames/swipe.js';
 import { HOST_ONLY } from '../net/session.js';
 import { hudDock } from '../ui/dock.js';
+import { spreadMarkers, hotbarRect } from '../ui/docklayout.js';
 import { escapeHtml } from '../core/util.js';
 import { toScreen, fx } from './funfx.js';
 import { ensureWardrobeProfile } from './cosmetics.js';
@@ -425,6 +426,7 @@ export function installTasks(game) {
       // [shotfix] one-goal rule: a named world label floats only for the nearest open task AND only while tasks own the ONE goal
       // (objectives.goalSrc); every other open task is a small icon + distance on the screen edge, never mid-view, never cut off.
       const isGoal = game.objectives?.goalSrc === 'tasks';
+      const pend = [];
       let nearest = null, nd = 1e9;
       const cam = game.camera.position;
       for (const a of myList()) {
@@ -449,16 +451,23 @@ export function installTasks(game) {
         if (sp.behind) { x = sp.cx < 0 ? mx : W - mx; y = H - 90; edge = true; }
         else if (x < mx || x > W - mx || y < 24 || y > H - 24) { x = Math.min(W - mx, Math.max(mx, x)); y = Math.min(H - 90, Math.max(24, y)); edge = true; }
         if (!named && !edge) continue;   // on-screen and not the goal: the station's own marker is enough
-        let e = markEls.get(a.sid);
+        pend.push({ sid: a.sid, x, y, d, def, named, edge, first: named });
+      }
+      // [n3fix] edge markers never stack on each other or sit over the hotbar
+      spreadMarkers(pend, hotbarRect());
+      for (const m of pend) {
+        if (m.hide) continue;
+        const { sid, x, y, d, def, named, edge } = m;
+        let e = markEls.get(sid);
         if (!e) {
           e = document.createElement('div');
           e.style.cssText = 'position:absolute;transform:translate(-50%,-50%);font-family:VT323,monospace;font-size:20px;text-shadow:0 0 4px #000,0 0 8px #000;white-space:nowrap;text-align:center';
-          marks.appendChild(e); markEls.set(a.sid, e);
+          marks.appendChild(e); markEls.set(sid, e);
         }
         e.style.left = x + 'px'; e.style.top = y + 'px'; e.style.color = def.color; e.style.opacity = edge ? '0.75' : '0.95';
         const html = `${def.icon} ${named ? def.name : ''}<br><span style="font-size:16px;color:#fff">${Math.round(d)} m</span>`;
         if (e._html !== html) { e.innerHTML = html; e._html = html; }
-        want.add(a.sid);
+        want.add(sid);
       }
     }
     for (const [sid, e] of markEls) if (!want.has(sid)) { e.remove(); markEls.delete(sid); }

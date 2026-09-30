@@ -123,7 +123,9 @@ export const GRIP_MELEE = {
 };
 /** torches: metres the model is pushed forward of the palm so the head sticks out of the glove */
 const TORCH_FWD = { flashlight: 0.07, proflash: 0.07 };
-const meleeQuat = (id) => { const g = GRIP_MELEE[id] || GRIP_MELEE_DEFAULT; return qFromEuler(g[0], g[1], g[2]); };
+const meleeQuat = (id, dp = 0) => { const g = GRIP_MELEE[id] || GRIP_MELEE_DEFAULT; return qFromEuler(g[0] + dp, g[1], g[2]); };
+/** [n3fix] the top of a one-hand melee model may reach at most this NDC height (else the pitch is lowered, the head must stay in frame) */
+export const MELEE_TOP = 0.62;
 
 const qFromEuler = (x, y, z, out = new THREE.Quaternion()) => out.setFromEuler(_e.set(x, y, z));
 
@@ -158,7 +160,7 @@ export function boxCover(cx, cy, cz, rs) {
  * Fit a held item. Returns { cls, pos (hand frame), quat, grip: { R?, L? } (camera-space hand targets for the arm IK),
  * pen, palm (nearest vertex to the palm, m), box (camera-space AABB) }.
  */
-export function fitGrip(geom, def, id = '') {
+export function fitGrip(geom, def, id = '', dp = 0) {
   const cls = classify(def, geom, id);
   const s = geom.size;
   const q = new THREE.Quaternion();
@@ -178,7 +180,7 @@ export function fitGrip(geom, def, id = '') {
     if (longAxis === 'y' && s.y > 1.5 * s.z) auto.setFromAxisAngle(V(1, 0, 0), -Math.PI / 2);
     else if (longAxis === 'x' && s.x > 1.5 * s.z) auto.setFromAxisAngle(V(0, 1, 0), Math.PI / 2);
   }
-  if (cls === 'melee') q.copy(meleeQuat(id)).multiply(auto);   // [ux]
+  if (cls === 'melee') q.copy(meleeQuat(id, dp)).multiply(auto);   // [ux]
   else if (cls === 'long2h') q.copy(def?.ranged ? qFromEuler(0.04, 0.16, 0) : meleeQuat(id)).multiply(auto);
   else if (cls === 'body') q.setFromAxisAngle(V(0, 1, 0), Math.PI / 2);
   else if (cls === 'carry') {
@@ -249,12 +251,15 @@ export function fitGrip(geom, def, id = '') {
 
   // ---- diagnostics (camera space)
   const cam = new THREE.Box3(), p = V(), palm = hand.clone().add(PALM);
-  let palmD = 9;
+  let palmD = 9, top = -9;
   const qq = q;
   for (let i = 0; i < geom.pts.length; i += 3) {
     p.set(geom.pts[i], geom.pts[i + 1], geom.pts[i + 2]).applyQuaternion(qq).add(pos).add(hand);
     cam.expandByPoint(p); palmD = Math.min(palmD, p.distanceTo(palm));
+    if (cls === 'melee' && p.z < -0.08) top = Math.max(top, p.y / (-p.z * TAN_V));
   }
+  // [n3fix] long melee (shovel, stop sign) left the frame as a bare pole: tip the weapon down in steps until its head is in view
+  if (cls === 'melee' && top > MELEE_TOP && dp > -0.55) return fitGrip(geom, def, id, dp - 0.07);
   return { cls, pos, quat: q, grip, pen, palm: palmD, box: cam, hand, cover, scale: sc, ghost: big };
 }
 

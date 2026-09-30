@@ -15,6 +15,7 @@ import { RNG, hashString } from '../core/rng.js';
 import { addTranslations, t, tf, tfIn, sysMsg } from '../core/i18n.js';
 import { HOST_ONLY } from '../net/session.js';
 import { hudDock } from '../ui/dock.js';
+import { spreadMarkers, hotbarRect } from '../ui/docklayout.js';
 import { ITEMS, registerItem, scrapTableFor } from './items.js';
 import { CREATURES, registerCreature } from './creatures.js';
 import { scrapValueMul } from './progression.js';
@@ -1023,13 +1024,17 @@ export function installVoyage(game) {
     if (ct && !(run().vy?.mission?.st === 'active') && !me().indoor && run().phase === 'moon' && dist2(ct.p) > 20) tg.push({ ...ct, soft: 1 });
     while (S.marks.length < tg.length) { const el = document.createElement('div'); el.className = 'vy-mk'; el.innerHTML = '<i></i><span></span>'; S.markEl.appendChild(el); S.marks.push(el); }
     const w = window.innerWidth, h = window.innerHeight;
-    S.marks.forEach((el, i) => {
-      const o = tg[i];
-      if (!o) { setStyle(el, 'display', 'none'); return; }
+    const pos = tg.map((o) => {
       _v.set(o.p.x, (o.p.y ?? 0) + (o.p.y === undefined ? 2 : 0), o.p.z).project(game.camera);
       let x = (_v.x * 0.5 + 0.5) * w, y = (1 - (_v.y * 0.5 + 0.5)) * h;
       if (_v.z > 1) { x = w - x; y = h - 40; }
-      x = clamp(x, 40, w - 40); y = clamp(y, 60, h - 60);
+      return { x: clamp(x, 40, w - 40), y: clamp(y, 60, h - 60), d: dist2(o.p), first: !o.soft };
+    });
+    spreadMarkers(pos, hotbarRect());   // [n3fix] no stacked labels, nothing over the hotbar
+    S.marks.forEach((el, i) => {
+      const o = tg[i];
+      if (!o || pos[i].hide) { setStyle(el, 'display', 'none'); return; }
+      const x = pos[i].x, y = pos[i].y;
       setStyle(el, 'display', ''); setStyle(el, 'left', Math.round(x) + 'px'); setStyle(el, 'top', Math.round(y) + 'px'); setStyle(el, 'opacity', o.soft ? '0.65' : '1');   // [perf5] write-if-changed (was 5 DOM writes per marker per frame)
       setText(el.lastChild, `${t(o.label)} ${dist2(o.p)} m`);
     });
