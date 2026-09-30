@@ -13,4 +13,5 @@ Loop rule: 2-3 Sonnet agents at a time (1 browser/QA agent max) → merge with t
 | 2 | rewardviz | merged de6693a: day summary 'income by source' block, lever job-fee confirm, ORE n/240, diner till toast, +% VALUE / CURSED scan chips, reward pop ≥100. (Hit the usage limit once; resumed.) |
 | 3 | fixbundle | merged f947a76: Y/B/M key priority, Medic +40 % revive, medkit/adrenaline revive a downed crewmate, off-screen arrow, tax row de-dup, translated affix chat + all death lines TR/RU. |
 | 3 | pacing (ship→entrance 40-60 m, smaller empty outdoors, landmark visible from the ramp) | running |
-| 3 | artpass (placeholder models → studio-quality: jammer, goggles, cell, picks, axe/pickaxe/drill, shards, kits, relic, potion) | running |
+| 3 | artpass | merged 07579a5: new src/models/artpass.js — axe, 3 pickaxes/drill, titanium/bypass picks, jammer, NV goggles + cell, potions, sickle, forge shards, kit case, voyage relics (company-issued style, -Z grip convention). Not seen in browser. |
+| 4 | firstrun (first 15 minutes: one objective at a time, message budget, designed tutorial camera) | running |
