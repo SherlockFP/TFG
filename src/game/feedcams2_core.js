@@ -84,6 +84,7 @@ export function jammed(x, y, z, jams, r = JAM.r) {
 export const HL = {
   down: [80, 0], revive: [72, 0], drone: [58, 0], fans: [50, 0], smash: [44, 0], cut: [40, 0],
   show: [26, 0.4], juke: [18, 0.3], streak: [0, 1.4], live: [8, 0],
+  crack: [42, 0.25], catch: [36, 0],   // carry2: a fragile carry breaking on camera / a thrown item caught out of the air
 };
 export const hlScore = (kind, v = 0) => { const k = HL[kind]; return k ? k[0] + k[1] * (Number(v) || 0) : 0; };
 /** keep the better moment. m = [kind, name, value, extra, score] */

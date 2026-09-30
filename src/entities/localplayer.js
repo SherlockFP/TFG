@@ -195,7 +195,8 @@ export class LocalPlayer {
     // look
     const { dx, dy } = input.consumeMouse();
     if (!this.frozen || this.dead) {
-      this.yaw -= dx; this.pitch = clamp(this.pitch - dy, -1.5, 1.5);
+      const ct = this.carryTurn || 1;   // [carry2] heavy / bulky loot slows the turn
+      this.yaw -= dx * ct; this.pitch = clamp(this.pitch - dy * ct, -1.5, 1.5);
     }
     if (!this.lookDelta) this.lookDelta = { x: 0, y: 0 };   // [fpbody] reused, no per-frame allocation
     this.lookDelta.x = dx; this.lookDelta.y = dy;
@@ -245,6 +246,7 @@ export class LocalPlayer {
     let speed = this.downed ? 0.9 : this.sneak ? 2.1 : this.crouch ? 2.6 : this.sprinting ? 8.2 : 5.0;
     speed *= weightMul * s.speedMul * (this.speedBoost > 0 ? 1.25 : 1) * (this.slowT > 0 ? 0.35 : 1) * (this.game.lmMove?.speedMul ?? 1);   // [lcmonsters] Heavy Curse
     if (this.game.grab?.item) speed *= 0.88;
+    if (this.carryMul) speed *= this.carryMul;   // [carry2] bulky loot: crawl solo, near-normal with a helper
     if (bodyCarry) speed *= 0.85;   // on top of the 90 lb weight penalty: a slow, heavy trudge (~2.9 m/s), never frozen
     if (this.game.weatherMud && !this.indoor && !this.inShip) speed *= 0.92;
     // facility set pieces: wading through the flooded room
