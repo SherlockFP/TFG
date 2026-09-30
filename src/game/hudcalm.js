@@ -1,7 +1,8 @@
 // HUDCALM (wave 8 "declutter", docs/wave8/declutter.md). Installed with `this.useModule('hudcalm', installHudCalm)`.
 // The in-run HUD had grown to ~20 always-on widgets. Density (Settings > HUD, `settings.hudDensity`, html[data-hud]):
 //   full      everything stays on screen, exactly like before (only the layout manager in ui/docklayout.js still de-collides it)
-//   standard  (default) always on: health/stamina, hotbar, compass + clock, objective (2 lines), threat. Every other widget is
+//   standard  (default) SIX always-on areas [hud6]: health/stamina, hotbar, compass + clock, the ONE objective line, threat/noise (only above CALM / when loud),
+//             crosshair + interact prompt. ONE currency (credits) on the HUD. Weight only above 30 lb, ability bar only on cooldown, mana only when spent. Every other widget is
 //             CONTEXTUAL: it shows when its content changes, fades after FLASH_S seconds, and is always reachable with HOLD TAB
 //   minimal   same, 1 objective line, shorter flashes, and the widgets marked `min:'hide'` only exist in the Tab card
 // Contextual = the widget's own module is untouched; this file only toggles class `.hc-off` on its dock item / HUD block.
@@ -9,6 +10,7 @@ import { t, tf } from '../core/i18n.js';
 import { escapeHtml } from '../core/util.js';
 import { MOONS } from './moons.js';
 import { hudDensityOf } from '../ui/hudcalm_ui.js';
+import { walletRowOf } from './wallet.js';
 
 const FLASH_S = { standard: 6, minimal: 3 };
 // dock item id -> rule.  f: shown for FLASH_S s after each change of its text (digits ignored, so ticking timers do not re-trigger)
@@ -16,18 +18,21 @@ const FLASH_S = { standard: 6, minimal: 3 };
 const DOCK_RULES = {
   daily: { f: 1, min: 'hide' }, a2feed: { f: 1, min: 'hide' }, 'tfg-inv-feed': { f: 1 }, buffs: { f: 1 }, static: { f: 1 },
   'social-phone': { f: 1, min: 'hide' }, story: { f: 1, min: 'hide' }, roledays: { f: 1, min: 'hide' }, rdmap: { f: 1, min: 'hide' },
-  's2-hull': { f: 1 }, facility: { f: 1 }, w2clock: { f: 1, min: 'hide' }, roleskills: { f: 1 }, h2: { f: 1, min: 'hide' },
+  's2-hull': { f: 1 }, facility: { f: 1 }, w2clock: { f: 1, min: 'hide' }, roleskills: { fn: 'cd' }, mana: { fn: 'mana' }, h2: { f: 1, min: 'hide' },
   h2g: { f: 1, min: 'hide' }, contract: { f: 1, min: 'hide' },
   survival: { c: '.svh.low, .svh.cold' },
   stealth: { fn: 'noise' },
-  threat: { minC: '.tfg-threat.hot' },
+  threat: { c: '.tfg-threat.up' },   // [hud6] Standard + Minimal: THREAT only above CALM
 };
 // plain HUD blocks (selector inside .hud). digits:1 = numbers count as change (coins, quota)
 const HUD_RULES = [
-  { sel: '.hud-tr', f: 1, digits: 1, min: 'hide' },
+  { sel: '.hud-tr', f: 1, digits: 1, strip: 1, min: 'hide' },   // strip: the transient "· ◈ clout" tail is not a change (the clout flash itself keeps the block up)
   { sel: '.hud-chips', f: 1, min: 'hide' },
   { sel: '.hud-quota', f: 1, digits: 1, phases: ['orbit', 'company'] },
+  { sel: '.hud-weight', fn: 'weight' },                       // [hud6] only when heavy (> 30 lb)
+  { sel: '.tfg-asg', f: 1, digits: 1 },                      // [hud6] the ASSIGNMENT card: on change + on Tab
 ];
+const HEAVY_LB = 30;
 
 const CSS = `
 html:not([data-hud="full"]) .hc-off{animation:hcOut .6s ease-in forwards;overflow:hidden;pointer-events:none}
@@ -48,6 +53,7 @@ html:not([data-hud="full"]) .tfg-threat .tt-foot{display:none}
 .hc-tab .hc-o{margin-bottom:3px}.hc-tab .hc-o.warn{color:#ff6a5a}.hc-tab .hc-o.main{color:#fff}.hc-tab .hc-o.hint{opacity:.65}.hc-tab .hc-o.done{color:var(--good,#7dff9a);opacity:.8}
 .hc-tab .hc-r{display:flex;justify-content:space-between;gap:12px}.hc-tab .hc-r b{font-weight:400;color:#fff3e6}
 .hc-tab .hc-cell{margin-bottom:8px;max-width:340px}.hc-tab .hc-cell .hud-dock-item{display:block}
+.hc-tab .hc-cell svg{width:1.1em;height:1.1em;vertical-align:-.15em}   /* [hud6] copied dock glyphs lost their sizing rule (a giant bolt in the card) */
 .hc-tab .hc-dead{opacity:.55}
 .hc-tab .hc-none{opacity:.55}
 @media (max-height:760px){.hc-tab{font-size:18px;gap:10px 22px;padding:12px 16px 8px}}
@@ -70,8 +76,9 @@ export function installHudCalm(game) {
     el.classList.toggle('hc-off', off);
     if (!off) { el.classList.add('hc-in'); setTimeout(() => el.classList.remove('hc-in'), 350); }
   }
-  const sigOf = (el, digits) => {
-    const tx = (el.textContent || '').trim();
+  const sigOf = (el, digits, strip) => {
+    let tx = (el.textContent || '').trim();
+    if (strip) tx = tx.replace(/\s*·\s*◈.*$/, '');
     const s = digits ? tx : tx.replace(/[\d:.,%]+/g, '');
     return s || (el.querySelector('canvas') ? 'canvas' : '');
   };
@@ -80,17 +87,25 @@ export function installHudCalm(game) {
     if (rule.min === 'hide' && d === 'minimal') return false;
     if (rule.c) return !!el.querySelector(rule.c);
     if (rule.minC && d === 'minimal') return !!el.querySelector(rule.minC);
+    if (rule.fn === 'weight') return (parseFloat((el.textContent || '').replace(/[^\d.]/g, '')) || 0) >= HEAVY_LB;
+    if (rule.fn === 'cd' || rule.fn === 'mana') {   // [hud6] ability bar: only while a skill is on cooldown; mana: only while spent / a spell cools down. Lingers FLASH_S after
+      let on = [...el.querySelectorAll('.rs-c i, .mg-cd')].some((c) => parseFloat(c.style.getPropertyValue('--cd')) > 0);
+      if (rule.fn === 'mana' && !on) { const f = el.querySelector('.mg-fill'); on = !!f && f.offsetParent !== null && parseFloat(f.style.width || '100') < 99; }
+      let s = seen.get(el); if (!s) { s = { sig: '', until: 0 }; seen.set(el, s); }
+      if (on) s.until = tnow + FLASH_S[d];
+      return tnow < s.until;
+    }
     if (rule.fn === 'noise') { const p = game.player; return !!p && (p.noise || 0) > (d === 'minimal' ? 0.6 : 0.35); }
     if (!rule.f) return true;
     let s = seen.get(el);
-    const sig = sigOf(el, rule.digits);
+    const sig = sigOf(el, rule.digits, rule.strip);
     if (!s) { s = { sig: '', until: 0 }; seen.set(el, s); }
     if (sig !== s.sig) { s.sig = sig; if (sig) s.until = tnow + FLASH_S[d]; }
     return !!sig && tnow < s.until;
   }
   function pass() {
     const d = dens();
-    if (document.documentElement.dataset.hud !== d) document.documentElement.dataset.hud = d;
+    if (document.documentElement.dataset.hud !== d) { document.documentElement.dataset.hud = d; try { game.ui?.hud?.setCoins?.(game.ui.hud.coinsVal ?? 0); } catch { /* hud not ready */ } }
     const tnow = now();
     for (const el of document.querySelectorAll('.hud-dock-item')) {
       const rule = DOCK_RULES[el.dataset.dockId];
@@ -101,7 +116,7 @@ export function installHudCalm(game) {
     if (hud?.el) for (const r of HUD_RULES) {
       const el = hud.el.querySelector(r.sel);
       if (!el) continue;
-      const keep = r.phases?.includes(phase);
+      const keep = r.phases?.includes(phase) || (r.strip && performance.now() < (hud.cloutUntil || 0));
       setOff(el, !(keep || decide(el, r, d, tnow)));
     }
   }
@@ -124,7 +139,7 @@ export function installHudCalm(game) {
       [t('QUOTA'), `▮${run.sold || 0} / ▮${run.quota || 0}`],
       [t('Days left'), String(run.daysLeft ?? '')],
       [t('Clock'), txt('.clock-time')],
-      [`${txt('.lvl')} ${txt('.rank')}`, txt('.hud-coins')],
+      [`${txt('.lvl')} ${txt('.rank')}`, walletRowOf(game)],   // [hud6] the Tab card is where Clout lives
       [t('Weight'), txt('.hud-weight')],
     ].filter((r) => r[1] || r[0].trim());
     const crew = [`<div class="hc-r"><span>${escapeHtml(game.playerName?.(game.selfId) || '')} (${t('you')})</span><b>${p ? Math.round(p.hp || 0) + '/' + Math.round(p.maxHp || 100) : ''}</b></div>`];
