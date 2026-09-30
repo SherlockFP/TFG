@@ -16,11 +16,12 @@ void main(){
   float scan = 0.72 + 0.28 * sin(vUv.y * 90.0 + uT * 34.0);
   float on = step(0.12, h(vec2(floor(uT * 13.0), 3.0)));
   float a = (0.28 + 0.5 * step(0.55, blk) + 0.35 * tear) * on * uK;
-  vec3 col = uC * (0.55 + 0.9 * blk) * scan + vec3(0.6, 0.0, 0.5) * tear * 0.6;
+  vec3 col = uC * (0.55 + 0.9 * blk) * scan + vec3(0.45, 0.5, 0.45) * tear * 0.6;
   gl_FragColor = vec4(col, clamp(a, 0.0, 0.92));
 }`;
 
-const GLITCH_COL = { wall: 0x33e6ff, dup: 0xffd23f, freeze: 0xff4fd8 };
+// [shotfix] CRT phosphor palette (green / amber / grey static) - the owner hated magenta + cyan glitch patches
+const GLITCH_COL = { wall: 0x8fe0a0, dup: 0xffb84a, freeze: 0xcfd8d2 };
 
 export function createView(game) {
   const uT = { value: 0 };
@@ -32,8 +33,11 @@ export function createView(game) {
     wall: new THREE.BoxGeometry(1.7, 2.4, 0.14),
     shelf: new THREE.BoxGeometry(1.1, 1.7, 0.5),
     crate: new THREE.BoxGeometry(0.28, 0.2, 0.28),
-    pixel: new THREE.OctahedronGeometry(0.26),
+    crt: new THREE.BoxGeometry(0.62, 0.5, 0.5),
+    crtScr: new THREE.PlaneGeometry(0.46, 0.34),
+    crtBase: new THREE.BoxGeometry(0.7, 0.42, 0.56),
   };
+  const crtMat = new THREE.MeshLambertMaterial({ color: 0x3a3d3c });   // [shotfix] housing of the broken monitor (freeze glitch)
   const ghostMat = new THREE.MeshBasicMaterial({ color: 0x9fd0ff, transparent: true, opacity: 0.34, depthWrite: false });
   const beamMat = new THREE.MeshBasicMaterial({ color: 0xffd23f, transparent: true, opacity: 0.32, depthWrite: false, blending: THREE.AdditiveBlending });
   const beamGeo = new THREE.CylinderGeometry(0.05, 0.05, 3.2, 6, 1, true);
@@ -54,7 +58,10 @@ export function createView(game) {
       for (let i = 0; i < 3; i++) { const c = new THREE.Mesh(geo.crate, mats.dup); c.position.set(-0.3 + i * 0.3, 1.8, 0); grp.add(c); }
       grp.rotation.y = ((g.x * 5 + g.z * 11) % 4) * (Math.PI / 2);
     } else {
-      const m = new THREE.Mesh(geo.pixel, mats.freeze); m.position.y = 1.2; m.userData.spin = true; grp.add(m);
+      // a dead CRT monitor on a crate, screen full of static (it used to be a floating magenta cube)
+      const base = new THREE.Mesh(geo.crtBase, crtMat); base.position.y = 0.21; grp.add(base);
+      const body = new THREE.Mesh(geo.crt, crtMat); body.position.set(0, 0.67, 0); body.rotation.y = 0.35; grp.add(body);
+      const scr = new THREE.Mesh(geo.crtScr, mats.freeze); body.add(scr); scr.position.set(0, 0.01, 0.255);
     }
     glGroup.add(grp);
     glitches.set(g.id, { obj: grp, type: g.type });
@@ -103,7 +110,6 @@ export function createView(game) {
     ghostAnchors: () => ghosts.map((g) => g.anchor),
     update(dt, camPos) {
       time += dt; uT.value = time * (game.settings?.reduceFlash ? 0.2 : 1);   // [a11y] reduce flashing: slower glitch flicker
-      for (const e of glitches.values()) if (e.type === 'freeze') e.obj.children[0].rotation.y += dt * 1.6;
       for (const g of ghosts) {
         const dx = camPos.x - g.anchor[0], dz = camPos.z - g.anchor[2];
         const d2 = dx * dx + dz * dz;

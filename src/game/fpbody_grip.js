@@ -121,6 +121,8 @@ export const GRIP_MELEE = {
   bat: [1.02, -0.14, 0], nailbat: [1.02, -0.14, 0], pipe: [0.98, -0.14, 0], crowbar: [0.98, -0.14, 0], shovel: [1.0, -0.12, 0], stopsign: [0.8, -0.1, 0],
   spear: [0.62, -0.06, 0], waraxe: [0.98, -0.12, 0], greatsword: [0.76, 0.2, 0], warhammer: [0.76, 0.2, 0], sledge: [0.76, 0.2, 0],   // two-handers keep the two-hand stance (unchanged)
 };
+/** torches: metres the model is pushed forward of the palm so the head sticks out of the glove */
+const TORCH_FWD = { flashlight: 0.07, proflash: 0.07 };
 const meleeQuat = (id) => { const g = GRIP_MELEE[id] || GRIP_MELEE_DEFAULT; return qFromEuler(g[0], g[1], g[2]); };
 
 const qFromEuler = (x, y, z, out = new THREE.Quaternion()) => out.setFromEuler(_e.set(x, y, z));
@@ -199,6 +201,7 @@ export function fitGrip(geom, def, id = '') {
     }
     const Gr = G.clone().applyQuaternion(q);
     pos.copy(PALM).sub(Gr);
+    if (cls === 'tool' && TORCH_FWD[id]) pos.z -= TORCH_FWD[id];   // [shotfix] fist round the barrel, lens clear of the mitten (it used to sit inside a grey blob)
   }
 
   // ---- keep the item out of the arms
