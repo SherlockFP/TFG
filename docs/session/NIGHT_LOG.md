@@ -20,4 +20,5 @@ Loop rule: 2-3 Sonnet agents at a time (1 browser/QA agent max) → merge with t
 | 5 | hostmig | merged bd5212d: facjobs/chess/arcade2 rebuild on host migration (resto/lcmonsters/crdirector already graceful), charge + elevator range checks, kit revive verified host-side (141 checks). |
 | 5 | creatureart | merged 8336791: 72 hostile types audited; emissive eye tells for all, walk/run lean + 0.4 s wind-up lean + strike snap + hit flinch pose layer, distinct Dimmer/Follower/Auditor models, Mannequin wind-up visible. |
 | 6 | carry2 | merged c8da40e: heavy-item sway + slower turn, fragile bump value loss (5-25 %, floor 35 %), bulky vending machine/server rack/statue + facjobs core: solo crawl 0.55× or two-person carry 0.92× (hold E), throw & catch fragile items, Algorithm lines + crack/catch highlights. |
-| 7 | highlights (end-of-day Algorithm replay clip of the best on-air moment, CRT stream overlay) | running |
+| 7 | highlights | merged 1c915a7: host ring recorder (12 s, 10 Hz, typed arrays), best 3 clips/day from feedcams2 moments, `hlclip` ≤20 KB, CRT top-down replay with REC/LIVE/viewers + Algorithm captions (EN/TR/RU), WATCH HIGHLIGHT button + [L] pill, skippable. |
+| 8 | expeditions (3 adventure moons with their own need + goal: Sunken Server Barge/oxygen, Dune Relay Caravan/heat+water, Rooftop Blackout City/height+power) | running |
