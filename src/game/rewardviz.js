@@ -94,7 +94,9 @@ export function installRewardviz(game) {
     if (g !== game || !d) return;
     try {
       L.pocket = Math.max(L.pocket, pocketValue());
-      const rows = C.rowsOf(L, d, mapVal());
+      let rows = C.rowsOf(L, d, mapVal());
+      // feedcams already prints a VIEWER TAX line in the summary: do not show the tax twice
+      if (game.run?.fc?.tx > 0) rows = rows.filter((r) => r[0] !== 'tax');
       if (rows.length > 1) {
         extra.push(`<div class="rv-sum"><div class="rv-h">${escapeHtml(t('INCOME BY SOURCE'))}</div>${rows.map(([k, gl, n, sg], i) => `<div class="rv-row${sg === '-' ? ' cost' : ''}" data-i="${i}"><i>${gl}</i><span>${escapeHtml(t(LABEL[k]))}${k === 'crate' ? ' ×' + n : ''}</span>${k === 'crate' ? '' : `<b class="rv-n" data-v="${n}" data-pre="${sg}${k === 'clout' ? '◈' : '▮'}">${sg}${k === 'clout' ? '◈' : '▮'}0</b>`}</div>`).join('')}</div>`);
         timers.push(setTimeout(countUp, 120));

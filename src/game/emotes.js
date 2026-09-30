@@ -145,7 +145,7 @@ export class EmoteSystem {
     const g = this.game;
     const p = g.player;
     // wheel (hold B)
-    const holding = input.enabled && input.locked && input.isDown('emoteWheel') && !p.dead;
+    const holding = input.enabled && input.locked && input.isDown('emoteWheel') && !p.dead && !g.voyage?.votePromptOpen?.();
     if (this.wheelUI) {
       if (holding && !this.wheelOpen) { this.wheelOpen = true; this.holdT = 0; this.wheelUI.open(); }
       if (this.wheelOpen) {

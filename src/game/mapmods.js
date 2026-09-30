@@ -13,7 +13,7 @@ import { MOONS } from './moons.js';
 import { wrapMethod, combineEvents } from './dailyEvents.js';
 import { capOne } from './balance_rules.js';
 import { insideShip } from '../world/ship.js';
-import { sysMsg, t, tf } from '../core/i18n.js';
+import { t, tf } from '../core/i18n.js';
 import { RNG, hashString } from '../core/rng.js';
 import { AFFIX_BY_ID, MAX_AFFIX, RARITY_NAME, rollMap, addAffix, effectsOf, flagsOf, rewardOf, mapTitle, cleanMap } from './mapmods_core.js';
 import './mapmods_i18n.js';
@@ -116,7 +116,7 @@ export function installMapmods(game) {
     if (g && g !== game) return;
     const cur = host() && ph === 'moon' ? mmOf()?.cur : null;
     if (!cur?.a.length) return;
-    game.net.broadcast('sys', sysMsg('SECTOR MAP [{@r}]: {@t} - loot +{q}%, value +{v}%', { r: RARITY_NAME[cur.r], t: mapTitle(MOONS[run().moon]?.name || '', cur.a), q: rewardOf(cur.a).qty, v: rewardOf(cur.a).val }, cur.r >= 2 ? 'warn' : 'info'));
+    sysTitle('SECTOR MAP [{@r}]: {@t} - loot +{q}%, value +{v}%', { r: RARITY_NAME[cur.r], q: rewardOf(cur.a).qty, v: rewardOf(cur.a).val }, cur.r >= 2 ? 'warn' : 'info', MOONS[run().moon]?.name || '', cur.a);
   }));
 
   // ------------------------------------------------------------------ runtime flags (creature speed / hearing, Volatile scrap)
@@ -188,14 +188,17 @@ export function installMapmods(game) {
     m.n++;
     game.broadcastRun?.(['mm']);
     const name = game.aiPlayerById?.(from)?.name || game.remotes?.get?.(from)?.name || (from === game.selfId ? game.profile?.name : '') || '?';
-    game.net.broadcast('sys', sysMsg(op === 'reroll' ? '{@n} rerolled the next landing: {@t}' : '{@n} added an affix to the next landing: {@t}', { n: name, t: mapTitle(MOONS[r.moon]?.name || '', m.nxt.a) }, 'warn'));
+    sysTitle(op === 'reroll' ? '{@n} rerolled the next landing: {@t}' : '{@n} added an affix to the next landing: {@t}', { n: name }, 'warn', MOONS[r.moon]?.name || '', m.nxt.a);
     reply('Map updated ({a} affixes, was {b}). Type ATLAS.', { a: m.nxt.a.length, b: was });
   }
   offs.push(mods.on('registerHandlers', (H, g) => { if (g === game) H('mmq', hostUse); }));
 
   let boundNet = null;
+  /** host: chat line whose affix title is built on each receiver, so the affix names come out in their language */
+  function sysTitle(key, v, kind, moon, ids) { game.net.broadcast('mm', { s: key, v, sys: kind, moon, ids }); }
   const onMsg = (m) => {
     if (!m?.s) return;
+    if (m.sys) { game.ui?.systemMessage?.(tf(m.s, { ...(m.v || {}), t: mapTitle(t(String(m.moon || '')), Array.isArray(m.ids) ? m.ids : [], t) }), m.sys); return; }
     const text = tf(m.s, m.v || {});
     game.terminal?.print?.(text, m.err ? 'err' : '');
     game.ui?.toast?.(text, m.err ? 'bad' : 'good');

@@ -318,3 +318,6 @@ First economy pass over wave 8: the sim now models jobs, crates, ore, pockets, d
 
 ## Wave 8 - rewardviz (docs/wave8/rewardviz.md)
 The economy numbers are now readable: a per-source income block in the day summary, warnings before the silent -25 job fee and the 240 ore cap, map / cursed value chips on the scanner and a pop for payouts >= 100. Not browser-verified; the block sits next to feedcams' Highlights and viewer tax appears twice until those two are merged into one.
+
+## Wave 8 - gap closers
+Key conflicts (RPS Y, vote B/M), downed medic / kit revive / edge arrow, duplicate viewer-tax row, translated affix names in chat and translated death lines closed. Still open: the raw-KeyX modules that bypass rebinding; medic speed and kit revive are trusted from the client (co-op).
