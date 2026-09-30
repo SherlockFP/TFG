@@ -57,4 +57,6 @@ Loop rule: 2-3 Sonnet agents at a time (1 browser/QA agent max) → merge with t
 | 17 | herocontent | merged 36c6764: own scrap tables for metro/greenhouse/prison/tower (12 new modelled items), themed sector bosses via BOSS_TABLE aliases, route-board payouts use them; economy unchanged (median 7). |
 | 18 | perf5 | merged f60343c: steady-state profiler (105 modules on a stub facility day); tonight's modules were already cheap; fixed per-frame DOM writes (221→41 text/s, 441→81 style/s via domdiff), shipyard/pets/feedcams/combat_kit garbage. Felt stutter is most likely the landing/first-use hitches (perf3/4). |
 | 19 | perf6 warmset | merged e79aa11: landing builds hidden copies of the moon's pool creatures (≤12), top scrap/big items and common VFX so shaders compile + textures upload before first sight; `kefal.game.perfInfo()` for QA. Material dedupe: nothing needed (three shares programs by params). |
-| 20 | expedfix (expedition memory blow-up + look, browser), feelfix2 (locked-prompt on first frame, round soft cones, bulky carry view, carryMul bug, metro/influencer readability, feedback overlaps) | running |
+| 20 | feelfix2 | merged 0954a7f: face the terminal after the stream, locked prompts only within 1.5 m, tarp hides lids, round soft drone/camera cones, bulky carry ≤25 % of view + 60 % opacity, carryMul 0.92 fixed, metro/influencer brighter practicals + floors, report hides the quota banner. |
+| 20 | expedfix | running |
+| 21 | mpfix (2-tab MP: 4 failed checks, takeoff stuck in MP, migration mid-landing, TAGGED clear, strap) | running |
