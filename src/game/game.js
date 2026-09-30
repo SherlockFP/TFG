@@ -231,7 +231,7 @@ import { installMystery10 } from './mystery10.js';
 // [import:creatures11]
 // [import:swarm11]
 // [import:loop11]
-// [import:shift11]
+import { installShift11 } from './shift11.js';
 // [import:events11]
 // [import:gear11]
 import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
@@ -626,7 +626,7 @@ export class Game extends Emitter {
     // [slot:creatures11]
     // [slot:swarm11]
     // [slot:loop11]
-    // [slot:shift11]
+    this.useModule('shift11', installShift11);
     // [slot:events11]
     // [slot:gear11]
 
