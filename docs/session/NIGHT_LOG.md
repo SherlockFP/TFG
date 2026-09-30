@@ -37,3 +37,4 @@ Loop rule: 2-3 Sonnet agents at a time (1 browser/QA agent max) → merge with t
 | 16 | QA night 2 (browser at gamma 1.0: everything merged after night 1 + scripted 2-player session) | running |
 | 16 | glove | merged e86a155: small dark work glove with suit-colour cuff, thinner sleeve; torch reads clearly low-right (docs/wave8/qa_shots/glove_torch.jpg, lead-checked). Found: blue light pillar clipping through walls → sent to QA night 2. |
 | 17 | herocontent | merged 36c6764: own scrap tables for metro/greenhouse/prison/tower (12 new modelled items), themed sector bosses via BOSS_TABLE aliases, route-board payouts use them; economy unchanged (median 7). |
+| 18 | perf5 | merged f60343c: steady-state profiler (105 modules on a stub facility day); tonight's modules were already cheap; fixed per-frame DOM writes (221→41 text/s, 441→81 style/s via domdiff), shipyard/pets/feedcams/combat_kit garbage. Felt stutter is most likely the landing/first-use hitches (perf3/4). |
