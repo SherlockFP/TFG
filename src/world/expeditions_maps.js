@@ -140,6 +140,20 @@ export function buildBarge(seed, moon, { physics, lightPool, biome }) {
     k.ico(r.x, y + r.r * 0.55, r.z, r.r, 0x3c4a4a, { sy: 0.7, detail: 0 });
     B.addBox(r.x, y + r.r * 0.5, r.z, r.r * 1.5, r.r * 1.0, r.r * 1.5, 0, { kind: 'prop', id: 'ex_rock' });
   }
+  // sunken wreck silhouettes: masts, funnels, listing container stacks that poke above the sea so the basin reads as a graveyard from the dock
+  {
+    const WR = new RNG((seed ^ 0x5eaf) >>> 0), inHull = (x, z, m) => x > P.hull.x0 - m && x < P.hull.x1 + m && z > P.hull.z0 - m && z < P.hull.z1 + m;
+    const near = (x, z) => P.vents.some((v) => Math.hypot(v.x - x, v.z - z) < 5) || P.cores.some((c) => Math.hypot(c.x - x, c.z - z) < 5) || P.rocks.some((r) => Math.hypot(r.x - x, r.z - z) < r.r + 3);
+    for (let i = 0, n = 0; i < 60 && n < 9; i++) {
+      const a = WR.float(0, Math.PI * 2), d = WR.float(24, 66), x = Math.cos(a) * d, z = Math.sin(a) * d;
+      if (Math.abs(x) > 100 || Math.abs(z) > 100 || inHull(x, z, 8) || near(x, z) || B.solidAt(x, z, 3)) continue;
+      const y = terrain.heightAt(x, z), top = K.BARGE.water + WR.float(4, 13), h = top - y, kind = n % 3;
+      if (kind === 0) { k.box(x, y, z, 0.7, h, 0.7, 0x2c3338, { solid: true, data: { kind: 'prop', id: 'ex_wreck' } }); k.box(x - 2.4, y + h - 1.4, z, 5.6, 0.45, 0.45, 0x2c3338, { ry: WR.float(-0.4, 0.4) }); k.box(x, y + h, z, 0.34, 0.34, 0.34, 0xff5a3a, { glow: true }); }
+      else if (kind === 1) { k.cyl(x, y, z, 2.1, h, 0x4a3d34, { seg: 8, solid: true, data: { kind: 'prop', id: 'ex_wreck' } }); k.cyl(x, y + h - 0.5, z, 2.25, 0.5, 0xa03a2a, { seg: 8 }); }
+      else { const cy = K.BARGE.water + WR.float(0.6, 2.2); k.box(x, y, z, 2.6, cy - y, 2.6, 0x3b3c40, { solid: true, data: { kind: 'prop', id: 'ex_wreck' } }); k.box(x, cy, z, 6.4, 2.5, 2.5, CONT[n % CONT.length], { ry: WR.float(0, 3.1), rz: WR.float(-0.25, 0.25) }); }
+      n++;
+    }
+  }
   k.finish();
   // water sheet + bubbles + core beacons (dynamic)
   const wGeo = new THREE.PlaneGeometry(420, 420); wGeo.rotateX(-Math.PI / 2);
@@ -264,16 +278,17 @@ export function buildDune(seed, moon, { physics, lightPool, biome }) {
 
 // ------------------------------------------------------------------------------------------------ ROOF
 const AD_TEXT = ['ALGORITHM+', 'STREAM NOW', 'CLICK. LIKE. OBEY.', 'YOUR FEED AWAITS'];
+/** one 256x128 (power-of-two) canvas texture per ad style, drawn once; the caller caches it per map and disposes it with the map */
 function adTexture(i) {
   try {
-    const c = document.createElement('canvas'); c.width = 256; c.height = 112;
+    const c = document.createElement('canvas'); c.width = 256; c.height = 128;
     const g = c.getContext('2d'); if (!g) return null;
     const hue = [340, 40, 190, 280][i % 4];
-    g.fillStyle = `hsl(${hue},85%,52%)`; g.fillRect(0, 0, 256, 112);
-    g.fillStyle = 'rgba(0,0,0,.28)'; for (let y = 0; y < 112; y += 6) g.fillRect(0, y, 256, 2);
-    g.fillStyle = '#fff'; g.font = 'bold 30px monospace'; g.textAlign = 'center'; g.fillText(AD_TEXT[i % 4], 128, 64);
-    g.strokeStyle = '#fff'; g.lineWidth = 4; g.strokeRect(6, 6, 244, 100);
-    const tex = new THREE.CanvasTexture(c); return tex;
+    g.fillStyle = `hsl(${hue},85%,52%)`; g.fillRect(0, 0, 256, 128);
+    g.fillStyle = 'rgba(0,0,0,.28)'; for (let y = 0; y < 128; y += 6) g.fillRect(0, y, 256, 2);
+    g.fillStyle = '#fff'; g.font = 'bold 30px monospace'; g.textAlign = 'center'; g.fillText(AD_TEXT[i % 4], 128, 72);
+    g.strokeStyle = '#fff'; g.lineWidth = 4; g.strokeRect(6, 6, 244, 116);
+    const tex = new THREE.CanvasTexture(c); tex.generateMipmaps = false; tex.minFilter = THREE.LinearFilter; return tex;
   } catch { return null; }
 }
 export function buildRoof(seed, moon, { physics, lightPool, biome }) {
@@ -325,23 +340,25 @@ export function buildRoof(seed, moon, { physics, lightPool, biome }) {
   // generator (charging station) + billboards (dynamic panels) + kiosks
   const g0 = P.gen; k.box(g0.x, g0.y + 1.5, g0.z, 1.4, 0.16, 0.5, 0xffd060, { glow: true }); k.box(g0.x - 1.2, g0.y + 1.6, g0.z - 0.72, 0.16, 0.16, 0.06, 0x40ff70, { glow: true });
   k.finish();
-  const boards = [], panelGeo = new THREE.BoxGeometry(1, 1, 1);
+  const boards = [], panelGeo = new THREE.BoxGeometry(1, 1, 1), ledGeo = new THREE.BoxGeometry(0.22, 0.22, 0.22), adTex = new Map();
   for (const q of P.bbs) {
-    const tex = adTexture(q.i), on = new THREE.MeshBasicMaterial(tex ? { map: tex, fog: true } : { color: new THREE.Color().setHSL(q.hue, 0.85, 0.55), fog: true }), off = new THREE.MeshBasicMaterial({ color: 0x14161c, fog: true });
+    if (!adTex.has(q.i % 4)) adTex.set(q.i % 4, adTexture(q.i));
+    const tex = adTex.get(q.i % 4), on = new THREE.MeshBasicMaterial(tex ? { map: tex, fog: true } : { color: new THREE.Color().setHSL(q.hue, 0.85, 0.55), fog: true }), off = new THREE.MeshBasicMaterial({ color: 0x14161c, fog: true });
     const mesh = new THREE.Mesh(panelGeo, off);
     const fw = q.out.x ? new V3(q.out.x, 0, 0) : new V3(0, 0, q.out.z);
     mesh.scale.set(q.out.x ? 0.5 : 11.6, 5.6, q.out.x ? 11.6 : 0.5); mesh.position.set(q.x + fw.x * 0.06, q.y + 5.5, q.z + fw.z * 0.06);
     env.add(mesh); env.mat(on); env.mat(off);
     const em = { pos: new V3(q.x + fw.x * 4, q.y + 6, q.z + fw.z * 4), color: new THREE.Color().setHSL(q.hue, 0.9, 0.6).getHex(), intensity: 0, distance: 30, group: 'outdoor' }; emitters.push(em);
-    const led = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.22, 0.22), new THREE.MeshBasicMaterial({ color: 0xff3a24 })); led.position.set(q.kiosk.x, q.y + 1.4, q.kiosk.z); env.add(led); env.own(led.geometry); env.mat(led.material);
+    const led = new THREE.Mesh(ledGeo, new THREE.MeshBasicMaterial({ color: 0xff3a24 })); led.position.set(q.kiosk.x, q.y + 1.4, q.kiosk.z); env.add(led); env.mat(led.material);
     boards.push({ q, mesh, on, off, em, led });
   }
-  env.own(panelGeo);
+  env.own(panelGeo); env.own(ledGeo);
   // plaza lamps + skyline (dark towers beyond the walls, a few lit windows)
-  for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + 0.5, x = Math.cos(a) * 21, z = Math.sin(a) * 21; const kk = new Kit(env, 0, 0, 0, 0); kk.box(x, K.SHIP_Y, z, 0.3, 4.4, 0.3, 0x30353b, { solid: true, data: { kind: 'prop', id: 'ex_lamp' } }); kk.box(x, K.SHIP_Y + 4.4, z, 0.9, 0.2, 0.9, 0xffa040, { glow: true }); kk.finish(); }
+  const sk = new Kit(env, 0, 0, 0, 0);   // one kit (2 meshes) for the plaza lamps + the skyline
+  for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + 0.5, x = Math.cos(a) * 21, z = Math.sin(a) * 21; sk.box(x, K.SHIP_Y, z, 0.3, 4.4, 0.3, 0x30353b, { solid: true, data: { kind: 'prop', id: 'ex_lamp' } }); sk.box(x, K.SHIP_Y + 4.4, z, 0.9, 0.2, 0.9, 0xffa040, { glow: true }); }
   emitters.push({ pos: new V3(0, K.SHIP_Y + 4.5, 21), color: 0xffa040, intensity: 0.9, distance: 26, group: 'outdoor' }, { pos: new V3(0, K.SHIP_Y + 4.5, -21), color: 0xffa040, intensity: 0.9, distance: 26, group: 'outdoor' });
   {
-    const sk = new Kit(env, 0, 0, 0, 0), half = terrain.half - 8;
+    const half = terrain.half - 8;
     for (let i = 0; i < 18; i++) {
       const a = i / 18 * Math.PI * 2, x = Math.max(-half, Math.min(half, Math.cos(a) * 140)), z = Math.max(-half, Math.min(half, Math.sin(a) * 140)), h = R.float(24, 52), w = R.float(12, 20);
       if (Math.abs(x) < terrain.playHalf + 6 && Math.abs(z) < terrain.playHalf + 6) continue;
@@ -354,7 +371,7 @@ export function buildRoof(seed, moon, { physics, lightPool, biome }) {
   const ex = { kind: 'roof', plan: P, boards, gen: g0 };
   ex.setBoard = (i, lit) => { const b = boards[i]; if (!b) return; b.mesh.material = lit ? b.on : b.off; b.em.intensity = lit ? 1.7 : 0; b.led.material.color.setHex(lit ? 0x40ff70 : 0xff3a24); };
   const update = (dt) => { t += dt; for (const b of boards) if (b.mesh.material === b.off) b.led.visible = Math.sin(t * 3 + b.q.i) > -0.2; else b.led.visible = true; };
-  return finishOut(B, { kind: 'roof', mainExit: mainExitAt(P.gen.x, P.gen.z, P.gen.y), ex, update });
+  return finishOut(B, { kind: 'roof', mainExit: mainExitAt(P.gen.x, P.gen.z, P.gen.y), ex, update, dispose: () => { for (const tx of adTex.values()) tx?.dispose(); adTex.clear(); } });
 }
 
 export function buildExpeditionMap(kind, seed, moon, ctx) {

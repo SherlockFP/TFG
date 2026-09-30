@@ -894,7 +894,7 @@ export class Game extends Emitter {
         this.scene.add(outdoor.group);
         this.world.mapGroup = outdoor.group;
         this.env.setMoon(BIOMES[moon.biome], run.weather || 'clear', 'moon');
-        { const sp = outdoor.mainExit?.spawn; if (sp) this.env.fogCap = fogCapFor(Math.hypot(sp.x, sp.z)); }   // [pacing] the entrance stays visible from the ship
+        { const sp = outdoor.mainExit?.spawn; if (sp) this.env.fogCap = outdoor.expedition ? null : fogCapFor(Math.hypot(sp.x, sp.z)); }   // [expedfix] expedition maps set their own fog (the barge dive needs 0.04 underwater)   // [pacing] the entrance stays visible from the ship
         this.weatherMud = run.weather === 'rainy' || run.weather === 'stormy';
         slide();
       });
