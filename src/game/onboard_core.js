@@ -138,22 +138,33 @@ export function remarkFor(f) {
 /** q = quotas the crew has met, boss = first sector boss killed.  Wave 8 (hubgate): the side systems open one by one behind the ship's Hub door
  *  (docs/wave8/hubgate.md). What each id switches off lives in hubgate_core.js (SYSTEMS). */
 export const UNLOCKS = [
-  { id: 'shop', q: 1 }, { id: 'tree', q: 1 },
-  { id: 'arcade', q: 2 }, { id: 'pets', q: 2 },
-  { id: 'homeworld', q: 3 }, { id: 'farming', q: 3 }, { id: 'restaurant', q: 3 },
-  { id: 'forge', q: 4 }, { id: 'zones', q: 4 },
-  { id: 'voyage', q: 5 }, { id: 'season', q: 5 },
+  { id: 'shop', sale: true }, { id: 'tree', sale: true },   // the first sale at the Company desk (about the end of day 1-3), not quota 1
+  { id: 'arcade', q: 1 }, { id: 'pets', q: 1 },
+  { id: 'homeworld', q: 2 }, { id: 'farming', q: 2 }, { id: 'restaurant', q: 2 },
+  { id: 'forge', q: 3 }, { id: 'zones', q: 3 },
+  { id: 'voyage', q: 4 }, { id: 'season', q: 4 },
   { id: 'gates', boss: true },
 ];
+/** ONE wardrobe piece handed over with each unlock (cosmetics.js slot:id; cosmetics.entry() must know it; the wardrobe never needed the shop for these) */
+export const GIFTS = {
+  shop: { slot: 'hat', id: 'beanie' }, tree: { slot: 'hat', id: 'wizard' },
+  arcade: { slot: 'face', id: 'shades' }, pets: { slot: 'back', id: 'plushie' },
+  homeworld: { slot: 'suit', id: 'construction' }, farming: { slot: 'hat', id: 'bucket' }, restaurant: { slot: 'face', id: 'moustache' },
+  forge: { slot: 'hat', id: 'headlamp' }, zones: { slot: 'suit', id: 'soviet' },
+  voyage: { slot: 'back', id: 'antenna' }, season: { slot: 'suit', id: 'tracksuit' },
+  gates: { slot: 'face', id: 'gasmask' },
+};
+export const giftOf = (id) => GIFTS[id] || null;
 export const UNLOCK_IDS = UNLOCKS.map((u) => u.id);
 
 export function ensureUnlocks(p) {
   if (!p || typeof p !== 'object') return null;
   let u = p.unlocks;
-  if (!u || typeof u !== 'object' || Array.isArray(u) || u.v !== V) u = p.unlocks = { v: V, mode: null, q: 0, boss: false, given: {} };
+  if (!u || typeof u !== 'object' || Array.isArray(u) || u.v !== V) u = p.unlocks = { v: V, mode: null, q: 0, boss: false, sale: false, given: {} };
   if (u.mode !== 'staged' && u.mode !== 'all') u.mode = null;
   if (!Number.isFinite(u.q)) u.q = 0;
   u.boss = !!u.boss;
+  u.sale = !!u.sale;
   if (!u.given || typeof u.given !== 'object' || Array.isArray(u.given)) u.given = {};
   return u;
 }
@@ -166,16 +177,18 @@ export function decideMode(p) {
 /** pure progress of a run: quotas met + first boss */
 export function progressOf(run, u) {
   const r = run || {};
-  if (r.quick) return { q: 0, boss: false };   // QUICK SHIFT (hubgate) never advances the ladder
+  if (r.quick) return { q: 0, boss: false, sale: false };   // QUICK SHIFT (hubgate) never advances the ladder
   const cy = r.cycle || {};
   const boss = !!(cy.firstKills && Object.keys(cy.firstKills).length) || (cy.sector | 0) > 0 || (cy.cores | 0) > 0 || !!cy.bossDead;
-  return { q: Math.max(0, r.quotaIndex | 0), boss };
+  const q = Math.max(0, r.quotaIndex | 0);
+  return { q, boss, sale: q > 0 || (r.sold | 0) > 0 };   // the first sale = credits sold at the Company desk (host.js run.sold)
 }
 /** fold the run's progress into the profile record (never decreases: a second run keeps what the first one earned) */
 export function fold(u, prog) {
   let ch = false;
   if (prog.q > u.q) { u.q = prog.q; ch = true; }
   if (prog.boss && !u.boss) { u.boss = true; ch = true; }
+  if (prog.sale && !u.sale) { u.sale = true; ch = true; }
   return ch;
 }
 export function isOpen(id, u, prog, unlockAll = false) {
@@ -184,6 +197,7 @@ export function isOpen(id, u, prog, unlockAll = false) {
   if (unlockAll || !u || u.mode === 'all') return true;
   const q = Math.max(u.q | 0, prog?.q | 0), boss = !!(u.boss || prog?.boss);
   if (def.boss) return boss;
+  if (def.sale) return q >= 1 || !!(u.sale || prog?.sale);
   return q >= (def.q | 0);
 }
 export const isLockedId = (id, u, prog, unlockAll) => !isOpen(id, u, prog, unlockAll);
@@ -197,5 +211,5 @@ export function markGiven(u, id, at = Date.now()) { if (u && UNLOCK_IDS.includes
 export function requirementText(id) {
   const def = UNLOCKS.find((x) => x.id === id);
   if (!def) return null;
-  return def.boss ? { boss: true } : { q: def.q };
+  return def.boss ? { boss: true } : def.sale ? { sale: true } : { q: def.q };
 }

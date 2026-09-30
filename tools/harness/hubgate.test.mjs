@@ -10,7 +10,7 @@ const chk = (c, m) => { n++; if (!c) { bad++; console.log('FAIL', m); } };
 const rd = (p) => fs.readFileSync(new URL('../../' + p, import.meta.url), 'utf8');
 
 // ladder: every id has a system entry, a name and a gift line in EN + TR + RU; ladder order = quota order
-chk(K.UNLOCKS.map((u) => u.q ?? 99).join() === '1,1,2,2,3,3,3,4,4,5,5,99', 'ladder quotas 1,1,2,2,3,3,3,4,4,5,5,boss');
+chk(K.UNLOCKS.map((u) => (u.sale ? 0 : u.q ?? 99)).join() === '0,0,1,1,2,2,2,3,3,4,4,99', 'ladder: sale,sale,1,1,2,2,2,3,3,4,4,boss');
 for (const id of K.UNLOCK_IDS) {
   chk(H.SYSTEMS[id], 'SYSTEMS has ' + id);
   for (const k of ['u.' + id, 'gift.' + id]) chk(OB[k] && OB[k].length === 3 && OB[k].every((s) => s && s.length > 1), 'text EN/TR/RU ' + k);
@@ -32,8 +32,8 @@ chk(H.zoneOwner(L.SPOTS.arcade.x, L.SPOTS.arcade.z, []) === null && H.zoneOwner(
 chk(L.SPOTS.hubDoor && L.fixtureBoxes().some((b) => b.id === 'hubDoor') && L.ACCESS.some((a) => a.id === 'hubDoor'), 'Hub door lives in shiplayout (box + access spot)');
 // host ladder -> joiner
 const hub = H.hubOf({ mode: 'staged', q: 2, boss: false }, { q: 3 });
-chk(hub.q === 3 && H.hubOpen('homeworld', hub) && !H.hubOpen('forge', hub) && H.hubOpen('forge', hub, true) && H.hubOpen('forge', { mode: 'all', q: 0 }) && H.sameHub(hub, { ...hub }), 'run.hub rules a joiner');
-chk(H.openIds({ mode: 'staged', q: 0 }).length === 0 && H.openIds({ mode: 'staged', q: 1 }).join() === 'shop,tree', 'open ids by quota');
+chk(hub.q === 3 && H.hubOpen('homeworld', hub) && H.hubOpen('forge', hub) && !H.hubOpen('voyage', hub) && H.hubOpen('voyage', hub, true) && H.hubOpen('forge', { mode: 'all', q: 0 }) && H.sameHub(hub, { ...hub }), 'run.hub rules a joiner');
+chk(H.openIds({ mode: 'staged', q: 0 }).length === 0 && H.openIds({ mode: 'staged', q: 0, sale: true }).join() === 'shop,tree' && H.openIds({ mode: 'staged', q: 1 }).join() === 'shop,tree,arcade,pets', 'open ids: first sale = store + tree, quota 1 adds arcade + pets');
 // quick shift
 const f = H.quickFields('ABC123:0', () => 2);
 chk(H.QUICK.moons.includes(f.moon) && f.daysLeft === 1 && f.quotaIndex === 0 && f.quick && f.quota === H.QUICK.quotaByTier[2], 'quick run fields');

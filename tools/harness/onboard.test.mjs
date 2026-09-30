@@ -25,6 +25,7 @@ globalThis.location = { search: '' };
 const THREE = await import('three');
 const K = await import('../../src/game/onboard_core.js');
 const TX = await import('../../src/game/onboard_text.js');
+const CO = await import('../../src/game/cosmetics.js');
 const { installOnboard } = await import('../../src/game/onboard.js');
 const { setLang, t, tf } = await import('../../src/core/i18n.js');
 
@@ -137,31 +138,33 @@ const eq = (a, b, m) => ok(JSON.stringify(a) === JSON.stringify(b), `${m}: got $
   const v = { stats: { days: 5 }, level: 2 };
   eq(K.decideMode(v), 'all', 'veteran keeps everything');
   const u = p.unlocks;
-  const at = (q, boss = false) => Object.fromEntries(K.UNLOCK_IDS.filter((id) => K.UNLOCKS.find((x) => x.id === id).boss || K.UNLOCKS.find((x) => x.id === id).q <= q + 1).map((id) => [id, K.isOpen(id, u, { q, boss })]));   // hubgate ladder: only the ids up to the next rung are compared
-  eq(at(0), { shop: false, tree: false, gates: false }, 'quota 0: everything locked');
-  eq(at(1), { shop: true, tree: true, arcade: false, pets: false, gates: false }, 'quota 1: store tiers + skill tree');
-  eq(at(2), { shop: true, tree: true, arcade: true, pets: true, homeworld: false, farming: false, restaurant: false, gates: false }, 'quota 2: arcade + pets');
-  eq(at(3), { shop: true, tree: true, arcade: true, pets: true, homeworld: true, farming: true, restaurant: true, forge: false, zones: false, gates: false }, 'quota 3: homeworld + farming + restaurant');
-  eq(at(0, true), { shop: false, tree: false, gates: true }, 'first boss: gates (independent of quotas)');
+  const at = (q, boss = false, sale = false) => Object.fromEntries(K.UNLOCK_IDS.filter((id) => { const d = K.UNLOCKS.find((x) => x.id === id); return d.boss || d.sale || d.q <= q + 1; }).map((id) => [id, K.isOpen(id, u, { q, boss, sale })]));   // only the ids up to the next rung are compared
+  eq(at(0), { shop: false, tree: false, arcade: false, pets: false, gates: false }, 'quota 0, no sale: everything locked');
+  eq(at(0, false, true), { shop: true, tree: true, arcade: false, pets: false, gates: false }, 'first sale: store + skill tree (before quota 1)');
+  eq(at(1), { shop: true, tree: true, arcade: true, pets: true, homeworld: false, farming: false, restaurant: false, gates: false }, 'quota 1: arcade + pets (quota 1 implies a sale)');
+  eq(at(2), { shop: true, tree: true, arcade: true, pets: true, homeworld: true, farming: true, restaurant: true, forge: false, zones: false, gates: false }, 'quota 2: homeworld + farming + restaurant');
+  eq(at(0, true), { shop: false, tree: false, arcade: false, pets: false, gates: true }, 'first boss: gates (independent of quotas)');
   ok(K.isOpen('nope', u, { q: 0 }), 'unknown ids are never locked');
   ok(K.isOpen('forge', u, { q: 0 }, true), 'unlockAll opens everything');
   ok(K.isOpen('homeworld', v.unlocks, { q: 0 }), 'mode all opens everything');
   // progress of a run
-  eq(K.progressOf({ quotaIndex: 2 }), { q: 2, boss: false }, 'progressOf quotas');
+  eq(K.progressOf({ quotaIndex: 2 }), { q: 2, boss: false, sale: true }, 'progressOf quotas');
+  ok(K.progressOf({ sold: 5 }).sale && !K.progressOf({ sold: 0 }).sale && !K.progressOf({ sold: 9, quick: { v: 1 } }).sale, 'the first sale (run.sold > 0) opens the store; Quick Shift never');
   ok(K.progressOf({ quotaIndex: 0, cycle: { firstKills: { a: 1 } } }).boss, 'boss from firstKills');
   ok(K.progressOf({ cycle: { sector: 1 } }).boss && K.progressOf({ cycle: { bossDead: true } }).boss, 'boss from sector / bossDead');
   ok(!K.progressOf({ cycle: { sector: 0, firstKills: {} } }).boss, 'no boss yet');
   // fold: never decreases, survives a second run
-  ok(K.fold(u, { q: 2, boss: false }) && u.q === 2, 'fold raises q');
-  ok(!K.fold(u, { q: 0, boss: false }) && u.q === 2, 'fold never lowers q');
+  ok(K.fold(u, { q: 2, boss: false, sale: true }) && u.q === 2 && u.sale, 'fold raises q + sale');
+  ok(!K.fold(u, { q: 0, boss: false, sale: false }) && u.q === 2 && u.sale, 'fold never lowers q / sale');
   ok(K.isOpen('pets', u, { q: 0, boss: false }), 'a new run (quota 0) keeps what the profile earned');
   // gifts one per system, only staged profiles, once
   const g = fresh(); K.decideMode(g);
   eq(K.pendingGifts(g.unlocks, { q: 0 }), [], 'nothing to gift at quota 0');
-  eq(K.pendingGifts(g.unlocks, { q: 2 }), ['shop', 'tree', 'arcade', 'pets'], 'gifts due at quota 2');
+  eq(K.pendingGifts(g.unlocks, { q: 0, sale: true }), ['shop', 'tree'], 'store + tree gifts due at the first sale');
+  eq(K.pendingGifts(g.unlocks, { q: 1 }), ['shop', 'tree', 'arcade', 'pets'], 'gifts due at quota 1');
   ok(K.markGiven(g.unlocks, 'shop') && !K.markGiven(g.unlocks, 'shop'), 'gift marked once');
-  eq(K.pendingGifts(g.unlocks, { q: 2 }), ['tree', 'arcade', 'pets'], 'shop no longer pending');
-  eq(K.pendingGifts(g.unlocks, { q: 3, boss: true }, false), ['tree', 'arcade', 'pets', 'homeworld', 'farming', 'restaurant', 'gates'], 'the rest at quota 3 + boss');
+  eq(K.pendingGifts(g.unlocks, { q: 1 }), ['tree', 'arcade', 'pets'], 'shop no longer pending');
+  eq(K.pendingGifts(g.unlocks, { q: 2, boss: true }, false), ['tree', 'arcade', 'pets', 'homeworld', 'farming', 'restaurant', 'gates'], 'the rest at quota 2 + boss');
   eq(K.pendingGifts(g.unlocks, { q: 3 }, true), [], 'unlockAll: no gifts');
   const vv = { stats: { days: 3 } }; K.decideMode(vv);
   eq(K.pendingGifts(vv.unlocks, { q: 9, boss: true }), [], 'veterans get no staged gifts');
@@ -170,9 +173,10 @@ const eq = (a, b, m) => ok(JSON.stringify(a) === JSON.stringify(b), `${m}: got $
   ok(rt.unlocks.mode === 'staged' && rt.unlocks.given.shop, 'unlocks survive JSON');
   const bad = { unlocks: { v: 1, mode: 'x', q: 'a', given: [] } }; const fixed = K.ensureUnlocks(bad);
   ok(fixed.mode === null && fixed.q === 0 && typeof fixed.given === 'object' && !Array.isArray(fixed.given), 'garbage unlocks repaired');
-  eq(K.requirementText('forge'), { q: 4 }, 'requirement forge'); eq(K.requirementText('gates'), { boss: true }, 'requirement gates');
+  eq(K.requirementText('forge'), { q: 3 }, 'requirement forge'); eq(K.requirementText('shop'), { sale: true }, 'requirement shop'); eq(K.requirementText('gates'), { boss: true }, 'requirement gates');
   // the design table
-  eq(K.UNLOCKS.map((x) => [x.id, x.q ?? 'boss']), [['shop', 1], ['tree', 1], ['arcade', 2], ['pets', 2], ['homeworld', 3], ['farming', 3], ['restaurant', 3], ['forge', 4], ['zones', 4], ['voyage', 5], ['season', 5], ['gates', 'boss']], 'the hubgate ladder (wave 8)');
+  eq(K.UNLOCKS.map((x) => [x.id, x.q ?? (x.sale ? 'sale' : 'boss')]), [['shop', 'sale'], ['tree', 'sale'], ['arcade', 1], ['pets', 1], ['homeworld', 2], ['farming', 2], ['restaurant', 2], ['forge', 3], ['zones', 3], ['voyage', 4], ['season', 4], ['gates', 'boss']], 'the wave 9 ladder (store at the first sale)');
+  for (const id of K.UNLOCK_IDS) ok(K.giftOf(id) && CO.entry(K.giftOf(id).slot, K.giftOf(id).id), 'a real wardrobe gift for ' + id);
 }
 
 // ================================================================================================ 5. text table (EN / TR / RU)
@@ -259,19 +263,21 @@ const eq = (a, b, m) => ok(JSON.stringify(a) === JSON.stringify(b), `${m}: got $
   ok(api.locked('forge') && api.locked('pets') && api.locked('voyage') && api.locked('homeworld') && api.locked('gates'), 'staged: everything locked at quota 0');
   ok(api.deny('forge') === true && toasts.length === 1 && /LOCKED/.test(toasts[0][0]), 'deny() toasts the lock');
   const term = []; const pt = { print: (s, c) => term.push([s, c]) };
-  ok(mods.terminalCommand('pets', [], pt) === true && term.length === 1 && /quota 2/.test(term[0][0]), 'terminal PETS is answered with the lock text');
+  ok(mods.terminalCommand('pets', [], pt) === true && term.length === 1 && /quota 1/.test(term[0][0]), 'terminal PETS is answered with the lock text');
   ok(mods.terminalCommand('moon', ['random'], pt) === true && mods.terminalCommand('route', ['s1'], pt) === true && mods.terminalCommand('home', [], pt) === true, 'MOON RANDOM / ROUTE S1 / HOME locked');
   ok(mods.terminalCommand('hello', [], pt) === true, 'other commands pass through to the original');
   ok(mods.terminalCommand('route', ['hamsi'], pt) === false, 'plain ROUTE passes through');
   const rb = api.routeBlocked({ id: 'home', home: true });
-  ok(rb && /quota 3/.test(TX.xf('locked_term', rb.v)) && rb.v.name === 'HOMEWORLD', 'homeworld ROUTE blocked with a translatable message');
+  ok(rb && /quota 2/.test(TX.xf('locked_term', rb.v)) && rb.v.name === 'HOMEWORLD', 'homeworld ROUTE blocked with a translatable message');
   ok(api.routeBlocked({ id: 'hamsi' }) === null, 'other moons not blocked');
   // quota progress opens things and the Algorithm gifts them one by one
-  game.run.quotaIndex = 1; tick(0.6);
-  ok(!api.locked('shop') && !api.locked('tree') && api.locked('pets'), 'quota 1 opens store tiers + skill tree');
+  ok(api.locked('shop') && /first sale/.test(TX.xf('locked_term_sale', { name: 'STORE' })), 'store: locked before the first sale, sale text');
+  game.run.sold = 40; tick(0.6);
+  ok(!api.locked('shop') && !api.locked('tree') && api.locked('pets'), 'the FIRST SALE (run.sold > 0, quota 0) opens store tiers + skill tree');
+  ok(profile.cosmetics?.hats?.includes('beanie'), 'the store unlock handed over its wardrobe gift (hat:beanie)');
   ok(said.some((s) => /better stock/.test(s)) && toasts.some((x) => /NEW TOY/.test(x[0])), 'the store tiers are gifted by the Algorithm (line + toast)');
-  game.run.quotaIndex = 2; tick(0.6);
-  ok(!api.locked('pets') && !api.locked('arcade') && api.locked('homeworld'), 'quota 2 opens arcade + pets');
+  game.run.quotaIndex = 1; tick(0.6);
+  ok(!api.locked('pets') && !api.locked('arcade') && api.locked('homeworld'), 'quota 1 opens arcade + pets');
   const n1 = said.length; tick(0.6, 3); ok(said.length === n1, 'gifts are spaced (one per 9 s)');
   tick(10, 1); tick(0.6);
   ok(said.filter((s) => /gift/i.test(s)).length >= 2, 'the next gift follows later');

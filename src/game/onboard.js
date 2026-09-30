@@ -9,18 +9,19 @@
 //                The wing is compact merged geometry far from the ship (onboard_world.js, no lights) and is disposed on boarding. Steps are FACTS (onboard_core.js),
 //                the guide's tutorial steps (move / flash / scrap) are marked as they happen. Returning players, veterans, friend lobbies, loaded saves and dev
 //                auto-host skip it (profile.onboard flag); in co-op the crew simply stays in the ship (the real "hangar") and can not pull the lever meanwhile.
-//   Unlocks      systems are locked at first and "gifted" by The Algorithm: forge quota 1, pets + voyage quota 2, homeworld quota 3, glitch gates after the first boss.
+//   Unlocks      systems are locked at first and "gifted" by The Algorithm: store + tree at the first sale, arcade + pets q1, homeworld/farm/diner q2, forge + zones q3, voyage + season q4, gates after the first boss; each hands over one wardrobe piece (K.GIFTS).
 //                Other modules ask game.onboard.locked(id) / deny(id) (one guard line each); Settings > "Unlock everything" opens all.
 // State: profile.onboard (flow), profile.unlocks (schedule). No new net message types: the wing is local to the host player, the crew is told through
 // the existing 'sys' message. Debug: game.onboard.debug(), .skip(), .force(stepId).
 import * as THREE from 'three';
-import { sysMsg } from '../core/i18n.js';
+import { sysMsg, t } from '../core/i18n.js';
 import { wrapMethod } from './dailyEvents.js';
 import * as K from './onboard_core.js';
 import * as FR from './firstrun_core.js';   // wave 8: the first-run message budget (game.onboard.fr)
 import { fmtLive } from './onegoal_core.js';   // [algoctx] one number format for every LIVE count
 import { TEXT, x, xf } from './onboard_text.js';
 import { buildWing, SHUTTER } from './onboard_world.js';
+import { grant as grantCosmetic, entry as cosmeticEntry, ensureWardrobeProfile } from './cosmetics.js';   // the unlock gifts are wardrobe pieces
 import { HUB_CMDS, hubOpen } from './hubgate_core.js';   // wave 8: what each locked id switches off
 
 const CSS = `.ob-pa{position:fixed;left:50%;top:clamp(48px,8vh,96px);transform:translateX(-50%);z-index:58;width:min(760px,94vw);background:#12130d;border:2px solid #f2c230;color:#e8e6d0;font:600 15px/1.35 'Bahnschrift','Arial Narrow',Arial,sans-serif;letter-spacing:.03em;box-shadow:0 6px 30px #000c;pointer-events:none;opacity:0;transition:opacity .35s}
@@ -85,10 +86,10 @@ export function installOnboard(game) {
     if (hub) return !hubOpen(id, hub, unlockAll());
     return K.isLockedId(id, u, prog(), unlockAll());
   }
-  function lockedVars(id) { const r = K.requirementText(id); return { name: TEXT['u.' + id]?.[0] || id, n: r?.q || 0, boss: !!r?.boss }; }
+  function lockedVars(id) { const r = K.requirementText(id); return { name: TEXT['u.' + id]?.[0] || id, n: r?.q || 0, boss: !!r?.boss, sale: !!r?.sale }; }
   function lockedText(id, term) {
     const v = lockedVars(id);
-    return xf(term ? (v.boss ? 'locked_term_boss' : 'locked_term') : (v.boss ? 'locked_boss' : 'locked_q'), v);
+    return xf(term ? (v.boss ? 'locked_term_boss' : v.sale ? 'locked_term_sale' : 'locked_term') : (v.boss ? 'locked_boss' : v.sale ? 'locked_sale' : 'locked_q'), v);
   }
   let denyAt = -9;
   /** guard for other modules: true (and a toast) when `id` is still locked */
@@ -117,11 +118,26 @@ export function installOnboard(game) {
     }
     return orig.call(this, w0, rest, term);
   }));
+  /** hand over the unlock's ONE wardrobe piece (own profile; each peer's gift lands in their own wardrobe) -> its translated name or '' */
+  function giveGift(id) {
+    const g = K.giftOf(id);
+    if (!g || !game.profile) return '';
+    try {
+      ensureWardrobeProfile(game.profile);
+      const e = cosmeticEntry(g.slot, g.id);
+      if (!e) return '';
+      grantCosmetic(game.profile, g.slot, g.id);
+      game.cosmetics?.refresh?.();
+      return t(e.name);
+    } catch { return ''; }
+  }
   function announceGift(id) {
     const name = TEXT['u.' + id]?.[0] || id;
+    const item = giveGift(id);
+    const extra = item ? xf('gift_item', { name: item }) : '';
     let carded = false;
-    try { carded = !!game.hubgate?.card?.(id); } catch { /* optional */ }   // wave 8: the unlock card (big banner) replaces the toast
-    if (!carded) toast(xf('gift_toast', { name }), 'good');
+    try { carded = !!game.hubgate?.card?.(id, extra); } catch { /* optional */ }   // wave 8: the unlock card (big banner) replaces the toast
+    if (!carded) toast(xf('gift_toast', { name }) + (extra ? ' | ' + extra : ''), 'good');
     sfx('ui_levelup', 0.6);
     say('gift.' + id);
     S.giftHint = { id, until: T.t + 240 };
@@ -137,7 +153,7 @@ export function installOnboard(game) {
     if (!['orbit', 'company'].includes(game.run.phase)) return;
     if (game.ui?.panelOpen || game.terminal?.active || game.minigame || T.t < S.giftAt) return;
     const [id] = K.pendingGifts(u, prog(), unlockAll());
-    if (id && K.markGiven(u, id)) { save(); announceGift(id); S.giftAt = T.t + 9; }
+    if (id && K.markGiven(u, id)) { announceGift(id); save(); S.giftAt = T.t + 9; }
   }
 
   // ============================================================================================ HIRING DAY
