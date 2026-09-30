@@ -11,6 +11,7 @@ import { HOST_ONLY } from '../net/session.js';
 import { SCRAP_TABLE, ITEMS, registerItem } from './items.js';
 import { MOONS } from './moons.js';
 import * as C from './carry2_core.js';
+import { createArtModel } from '../models/artpass.js';
 
 HOST_ONLY.add('cy2fx');
 
@@ -50,24 +51,9 @@ addTranslations(TR, 'tr'); addTranslations(RU, 'ru');
 
 const CSS = '.cy2-pop{position:fixed;left:50%;top:52%;transform:translateX(-50%);pointer-events:none;z-index:45;font-family:var(--cond,"Barlow Condensed","Arial Narrow",sans-serif);font-size:30px;color:#ff6a5a;text-shadow:0 2px 8px #000;opacity:0}';
 
-// ---------------------------------------------------------------------------------------------------------------- models (emissive / basic materials only: no lights)
-function boxM(w, h, d, color, x = 0, y = 0, z = 0, basic = false) {
-  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), basic ? new THREE.MeshBasicMaterial({ color }) : new THREE.MeshLambertMaterial({ color }));
-  m.position.set(x, y, z);
-  return m;
-}
-const MODELS = {
-  cy_vending: () => { const g = new THREE.Group(); g.add(boxM(0.5, 0.9, 0.4, 0xb3262e)); g.add(boxM(0.34, 0.5, 0.02, 0x9be7ff, -0.04, 0.1, 0.2, true)); g.add(boxM(0.08, 0.3, 0.02, 0x222222, 0.19, 0.15, 0.2)); g.add(boxM(0.34, 0.08, 0.02, 0x101010, -0.04, -0.34, 0.2)); return g; },
-  cy_rack: () => { const g = new THREE.Group(); g.add(boxM(0.5, 0.85, 0.45, 0x24272d)); for (let i = 0; i < 6; i++) { g.add(boxM(0.42, 0.06, 0.02, 0x30343c, 0, -0.32 + i * 0.13, 0.23)); g.add(boxM(0.04, 0.03, 0.02, i % 2 ? 0x4aa8ff : 0x59e88a, 0.16, -0.32 + i * 0.13, 0.245, true)); } return g; },
-  cy_statue: () => {
-    const bronze = new THREE.MeshLambertMaterial({ color: 0xa9793a }), g = new THREE.Group();
-    g.add(boxM(0.4, 0.14, 0.4, 0x6f6a5f, 0, -0.38, 0));
-    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.17, 0.5, 10), bronze); body.position.y = -0.06; g.add(body);
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.11, 10, 8), bronze); head.position.y = 0.28; g.add(head);
-    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.34, 6), bronze); arm.position.set(0.2, 0.12, 0); arm.rotation.z = -0.5; g.add(arm);
-    return g;
-  },
-};
+// ---------------------------------------------------------------------------------------------------------------- models (art-pass kit models, unlit / Lambert materials only: no lights)
+const MODELS = {};
+for (const id of ['cy_vending', 'cy_rack', 'cy_statue', 'pipe']) MODELS[id] = () => createArtModel(id);   // [heroprops] the held lead pipe rides along (hand tool, same hooks)
 
 export function installCarry2(game) {
   const mods = game.mods;

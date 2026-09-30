@@ -557,8 +557,95 @@ function execSafe(k) {                                     // tower / cold stora
   k.add(hazard(), box(0.7, 0.05, 0.005), [0, 0.2, 0.383], null, null, 0.2);
 }
 
+// --------------------------------------------------------------------------------------------------------- hero props (wave 8: carry2 bulky loot + the lead pipe)
+// Base at y = 0, +Z = the front the player reads. entities/items.js re-centres every model on its bounding box, so the carry grip is unchanged.
+const stl = () => L('metal', STEEL);
+function vendingMachine(k) {                                // cy_vending: company-issued snack machine, glass front, product rows, coin slot, logo header, price strip
+  const red = L('paint', 0xa8262a), dk = L('plastic', 0x1c1d22), st = stl(), gl = L('glass', 0xa8e0f0, { opacity: 0.32 });
+  k.add(dk, box(0.58, 0.05, 0.46), [0, 0.025, 0]);                                          // plinth
+  k.add(red, box(0.56, 0.86, 0.44), [0, 0.48, 0]);                                          // body
+  k.add(dk, box(0.6, 0.12, 0.46), [0, 0.95, 0]);                                            // header cap (logo lightbox housing)
+  k.add(stencil(), plane(0.3, 0.1), [-0.08, 0.95, 0.232]);                                  // logo panel
+  k.add(B(0xffb640), box(0.5, 0.012, 0.006), [0, 0.885, 0.222]);                            // header underline glow
+  k.add(dk, box(0.35, 0.53, 0.02), [-0.09, 0.6, 0.222]);                                    // product recess
+  const prod = [L('plastic', 0xe4c020), L('plastic', 0x3a8ad0), L('plastic', 0xe8e4dc)];
+  for (let r = 0; r < 4; r++) {
+    const y = 0.42 + r * 0.125;
+    k.add(st, box(0.33, 0.01, 0.12), [-0.09, y, 0.17]);                                     // shelf
+    for (let i = 0; i < 4; i++) k.add(prod[(i + r) % 3], box(0.05, 0.07, 0.05), [-0.21 + i * 0.075, y + 0.04, 0.17]);   // cans / bars
+  }
+  k.add(gl, box(0.36, 0.55, 0.008), [-0.09, 0.6, 0.242]);                                   // glass front
+  k.add(st, box(0.38, 0.012, 0.012), [-0.09, 0.878, 0.246]); k.add(st, box(0.38, 0.012, 0.012), [-0.09, 0.322, 0.246]);   // glass frame
+  k.add(st, box(0.012, 0.56, 0.012), [-0.28, 0.6, 0.246]); k.add(st, box(0.012, 0.56, 0.012), [0.1, 0.6, 0.246]);
+  k.add(B(0xffb640), box(0.13, 0.035, 0.006), [0.19, 0.8, 0.226]);                          // emissive price strip
+  k.add(L('keypad'), plane(0.11, 0.17), [0.19, 0.66, 0.226]);                               // selector keypad
+  k.add(dk, box(0.08, 0.1, 0.024), [0.19, 0.5, 0.228]); k.add(B(0x0a0a0a), box(0.012, 0.05, 0.006), [0.19, 0.51, 0.242]);   // coin slot + throat
+  k.add(B(0xff3020), box(0.02, 0.02, 0.006), [0.19, 0.435, 0.242]);                         // coin-return lamp
+  k.add(dk, box(0.36, 0.15, 0.03), [-0.09, 0.15, 0.228]); k.add(L('plastic', 0x0a0a0c), box(0.3, 0.09, 0.006), [-0.09, 0.15, 0.246]);   // dispensing tray + flap gap
+  k.add(hazard(), box(0.5, 0.03, 0.005), [0, 0.075, 0.223], null, null, 0.12);
+  k.add(dk, box(0.005, 0.1, 0.16), [0.283, 0.5, 0]);                                        // side vent
+  k.add(stencil(), plane(0.16, 0.08), [0.286, 0.7, 0.0], [0, HP, 0]);
+}
+function serverRack(k) {                                    // cy_rack: humming blade rack, bezels, LED rows, cable bundles
+  const fr = L('metal', 0x4a4e56), pn = L('metal_dark', 0x202226), bz = L('plastic', 0x30343c), st = stl(), rb = L('rubber', RUBBER);
+  const lg = B(0x59e88a), lb = B(0x4aa8ff), la = B(0xffb640), yel = L('plastic', 0xd8b820);
+  for (const [x, z] of [[-0.25, -0.24], [0.25, -0.24], [-0.25, 0.24], [0.25, 0.24]]) k.add(fr, box(0.03, 0.88, 0.03), [x, 0.5, z]);   // frame posts
+  k.add(fr, box(0.53, 0.03, 0.51), [0, 0.945, 0]); k.add(fr, box(0.53, 0.03, 0.51), [0, 0.09, 0]);
+  k.add(pn, box(0.02, 0.84, 0.44), [-0.25, 0.5, 0]); k.add(pn, box(0.02, 0.84, 0.44), [0.25, 0.5, 0]); k.add(pn, box(0.46, 0.84, 0.02), [0, 0.5, -0.24]);
+  for (const [x, z] of [[-0.22, -0.2], [0.22, -0.2], [-0.22, 0.2], [0.22, 0.2]]) { k.add(pn, cyl(0.02, 0.02, 0.04, 6), [x, 0.05, z]); k.add(rb, cyl(0.026, 0.026, 0.02, 6), [x, 0.01, z]); }   // casters
+  for (let i = 0; i < 6; i++) {                                                             // blade bezels
+    const y = 0.17 + i * 0.125;
+    k.add(bz, box(0.44, 0.1, 0.03), [0, y, 0.235]);
+    for (let v = 0; v < 5; v++) k.add(pn, box(0.05, 0.05, 0.006), [-0.17 + v * 0.06, y, 0.252]);   // intake vents
+    k.add(i % 3 === 1 ? la : lg, box(0.018, 0.018, 0.006), [0.13, y + 0.02, 0.252]); k.add(i % 2 ? lb : lg, box(0.018, 0.018, 0.006), [0.16, y + 0.02, 0.252]);
+    k.add(st, box(0.02, 0.06, 0.014), [0.19, y - 0.005, 0.255]);                            // pull handle
+  }
+  k.add(hazard(), box(0.44, 0.035, 0.005), [0, 0.905, 0.252], null, null, 0.12);            // top strip
+  k.add(stencil(), plane(0.12, 0.06), [-0.13, 0.905, 0.256]);
+  for (const [x, dx] of [[-0.16, -0.03], [0.16, 0.03]]) {                                     // hanging patch-cable bundles
+    k.limb(rb, [x, 0.96, 0.27], [x + dx, 0.55, 0.29], 0.02, 0.02, 5); k.limb(rb, [x + dx, 0.55, 0.29], [x + dx * 1.4, 0.16, 0.285], 0.02, 0.02, 5);
+    k.limb(yel, [x + 0.02, 0.96, 0.27], [x + dx + 0.02, 0.6, 0.295], 0.008, 0.008, 4); k.add(yel, cyl(0.009, 0.009, 0.05, 4), [x + dx * 1.4 + 0.02, 0.16, 0.285]);
+  }
+}
+function companyStatue(k) {                                 // cy_statue: bronze Founder, pointing up at the chart, briefcase in the other hand, plaque on the plinth
+  const stone = L('rock', 0x6f6a5f), br = L('metal', 0xa9793a), brd = L('metal_dark', 0x5a3c1a), vd = L('paint', 0x4f8f78);
+  k.add(stone, box(0.42, 0.08, 0.42), [0, 0.04, 0]); k.add(stone, box(0.34, 0.08, 0.34), [0, 0.12, 0]);
+  k.add(L('gold', BRASS), box(0.2, 0.05, 0.008), [0, 0.12, 0.174]); k.add(stencil(), plane(0.12, 0.06), [0, 0.12, 0.179]);   // plaque
+  for (const [x, z] of [[-0.05, 0], [0.05, 0.03]]) { k.limb(br, [x, 0.5, z], [x, 0.18, z], 0.036, 0.03, 7); k.add(brd, box(0.06, 0.03, 0.11), [x, 0.175, z + 0.03]); }   // legs + shoes
+  k.add(br, cyl(0.098, 0.082, 0.32, 8), [0, 0.66, 0.01]);                                   // coat
+  k.add(brd, box(0.1, 0.22, 0.01), [0, 0.66, 0.098], [0.05, 0, 0]);                         // lapel panel
+  k.add(brd, box(0.024, 0.16, 0.01), [0, 0.65, 0.106]);                                     // tie
+  k.add(br, sph(0.05, 6, 5), [-0.105, 0.79, 0.01]); k.add(br, sph(0.05, 6, 5), [0.105, 0.79, 0.01]);   // shoulders
+  k.add(br, cyl(0.03, 0.036, 0.05, 6), [0, 0.845, 0.01]);                                   // neck
+  k.add(br, sph(0.066, 8, 6), [0, 0.92, 0.015]); k.add(brd, sph(0.069, 8, 5), [0, 0.94, 0.005], null, [1, 0.6, 1]);   // head + slicked hair
+  k.add(br, box(0.02, 0.03, 0.03), [0, 0.915, 0.08]);                                       // nose
+  k.limb(br, [0.105, 0.79, 0.01], [0.15, 0.7, 0.12], 0.032, 0.028, 6);                      // right arm: shoulder -> elbow
+  k.limb(br, [0.15, 0.7, 0.12], [0.14, 0.9, 0.2], 0.028, 0.024, 6); k.limb(br, [0.14, 0.9, 0.2], [0.14, 0.98, 0.21], 0.012, 0.007, 5);   // forearm + pointing finger
+  k.limb(br, [-0.105, 0.79, 0.01], [-0.13, 0.52, 0.04], 0.032, 0.026, 6);                   // left arm down
+  k.add(brd, box(0.05, 0.11, 0.15), [-0.135, 0.45, 0.04]); k.limb(brd, [-0.135, 0.505, 0.0], [-0.135, 0.505, 0.08], 0.008, 0.008, 4);   // briefcase + handle
+  k.add(vd, box(0.05, 0.012, 0.05), [0.105, 0.83, 0.0]); k.add(vd, box(0.04, 0.012, 0.05), [-0.105, 0.83, 0.0]); k.add(vd, box(0.05, 0.02, 0.05), [0, 0.99, 0.0]);   // verdigris streaks
+}
+function leadPipe(k, root) {                                // pipe: hand tool (origin at the grip, -Z forward): tape grip, threads, coupling, bend, flange head
+  const pb = L('metal_rust', 0x7f8488), pd = L('metal_dark', 0x4a4e52), rust = L('paint', RUST), rb = L('rubber', 0x2a2620);
+  k.add(pb, cyl(0.02, 0.02, 0.36, 8), [0, 0, -0.13], [HP, 0, 0]);                           // straight run
+  k.add(rb, cyl(0.025, 0.025, 0.15, 8, true), [0, 0, 0.0], [HP, 0, 0]);                     // taped grip
+  for (let i = 0; i < 3; i++) k.add(rb, cyl(0.027, 0.027, 0.006, 8), [0, 0, 0.06 - i * 0.05], [HP, 0, 0]);
+  for (let i = 0; i < 4; i++) k.add(pd, cyl(0.023, 0.023, 0.006, 8), [0, 0, 0.13 - i * 0.012], [HP, 0, 0]);   // threaded butt end
+  k.add(pd, cyl(0.03, 0.03, 0.02, 6), [0, 0, 0.17], [HP, 0, 0]);                           // butt cap
+  k.add(pb, cyl(0.032, 0.032, 0.075, 8), [0, 0, -0.27], [HP, 0, 0]);                       // coupling
+  for (const dz of [-0.235, -0.305]) k.add(pd, cyl(0.035, 0.035, 0.012, 6), [0, 0, dz], [HP, 0, 0]);   // coupling nuts
+  k.add(pb, sph(0.03, 8, 6), [0, 0, -0.34]);                                                // elbow ball
+  k.limb(pb, [0, 0, -0.34], [0, 0.07, -0.52], 0.021, 0.021, 8);                             // bent head run
+  k.add(pd, cyl(0.048, 0.048, 0.016, 8), [0, 0.078, -0.535], [HP + 0.36, 0, 0]);            // heavy flange
+  k.add(pd, cyl(0.026, 0.026, 0.03, 6), [0, 0.085, -0.56], [HP + 0.36, 0, 0]);
+  for (let i = 0; i < 6; i++) k.add(rust, box(0.018, 0.012, 0.03), [Math.cos(i * 1.1) * 0.02, Math.sin(i * 1.1) * 0.02, -0.06 - i * 0.045], [0, 0, i]);   // rust patches
+  for (const [x, y] of [[0.038, 0.078], [-0.038, 0.078], [0, 0.116], [0, 0.04]]) k.add(stl(), box(0.008, 0.008, 0.012), [x, y, -0.54]);   // flange bolts
+  root.userData.tip = anchor(root, 'tip', [0, 0.09, -0.575]);
+}
+
 // --------------------------------------------------------------------------------------------------------- registry
 const ART = {
+  cy_vending: vendingMachine, cy_rack: serverRack, cy_statue: companyStatue, pipe: leadPipe,   // carry2 bulky loot + the lead pipe (hooked in game/carry2.js)
   hb_turnstile: turnstile, hb_ticketkiosk: ticketKiosk, hb_planter: bigPlanter, hb_terrarium: terrarium,   // big valuables (game/herocontent_core.js BIG_DEFS)
   hb_locker: evidenceLocker, hb_searchlight: searchlight, hb_bust: founderBust, hb_safe: execSafe,
   hc_cardreader: cardReader, hc_railspike: railSpike, hc_lantern: conductorLantern, hc_lostbag: lostBag,   // hero-content scrap (game/herocontent.js)
@@ -571,7 +658,7 @@ const ART = {
   vy_blackbox: blackbox, vy_relic: (k, r) => relic(k, r, 0x40f0d0, 1.3), vy_meteorite: meteorite,
 };
 export const ART_IDS = Object.freeze(Object.keys(ART));
-const TOOL_IDS = new Set(['tool_axe', 'tool_pickaxe', 'tool_pickaxe_steel', 'tool_drill', 'lp2_titanium', 'lp2_bypass', 'fc_jammer', 'sv_sickle']);
+const TOOL_IDS = new Set(['tool_axe', 'tool_pickaxe', 'tool_pickaxe_steel', 'tool_drill', 'lp2_titanium', 'lp2_bypass', 'fc_jammer', 'sv_sickle', 'pipe']);
 const r3 = (v) => Math.round(v * 1000) / 1000;
 
 function finish(root, k, id, tool) {

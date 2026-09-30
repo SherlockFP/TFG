@@ -25,6 +25,7 @@ const TEXT = {
   danger: ['DANGER', 'TEHLİKE', 'ОПАСНОСТЬ'],
   payout: ['SCRAP ON SITE', 'SAHADAKİ HURDA', 'ХЛАМ НА МЕСТЕ'],
   interior: ['INTERIOR', 'İÇ MEKÂN', 'ИНТЕРЬЕР'],
+  int_hamsi: ['Abandoned Web Host', 'Terk Edilmiş Web Host', 'Заброшенный веб-хостинг'],   // moons.js hamsi.interiorName (the card used to read "Data Center" on 56K-Dialup)
   weather: ['WEATHER', 'HAVA', 'ПОГОДА'],
   cur: ['CURRENT ROUTE', 'MEVCUT ROTA', 'ТЕКУЩИЙ МАРШРУТ'],
   fresh: ['NEW', 'YENİ', 'НОВОЕ'],
