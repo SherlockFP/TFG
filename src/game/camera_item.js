@@ -7,7 +7,7 @@
 //     other creatures close to the lens are dazzled for a moment.
 // Host request: 'hcam' { ids: [mimic creature ids], daze: [creature ids] } (validated: type, range).
 import * as THREE from 'three';
-import { t, tf, addTranslations } from '../core/i18n.js';
+import { t, tf, addTranslations, getLang } from '../core/i18n.js';
 import { MOONS } from './moons.js';
 
 addTranslations({
@@ -181,7 +181,7 @@ export function installCamera(game) {
     const mim = inFrame.find((f) => f.mimic);
     ctx.textAlign = 'center';
     if (mim) {
-      const nm = (mim.v.name && mim.v.name !== '???' ? mim.v.name : t('crewmate')).toUpperCase().slice(0, 16);
+      const nm = (mim.v.name && mim.v.name !== '???' ? mim.v.name : t('crewmate')).toLocaleUpperCase(getLang()).slice(0, 16);
       ctx.fillStyle = '#b3101c'; ctx.font = 'bold 18px VT323, monospace';
       ctx.fillText(tf("IT'S NOT {name}", { name: nm }), FW / 2, PH + 36);
       ctx.fillStyle = '#6a5a4a'; ctx.font = '13px VT323, monospace'; ctx.fillText(t('Something is wrong with this photo...'), FW / 2, PH + 54);

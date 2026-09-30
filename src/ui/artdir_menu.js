@@ -3,7 +3,7 @@
 // follows the cursor), three entry groups with a plate-style selection, hint line, "Company memo" ticker, key hints.
 // Screen changes trigger a scanline wipe (skipped with reduceMotion). Colours: docs/wave6/artdir.md.
 import * as THREE from 'three';
-import { t } from '../core/i18n.js';
+import { t, getLang } from '../core/i18n.js';
 import { glyphPath } from './glyphs.js';
 import { WM_LETTERS, COL, drawWordmark, drawSeal, drawEye } from './logo.js';
 import './artdir_i18n.js';
@@ -136,7 +136,7 @@ export function drawArtMenu(menu, c, time) {
     const scr = menu.app.ui?.currentScreen, gn = MODE_GLYPH[scr];
     const cx = Math.round(W * 0.32);   // the DOM panel covers the right side: keep the content on the visible left part
     // stamped mode label plate + big pictogram
-    const label = String(menu.modeLabel || '').toUpperCase(); ctx.font = F(50); const fs0 = Math.min(50, Math.floor(50 * 230 / Math.max(1, ctx.measureText(label).width))); ctx.font = F(fs0); const lw = ctx.measureText(label).width;
+    const label = String(menu.modeLabel || '').toLocaleUpperCase(getLang()); ctx.font = F(50); const fs0 = Math.min(50, Math.floor(50 * 230 / Math.max(1, ctx.measureText(label).width))); ctx.font = F(fs0); const lw = ctx.measureText(label).width;
     const px = cx - (lw + 36) / 2, py = 190;
     ctx.fillStyle = COL.amber; ctx.fillRect(px, py, lw + 36, 64); ctx.fillStyle = COL.ink; ctx.textAlign = 'center';
     if ('letterSpacing' in ctx) ctx.letterSpacing = '3px';
@@ -176,7 +176,7 @@ export function drawArtMenu(menu, c, time) {
   for (let i = 0; i < n; i++) {
     const ci = colOf(items[i]), C = COLS[ci], y = yc[ci], rh = C.h, cy = y + rh / 2, on = i === menu.sel;
     ctx.font = F(C.fs); ctx.textAlign = 'left';
-    const label = String(items[i].label).toUpperCase(), lw = ctx.measureText(label).width;
+    const label = String(items[i].label).toLocaleUpperCase(getLang()), lw = ctx.measureText(label).width;
     if ('letterSpacing' in ctx) ctx.letterSpacing = '2px';
     const lx = C.x + 44;
     if (on) {

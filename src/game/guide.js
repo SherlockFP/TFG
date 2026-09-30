@@ -362,7 +362,7 @@ export function installGuide(game) {
     const MAX = 8;
     for (const e of list.slice(0, MAX)) {
       const f = e.f;
-      out.push(`* ${pick(f.name, lang()).toUpperCase()}${f.key ? '  [' + f.key + ']' : ''}${e.rel ? '  <-' : ''}`);
+      out.push(`* ${pick(f.name, lang()).toLocaleUpperCase(lang())}${f.key ? '  [' + f.key + ']' : ''}${e.rel ? '  <-' : ''}`);
       out.push('    ' + firstSentence(pick(f.how, lang())));
     }
     if (list.length > MAX) out.push('', T('guide_more', { n: list.length - MAX }));
@@ -393,7 +393,7 @@ export function installGuide(game) {
   }
   function detailText(f) {
     const g = G();
-    const out = [pick(f.name, lang()).toUpperCase() + '  -  ' + T(g.used[canon(f)] ? 'guide_state_tried' : 'guide_state_new'), '', T('guide_how') + pick(f.how, lang())];
+    const out = [pick(f.name, lang()).toLocaleUpperCase(lang()) + '  -  ' + T(g.used[canon(f)] ? 'guide_state_tried' : 'guide_state_new'), '', T('guide_how') + pick(f.how, lang())];
     if (f.cmds?.length) out.push('', T('guide_cmds') + f.cmds.map((c) => c.toUpperCase()).join(', '));
     if (f.key) out.push(T('guide_key') + f.key);
     return out.join('\n');

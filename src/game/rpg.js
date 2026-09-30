@@ -14,7 +14,7 @@
 // Events: 'tfg:role' (roleId, game) and 'tfg:rpg' (kind, detail, game) on the mod bus.
 import * as THREE from 'three';
 import { clamp, aAn } from '../core/util.js';
-import { addTranslations, t, tf } from '../core/i18n.js';
+import { addTranslations, t, tf, getLang } from '../core/i18n.js';
 import { ROLES, ROLE_ORDER, NODE, KEYSTONE_NODES, treeBonus, treeFlags, normId, bonusLines, treeSpent } from './passivetree.js';
 import { createRpgController } from './rpgctl.js';
 import { ensureRpgProfile } from './profile.js';
@@ -215,7 +215,7 @@ export function installRpg(game) {
     ctx.font = '20px VT323, monospace';
     ctx.textAlign = 'left';
     const lv = 'Lv.' + (r.level || 1) + '  ';
-    const rn = ROLES[role].name.toUpperCase();
+    const rn = ROLES[role].name.toLocaleUpperCase(getLang());
     const w1 = ctx.measureText(lv).width, w2 = ctx.measureText(rn).width;
     const x0 = 128 - (w1 + w2) / 2;
     ctx.fillStyle = '#ffd27a'; ctx.fillText(lv, x0, y);
@@ -348,8 +348,8 @@ export function installRpg(game) {
       const confirm = rest.includes('confirm');
       if (!arg) {
         const cur = R.role();
-        const out = [`ROLES (yours: ${cur ? ROLES[cur].name.toUpperCase() : 'NONE'}):`];
-        for (const id of Object.keys(ROLES)) { const r = ROLES[id]; out.push(`${id === cur ? '*' : ' '} ${r.name.toUpperCase().padEnd(12)} ${r.tag}`, `    ${bonusLines(r.bonus).map((l) => l.text).join(', ')} | kit: ${itemDef(r.kit).name}`); }
+        const out = [`ROLES (yours: ${cur ? ROLES[cur].name.toLocaleUpperCase(getLang()) : 'NONE'}):`];
+        for (const id of Object.keys(ROLES)) { const r = ROLES[id]; out.push(`${id === cur ? '*' : ' '} ${r.name.toLocaleUpperCase(getLang()).padEnd(12)} ${r.tag}`, `    ${bonusLines(r.bonus).map((l) => l.text).join(', ')} | kit: ${itemDef(r.kit).name}`); }
         out.push('', 'ROLE <name> to switch (ship in orbit only). Full tree: press K.');
         term.print(out.join('\n'));
         return;

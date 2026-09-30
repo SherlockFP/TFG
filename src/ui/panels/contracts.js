@@ -143,7 +143,7 @@ export function createLoreBoard({ game, lore, tab, onClose } = {}) {
       const chain = o.chain !== null && o.chain !== undefined;
       const card = mk('div', 'lb-card' + (o.taken ? ' taken' : '') + (chain ? ' chain' : ''));
       card.style.setProperty('--fc', f.color);
-      card.innerHTML = `<div class="lb-k">${f.glyph} ${escapeHtml(f.name.toUpperCase())} · ${escapeHtml(tx.icon)} ${escapeHtml(tx.type)}${o.patron ? ' · ' + (o.patron === 'company' ? L('THE COMPANY', 'ŞİRKET') : L('THE ALGORITHM', 'ALGORİTMA')) : ''}</div>`
+      card.innerHTML = `<div class="lb-k">${f.glyph} ${escapeHtml(f.name.toLocaleUpperCase(getLang()))} · ${escapeHtml(tx.icon)} ${escapeHtml(tx.type)}${o.patron ? ' · ' + (o.patron === 'company' ? L('THE COMPANY', 'ŞİRKET') : L('THE ALGORITHM', 'ALGORİTMA')) : ''}</div>`
         + `<div class="lb-n">${escapeHtml(tx.title)}</div>`
         + (chain ? `<div class="lb-chain">★ ${escapeHtml(pickLang(CHAINS[o.faction].name, T))} - ${L('step', 'adım')} ${o.chain + 1}/5</div>` : '')
         + `<div class="lb-b">${escapeHtml(tx.brief)}${tx.goal !== tx.brief ? `<br><span style="opacity:.7">${escapeHtml(tx.goal)}</span>` : ''}</div>`

@@ -15,7 +15,7 @@ import { MOONS } from './moons.js';
 import { MARKET, MAX_LEVEL, REBIRTH_LEVEL, prestigeStars, MASTERY, masteryRank } from './progression.js';
 import { SUIT_COLORS, HATS } from '../models/avatar.js';
 import { saveProfile } from '../core/save.js';
-import { getLang, t } from '../core/i18n.js';
+import { getLang, t, upperT } from '../core/i18n.js';
 import { glyphFromEmoji } from '../ui/glyphs.js';   // wave 8: pictograms instead of colour emoji
 
 const DAY_MS = 86400000;
@@ -685,7 +685,7 @@ export function installAchievements(game) {
     return fresh;
   }
   function queueAchievement(a) {
-    banner.push({ tier: a.tier, icon: a.icon, kicker: `${L('ACHIEVEMENT UNLOCKED')} · ${tierName(a.tier).toUpperCase()}`, name: nameOf(a), desc: descOf(a), reward: rewardText(a.reward || {}) });
+    banner.push({ tier: a.tier, icon: a.icon, kicker: `${L('ACHIEVEMENT UNLOCKED')} · ${upperT(tierName(a.tier))}`, name: nameOf(a), desc: descOf(a), reward: rewardText(a.reward || {}) });
   }
 
   // ---- daily login streak
@@ -847,7 +847,7 @@ export function renderAchievementsPanel(container, game, profile = game?.profile
       card.style.setProperty?.('--kt', TIERS[a.tier]?.color || '#ffd23f');
       const body = mk('div', 'kach-body');
       const nm = mk('div', 'kach-n', nameOf(a));
-      nm.appendChild(mk('span', 'kach-t', tierName(a.tier).toUpperCase()));
+      nm.appendChild(mk('span', 'kach-t', upperT(tierName(a.tier))));
       body.append(nm, mk('div', 'kach-d', descOf(a)));
       if (!un && a.progress) {
         let pr = null;

@@ -33,7 +33,7 @@ import { registerCreature, CREATURES, EXTRA_SPAWNS } from './creatures.js';
 import { STATE_SOUNDS, LOOPS } from '../entities/creatures.js';
 import { ITEMS, registerItem } from './items.js';
 import { FIELD_NOTES } from './collection.js';
-import { addTranslations, t, tf } from '../core/i18n.js';
+import { addTranslations, t, tf, getLang } from '../core/i18n.js';
 import { installBrRussian } from './br_i18n_ru.js';
 import { angleDiff, clamp, dampAngle } from '../core/util.js';
 import { planDarkCorridors } from '../world/setpieces.js';
@@ -745,7 +745,7 @@ export function installBackroomsCreatures(game) {
     S.capEl.innerHTML = '<div class="br-cap"><div class="k"></div><div class="n"></div><div class="h"></div></div>';
     const box = S.capEl.firstChild;
     box.querySelector('.k').textContent = '● REC  ' + t('ENTITY SIGHTED');
-    box.querySelector('.n').textContent = String(def?.name || type).toUpperCase();
+    box.querySelector('.n').textContent = String(def?.name || type).toLocaleUpperCase(getLang());
     box.querySelector('.h').textContent = t(CAP_HINT[type] || '');
     requestAnimationFrame?.(() => box.classList.add('on'));
     S.capT = 5.5;

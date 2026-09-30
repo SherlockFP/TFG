@@ -2,7 +2,7 @@
 // Pure DOM + injected CSS; all state comes from the magic module (src/game/magic.js) passed in.
 import { hudDock } from '../dock.js';
 import { glyph } from '../glyphs.js';
-import { t } from '../../core/i18n.js';
+import { t, getLang } from '../../core/i18n.js';
 
 // 12x12 pixel glyphs per spell ('#' = filled)
 const GLYPHS = {
@@ -187,7 +187,7 @@ export class ManaDock {
     const e = document.createElement('div');
     e.className = 'mg-learn';
     e.style.setProperty('--mgc', hex(sp.color));
-    e.innerHTML = `${spellGlyph(id)}<div class="mg-l1">${t('NEW SPELL LEARNED')}</div><div class="mg-l2">${t(sp.name).toUpperCase()}</div><div class="mg-l3">${t('Say')} "${words}" · ${t('or type it in chat')} · [C]</div>`;
+    e.innerHTML = `${spellGlyph(id)}<div class="mg-l1">${t('NEW SPELL LEARNED')}</div><div class="mg-l2">${t(sp.name).toLocaleUpperCase(getLang())}</div><div class="mg-l3">${t('Say')} "${words}" · ${t('or type it in chat')} · [C]</div>`;
     uiRoot().appendChild(e);
     setTimeout(() => e.remove(), 4300);
   }
@@ -249,7 +249,7 @@ export class SpellWheel {
     this.center.style.setProperty('--mgc', hex(sp.color));
     const known = m.knows(id);
     const cd = m.cooldownLeft(id);
-    this.center.innerHTML = `<div class="mg-t">${known ? t(sp.name).toUpperCase() : '???'}</div>`
+    this.center.innerHTML = `<div class="mg-t">${known ? t(sp.name).toLocaleUpperCase(getLang()) : '???'}</div>`
       + `<div class="mg-say">"${sp.say.en}" · "${sp.say.tr}"</div>`
       + `<div class="mg-d">${t(sp.desc)}</div>`
       + `<div class="mg-s">${known ? `${m.bloodMagic ? m.hpCost(id) + ' HP' : m.costOf(id) + ' ' + t('mana')} · ${m.cooldownOf(id).toFixed(0)}s${cd > 0 ? ' · ' + t('ready in') + ' ' + cd.toFixed(1) + 's' : ''}` : t('Learn it from a skillbook') + ` (${t(sp.tierName)})`}</div>`;

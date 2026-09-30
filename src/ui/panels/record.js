@@ -244,7 +244,7 @@ export function createServiceRecord({ game = null, profile = game?.profile, tab,
         const got = !!p.codex.claimed[m.id];
         const target = milestoneTarget(m, k);
         const have = Math.min(m.get(k), target);
-        const c = card(got, got ? '🏆' : '🔒', m.name, m.cat.toUpperCase(), [['rec-d', `${fmt(have)} / ${fmt(target)}`], ['rec-note', rewardLine(m.reward)]]);
+        const c = card(got, got ? '🏆' : '🔒', m.name, m.cat.toLocaleUpperCase(getLang()), [['rec-d', `${fmt(have)} / ${fmt(target)}`], ['rec-note', rewardLine(m.reward)]]);
         if (!got) c.querySelector('.rec-cb').appendChild(bar(target ? have / target : 0));
         grid.appendChild(c);
       }

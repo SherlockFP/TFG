@@ -7,7 +7,7 @@
 // state (run.ex), per-player needs are local (damage goes through game.damageLocal, so the downed rules apply). Net prefix `ex`:
 //   exreq client -> host {op:'sync'} | {op:'water', i} | {op:'relight', i} | {op:'charge'}      exfx host -> everyone {k:'cw'|'pay'|'say'|'lit'|'banner', ...}
 import * as THREE from 'three';
-import { t, tf, addTranslations, sysMsg, localizeFields } from '../core/i18n.js';
+import { t, tf, addTranslations, sysMsg, localizeFields, getLang } from '../core/i18n.js';
 import { HOST_ONLY } from '../net/session.js';
 import { MOONS, MOON_ORDER, BIOMES } from './moons.js';
 import { registerItem, ITEMS } from './items.js';
@@ -160,7 +160,7 @@ export function installExpeditions(game) {
   }
   function moonInfo(m, run2, brief) {
     const kind = m.expedition, I = INFO[kind], lines = [];
-    if (!brief) lines.push(String(m.$name || m.name).toUpperCase() + '  [' + t('EXPEDITION') + ']');
+    if (!brief) lines.push(String(m.$name || m.name).toLocaleUpperCase(getLang()) + '  [' + t('EXPEDITION') + ']');
     lines.push(`${t('Tier')} ${m.tier}  ·  ${t('FREE')}`);
     lines.push(`${t('NEED')}: ${t(I.need)}. ${t(I.hint)}`);
     lines.push(`${t('GOAL')}: ${t(I.goalS)}`);

@@ -22,9 +22,9 @@ export function followerCard(profile) {
 
 addTranslations({
   'CONFIRM?': 'ONAY?', Adopt: 'Sahiplen', '+{n} followers': '+{n} takipçi',
-  'Next milestone: {name} at {n} followers': 'Sonraki eşik: {name}, {n} takipçide', 'Next milestone: {n} followers': 'Sonraki eşik: {n} takipçi',
+  'Next milestone: {name} at {n} followers': 'Sonraki eşik: {name} ({n} takipçide)', 'Next milestone: {n} followers': 'Sonraki eşik: {n} takipçi',
   'Viewers today: {v} -> +{n} followers': 'Bugünkü izleyici: {v} -> +{n} takipçi', 'Channel: {n} followers': 'Kanal: {n} takipçi',
-  'FOLLOWERS': 'TAKİPÇİ', 'Followers only grow. Milestones unlock gear and cosmetics.': 'Takipçi sadece artar. Eşikler ekipman ve kozmetik açar.',
+  'FOLLOWERS': 'TAKİPÇİ', 'Followers only grow. Milestones unlock gear and cosmetics.': 'Takipçi sayın yalnızca artar. Eşikleri geçtikçe ekipman ve kozmetik açılır.',
 }, 'tr');
 addTranslations({
   'CONFIRM?': 'ПОДТВЕРДИТЬ?', Adopt: 'Взять', '+{n} followers': '+{n} подписчиков',

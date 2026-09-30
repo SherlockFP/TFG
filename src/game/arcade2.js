@@ -5,7 +5,7 @@
 // Net (prefix 'ac2'): 'ac2req' client -> host {op:'score', game, score} | {op:'sync'};  'ac2s' host -> everyone {k:'b', day, b:{game:[{id,n,s}]}} | {k:'r', to, game, score, best, rank, coins, champ}.
 import { MINIGAMES } from '../minigames/index.js';
 import { createArcade2 } from '../minigames/arcade2.js';
-import { addTranslations, t, tf } from '../core/i18n.js';
+import { addTranslations, t, tf, getLang } from '../core/i18n.js';
 import * as K from './arcade2_core.js';
 
 const TR = {
@@ -155,7 +155,7 @@ export function installArcade2(game) {
     const lines = [t('Today\'s crew high scores')];
     for (const g of K.GAMES) {
       const rows = (S.mirror.b[g] || []).slice(0, 3);
-      lines.push(`${t(GN[g]).toUpperCase()} (${K.TARGETS[g]}): ${rows.length ? rows.map((r, i) => `${i + 1}. ${r.n} ${r.s}`).join('  ') : t('no scores yet')}`);
+      lines.push(`${t(GN[g]).toLocaleUpperCase(getLang())} (${K.TARGETS[g]}): ${rows.length ? rows.map((r, i) => `${i + 1}. ${r.n} ${r.s}`).join('  ') : t('no scores yet')}`);
     }
     return lines.join('\n');
   }

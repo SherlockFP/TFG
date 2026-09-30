@@ -860,7 +860,7 @@ export class MenuRoom {
   startBoot() {
     const name = this.app.profile?.name || 'EMPLOYEE';
     const lines = [t('TFG OS v4.1  (c) FEED CORP  ALL VIEWS RESERVED'), t('CONTENT REVIEW CELL 07 ........ ONLINE'), t('MEMORY CHECK ........ 640K OK (2,041 TB LOST)'),
-      t('SUBJECT') + ': ' + String(name).toUpperCase(), t('FLAG: UNAUTHORIZED SURVIVAL'), t('MODERATION RESTRAINTS ........ ENGAGED'), t('SEATING SUBJECT ........')];
+      t('SUBJECT') + ': ' + String(name).toLocaleUpperCase(getLang()), t('FLAG: UNAUTHORIZED SURVIVAL'), t('MODERATION RESTRAINTS ........ ENGAGED'), t('SEATING SUBJECT ........')];
     this.boot = { active: true, t: 0, lines, shown: 0, fading: false };
     this.ui.boot.className = 'cell-boot';
     this.ui.boot.innerHTML = '<div class="cb-lines"></div><div class="cb-skip">' + escapeHtml(t('press any key to skip')) + '</div>';

@@ -10,7 +10,7 @@
 import * as THREE from 'three';
 import { CREATURES } from './creatures.js';
 import { G } from '../physics/physics.js';
-import { addTranslations, t } from '../core/i18n.js';
+import { addTranslations, t, getLang } from '../core/i18n.js';
 
 export const CLASSES = {
   Predator: { color: '#ff5a4a', tr: 'Avcı' },
@@ -200,8 +200,8 @@ export function installIdentify(game, ctx = {}) {
     const i = info(type);
     const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     st.cardEl.style.setProperty('--gc', i.clsColor);
-    st.cardEl.innerHTML = `<div class="h">${esc(t('ENTITY IDENTIFIED'))}</div><div class="nm">${esc(t(i.name).toUpperCase())}</div>`
-      + `<div class="cl">${esc(t(i.cls).toUpperCase())}</div><div class="st" title="${esc(t('THREAT'))}">${starsText(i.stars)}</div>`
+    st.cardEl.innerHTML = `<div class="h">${esc(t('ENTITY IDENTIFIED'))}</div><div class="nm">${esc(t(i.name).toLocaleUpperCase(getLang()))}</div>`
+      + `<div class="cl">${esc(t(i.cls).toLocaleUpperCase(getLang()))}</div><div class="st" title="${esc(t('THREAT'))}">${starsText(i.stars)}</div>`
       + `<div class="wk"><b>${esc(t('WEAKNESS'))}:</b> ${esc(t(i.weak))}</div>`
       + (xp ? `<div class="xp">+${xp} XP</div>` : '') + (by ? `<div class="by">${esc(t('identified by'))} ${esc(by)}</div>` : '');
     st.cardEl.classList.add('on');
@@ -266,7 +266,7 @@ export function installIdentify(game, ctx = {}) {
       if (known(v.type)) {
         const i = info(v.type);
         lb.name = `${t(v.def.name)} Lv.${v.level}${v.elite ? ' ★ELITE' : ''}`;
-        lb.sub = `${t(i.cls).toUpperCase()}  ${starsText(i.stars)}`;
+        lb.sub = `${t(i.cls).toLocaleUpperCase(getLang())}  ${starsText(i.stars)}`;
         lb.color = i.clsColor;
       } else {
         lb.name = t('??? UNKNOWN ENTITY');
@@ -355,8 +355,8 @@ export function installIdentify(game, ctx = {}) {
       bar.style.display = st.prog > 0.02 ? 'block' : 'none'; bar.firstChild.style.width = Math.round(st.prog * 100) + '%';
     } else {
       const i = info(v.type);
-      n.textContent = `${t(v.def.name).toUpperCase()}`; n.style.color = i.clsColor;
-      s.textContent = `${t(i.cls).toUpperCase()}  ${starsText(i.stars)}`;
+      n.textContent = `${t(v.def.name).toLocaleUpperCase(getLang())}`; n.style.color = i.clsColor;
+      s.textContent = `${t(i.cls).toLocaleUpperCase(getLang())}  ${starsText(i.stars)}`;
       bar.style.display = 'none';
     }
   }

@@ -13,7 +13,7 @@ import { dropPoint } from '../world/shiplayout.js';
 import { copyJoinLink } from '../net/joinlink.js';   // [joinplay]
 import { escapeHtml } from '../core/util.js';
 const n0 = (v) => Math.round(v || 0).toLocaleString('en-US');   // credits are always shown with thousands separators (docs/wave8/studio_style.md)
-import { t, tf, tfIn, sysMsg, addTranslations } from '../core/i18n.js';
+import { t, tf, tfIn, sysMsg, addTranslations, getLang } from '../core/i18n.js';
 import { tNum } from '../i18n/tnum.js';   // [i18n8] safety net for literal terminal lines that were not wrapped
 import { LAB_HINT } from './labyrinths_core.js';   // [labyrinths]
 
@@ -295,7 +295,7 @@ export class Terminal {
           const e = fuzzyFind(seen.map(([id]) => id), arg, (id) => (CREATURES[id]?.name || id) + ' ' + (CREATURES[id]?.$name || '') + ' ' + id);
           if (!e) { this.print(t('No entry. You have to see it first.'), 'err'); return; }
           const d = CREATURES[e];
-          this.print(`${d.name.toUpperCase()}\n${d.hp ? tf('Durability: {hp} (Lv.1)', { hp: d.hp }) : t('Durability: UNKNOWN')}    ${t('Danger')}: ${'!'.repeat(Math.min(5, Math.ceil((d.power || 1) + (d.dmg >= 999 ? 2 : 0))))}\n${t('Kills')}: ${g.profile.bestiary[e].kills || 0}\n\n${d.lore}\n\n  - ${t('field notes by u/throwaway_janitor')}`);
+          this.print(`${d.name.toLocaleUpperCase(getLang())}\n${d.hp ? tf('Durability: {hp} (Lv.1)', { hp: d.hp }) : t('Durability: UNKNOWN')}    ${t('Danger')}: ${'!'.repeat(Math.min(5, Math.ceil((d.power || 1) + (d.dmg >= 999 ? 2 : 0))))}\n${t('Kills')}: ${g.profile.bestiary[e].kills || 0}\n\n${d.lore}\n\n  - ${t('field notes by u/throwaway_janitor')}`);
           return;
         }
         if (!seen.length) { this.print(t('No entries yet. Scan creatures (RMB) to learn about them.')); return; }
@@ -351,7 +351,7 @@ export class Terminal {
   moonInfo(m, run, brief = false) {
     if (m.company) return `${m.name}\n${m.desc}`;
     const lines = [];
-    if (!brief) lines.push(`${m.name.toUpperCase()}${m.generated ? '  [' + t('UNCHARTED') + ']' : ''}`);
+    if (!brief) lines.push(`${m.name.toLocaleUpperCase(getLang())}${m.generated ? '  [' + t('UNCHARTED') + ']' : ''}`);
     lines.push(`${t('Tier')} ${m.tier}  ·  ${t('Risk')} ${riskBar(m)} ${t(m.risk || ['', 'LOW', 'MODERATE', 'HIGH', 'SEVERE', 'LETHAL'][Math.min(5, m.tier)])}  ·  ${costText(m)}`);
     lines.push(`${t('Biome')}: ${t(biomeName(m.biome))}   ${t('Interior')}: ${interiorName(m.interior)}   ${t('Size')}: ${sizeLabel(m.size || 1)}${(m.mapScale || 1) > 1 ? ' (' + t('big map') + ')' : ''}`);
     lines.push(`${t('Forecast')}: ${weatherName(run, m)}   ${t('Scrap value')}: x${(m.scrapMul || 1).toFixed(2)}`);
