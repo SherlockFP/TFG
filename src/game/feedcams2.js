@@ -65,6 +65,10 @@ export function installFeedcams2(game) {
   offs.push(mods.on('feedcams', (ev, g) => {
     if (g !== game || disposed || !host() || !ev || !F2()) return;
     try {
+      if (ev.k === 'clock') {   // host migration re-based the feedcams clock: shift the drone timers the same way
+        for (const e of F2().dr || []) { if (e[1]) e[1] = Math.round((e[1] - ev.d) * 10) / 10; if (e[4]) e[4] -= ev.d; if (e[5]) e[5] -= ev.d; }
+        sync(); return;
+      }
       if (ev.k === 'tax') {
         const paid = S.paid.get(ev.by) || 0, tip = C.showTip(ev.v, ev.cut, paid);
         if (ev.v >= C.SHOW.min) {

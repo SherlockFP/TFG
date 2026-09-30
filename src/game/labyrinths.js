@@ -46,6 +46,7 @@ export function installLabyrinths(game) {
     else if (d.k === 'lock' && L.id === 'prison') startLock();
     else if (d.k === 'elev' && L.id === 'tower') startElev(d);
     else if (d.k === 'state' && L.id === 'greenhouse') for (const id of d.cut || []) applyCut(L, id, true);
+    else if (d.k === 'estate' && L.id === 'tower') applyElevState(L, d);
   }
   function posOf(id) {
     if (id === game.selfId) return game.player?.pos;
@@ -64,6 +65,8 @@ export function installLabyrinths(game) {
       if (S.elev.moving || to < 0 || to >= K.ELEV.levels || to === S.elev.at) return;
       const ride = K.elevRide(run()?.seed ?? 0, S.elev.n, S.elev.at, to);
       fx({ k: 'elev', from: S.elev.at, to, n: S.elev.n, dur: ride.dur, stall: ride.stall });
+    } else if (d.op === 'sync' && L.id === 'tower') {
+      if (!S.elev.moving && S.elev.at) { try { game.net.sendTo(from, 'labfx', { k: 'estate', at: S.elev.at, n: S.elev.n }); } catch { /* peer gone */ } }
     } else if (d.op === 'sync' && L.id === 'greenhouse') {
       const cut = L.vines.filter((v) => v.cut).map((v) => v.id);
       if (cut.length) { try { game.net.sendTo(from, 'labfx', { k: 'state', cut }); } catch { /* peer gone */ } }
@@ -235,6 +238,13 @@ export function installLabyrinths(game) {
       if (!near) { try { gateColT.set(key, game.physics.addStaticBox(g.x, g.y + g.sy / 2, g.z, g.sx / 2, g.sy / 2, g.sz / 2, 0, G.STATIC, { kind: 'static' })); } catch { /* physics optional */ } }
     } else if (!closed && cur) { try { game.physics?.removeCollider(cur); } catch { /* gone */ } gateColT.set(key, null); if (g.col === cur) g.col = null; }
   }
+  /** late join: park the cab + gates where the host's elevator is (a ride that is running right now finishes for the joiner on the next call) */
+  function applyElevState(L, d) {
+    const E = S.elev, at = d.at | 0;
+    if (E.moving || at < 0 || at >= K.ELEV.levels) return;
+    E.at = at; E.n = d.n | 0; L.cab.position.y = L.ys[at];
+    for (let k = 0; k < K.ELEV.levels; k++) gateSet(L, k, k !== at);
+  }
   function startElev(d) {
     const L = lab(), E = S.elev;
     if (!L || L.id !== 'tower' || E.moving) return;
@@ -312,7 +322,7 @@ export function installLabyrinths(game) {
     if (!L || run()?.phase !== 'moon') { if (overlay) overlay.style.opacity = '0'; return; }
     if (L.id === 'metro') tickMetro(dt, L);
     else if (L.id === 'prison') tickPrison(dt, L);
-    else if (L.id === 'tower') tickTower(dt, L);
+    else if (L.id === 'tower') { if (!syncAsked && !host()) { syncAsked = true; try { game.net.request('labreq', { op: 'sync' }); } catch { /* net closing */ } } tickTower(dt, L); }
     else if (L.id === 'greenhouse') {
       if (!syncAsked && !host()) { syncAsked = true; try { game.net.request('labreq', { op: 'sync' }); } catch { /* net closing */ } }
       tickGreenhouse(dt, L);

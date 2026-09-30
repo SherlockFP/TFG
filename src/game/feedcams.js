@@ -339,14 +339,14 @@ export function installFeedcams(game) {
   /** spray paint on the wall / ceiling right at a camera blinds it; a rifle tracer through it smashes it */
   function onFx(d, from) {
     const F = fc(); if (!host() || !F || !d || run()?.phase !== 'moon') return;
-    if (d.k === 'spray' && Array.isArray(d.p)) {
+    if (d.k === 'spray' && Array.isArray(d.p) && d.p.length >= 3 && d.p.every(Number.isFinite)) {
       const pp = posOf(from); if (!pp) return;
       for (const c of S.plan) {
         const e = F.c[c.i];
         if (e[0] === ST.DEAD || e[0] === ST.CUT || Math.hypot(d.p[0] - c.x, d.p[1] - c.y, d.p[2] - c.z) > 1.7 || Math.hypot(pp.x - c.x, pp.z - c.z) > 6.5) continue;
         setState(c.i, ST.BLIND, game.time + FC.blind); fx({ k: 'spray', i: c.i }); game.broadcastRun?.(['fc']);
       }
-    } else if (d.k === 'cb' && d.t === 'tr' && Array.isArray(d.a) && Array.isArray(d.b)) {
+    } else if (d.k === 'cb' && d.t === 'tr' && Array.isArray(d.a) && Array.isArray(d.b) && d.a.length >= 3 && d.a.every(Number.isFinite) && d.b.length >= 3 && d.b.every(Number.isFinite)) {
       const pp = posOf(from); if (!pp || Math.hypot(pp.x - d.a[0], pp.z - d.a[2]) > 6) return;
       for (const c of S.plan) {
         if (F.c[c.i][0] >= ST.DEAD || !K.segNear(d.a, d.b, [c.x, c.y, c.z], 0.8)) continue;
@@ -355,6 +355,18 @@ export function installFeedcams(game) {
     }
   }
   offs.push(mods.on('fx', (d, from) => { try { onFx(d, from); } catch (e) { console.warn('[feedcams] fx', e); } }));
+  // host migration: run.fc timestamps are on the OLD host's game.time; clients know the offset (S.off). Re-base them onto this peer's clock so blind / bait / feed-off timers keep their remaining time.
+  offs.push(mods.on('hostMigrated', (g, info) => {
+    if (g !== game || !info?.self || !host()) return;
+    const F = fc(), off = S.off || 0;
+    if (F && off) {
+      for (const e of F.c) { if (e[1]) e[1] = Math.round((e[1] - off) * 10) / 10; if (e[3]) e[3] -= off; if (e[4]) e[4] -= off; }
+      if (F.off) F.off -= off;
+    }
+    if (F) F.ck = Math.round(game.time * 100) / 100;
+    S.off = 0; if (off) emit({ k: 'clock', d: off });
+    if (F) game.broadcastRun?.(['fc']);
+  }));
   offs.push(mods.on('registerHandlers', (H, g) => { if (g === game) H('fcreq', (d, from) => { try { hostReq(d, from); } catch (e) { console.warn('[feedcams] req', e); } }); }));
 
   // local swings / zaps become requests (host validates)
@@ -372,6 +384,9 @@ export function installFeedcams(game) {
   const camAt = (a, b, r) => S.plan.find((c) => stOf(c.i) < ST.DEAD && K.segNear(a, b, [c.x, c.y, c.z], r));
   wrap('resolveMelee', (h) => { if (!S.plan.length) return; const [a, b] = aim((h?.reach || 2.4) + 0.5), c = camAt(a, b, 0.9); if (c) game.net.request('fcreq', { op: 'hit', i: c.i }); });
   wrap('fireRanged', (it) => { if (!S.plan.length || it?.type !== 'taser') return; const [a, b] = aim(it.def?.reach || 12), c = camAt(a, b, 1.0); if (c) game.net.request('fcreq', { op: 'zap', i: c.i }); });
+
+  // game.js owns the sell message type with a direct handler (no 'msg:sell' emitter event ever fires), so the viewer-tax sale line hooks onSellResult instead
+  wrap('onSellResult', (d) => onSell(d));
 
   // ------------------------------------------------------------------ client: reactions, vignette, tips, summary
   function onFxMsg(d) {
@@ -398,8 +413,8 @@ export function installFeedcams(game) {
   }
   function bindNet(net) {
     if (!net || boundNet === net) return;
-    boundNet?.off?.('msg:fcfx', onFxMsg); boundNet?.off?.('msg:sell', onSell);
-    boundNet = net; net.on('msg:fcfx', onFxMsg); net.on('msg:sell', onSell);
+    boundNet?.off?.('msg:fcfx', onFxMsg);
+    boundNet = net; net.on('msg:fcfx', onFxMsg);
   }
   offs.push(mods.on('netReady', (n, g) => { if (g === game) bindNet(n); }));
   if (game.net) bindNet(game.net);
@@ -512,7 +527,7 @@ export function installFeedcams(game) {
       for (const o of offs.splice(0)) { try { o?.(); } catch { /* ignore */ } }
       for (const [name, orig, mine, own] of wraps.reverse()) { if (game[name] === mine) { if (own) game[name] = orig; else delete game[name]; } }
       unwrapNoise(); clearVis();
-      try { boundNet?.off?.('msg:fcfx', onFxMsg); boundNet?.off?.('msg:sell', onSell); } catch { /* ignore */ }
+      try { boundNet?.off?.('msg:fcfx', onFxMsg); } catch { /* ignore */ }
       S.vig?.remove(); S.style?.remove();
       if (typeof document !== 'undefined') for (const el of document.querySelectorAll('.algo-live')) el.classList.remove('fc-onair');
     },

@@ -328,3 +328,6 @@ The primitive placeholder item models (axe, pickaxes, drill, titanium pick, bypa
 
 ## Wave 8 - pacing
 Problem 4 ("wide but empty"): outdoor area -46 %, ship->entrance 45-70 m instead of 75-108, smooth path, fog capped to the entrance distance, story beats every ~15-18 m; props per hectare +50 %. Not yet hand-walked in the real game (fog feel in rain / night, worlds3 large facilities unchanged).
+
+## Wave 8 - multiplayer audit
+Never tested with two real players; audited statically + with a 3-peer in-memory Session sim (tools/harness/netaudit_wave8.test.mjs). 10 real bugs fixed (dead viewer-tax line, NaN spray, migration clocks / DownBook / diner wipe, unenforced hub shop lock, forgeable `hg` / `mm`, late-join gaps for downs / elevator / shelves). Still unproven: real WebRTC ordering, real hostmig with live modules, and several host-only states that reset on migration (docs/wave8/netaudit.md).

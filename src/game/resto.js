@@ -48,7 +48,8 @@ export function installResto(game) {
   const me = () => game.selfId;
   const S = () => { const s = game.run?.rs; return s && Array.isArray(s.b) ? s : BLANK; };
   const BLANK = C.blank();
-  const st = () => game.profile.resto;
+  let migRs = false;   // this peer became host mid-run (hostmig): the crew's diner lives in run.rs, NOT in this player's own profile.resto
+  const st = () => (migRs ? game.run.rs : game.profile.resto);
   const onHome = () => !!(MOONS[game.run?.moon]?.home && !MOONS[game.run?.moon]?.ghost && game.run?.phase === 'moon' && game.world?.outdoor?.home);
   const posOf = (id) => (id === me() ? game.player.pos : game.remotes.get(id)?.pos) || null;
   const near = (from, x, z, r) => { const q = posOf(from); return !!q && Math.hypot(q.x - x, q.z - z) <= r; };
@@ -537,6 +538,10 @@ export function installResto(game) {
   if (game.net) bindNet(game.net);
   offs.push(mods.on('registerHandlers', (Hh, g) => { if (g === game) Hh('rsreq', (d, from) => { try { hostReq(d, from); } catch (e) { console.error('rsreq', e); err(from, 'Error.'); } }); }));
   offs.push(mods.on('hostStart', (g) => { if (!g || g === game) attach(); }));
+  offs.push(mods.on('hostMigrated', (g, info) => {
+    if (g !== game || !info?.self || !game.run?.rs) return;
+    migRs = true; game.run.rs = C.sanitize(game.run.rs);   // adopt the synced diner; commit() then keeps broadcasting it without touching the new host's profile
+  }));
   offs.push(mods.on('phase', (ph, g) => { if (g !== game || disposed) return; if (ph !== 'moon' && ph !== 'landing') { closePanel(); clearViews(); snap = { sh: [0, 0], c: [], p: [], d: [], cl: 100, ck: [] }; snapCust = []; } }));
   offs.push(mods.on('mapLoaded', (w, g) => { if (g === game) clearViews(); }));
   offs.push(mods.on('moonPopulated', (g) => { if (!g || g === game) { try { seedIngredients(); } catch (e) { console.warn('[rs] seed', e); } } }));

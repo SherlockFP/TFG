@@ -191,6 +191,7 @@ export function installRepomaps(game) {
 
   // ---- events -----------------------------------------------------------------------------------------------------------------
   on('netReady', (net) => bindNet(net));
+  on('playerJoin', (id, info, gg) => { if (gg === g && g.isHost && S.shelves.length && S.step > 0 && id !== g.selfId) g.later?.(() => g.net.sendTo(id, MSG, { k: 'set', n: S.step }), 1500); });   // late joiner: catch up the shelf step now, not at the next 25 s sync
   if (g.net) bindNet(g.net);
   on('mapLoaded', (world) => {
     const th = world?.facility?.layout?.theme;
