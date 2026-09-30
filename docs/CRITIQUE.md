@@ -419,3 +419,11 @@ props floating near the ceiling (metro); creatures are not legible. Wave 10 (6 S
 [wave 11 shift11] The labyrinths were dead once generated; now 404-Not Found and 88-Chatroom re-arrange themselves: a PA announces "EMPTYING RECYCLE BIN IN 10", one room is permanently deleted (sealed, loot shredded, restored two shifts later) and junk-tower shutters drop from the ceiling to close some corridors and open others. Planner + nav/collider consistency node-tested over 44 layouts; NOT seen in a browser: shutter / void-floor look, HUD strip, the 10 s telegraph readability and eject feel are the risks.
 - [events11, wave 11] The facility was always the same walk-and-loot: added 4 mid-run crises with one rule each (sealed doors + hack terminals, rising water + floating loot + drowning, breaker-order power puzzle that calls creatures, a trending player everyone hunts for x3 loot). Node + mock-game tested, NOT seen in a browser (look of terminals / water / straps, hold-E feel, buoyancy).
 - [gear11, wave 11] Five new tools with one verb each (Decoy Speaker with the crew's own voice, Door Jammer, Scout Drone with crew-shared scan, Glow Trail, Zipline Kit) as store items; rules + net unit-tested only, NOT seen in a browser (drone camera cull/lighting, jam mesh on door orientation, zipline feel need a real run).
+
+## W10+W11 result (2026-09-30 night, lead browser check on the owner's PC; 183 node suites: only the 4 pre-existing failures)
+Score **6.2/10** (was 5.3) — content 8 · replayability 6.5 · feel 5.5 · UI 6 · visuals 5.5 · balance 5 (untested) · stability 7 · perf 6.5.
+Seen on screen: ∞-Feed (magenta dunes, phone monoliths, notification badges) and 503 (snow, cooling towers) finally have a
+skyline and ground life; Dead Mall (parody neon, grilles, dry fountain atrium) reads as a place; The Loop (Exit-8 office
+corridor with EXIT counter, mascot poster, door 101) is the strongest new idea; Captcha tile test reads well; Ratio twins
+readable; centre cards now queue one at a time. Still weak: Buffering tell only fixed in code (re-check in the dark), new
+creatures/crises/gear never played by a human or with 2 real players, balance of 12 new threats + 5 gadgets is paper-only.
