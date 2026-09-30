@@ -15,12 +15,13 @@ import { CREATURES } from './creatures.js';
 import { MOONS } from './moons.js';
 import * as K from './crdirector_core.js';
 import * as F from './firstsight_core.js';
+import { cloneMat } from '../models/modelkit.js';
 
 export function installFirstSight(game) {
   const mods = game.mods, FS = F.FS;
   const offs = [];
   let disposed = false, boundNet = null;
-  const H = { key: null, done: false, inT: new Map(), beat: null, searchT: 0, metT: 0, stats: { staged: 0, left: 0, abort: 0, blink: 0, vetoed: 0 } };
+  const H = { key: null, done: false, inT: new Map(), beat: null, searchT: 0, metT: 0, tries: 0, stats: { staged: 0, left: 0, abort: 0, blink: 0, vetoed: 0, retried: 0 } };
   const C = { b: null, zoom: 1, losT: 0, los: false, lift: null };
   const V1 = new THREE.Vector3(), V2 = new THREE.Vector3();
 
@@ -51,7 +52,7 @@ export function installFirstSight(game) {
     }
     return false;
   }
-  function spotFor(p, rnd) {
+  function spotFor(p, rnd, type) {
     const out = p.zone === 'out', fac = game.world?.facility, ter = game.world?.terrain;
     let ground;
     if (out) {
@@ -64,8 +65,9 @@ export function installFirstSight(game) {
       ground = (x, z) => (nav.walkableAt(x, z) ? nav.y : null);
     }
     const em = out ? null : (fac.emitters || []).filter((e) => e.pos && e.pos.distanceToSquared(p.pos) < 32 * 32);
+    const d = CREATURES[type], dPref = d ? F.distFor(d.height || 1.6, Math.max(2 * (d.radius || 0.4), 0.5)) : undefined;   // the real body width, not the zoom's assumed one
     return F.findSpot({
-      eye: p.eye, look: p.look, feetY: p.pos.y, out, ground, rnd,
+      dPref, eye: p.eye, look: p.look, feetY: p.pos.y, out, ground, rnd,
       los: (x, y, z) => los(p.eye, x, y, z),
       lit: em ? (x, z) => { let k = 0; for (const e of em) { const r = 0.7 * (e.distance || 8), d = Math.hypot(e.pos.x - x, e.pos.z - z); if (d < r) k = Math.max(k, Math.min(1, e.intensity ?? 1) * (1 - d / r)); } return k; } : null,
     });
@@ -112,14 +114,19 @@ export function installFirstSight(game) {
     if (c) game.creatures.hostRemove(b.id);
     send({ k: 'out', id: b.id, p, why });
     H.stats[why] = (H.stats[why] || 0) + 1;
+    if (why === 'abort' && b.t < FS.stareAt && !b.hurt && H.tries < FS.retries && onMoon()) {   // nothing was seen yet (peak / crowd): not a met creature, try again a bit later
+      H.tries++; H.stats.retried++; H.done = false; H.searchT = 4;
+      const r = run(); if (r) r.fsSeen = seenList().filter((x) => x !== b.type);
+    }
     try { mods?.emit?.('firstsight', { kind: 'end', type: b.type, why }, game); } catch { /* mods optional */ }
   }
   function beatTick(dt, crew) {
     const b = H.beat, M = game.creatures, c = M.host.get(b.id);
     if (!c || c.dead) { end('abort'); return; }
     b.t += dt; c.stunT = 1e4;
-    const close = crew.some((p) => p.zone === b.zone && Math.hypot(p.pos.x - c.pos.x, p.pos.z - c.pos.z) < FS.near);
-    if (close || (c.maxHp && c.hp < c.maxHp) || game.crdirector?.peakNow?.()) { end('abort'); return; }
+    const close = b.t >= FS.nearFrom && crew.some((p) => p.zone === b.zone && Math.hypot(p.pos.x - c.pos.x, p.pos.z - c.pos.z) < FS.near);   // frozen until then: a walker still gets the tell
+    b.hurt = !!(c.maxHp && c.hp < c.maxHp);
+    if (close || b.hurt || game.crdirector?.peakNow?.()) { end('abort'); return; }
     const ph = F.beatPhase(b.t, b.hold);
     if (ph === 'in') { c.yaw = b.side; return; }
     if (ph === 'stare') {
@@ -145,10 +152,14 @@ export function installFirstSight(game) {
     const r = run();
     if (!enabled() || !onMoon() || !game.hostData) { if (H.beat) end('abort'); H.key = null; return; }
     const key = `${r.runId ?? r.seed ?? ''}|${r.day | 0}|${r.moon}`;
-    if (key !== H.key) { H.key = key; H.done = false; H.inT.clear(); H.beat = null; H.searchT = 1; H.metT = 0; }
+    if (key !== H.key) { H.key = key; H.done = false; H.inT.clear(); H.beat = null; H.searchT = 1; H.metT = 0; H.tries = 0; }
     const crew = (game.aiPlayers?.() || []).filter((p) => !p.dead && !p.inShip);
     const ids = new Set();
-    for (const p of crew) { ids.add(p.id); const e = H.inT.get(p.id); if (!e || e.z !== p.zone) H.inT.set(p.id, { z: p.zone, t: 0 }); else e.t += dt; }
+    for (const p of crew) {
+      ids.add(p.id); const e = H.inT.get(p.id);
+      if (!e || e.z !== p.zone) H.inT.set(p.id, { z: p.zone, t: 0, x: p.pos.x, zz: p.pos.z, v: 0 });
+      else { e.t += dt; e.v += (Math.hypot(p.pos.x - e.x, p.pos.z - e.zz) / Math.max(dt, 1e-3) - e.v) * Math.min(1, dt * 4); e.x = p.pos.x; e.zz = p.pos.z; }   // smoothed horizontal speed
+    }
     for (const id of H.inT.keys()) if (!ids.has(id)) H.inT.delete(id);
     if (H.beat) { beatTick(dt, crew); return; }
     if (H.done) return;
@@ -167,13 +178,13 @@ export function installFirstSight(game) {
     if (H.searchT > 0) return;
     H.searchT = FS.searchGap;
     if (game.crdirector?.phase?.() === 'peak' || game.crdirector?.peakNow?.() || chaseOn(crew)) return;
-    const ready = crew.filter((p) => (H.inT.get(p.id)?.t || 0) >= FS.inDelay).sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+    const ready = crew.filter((p) => (H.inT.get(p.id)?.t || 0) >= FS.inDelay && (H.inT.get(p.id)?.v || 0) < FS.walkMax).sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
     const type = F.pickType(pool, seenList(), (id) => ready.some((p) => p.zone === zoneOf(id)), defOk);
     if (!type) return;
     const rng = new RNG(hashString(`firstsight:${r.runId ?? r.seed ?? ''}:${type}`));   // deterministic per run + creature
     for (const p of ready) {
       if (p.zone !== zoneOf(type)) continue;
-      const spot = spotFor(p, () => rng.float(0, 1));
+      const spot = spotFor(p, () => rng.float(0, 1), type);
       if (spot && start(type, p, spot, rng)) return;
     }
   }
@@ -227,9 +238,14 @@ export function installFirstSight(game) {
    *  setHitFlash every frame (it rewrites emissive), so the lift wraps it and is added on top; restored when the beat ends. */
   function liftOn(v, b) {
     if (C.lift || !v?.model || !v.root) return;
-    const mats = new Set();
-    v.root.traverse((o) => { if (!o.isMesh || o.userData?.tell) return; for (const m of [].concat(o.material)) if (m?.emissive && !m.isMeshBasicMaterial) mats.add(m); });
-    const orig = v.model.setHitFlash, L = { v, mats: [...mats], base: [...mats].map((m) => m.emissive.clone()), orig, own: Object.prototype.hasOwnProperty.call(v.model, 'setHitFlash'), k: 0 };
+    const mats = new Set(), swap = [], cache = new Map();   // swap: [mesh, original material(s), own material(s)]: cached modelkit lam() materials are SHARED between instances, so the body gets its own before the lift touches emissive
+    const mine = (m) => { if (!m?.emissive || m.isMeshBasicMaterial) return m; if (m.userData?.instance) { mats.add(m); return m; } let c = cache.get(m); if (!c) { c = cloneMat(m); cache.set(m, c); mats.add(c); } return c; };
+    v.root.traverse((o) => {
+      if (!o.isMesh || o.userData?.tell) return;
+      const before = o.material, after = Array.isArray(before) ? before.map(mine) : mine(before);
+      if (Array.isArray(before) ? after.some((m, i) => m !== before[i]) : after !== before) { o.material = after; swap.push([o, before, after]); }
+    });
+    const orig = v.model.setHitFlash, L = { v, swap, mats: [...mats], base: [...mats].map((m) => m.emissive.clone()), orig, own: Object.prototype.hasOwnProperty.call(v.model, 'setHitFlash'), k: 0 };
     v.model.setHitFlash = function (f) {   // damage ends the beat, so the flash colour is not needed while the lift is on
       orig?.call(this, f);
       L.mats.forEach((m, i) => m.emissive.setRGB(L.base[i].r + FS.lift[0] * L.k, L.base[i].g + FS.lift[1] * L.k, L.base[i].b + FS.lift[2] * L.k));
@@ -241,6 +257,11 @@ export function installFirstSight(game) {
     if (!L) return;
     if (L.own) L.v.model.setHitFlash = L.orig; else delete L.v.model.setHitFlash;
     L.mats.forEach((m, i) => m.emissive.copy(L.base[i]));
+    for (const [o, before, after] of L.swap) {   // back to the shared materials (unless the Tinter has adopted the clones since: then they stay)
+      if (o.material !== after) continue;
+      o.material = before;
+      for (const m of [].concat(after)) if (!([].concat(before)).includes(m)) m.dispose?.();
+    }
   }
   function setZoom(z) {
     const cam = game.camera; if (!cam) return;
@@ -282,7 +303,7 @@ export function installFirstSight(game) {
 
   return {
     /** host: best spot for crewmate `id` (default: me) right now, or null. Harness / debug. */
-    probe(id = game.selfId) { const p = game.aiPlayerById?.(id); return p ? spotFor(p, () => 0.5) : null; },
+    probe(id = game.selfId, type) { const p = game.aiPlayerById?.(id); return p ? spotFor(p, () => 0.5, type) : null; },
     /** the beat running now (host: full state, client: what the host announced) */
     beat() { const b = H.beat || C.b; return b ? { id: b.id, type: b.type || b.ty, t: +b.t.toFixed(2), hold: b.hold || b.h, phase: H.beat ? F.beatPhase(b.t, b.hold) : (b.stared ? 'stare' : 'in') } : null; },
     zoom() { return C.zoom; },
