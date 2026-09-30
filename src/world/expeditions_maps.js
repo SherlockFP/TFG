@@ -144,8 +144,8 @@ export function buildBarge(seed, moon, { physics, lightPool, biome }) {
   {
     const WR = new RNG((seed ^ 0x5eaf) >>> 0), inHull = (x, z, m) => x > P.hull.x0 - m && x < P.hull.x1 + m && z > P.hull.z0 - m && z < P.hull.z1 + m;
     const near = (x, z) => P.vents.some((v) => Math.hypot(v.x - x, v.z - z) < 5) || P.cores.some((c) => Math.hypot(c.x - x, c.z - z) < 5) || P.rocks.some((r) => Math.hypot(r.x - x, r.z - z) < r.r + 3);
-    for (let i = 0, n = 0; i < 60 && n < 9; i++) {
-      const a = WR.float(0, Math.PI * 2), d = WR.float(24, 66), x = Math.cos(a) * d, z = Math.sin(a) * d;
+    for (let i = 0, n = 0; i < 80 && n < 9; i++) {   // the first six sit in the cone toward the barge (the view from the dock)
+      const a = n < 6 ? Math.atan2(P.cz, P.cx) + WR.float(-0.5, 0.5) : WR.float(0, Math.PI * 2), d = WR.float(24, 66), x = Math.cos(a) * d, z = Math.sin(a) * d;
       if (Math.abs(x) > 100 || Math.abs(z) > 100 || inHull(x, z, 8) || near(x, z) || B.solidAt(x, z, 3)) continue;
       const y = terrain.heightAt(x, z), top = K.BARGE.water + WR.float(4, 13), h = top - y, kind = n % 3;
       if (kind === 0) { k.box(x, y, z, 0.7, h, 0.7, 0x2c3338, { solid: true, data: { kind: 'prop', id: 'ex_wreck' } }); k.box(x - 2.4, y + h - 1.4, z, 5.6, 0.45, 0.45, 0x2c3338, { ry: WR.float(-0.4, 0.4) }); k.box(x, y + h, z, 0.34, 0.34, 0.34, 0xff5a3a, { glow: true }); }
@@ -157,7 +157,7 @@ export function buildBarge(seed, moon, { physics, lightPool, biome }) {
   k.finish();
   // water sheet + bubbles + core beacons (dynamic)
   const wGeo = new THREE.PlaneGeometry(420, 420); wGeo.rotateX(-Math.PI / 2);
-  const wMat = noSnap(new THREE.MeshBasicMaterial({ color: 0x1f8aa6, transparent: true, opacity: 0.5, side: THREE.DoubleSide, depthWrite: false, fog: true }));
+  const wMat = noSnap(new THREE.MeshBasicMaterial({ color: 0x0f5a72, transparent: true, opacity: 0.6, side: THREE.DoubleSide, depthWrite: false, fog: true }));
   const water = new THREE.Mesh(wGeo, wMat); water.position.y = K.BARGE.water; env.add(water); env.own(wGeo); env.mat(wMat);
   const NB = P.vents.length * 22, bp = new Float32Array(NB * 3), bph = new Float32Array(NB);
   for (let i = 0; i < NB; i++) { bph[i] = ((i * 0.6180339) % 1) * 5; const v = P.vents[i % P.vents.length]; bp[i * 3] = v.x; bp[i * 3 + 1] = terrain.heightAt(v.x, v.z); bp[i * 3 + 2] = v.z; }
@@ -309,6 +309,9 @@ export function buildRoof(seed, moon, { physics, lightPool, biome }) {
     for (const [a0, a1] of K.segs(b.x0, b.x1, gaps.s.slice().sort((p, q) => p[0] - q[0]))) par(a0, a1, b.z1 - 0.5, b.z1);
     for (const [a0, a1] of K.segs(b.z0, b.z1, gaps.w.slice().sort((p, q) => p[0] - q[0]))) par(b.x0, b.x0 + 0.5, a0, a1);
     for (const [a0, a1] of K.segs(b.z0, b.z1, gaps.e.slice().sort((p, q) => p[0] - q[0]))) par(b.x1 - 0.5, b.x1, a0, a1);
+    // a dim violet edge line along the roof rim: the blackout city still reads as walkable roofs from the plaza and from the next roof over
+    { const ey = b.y + K.ROOFC.parapet + 0.02, w = b.x1 - b.x0, d = b.z1 - b.z0;
+      for (const [cx, cz, sx, sz] of [[(b.x0 + b.x1) / 2, b.z0 + 0.25, w, 0.1], [(b.x0 + b.x1) / 2, b.z1 - 0.25, w, 0.1], [b.x0 + 0.25, (b.z0 + b.z1) / 2, 0.1, d], [b.x1 - 0.25, (b.z0 + b.z1) / 2, 0.1, d]]) k.box(cx, ey, cz, sx, 0.05, sz, 0x4a52c8, { glow: true }); }
     // window strips on the four faces (glow), about a third lit
     for (let row = 0; row < 3; row++) {
       const yy = K.SHIP_Y + 1.6 + row * (b.h - 3) / 3;
