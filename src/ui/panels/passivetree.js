@@ -236,7 +236,7 @@ export function createTreePanel({ game = null, ctl = null, profile = game?.profi
     if (!ks.length) side.appendChild(mk('div', 'd', '-'));
     for (const k of ks) {
       side.appendChild(mk('div', 'k', '◆ ' + KEYSTONES[k].name));
-      for (const t of KEYSTONES[k].text || []) side.appendChild(mk('div', 'd', t));
+      for (const x of KEYSTONES[k].text || []) side.appendChild(mk('div', 'd', t(x)));
     }
     h('INFO');
     side.appendChild(mk('div', 'd', L('DRAG pan · WHEEL zoom · CLICK allocate · RIGHT-CLICK refund')));
@@ -266,7 +266,7 @@ export function createTreePanel({ game = null, ctl = null, profile = game?.profi
     const b = isMyPost ? ROLES[n.role].bonus : n.b;
     if (isMyPost) tip.appendChild(mk('div', 'tt', L('ROLE BONUS')));
     for (const l of bonusLines(b)) tip.appendChild(mk('div', l.good ? 'tg' : 'tb', l.text));
-    for (const t of n.text) tip.appendChild(mk('div', 'tx', '◆ ' + t));
+    for (const x of n.text) tip.appendChild(mk('div', 'tx', '◆ ' + t(x)));
     if (n.tip) tip.appendChild(mk('div', 'tf', '"' + n.tip + '"'));
     const st = mk('div', 'ts');
     if (isMyPost) { st.style.color = '#8dff8d'; st.textContent = t('YOUR ROLE POST - everything connects from here.'); }

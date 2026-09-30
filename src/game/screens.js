@@ -1,5 +1,6 @@
 // Live canvas textures for the ship: terminal mirror, radar monitor, quota screens, arcade attract.
 import * as THREE from 'three';
+import { t as tt, tf } from '../core/i18n.js';   // [i18n8] ship monitors follow the language
 import { MOONS } from './moons.js';
 import { FACILITY_Y } from '../world/facility.js';
 import { insideShip } from '../world/ship.js';
@@ -147,7 +148,7 @@ export class ShipScreens {
     for (const r of g.remotes.values()) drawP(r.pos, r.yaw, '#b8ffcc', r.dead);
     drawP(g.player.pos, g.player.yaw, '#ffffff', g.player.dead);
     ctx.fillStyle = '#39ff6a'; ctx.font = '9px "TFG Credit", monospace';
-    ctx.fillText('RADAR: ' + tname.slice(0, 14), 3, 10);
+    ctx.fillText(tt('RADAR') + ': ' + tname.slice(0, 14), 3, 10);
     this.crt(ctx, W, H);
     s.t.needsUpdate = true;
   }
@@ -160,16 +161,16 @@ export class ShipScreens {
     let shipVal = 0;
     for (const it of g.items.inShipItems()) if (isSellable(it.def) && !it.soulbound) shipVal += it.value;
     ctx.fillStyle = '#7fd1ff'; ctx.font = '11px "TFG Credit", monospace';
-    ctx.fillText('SHIP STATUS', 8, 14);
+    ctx.fillText(tt('SHIP STATUS'), 8, 14);
     ctx.fillStyle = '#e8f4ff';
-    ctx.fillText(`MOON: ${MOONS[run.moon]?.short || '-'}`, 8, 32);
-    ctx.fillText(`PHASE: ${String(run.phase || '').toUpperCase()}`, 8, 46);
-    ctx.fillText(`LOOT ONBOARD: ▮${shipVal}`, 8, 64);
-    ctx.fillText(`CREDITS: ▮${run.credits ?? 0}`, 8, 80);
-    ctx.fillText(`CREW: ${1 + g.remotes.size}`, 8, 96);
+    ctx.fillText(`${tt('MOON')}: ${MOONS[run.moon]?.short || '-'}`, 8, 32);
+    ctx.fillText(`${tt('PHASE')}: ${tt(String(run.phase || '').toUpperCase())}`, 8, 46);
+    ctx.fillText(`${tt('LOOT ONBOARD')}: ▮${shipVal}`, 8, 64);
+    ctx.fillText(`${tt('CREDITS')}: ▮${run.credits ?? 0}`, 8, 80);
+    ctx.fillText(`${tt('CREW')}: ${1 + g.remotes.size}`, 8, 96);
     if (run.phase === 'moon') {
       const t = run.time || 480;
-      ctx.fillText(`TIME: ${String(Math.floor(t / 60)).padStart(2, '0')}:${String(Math.floor(t % 60)).padStart(2, '0')}`, 8, 112);
+      ctx.fillText(`${tt('TIME')}: ${String(Math.floor(t / 60)).padStart(2, '0')}:${String(Math.floor(t % 60)).padStart(2, '0')}`, 8, 112);
     }
     this.crt(ctx, c.width, c.height);
     s.t.needsUpdate = true;
@@ -179,9 +180,9 @@ export class ShipScreens {
     const { ctx, c } = s;
     ctx.fillStyle = '#100606'; ctx.fillRect(0, 0, c.width, c.height);
     ctx.fillStyle = '#ff7a5a'; ctx.font = '11px "TFG Credit", monospace';
-    ctx.fillText('CREW VITALS', 8, 14);
+    ctx.fillText(tt('CREW VITALS'), 8, 14);
     let y = 32;
-    const row = (name, hp, dead) => { ctx.fillStyle = dead ? '#777' : hp < 35 ? '#ff4040' : '#9dff9d'; ctx.fillText(`${name.slice(0, 12).padEnd(12)} ${dead ? 'DEAD' : Math.round(hp)}`, 8, y); y += 14; };
+    const row = (name, hp, dead) => { ctx.fillStyle = dead ? '#777' : hp < 35 ? '#ff4040' : '#9dff9d'; ctx.fillText(`${name.slice(0, 12).padEnd(12)} ${dead ? tt('DEAD') : Math.round(hp)}`, 8, y); y += 14; };
     row(g.profile.name, g.player.hp, g.player.dead);
     for (const r of g.remotes.values()) row(r.name, r.hp ?? 100, r.dead);
     const ev = todaysEvent(g.run);
@@ -199,13 +200,13 @@ export class ShipScreens {
     const { ctx, c } = s;
     ctx.fillStyle = '#140a02'; ctx.fillRect(0, 0, c.width, c.height);
     ctx.fillStyle = '#ffb347'; ctx.font = 'bold 13px "TFG Credit", monospace';
-    ctx.fillText('ENGAGEMENT QUOTA', 10, 18);
+    ctx.fillText(tt('ENGAGEMENT QUOTA'), 10, 18);
     ctx.font = 'bold 18px "TFG Credit", monospace';
     ctx.fillStyle = run.sold >= run.quota ? '#7dff7d' : '#ffd9a0';
     ctx.fillText(`▮${run.sold ?? 0} / ▮${run.quota ?? 0}`, 10, 44);
     ctx.font = '12px "TFG Credit", monospace'; ctx.fillStyle = '#ffb347';
-    ctx.fillText(`DEADLINE: ${run.daysLeft ?? 3} DAYS`, 10, 66);
-    ctx.fillText(`DAY ${run.day ?? 1}`, 10, 84);
+    ctx.fillText(tf('DEADLINE: {n} DAYS', { n: run.daysLeft ?? 3 }), 10, 66);
+    ctx.fillText(tf('DAY {n}', { n: run.day ?? 1 }), 10, 84);
     this.crt(ctx, c.width, c.height);
     s.t.needsUpdate = true;
   }

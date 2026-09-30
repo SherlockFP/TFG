@@ -9,6 +9,7 @@
 //   default output: summary + per-file counts + the first 6 examples per file
 //   --dump     JSON of every key needing RU (with TR text + source)
 //   --all      also scan src/render, src/audio, src/physics (ignored by default: shaders / textures / sound ids)
+//   --gaps     JSON of keys that have a TR but no RU twin and vice versa
 //   --verbose  every finding      --file  only files whose path contains <substr>      --max  examples per file
 // Exit code is 0 always (it is a report). Dictionaries are read from src/core/i18n.js (TR table), every
 // addTranslations({...}[, 'ru']) call in src/, and the pure-data files src/i18n/tr*.js / ru*.js.
@@ -210,6 +211,17 @@ for (const P of parsed) {
     }
   });
 }
+// Install-time tables shaped { 'English key': ['Turkish', 'Русский'] } (mining, harvest, dance_data ...): the addTranslations() call builds them at
+// runtime, so recognise the shape itself: a property whose value is a [tr, ru] string pair with Cyrillic in the second entry.
+for (const P of parsed) {
+  walkAst(P.ast, (n) => {
+    if (n.type !== 'Property' && n.type !== 'ObjectProperty') return;
+    const k = n.computed ? (isStaticStr(n.key) ? staticStr(n.key) : null) : keyName(n.key), v = n.value;
+    if (k === null || !v || v.type !== 'ArrayExpression' || v.elements.length !== 2 || !v.elements.every(isStaticStr)) return;
+    const [a, b] = v.elements.map(staticStr);
+    if (CYR.test(b) && !CYR.test(a)) { if (!TR.has(k)) TR.set(k, P.r + ':pair'); if (!RU.has(k)) RU.set(k, P.r + ':pair'); }
+  });
+}
 function isCoreDef(P) { return P.r === 'src/core/i18n.js'; }
 
 // ------------------------------------------------------------------ pass 2: usage + unwrapped strings
@@ -353,6 +365,21 @@ for (const P of parsed) {
 
 // ------------------------------------------------------------------ report
 const keysUsed = [...used.keys()];
+// Dictionaries that modules build at import time (ROWS tables, builders): import every pure-data *_i18n / *_text file in node, which fills the
+// real runtime tables, then count what hasTranslation() sees. Files that need the DOM/three are skipped (the static scan covers them).
+{
+  const I = await import(pathToUrl(path.join(SRC, 'core', 'i18n.js')));
+  for (const f of walk(SRC).filter((f) => /(_i18n\w*|_text\d?|_data|ru_gap8_\w+|passivetree_i18n)\.js$/.test(f))) {
+    try {
+      const m = await import(pathToUrl(f));
+      const d = m.buildDictionaries ? m.buildDictionaries() : {};
+      for (const [o, T] of [[d.tr, 'tr'], [m.TR, 'tr'], [m.C3_TR, 'tr'], [m.A11Y_TR, 'tr'], [d.ru, 'ru'], [m.RU, 'ru'], [m.C3_RU, 'ru'], [m.A11Y_RU, 'ru']]) {
+        if (o && typeof o === 'object') for (const k of Object.keys(o)) { const M = T === 'tr' ? TR : RU; if (!M.has(k)) M.set(k, rel(f)); }
+      }
+    } catch (e) { /* not importable in node */ }
+  }
+  for (const k of new Set([...keysUsed, ...TR.keys(), ...RU.keys()])) { if (!TR.has(k) && I.hasTranslation('tr', k)) TR.set(k, 'runtime'); if (!RU.has(k) && I.hasTranslation('ru', k)) RU.set(k, 'runtime'); }
+}
 const missTR = keysUsed.filter((k) => !TR.has(k) && !/^[^A-Za-z]*$/.test(k));
 const missRU = keysUsed.filter((k) => !RU.has(k) && !/^[^A-Za-z]*$/.test(k));
 const ltMissRU = localTables.filter((x) => !x.ru);
@@ -361,6 +388,8 @@ const ltMissTR = localTables.filter((x) => !x.tr);
 const trNoRu = [...TR.keys()].filter((k) => !RU.has(k));
 const localEn = new Set(localTables.map((x) => x.text));
 const ruNoTr = [...RU.keys()].filter((k) => !TR.has(k) && !localEn.has(k));
+
+if (flag('gaps')) { console.log(JSON.stringify({ trNoRu: trNoRu.map((k) => [k, TR.get(k)]), ruNoTr: ruNoTr.map((k) => [k, RU.get(k)]) }, null, 1)); process.exit(0); }   // --gaps: the twin-less keys with their TR/RU source
 
 // unwrapped findings that are actually covered by both dictionaries (data strings translated through t() elsewhere) -> "covered"
 const localEnAll = new Set(localTables.map((x) => x.text));
@@ -386,7 +415,7 @@ if (JSON_OUT) {
     dict: { tr: TR.size, ru: RU.size, dynamic: notes.dynamicDicts.length },
     keysUsed: keysUsed.length, missingTR: missTR, missingRU: missRU, dynamicKeys,
     localTables: { total: localTables.length, missingRU: ltMissRU, missingTR: ltMissTR },
-    unwrapped: unwrapped.filter((x) => inFilter(x.file)),
+    unwrapped: unwrapped.filter((x) => inFilter(x.file)).map((x) => ({ ...x, hasTR: TR.has(x.text) || localEnAll.has(x.text), hasRU: RU.has(x.text) })),
   }, null, 1));
   process.exit(0);
 }

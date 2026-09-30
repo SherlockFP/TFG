@@ -210,8 +210,8 @@ export function createTradePanel(game, T) {
     $('.trd-theirs').classList.toggle('locked', !!theirs.l && !theirs.k); $('.trd-theirs').classList.toggle('accepted', !!theirs.k);
     $('.trd-lamps').innerHTML = [[t('You'), my], [T.nameOf(other), theirs]].map(([n, p]) => `<span class="trd-lamp ${p.k ? 'ok' : p.l ? 'lock' : ''}">${escapeHtml(n)}: ${escapeHtml(p.k ? t('ACCEPTED') : p.l ? t('LOCKED') : t('EDITING'))}</span>`).join('');
     // summary
-    const gv = `${mine.items.length ? tf('{n} item(s)', { n: mine.items.length }) : t('nothing')}${mine.clout ? ` + ◈${fmt(mine.clout)}` : ''}`;
-    const tv = `${theirs.i.length ? tf('{n} item(s)', { n: theirs.i.length }) : t('nothing')}${theirs.c ? ` + ◈${fmt(theirs.c)}` : ''}`;
+    const gv = `${mine.items.length ? tf('Items: {n}', { n: mine.items.length }) : t('nothing')}${mine.clout ? ` + ◈${fmt(mine.clout)}` : ''}`;
+    const tv = `${theirs.i.length ? tf('Items: {n}', { n: theirs.i.length }) : t('nothing')}${theirs.c ? ` + ◈${fmt(theirs.c)}` : ''}`;
     $('.trd-sum').innerHTML = `<div>${escapeHtml(t('You give'))}<b>${escapeHtml(gv)}</b></div><div>${escapeHtml(t('You get'))}<b>${escapeHtml(tv)}</b></div>`
       + (!theirs.i.length && !theirs.c && (mine.items.length || mine.clout) ? `<div class="warn">${escapeHtml(t('Careful: they are offering nothing.'))}</div>` : '')
       + (myV > 0 && thV > 0 && myV > thV * 2.5 ? `<div class="warn">${escapeHtml(t('Their offer is worth far less than yours.'))}</div>` : '');

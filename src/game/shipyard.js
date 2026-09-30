@@ -8,6 +8,7 @@
 // shipyard_core.js (node-tested). Net: request  syact {op,...}  ->  host messages  symsg {k,...}.
 import * as THREE from 'three';
 import { t, tf, addTranslations } from '../core/i18n.js';
+import { tNum } from '../i18n/tnum.js';   // [i18n8] canvas screen lines built from a literal + numbers
 import { registerItem, ITEMS, isSellable } from './items.js';
 import { CREATURES } from './creatures.js';
 import { HOST_ONLY } from '../net/session.js';
@@ -898,14 +899,14 @@ export function installShipyard(game) {
     const cg = built.get(socketOf('cargo'))?.b.screens?.scan;
     if (cg) {
       const m = manifest(), q = game.run?.quota || 0, sold = game.run?.sold || 0;
-      cg.redraw((c, w, h) => { c.fillStyle = '#04120a'; c.fillRect(0, 0, w, h); c.fillStyle = '#6dff9a'; c.font = '20px monospace'; c.fillText(t('CARGO SCAN'), 8, 24); c.font = '26px monospace'; c.fillText(`${m.n} ITEMS`, 8, 56); c.fillStyle = '#c8ffd8'; c.font = '22px monospace'; c.fillText(e.scanner >= 3 ? `▮${m.v}` : e.scanner === 2 ? `~▮${Math.round(m.v / 10) * 10}` : '▮ ???', 8, 82); if (e.scanner >= 3 && q) { c.fillStyle = '#ffd23f'; c.font = '16px monospace'; c.fillText(`QUOTA ${Math.min(100, Math.round(((sold + m.v) / q) * 100))}%`, 100, 82); } });
+      cg.redraw((c, w, h) => { c.fillStyle = '#04120a'; c.fillRect(0, 0, w, h); c.fillStyle = '#6dff9a'; c.font = '20px monospace'; c.fillText(t('CARGO SCAN'), 8, 24); c.font = '26px monospace'; c.fillText(tNum(`${m.n} ITEMS`), 8, 56); c.fillStyle = '#c8ffd8'; c.font = '22px monospace'; c.fillText(e.scanner >= 3 ? `▮${m.v}` : e.scanner === 2 ? `~▮${Math.round(m.v / 10) * 10}` : '▮ ???', 8, 82); if (e.scanner >= 3 && q) { c.fillStyle = '#ffd23f'; c.font = '16px monospace'; c.fillText(tNum(`QUOTA ${Math.min(100, Math.round(((sold + m.v) / q) * 100))}%`), 100, 82); } });
     }
     const en = built.get(socketOf('engine'))?.b.screens?.weight;
-    if (en) en.redraw((c, w, h) => { c.fillStyle = '#1a0a02'; c.fillRect(0, 0, w, h); c.fillStyle = '#ff9a3a'; c.font = '18px monospace'; c.fillText(t('HULL WEIGHT'), 8, 22); c.font = '28px monospace'; c.fillText(Y.weightText(cur), 8, 54); c.font = '16px monospace'; c.fillStyle = '#ffd9b8'; c.fillText(`ROUTE x${Y.routeMul(cur).toFixed(2)}  ${Y.count(cur)} MOD`, 8, 74); });
+    if (en) en.redraw((c, w, h) => { c.fillStyle = '#1a0a02'; c.fillRect(0, 0, w, h); c.fillStyle = '#ff9a3a'; c.font = '18px monospace'; c.fillText(t('HULL WEIGHT'), 8, 22); c.font = '28px monospace'; c.fillText(Y.weightText(cur), 8, 54); c.font = '16px monospace'; c.fillStyle = '#ffd9b8'; c.fillText(tNum(`ROUTE x${Y.routeMul(cur).toFixed(2)}  ${Y.count(cur)} MOD`), 8, 74); });
     const dk = built.get('DECK')?.b.screens?.scan;
     if (dk) {
       const run = game.run || {}, thr = game.balance?.level?.().name || '-';
-      dk.redraw((c, w, h) => { c.fillStyle = '#02101c'; c.fillRect(0, 0, w, h); c.fillStyle = '#7ad8ff'; c.font = '18px monospace'; c.fillText(t('STAR SCANNER'), 8, 22); c.font = '15px monospace'; c.fillStyle = '#bfe8ff'; c.fillText(`DAY ${run.day || 1}  ${run.daysLeft ?? '-'}d LEFT`, 8, 46); c.fillText(`THREAT ${thr}`, 8, 64); c.fillText(`WX ${(run.weather || 'clear').toUpperCase()}`, 8, 80); });
+      dk.redraw((c, w, h) => { c.fillStyle = '#02101c'; c.fillRect(0, 0, w, h); c.fillStyle = '#7ad8ff'; c.font = '18px monospace'; c.fillText(t('STAR SCANNER'), 8, 22); c.font = '15px monospace'; c.fillStyle = '#bfe8ff'; c.fillText(tNum(`DAY ${run.day || 1}  ${run.daysLeft ?? '-'}d LEFT`), 8, 46); c.fillText(tf('THREAT {n}', { n: thr }), 8, 64); c.fillText(tf('WX {n}', { n: t((run.weather || 'clear').toUpperCase()) }), 8, 80); });
     }
   }
   const socketOf = (id) => Y.socketOf(cur, id);

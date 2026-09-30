@@ -117,6 +117,13 @@ function weatherInfo(id) {
 const TAU = Math.PI * 2;
 const wrapPI = (a) => ((a + Math.PI) % TAU + TAU) % TAU - Math.PI;
 
+// [i18n8] XP-feed reasons arrive as English keys ("Scrap sold") or "<label> <name>" ("Crafted Sword"): translate both shapes on the receiving client
+const XP_PREFIX = /^(Crafted|Dismantled|Analysis:|Blueprint required:|Contract:|Task:|Ship fault:) (.+)$/;
+function xpReason(reason) {
+  const m = XP_PREFIX.exec(reason);
+  return m ? tf(m[1] + ' {name}', { name: t(m[2]) }) : t(reason);
+}
+
 export class HUD {
   constructor(root) {
     this.root = root;
@@ -263,7 +270,7 @@ export class HUD {
 
   xpGain(xp, reason) {
     if (!xp) return;
-    const e = el('div', { class: 'xpline' }, tf('+{xp} XP', { xp }), reason ? el('span', {}, ' ' + reason) : null);
+    const e = el('div', { class: 'xpline' }, tf('+{xp} XP', { xp }), reason ? el('span', {}, ' ' + xpReason(reason)) : null);
     this.$.xpfeed.appendChild(e);
     setTimeout(() => e.remove(), 2600);
     while (this.$.xpfeed.children.length > 5) this.$.xpfeed.firstChild.remove();
@@ -325,7 +332,7 @@ export class HUD {
       const type = l.type || typeFromName(l.name);
       const ico = type && itemDef(type).kind !== 'body' ? el('div', { class: 'sl-ico', html: iconHTML(type, 'sl-img') }) : null;
       const e = el('div', { class: 'scan-label' + (ico ? ' has-ico' : '') }, ico,
-        el('div', { class: 'sl-text' }, el('div', { class: 'sl-name', style: { color: l.color } }, l.name), l.sub ? el('div', { class: 'sl-sub' }, l.sub) : null));
+        el('div', { class: 'sl-text' }, el('div', { class: 'sl-name', style: { color: l.color } }, t(l.name)), l.sub ? el('div', { class: 'sl-sub' }, t(l.sub)) : null));   // t(): safety net for static scan labels (Ship, Main Entrance ...)
       e.style.animationDelay = (l.delay ?? i * 0.04) + 's';
       if (ico) ico.style.borderColor = l.color || '';
       this.$.scan.appendChild(e);

@@ -403,7 +403,7 @@ export class ModManager extends Emitter {
     if (!c || (c.owner && !this.featureOn(c.owner))) {
       if (w0 === 'help' && this.commands.size) {
         const live = [...this.commands.entries()].filter(([, v]) => !v.owner || this.featureOn(v.owner));
-        setTimeout(() => terminal.print(tf('FEATURE & MOD COMMANDS:\n{n}', { n: live.map(([k, v]) => `>${k.toUpperCase()}  ${v.help || ''}`).join('\n') })), 0);
+        setTimeout(() => terminal.print(tf('FEATURE & MOD COMMANDS:\n{n}', { n: live.map(([k, v]) => `>${k.toUpperCase()}  ${t(v.help || '')}`).join('\n') })), 0);
       }
       return false;
     }

@@ -11,6 +11,10 @@
  * IMPORTANT: nothing here touches `document` / `window` at import time.
  */
 
+import { tNum as tmg } from '../i18n/tnum.js';   // [i18n8] every minigame string goes through tmg() (exact key, then numbers as {})
+import './minigames_i18n.js';
+export { tmg };
+
 // ─────────────────────────────────────────────── math ──
 export const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
 export const clamp01 = (v) => clamp(v, 0, 1);
@@ -169,10 +173,15 @@ const GLYPHS = {
   '|': [2, 2, 2, 2, 2], '~': [0, 3, 6, 0, 0],
   // lowercase x is a small "times" sign (x100); other lowercase letters render uppercase
   x: [0, 5, 2, 5, 0],
+  // Cyrillic (Russian): look-alikes reuse the Latin glyph, the rest are drawn in the same 3x5 grid ([i18n8])
+  'А': [2, 5, 7, 5, 5], 'Б': [7, 4, 6, 5, 6], 'В': [6, 5, 6, 5, 6], 'Г': [7, 4, 4, 4, 4], 'Д': [3, 5, 5, 7, 5], 'Е': [7, 4, 6, 4, 7], 'Ё': [7, 4, 6, 4, 7],
+  'Ж': [5, 2, 7, 2, 5], 'З': [6, 1, 2, 1, 6], 'И': [5, 5, 2, 5, 5], 'Й': [5, 5, 2, 5, 5], 'К': [5, 5, 6, 5, 5], 'Л': [3, 5, 5, 5, 5], 'М': [5, 7, 7, 5, 5],
+  'Н': [5, 5, 7, 5, 5], 'О': [2, 5, 5, 5, 2], 'П': [7, 5, 5, 5, 5], 'Р': [6, 5, 6, 4, 4], 'С': [3, 4, 4, 4, 3], 'Т': [7, 2, 2, 2, 2], 'У': [5, 5, 2, 2, 2],
+  'Ф': [2, 7, 5, 7, 2], 'Х': [5, 5, 2, 5, 5], 'Ц': [5, 5, 5, 7, 3], 'Ч': [5, 5, 7, 1, 1], 'Ъ': [6, 2, 6, 5, 6], 'Ь': [4, 4, 6, 5, 6], 'Э': [6, 1, 3, 1, 6], 'Я': [3, 5, 3, 5, 5],
 };
 
 function normText(text) {
-  return String(text)
+  return tmg(String(text))
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
     .replace(/[—–]/g, '-')
@@ -184,6 +193,7 @@ const WIDE = {
   M: { w: 5, r: [17, 27, 21, 17, 17] },
   W: { w: 5, r: [17, 17, 21, 27, 17] },
   N: { w: 4, r: [9, 13, 11, 9, 9] },
+  'Ш': { w: 5, r: [21, 21, 21, 21, 31] }, 'Щ': { w: 5, r: [21, 21, 21, 31, 1] }, 'Ы': { w: 5, r: [17, 17, 25, 21, 25] }, 'Ю': { w: 5, r: [18, 21, 29, 21, 18] },
   '#': { w: 5, r: [10, 31, 10, 31, 10] },
 };
 
@@ -767,7 +777,7 @@ export function normalizeOpts(opts = {}) {
 /** Fill an element with help text, highlighting [KEY] tokens. */
 export function setHelpText(node, text) {
   node.textContent = '';
-  const parts = String(text || '').split(/(\[[^\]]+\])/g);
+  const parts = tmg(String(text || '')).split(/(\[[^\]]+\])/g);
   for (const part of parts) {
     if (!part) continue;
     if (/^\[[^\]]+\]$/.test(part)) node.appendChild(el('span', 'mg-key', part));
@@ -791,13 +801,13 @@ export function createMinigame(rawOpts, cfg) {
 
   const root = el('div', `mg-root mg-${cfg.kind}`);
   root.setAttribute('role', 'dialog');
-  root.setAttribute('aria-label', cfg.title);
+  root.setAttribute('aria-label', tmg(cfg.title));
   root.tabIndex = -1;
   const frame = el('div', 'mg-frame');
   const head = el('div', 'mg-head');
   const titleWrap = el('div', 'mg-titlewrap');
-  titleWrap.append(el('div', 'mg-brand', `TFG // ${cfg.tag || 'TERMINAL'}`), el('div', 'mg-title', cfg.title));
-  const statusEl = el('div', 'mg-status', cfg.status || '');
+  titleWrap.append(el('div', 'mg-brand', `TFG // ${tmg(cfg.tag || 'TERMINAL')}`), el('div', 'mg-title', tmg(cfg.title)));
+  const statusEl = el('div', 'mg-status', tmg(cfg.status || ''));
   head.append(titleWrap, statusEl);
   const screen = el('div', 'mg-screen');
   const canvas = document.createElement('canvas');
@@ -874,7 +884,7 @@ export function createMinigame(rawOpts, cfg) {
       root.classList.add('mg-glitching');
     },
     setStatus(text, tone) {
-      const txt = text || '';
+      const txt = tmg(text || '');
       const cls = 'mg-status' + (tone ? ` mg-tone-${tone}` : '');
       if (statusEl.textContent !== txt) statusEl.textContent = txt;
       if (statusEl.className !== cls) statusEl.className = cls;
