@@ -79,12 +79,29 @@ Diff.setMode('hard'); game.died = null; game.player.hp = 10; game.origHit = 0; g
 ok(game.origHit === 1 && game.died === true && !game.player.downed, 'Hard: one hit kills as before');
 Diff.setMode('standard');
 // solo: no crew -> death unless a medkit
-game.remotes.clear(); game.died = null; game.origHit = 0; game.player.dead = false; game.player.hp = 10;
+game.remotes.clear(); game.damageLocal(50, 'x', null); nets['msg:dn']({ k: 'up', id: 'me', by: 'me', hp: 0.25 }, 'me'); /* burn the free solo stand-up */ game.died = null; game.origHit = 0; game.player.dead = false; game.player.hp = 10;
 game.damageLocal(50, 'lurker', null); ok(game.origHit === 1 && game.died === true, 'solo without a kit: death as today');
 game.died = null; game.player.hp = 10; game.player.dead = false; items.push({ id: 'k1', type: 'medkit', holder: 'me', def: { name: 'Medkit' } });
 reqs.length = 0; game.damageLocal(50, 'lurker', null);
 ok(!game.died && game.player.hp === 30 && !game.player.downed && reqs.some((q) => q[0] === 'consume' && q[1].id === 'k1'), 'solo with a medkit: self-revive at 30 %, kit consumed');
 game.player.hp = 10; game.origHit = 0; game.damageLocal(50, 'lurker', null); ok(game.origHit === 1, 'only one self-revive per landing');
+// solo self-revive (wave 8 backlog 7): first down per landing = slow stand-up; second = old flow
+mods.emit('phase', 'moon', game); items.length = 0; reqs.length = 0; game.died = null; game.origHit = 0; game.player.dead = false; game.player.hp = 10;
+game.input = { enabled: true, held: false, isDown() { return this.held; } };
+game.damageLocal(50, 'lurker', null); ok(game.player.downed && !game.died, 'solo first down: DOWNED, not dead');
+nets['msg:dn']({ k: 'on', id: 'me', dur: 20, p: [0, 0, 0], c: 'lurker' }, 'me');
+game.input.held = true; for (let i = 0; i < 50; i++) mods.emit('update', 0.1, game);   // 5 s: not yet
+ok(!reqs.some((q) => q[1].k === 'self'), 'not before ~6 s');
+game.damageLocal(20, 'hound', null); mods.emit('update', 0.1, game);
+for (let i = 0; i < 50; i++) mods.emit('update', 0.1, game); ok(!reqs.some((q) => q[1].k === 'self'), 'damage resets the hold');
+for (let i = 0; i < 20; i++) mods.emit('update', 0.1, game); ok(reqs.some((q) => q[1].k === 'self' && q[1].id === 'me'), 'held 6 s: self request');
+nets['msg:dn']({ k: 'up', id: 'me', by: 'me', hp: R.selfHp }, 'me');
+ok(!game.player.downed && game.player.hp === 25, 'stands up at 25 % HP');
+game.input.held = false; game.player.hp = 10; game.damageLocal(50, 'lurker', null); ok(game.died === true && !game.player.downed, 'second solo down in the landing: death as today');
+mods.emit('phase', 'moon', game); game.died = null; game.player.dead = false; game.player.hp = 10;
+game.remotes.set('b', { id: 'b', dead: false, flags: 0, pos: { x: 0, y: 0, z: 0 } }); reqs.length = 0; game.damageLocal(50, 'lurker', null);
+nets['msg:dn']({ k: 'on', id: 'me', dur: 20, p: [0, 0, 0], c: 'lurker' }, 'me'); game.input.held = true; for (let i = 0; i < 80; i++) mods.emit('update', 0.1, game);
+ok(game.player.downed && !reqs.some((q) => q[1].k === 'self'), 'crewmate up: no self-revive offered (normal down)');
 api.dispose();
 
 console.log(`downed: ${checks - fails}/${checks} ok`);

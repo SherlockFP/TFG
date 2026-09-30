@@ -20,6 +20,8 @@ export const RULES = Object.freeze({
   reviveS: 3,            // s a crewmate holds E
   reviveMedic: 0.6,      // reviver time multiplier for the Medic role (40 % faster)
   kitHp: 0.4,            // a medkit / adrenaline used on a downed crewmate stands them up at this fraction
+  selfS: 6,              // solo: s holding E to get yourself up (once per landing)
+  selfHp: 0.25,          // solo self stand-up HP fraction
   reviveHp: 0.3,         // fraction of max HP after a revive
   orbitHp: 0.5,          // downed players still lying there when the ship reaches orbit
   repeatWin: 60,         // s: a second down inside this window bleeds out ...
@@ -83,6 +85,7 @@ export class DownBook {
 const TR = {
   'YOU ARE DOWN': 'YERE DÜŞTÜN', 'BLEEDING OUT': 'KANAMADAN ÖLÜYORSUN', 'Crawl to your crew. A crewmate can hold [E] on you to get you up.': 'Ekibine sürün. Bir ekip arkadaşı [E] basılı tutarak seni kaldırabilir.',
   'Nobody can reach you. Hold on.': 'Kimse sana ulaşamıyor. Dayan.',
+  'Get up… hold [E]': 'Kalk… [E] basılı tut', 'The Algorithm notes you got up alone. Once.': 'Algoritma tek başına kalktığını not etti. Bir kez.',
   'HOLD [E] TO REVIVE': 'KALDIRMAK İÇİN [E] BASILI TUTUN', 'REVIVING': 'KALDIRILIYOR', 'DOWN': 'YERDE',
   '{name} is down! Hold [E] on them to revive.': '{name} yere düştü! Kaldırmak için [E] basılı tut.',
   '{by} revived {name}.': '{by}, {name} adlı oyuncuyu kaldırdı.', 'You were revived by {name}.': '{name} seni ayağa kaldırdı.',
@@ -94,6 +97,7 @@ const TR = {
 const RU = {
   'YOU ARE DOWN': 'ТЫ УПАЛ', 'BLEEDING OUT': 'ИСТЕКАЕШЬ КРОВЬЮ', 'Crawl to your crew. A crewmate can hold [E] on you to get you up.': 'Ползи к команде. Напарник может удержать [E] на тебе и поднять.',
   'Nobody can reach you. Hold on.': 'До тебя никто не добраться. Держись.',
+  'Get up… hold [E]': 'Вставай… удерживай [E]', 'The Algorithm notes you got up alone. Once.': 'Алгоритм отметил, что ты встал сам. Один раз.',
   'HOLD [E] TO REVIVE': 'УДЕРЖИВАЙ [E], ЧТОБЫ ПОДНЯТЬ', 'REVIVING': 'ПОДНИМАЕМ', 'DOWN': 'ЛЕЖИТ',
   '{name} is down! Hold [E] on them to revive.': '{name} упал! Удерживай [E], чтобы поднять.',
   '{by} revived {name}.': '{by} поднял {name}.', 'You were revived by {name}.': '{name} поднял тебя.',
@@ -126,7 +130,7 @@ export function installDowned(game) {
   let disposed = false, boundNet = null, style = null, dock = null, root = null, vig = null, mid = null, lp = null;
   const S = {
     clock: 0, book: new DownBook(), down: new Map(),   // down: every peer's view id -> {dur, left, prog, by, p:[x,y,z], name}
-    me: null, hold: null, selfUsed: false, sendT: 0, pgT: 0, sweepT: 0, lastSay: -999, marks: new Map(), lastPg: new Map(),
+    me: null, hold: null, selfUsed: false, soloUsed: false, sendT: 0, pgT: 0, sweepT: 0, lastSay: -999, marks: new Map(), lastPg: new Map(),
   };
   const host = () => !!game.isHost;
   const mode = () => getMode();
@@ -170,7 +174,7 @@ export function installDowned(game) {
       const e = S.down.get(id); S.down.delete(id);
       const nm = e?.name || nameOf(id);
       try { mods.emit('tfg:revived', { id, name: nm, by: m.by || null, self: false }, game); } catch (err) { console.warn('[downed] emit', err); }
-      if (id === game.selfId) localRevive(+m.hp || RULES.reviveHp, m.by);
+      if (id === game.selfId) localRevive(+m.hp || RULES.reviveHp, m.by === id ? null : m.by);
       else game.ui?.systemMessage?.(tf('{by} revived {name}.', { by: nameOf(m.by), name: nm }), 'good');
     } else if (m.k === 'bleed') {
       S.down.delete(id);
@@ -224,6 +228,12 @@ export function installDowned(game) {
         try { game.net.broadcast('it', { e: 'rm', id: kit.id }); } catch { /* net closing */ }
         S.book.e.delete(d.id);
         send({ k: 'up', id: d.id, by: from, hp: RULES.kitHp });
+      } else if (d.k === 'self') {   // solo stand-up: only for yourself, only when the host also sees nobody who could revive you
+        const e = S.book.e.get(from);
+        if (!e || d.id !== from || rawPlayers().some((q) => q.id !== from && !q.dead && !S.book.e.has(q.id))) return;
+        S.book.e.delete(from);
+        send({ k: 'up', id: from, by: from, hp: RULES.selfHp });
+        maybeSay('The Algorithm notes you got up alone. Once.', {}, 0.4);
       } else if (d.k === 'stop') {
         const e = S.book.stop(d.id, from);
         if (e) send({ k: 'pg', id: e.id, p: 0, by: null, l: e.left });
@@ -248,7 +258,7 @@ export function installDowned(game) {
   // ship reaches orbit: everybody still lying down is picked up (same idea as the old "crew revives in orbit"); a new landing forgets the second-down penalty
   offs.push(mods.on('phase', (ph, g) => {
     if (g && g !== game) return;
-    if (ph === 'moon') { S.selfUsed = false; if (host()) S.book.last.clear(); }
+    if (ph === 'moon') { S.selfUsed = false; S.soloUsed = false; if (host()) S.book.last.clear(); }
     if (ph === 'orbit' && host() && (S.book.e.size || S.down.size)) { S.book.clear(); send({ k: 'clear' }); }
   }));
 
@@ -261,10 +271,10 @@ export function installDowned(game) {
     for (const r of game.remotes?.values?.() || []) if (!r.dead && !(r.flags & 64) && !S.down.has(r.id)) return true;
     return false;
   };
-  function goDown(cause, dmg, fromPos) {
+  function goDown(cause, dmg, fromPos, solo) {
     const p = game.player;
     p.downed = true; p.hp = 1; p.latched = null;
-    S.me = { cause, t: 0, seen: false };
+    S.me = { cause, t: 0, seen: false, solo: !!solo, selfT: 0 };
     S.hold = null;
     game.grab?.stop?.(); game.closeMinigame?.(); game.terminal?.close?.(); game.inventory?.close?.();
     game.engine.hurt?.(Math.min(1, Math.max(0.25, dmg / 50)));
@@ -298,12 +308,14 @@ export function installDowned(game) {
     const p = this.player;
     if (disposed || !p || p.dead || dmg <= 0 || this.godMode || !enabled()) return orig.call(this, dmg, cause, fromPos);
     if (p.downed) {
+      if (S.me?.solo && S.me.selfT > 0 && !TRUE_DEATH.has(cause)) { S.me.selfT = 0; this.ui?.toast?.(t('Revive interrupted.'), 'warn'); }   // damage breaks the solo stand-up
       // already down: creatures ignore you; only a fall into the void / left behind / eaten finishes you at once
       if (TRUE_DEATH.has(cause)) { S.me = null; p.downed = false; p.hp = 0; return orig.call(this, 9999, cause, fromPos); }
       return;
     }
     if (!shouldDown(mode(), cause, p.hp, dmg)) return orig.call(this, dmg, cause, fromPos);
     if (this.hasPerk?.('secondwind') && !this.secondWindUsed && dmg < 999) return orig.call(this, dmg, cause, fromPos);   // Second Wind stays as it was
+    if (!crewAlive() && !S.soloUsed) { S.soloUsed = true; goDown(cause, dmg, fromPos, true); return; }   // first solo down per landing: slow self-revive
     if (!crewAlive()) {
       // solo (or the whole crew is down / dead): one self-revive per landing with a medkit / adrenaline, else death as before
       const kit = !S.selfUsed ? kitId() : null;
@@ -378,7 +390,7 @@ export function installDowned(game) {
     if (me) {
       if (!vig) { vig = document.createElement('div'); vig.className = 'dn-vig'; (document.getElementById('ui') || document.body).appendChild(vig); }
       const left = mine ? Math.max(0, mine.left) : 0, frac = mine ? left / mine.dur : 1;
-      const html = `<div class="dn-bar"><span>${t('BLEEDING OUT')} ${mine ? Math.ceil(left) + ' s' : ''}</span><u><b style="width:${Math.round(frac * 100)}%"></b></u><i>${t(crewAlive() ? 'Crawl to your crew. A crewmate can hold [E] on you to get you up.' : 'Nobody can reach you. Hold on.')}${mine?.prog > 0 ? ' · ' + t('REVIVING') : ''}</i></div>`;
+      const html = `<div class="dn-bar"><span>${t('BLEEDING OUT')} ${mine ? Math.ceil(left) + ' s' : ''}</span><u><b style="width:${Math.round(frac * 100)}%"></b></u>${me.solo && !crewAlive() && me.selfT > 0 ? `<u><b style="width:${Math.round(Math.min(1, me.selfT / RULES.selfS) * 100)}%;background:#7dff9b"></b></u>` : ''}<i>${t(me.solo && !crewAlive() ? 'Get up… hold [E]' : crewAlive() ? 'Crawl to your crew. A crewmate can hold [E] on you to get you up.' : 'Nobody can reach you. Hold on.')}${mine?.prog > 0 ? ' · ' + t('REVIVING') : ''}</i></div>`;
       if (dock.dataset.h !== html) { dock.dataset.h = html; dock.innerHTML = html; }
       dock.style.display = '';
     } else {
@@ -465,6 +477,11 @@ export function installDowned(game) {
       const mine = S.down.get(game.selfId);
       if ((S.me.t > 3 && !mine && !S.me.seen) || (S.me.seen && !mine)) localBleed(S.me.cause);   // the host never confirmed / dropped us: die as before
     }
+    // solo: hold E ~6 s to get yourself up (damage resets it in damageLocal)
+    if (S.me?.solo && p && game.input?.enabled && !crewAlive() && game.input.isDown('interact')) {
+      S.me.selfT += dt;
+      if (S.me.selfT >= RULES.selfS && !S.me.req) { S.me.req = true; try { game.net.request('dnreq', { k: 'self', id: game.selfId }); } catch { /* net closing */ } }
+    } else if (S.me?.solo && !S.me.req) S.me.selfT = Math.max(0, S.me.selfT - dt * RULES.decay);
     // crewmate holding E on a downed player
     const input = game.input;
     const tid = game.interactTarget?.action?.__dn;
