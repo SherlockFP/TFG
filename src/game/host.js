@@ -287,6 +287,8 @@ export const hostMethods = {
     H('charge', (d, from) => {
       const it = this.items.get(d.id);
       if (!it || it.holder !== from) return;
+      const ch = this.ship.points.charger, cp = this.aiPlayerById?.(from)?.pos;   // must stand at the ship charger (loose 8 m)
+      if (ch && cp && Math.hypot(cp.x - ch.x, cp.z - ch.z) > 8) return;
       const full = it.def.battery ? Math.round(it.def.battery * clamp(Number(d.mul) || 1, 1, 3)) : null;
       if (full) { it.battery = full; this.net.broadcast('itst', { id: it.id, b: full }); this.onItemState?.(it); }
       this.net.broadcast('fx', { k: 'snd', s: 'spark', p: [this.ship.points.charger?.x || 0, 1.2, this.ship.points.charger?.z || 0], v: 0.8 });

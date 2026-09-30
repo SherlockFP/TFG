@@ -480,6 +480,36 @@ export function installFacjobs(game) {
   offs.push(mods.on('netReady', (n, g) => { if (g === game) bindNet(n); }));
   if (game.net) bindNet(game.net);
   offs.push(mods.on('moonPopulated', (g) => { if (g === game) { try { hostSetup(); } catch (e) { console.warn('[facjobs] setup', e); } } }));
+  // host migration: item ids + the drone are host-only runtime; rebuild them from the synced run.fj (job progress) and the items every peer holds
+  function hostRebuild() {
+    const f = fj(), F = fac();
+    if (!host() || !f || run()?.phase !== 'moon') return;
+    mem.ids = {};
+    for (const j of f.j || []) {
+      if (j.st !== 0) continue;
+      const type = { power: 'fj_fuse', core: 'fj_core', rescue: 'fj_contractor', sample: 'fj_sample' }[j.id];
+      if (!type) continue;
+      const ids = game.items.all().filter((it) => it.type === type).map((it) => it.id);
+      if (ids.length) mem.ids[j.sl] = j.id === 'core' || j.id === 'rescue' ? ids[0] : ids;
+      else if (j.id === 'core' || j.id === 'rescue') failJob(j, 'Job failed: {job}', { job: title(j.id) });   // the item is gone: same outcome as the host-side check
+    }
+    const dj = f.j.find((j) => j.id === 'drone' && j.st === 0), L = F?.layout;
+    if (dj && L && !mem.drone) {
+      const from = L.idx(L.entrance.room.cx, L.entrance.room.cz), to = L.idx(Math.floor((dj.pos[0] - L.ox) / L.cell), Math.floor((dj.pos[2] - L.oz) / L.cell));
+      const path = C.cellPath(L, from, to);
+      if (path && path.length >= 2) {
+        let total = 0; for (let k = 1; k < path.length; k++) total += Math.hypot(path[k][0] - path[k - 1][0], path[k][1] - path[k - 1][1]);
+        const D = { path, k: 1, x: path[0][0], y: L.y + 1.5, z: path[0][1], hp: dj.ex?.hp || C.DRONE_HP, total, done: 0, sendT: 0 };
+        let left = (dj.p / 100) * total;   // resume where the synced progress says it was
+        while (left > 0 && D.k < path.length) {
+          const tx = path[D.k][0], tz = path[D.k][1], dist = Math.hypot(tx - D.x, tz - D.z);
+          if (dist <= left) { D.x = tx; D.z = tz; left -= dist; D.done += dist; D.k++; } else { D.x += ((tx - D.x) / dist) * left; D.z += ((tz - D.z) / dist) * left; D.done += left; left = 0; }
+        }
+        mem.drone = D;
+      } else failJob(dj, 'The drone is destroyed.');
+    }
+  }
+  offs.push(mods.on('hostMigrated', (g, info) => { if (g === game && info?.self) { try { hostRebuild(); } catch (e) { console.warn('[facjobs] migrate', e); } } }));
   offs.push(mods.on('phase', (ph, g) => {
     if (g && g !== game) return;
     if (ph === 'takeoff' && host()) { try { hostTakeoff(); } catch (e) { console.warn('[facjobs] takeoff', e); } }
@@ -506,7 +536,7 @@ export function installFacjobs(game) {
     /** layoutOpts for game.js loadMap: the day's archetype (null = classic) */
     layoutOpts: (moon, r) => C.layoutOptsFor(moon, r),
     roll: () => { const r = run(); return r ? C.rollJobs(r.runId ?? 'x', r.day ?? 1, r.moon, r.quotaIndex | 0) : null; },
-    hostSetup, hostReq, hostTick, droneTick, _mem: mem,
+    hostSetup, hostRebuild, hostReq, hostTick, droneTick, _mem: mem,
     dispose() {
       disposed = true;
       for (const off of offs) { try { off(); } catch { /* ignore */ } }

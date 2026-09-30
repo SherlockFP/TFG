@@ -395,6 +395,11 @@ export function installArcade(game) {
   offs.push(mm.on('netReady', (net, g) => { if (g === game) bindNet(net); }));
   if (game.net) bindNet(game.net);
   offs.push(mm.on('playerJoin', (id, info, g) => { if (g === game && isHost()) for (const tb of H.tables.values()) if (tb.ply > 0 || A.humans(tb).length) game.net.sendTo(id, 'ar', { k: 't', s: A.snapshot(tb) }); }));
+  // host migration: every peer mirrors the table snapshots, so the new host rebuilds its books from them (stale seats are stood up by the away sweep)
+  offs.push(mm.on('hostMigrated', (g, info) => {
+    if (g !== game || !info?.self) return;
+    for (const [id, e] of tables) { try { if (SITES[id] && !H.tables.has(id) && e?.snap) { const tb = A.restoreTable(e.snap); H.tables.set(id, tb); aiKick(tb); } } catch (err2) { console.warn('[arcade] migrate', id, err2); } }
+  }));
   offs.push(mm.on('mapLoaded', (w, g) => { if (g === game) syncWorld(); }));
   offs.push(mm.on('phase', (ph, g) => { if (g === game) { close(); booths.cancel(true); if (isHost()) { for (const m of [...H.rps.matches.values()]) H.rps.leave(game.time, m.a); rpsFlush(); } setTimeout(() => { if (!disposed) syncWorld(); }, 50); } }));
   offs.push(mm.on('interactables', (list, g) => {

@@ -116,6 +116,11 @@ export function installArcade2(game) {
   offs.push(mods.on('netReady', (n, g) => { if (g === game) bindNet(n); }));
   if (game.net) bindNet(game.net);
   offs.push(mods.on('registerHandlers', (H, g) => { if (g === game) H('ac2req', (d, from) => hostReq(d, from)); }));
+  // host migration: every peer mirrors the boards (top entries); the new host continues from them (daily prize ledger restarts, the client profile ledger still caps it)
+  offs.push(mods.on('hostMigrated', (g, info) => {
+    if (g !== game || !info?.self || S.host) return;
+    const m = S.mirror; if (m && m.day === K.dayKey() && m.b) S.host = { day: m.day, b: K.wire({ day: m.day, b: m.b }).b, paid: {}, last: {} };
+  }));
   offs.push(mods.on('playerJoin', (id, info, g) => {
     if (g !== game || !host()) return;
     try { game.net.sendTo(id, 'ac2s', { k: 'b', ...K.wire(hostState()) }); } catch { /* joiner gone */ }

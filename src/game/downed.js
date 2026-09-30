@@ -219,6 +219,9 @@ export function installDowned(game) {
       } else if (d.k === 'kit') {   // a crewmate jabbed a medkit / adrenaline into a downed player
         const e = S.book.e.get(d.id), rp = rawPlayer(from), vp = rawPlayer(d.id);
         if (!e || !rp || rp.dead || !vp || S.book.e.has(from) || from === d.id || !(rp.pos.distanceTo(vp.pos) <= RULES.hostRange)) return;
+        const kit = game.items?.get?.(d.it);   // the reviver must really hold the kit; the host consumes it (no separate `consume`)
+        if (!kit || kit.holder !== from || !KITS.includes(kit.type)) return;
+        try { game.net.broadcast('it', { e: 'rm', id: kit.id }); } catch { /* net closing */ }
         S.book.e.delete(d.id);
         send({ k: 'up', id: d.id, by: from, hp: RULES.kitHp });
       } else if (d.k === 'stop') {
@@ -344,7 +347,7 @@ export function installDowned(game) {
     const tid = game.interactTarget?.action?.__dn;   // medkit / adrenaline on the downed crewmate I am looking at
     if (!hk.handled && it && KITS.includes(it.type) && tid && S.down.has(tid)) {
       hk.handled = true;
-      try { game.net.request('consume', { id: it.id }); game.net.request('dnreq', { k: 'kit', id: tid }); } catch { /* net closing */ }
+      try { game.net.request('dnreq', { k: 'kit', id: tid, it: it.id }); } catch { /* net closing */ }
     }
   }));
 
