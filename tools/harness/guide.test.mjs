@@ -1,7 +1,7 @@
 // node tools/harness/guide.test.mjs - GUIDE module (wave 4): registry integrity, i18n completeness, tip selection (cooldown / used flags /
 // repeat gap / context), tutorial completion from events, panel classification, lookup + "did you mean".
 import fs from 'node:fs';
-import { FEATURES, TUT_STEPS, TUT_DONE_SAY, TUT_START_SAY, UI, CATS, CTX_FLAGS, HIDDEN_CMDS, CMD_ALIAS, pick } from '../../src/game/guide_data.js';
+import { FEATURES, TUT_STEPS, TUT_DONE_SAY, UI, CATS, CTX_FLAGS, HIDDEN_CMDS, CMD_ALIAS, pick } from '../../src/game/guide_data.js';
 import * as C from '../../src/game/guide_core.js';
 
 let fails = 0, checks = 0;
@@ -61,7 +61,7 @@ for (const f of FEATURES) {
 }
 for (const [k, v] of Object.entries(CATS)) checkTriple(v, 'CATS.' + k, { ident: true });
 for (const s of TUT_STEPS) { checkTriple(s.obj, `tut ${s.id}.obj`, { maxEn: 120 }); if (s.obj2) checkTriple(s.obj2, `tut ${s.id}.obj2`); checkTriple(s.say, `tut ${s.id}.say`, { maxEn: 135 }); }
-checkTriple(TUT_DONE_SAY, 'TUT_DONE_SAY', { maxEn: 160 }); checkTriple(TUT_START_SAY, 'TUT_START_SAY', { maxEn: 160 });
+checkTriple(TUT_DONE_SAY, 'TUT_DONE_SAY', { maxEn: 160 });
 for (const [k, v] of Object.entries(UI)) checkTriple(v, 'UI.' + k, { ident: v[0].length < 30 || k === 'tut_usage' });
 ok(TUT_STEPS.length >= 5 && TUT_STEPS.length <= 7, 'tutorial has 5-7 steps');
 // the words a tip tells the player to type must exist as real commands (a typo in a tip would send players nowhere)

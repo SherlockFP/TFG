@@ -124,7 +124,20 @@ export function addViewers(v, kind) {
 }
 /** slow decay toward the base (per second) */
 export function decayViewers(v, dt) {
-  if (v.n > VIEW.base) v.n = Math.max(VIEW.base, v.n - (v.n - VIEW.base) * VIEW.decay * dt);
+  const base = Math.max(VIEW.base, v.floor || 0);   // [algoctx] the stream overlay's audience is the new floor (seedViewers)
+  if (v.n > base) v.n = Math.max(base, v.n - (v.n - base) * VIEW.decay * dt);
+  return v;
+}
+/** [algoctx] the audience never sits still: a slow random walk (+-1.5 %/s, r01 = a 0..1 random), never below the floor. Returns v. */
+export function driftViewers(v, dt, r01) {
+  const base = Math.max(VIEW.base, v.floor || 0);
+  v.n = Math.min(VIEW.max, Math.max(base, v.n * (1 + (r01 - 0.47) * 0.03 * dt)));
+  return v;
+}
+/** [algoctx] the overlay's count becomes the running audience (floor = 60 % of it) */
+export function seedViewers(v, n) {
+  n = Math.max(VIEW.base, Math.min(VIEW.max, Math.round(n) || 0));
+  v.n = n; v.floor = Math.round(n * 0.6);
   return v;
 }
 export const fmtViewers = (n) => (n >= 10000 ? (n / 1000).toFixed(0) + 'K' : n >= 1000 ? (n / 1000).toFixed(1) + 'K' : String(Math.round(n)));

@@ -14,7 +14,7 @@ import { saveSettings } from '../core/save.js';
 import { wrapMethod } from './dailyEvents.js';
 import { isSellable } from './items.js';
 import {
-  FEATURES, CATS, UI, TUT_STEPS, TUT_DONE_SAY, TUT_START_SAY, HIDDEN_CMDS, pick, fmt,
+  FEATURES, CATS, UI, TUT_STEPS, TUT_DONE_SAY, HIDDEN_CMDS, pick, fmt,
 } from './guide_data.js';
 import {
   ensureState, markUsed, isUsed, usedCount, visibleFeatures, featureById, canon, selectTip, recordShown, untried, findFeature, suggestCommand,
@@ -163,7 +163,8 @@ export function installGuide(game) {
     const s = tutCurrent(g);
     if (!s || g.tut.said[s.id]) return;
     g.tut.said[s.id] = 1;
-    S.sayQ.push({ text: pick(s.say, lang()), at: S.t + delay, kind: 'tut', id: s.id, key: 'say:' + s.id, src: s.say });
+    if (s.id === 'move' && game.onboard?.controlsPinned?.()) { save(); return; }   // [algoctx] the stream overlay / Hiring Day already showed WASD, Shift and Ctrl
+    S.sayQ.push({ text: pick(s.say, lang()), at: S.t + delay, kind: 'tut', id: s.id, key: 'say:' + s.id, src: s.say, ctx: s.ctx });
     save();
   }
   function finishTutorial() {
@@ -258,9 +259,9 @@ export function installGuide(game) {
     if (!game.run || game.run.phase === 'fired') return false;
     return !loreBusy() && S.quietT <= 0;
   }
-  function say(text, pri = false) {
+  function say(text, pri = false, ctx) {
     try {
-      if (game.lore?.say) { game.lore.say(text, { mood: 'curious', pri }); return true; }
+      if (game.lore?.say) { game.lore.say(text, { mood: 'curious', pri, ctx }); return true; }
       game.ui?.toast?.(pick(UI.fallback_prefix, lang()) + text, 'info');
       return true;
     } catch (e) { console.warn('[guide] say', e); return false; }
@@ -332,13 +333,13 @@ export function installGuide(game) {
     if (!g || !game.run || game.onboard?.active?.()) return;   // [onboard] the guide waits while Hiring Day runs
     // queued tutorial lines first (tips wait while a tutorial line is due)
     if (S.sayQ.length && S.sayQ[0].at <= S.t) {
-      if (tutRunning(g) || S.sayQ[0].src === TUT_DONE_SAY) { if (canSpeak()) { const q = S.sayQ.shift(); say(pick(q.src, lang()), true); S.quietT = 4; } }
+      if (tutRunning(g) || S.sayQ[0].src === TUT_DONE_SAY) { if (canSpeak()) { const q = S.sayQ.shift(); say(pick(q.src, lang()), true, q.ctx); S.quietT = 4; } }
       else S.sayQ.shift();
       return;
     }
     if (tutRunning(g) && !S.tutStartSaid && S.t > 8 && game.run.phase) {
       S.tutStartSaid = true;
-      if (!g.tut.said.start) { g.tut.said.start = 1; S.sayQ.push({ src: TUT_START_SAY, at: S.t, kind: 'tut' }); queueStepSay(9); save(); }
+      if (!g.tut.said.start) { g.tut.said.start = 1; queueStepSay(9); save(); }   // [algoctx] no 'optional onboarding started' line
       else queueStepSay(6);
       return;
     }

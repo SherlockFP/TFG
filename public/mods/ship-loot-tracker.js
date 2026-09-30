@@ -100,13 +100,14 @@ KefalAPI.defineMod({
       const projF = quota ? Math.min(1, (sold + worth) / quota) : 0;
       const fullF = quota ? Math.min(1, (sold + total) / quota) : 0;
       const cls = !cfg.colorByQuota ? '' : worth >= need ? 'ok' : total >= need ? '' : 'bad';
-      let html = `<div class="t"><span>SHIP LOOT</span><b class="${cls}">▮${total}</b></div>`;
-      html += `<div class="dim">${n} item${n === 1 ? '' : 's'} · quota ▮${sold}/▮${quota}</div>`;
+      // [algoctx] plain language; the quota numbers live in the top bar only (one source)
+      let html = `<div class="t"><span>${esc(api.t('LOOT ABOARD'))}</span><b class="${cls}">▮${total}</b></div>`;
+      html += `<div class="dim">${esc(api.tf(n === 1 ? '{n} item' : '{n} items', { n }))}</div>`;
       html += `<div class="bar"><i class="pr" style="width:${(fullF * 100).toFixed(1)}%"></i><i style="width:${(projF * 100).toFixed(1)}%;opacity:.55"></i><i style="width:${(soldF * 100).toFixed(1)}%"></i></div>`;
-      html += `<div class="dim">sell today @${Math.round(rate * 100)}%: <span class="${cls}">▮${worth}</span>${need > 0 ? ` · need ▮${need}` : ' · <span class="ok">QUOTA MET</span>'}</div>`;
+      html += `<div class="dim">${esc(api.tf('The Company pays {r}% today', { r: Math.round(rate * 100) }))}: <span class="${cls}">▮${worth}</span>${need > 0 ? ` · ${esc(api.tf('▮{n} to go', { n: need }))}` : ` · <span class="ok">${esc(api.t('QUOTA MET'))}</span>`}</div>`;
       if (cfg.showBreakdown && list.length) {
         for (const it of list.slice(0, 4)) html += `<div class="it"><span>${esc(it.label || it.def.name)}</span><span>▮${it.value}</span></div>`;
-        if (list.length > 4) html += `<div class="it"><span>+${list.length - 4} more</span><span></span></div>`;
+        if (list.length > 4) html += `<div class="it"><span>${esc(api.tf('+{n} more', { n: list.length - 4 }))}</span><span></span></div>`;
       }
       if (html !== lastHtml) { box.innerHTML = html; lastHtml = html; }
     });

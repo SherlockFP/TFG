@@ -14,6 +14,7 @@ import { isSellable } from './items.js';
 import { getLang, t, speechLang } from '../core/i18n.js';
 import { saveSettings } from '../core/save.js';
 import * as OG from './onegoal_core.js';
+import './algoctx_i18n.js';
 
 export const FOCI = ['noise', 'light', 'greed', 'split', 'doors', 'coward'];
 export const FOCUS_NAME = {
@@ -189,6 +190,12 @@ export function installAlgorithm(core) {
   }
 
   // ---------------------------------------------------------------- client: intercom
+  /** [algoctx] where the player is right now (onegoal_core.ctxTags): a queued line whose context no longer matches is dropped */
+  function tagsNow() {
+    let expedition = false;
+    try { expedition = !!game.world?.outdoor?.expedition; } catch { /* no map */ }
+    return OG.ctxTags({ phase: game.run?.phase, inShip: !!game.player?.inShip, indoor: !!game.player?.indoor, expedition });
+  }
   function ensureDom() {
     if (st.el || typeof document === 'undefined') return;
     ensureStyle();
@@ -225,11 +232,14 @@ export function installAlgorithm(core) {
       // [firstrun] a brand-new player hears at most one Algorithm line per 45 s; teaching lines and deaths always pass (past the budget: onegoal, same pacing for everyone)
       else if (game.onboard?.fr?.algoOk?.(cls === 'teach') === false) return;
     }
+    const ctx = OG.inferCtx({ ...d, text });   // [algoctx] a line for another moment is not queued at all; the rest expire in the queue (ttl)
+    if (!OG.ctxOk(ctx, tagsNow())) return;
     st.seen.push(OG.lineWords(text)); if (st.seen.length > 40) st.seen.shift();
-    st.q = OG.enqueue(st.q, { text, pri: rank < 2, cls, voice: d.voice || null, mood: d.mood || game.run?.algo?.mood });
+    st.q = OG.enqueue(st.q, { text, pri: rank < 2, cls, voice: d.voice || null, mood: d.mood || game.run?.algo?.mood, ctx, exp: st.t + OG.ttlOf(d) });
     if (rank < 2 && st.cur && OG.CLS[st.cur.cls] === 2) st.cur.dur = Math.min(st.cur.dur, st.cur.t + 0.6);   // a warning / lesson cuts a flavour line short
   }
   function startNext() {
+    st.q = OG.prune(st.q, st.t, tagsNow());
     const n = st.q.shift();
     if (!n) return;
     ensureDom();
@@ -265,6 +275,7 @@ export function installAlgorithm(core) {
   }
   function clientUpdate(dt) {
     const busy = game.ui?.fullscreenOpen?.();
+    if (st.q.length) st.q = OG.prune(st.q, st.t, tagsNow());   // [algoctx] stale / wrong-context lines never wait for their turn
     if (!st.cur && st.q.length && !busy && (st.q[0].pri || !(game.onboard?.fr?.busy?.() > 0))) startNext();   // [qa] the Algorithm box waits for the arrival cards (soul / sector map / wave)
     const c = st.cur;
     if (c && st.el) {
@@ -273,7 +284,7 @@ export function installAlgorithm(core) {
       const shown = Math.min(c.text.length, Math.floor(typeT * 32));
       if (shown !== c.shown || shown < c.text.length) {
         c.shown = shown;
-        const tail = shown < c.text.length ? GLYPHS[Math.floor(Math.random() * GLYPHS.length)] + GLYPHS[Math.floor(Math.random() * GLYPHS.length)] : '';
+        const tail = shown < c.text.length && (c.scr = (c.scr ?? 2) - 1) >= 0 ? GLYPHS[Math.floor(Math.random() * GLYPHS.length)] + GLYPHS[Math.floor(Math.random() * GLYPHS.length)] : '';
         st.textEl.innerHTML = '';
         st.textEl.append(document.createTextNode(c.text.slice(0, shown)));
         if (tail) { const i = document.createElement('i'); i.textContent = tail; st.textEl.append(i); }
