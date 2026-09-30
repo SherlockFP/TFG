@@ -62,9 +62,9 @@ export const wantedInterior = { [TUNDRA]: 'funhouse', [FEED]: 'deadmall' };
 
 if (!MOONS[FEED]) {
   const m = registerMoon({
-    id: FEED, name: '∞-Feed', short: 'Feed', tier: 3, cost: 380, biome: 'feed8', size: 1.4, mapScale: 1.15, cardSil: 'feed8', landmarkBonus: 1,
+    id: FEED, name: '∞-Feed', short: 'Feed', tier: 3, cost: 500, biome: 'feed8', size: 1.4, mapScale: 1.15, cardSil: 'feed8', landmarkBonus: 1,
     desc: TX.feed_desc[0],
-    weather: ['clear', 'clear', 'clear', 'eclipsed', 'foggy'], scrapCount: [18, 24], scrapMul: 1.45, power: 7, outdoorPower: 6,
+    weather: ['clear', 'clear', 'clear', 'eclipsed', 'foggy'], scrapCount: [18, 24], scrapMul: 1.55, power: 7, outdoorPower: 6,
     creatures: { scuttler: 12, yoinker: 10, crawler: 12, lurker: 10, mannequin: 16, sludge: 6, spider: 8, leech: 8, jester: 12, screamer: 10, mimic: 10, turret: 8, mine: 10 },
     outdoor: { sandkefal: 9, hound: 4, mimic: 4, giant: 2 },
   });
@@ -73,10 +73,10 @@ if (!MOONS[FEED]) {
 }
 if (!MOONS[TUNDRA]) {
   const m = registerMoon({
-    id: TUNDRA, name: '503-Service Unavailable', short: '503', tier: 4, cost: 800, biome: 'tundra503', size: 1.6, mapScale: 1.15, cardSil: 'tundra503', landmarkBonus: 1,
+    id: TUNDRA, name: '503-Service Unavailable', short: '503', tier: 4, cost: 1100, biome: 'tundra503', size: 1.6, mapScale: 1.15, cardSil: 'tundra503', landmarkBonus: 1,
     desc: TX.x503_desc[0],
     weather: ['clear', 'foggy', 'foggy', 'stormy', 'eclipsed'], scrapCount: [24, 31], scrapMul: 1.8, power: 9, outdoorPower: 7,
-    creatures: { scuttler: 8, yoinker: 8, crawler: 10, lurker: 12, mannequin: 12, sludge: 6, spider: 6, leech: 6, jester: 18, screamer: 14, mimic: 16, turret: 6, mine: 8 },
+    creatures: { scuttler: 8, yoinker: 8, crawler: 10, lurker: 12, mannequin: 12, sludge: 6, spider: 6, leech: 6, jester: 12, screamer: 14, mimic: 16, turret: 6, mine: 8 },
     outdoor: { hound: 12, giant: 6, mimic: 5 },
   });
   localizeFields(m, ['name', 'desc', 'short']); bindInterior(m, wantedInterior[TUNDRA]);

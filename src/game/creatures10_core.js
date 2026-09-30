@@ -13,7 +13,7 @@ export const TUNE = Object.freeze({
   // ---- Ratio: watchDist / cone decide "looked at" (M.isLookedAt); grace keeps a twin frozen 0.2 s after the look ends (net jitter)
   ratio: { watchDist: 34, cone: 0.8, grace: 0.2, sense: 45, reach: 1.6, hitReach: 2.3, windup: 0.9, attackT: 0.6, cd: 3, twinMin: 3.5, twinMax: 9, twinTries: 6 },
   // first quota index (run.quotaIndex) in which the generic spawners may roll each of them: not the first days
-  minQuota: { c10_buffering: 1, c10_doomscroller: 1, c10_ratio: 2 },
+  minQuota: { c10_buffering: 2, c10_doomscroller: 2, c10_ratio: 3 },   // wave 12 balance12: staggered (was 1 / 1 / 2): the chase-and-hit rules wait until quota 2-3
   // spawn weight per moon tier 1..4 (tier 1 = the first two moons never get them) - merged into creatures.js EXTRA_SPAWNS
   spawn: {
     c10_buffering: { zone: 'in', w: [0, 4, 6, 7] },

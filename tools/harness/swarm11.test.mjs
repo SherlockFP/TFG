@@ -76,7 +76,8 @@ await ok('registration: four creatures, one rule in the first lore sentence, tel
   const M = new Map(); AI.setSwGame(null); assert.equal(canSpawnMore(STR, M), false, 'no run: blocked');
   const g = { run: { quotaIndex: 0 } }; AI.setSwGame(g);
   assert.equal(canSpawnMore(STR, M), false); assert.equal(canSpawnMore(MOD, M), false);
-  g.run.quotaIndex = 1; assert.ok(canSpawnMore(STR, M) && canSpawnMore(MOD, M));
+  g.run.quotaIndex = 1; assert.ok(canSpawnMore(STR, M)); assert.equal(canSpawnMore(MOD, M), false, 'balance12: AutoMod from quota 3');
+  g.run.quotaIndex = 3; assert.ok(canSpawnMore(STR, M) && canSpawnMore(MOD, M));
   M.set('a', { type: MOD, dead: false }); assert.equal(canSpawnMore(MOD, M), false, 'max 1 AutoMod alive');
   for (const id of [STR, MOD]) { assert.ok(EXTRA_SPAWNS[id] && EXTRA_SPAWNS[id].w[0] === 0 && EXTRA_SPAWNS[id].w[3] > 0); }
 });

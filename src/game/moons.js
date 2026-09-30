@@ -20,28 +20,28 @@ export const MOONS = {
     outdoor: { hound: 6, giant: 3, mimic: 3 },
   },
   palamut: {
-    id: 'palamut', name: '33-Guestbook', short: 'Guestbook', tier: 2, cost: 150, biome: 'snow', interior: 'academy', size: 1.1,   // [repomaps] Content Academy (the guestbook is a yearbook)
+    id: 'palamut', name: '33-Guestbook', short: 'Guestbook', tier: 2, cost: 220, biome: 'snow', interior: 'academy', size: 1.1,   // [repomaps] Content Academy (the guestbook is a yearbook)
     desc: 'A frozen yearbook page: the Algorithm trains its streamers here. Lecture halls, detention and a library that rearranges itself. Trolls hunt at night.',
     weather: ['clear', 'foggy', 'stormy', 'eclipsed'], scrapCount: [14, 19], scrapMul: 1.25, power: 5, outdoorPower: 4,
     creatures: { scuttler: 14, yoinker: 14, crawler: 14, lurker: 14, mannequin: 10, sludge: 8, spider: 12, leech: 10, jester: 8, screamer: 8, mimic: 6, turret: 4, mine: 6 },
     outdoor: { hound: 12, giant: 5, mimic: 4 },
   },
   levrek: {
-    id: 'levrek', name: '88-Chatroom', short: 'Chatroom', tier: 2, cost: 200, biome: 'desert', interior: 'metro', size: 1.35,   // [labyrinths] was mineshaft
+    id: 'levrek', name: '88-Chatroom', short: 'Chatroom', tier: 2, cost: 320, biome: 'desert', interior: 'metro', size: 1.35,   // [labyrinths] was mineshaft
     desc: 'Red desert of dead chatrooms. An abandoned subway runs under the mesa, and the ghost trains still keep their schedule. Something digs under the sand.',
     weather: ['clear', 'clear', 'foggy', 'eclipsed'], scrapCount: [16, 22], scrapMul: 1.3, power: 6, outdoorPower: 5,
     creatures: { scuttler: 18, yoinker: 14, crawler: 18, lurker: 10, mannequin: 12, sludge: 10, spider: 14, leech: 12, jester: 8, screamer: 8, mimic: 6, turret: 10, mine: 14 },
     outdoor: { sandkefal: 8, hound: 6, giant: 3, mimic: 3 },
   },
   cipura: {
-    id: 'cipura', name: '666-Creepypasta', short: 'Creepypasta', tier: 3, cost: 450, biome: 'moor', interior: 'prison', size: 1.5,   // [labyrinths] was mansion
+    id: 'cipura', name: '666-Creepypasta', short: 'Creepypasta', tier: 3, cost: 700, biome: 'moor', interior: 'prison', size: 1.5,   // [labyrinths] was mansion
     desc: 'Storm-battered moor. A penitentiary of banned accounts: the cell doors slam shut when the alarm sounds. Elites roam.',
     weather: ['stormy', 'rainy', 'foggy', 'eclipsed'], scrapCount: [20, 26], scrapMul: 1.55, power: 8, outdoorPower: 6,
     creatures: { scuttler: 10, yoinker: 10, crawler: 16, lurker: 16, mannequin: 14, sludge: 10, spider: 14, leech: 12, jester: 12, screamer: 12, mimic: 10, turret: 8, mine: 10 },
     outdoor: { hound: 12, giant: 8, mimic: 6 },
   },
   orkinos: {
-    id: 'orkinos', name: '404-Not Found', short: '404', tier: 4, cost: 900, biome: 'blackforest', interior: 'museum', size: 1.8,   // [repomaps] Museum of Deleted Content
+    id: 'orkinos', name: '404-Not Found', short: '404', tier: 4, cost: 1500, biome: 'blackforest', interior: 'museum', size: 1.8,   // [repomaps] Museum of Deleted Content
     desc: 'Black forest under a dead sun. Everything lives here, and the Museum of Deleted Content keeps the best of it framed behind laser grids. Do not bump the art.',
     weather: ['eclipsed', 'foggy', 'stormy'], scrapCount: [26, 34], scrapMul: 2.0, power: 9, outdoorPower: 8,
     creatures: { scuttler: 10, yoinker: 8, crawler: 16, lurker: 16, mannequin: 16, sludge: 10, spider: 16, leech: 12, jester: 14, screamer: 14, mimic: 12, turret: 12, mine: 14 },

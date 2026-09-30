@@ -23,9 +23,12 @@
 // The player model is a set of assumptions (documented next to each number) - use it to compare tunings,
 // not as a prediction of an exact quota. Output: per-cycle economy table, quotas-survived distribution per
 // crew, generated-moon affordability, modifier risk/reward, and hours to the first Rebirth (Lv.50).
-import { ITEMS, scrapTableFor, bigTableFor } from '../../src/game/items.js';
+import { ITEMS, scrapTableFor, bigTableFor, SHIP_UPGRADES } from '../../src/game/items.js';
+import { MODULES as SY_MODULES, creditCost as syCost } from '../../src/game/shipyard_core.js';   // wave 12 shop model (real module prices)
+import { ITEMS11 } from '../../src/game/gear11_core.js';
 import { HERO_THEMES, BIG_THEMES } from '../../src/game/herocontent_core.js';   // wave 8: themed tables for metro / greenhouse / prison / tower (registered on import)
 import { MOONS } from '../../src/game/moons.js';
+import '../../src/game/moons10_core.js';   // wave 12: 503 + Infinity-Feed join the route catalogue (--no-moons10 = the wave-9 catalogue)
 import { generateSector, MODIFIERS } from '../../src/game/moongen.js';
 import { DAILY_EVENTS } from '../../src/game/dailyEvents.js';
 import { CREATURES, spawnTable, creatureLevelStats } from '../../src/game/creatures.js';
@@ -53,6 +56,7 @@ const BALANCE_ON = !args.includes('--no-balance');
 const MODE = DIFF.norm(argv('--mode', DIFF.DEFAULT_MODE));
 const MODES_ONLY = args.includes('--modes-only');
 const PRE8 = args.includes('--pre8');                       // the economy before wave 8: no wave-8 layer and indoor loot x0.7 (pre-wave-8 median for 4 competent Standard was 8 quotas)
+const SHOP = !args.includes('--no-shop');                  // wave 12: crews spend credits on a wishlist (real prices); the sim used to leave credits idle, which made the piles look bigger than they are (docs/wave12/balance12.md)
 const W8 = !PRE8 && !args.includes('--no-wave8');          // wave-8 income / cost layer (docs/wave8/econ8.md)
 DIFF.setMode(MODE);
 const AVG_THREAT = +argv('--avg-threat', 40);   // mean Threat over a landing for a crew that holds loot and stays a while (see docs/wave1/balance.md)
@@ -97,7 +101,7 @@ const REAL_DAY_MIN = 11.5;       // real minutes per landed day (720 s day, crew
 const CYCLE_OVERHEAD_MIN = 6;    // company visit + orbit/terminal per quota cycle
 
 // ---------------------------------------------------------------- moon catalogue
-const HANDCRAFTED = ['hamsi', 'lufer', 'palamut', 'levrek', 'cipura', 'orkinos'].map((id) => MOONS[id]);
+const HANDCRAFTED = ['hamsi', 'lufer', 'palamut', 'levrek', 'cipura', 'orkinos', ...(args.includes('--no-moons10') ? [] : ['x8feed', 'x503'])].map((id) => MOONS[id]);
 function moonsFor(runKey, q) { return [...HANDCRAFTED, ...generateSector(runKey, q).moons]; }
 const theme = (m) => (THEMES.includes(m.interior) ? m.interior : 'factory');
 
@@ -279,12 +283,30 @@ function hsCycle(k) {
 const hashRun = (k) => { let h = 2166136261; for (const c of String(k)) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return (h >>> 0) % 100; };   // no rand() call: the old streams stay identical
 
 // ---------------------------------------------------------------- one run
+// ---------------------------------------------------------------- wave 12: shop model (docs/wave12/balance12.md)
+// What a crew buys, in priority order, with the REAL prices (items.js, gear11_core, shipyard_core). Effects on crew power are not modelled (as before): this only drains credits.
+const W12 = { consumables: 40, reserve: 300 };
+function wishlist(n) {
+  const P = (id) => ITEMS[id]?.price || 0, per = (id) => P(id) * n, L = [];
+  const add = (name, cost) => { if (cost > 0) L.push({ name, cost }); };
+  const mods = ['medbay', 'cargo', 'workshop', 'bunk', 'lounge', 'engine', 'lab', 'turret'];
+  add('beltbag x n', per('beltbag')); add('fieldpack x n', per('bag_fieldpack')); add('riot vest x n', per('arm_riot'));
+  add('scout drone', ITEMS11.scoutdrone.price); add('door jammer', ITEMS11.doorjammer.price); add('zipline', ITEMS11.ziplinekit.price); add('decoy speaker', 90);
+  add('signal translator', SHIP_UPGRADES.signal.price); add('floodlight+', SHIP_UPGRADES.lightsplus.price);
+  for (const id of mods) add(id + ' Mk I', syCost(id, 1));
+  add('hauler frame x n', per('bag_hauler')); add('teleporter', SHIP_UPGRADES.teleporter.price);
+  for (const id of mods) add(id + ' Mk II', syCost(id, 2));
+  add('zap gun', P('taser')); add('harpoon', P('harpoon')); add('kevlar x n', per('arm_kevlar')); add('jetpack', P('jetpack'));
+  for (const id of mods) add(id + ' Mk III', syCost(id, 3));
+  return L;
+}
 function simRun(crew, runKey, stats) {
   let q = 0, quota = nextQuota(0, 0, rand), credits = 60, stash = 0, minutes = 0, xp = 0, current = 'hamsi', van = false;
   const perCycle = [];
   const inc = { scrap: 0, ore: 0, crate: 0, job: 0, pocket: 0, lantern: 0, resto: 0, arcade: 0, map: 0, hs: 0 };   // where the run's income came from (wave 8 layer)
   const sk0 = crew.skill, usesResto = W8 && rand() < W8K.restoP;
-  let restoK = -1, restoSpent = 0, mapNow = null, hsK = 0;
+  let restoK = -1, restoSpent = 0, mapNow = null, hsK = 0, wishK = 0;
+  const wish = SHOP ? wishlist(crew.n) : [];
   const usesHs = W8 && hashRun(runKey) < W8K.hsP * 100;
   for (;;) {
     // ---- routing (quota-aware, like real crews): the safest affordable moon whose expected 3-day haul covers
@@ -361,6 +383,10 @@ function simRun(crew, runKey, stats) {
         if (hsK < HS_ORDER.length && credits >= HS_ORDER[hsK].cost + W8K.hsCushion) { credits -= HS_ORDER[hsK].cost; hsK++; }
         if (hsK > 0) { const r = hsCycle(hsK); credits += r.total; inc.hs += r.total; }
       }
+    }
+    if (SHOP) {   // consumables every cycle (medkits, shells, batteries), then the wishlist in priority order while a reserve for the next route stays in the wallet
+      credits -= Math.min(credits, W12.consumables * crew.n);
+      while (wishK < wish.length && credits - wish[wishK].cost >= W12.reserve + 0.15 * quota) { credits -= wish[wishK].cost; wishK++; }
     }
     xp += 0.25 * sold / Math.sqrt(crew.n);
     xp += META_XP_PER_HOUR(stats.level) * ((REAL_DAY_MIN * 3 + CYCLE_OVERHEAD_MIN) / 60);
@@ -468,6 +494,22 @@ function w8Report() {
   }
 }
 
+// ---------------------------------------------------------------- wave 12: moon table (docs/wave12/balance12.md)
+// Expected 3-day haul (sold value incl. crew efficiency, competent 4) per moon and quota index, the danger ratio r = threat / crew capacity, wipe chance, and what the route costs against the haul.
+function moonTable() {
+  const crew = { n: 4, skill: 'competent' };
+  console.log('\n== MOON TABLE (4 competent, expected over daily events + weather; haul = 3 landings; net = haul x survive - cost; cost% = cost / haul) ==');
+  console.log('moon        tier cost | ' + [0, 1, 2, 3, 4, 6].map((q) => ('q' + q + ' haul r wipe%').padEnd(19)).join(''));
+  for (const m of HANDCRAFTED) {
+    const cells = [0, 1, 2, 3, 4, 6].map((q) => {
+      const e = expectedDay(crew, m, q), th = landingOutcome(crew, m, q, { w: 1 }, m.weather[0]);
+      return (fmt(3 * e.value) + ' ' + fmt(th.r, 2) + ' ' + fmt(e.wipe * 100, 1)).padEnd(19);
+    });
+    console.log(m.id.padEnd(11) + ' ' + m.tier + '    ' + pad(m.cost || 0, 4) + ' | ' + cells.join(''));
+  }
+  for (const n of [2, 4]) { const L = wishlist(n); console.log(`shop wishlist (${n} players): ${L.length} buys, ${L.reduce((a, x) => a + x.cost, 0)} credits in total (+ ${W12.consumables * n} consumables per cycle)`); }
+}
+if (args.includes('--moon-table')) { moonTable(); process.exit(0); }
 if (MODES_ONLY) { console.log(`TFG economy sim (modes only) runs/crew=${RUNS} seed=${SEED}`); modeComparison(); w8Report(); process.exit(0); }
 
 // ---------------------------------------------------------------- run everything

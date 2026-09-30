@@ -25,7 +25,7 @@ export const TUNE = Object.freeze({
     hp: 220, dmg: 55, walk: 1.7, run: 3.4, scanR: 30, scanEvery: 1.0, sweepT: 2.4, reach: 1.7, dropGrace: 8, protectR: 3,
     bodyR: 4.5, dwellFill: 4, dwellDrain: 1.5, awareR: 22, flagT: 1.3, strikeT: 0.55, hitReach: 2.8, cd: 7, bloodCap: 28, bloodGap: 1.4, aimEvery: 1,
   },
-  minQuota: { sw_streamer: 1, sw_automod: 1 },
+  minQuota: { sw_streamer: 1, sw_automod: 3 },   // wave 12 balance12: AutoMod (55 dmg delete) from quota 3 (was 1)
   spawn: {
     sw_streamer: { zone: 'in', w: [0, 4, 6, 7], interior: { office: 1.3, serverfarm: 1.3, mansion: 0.8 } },
     sw_automod: { zone: 'in', w: [0, 3, 5, 6], interior: { office: 1.3, hospital: 1.2, factory: 0.9 } },

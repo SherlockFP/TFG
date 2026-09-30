@@ -65,8 +65,8 @@ await ok('spawn pools: not on tier 1 moons, not in the first quotas (generic gat
   AI.setC10Game(null); assert.equal(canSpawnMore(BUF, M), false, 'no run: blocked');
   const g = { run: { quotaIndex: 0 } }; AI.setC10Game(g);
   for (const id of C.ALL_IDS) assert.equal(canSpawnMore(id, M), false, 'quota 0 blocked ' + id);
-  g.run.quotaIndex = 1; assert.ok(canSpawnMore(BUF, M) && canSpawnMore(DOOM, M)); assert.equal(canSpawnMore(RATIO, M), false);
-  g.run.quotaIndex = 2; assert.ok(canSpawnMore(RATIO, M));
+  for (let q = 1; q <= 4; q++) { g.run.quotaIndex = q; for (const id of C.ALL_IDS) assert.equal(canSpawnMore(id, M), q >= T.minQuota[id], `quota ${q} gate ${id}`); }   // wave 12: staggered gates (Buffering / Doomscroller 2, Ratio 3)
+  assert.ok(T.minQuota[BUF] >= 2 && T.minQuota[RATIO] > T.minQuota[BUF], 'balance12: the chase rules wait, the Ratio last');
   M.set('a', { type: BUF, dead: false }); assert.equal(canSpawnMore(BUF, M), false, 'max 1 Buffering alive');
 });
 

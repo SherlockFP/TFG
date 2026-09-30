@@ -13,7 +13,7 @@ export const TUNE = Object.freeze({
   cap: { zone: 2.2, cancelR: 3.8, scan: 0.9, limit: 5, grace: 1.5, pass: 20, closeWarn: 3, alarm: 1.0, alarmT: 0.5, burstR: 9, burstDmg: 12, stun: 1.2, noise: 3.4, reload: 8, slide: 1.7, slideT: 0.8, clear: 1.3, clearMax: 4, retry: 3 },
   ban: { markR: 22, mark: 1.2, dur: 25, soloDur: 12, touch: 1.5, touchT: 0.4, reach: 1.8, hitReach: 2.6, windup: 1.0, attackT: 0.6, cd: 3, off: 3.5, rest: [24, 34], walk: 2.0, run: 3.6, sense: 26 },
   rec: { glow: 2.0, glowMin: 8, glowMax: 18, glowK: 2.6, moveMin: 0.5, wait: 7, trigger: 2.4, windup: 0.9, attackT: 0.6, hitReach: 2.6, dismiss: 1.2, rest: [18, 28], learnMin: 2, share: 0.6, habitMin: 3, habitShare: 0.6, hist: 12, far: 1.2 },
-  minQuota: { c11_captcha: 1, c11_shadowban: 2, c11_recommender: 2 },
+  minQuota: { c11_captcha: 1, c11_shadowban: 3, c11_recommender: 4 },   // wave 12 balance12: staggered (was 1 / 2 / 2): the mute + the habit learner come later
   spawn: {
     c11_captcha: { zone: 'in', w: [0, 3, 5, 6], interior: { office: 1.3, serverfarm: 1.3, factory: 1.1 } },
     c11_shadowban: { zone: 'in', w: [0, 2, 4, 5], interior: { mansion: 1.2, hospital: 1.2 } },
