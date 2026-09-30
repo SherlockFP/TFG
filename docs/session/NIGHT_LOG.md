@@ -72,4 +72,5 @@ Loop rule: 2-3 Sonnet agents at a time (1 browser/QA agent max) → merge with t
 | 27 | i18n8 (fill ~370+ missing TR/RU strings) | running |
 | 28 | algoctx | merged 54e5e12: Algorithm lines carry context + 12 s expiry (stale terminal/HR/WASD lines dropped), one shared live viewer count, 'Host revived Client' once as a toast, TUTORIAL SKIP line removed, ship-loot-tracker plain wording. |
 | 28 | firstsight (Opus) | running |
-| 29 | heroprops (vending machine/rack/statue/pipe models, horror-safe loot glint instead of blue pillars, route-card interior label) | running |
+| 29 | heroprops | merged 367d0c6: rebuilt vending machine / server rack / Founder statue / lead pipe models, blue rarity pillars replaced by a small periodic glint + 6 m floor ring (line-of-sight), hamsi card says 'Abandoned Web Host'. |
+| 30 | homeworld tycoon (owner request: Roblox-tycoon-style base on the home planet) — multi-agent workflow: understand → 2 designs + judge → implement → adversarial review → fix | running |
