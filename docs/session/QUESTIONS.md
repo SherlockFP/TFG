@@ -8,3 +8,8 @@ The loop keeps working with the recommended default until you answer.
 3. **Creative director's questions** (docs/REVIEW_W8_NIGHT.md §5, recommendation in the doc): (a) freeze NEW systems for two waves and only polish/merge — default: **yes**; (b) campaign starts with 3 main moons, 3-4 creatures per moon, no swarm waves before quota 3 — default: **yes**; (c) free starter torch + one automatic slow self-revive per landing for solo — default: **yes** (I'm applying the solo self-revive now; the torch stays 'loaner during Hiring Day + readable-dim interiors' until you answer, because you asked for flashlights to be bought).
 
 4. **Morning review questions** (docs/REVIEW_W8_MORNING.md): (a) play 15 minutes with a friend on a real graphics card using a checklist — recommended **yes**; (b) the Algorithm speaks only in reaction to events and stays mostly off screen — recommended **yes** (applying now).
+
+## Owner answers (2026-09-30)
+- Starting quota: **300-350** (recommended) → economy re-anchor task.
+- Homeworld base: owner likes the **Roblox tycoon system** — finish it as a Roblox-style tycoon (no re-theme to 'studio'). Main priority: bring the main game to **min 7/10, ideally 8/10**.
+- Clout: becomes **Followers** (channel growth, not a spendable currency).
