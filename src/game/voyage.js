@@ -1017,11 +1017,12 @@ export function installVoyage(game) {
   }
   const _v = new THREE.Vector3();
   function updateMarkers() {
-    ensureMarkEl();
-    if (!S.markEl) return;
     const tg = run()?.phase === 'moon' && !me().dead && !me().indoor ? missionTargets() : [];
     const ct = contentTarget();
     if (ct && !(run().vy?.mission?.st === 'active') && !me().indoor && run().phase === 'moon' && dist2(ct.p) > 20) tg.push({ ...ct, soft: 1 });
+    if (!tg.length) { for (const el of S.marks) setStyle(el, 'display', 'none'); return; }
+    ensureMarkEl();
+    if (!S.markEl) return;
     while (S.marks.length < tg.length) { const el = document.createElement('div'); el.className = 'vy-mk'; el.innerHTML = '<i></i><span></span>'; S.markEl.appendChild(el); S.marks.push(el); }
     const w = window.innerWidth, h = window.innerHeight;
     const pos = tg.map((o) => {

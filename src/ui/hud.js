@@ -613,18 +613,21 @@ export class HUD {
     // health figure color
     const hpf = clamp(p.hp / Math.max(1, p.maxHp), 0, 1);
     const col = hpf > 0.7 ? '#ffd9b0' : hpf > 0.4 ? '#ffb347' : hpf > 0.2 ? '#ff6a2a' : '#ff2a2a';
-    this.$.health.style.color = col;
+    if (this.healthColor !== col) { this.healthColor = col; this.$.health.style.color = col; }
     this.$.health.classList.toggle('crit', hpf < 0.25 && !p.dead);
-    this.$.stam.style.width = (p.stamina / p.maxStamina * 100) + '%';
+    const staminaWidth = (p.stamina / p.maxStamina * 100) + '%';
+    if (this.staminaWidth !== staminaWidth) { this.staminaWidth = staminaWidth; this.$.stam.style.width = staminaWidth; }
     this.$.stamBox.classList.toggle('exhausted', p.exhausted);
     this.$.stamBox.classList.toggle('low', p.stamina < p.maxStamina * 0.25 && !p.exhausted);   // [artdir]
     this.el.classList.toggle('hp-low', hpf < 0.3 && !p.dead);   // [artdir] red edge pulse
-    this.$.weight.textContent = Math.round(p.carryWeight ? p.carryWeight() + (game.stats.carryRelief || 0) : 0) + ' lb';
+    const weightText = Math.round(p.carryWeight ? p.carryWeight() + (game.stats.carryRelief || 0) : 0) + ' lb';
+    if (this.$.weight.textContent !== weightText) this.$.weight.textContent = weightText;
     // clock
     const onMoon = (run.phase === 'moon' || run.phase === 'takeoff') && !p.indoor;
     this.$.clock.classList.toggle('hidden', !onMoon);
     if (onMoon) {
-      this.$.clockTime.textContent = fmtClock(run.time || 480);
+      const clockText = fmtClock(run.time || 480);
+      if (this.$.clockTime.textContent !== clockText) this.$.clockTime.textContent = clockText;
       const night = (run.time || 480) > 18.5 * 60;   // [ui2] vector sun / moon instead of text glyphs
       if (this._night !== night) { this._night = night; this.$.clockIcon.innerHTML = glyph(night ? 'moon' : 'sun'); }
       this.$.clock.classList.toggle('late', (run.time || 0) > 22 * 60);
@@ -635,9 +638,11 @@ export class HUD {
     if (showCmp) this.drawCompass(game);
     // level / xp
     const prof = game.profile;
-    this.$.lvl.textContent = 'Lv.' + prof.level;
-    this.$.rank.textContent = rankOf(prof.level) + (prof.skillPoints ? ` (+${prof.skillPoints})` : '');
-    this.$.xp.style.width = (prof.xp / xpForLevel(prof.level) * 100) + '%';
+    const levelText = 'Lv.' + prof.level, rankText = rankOf(prof.level) + (prof.skillPoints ? ` (+${prof.skillPoints})` : '');
+    if (this.$.lvl.textContent !== levelText) this.$.lvl.textContent = levelText;
+    if (this.$.rank.textContent !== rankText) this.$.rank.textContent = rankText;
+    const xpWidth = (prof.xp / xpForLevel(prof.level) * 100) + '%';
+    if (this.xpWidth !== xpWidth) { this.xpWidth = xpWidth; this.$.xp.style.width = xpWidth; }
     if (!this.coinsInit || (run.credits ?? 0) !== this.creditsVal) { this.coinsInit = true; this.creditsVal = run.credits ?? 0; this.setCoins(prof.coins); }
     // [algoslot] QUOTA / CREDITS / ROUTE left the top bar: they live on the hold-Tab card (hudcalm.js) and the terminal header (terminal.js). The LIVE strip (algoslot.js) sits above HP.
     if (!this.quotaOff) { this.quotaOff = true; this.$.quota.classList.add('hidden'); }
@@ -654,7 +659,8 @@ export class HUD {
     // voice indicator
     this.$.voice.classList.toggle('hidden', !game.voice.transmitting || game.voice.localLevel < 0.05);
     // crosshair
-    this.$.cross.style.opacity = p.dead || game.minigame ? 0 : 1;
+    const crossOpacity = p.dead || game.minigame ? 0 : 1;
+    if (this.crossOpacity !== crossOpacity) { this.crossOpacity = crossOpacity; this.$.cross.style.opacity = crossOpacity; }
     // scan labels
     if (this.scanLabels.length) {
       if (performance.now() > this.scanUntil) { this.$.scan.innerHTML = ''; this.scanLabels = []; }

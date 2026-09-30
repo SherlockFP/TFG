@@ -69,7 +69,7 @@ export const BALANCE = {
   quotaBase: 330,             // first quota (wave 9: was 130 = 20-30x sold/quota at q0, no decisions; owner 300-350, docs/wave9/econ9.md)
   overtimeDiv: 10,            // wave 9: overtime bonus = surplus / overtimeDiv (was 5; credits need sinks, not a faucet)
   quotaGrowth: 28,            // wave 12: growth term from index 3 on: quotaGrowth * (1 + q^2 / quotaCurveDiv) * (0.8..1.2), was 85 (from 330 with div 16) - the ramp above carries the early jump
-  quotaRamp: [330, 850, 1250], // wave 12 balance12: explicit quotas for index 0-2 (null = pure growth curve). q0 keeps the owner 300-350 start (the learning cycle); q1 / q2 squeeze (docs/wave12/balance12.md)
+  quotaRamp: [330, 650, 1000], // wave 18: retain q0 learning target, smooth first-success demand cliff; late convex growth unchanged (docs/wave18/pacing.md)
   quotaCurveDiv: 8,           // wave 12: convexity of the growth term (was 16)
   valuePerQuota: 0.015,       // scrap value multiplier growth per met quota
   countPerQuota: 0.2,         // extra indoor scrap items per met quota

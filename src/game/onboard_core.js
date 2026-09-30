@@ -2,7 +2,7 @@
 //   flow      a linear list of steps completed by ACCUMULATING FACTS (an event sets a fact, the current step is the first one whose need() is still
 //             false), so events may arrive early / out of order and the machine never gets stuck.
 //   skip      shouldRun(ctx): returning players, veterans, friend lobbies, loaded saves, dev auto-host, settings switch.
-//   unlocks   the Algorithm "gifts" systems as the crew meets quotas: forge q1, pets + voyage q2, homeworld q3, glitch gates after the first boss.
+//   unlocks   runtime feature access is immediate; pure staged rules remain for legacy schedule compatibility.
 // State lives in profile.onboard (flow) and profile.unlocks (schedule); both survive save / load (plain JSON).
 
 export const V = 1;
@@ -102,6 +102,13 @@ export function isVeteran(p) {
   const st = (p && p.stats) || {};
   return (st.days || 0) > 0 || (st.quotasMet || 0) > 0 || (p?.level || 1) >= 4 || (st.scrapCollected || 0) > 0 || (st.sold || 0) > 0;
 }
+/** Message/hazard pacing is separate from access. A first-shift pickup or sale is not an experienced player. */
+export function pacingMode(p, run) {
+  const st=p?.stats||{};
+  const firstShift=run && !run.quick && (run.day|0)<=1 && (run.quotaIndex|0)<=0;
+  const established=(st.days||0)>0 || (st.quotasMet||0)>0 || (p?.level||1)>=4;
+  return isVeteran(p) && (!firstShift || established) ? 'all' : 'staged';
+}
 /**
  * ctx = { profile, settings, isHost, hasRunData, phase, quotaIndex, day, devAuto, forced, crew }
  * -> { run: bool, why: string, mark: 'skip' | null }  (mark = write the skip flag into the profile so a later game does not ask again)
@@ -171,10 +178,11 @@ export function ensureUnlocks(p) {
   if (!u.given || typeof u.given !== 'object' || Array.isArray(u.given)) u.given = {};
   return u;
 }
-/** first look at a profile: veterans keep everything they already had, fresh profiles get the staged schedule */
+/** Runtime policy: fresh and saved staged profiles have all feature access; earned records remain intact. */
 export function decideMode(p) {
   const u = ensureUnlocks(p);
-  if (!u.mode) u.mode = isVeteran(p) ? 'all' : 'staged';
+  // Feature access is immediate; earned progress and existing gift records stay intact.
+  u.mode = 'all';
   return u.mode;
 }
 /** pure progress of a run: quotas met + first boss */

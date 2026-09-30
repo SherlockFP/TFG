@@ -1,0 +1,25 @@
+# Wave18 independent identity review
+
+Independent review:7.7/10, up from wave17 baseline7.5. The increase reflects observed original dock/worker/archive identity and working native camera choice; it does not certify hardware stutter is solved or force an8/8.5 target. This is source-guided local Chromium QA with labelled approach/phase fixtures, not an unassisted human retention study or hardware performance benchmark.
+
+The original dockmaster office now has a coherent silhouette: recessed staffed service window, cast control desk, CRT clerk and industrial fittings. Final PSX refresh visibly removes broad mint surfaces in favor of matte neutral workwear, faceted forms and small CRT pixels. Three worker variants have valid ordinary-eye-height full-body captures in `/tmp/tfg-qa18-final/23-final-worker-0/1/2.png`; moving native actors remain active. Native office keyboard approach/E still opens fleet selection. Initial green/cropped/occluded captures are excluded from final model approval.
+
+Camera-network choice is playable in the frozen-source local two-peer slice: native E cut closes the optional physical shortcut and replicates the same outage/revision; restore returns it; occupied-cut refusal is safe and actual peer keyboard movement clears the gate for retry. Wallet/sold unchanged. The actual main-return probe reached the ship perimeter after walking around a narrow visible legacy post; precise0.32m waypoint following initially failed. A native sidestep and0.75m street tolerance allowed continued movement. Final approach hit the ship side near9.6m rather than the door, so an onboard claim is excluded. This proves substantial playable return space, with a route/entry guidance limitation.
+
+Concrete remaining limits to assess:
+
+1. Worker cloth/limbs remain dark against gray walls at normal exposure. Improve material value separation and localized existing-light contrast rather than brighter green accents.
+2. Large quiet gray planes and sparse ground-level detail still dominate some dock approaches. Use purposeful small wear/signage/edge contrast at decision points; avoid filling open navigation with repetitive props.
+3. Timing and clarity need continued attention: actual software-frame samples show HUD/mod update outliers, and historic renderer feedback warnings remain unlocalized. The targeted changes have actual after evidence: unchanged HUD mutation45→0; voyage callback median2.1→0ms/max28.7→0.1ms. Small software samples and different loads limit broad attribution; a477ms render startup outlier and130 peer feedback warnings remain relevant. No hardware stutter cure is claimed.
+
+Earlier validated salvage→native Company sale, inventory recovery, workshop patterns, field jobs, finite Warden escape/reward and peer identity remain wave15–17 evidence. New art and 214 passing source suites do not substitute for current browser interaction/visual proof.
+
+All four authored Archive Exchange routes were actually walked and captured at eye height. Sorting skyline, rejected drawers and sealed storage create a bureaucratic intake story beyond the original counter. Native fixture copper30 sold through real E/slot/G/bell for10 at33%; exactID removed and credits/sold replicated on both peers. Early total7 is intentional countup, not a proven money defect; the subsequent2.2s realRAF settled receipt matched both peers’12-credit payout at native40% after haggle.
+
+Top priorities for the next round are worker/world contrast at ordinary exposure, purposeful readable street/ship-entry wayfinding around legacy poles and hull sides, and localization of the peer rendering feedback/startup stall. The game has more authored identity and verified activities; readability and reliable frame pacing remain the reasons this review does not reach8.
+
+Actual safe-city keyboard sprint moved8.67m with stamina100→93.07 and immediate regeneration to100 after release, without infinite sprint. This removes some municipal stop/rest burden. It does not establish long-session enjoyment or complete progression balance.
+
+Final limits remain explicit: two-peer camera actions and substantial physical return movement passed, but precise route following met a legacy thin post and the final ship side; no onboard-return claim. The peer actual-draw diagnostic also returned no error in a fresh minimal context, so130 earlier feedback warnings remain unresolved rather than silently declared repaired. Zero game page/runtime errors were observed; the cyclic metadata serializer failure belongs to the private QA helper.
+
+Fresh-game access follow-up passes: native day1/quota0/level1 host+peer K/tree and physical Incubator open without free points/eggs; native cabinet fifth entry plays classic FLAPPY PHISH; dining exists and selected-held food consumes through real input/host custody and replicated removal. Native free Courier/boarding does not grant levels/points/coins. Feature accessibility now improves the player's options while earned progress and fresh teaching/hazard budget remain separate. Score remains7.7; no additional long-session retention or renderer fix is inferred.

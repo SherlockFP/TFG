@@ -134,7 +134,11 @@ const eq = (a, b, m) => ok(JSON.stringify(a) === JSON.stringify(b), `${m}: got $
 {
   const fresh = () => ({ stats: {}, level: 1 });
   const p = fresh();
-  eq(K.decideMode(p), 'staged', 'fresh profile is staged');
+  eq(K.decideMode(p), 'all', 'fresh profile has immediate feature access');
+  const saved = { unlocks: { v:1, mode:'staged', q:2, boss:true, sale:true, given:{shop:123} } };
+  eq(K.decideMode(saved), 'all', 'saved staged profile migrates to immediate access');
+  ok(saved.unlocks.q===2 && saved.unlocks.boss && saved.unlocks.sale && saved.unlocks.given.shop===123, 'migration retains earned progress and gifts');
+  p.unlocks.mode='staged'; // pure legacy schedule compatibility only
   const v = { stats: { days: 5 }, level: 2 };
   eq(K.decideMode(v), 'all', 'veteran keeps everything');
   const u = p.unlocks;
@@ -158,7 +162,7 @@ const eq = (a, b, m) => ok(JSON.stringify(a) === JSON.stringify(b), `${m}: got $
   ok(!K.fold(u, { q: 0, boss: false, sale: false }) && u.q === 2 && u.sale, 'fold never lowers q / sale');
   ok(K.isOpen('pets', u, { q: 0, boss: false }), 'a new run (quota 0) keeps what the profile earned');
   // gifts one per system, only staged profiles, once
-  const g = fresh(); K.decideMode(g);
+  const g = fresh(); K.ensureUnlocks(g).mode='staged'; // explicit legacy fixture, not runtime policy
   eq(K.pendingGifts(g.unlocks, { q: 0 }), [], 'nothing to gift at quota 0');
   eq(K.pendingGifts(g.unlocks, { q: 0, sale: true }), ['shop', 'tree'], 'store + tree gifts due at the first sale');
   eq(K.pendingGifts(g.unlocks, { q: 1 }), ['shop', 'tree', 'arcade', 'pets'], 'gifts due at quota 1');
@@ -255,42 +259,27 @@ const eq = (a, b, m) => ok(JSON.stringify(a) === JSON.stringify(b), `${m}: got $
   const interact = () => { const out = []; mods.emit('interactables', out, game); return out; };
   const findI = (re) => interact().find((i) => re.test(typeof i.label === 'function' ? i.label() : i.label));
 
-  // ---- guards work before anything runs (a fresh profile, staged) + a dev auto-host must not start Hiring Day
+  // Runtime policy opens fresh features without minting unlock rewards or bypassing other route rules.
   globalThis.location = { search: '?autohost=local&name=x' };
   let api = installOnboard(game);
   ok(api && typeof api.dispose === 'function', 'module installs');
   tick(0.1, 3);
   ok(!api.active() && !api.wing(), 'dev auto-host: no Hiring Day');
-  ok(api.locked('forge') && api.locked('pets') && api.locked('voyage') && api.locked('homeworld') && api.locked('gates'), 'staged: everything locked at quota 0');
-  ok(api.deny('forge') === true && toasts.length === 1 && /LOCKED/.test(toasts[0][0]), 'deny() toasts the lock');
+  ok(K.UNLOCK_IDS.every(id=>!api.locked(id)), 'every native feature opens at quota zero');
+  ok(api.unlocks().mode==='all' && api.fr.active() && !api.fr.allow('mapmods'), 'fresh all-access profile retains first-run message pacing');
+  profile.stats.scrapCollected=20;profile.stats.sold=10;ok(api.fr.active(), 'first shift pickup and sale do not remove beginner pacing');profile.stats.scrapCollected=0;profile.stats.sold=0;
+  profile.stats.days=1;ok(!api.fr.active(), 'earned veteran is free of beginner pacing');profile.stats.days=0;
+  game.run.quick={v:1};ok(!api.fr.active(), 'quick shift explicitly overrides pacing');delete game.run.quick;
+  game.settings.unlockAll=true;ok(!api.fr.active(), 'explicit legacy override keeps pacing free');game.settings.unlockAll=false;
+  ok(!api.deny('forge') && toasts.length===0, 'open access produces no lock toast');
   const term = []; const pt = { print: (s, c) => term.push([s, c]) };
-  ok(mods.terminalCommand('pets', [], pt) === true && term.length === 1 && /quota 1/.test(term[0][0]), 'terminal PETS is answered with the lock text');
-  ok(mods.terminalCommand('moon', ['random'], pt) === true && mods.terminalCommand('route', ['s1'], pt) === true && mods.terminalCommand('home', [], pt) === true, 'MOON RANDOM / ROUTE S1 / HOME locked');
-  ok(mods.terminalCommand('hello', [], pt) === true, 'other commands pass through to the original');
-  ok(mods.terminalCommand('route', ['hamsi'], pt) === false, 'plain ROUTE passes through');
-  const rb = api.routeBlocked({ id: 'home', home: true });
-  ok(rb && /quota 2/.test(TX.xf('locked_term', rb.v)) && rb.v.name === 'HOMEWORLD', 'homeworld ROUTE blocked with a translatable message');
-  ok(api.routeBlocked({ id: 'hamsi' }) === null, 'other moons not blocked');
-  // quota progress opens things and the Algorithm gifts them one by one
-  ok(api.locked('shop') && /first sale/.test(TX.xf('locked_term_sale', { name: 'STORE' })), 'store: locked before the first sale, sale text');
-  CO.grant(profile, 'hat', 'wizard');   // already owned: the tree gift must fall through to the next candidate
-  game.run.sold = 40; tick(0.6);
-  ok(!api.locked('shop') && !api.locked('tree') && api.locked('pets'), 'the FIRST SALE (run.sold > 0, quota 0) opens store tiers + skill tree');
-  ok(profile.cosmetics?.hats?.includes('hardhat'), 'the store unlock handed over its wardrobe gift (hat:hardhat)');
-  { const H = await import('../../src/game/hubgate_core.js'); const hb = H.hubOf(api.unlocks(), null);   // the host publishes the sale rung to joiners
-    ok(hb.sale === true && H.hubOpen('shop', hb) && H.hubOpen('tree', hb) && !H.hubOpen('pets', hb), 'api.unlocks() -> hubOf() carries the sale rung (joiners see the store open)');
-    game.run.sold = 0; ok(H.hubOf(api.unlocks(), null).sale === true, 'a new run (sold 0) on a profile that already sold still publishes sale:true'); game.run.sold = 40; }
-  ok(said.some((s) => /better stock/.test(s)) && toasts.some((x) => /NEW TOY/.test(x[0])), 'the store tiers are gifted by the Algorithm (line + toast)');
-  game.run.quotaIndex = 1; tick(0.6);
-  ok(!api.locked('pets') && !api.locked('arcade') && api.locked('homeworld'), 'quota 1 opens arcade + pets');
-  const n1 = said.length; tick(0.6, 3); ok(said.length === n1, 'gifts are spaced (one per 9 s)');
-  tick(10, 1); tick(0.6);
-  ok(said.filter((s) => /gift/i.test(s)).length >= 2, 'the next gift follows later');
-  ok(profile.cosmetics?.hats?.includes('propeller') && !profile.cosmetics?.hats?.includes('tophat'), 'tree gift: the wizard hat was already owned, so the next candidate (propeller) was granted');
-  game.settings.unlockAll = true; ok(!api.locked('gates') && !api.locked('homeworld'), 'Settings: unlock everything opens all'); game.settings.unlockAll = false;
-  game.run.cycle = { firstKills: { core1: 1 } }; ok(!api.locked('gates'), 'first boss opens the gates');
-  game.run.quotaIndex = 0; game.run.cycle = undefined;
-  ok(!api.locked('pets') && api.locked('gates') === true, 'profile memory: a new run keeps quota 2, gates need the boss again only via the profile flag (set)');
+  ok(mods.terminalCommand('pets', [], pt)===false && mods.terminalCommand('home', [], pt)===false, 'feature commands reach the original command handler');
+  ok(mods.terminalCommand('hello', [], pt)===true, 'other commands preserve original handling');
+  ok(api.routeBlocked({id:'home',home:true})===null && api.routeBlocked({id:'hamsi'})===null, 'onboarding adds no quota route gate');
+  { const H = await import('../../src/game/hubgate_core.js'); const hb = H.hubOf(api.unlocks(), null);
+    ok(hb.mode==='all' && K.UNLOCK_IDS.every(id=>H.hubOpen(id,hb)), 'native host publication opens the same features to joiners'); }
+  game.run.sold=40;game.run.quotaIndex=3;tick(10,3);
+  ok(!profile.cosmetics?.hats?.includes('hardhat') && !profile.cosmetics?.hats?.includes('propeller'), 'immediate access does not mint staged wardrobe gifts');
   api.dispose();
   ok(mods.terminalCommand('pets', [], pt) === false, 'dispose restores terminalCommand');
 

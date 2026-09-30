@@ -17,6 +17,7 @@ import { attentionHot } from '../ui/hud_attention.js';
 import { t, tf } from '../core/i18n.js';
 import { RNG, hashString } from '../core/rng.js';
 import { AFFIX_BY_ID, MAX_AFFIX, RARITY_NAME, rollMap, addAffix, effectsOf, flagsOf, rewardOf, mapTitle, cleanMap } from './mapmods_core.js';
+import { pacingMode } from './onboard_core.js';
 import { affixCalm } from './headline_core.js';
 import './mapmods_i18n.js';
 import { HOST_ONLY } from '../net/session.js';
@@ -104,7 +105,7 @@ export function installMapmods(game) {
   function mmGate(r) {
     if (game.onboard?.fr?.calm?.('mapmods')) return false;
     const u = game.profile?.unlocks;
-    return !affixCalm({ mode: u?.mode, q: Math.max(u?.q | 0, r?.quotaIndex | 0), quick: !!r?.quick, unlockAll: !!game.settings?.unlockAll });
+    return !affixCalm({ mode: pacingMode(game.profile, r), q: Math.max(u?.q | 0, r?.quotaIndex | 0), quick: !!r?.quick, unlockAll: !!game.settings?.unlockAll });
   }
   const mmAllowed = (r) => realMoon(r.moon) && !r.dailyEvent?.weekly && mmGate(r);
   /** [trim] headline.js: how many affixes the coming landing will carry (rolls the map now if orbit had none; applyLanding reuses it) */

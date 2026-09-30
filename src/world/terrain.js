@@ -7,6 +7,7 @@ import { createAnyProp as createProp } from './propfactory.js';
 import { getTexture, freeTree } from '../render/textures.js';
 import { levelTexture, mergeStaticMeshes } from './geobuilder.js';
 import { G } from '../physics/physics.js';
+import { planBroadcast18, buildBroadcast18, broadcast18Reserved } from './broadcast18.js';
 import { buildOutposts } from './outposts.js';
 import { buildBiomeDecor } from './outdoor_biomes.js';
 import { planLandmarks, buildLandmarks } from './landmarks.js';
@@ -392,6 +393,7 @@ function instanceProps(id, placements, group, tint = null, ownMats = null) {
 export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
   const plan = planMoon(seed, moon);
   const terrain = new Terrain(seed, moon, plan);
+  const broadcastPlan18 = planBroadcast18({ moon, terrain, plan });
   const rng = new RNG((seed ^ 0xb00b) >>> 0);
   const group = new THREE.Group();
   group.name = 'moon-outdoor';
@@ -495,6 +497,7 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
     return Math.hypot(x - st.x, z - st.z) < st.radius + m;
   };
   const avoidBase = (x, z, m = 0) => {
+    if (broadcast18Reserved(broadcastPlan18, x, z, m)) return true;
     if (terrain.blocked(x, z, m)) return true;
     if (Math.hypot(x, z) < 20 + m) return true;
     if (Math.hypot(x - e.x, z - e.z) < 15 + m) return true;
@@ -618,6 +621,8 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
   let landmarks = null;
   try { landmarks = buildLandmarks({ seed, moon, plan, terrain, group, addBox, emitters, avoid: avoidBase, sites: landmarkSites }); } catch (err) { console.warn('landmarks', err); landmarks = null; }
 
+  const broadcast18 = buildBroadcast18({ plan: broadcastPlan18, terrain, group, physics });
+
   try { if (globalThis.__kefalOutMerge) mergeStaticMeshes(placed.filter(isStaticProp), group); } catch (err) { console.warn('outdoor prop merge', err); }
   for (const em of emitters) lightPool.add(em);
   for (const s of outdoorScrapSpots) s.y = terrain.heightAt(s.x, s.z);
@@ -627,10 +632,11 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
     entranceObj: entObj,
     outposts,
     decor,
-    landmarks, harvest, avoid, solidAt, ownMats, voyage,
+    landmarks, harvest, avoid, solidAt, ownMats, voyage, broadcast18,
     // per-frame visuals of the biome decor (glitch cubes, pulsing grid, fires, blinking racks); cheap when idle
     update(dt, game) { decor?.update(dt, game); landmarks?.update(dt, game); voyage?.update(dt); },
     dispose(physicsRef) {
+      broadcast18?.dispose();
       for (const c of colliders) physicsRef.removeCollider(c);
       for (const em of emitters) lightPool.remove(em);
       freeTree(group);   // [leak] first: sub-systems detach their groups below (instanced geometry / uncached materials were never freed)

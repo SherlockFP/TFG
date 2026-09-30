@@ -96,3 +96,23 @@ Logo: **TFG** in chunky pixel type with a small "wifi eye" glyph (an eye whose i
 symbol). Palette stays amber-on-dark + terminal green, add hot magenta as an accent for "viral" moments.
 Posters: "ENGAGEMENT IS LOVE", "THE ALGORITHM IS WATCHING", "DO NOT FEED THE TROLLS", "404: SAFETY NOT FOUND",
 "LIKE. SHARE. SURVIVE.", missing-person poster "HAVE YOU SEEN THIS MODERATOR?".
+
+## Authored districts and model direction (wave 18)
+
+Relay Dock is a staffed content-transfer port: cast service desks, drydock ribs, cable reels and
+rounded CRT-headed workers. Algorithm Exchange is an archive/sorting bureau: archive glazing,
+suspended packet lanes and a magenta authority silhouette. Relay Ward on 56K-Dialup is a dead
+broadcast street with transmitter, reel-house, switchboard and studio landmarks. These places
+should tell their purpose through architecture and usable routes as well as labels.
+
+New characters and tools follow the native avatar2 visual language: faceted low-resolution
+industrial forms, clothed worker proportions, CRT/visor faces, practical gloves/boots/equipment,
+and muted enamel/fabric/metal colors under Lambert lighting. Broad surfaces use charcoal, worn steel, dirty ivory and faded workwear. Crew status uses small indicators,
+cargo industry worn amber and Algorithm authority restrained magenta. Alien differences belong in head shapes,
+faces and equipment. Keep emissive details small; glowing toy crystals, floating primitive bodies, smooth inflated surfaces
+and glossy PBR tools conflict with this direction. Preserve native rigs, collision footprints,
+interaction anchors, attack warnings and bounded merged draw batches when replacing visible models.
+
+Original authored assets retain a reproducible source. `tools/blender/dockmaster18.py` generates the
+fleet service GLB; boot preloads it before entering a session. Map instances own their cloned geometry
+and materials so travel cannot invalidate the reusable asset template.

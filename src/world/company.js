@@ -1,10 +1,10 @@
-// Company HQ "moon": industrial pier around the landed ship. Sell counter (+ The Algorithm's tentacles),
-// black market stall (Phish Dayı), casino corner (slot machines), bounty board, fishing dock.
+// Algorithm HQ: staffed archive/sorting bureau, native intake, market and enclosed casino.
 import * as THREE from 'three';
 import { GeoBuilder, levelMaterial } from './geobuilder.js';
 import { createAnyProp as createProp } from './propfactory.js';
 import { getTexture, freeTree } from '../render/textures.js';
 import { dressPort14 } from './port14.js';
+import { buildExchange18 } from './exchange18.js';
 import { createAvatar } from '../models/avatar.js';
 import '../game/company13_text.js';
 
@@ -32,16 +32,19 @@ export function buildCompany({ physics, lightPool }) {
   const wallT = 'concrete_dark';
   gb.vrect(wallT, bx - bw / 2, bz - bd / 2, bx + bw / 2, bz - bd / 2, PY, PY + bh, 0.25);        // back wall faces +z (dir +x -> normal +z)
   gb.vrect(wallT, bx - bw / 2, bz + bd / 2, bx - bw / 2, bz - bd / 2, PY, PY + bh, 0.25);        // left wall faces +x
-  gb.vrect(wallT, bx + bw / 2, bz - bd / 2, bx + bw / 2, bz + bd / 2, PY, PY + bh, 0.25);        // right wall faces -x
+  // East archive glass occupies the middle band; retain its solid native wall collider.
+  gb.vrect(wallT,17,-38,17,-20,PY,PY+1.2,.25);
+  gb.vrect(wallT,17,-38,17,-20,PY+5.8,PY+bh,.25);
+  for(const [z0,z1]of [[-38,-36],[-22,-20]])gb.vrect(wallT,17,z0,17,z1,PY+1.2,PY+5.8,.25);
   gb.hrect('metal_dark', bx - bw / 2, bz - bd / 2, bx + bw / 2, bz + bd / 2, PY + bh, false, 0.25);
   // exterior of building
   gb.vrect('metal_rust', bx + bw / 2 + 0.3, bz - bd / 2 - 0.3, bx - bw / 2 - 0.3, bz - bd / 2 - 0.3, PY, PY + bh + 1, 0.2);
   gb.vrect('metal_rust', bx - bw / 2 - 0.3, bz - bd / 2 - 0.3, bx - bw / 2 - 0.3, bz + bd / 2, PY, PY + bh + 1, 0.2);
-  gb.vrect('metal_rust', bx + bw / 2 + 0.3, bz + bd / 2, bx + bw / 2 + 0.3, bz - bd / 2 - 0.3, PY, PY + bh + 1, 0.2);
+  gb.vrect('metal_dark',17.3,-20,17.3,-38.3,PY,PY+1.2,.2);
+  gb.vrect('metal_dark',17.3,-20,17.3,-38.3,PY+5.8,PY+bh+1,.2);
+  for(const [z0,z1]of [[-20,-22],[-36,-38.3]])gb.vrect('metal_dark',17.3,z0,17.3,z1,PY+1.2,PY+5.8,.2);
   gb.hrect('metal_dark', bx - bw / 2 - 0.3, bz - bd / 2 - 0.3, bx + bw / 2 + 0.3, bz + bd / 2, PY + bh + 1, true, 0.2);
-  // front fascia above the opening
-  gb.vrect('metal_rust', bx - bw / 2 - 0.3, bz + bd / 2, bx + bw / 2 + 0.3, bz + bd / 2, PY + bh - 3, PY + bh + 1, 0.2);
-  gb.vrect('metal_rust', bx + bw / 2, bz + bd / 2 - 0.05, bx - bw / 2, bz + bd / 2 - 0.05, PY + bh - 3, PY + bh, 0.2);
+  // Front garage fascia replaced by the stepped exchange18 sorting canopy; roof physics unchanged.
   box(bx, PY + bh / 2, bz - bd / 2 - 0.2, bw + 1, bh, 0.5);
   box(bx - bw / 2 - 0.2, PY + bh / 2, bz, 0.5, bh, bd);
   box(bx + bw / 2 + 0.2, PY + bh / 2, bz, 0.5, bh, bd);
@@ -156,8 +159,8 @@ export function buildCompany({ physics, lightPool }) {
   put('shipping_container', 34, PY, 0, 0.1, { variant: 1 });
   put('shipping_container', 34, PY + 2.6, 0.5, -0.05, { variant: 2 });
   put('shipping_container', -34, PY, 20, Math.PI / 2, { variant: 0 });
-  put('fish_crates', 30, PY, 18, 0.4);
-  put('fish_crates', -20, PY, 30, -0.3);
+  // Retain old IDs/physical boxes; exchange18 replaces fish/ice with sealed archive cartons at identical bounds.
+  for(const [x,z,yaw]of [[30,18,.4],[-20,30,-.3]]){const legacy=put('fish_crates',x,PY,z,yaw);if(legacy)legacy.visible=false;}
   put('oil_drum_stack', 25, PY, 38, 0);
   for (const [x, z] of [[-25, 5], [25, 5], [-25, 32], [25, 32], [0, 38]]) put('lamp_post', x, PY, z, 0);
   put('radio_tower', -38, PY, -20, 0);
@@ -168,11 +171,13 @@ export function buildCompany({ physics, lightPool }) {
   box(-5.2,PY+.5,-35.25,3.8,1,.5);
   for(const x of [4.7,6,7.3])box(x,PY+.65,-36.3,1.1,1.3,1.7);
   const port14=dressPort14(group,'company',PY);
+  const exchange18=buildExchange18(group,PY);
 
   return {
     group, colliders, emitters, interactables, dropZone, npcPos, fishPos, slots, board, counter,
-    groundY: PY, casinoSpace, serviceNPCs, archiveIntake: port14, district: 'content-clearing',
+    groundY: PY, casinoSpace, serviceNPCs, archiveIntake: port14, exchange18, district: 'content-clearing',
     dispose(physicsRef) {
+      exchange18.dispose();
       port14.dispose();
       for (const npc of serviceNPCs) npc.avatar.dispose?.();
       for (const c of colliders) physicsRef.removeCollider(c);

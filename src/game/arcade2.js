@@ -1,5 +1,5 @@
 // ARCADE2 (docs/wave8/arcade2.md): four extra 30-90 s cabinet games (Flappy Fish, Cable Runner, Quota Stack, Viewer Invaders) behind ONE menu minigame ('arcade2', src/minigames/arcade2.js).
-//   entry     the existing ship arcade cabinet (its [E] now opens the menu; the old Flappy Phish stays reachable with the terminal `ARCADE CLASSIC`) and the terminal command `ARCADE [game|top|classic]`
+//   entry     the existing ship arcade cabinet (its [E] opens all five games, including original FLAPPY PHISH; terminal `ARCADE CLASSIC` also works) and the terminal command `ARCADE [game|top|classic]`
 //   rewards   host-authoritative per-day crew leaderboard (rules in arcade2_core.js), a small Clout prize per play capped per player per day (host ledger + the client's own profile ledger),
 //             and the Arcade Champion hat for beating a game's target score once (profile.arcade2.champ -> cosmetics rule 'hat:arcadecap').
 // Net (prefix 'ac2'): 'ac2req' client -> host {op:'score', game, score} | {op:'sync'};  'ac2s' host -> everyone {k:'b', day, b:{game:[{id,n,s}]}} | {k:'r', to, game, score, best, rank, coins, champ}.
@@ -9,6 +9,7 @@ import { addTranslations, t, tf, getLang } from '../core/i18n.js';
 import * as K from './arcade2_core.js';
 
 const TR = {
+  'Classic FLAPPY PHISH. One button, no quota or level requirement.': 'Klasik FLAPPY PHISH. Tek tuş; kota veya seviye gerektirmez.',
   'SHIP ARCADE': 'GEMİ SALONU', '[UP][DOWN] pick   [ENTER] play   [ESC] leave': '[YUKARI][AŞAĞI] seç   [ENTER] oyna   [ESC] çık',
   'DONATION! Gravity is upside down.': 'BAĞIŞ! Yer çekimi ters döndü.', 'Dodge the Company pipes.': 'Şirket borularından kaç.',
   'Eat plugs. Gold plugs are worth 3 and vanish.': 'Fişleri ye. Altın fiş 3 puan, çabuk kaybolur.', 'Quota: {n} lines. Stack the scrap, clear the rows.': 'Kota: {n} sıra. Hurdaları diz, sıraları temizle.',
@@ -26,6 +27,7 @@ const TR = {
   'Not on the ship.': 'Gemide değilsin.',
 };
 const RU = {
+  'Classic FLAPPY PHISH. One button, no quota or level requirement.': 'Классический FLAPPY PHISH. Одна кнопка; квота и уровень не нужны.',
   'SHIP ARCADE': 'КОРАБЕЛЬНЫЙ АРКАДНЫЙ', '[UP][DOWN] pick   [ENTER] play   [ESC] leave': '[ВВЕРХ][ВНИЗ] выбор   [ENTER] играть   [ESC] выход',
   'DONATION! Gravity is upside down.': 'ДОНАТ! Гравитация перевёрнута.', 'Dodge the Company pipes.': 'Уворачивайся от труб Компании.',
   'Eat plugs. Gold plugs are worth 3 and vanish.': 'Ешь разъёмы. Золотой стоит 3 и быстро исчезает.', 'Quota: {n} lines. Stack the scrap, clear the rows.': 'Квота: {n} линий. Складывай хлам, убирай ряды.',
@@ -137,9 +139,9 @@ export function installArcade2(game) {
     if (disposed || game.minigame || game.player?.dead) return;
     if (!game.net) { S.mirror = K.wire(hostState()); } else request({ op: 'sync' });
     game.openMinigame('arcade2', {
-      noEase: true, game: id, board: () => S.mirror.b, best: myBest,
+      noEase: true, classic: !!classic, classicBest: game.profile?.stats?.bestArcade || 0, game: id, board: () => S.mirror.b, best: myBest,
       onScore: (g, score) => request({ op: 'score', game: g, score }),
-    }, () => {});
+    }, result => { if (result?.classic && !disposed && !game.player?.dead) classic?.(); });
   }
   // the existing cabinet: same fixture, same [E], but it opens the menu now
   const origStart = Object.prototype.hasOwnProperty.call(game, 'startArcade') ? game.startArcade : null;

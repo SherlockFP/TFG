@@ -48,6 +48,7 @@
   {"id":"gq_water","name":"Free Water Stream Sounds","author":"Gregor Quendel","url":"https://gregor-quendel.itch.io/free-water-stream-sounds","license":"CC-BY 4.0","credit":"Free Water Stream Sounds by Gregor Quendel (CC-BY 4.0)"}
 ],
 "models":[
+  {"id":"tfg_dockmaster18","path":"/assets/original/dockmaster18.glb","pack":"tfg-original","name":"Relay Dock CRT Dockmaster, Cast Desk and Dispatch Facade","license":"Original project asset","author":"TFG","source":"tools/blender/dockmaster18.py"},
   {"id":"mon_bat","path":"assets/ext/models/quaternius-monsters/mon_bat.glb","category":"monster","pack":"LowPoly Animated Monsters","license":"CC0","tris":1046,"size":[0.57,0.851,0.9],"animations":["Attack","Attack2","Death","Flying","Hit"],"tags":["flying","bat"]},
   {"id":"mon_dragon","path":"assets/ext/models/quaternius-monsters/mon_dragon.glb","category":"monster","pack":"LowPoly Animated Monsters","license":"CC0","tris":1344,"size":[2.124,2.4,2.312],"animations":["Attack","Attack2","Death","Flying","Hit"],"tags":["dragon","big"]},
   {"id":"mon_skeleton","path":"assets/ext/models/quaternius-monsters/mon_skeleton.glb","category":"monster","pack":"LowPoly Animated Monsters","license":"CC0","tris":1810,"size":[1.628,1.8,0.47],"animations":["Attack","Death","Idle","Running","Spawn"],"tags":["humanoid","skeleton"]},

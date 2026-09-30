@@ -129,6 +129,7 @@ export function extAnimated(id, stateClips, { scale = 1, tint = null } = {}) {
 
 // curated preload list
 export const EXT_PRELOAD = [
+  'tfg_dockmaster18', // original first-entry actor/desk/facade, preloaded before session start
   // scrap
   'retro_clock', 'scrap_baseball_bat', 'scrap_briefcase', 'scrap_floppy', 'scrap_multimeter', 'scrap_keyring', 'scrap_padlock',
   'scrap_heater', 'scrap_wrench', 'kk_gold_bars', 'kk_silver_bar', 'kk_gold_nuggets', 'kk_copper_nugget', 'kk_jerrycan', 'ks_chest',

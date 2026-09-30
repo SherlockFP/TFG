@@ -43,7 +43,7 @@ export function installFeedcams(game) {
   const fx = (d) => { try { game.net.broadcast('fcfx', d); } catch { /* net closing */ } };
   const snd = (n, pos, v = 0.7) => { try { pos ? game.audio?.at?.(n, pos, v, { refDistance: 6, maxDistance: 50 }) : game.sfx?.(n, v); } catch { /* audio optional */ } };
   const posOf = (id) => (id === game.selfId ? game.player?.pos : game.remotes?.get(id)?.pos);
-  const netOff = () => { const F = fc(); return !!((F && game.time < (F.off || 0)) || game.mapart?.offStream?.()); };
+  const netOff = () => { const F = fc(); return !!((F && game.time + (host() ? 0 : (+S.off || 0)) < (F.off || 0)) || game.mapart?.offStream?.()); };
   const camPos = (c) => new V3(c.x, c.y, c.z);
   const stOf = (i) => { const e = fc()?.c?.[i]; return e ? K.stateNow({ st: e[0] | 0, until: e[1] || 0 }, game.time + S.off) : 0; };   // [camloot] timed states (BLIND, CUT) expire on every peer's clock
   const emit = (ev) => { try { mods.emit('feedcams', ev, game); } catch (e) { console.warn('[feedcams] emit', e); } };   // host-side hook for feedcams2 / other modules
@@ -587,6 +587,25 @@ export function installFeedcams(game) {
     /** HOST: blind camera i for `secs` (feedcams2 jammer); never shortens a longer blind or revives a dead camera */
     blind(i, secs) { const e = fc()?.c?.[i]; if (!host() || !e || e[0] >= ST.DEAD || (e[0] === ST.BLIND && e[1] > game.time + secs)) return; const was = e[0]; setState(i, ST.BLIND, game.time + secs); if (was !== ST.BLIND) game.broadcastRun?.(['fc']); },
     netOff,
+    /** HOST: finite whole-network interruption; receipt preserves any pre-existing outage. */
+    cutNetwork(secs = 150) {
+      const F = fc(); if (disposed || !host() || run()?.phase !== 'moon' || !F || !Number.isFinite(secs)) return null;
+      const previous = Number.isFinite(F.off) ? F.off : 0;
+      const until = Math.max(previous, game.time + Math.max(1, Math.min(150, secs)));
+      const receipt = { until, previous, owned: until > previous };
+      if (receipt.owned) {
+        F.off = until; F.ck = Math.round(game.time * 100) / 100; untag('*'); F.p = {}; for (const m of S.mt.values()) { m.m = 0; m.air = 0; }
+        S.seeC?.clear(); game.broadcastRun?.(['fc']); emit({ k:'networkCut', until });
+      }
+      return receipt;
+    },
+    /** HOST: restore only our matching interruption, never a borrowed or later unrelated one. */
+    restoreNetwork(receipt) {
+      const F = fc();
+      if (!host() || !F || !receipt?.owned || !Number.isFinite(receipt.until) || !Number.isFinite(receipt.previous) || F.off !== receipt.until) return false;
+      F.off = receipt.previous > game.time ? receipt.previous : 0; F.ck = Math.round(game.time * 100) / 100;
+      S.seeC?.clear(); game.broadcastRun?.(['fc']); emit({ k:'networkRestore', until:F.off }); return true;
+    },
     dispose() {
       disposed = true;
       for (const o of offs.splice(0)) { try { o?.(); } catch { /* ignore */ } }

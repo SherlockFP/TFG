@@ -6,8 +6,19 @@ const THREE=await import('three');
 const {buildCompany}=await import('../../src/world/company.js'),{buildHub13}=await import('../../src/world/hub13.js');
 const {hostMethods}=await import('../../src/game/host.js');
 const {fleetLayout,FLEET13}=await import('../../src/game/fleet13_core.js'),{hullBox}=await import('../../src/game/shipyard_core.js');
+const {createTrading15}=await import('../../src/game/trading15.js');
+const {CITY_ROUTES13}=await import('../../src/game/life13_core.js');
 const {initPhysics,Physics,G,groups}=await import('../../src/physics/physics.js');
 await initPhysics();
+// Preload the actual original GLB through the production loader; only transport is a local file fixture.
+const fs=await import('node:fs/promises'),{loadExtManifest}=await import('../../src/audio/extassets.js'),{preloadExtModels,hasExt,extInstance}=await import('../../src/world/extmodels.js');
+const realFetch=globalThis.fetch;globalThis.ProgressEvent??=class {constructor(type,data){Object.assign(this,data);this.type=type;}};
+const manifest=JSON.parse(await fs.readFile(new URL('../../public/assets/ext/manifest.json',import.meta.url),'utf8'));const original=manifest.models.find(m=>m.id==='tfg_dockmaster18');assert.ok(original);const glb=await fs.readFile(new URL('../../public/assets/original/dockmaster18.glb',import.meta.url));assert.ok(glb.length<350000);
+globalThis.fetch=async request=>{const url=typeof request==='string'?request:request.url;if(url.includes('manifest.json'))return new Response(JSON.stringify({...manifest,models:[{...original,path:'https://fixture.tfg/dockmaster18.glb'}]}));if(url.includes('dockmaster18.glb'))return new Response(glb,{headers:{'content-length':String(glb.length)}});throw Error('Unexpected asset transport '+url)};
+try{await loadExtManifest();await preloadExtModels(['tfg_dockmaster18']);}finally{globalThis.fetch=realFetch;}assert.equal(hasExt('tfg_dockmaster18'),true);window.__kefalExtTextures=false;
+const cached=extInstance('tfg_dockmaster18'),cachedGeo=new Set();cached.traverse(o=>{if(o.geometry)cachedGeo.add(o.geometry)});let cachedDisposed=0;for(const g of cachedGeo)g.addEventListener('dispose',()=>cachedDisposed++);
+const glbJson=JSON.parse(glb.subarray(20,20+glb.readUInt32LE(12)).toString());assert.equal(glbJson.materials.length,7);assert.equal(glbJson.meshes.length,16);assert.ok(glbJson.nodes.some(n=>n.name==='dockmaster18_actor'));assert.ok(glbJson.nodes.some(n=>n.name==='dockmaster18_facade'));assert.equal(glbJson.images,undefined);const mintIndex=glbJson.materials.findIndex(m=>m.name==='dock18_mint');const greenMeshes=glbJson.meshes.filter(m=>m.primitives.some(p=>p.material===mintIndex));assert.equal(greenMeshes.length,1);assert.ok(glbJson.nodes.some(n=>n.mesh===glbJson.meshes.indexOf(greenMeshes[0])&&n.name.includes('desk')),'green belongs only to tiny terminal status, never actor/facade');assert.ok(glbJson.materials.some(m=>m.name==='dock18_workwear'));assert.ok(glbJson.meshes.every(m=>m.primitives.every(p=>p.attributes.COLOR_0!==undefined)),'original vertex wear exported');const triangles=glbJson.meshes.reduce((n,m)=>n+m.primitives.reduce((s,p)=>s+glbJson.accessors[p.indices].count/3,0),0);assert.equal(triangles,3896);cached.traverse(o=>{if(o.isMesh)assert.equal(o.material.vertexColors,true,'production PSX loader preserves original vertex wear')});console.log('dockmaster18 GLB bytes',glb.length);
+
 const companyRoutes=[[[0,10],[-9.5,10],[-9.5,-12],[0,-12],[0,-33.6]],[[0,14],[-29,14],[-29,-10.2],[-29,-21]],[[0,12],[20,12]]];
 const hubRoutes=[[[1.8,23],[1.8,29.8]],[[-2.5,23],[-18,23],[-18,27]],[[3.7,21],[5.2,21],[5.2,11]]];
 const V=(x,y,z)=>new THREE.Vector3(x,y,z);
@@ -39,9 +50,22 @@ for(const kind of ['company','hub']){
   const b=hullBox(fleetLayout(vessel)),col=ph.addStaticBox((b.x0+b.x1)/2,1.25,(b.z0+b.z1)/2,(b.x1-b.x0)/2,1.25,(b.z1-b.z0)/2);ph.world.step();
   for(const route of kind==='company'?companyRoutes:hubRoutes)assertRoute(ph,`${kind}/${vessel}`,route);
   ph.removeCollider(col);
+  if(kind==='hub'){ph.world.step();for(const r of map.dock18.routes)assertRoute(ph,`dock18/${vessel}/${r.id}`,r.feet.map(p=>[p[0],p[2]]));
+   for(let x=b.x0+.5;x<b.x1;x+=1.5)for(let z=b.z0+.5;z<b.z1;z+=1.5)assert.equal(ph.raycast(V(x,.05,z),V(0,1,0),vessel==='survey'?9:4,G.STATIC),null,`${vessel} transfer structure intrudes on native vessel envelope`);
+  }
+ }
+ if(kind==='hub'){
+  assert.equal(map.dock18.assetReady,true);const service=map.group.getObjectByName('dockmaster18-service');assert.ok(service);service.traverse(o=>{if(o.geometry)assert.equal(cachedGeo.has(o.geometry),false,'map clone must own geometry independently of preload cache')});
+  const vendor=new THREE.Group();vendor.position.set(-18,-1.25,29);map.group.add(vendor);const trading=createTrading15({physics:ph,items:{all:()=>[]}},()=>true);trading.bind(vendor);ph.world.step();
+  for(const r of map.dock18.routes)walk(ph,`dock18/${r.id}`,r.feet.map(p=>[p[0],p[2]]));
+  for(const [i,loop]of CITY_ROUTES13.hub.entries()){const route=[...loop,loop[0]];assertRoute(ph,`dock18 citizen${i}`,route);walk(ph,`dock18 citizen${i}`,route);}
+  trading.dispose();vendor.removeFromParent();const dock=map.group.getObjectByName('dock18-transfer-port');assert.ok(dock);assert.equal(dock.children.length,2);let lights=0,verts=0,triangles=0;map.group.traverse(o=>{if(o.isLight)lights++});dock.traverse(o=>{if(o.geometry){verts+=o.geometry.attributes.position.count;triangles+=o.geometry.index.count/3;}});assert.equal(lights,0);assert.ok(Object.isFrozen(map.dock18.routes));console.log('dock18 metrics',JSON.stringify({...map.dock18,colliders:map.colliders.length,vertices:verts,triangles}));
  }
  if(kind==='company'){
   assert.equal(map.counter.visible,false,'inherited shutter must not render over the new intake');assert.ok(map.archiveIntake?.update);
+  assert.equal(map.exchange18.metrics.lights,0);assert.ok(map.exchange18.metrics.batches<=8,'exchange static batches remain bounded');
+  for(const view of map.exchange18.viewpoints){assertRoute(ph,`exchange/${view.name}`,view.route);walk(ph,`exchange/${view.name}`,view.route);}
+  for(const route of [[[-12,14],[-4,14],[-4,22],[-12,22],[-12,14]],[[4,18],[12,18],[12,24],[4,24],[4,18]]])assertRoute(ph,'courier citizen loop',route);
   const zone=map.interactables.find(i=>i.type==='sellzone'),bell=map.interactables.find(i=>i.type==='bell');assert.ok(zone&&bell);
   assert.ok(Math.abs(zone.pos.y-(map.groundY+1.1))<1e-8);assert.equal(zone.pos.z,-35.8);assert.equal(bell.pos.x,2.2);
   walk(ph,'first-sale bell',[[-9.5,-12],[0,-12],[0,-32],[2.2,-32],[2.2,-34.5]]);
@@ -54,8 +78,9 @@ for(const kind of ['company','hub']){
   hostMethods.hostSell.call(g,'p');assert.equal(g.hostData.selling,true);assert.ok(delayed);delayed();assert.equal(events.filter(([k,d])=>k==='it'&&d.e==='rm').length,1);assert.equal(items[0].id,'outside');assert.ok(g.run.credits>0);assert.equal(g.run.sold,g.run.credits);assert.equal(g.hostData.selling,false);
   const paid=g.run.credits;delayed=null;hostMethods.hostSell.call(g,'p');assert.equal(delayed,null,'empty tray must not schedule another payment');assert.equal(g.run.credits,paid,'completed intake delivery cannot pay twice');
  }
- const port=map.group.children.find(o=>o.name===`port14-${kind}`),geometries=new Set();port.traverse(o=>{if(o.geometry)geometries.add(o.geometry);});let disposed=0;for(const geometry of geometries)geometry.addEventListener('dispose',()=>disposed++);
- map.dispose(ph);assert.equal(ph.info.size,0,'all map collider registrations must be cleared');assert.equal(disposed,geometries.size,'owned intake/port geometry must be released exactly once');assert.equal(removed.size,emitted.size,'pool emitters must be released');ph.world.free();
+ const port=map.group.children.find(o=>o.name===`port14-${kind}`),geometries=new Set();port.traverse(o=>{if(o.geometry)geometries.add(o.geometry);});map.exchange18?.root.traverse(o=>{if(o.geometry)geometries.add(o.geometry);});let disposed=0;for(const geometry of geometries)geometry.addEventListener('dispose',()=>disposed++);
+ map.dispose(ph);assert.equal(ph.info.size,0,'all map collider registrations must be cleared');assert.equal(disposed,geometries.size,'owned intake/port geometry must be released exactly once');assert.equal(removed.size,emitted.size,'pool emitters must be released');assert.equal(cachedDisposed,0,'hub disposal cannot release preloaded GLB template');ph.world.free();
+ if(map.exchange18)console.log('exchange18 metrics',JSON.stringify(map.exchange18.metrics),`colliders=${map.colliders.length} emitters=${emitted.size}`);
  console.log(`${kind}: real collision corridors / all four hulls / lifecycle pass`);
 }
 console.log('world15: first sale, empty-tray repeat prevention, clerk access, receipt processing and real Rapier capsule paths pass');

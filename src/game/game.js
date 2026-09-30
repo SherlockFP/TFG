@@ -300,6 +300,7 @@ import { installSound2 } from './sound2.js';   // [import:sound2] wave 8 sound p
 import { installArcade2 } from './arcade2.js';
 import { installFeedcams } from './feedcams.js';   // [import:feedcams]
 import { installFeedcams2 } from './feedcams2.js';   // [import:feedcams2] wave 8 pass 2: showcase, drones, jammer, highlights
+import { installBroadcast18 } from './broadcast18.js';
 import { installDowned } from './downed.js';   // [import:downed] wave 8: 0 HP = downed, crew revives (docs/wave8/downed.md)
 import { installHubgate } from './hubgate.js';   // [import:hubgate]
 import { installRouteboard } from './routeboard.js';   // wave 8: route board (3 route cards) + campaign route ladder (docs/wave8/routeboard.md)
@@ -602,6 +603,7 @@ export class Game extends Emitter {
     this.useModule('arcade2', installArcade2);
     this.useModule('feedcams', installFeedcams);   // [slot:feedcams]
     this.useModule('feedcams2', installFeedcams2);   // [slot:feedcams2]
+    this.useModule('broadcast18', installBroadcast18);
     this.useModule('downed', installDowned);   // [slot:downed]
     this.useModule('hubgate', installHubgate);   // [slot:hubgate] wave 8: Hub door, unlock cards, Quick Shift
     this.useModule('routeboard', installRouteboard);   // wave 8: route board + 3 hero moons at the campaign start

@@ -274,17 +274,22 @@ const descOf = (id) => ({
   invaders: t('Shoot the hate-comments.'),
 }[id]);
 
+export const cabinetGames = (classic = false) => classic ? [...GAMES, 'classic'] : GAMES.slice();
+
 export function createArcade2(rawOpts) {
   const mg = createMinigame(rawOpts, { kind: 'arcade2', title: t('SHIP ARCADE'), tag: 'ARCADE', help: t('[UP][DOWN] pick   [ENTER] play   [ESC] leave'), width: W, height: H });
   const { ctx, opts } = mg;
+  const entries = cabinetGames(!!opts.classic), names = { ...NAMES, classic: 'FLAPPY PHISH' };
+  const rowY = 32, rowStep = 14;
   const parts = createParticles(200), day = dayKey();
   const bests = { ...(opts.best?.() || {}) };
   let mode = 'menu', sel = Math.max(0, GAMES.indexOf(opts.game)), game = null, gid = '', tm = 0, playT = 0, plays = 0, endT = 0, last = { score: 0, best: false, hit: false }, cur = 0;
   const board = () => (typeof opts.board === 'function' ? opts.board() : {}) || {};
 
-  function menuStatus() { mg.setStatus(descOf(GAMES[sel]), ''); mg.setHelp(t('[UP][DOWN] pick   [ENTER] play   [ESC] leave')); }
+  function menuStatus() { mg.setStatus(entries[sel] === 'classic' ? t('Classic FLAPPY PHISH. One button, no quota or level requirement.') : descOf(entries[sel]), ''); mg.setHelp(t('[UP][DOWN] pick   [ENTER] play   [ESC] leave')); }
   function start(i) {
-    gid = GAMES[i]; sel = i; cur = i;
+    gid = entries[i]; if (!gid) return; sel = i; cur = i;
+    if (gid === 'classic') { mg.finish({ success: true, cancelled: false, classic: true, plays }); return; }
     const rng = mulberry32((day * 2654435761 + i * 40503 + plays * 0) >>> 0);   // same seed for everyone, every attempt
     game = MAKERS[gid]({ rng, sfx: mg.sfx, parts, mg });
     mode = 'play'; playT = 0; parts.list.length = 0;
@@ -305,9 +310,9 @@ export function createArcade2(rawOpts) {
 
   mg.onKeyDown = (e) => {
     if (mode === 'menu') {
-      if (e.code === 'ArrowUp' || e.code === 'KeyW') { sel = (sel + GAMES.length - 1) % GAMES.length; menuStatus(); return true; }
-      if (e.code === 'ArrowDown' || e.code === 'KeyS') { sel = (sel + 1) % GAMES.length; menuStatus(); return true; }
-      if (/^Digit[1-4]$/.test(e.code)) { start(+e.code.slice(5) - 1); return true; }
+      if (e.code === 'ArrowUp' || e.code === 'KeyW') { sel = (sel + entries.length - 1) % entries.length; menuStatus(); return true; }
+      if (e.code === 'ArrowDown' || e.code === 'KeyS') { sel = (sel + 1) % entries.length; menuStatus(); return true; }
+      if (/^Digit[1-5]$/.test(e.code)) { start(+e.code.slice(5) - 1); return true; }
       if (e.code === 'Enter' || e.code === 'Space' || e.code === 'NumpadEnter') { start(sel); return true; }
       return false;
     }
@@ -321,12 +326,12 @@ export function createArcade2(rawOpts) {
     if (mode === 'over') { mode = 'menu'; game = null; menuStatus(); return; }
     mg.finish({ success: true, cancelled: false, plays });
   };
-  const rowAt = (y) => Math.floor((y - 40) / 17);
+  const rowAt = (y) => Math.floor((y - rowY) / rowStep);
   mg.onPointerMove = (x, y) => {
-    if (mode === 'menu') { const r = rowAt(y); if (r >= 0 && r < GAMES.length && r !== sel) { sel = r; menuStatus(); } } else if (mode === 'play') game.move(x, y);
+    if (mode === 'menu') { const r = rowAt(y); if (r >= 0 && r < entries.length && r !== sel) { sel = r; menuStatus(); } } else if (mode === 'play') game.move(x, y);
   };
   mg.onPointerDown = (x, y) => {
-    if (mode === 'menu') { const r = rowAt(y); if (r >= 0 && r < GAMES.length) start(r); } else if (mode === 'over') { if (endT > 0.7) start(cur); } else game.press(x, y);
+    if (mode === 'menu') { const r = rowAt(y); if (r >= 0 && r < entries.length) start(r); } else if (mode === 'over') { if (endT > 0.7) start(cur); } else game.press(x, y);
   };
   mg.onPointerUp = () => { if (mode === 'play') game.release?.(); };
 
@@ -342,15 +347,15 @@ export function createArcade2(rawOpts) {
     if (mode === 'menu') {
       backdrop(ctx, tm);
       drawText(ctx, 'SHIP ARCADE', W / 2, 8, { align: 'center', scale: 2, color: C.green, shadow: '#04240f', wave: { t: tm, amp: 1, speed: 3 } });
-      GAMES.forEach((id, i) => {
-        const y = 40 + i * 17, on = i === sel;
-        bevel(ctx, 14, y, W - 28, 15, on ? '#0d3a1a' : '#08140c', on ? '#39ff6a' : '#16813a', '#020805', !on);
-        drawText(ctx, `${i + 1} ${NAMES[id]}`, 20, y + 5, { color: on ? C.white : C.green });
-        drawText(ctx, `${bests[id] || 0}/${TARGETS[id]}`, W - 20, y + 5, { align: 'right', color: (bests[id] || 0) >= TARGETS[id] ? C.amber : C.greenDim });
+      entries.forEach((id, i) => {
+        const y = rowY + i * rowStep, on = i === sel;
+        bevel(ctx, 14, y, W - 28, 12, on ? '#0d3a1a' : '#08140c', on ? '#39ff6a' : '#16813a', '#020805', !on);
+        drawText(ctx, `${i + 1} ${names[id]}`, 20, y + 5, { color: on ? C.white : C.green });
+        drawText(ctx, id === 'classic' ? 'CLASSIC' : `${bests[id] || 0}/${TARGETS[id]}`, W - 20, y + 5, { align: 'right', color: (bests[id] || 0) >= TARGETS[id] ? C.amber : C.greenDim });
       });
-      const rows = (board()[GAMES[sel]] || []).slice(0, 3);
-      drawText(ctx, `TODAY ${NAMES[GAMES[sel]]}`, 14, 112, { color: C.amberDim });
-      if (!rows.length) drawText(ctx, '---', 14, 122, { color: C.greenDim });
+      const rows = (board()[entries[sel]] || []).slice(0, 3);
+      drawText(ctx, entries[sel] === 'classic' ? 'PERSONAL BEST' : `TODAY ${names[entries[sel]]}`, 14, 112, { color: C.amberDim });
+      if (!rows.length) drawText(ctx, entries[sel] === 'classic' ? String(opts.classicBest || 0) : '---', 14, 122, { color: C.greenDim });
       rows.forEach((r, i) => {
         const x = 14 + (i % 2) * 96, y = 122 + Math.floor(i / 2) * 9;
         drawText(ctx, `${i + 1} ${String(r.n || '?').toUpperCase().slice(0, 12)}`, x, y, { color: i === 0 ? C.amber : C.greenMid });

@@ -627,14 +627,15 @@ export function installFood(game) {
 
   // ---------------------------------------------------------------- ship table + world machines
   function placeTable() {
-    F.tableTries++;
     const ship = game.ship?.group;
+    if (!ship || F.table) return;   // Stations belong to the actual ship, never the temporary hub/world scene.
+    F.tableTries++;
     for (const [x, z, ry = 0] of TABLE_SPOTS) {
       const q = Math.round(ry / (Math.PI / 2)) & 1;   // [wave5] quarter turns: ry = PI / 2 puts the stools along x (world/shiplayout.js TABLE_SPOTS)
       if (boxOccupied(game.physics, x, 0.9, z, q ? 1.15 : 0.95, 0.85, q ? 0.95 : 1.15, G.STATIC | G.DOOR)) continue;
       const model = createTable();
       model.position.set(x, 0, z); model.rotation.y = ry;
-      (ship || game.scene).add(model);
+      ship.add(model);
       const cols = [], c = Math.cos(ry), sn = Math.sin(ry);
       for (const [cx, cy, cz, hx, hy, hz] of model.userData.colliders) { try { cols.push(game.physics.addStaticBox(x + cx * c + cz * sn, cy, z - cx * sn + cz * c, q ? hz : hx, hy, q ? hx : hz, 0, G.STATIC, { kind: 'static' })); } catch { /* physics optional */ } }
       F.table = { x, z, model, cols, pos: new THREE.Vector3(x, 0, z) };
@@ -648,6 +649,16 @@ export function installFood(game) {
     disposeGroup(tb.model);
     F.table = null;
   }
+  // Fresh-run and later ship/map lifecycle events retry a temporarily occupied mess spot.
+  // Successful stations remain singletons; no quota/room purchase is needed to eat together.
+  function ensureTable() {
+    if (disposed || !game.ship?.group) return;
+    if (F.table && F.table.model.parent !== game.ship.group) { disposeTable(); F.hostTable = []; }
+    if (F.table) return;
+    F.tableTries = 0; F.tableAt = now() + 3; placeTable();
+  }
+  offs.push(mods.on('hostStart', (g) => { if (!g || g === game) ensureTable(); }));
+  offs.push(mods.on('mapLoaded', (world, g) => { if (g === game) ensureTable(); }));
   function disposeMachines() {
     for (const m of F.machines) { try { game.physics?.removeCollider(m.col); } catch { /* gone */ } disposeGroup(m.model); }
     F.machines = [];

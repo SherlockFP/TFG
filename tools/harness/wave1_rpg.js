@@ -8,6 +8,13 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 if (!ok(R, 'game.rpg missing')) return out;
 
 const P = g.profile;
+// Native fresh access: opening the complete tree must not require quota or grant progression.
+const beforeAccess={points:P.skillPoints,nodes:[...(P.rpg?.nodes||[])]};
+const accessKey=g.settings?.keys?.skillTree||'KeyK';
+window.dispatchEvent(new KeyboardEvent('keydown',{code:accessKey,key:'k',bubbles:true,cancelable:true}));
+ok(!!g.ui.panelOpen?.querySelector?.('.pt-canvas'),'native tree hotkey opens the full panel on a fresh profile');
+ok(P.skillPoints===beforeAccess.points&&JSON.stringify(P.rpg?.nodes||[])===JSON.stringify(beforeAccess.nodes),'opening tree grants no points or ranks');
+R.close();
 P.skillPoints = 60; P.coins = 3000;
 g.refreshStats();
 const base = { ...g.stats };

@@ -256,14 +256,17 @@ export class LocalPlayer {
     this.wading = wade < 1;
     speed *= wade;
 
-    // stamina
+    // Safe municipal transit is not a repeated sprint/rest chore. Field, ship and heavy-body rules stay intact.
+    const cityTransit = !this.indoor && !this.inShip && !bodyCarry && !this.downed &&
+      ((this.game.run?.phase === 'company' && !!this.game.world?.company) ||
+       (!!this.game.world?.outdoor?.vendorSpace && !!this.game.fleet13?.docked?.()));
     const drainMul = 1 + (1 - weightMul) * 1.5;
     if (this.sprinting) {
-      this.stamina -= 18 * drainMul * dt * (this.speedBoost > 0 ? 0.3 : 1);
-      this.staminaDelay = 1.1;
+      this.stamina -= 18 * drainMul * dt * (cityTransit ? 0.35 : 1) * (this.speedBoost > 0 ? 0.3 : 1);
+      this.staminaDelay = cityTransit ? 0 : 1.1;
     } else {
-      this.staminaDelay = Math.max(0, (this.staminaDelay || 0) - dt);
-      if (this.staminaDelay <= 0) this.stamina += s.staminaRegen * (moving && !this.sneak ? 0.7 : 1.1) * dt * (this.game.infiniteSprint ? 10 : 1);
+      this.staminaDelay = cityTransit ? 0 : Math.max(0, (this.staminaDelay || 0) - dt);
+      if (this.staminaDelay <= 0) this.stamina += s.staminaRegen * (moving && !this.sneak && !cityTransit ? 0.7 : 1.1) * dt * (this.game.infiniteSprint ? 10 : 1);
     }
     if (this.game.infiniteSprint) this.stamina = this.maxStamina;
     this.stamina = clamp(this.stamina, 0, this.maxStamina);

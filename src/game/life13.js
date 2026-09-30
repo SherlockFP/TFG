@@ -14,7 +14,7 @@ export function installLife13(game) {
  if(typeof window!=='undefined'&&window.__kefalMods?.itemModels)window.__kefalMods.itemModels.set('courier17',createParcel17);
  const offs=[],rate=new Map();let actors=[],beacon=null,kind=null,root=null,time=0,lastWire=-1,wireCD=0,disposed=false;
  const token=()=>`${game.run?.seed}:${game.run?.day}:${game.run?.moon}:${game.fleet13?.docked?.()?'hub':'field'}`;
- const courierUnlocked=()=>Number(game.run?.quotaIndex)>=1||Number(game.run?.day)>1;
+ const courierUnlocked=()=>game.onboard?.unlocks?.()?.mode==='all'||Number(game.run?.quotaIndex)>=1||Number(game.run?.day)>1;
  const day=()=>`${game.run?.seed}:${game.run?.day}`;
  const state=()=>game.run?.life13?.day===day()?game.run.life13:null;
  function ensure(){if(game.isHost && !state()){cancelCourier();game.run.life13={day:day(),time:0,mission:{stage:'idle',paid:0}};}return state();}

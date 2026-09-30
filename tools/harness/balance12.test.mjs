@@ -15,15 +15,17 @@ const { KINDS } = await import('../../src/game/grenades_core.js');
 let n = 0;
 const ok = (name, fn) => { fn(); n++; console.log('ok', name); };
 
-ok('quota curve: q0 = the owner start (300-350), a real squeeze from q1, strictly rising, late curve near the old one', () => {
+ok('quota curve: q0 retains learning target, early ramp rises without a demand cliff, late growth stays convex', () => {
   const B = P.BALANCE;
   let prev = P.nextQuota(0, 0); const seq = [prev];
   assert.ok(prev >= 300 && prev <= 350, 'q0 300-350');
   for (let q = 1; q <= 12; q++) { const v = P.nextQuota(prev, q, () => 0.5); assert.ok(v > prev, `q${q} rises`); seq.push(v); prev = v; }
-  assert.ok(seq[1] >= 700 && seq[2] >= 1000, 'q1 / q2 are the squeeze: ' + seq.slice(0, 3));
-  assert.ok(seq[1] / seq[0] >= 2 && seq[3] - seq[2] < seq[2] - seq[1], 'the jump is at the start, the growth term takes over after the ramp');
-  assert.ok(seq[6] >= 1450 && seq[6] <= 1900, 'q6 in the old neighbourhood (1445) plus the squeeze: ' + seq[6]);
+  assert.deepEqual(seq.slice(0,3),[330,650,1000],'authoritative early targets');
+  assert.ok(seq[1] / seq[0] > 1.7 && seq[1] / seq[0] < 2.2 && seq[3] - seq[2] < seq[2] - seq[1], 'the jump is at the start, the growth term takes over after the ramp');
+  assert.ok(seq[6] >= 1250 && seq[6] <= 1700, 'q6 retains rising late demand: ' + seq[6]);
   assert.ok(B.quotaRamp.length === 3 && B.quotaCurveDiv > 0);
+  assert.ok(seq[12]-seq[11]>seq[6]-seq[5],'later increments remain convex');
+  for(const quota of seq.slice(0,3)){const state=P.quotaState({quota,sold:0,daysLeft:3},60);assert.equal(state.perDay,Math.ceil((quota-60)/3),'native objectives share the actual early target and banked value');}
 });
 
 ok('pool pacing: at most 1 wave 10/11 headliner per pool before quota 2, 2 before quota 4; every pool >= 3 residents; deterministic', () => {

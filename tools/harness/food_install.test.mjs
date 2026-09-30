@@ -5,6 +5,7 @@ globalThis.window = globalThis;
 globalThis.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
 const THREE = await import('three');
 const { installFood } = await import('../../src/game/food.js');
+const {initPhysics}=await import('../../src/physics/physics.js');await initPhysics();
 const { FOODS, BUFFS } = await import('../../src/game/food_data.js');
 
 let fails = 0, checks = 0;
@@ -51,7 +52,9 @@ const game = {
   },
 };
 game.scene = { add() {} };
-game.physics = { world: null, removeCollider() {}, addStaticBox() { return {}; } };
+game.ship = {group:new THREE.Group()};
+let tableCols=0,tableRemoved=0,tableOccupied=false;
+game.physics = { world: {intersectionsWithShape(pos,q,shape,cb){if(tableOccupied)cb({});}}, removeCollider() {tableRemoved++;}, addStaticBox() {tableCols++;return {};} };
 game.creatures = { views: new Map() };
 game.stats = { speedMul: 1 };
 
@@ -67,6 +70,14 @@ ok(net.relayTypes.has('fds'), 'fds is relayed');
 
 const tick = (sec, dt = 1 / 30) => { for (let t = 0; t < sec; t += dt) { game.time += dt; mods.emit('update', dt, game); } };
 const useItem = (type, id) => { items.set(id, { id, type, holder: 'me', def: {} }); held = items.get(id); const hk = { handled: false }; mods.emit('useItem', held, hk, game); return hk; };
+
+// ---- fresh q0/day1 physical table, independent of quota/room purchase
+mods.emit('hostStart',game);
+ok(api.state().table!==null,'mess table exists on first hostStart before a quota or field shift');
+const firstCols=tableCols;mods.emit('mapLoaded',{},game);mods.emit('hostStart',game);
+ok(tableCols===firstCols,'repeated station lifecycle events do not duplicate physical colliders');
+const freshPrompts=[];mods.emit('interactables',freshPrompts,game);
+ok(freshPrompts.some(i=>i.label==='Ship table [E]'),'native dining E prompt is available from first ship');
 
 // ---- eat a pizza slice
 tick(2);
@@ -160,9 +171,15 @@ ok(cake && cake[1].ids.length === 2 && cake[1].dur === 90, 'cake goes to both pl
 ok(active.has('f_cake'), 'Cake Day buff on the eater');
 
 // ---- ship table: eating together -> Well Fed
-game.table = null;
-api.state();
-active.clear();
+const table=api.state().table;active.clear();game.player.pos.set(table[0],0,table[1]);game.remotes.get('bud').pos.set(table[0]+.8,0,table[1]);
+items.set('meal1',{id:'meal1',type:'fd_pizza',holder:'me'});items.set('meal2',{id:'meal2',type:'fd_pizza',holder:'bud'});sent.length=0;game.time+=5;H.fd({op:'use',id:'meal1',p:[999,0,999]},'me');game.time+=1;H.fd({op:'use',id:'meal2'},'bud');
+ok(!items.has('meal1')&&!items.has('meal2'),'table meals consume exact native held food, not free rations');
+ok(sent.some(([t,d])=>t==='fdfx'&&d.k==='wf'&&d.ids.includes('me')&&d.ids.includes('bud')),'native nearby crew meal awards next-landing Well Fed');
+const oldShip=game.ship.group,removedBefore=tableRemoved;game.ship={group:new THREE.Group()};mods.emit('mapLoaded',{},game);
+ok(tableRemoved-removedBefore===firstCols&&oldShip.children.length===0&&api.state().table!==null,'ship-group changes release the old table and reattach the station');
+tableOccupied=true;game.ship={group:new THREE.Group()};mods.emit('mapLoaded',{},game);tick(13);ok(api.state().table===null,'occupied station space is protected through exhausted retries');
+tableOccupied=false;mods.emit('mapLoaded',{},game);ok(api.state().table!==null,'a later native lifecycle event recovers the station after occupied retries');
+game.player.pos.set(0,0,0);game.remotes.get('bud').pos.set(2,0,0);
 
 // ---- offer / take
 items.set('o1', { id: 'o1', type: 'fd_pizza', holder: 'bud' }); sent.length = 0;

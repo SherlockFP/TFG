@@ -1,12 +1,49 @@
 // Node test for arcade2 (src/game/arcade2_core.js + the four game simulations of src/minigames/arcade2.js).
 //   node tools/harness/arcade2.test.mjs
 import * as K from '../../src/game/arcade2_core.js';
-import { MAKERS } from '../../src/minigames/arcade2.js';
+import { MAKERS, cabinetGames } from '../../src/minigames/arcade2.js';
+import { readFile } from 'node:fs/promises';
 import { mulberry32 } from '../../src/minigames/common.js';
 
 let fails = 0, checks = 0;
 const ok = (c, m) => { checks++; if (!c) { fails++; console.error('FAIL', m); } };
 const eq = (a, b, m) => ok(JSON.stringify(a) === JSON.stringify(b), `${m}: got ${JSON.stringify(a)} want ${JSON.stringify(b)}`);
+// The browser registry imports CSS; stub only that registry while executing
+// the actual installer and its real core/translation dependencies in Node.
+const installerUrl = new URL('../../src/game/arcade2.js', import.meta.url);
+const installerSource = (await readFile(installerUrl, 'utf8'))
+  .replace("import { MINIGAMES } from '../minigames/index.js';", 'const MINIGAMES = {};')
+  .replace(/from '(\.\.?\/[^']+)'/g, (_, path) => `from '${new URL(path, installerUrl).href}'`);
+const { installArcade2 } = await import(`data:text/javascript;base64,${Buffer.from(installerSource).toString('base64')}`);
+
+// A brand-new character uses the actual cabinet installer, then hands classic
+// back to its native entry point; menu selection must not issue a reward claim.
+{
+  let opened = 0, classicPlays = 0, captured, done;
+  const requests = [];
+  const original = () => { classicPlays++; };
+  const game = {
+    run: { quotaIndex: 0, day: 0 }, profile: { level: 1 }, player: { dead: false },
+    mods: { on: () => () => {} },
+    net: { on() {}, off() {}, request: (...args) => requests.push(args) },
+    startArcade: original,
+    openMinigame: (id, opts, callback) => { opened++; captured = { id, opts }; done = callback; },
+  };
+  const installed = installArcade2(game);
+  game.startArcade();
+  ok(opened === 1 && captured.id === 'arcade2' && captured.opts.classic, 'q0 lv1 physical cabinet opens all five games');
+  eq(cabinetGames(captured.opts.classic), [...K.GAMES, 'classic'], 'classic appears beside all four existing games');
+  done({ classic: true });
+  ok(classicPlays === 1 && requests.every(([, req]) => req.op === 'sync'), 'classic selection uses native entry without inventing a reward');
+  game.player.dead = true;
+  game.startArcade(); done({ classic: true });
+  ok(opened === 1 && classicPlays === 1, 'death prevents menu entry and delayed classic handoff');
+  game.player.dead = false; game.minigame = {};
+  game.startArcade();
+  ok(opened === 1, 'existing minigame prevents overlapping cabinet sessions');
+  installed.dispose();
+  ok(game.startArcade === original, 'dispose restores original classic entry');
+}
 
 // ---------------------------------------------------------------- boards / prizes / caps
 {

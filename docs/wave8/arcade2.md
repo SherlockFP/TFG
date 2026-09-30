@@ -23,7 +23,10 @@ Four short arcade games on the ship cabinet, a crew leaderboard and small capped
 `arcade2_core.js`: `TARGETS`, `MAX_SCORE`, `PRIZE_DIV`, `PRIZE_CAP`, `MIN_PLAY_MS`, `BOARD_SIZE`. `arcade2.js` (minigame): `LIMIT` seconds per game.
 
 ## Test
-`node tools/harness/arcade2.test.mjs` (23 checks: caps, rate limit, ranking, day reset, scripted play of all four games, seed determinism). `npm run build`.
+`node tools/harness/arcade2.test.mjs` (29 checks: caps, rate limit, ranking, day reset, scripted play of all four games, seed determinism, fresh q0/lv1 cabinet entry and classic handoff).
+
+## Fresh-game access
+The physical cabinet menu now includes original FLAPPY PHISH as its fifth option, alongside the four newer games. Selection closes the menu and calls the original native classic entry, preserving its score/profile handling. The menu has no quota, level or day requirements; central onboarding/fixture gates control access separately. Death and overlapping minigames still prevent entry, and prize limits/cosmetic achievements remain unchanged.
 
 ## Known gaps
 No browser playtest (shared lock jammed): feel, difficulty and targets untuned. Canvas HUD words are English arcade words (bitmap font has no Cyrillic/Turkish); sentences, statuses, help and toasts are localised EN/TR/RU. Cabinet screen texture still shows the old attract loop.

@@ -41,8 +41,8 @@ chk(/checked: true/.test(P.slice(P.indexOf('screen_host()'), P.indexOf('screen_h
 // menu items for a fresh vs veteran profile (pure)
 const K = await import('../../src/game/onboard_core.js');
 const fresh = { name: 'x', level: 1 }; K.decideMode(fresh);
-chk(fresh.unlocks.mode === 'staged' && !K.isOpen('shop', fresh.unlocks, null), 'fresh profile: menu gate closed');
-fresh.unlocks.q = 1; chk(K.isOpen('shop', fresh.unlocks, null), 'after quota 1: DAILY + HUB appear');
+chk(fresh.unlocks.mode === 'all' && K.isOpen('shop', fresh.unlocks, null), 'fresh profile: DAILY + HUB feature gate is open');
+fresh.unlocks.q = 1; chk(K.isOpen('shop', fresh.unlocks, null), 'quota progress retains immediate menu access');
 
 if (process.argv.includes('--browser')) {
   const { createRequire } = await import('module'); const { execSync } = await import('child_process');

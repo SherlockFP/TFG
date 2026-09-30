@@ -1,0 +1,18 @@
+# Wave 18 — Broadcast Street splice choice
+
+56K-Dialup's authored broadcast street has one physical splice console. Cutting it interrupts the existing feed-camera network for at most 150 seconds and closes the optional powered service shortcut. The main return route remains open. The console explains this trade before activation, can restore its own interruption, and uses EN/TR/RU interaction text. No rewards, wallet changes, mandatory HUD, additional minigame or controls are introduced.
+
+`installBroadcast18(game)` belongs after the native feedcams installer. World contract: `outdoor.broadcast18 = {plan, group, setPowered(bool), dispose}`, with `plan.console` a Vector3 and `plan.shortcutDoor = {pos, size:[width,height,depth], rotY, baseY}`. Existing authored geometry owns visuals/collider. Gameplay derives desired power from actual `feedcams.netOff()` (including other native outages); it never stores a competing camera power flag. An occupied shutter remains physically open. Crew, downed players and world bodies are checked conservatively against the rotated closing volume.
+
+The host handles `b18req` `{token,rev,op:'cut'|'restore'}`. It checks actual moon/map/phase, server-issued current revision, known alive outdoor player, downed status, reach and real obstruction ray. Replayed/stale requests do not toggle again. Shared run state stores only the map token, revision and native interruption receipt. Host-only localized messages use b18say; no client can publish the power state.
+
+Native feedcams additions: `cutNetwork(seconds)` caps duration at 150 and returns `{until,previous,owned}`. It preserves a longer existing outage, clears native live meters/tags and retains individual CUT/DEAD/blind camera states. `restoreNetwork(receipt)` only undoes its matching owned expiry, retains a still-active prior outage and refuses borrowed or superseded interruptions. Expiry uses the existing game clock; inactive/unloaded maps reject actions and release only their owned interruption. Existing camera clock migration rebases the receipt too.
+
+Validation: one new broadcast18 fixture installs both native feedcams and the real Broadcast18 module. It covers API receipt ownership/cap/prior/later outage preservation, installed host handler forgery/range/LOS/life/zone/replay checks, crew/body occupancy, client native-state visuals, expiry and unload cleanup, plus all localized text. The existing feedcams layout/math/text fixture remains unchanged. Shared QA receives the actual console/shortcut APIs and captures physical E choices after the combined source freeze; no independent browser run was used.
+
+Migration regression uses the installed client feedcams clock refresh and real host-migration event to rebase both native network expiry and the splice receipt, then restores through the actual new host handler. A zero prior expiry remains zero, so migration cannot create a nonexistent earlier outage. Native netOff now uses the existing synchronized camera clock offset on replicas, and cut/restore publish a fresh clock stamp. The actual client-clock skew fixture confirms the native outage and shortcut remain active even when raw local time would falsely report expiration.
+
+Final root review: stale dead-player AI positions no longer hold a shutter open after the actual corpse
+has left. Occupancy uses living outdoor crew (including downed crew) plus real world-body items. The
+installed fixture covers dead-position release, real corpse protection and revived-player protection.
+Broadcast18/native camera/world regressions pass after this correction; final build passes.

@@ -57,6 +57,14 @@ const game = {
   broadcastRun() {}, hostSetPhase(p, e) { phases.push([p, e]); Object.assign(this.run, e); },
 };
 const api = M.installMapmods(game);
+// Access mode is not a difficulty/pacing signal. Exercise the actual installed native gate.
+game.profile={level:1,stats:{},unlocks:{mode:'all',q:0}};game.run.quotaIndex=0;game.run.day=1;
+ok(!api.allowed(), 'fresh immediate feature access still keeps affixes quiet');
+game.profile.stats.scrapCollected=20;game.profile.stats.sold=10;ok(!api.allowed(), 'first shift loot and sale do not enable early hazards');game.profile.stats.scrapCollected=0;game.profile.stats.sold=0;
+game.profile.stats.days=1;ok(api.allowed(), 'earned veteran has normal affix availability');
+game.profile.stats.days=0;game.run.quick={v:1};ok(api.allowed(), 'quick shift keeps explicit affix override');delete game.run.quick;
+game.settings={unlockAll:true};ok(api.allowed(), 'explicit legacy override remains available');game.settings.unlockAll=false;
+game.run.quotaIndex=5;
 api.rollNext();
 const nxt = JSON.parse(JSON.stringify(game.run.mm.nxt));
 ok(!!nxt && Array.isArray(nxt.a), 'orbit roll writes run.mm.nxt');

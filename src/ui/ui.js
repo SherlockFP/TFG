@@ -942,7 +942,6 @@ export class UI {
             if (gd?.restartTutorial) { gd.restartTutorial(); this.toast(guidePick(GUIDE_UI.set_replay_now, getLang()), 'good'); }
             else { guideResetTutorial(this.app.profile); saveProfile(this.app.profile); this.toast(guidePick(GUIDE_UI.set_replay_done, getLang()), 'good'); }
           }, 'small')),
-          check(obx('set_unlock'), 'unlockAll', obx('set_unlock_note'), false),   // [onboard] veterans: no staged gifts
           check(obx('set_skip'), 'skipHiringDay', obx('set_skip_note'), false),   // [onboard]
           section(t('Social hub')),   // [social]
           check(t('Join the hub network (players, friends, messages)'), 'hubEnabled', t('only your nickname, avatar, level and status are broadcast'), true),

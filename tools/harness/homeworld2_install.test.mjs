@@ -51,7 +51,8 @@ function makeGame({ isHost = true, profile = null } = {}) {
   const outdoor = { home: { grid: { visible: false } }, group: new THREE.Group(), colliders };
   const game = {
     isHost, selfId: isHost ? 'H' : 'C', destroyed: false, time: 1, mods, net, scene: new THREE.Scene(), camera: new THREE.PerspectiveCamera(), remotes: new Map(),
-    profile: profile || { name: 'Host', homeworld: H.sanitize(null) }, progress: { saves: 0, save() { this.saves++; } },
+    // Fixed native terrain seed: this fixture authors one factory route, not a random-layout search.
+    profile: profile || { name: 'Host', homeworld: H.sanitize(null), homeworld2: X.blank(1) }, progress: { saves: 0, save() { this.saves++; } },
     run: { phase: 'orbit', credits: 20000, day: 3, moon: 'home', quotaIndex: 2, runId: 'r1' },
     world: { outdoor }, physics: { addStaticBox() { const c = { id: ++colId }; return c; }, removeCollider() {}, lineOfSight: () => true },
     input: { codePressed: () => false, mouseClicked: () => false, mouseDown: () => false }, terminal: { active: false }, audio: { play() {} }, env: { setSpace() {} }, planetColorFor: () => 0,

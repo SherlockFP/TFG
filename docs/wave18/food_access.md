@@ -1,0 +1,9 @@
+# Fresh-run food and dining access
+
+The native food module has no quota, skill or purchased-room requirement for the ship mess table. Central Hub/onboarding locks for farming, restaurant and pet access are owned by the access-opening pass; this lane does not grant food, ingredients, currency or completed production.
+
+`src/game/food.js` now places/retries the physical mess table on native `hostStart` and `mapLoaded` events. A missing ship no longer spends the limited placement attempts or mounts a station into the temporary world scene. Repeated events do not duplicate the successful station. If the ship group changes, the old table model/colliders and stale shared-meal log are released before the replacement is placed. A later map/ship lifecycle event can recover an initially occupied station after its four delayed attempts were exhausted. Ordinary placement still checks STATIC/DOOR occupancy and uses the existing authored `TABLE_SPOTS`; no footprint/route was changed.
+
+The existing E interaction remains: hold actual food or drink, eat at the table, and nearby crew meals produce native next-landing Well Fed. Host food consumption still requires custody of the actual item and removes that exact item; meal location uses native player positions, ignoring client-supplied coordinates. The feature does not dispense free rations. Existing inventory, finite vending stock, recipes, consumption cooldowns and buffs remain.
+
+Validation: existing `tools/harness/food_install.test.mjs` passes 62 actual-module checks, including a day-one/q0 hostStart table/prompt, singleton repeated lifecycle events, exact native food consumption/shared meal, ship-group cleanup/recreation, occupied placement protection and lifecycle retry recovery. Existing `food.test.mjs` passes 877 food/buff/rule checks. All-four-hull native station routes and visible access are verified by the fleet/shared QA lanes; this document does not claim browser evidence from the Node fixtures.

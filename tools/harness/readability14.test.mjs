@@ -108,3 +108,21 @@ try {
  wardGame.run.escape14.result='escaped';intercom.update(.1);assert.equal(intercom.state.cur.cls,'teach');assert.equal(intercom.state.cur.text,'Inspect the service counter.');
  intercom.dispose();
 } finally {if(oldDoc===undefined)delete globalThis.document;else globalThis.document=oldDoc;}
+
+// Installed HUD: unchanged frames must not replace status text nodes or stable bars repeatedly.
+const prevDocument=globalThis.document,prevWindow=globalThis.window;
+let textWrites=0,styleWrites=0;
+const domNode=()=>{const classes=new Set(),cache=new Map();let text='';return {children:[],offsetHeight:0,childElementCount:0,classList:classList(classes),style:new Proxy({},{set(o,k,v){styleWrites++;o[k]=v;return true;}}),setAttribute(){},appendChild(n){this.children.push(n);},querySelector(s){if(!cache.has(s))cache.set(s,domNode());return cache.get(s);},querySelectorAll(){return [];},getContext(){return {};},getBoundingClientRect(){return {bottom:this.rectBottom||0,height:0};},getClientRects(){return [];},get textContent(){return text;},set textContent(v){textWrites++;text=String(v);}};};
+globalThis.document={documentElement:{dataset:{hud:'standard'}},createElement:domNode,head:domNode(),getElementById:()=>null};globalThis.window={innerWidth:960,innerHeight:540};
+try {
+ const mounted=new HUD(domNode());
+ const stable={player:{hp:100,maxHp:100,stamina:100,maxStamina:100,carryWeight:()=>4,inShip:true,slots:[]},run:{phase:'moon',moon:'hamsi',time:480,seed:1,credits:0},profile:{level:1,xp:0,coins:0,skillPoints:0},stats:{carryRelief:0},world:{},voice:{transmitting:false,localLevel:0},settings:{}};
+ mounted.setRun(stable.run);mounted.update(1/60,stable);textWrites=0;styleWrites=0;
+ for(let n=0;n<300;n++)mounted.update(1/60,stable);
+ console.log('HUD unchanged-frame writes:',JSON.stringify({frames:300,textWrites,styleWrites}));
+ assert.equal(textWrites,0,'stable status labels must not replace text nodes every frame');
+ assert.equal(styleWrites,0,'stable health/bars/crosshair must not rewrite styles every frame');
+ stable.player.hp=10;stable.player.stamina=50;stable.profile.level=2;stable.profile.skillPoints=1;stable.profile.xp=20;stable.run.time=600;
+ mounted.update(1/60,stable);assert.ok(textWrites>0);assert.ok(styleWrites>0);assert.equal(mounted.$.lvl.textContent,'Lv.2');assert.match(mounted.$.rank.textContent,/\(\+1\)/);assert.notEqual(mounted.$.clockTime.textContent,'8:00 AM');assert.equal(mounted.$.stam.style.width,'50%');
+ globalThis.window.innerHeight=720;mounted.el.querySelector('.hud-tr').rectBottom=140;for(let n=0;n<8;n++)mounted.update(1/60,stable);assert.equal(mounted.$.xpfeed.style.top,'148px','status cache does not bypass existing resize/layout measurement');
+} finally {if(prevDocument===undefined)delete globalThis.document;else globalThis.document=prevDocument;if(prevWindow===undefined)delete globalThis.window;else globalThis.window=prevWindow;}

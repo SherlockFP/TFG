@@ -444,6 +444,33 @@ function reachableSet(t, lim, ban) {
   mods.emit('phase', 'orbit', game); ok(run.vy.mission === null, 'finished jobs are cleared in orbit');
   // saves never resume inside a job
   run.vy.mission = { ...V.newMission(offer, 4), st: 'active', p: { x: 1 } }; mods.emit('hostStart', game); ok(run.vy.mission.st === 'accepted', 'hostStart resets an active job to accepted');
+  // Actual installed update handler: ordinary moons with no targets never force hotbar geometry.
+  const savedGlobals={document:globalThis.document,window:globalThis.window,performance:globalThis.performance,getComputedStyle:globalThis.getComputedStyle};
+  const oldWorld=game.world,oldRun=JSON.parse(JSON.stringify(run)),oldHost=game.isHost;
+  let rectReads=0,clock=10000;const made=[];
+  const domNode=()=>{const node={children:[],style:{},isConnected:true,lastChild:{textContent:''},appendChild(n){this.children.push(n);},remove(){},getClientRects(){return [1];},getBoundingClientRect(){rectReads++;return {left:300,right:700,top:450,bottom:510,height:60};}};made.push(node);return node;};
+  const hotbar=domNode(),body=domNode();
+  globalThis.document={body,getElementById:()=>null,createElement:domNode,querySelector:s=>s==='.hud-inv'?hotbar:null};globalThis.window={innerWidth:960,innerHeight:540};globalThis.performance={now:()=>clock};globalThis.getComputedStyle=()=>({opacity:'1',visibility:'visible'});
+  try {
+    game.isHost=false;run.phase='moon';run.moon='hamsi';run.vy.mission=null;game.world={outdoor:null,terrain:null};
+    for(let i=0;i<10;i++){clock+=300;mods.emit('update',.3,game);}
+    ok(rectReads===0,'empty targets: ten real elapsed update callbacks produce zero hotbar reads');
+    ok(!made.some(node=>node.className==='vy-marks'),'empty targets allocate no marker DOM');
+    game.world.outdoor={voyage:{sites:[{marker:{x:0,y:1.5,z:-8}}]}};
+    game.applyRunState({vy:{...run.vy,mission:{type:'defend',st:'active',moon:'hamsi',p:{}}}});
+    game.camera.position.set(0,1.5,0);game.camera.lookAt(0,1.5,-8);game.camera.updateMatrixWorld();
+    clock+=300;mods.emit('update',.3,game);
+    const marker=made.find(node=>node.className==='vy-mk');
+    ok(!!marker&&rectReads>0,'visible native mission target creates/project marker with real hotbar measurement');
+    const left=marker?.style.left;window.innerWidth=1280;clock+=300;mods.emit('update',.3,game);
+    ok(marker?.style.left!==left,'visible target still projects against changed viewport');
+    game.applyRunState({vy:{...run.vy,mission:{...run.vy.mission,st:'done'}}});const before=rectReads;
+    for(let i=0;i<10;i++){clock+=300;mods.emit('update',.3,game);}
+    ok(marker?.style.display==='none'&&rectReads===before,'mission end hides old marker and stops geometry reads');
+  } finally {
+    for(const [name,value] of Object.entries(savedGlobals)){if(value===undefined)delete globalThis[name];else globalThis[name]=value;}
+    game.world=oldWorld;Object.assign(run,oldRun);game.isHost=oldHost;
+  }
   // dispose restores the wrapped methods
   api.dispose();
   ok(game.hostLever.toString().includes('calls.lever'), 'dispose restores hostLever');

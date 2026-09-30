@@ -1,5 +1,20 @@
 # Honest critique log (updated every development round)
 
+## Wave 18 snapshot (2026-09-30)
+
+The final owner follow-up removes staged system access locks from fresh and existing saves, adds original FLAPPY PHISH to the physical cabinet, and repairs dining initialization/retry. Earned skills, ingredients, finite custody rewards and paid upgrades remain; beginner message/hazard pacing stays separate. All four hull station fixtures and the 216-group final regression pass. This reduces entry friction without claiming a new independent score or measured retention; see [wave18/access.md](wave18/access.md) and the browser addendum.
+
+The current independent assessment is **7.7/10**, up from 7.5; it belongs to [wave18/REVIEW.md](wave18/REVIEW.md), with actual input and setup boundaries in [wave18/PLAYTEST.md](wave18/PLAYTEST.md). The owner explicitly clarified PSX low-poly models and rejected broad green, smooth toy-like characters. The first-entry fleet officer/office now uses an original Blender-authored faceted service model with neutral matte workwear and vertex wear. Moving citizens have three deliberate terminal/visor heads, practical clothing/equipment and opposed limb motion. Fresh native fleet E and three unobstructed whole-body views passed; the earlier green and cropped captures are excluded from visual approval.
+
+Relay Dock, Algorithm Exchange and Hamsi Relay Ward now have different purposes expressed through silhouettes and routes: a staffed transfer port, an archive sorting bureau and a dead broadcast street. A physical splice lets the crew trade native surveillance privacy for a closed optional powered route, retaining its main return and refusing closure on a player/body. Native cut/restore and occupied-gate safety agree across two local peers. Safe planner alternatives retain the authored ward in 100 sampled seeds, with eleven actual Rapier maps checking its physical routes and console.
+
+The same ordinary sprint/rest loop made safe shopping walks unnecessarily tiring. Municipal stamina now supports longer uninterrupted travel; field stamina, carry speed and horror remain. The first-success quota jump is smoother at 330→650→1000, retaining deadlines, native ledger authority and the later growth formula. Matched economy samples show modestly longer runs, while the model was already comfortable for skilled early crews. An unrelated HOMESTEAD CLI gate failed before and after; do not claim this resolves every economy issue.
+
+Two measured CPU costs were removed: unchanged HUD writes and Voyage layout work when there are no markers. Installed regressions prove the avoided work and preserve immediate changed values, visible markers and resize behavior. Small software browser samples show lower costs in those components; they do not establish representative hardware FPS or a universal cure for the owner's stutter. Historic framebuffer feedback warnings remain a separate diagnosis. Final source regression: 214/214 passed in 317s; production build passed in 2.83s.
+
+Remaining material weaknesses include dark worker uniforms against gray backgrounds, sparse large ground-level planes, inherited generated interiors and unmeasured human cooperation/combat/audio/retention. Improve readable material separation and purposeful detail at decisions, rather than restoring neon green or multiplying catalogue entries. The familiar expedition/salvage/quota skeleton is still recognizable; authored places and meaningful surveillance choices strengthen identity but do not yet make the whole campaign original by themselves.
+
+
 ## Current direction — wave 17 (2026-09-30)
 
 **Current independent assessment: 7.5/10, up from wave 16's 7.** The owner requested further playable content and work toward 8–8.5. The assessment belongs to [wave17/REVIEW.md](wave17/REVIEW.md), with actual input, setup and failures recorded in [wave17/PLAYTEST.md](wave17/PLAYTEST.md). The score reflects the observed slice; it does not measure human retention or award eight merely because the feature list increased.

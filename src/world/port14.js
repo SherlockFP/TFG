@@ -3,8 +3,9 @@ import * as THREE from 'three';
 import { GeoBuilder, levelTexture } from './geobuilder.js';
 import { t, onLangChange } from '../core/i18n.js';
 import './port14_text.js';
-const C={metal:0x354d59,rust:0x7d5443,mint:0x72cdbb,amber:0xc7a35d,plum:0xa982b3,dark:0x17272d,ivory:0xc4cabb,intake:0x809996,tray:0x586f6c};
+const COLORS14={metal:0x354d59,rust:0x7d5443,mint:0x72cdbb,amber:0xc7a35d,plum:0xa982b3,dark:0x17272d,ivory:0xc4cabb,intake:0x809996,tray:0x586f6c};
 export function dressPort14(parent,kind,groundY=-1.25){
+ const C=kind==='hub'?{...COLORS14,metal:0x505653,rust:0x685849,mint:0xb2ad9e,amber:0x967d54,dark:0x252726,ivory:0xb7b3a6}:COLORS14;
  let receiptTab=null,receiptTime=0;
  const root=new THREE.Group();root.name=`port14-${kind}`;parent.add(root);
  const gb=new GeoBuilder(),floor=new GeoBuilder(),materials=[];
@@ -156,7 +157,7 @@ export function dressPort14(parent,kind,groundY=-1.25){
   sign('SUPPLIES / FIELD WORKSHOP',20,groundY+2.7,11.6,8,.65,0,'amber');
  }
  const materialFor=(key,paint=false)=>{
-  const mat=paint?new THREE.MeshBasicMaterial({color:C[key],vertexColors:true}):new THREE.MeshLambertMaterial({color:C[key],vertexColors:true,map:['metal','rust','dark'].includes(key)?levelTexture('metal_dark'):null,emissive:['mint','amber','plum','intake','tray'].includes(key)?C[key]:0,emissiveIntensity:['intake','tray'].includes(key)?.28:.22});
+  const mat=paint?new THREE.MeshBasicMaterial({color:C[key],vertexColors:true}):new THREE.MeshLambertMaterial({color:C[key],vertexColors:true,map:['metal','rust','dark'].includes(key)?levelTexture('metal_dark'):null,emissive:kind==='hub'?0:['mint','amber','plum','intake','tray'].includes(key)?C[key]:0,emissiveIntensity:['intake','tray'].includes(key)?.28:.22});
   if(paint){mat.defines={PSX_NOSNAP:''};mat.polygonOffset=true;mat.polygonOffsetFactor=-8;mat.polygonOffsetUnits=-8;}
   materials.push(mat);return mat;
  };
