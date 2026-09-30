@@ -427,3 +427,4 @@ skyline and ground life; Dead Mall (parody neon, grilles, dry fountain atrium) r
 corridor with EXIT counter, mascot poster, door 101) is the strongest new idea; Captcha tile test reads well; Ratio twins
 readable; centre cards now queue one at a time. Still weak: Buffering tell only fixed in code (re-check in the dark), new
 creatures/crises/gear never played by a human or with 2 real players, balance of 12 new threats + 5 gadgets is paper-only.
+- Wave 12 creatures12 (404 / Cookie / Echo Chamber / Lag Spike): first creatures whose rule is what you can perceive (invisible hunter, silent tracker, sound replay, input lag); paper-only balance, models / lag feel / ribbon UI never seen in a browser or with 2 real players; the photo camera does not reveal the 404.
