@@ -65,19 +65,12 @@ export class Terminal {
     if (this.el) return;
     const el = document.createElement('div');
     el.className = 'terminal hidden';
-<<<<<<< HEAD
-    el.innerHTML = `<div class="term-screen"><div class="term-head"></div><div class="term-out"></div><div class="term-line"><span class="term-prompt">&gt;</span><input class="term-in" spellcheck="false" autocomplete="off" maxlength="80"/></div></div><div class="term-hint">${escapeHtml(t('[ESC] leave terminal · type HELP'))}</div>`;
+    el.innerHTML = `<div class="term-screen"><div class="term-code"></div><div class="term-head"></div><div class="term-out"></div><div class="term-line"><span class="term-prompt">&gt;</span><input class="term-in" spellcheck="false" autocomplete="off" maxlength="80"/></div></div><div class="term-hint">${escapeHtml(t('[ESC] leave terminal · type HELP'))}</div>`;
     document.getElementById('ui').appendChild(el);
     this.el = el;
     this.out = el.querySelector('.term-out'); this.head = el.querySelector('.term-head');
-=======
-    el.innerHTML = `<div class="term-screen"><div class="term-code"></div><div class="term-out"></div><div class="term-line"><span class="term-prompt">&gt;</span><input class="term-in" spellcheck="false" autocomplete="off" maxlength="80"/></div></div><div class="term-hint">${escapeHtml(t('[ESC] leave terminal · type HELP'))}</div>`;
-    document.getElementById('ui').appendChild(el);
-    this.el = el;
-    this.out = el.querySelector('.term-out');
     this.codeEl = el.querySelector('.term-code');   // [joinplay] lobby code stays visible while in a run; click copies the join link
     this.codeEl.addEventListener('click', () => copyJoinLink(this.game.ui, this.game));
->>>>>>> worktree-agent-a7d43c3b43b31f34d
     this.inp = el.querySelector('.term-in');
     this.inp.addEventListener('keydown', (e) => {
       e.stopPropagation();
