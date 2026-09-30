@@ -3,6 +3,7 @@
 //   cd_dimmer   THE DIMMER    hunts LIGHT. A lit glowstick beats a flashlight: throw one away from you, switch your torch off, walk away.
 //                             It eats a flashlight (forced off ~6 s) or a stick (goes dark). Killable (90 HP), harmless to people in the dark.
 //   cd_follower THE FOLLOWER  only moves while somebody WATCHES it (the inverse of the NPC). Look away and it freezes; a camera flash freezes it.
+//                             The Algorithm's cameras watch too (feedcams.sees): in a camera cone it keeps coming until the camera is dead.
 //                             It strikes anything that stays within arm's length, whichever way you face.
 //   spider      (tuning only, no new type) Bunker-Spider rules: webs across corridors / doorways near the lair, a torn web hisses and wakes it, it
 //               drops in behind you after a ceiling-dust tell, and retreats to its lair when hurt. Web glint = client tell in crdirector.js.
@@ -138,6 +139,7 @@ export function followerBehavior(cfgIn = {}) {
     }
     let watched = false;
     for (const q of players) if (M.isLookedAt(c, q, cfg.seeR, cfg.cone)) { watched = true; break; }
+    if (!watched && M.game?.feedcams?.sees?.(c.pos)) watched = true;   // feedcams: a working camera counts as a watcher (kill the camera to freeze it)
     if (watched) {
       d.creep = Math.min(1, d.creep + dt / cfg.ramp);
       c.target = p.id; c.setState('chase');

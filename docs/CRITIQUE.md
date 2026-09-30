@@ -321,3 +321,5 @@ The economy numbers are now readable: a per-source income block in the day summa
 
 ## Wave 8 - gap closers
 Key conflicts (RPS Y, vote B/M), downed medic / kit revive / edge arrow, duplicate viewer-tax row, translated affix names in chat and translated death lines closed. Still open: the raw-KeyX modules that bypass rebinding; medic speed and kit revive are trusted from the client (co-op).
+## Wave 8 - feedcams2 (docs/wave8/feedcams2.md)
+Plan 8C verb pass 2: cameras now matter to every system (director heat, algo hype/viewers, Follower, Lantern Keeper, downed, Watched affix, feed job, day-summary Highlight) and have teeth: v1 taxed a sprinting crew 4 % of its haul, now 17 % (careful 1.5 %) with TAGGED trips + sprint visibility; new counter-play (silent cable cut, night drones, Signal Jammer) and a real "go live on purpose" choice (quota money vs Clout + hype). Numbers are node-sim only; the feel needs the 2-player playtest.

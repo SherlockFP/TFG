@@ -454,6 +454,8 @@ export function installAlgo2(game) {
 
   return {
     state: S, view,
+    /** HOST: add a hype act (feedcams2 showcases / downed on camera). Unknown kinds are ignored. */
+    hype,
     /** debug helpers (headless scripts): hype('dodge'), plan glitches now, ghost store */
     debug: { hype, ensureGlitches, glitches: () => S.gl, patch: () => S.ps, ghosts: () => S.live, store: () => a2(), chat, hostUse, hostPopulated },
     dispose() {

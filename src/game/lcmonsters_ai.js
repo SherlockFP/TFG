@@ -93,7 +93,7 @@ function keeper(c, dt, M) {
     const o = eyePos(c, 1.3);
     for (const p of M.playersFor(c)) {
       if (p.inShip || p.dead || Math.abs(p.pos.y - c.pos.y) > 3) continue;
-      if (C.inBeam(c.pos.x, c.pos.z, c.yaw, p.pos.x, p.pos.z) && M.game.physics.lineOfSight(o, p.eye, G.STATIC | G.DOOR)) L?.mark(p.id, c);
+      if (C.inBeam(c.pos.x, c.pos.z, c.yaw, p.pos.x, p.pos.z) && M.game.physics.lineOfSight(o, p.eye, G.STATIC | G.DOOR)) { L?.mark(p.id, c); M.game.feedcams?.expose?.(p.id, Math.hypot(p.pos.x - c.pos.x, p.pos.z - c.pos.z), 'k'); }   // the beam is a mobile camera (feedcams2)
     }
   }
 }
