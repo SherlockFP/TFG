@@ -440,8 +440,10 @@ export const hostMethods = {
     }
     // bodies disappear (crew revives in orbit)
     for (const it of [...this.items.all()]) if (it.type === 'body') this.net.broadcast('it', { e: 'rm', id: it.id });
+    let clean = 0;   // [greed] CLEAN SHIFT: nobody was tagged all day -> +10 % of the haul (feedcams_core.cleanBonus)
+    if (!moon.company && !allDead) { try { clean = this.feedcams?.cleanBonus?.(hd.dayStats.collected) | 0; } catch { clean = 0; } if (clean > 0) run.credits += clean; }
     const summary = {
-      moon: moon.name, company: !!moon.company, collected: hd.dayStats.collected, shipValue, deaths, fines, allDead,
+      clean, moon: moon.name, company: !!moon.company, collected: hd.dayStats.collected, shipValue, deaths, fines, allDead,
       kills: hd.dayStats.kills, day: run.day, quota: run.quota, sold: run.sold, daysLeft: moon.company ? run.daysLeft : Math.max(0, run.daysLeft - 1),
       leftValue, credits: run.credits,
       players: players.map((p) => ({ id: p.id, name: this.playerName(p.id), ...(hd.dayStats.per?.[p.id] || { loot: 0, kills: 0 }),

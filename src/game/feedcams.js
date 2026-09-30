@@ -262,9 +262,10 @@ export function installFeedcams(game) {
       const v = mt.lx != null ? Math.hypot(p.pos.x - mt.lx, p.pos.z - mt.lz) / Math.max(0.02, dt) : 0; mt.lx = p.pos.x; mt.lz = p.pos.z;
       const pk0 = mt.pk || 0, x = exp.get(p.id), res = K.meterStep(mt.m, x ? K.exposureRate(x.d, x.cr, x.n, v >= FC.sprintV && v < 20) : 0, dt, mt.pk || 0);
       mt.m = res.m; mt.pk = res.pk;
+      if (res.m > 0) F.ex = 1;   // [greed] a camera actually saw somebody today: CLEAN SHIFT needs real exposure
       if (res.live) {
         mt.air = now + FC.hold; F.lv++; F.h = Math.min(FC.heat.max, F.h + FC.heat.spike);
-        const fresh = !mt.tag; mt.tag = x?.src || mt.tag || 'x';
+        const fresh = !mt.tag; if (fresh) F.tg = (F.tg | 0) + 1; mt.tag = x?.src || mt.tag || 'x';
         fx({ k: 'live', id: p.id, tag: fresh ? 1 : 0 });
         emit({ k: 'live', id: p.id, src: mt.tag, pos: p.pos });
         try { game.algo1?.bump?.('onair', 'onair'); } catch { /* algo1 optional */ }
@@ -305,7 +306,7 @@ export function installFeedcams(game) {
     // sync (4 Hz on change, plus a clock refresh every 5 s)
     F.ck = Math.round(now * 100) / 100;
     sendT += dt;
-    const fp = JSON.stringify([F.c, F.p, Math.round(F.h), F.off, F.tx, F.lv]);
+    const fp = JSON.stringify([F.c, F.p, Math.round(F.h), F.off, F.tx, F.lv, F.tg]);
     if ((fp !== lastFp && sendT >= 0.25) || sendT >= 5) { sendT = 0; lastFp = fp; game.broadcastRun?.(['fc']); }
   }
   /** every 0.5 s: scrap held by someone ON AIR or TAGGED is marked; marked scrap that reaches the ship pays the viewer tax; reaching the ship clears the tag */
@@ -529,13 +530,14 @@ export function installFeedcams(game) {
     if (g !== game || d.company) return;
     const F = S.sum || fc(); if (!F || !(F.n > 0)) return;
     const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+    if (K.cleanBonus(1, F.tg, F.n, F.ex) > 0) extra.push(`<b>${esc(t('CLEAN SHIFT'))}</b> ${esc(d.clean > 0 ? tf('Nobody was tagged all day: +▮{n} bonus', { n: d.clean }) : t('Nobody was tagged all day.'))}`);   // [greed]
     extra.push(F.tx > 0 ? `<b>${esc(t('VIEWER TAX'))}</b> -▮${F.tx} (${esc(tf('{n} items carried out while ON AIR', { n: F.tn }))}) - ${esc(tf('live {n} s', { n: Math.round(F.as) }))}`
       : `<b>${esc(t('OFF THE FEED'))}</b> ${esc(F.lv ? tf('Went live {n}x but kept the haul clean.', { n: F.lv }) : t('Never went live. The Algorithm saw nothing.'))}`);
   }));
   offs.push(mods.on('phase', (ph, g) => {
     if (g && g !== game) return;
     const F = fc();
-    if (ph === 'takeoff' && F) S.sum = { tx: F.tx, tn: F.tn, lv: F.lv, as: F.as, n: S.plan.length };
+    if (ph === 'takeoff' && F) S.sum = { tx: F.tx, tn: F.tn, lv: F.lv, as: F.as, tg: F.tg | 0, ex: F.ex | 0, n: S.plan.length };
     if (ph === 'moon') { S.sum = null; S.mark.clear(); }
     if (ph === 'orbit' && host() && run()?.fc) { run().fc = null; game.broadcastRun?.(['fc']); }
     if (ph !== 'moon' && ph !== 'landing') { S.mt.clear(); }
@@ -562,7 +564,7 @@ export function installFeedcams(game) {
   }));
 
   return {
-    state: S, plan: () => S.plan, hostTick, hostReq, onNoise, taxTick, untag,
+    state: S, plan: () => S.plan, cleanBonus: (collected) => { const F = fc(); return F ? K.cleanBonus(collected, F.tg, S.plan.length, F.ex) : 0; }, hostTick, hostReq, onNoise, taxTick, untag,
     /** HOST: a mobile camera (drone, Lantern Keeper beam) sees player `id` from `d` metres this tick; src = tag source ('d0', 'x') */
     expose(id, d, src = 'x') { if (host() && id) S.ext.set(id, { d: Math.max(0.5, +d || 8), src, until: game.time + 0.35 }); },
     /** HOST: does a working camera see this point right now? (The Follower counts cameras as watchers.) Cached 0.25 s per 2 m cell. */
