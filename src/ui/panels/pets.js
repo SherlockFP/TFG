@@ -1,6 +1,6 @@
 // PET panel (N, or PETS in the terminal): STABLE (6 slots, stats, abilities, evolution tree, rename, set active, release) - NEST (incubator) -
 // SKINS (collars, hats, colours, seasonal; some from achievements, some for Clout) - SHOP (HQ only). Dark CRT / amber look, self-contained DOM + CSS.
-import { t, tf } from '../../core/i18n.js';
+import { t, tf, getLang } from '../../core/i18n.js';
 import * as C from '../../game/pets_core.js';
 import { unlockAt } from '../../game/wallet.js';
 import { createPetStudio, petSig } from './pets_studio.js';
@@ -86,7 +86,7 @@ export function createPetsPanel({ game, api, tab } = {}) {
       const tx = mk('div', 'pt-li-t');
       tx.append(mk('div', 'pt-li-n', `${p.nm}${p.sh ? ' ✦' : ''}`), mk('div', 'pt-li-s', `${t(C.SPECIES[p.sp].name)} · ${t('Level')} ${C.levelOf(p)}`));
       el.append(port, tx);
-      if (p.id === s.active) { const tg = mk('span', 'pt-tag pt-good', t('Active').toUpperCase()); el.appendChild(tg); }
+      if (p.id === s.active) { const tg = mk('span', 'pt-tag pt-good', t('Active').toLocaleUpperCase(getLang())); el.appendChild(tg); }
       else if (C.isResting(s, p)) el.appendChild(mk('span', 'pt-tag pt-bad', 'zZz'));
       el.addEventListener('click', () => { sel = p.id; sfx(); render(); });
       list.appendChild(el);

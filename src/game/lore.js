@@ -184,14 +184,14 @@ export function installLore(game) {
       case 'war': {
         const f = FACTIONS[d.f];
         if (!f) break;
-        hud?.bigText?.(d.on ? (t('⚔ WAR DECLARED')) : (t('CEASEFIRE')), f.name.toUpperCase());
+        hud?.bigText?.(d.on ? (t('⚔ WAR DECLARED')) : (t('CEASEFIRE')), f.name.toLocaleUpperCase(getLang()));
         if (d.on) { game.engine?.flash?.(0xff2010, 0.35); game.engine?.shake?.(0.3); }
         break;
       }
       case 'invade': {
         const f = FACTIONS[d.f];
         if (!f) break;
-        hud?.bigText?.(`⚠ ${f.name.toUpperCase()} ${t('HIT SQUAD')}`, t('HAS ENTERED THE SECTOR'));
+        hud?.bigText?.(`⚠ ${f.name.toLocaleUpperCase(getLang())} ${t('HIT SQUAD')}`, t('HAS ENTERED THE SECTOR'));
         game.engine?.flash?.(0xff2010, 0.45); game.engine?.shake?.(0.4);
         game.sfx?.('ship_alarm', 0.6);
         break;
@@ -220,7 +220,7 @@ export function installLore(game) {
     x.fillStyle = '#031208'; x.fillRect(0, 0, 128, 88);
     x.fillStyle = '#39ff6a'; x.font = 'bold 12px monospace'; x.fillText('▣ LOG ' + String(idx + 1).padStart(2, '0'), 6, 15);
     x.font = '10px monospace'; x.fillStyle = '#b9ffcf';
-    const words = log.title.toUpperCase().split(/\s+/); let line = '', y = 32;
+    const words = log.title.toLocaleUpperCase(getLang()).split(/\s+/); let line = '', y = 32;
     for (const w of words) { if ((line + ' ' + w).length > 18) { x.fillText(line, 6, y); y += 12; line = w; } else line = (line ? line + ' ' : '') + w; }
     if (line && y < 70) x.fillText(line, 6, y);
     x.fillStyle = '#39ff6a'; x.fillText('[E] READ', 6, 82);

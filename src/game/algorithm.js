@@ -243,7 +243,7 @@ export function installAlgorithm(core) {
     if (!st.el) return;
     const f = n.voice && FACTIONS[n.voice];
     st.cur = { ...n, shown: 0, t: 0, dur: 1.2 + n.text.length * 0.034 + 1.8 };
-    st.nameEl.textContent = f ? `${f.name.toUpperCase()} · ${f.leader.toUpperCase()}` : '';
+    st.nameEl.textContent = f ? `${f.name.toLocaleUpperCase(getLang())} · ${f.leader.toLocaleUpperCase(getLang())}` : '';
     st.el.classList.toggle('fac', !!f);
     st.nameEl.style.color = f ? f.color : '';
     st.el.classList.add('on');

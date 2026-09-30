@@ -2,7 +2,7 @@
 // Pure DOM + CSS + a little rAF; every effect cleans itself up. Sounds go through the `sfx(name, vol, pitch)` callback the caller gives
 // (existing procedural sfx only). reduceMotion collapses the crate to a simple fade-in and the fanfares to a single pill.
 import { el } from '../core/util.js';
-import { t } from '../core/i18n.js';
+import { t, getLang } from '../core/i18n.js';
 import { TIERS, TIER_ORDER } from '../game/tiers.js';
 
 const STYLE_ID = 'tfg-daily-fx-style';
@@ -108,7 +108,7 @@ export function playCrateReveal(opts) {
   rv.style.setProperty('--tc', kindColor); rv.style.setProperty('--tcg', tierGlow(kindColor));
   const rays = el('div', { class: 'dy-rays' });
   const stage = el('div', { class: 'dy-stage' });
-  const name = el('div', { class: 'dy-name' }, (opts.name || '').toUpperCase());
+  const name = el('div', { class: 'dy-name' }, (opts.name || '').toLocaleUpperCase(getLang()));
   const crate = el('div', { class: 'dy-crate' }, el('div', { class: 'cb' }), el('div', { class: 'cl' }));
   const WIN_AT = Math.max(20, cards.length - 6);
   const all = cards.slice(0, WIN_AT).concat([{ tier: view.tier, title: view.title, sub: view.sub, win: true }], cards.slice(WIN_AT + 1, WIN_AT + 8));

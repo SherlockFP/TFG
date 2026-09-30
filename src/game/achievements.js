@@ -685,7 +685,7 @@ export function installAchievements(game) {
     return fresh;
   }
   function queueAchievement(a) {
-    banner.push({ tier: a.tier, icon: a.icon, kicker: `${L('ACHIEVEMENT UNLOCKED')} · ${tierName(a.tier).toUpperCase()}`, name: nameOf(a), desc: descOf(a), reward: rewardText(a.reward || {}) });
+    banner.push({ tier: a.tier, icon: a.icon, kicker: `${L('ACHIEVEMENT UNLOCKED')} · ${tierName(a.tier).toLocaleUpperCase(getLang())}`, name: nameOf(a), desc: descOf(a), reward: rewardText(a.reward || {}) });
   }
 
   // ---- daily login streak
@@ -847,7 +847,7 @@ export function renderAchievementsPanel(container, game, profile = game?.profile
       card.style.setProperty?.('--kt', TIERS[a.tier]?.color || '#ffd23f');
       const body = mk('div', 'kach-body');
       const nm = mk('div', 'kach-n', nameOf(a));
-      nm.appendChild(mk('span', 'kach-t', tierName(a.tier).toUpperCase()));
+      nm.appendChild(mk('span', 'kach-t', tierName(a.tier).toLocaleUpperCase(getLang())));
       body.append(nm, mk('div', 'kach-d', descOf(a)));
       if (!un && a.progress) {
         let pr = null;

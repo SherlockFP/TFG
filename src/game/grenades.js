@@ -16,7 +16,7 @@
 import * as THREE from 'three';
 import { ITEMS, registerItem } from './items.js';
 import { RECIPES } from './recipes.js';
-import { addTranslations, t } from '../core/i18n.js';
+import { addTranslations, t, getLang } from '../core/i18n.js';
 import { G } from '../physics/physics.js';
 import { insideShip } from '../world/ship.js';
 import { hudDock } from '../ui/dock.js';
@@ -370,7 +370,7 @@ export function installGrenades(game) {
     if (key !== hudKey) {
       hudKey = key;
       if (!key) hud.style.display = 'none';
-      else { hud.style.display = 'block'; hudText.textContent = `${t(KINDS[kind].name).toUpperCase()}${(it.charges ?? 1) > 1 ? '  x' + it.charges : ''}`; hudHint.textContent = t('Hold LMB to aim, release to throw'); }
+      else { hud.style.display = 'block'; hudText.textContent = `${t(KINDS[kind].name).toLocaleUpperCase(getLang())}${(it.charges ?? 1) > 1 ? '  x' + it.charges : ''}`; hudHint.textContent = t('Hold LMB to aim, release to throw'); }
     }
     if (!cook.it) return;
     if (held() !== cook.it || !canAct()) { cancelCook(); return; }

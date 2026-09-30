@@ -91,7 +91,7 @@ export function createRolesPanel({ game = null, ctl, profile = game?.profile, on
       const top = mk('div', 'rl-top');
       top.appendChild(iconCanvas(r.icon, 64, r.color, true));
       const t = mk('div');
-      t.append(mk('div', 'rl-name', L(r.name).toUpperCase()), mk('div', 'rl-tag', r.tag));
+      t.append(mk('div', 'rl-name', L(r.name).toLocaleUpperCase(getLang())), mk('div', 'rl-tag', r.tag));
       top.appendChild(t);
       card.appendChild(top);
       card.appendChild(mk('div', 'rl-desc', r.desc));

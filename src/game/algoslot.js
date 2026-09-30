@@ -12,15 +12,15 @@ const HANDLES = ['xX_lurker_Xx', 'ratking', 'dialup_dave', 'nightshift', '404mom
 // pool key -> [EN, TR, RU] lines (the handle is prefixed in code, never translated)
 export const REACT = {
   tagged: [['ON AIR. smile.', 'YAYINDASIN. gülümse.', 'В ЭФИРЕ. улыбочку.'], ['that camera is not your friend', 'o kamera dostun değil', 'эта камера тебе не друг'], ['tagged. drop the bag lol', 'etiketlendi. çantayı bırak lol', 'тебя отметили. брось сумку лол']],
-  downed: [['he is down. clip it.', 'yere düştü. klipe al.', 'он упал. клипуйте.'], ['somebody get him up', 'biri kaldırsın onu', 'кто-нибудь, поднимите его'], ['chat, we are so back', 'chat, döndük', 'чат, мы вернулись']],
-  escape: [['ok that was smooth', 'tamam bu akıcıydı', 'ладно, это было гладко'], ['he dodged the whole thing', 'hepsinden kaçtı', 'он увернулся от всего']],
-  boss: [['hit it again!!', 'bir daha vur!!', 'ещё раз ударь!!'], ['is that thing even hurt', 'o şey acıyor mu hiç', 'ему вообще больно']],
+  downed: [['he is down. clip it.', 'yere yığıldı. klip al.', 'он упал. клипуйте.'], ['somebody get him up', 'biri kaldırsın onu', 'кто-нибудь, поднимите его'], ['chat, we are so back', 'chat, döndük', 'чат, мы вернулись']],
+  escape: [['ok that was smooth', 'tamam bu temizdi', 'ладно, это было гладко'], ['he dodged the whole thing', 'her şeyi atlattı', 'он увернулся от всего']],
+  boss: [['hit it again!!', 'bir daha vur!!', 'ещё раз ударь!!'], ['is that thing even hurt', 'bu şeyin canı yanıyor mu ki', 'ему вообще больно']],
   dodge: [['nice dodge', 'güzel kaçış', 'красивый уклон'], ['the door trick. classic.', 'kapı numarası. klasik.', 'трюк с дверью. классика.']],
   closet: [['do not open the closet', 'dolabı açma', 'не открывай шкаф'], ['hiding is content too', 'saklanmak da içerik', 'прятаться тоже контент']],
 };
 const TR = {}, RU = {};
 for (const pool of Object.values(REACT)) for (const [en, trs, rus] of pool) { TR[en] = trs; RU[en] = rus; }
-Object.assign(TR, { 'LIVE peak {n} viewers': 'CANLI zirve {n} izleyici' });
+Object.assign(TR, { 'LIVE peak {n} viewers': 'Yayın zirvesi: {n} izleyici' });
 Object.assign(RU, { 'LIVE peak {n} viewers': 'ПИК В ЭФИРЕ: {n} зрителей' });
 addTranslations(TR, 'tr');
 addTranslations(RU, 'ru');

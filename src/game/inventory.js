@@ -15,7 +15,7 @@ import { MOONS } from './moons.js';
 import { TIERS, tierIndex } from './tiers.js';
 import * as C from './inventory_core.js';
 import { RNG } from '../core/rng.js';
-import { addTranslations, t, tf } from '../core/i18n.js';
+import { addTranslations, t, tf, getLang } from '../core/i18n.js';
 import { insideShip } from '../world/ship.js';
 import { hudDock } from '../ui/dock.js';
 import { iconHTML } from '../ui/icons.js';
@@ -587,7 +587,7 @@ export function installInventory(game) {
       const g = gridNow(list);
       const used = C.usedCells(list), cap = g.cols * g.rows;
       const bag = C.bagEntryOf(list);
-      game.ui?.hud?.setBagTag?.(game.player.dead ? null : { used, cap, full: used >= cap, label: bag ? t('BAG') : t('Pockets').toUpperCase() });
+      game.ui?.hud?.setBagTag?.(game.player.dead ? null : { used, cap, full: used >= cap, label: bag ? t('BAG') : t('Pockets').toLocaleUpperCase(getLang()) });
     }
     st.healT = (st.healT || 0) - dt;
     if (st.healT <= 0) { st.healT = 1; healBag(); }

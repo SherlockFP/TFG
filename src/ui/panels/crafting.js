@@ -7,7 +7,7 @@ import { COMPONENT_IDS, COMPONENT_COLOR } from '../../game/components.js';
 import { BLUEPRINTS, CATS, tierOdds, upgradeInfo, isUpgradable } from '../../game/recipes.js';
 import { analyzeInfo, dismantleYield, dismantleBlock, isStrange } from '../../game/research.js';
 import { iconImg } from '../icons.js';
-import { t, tf } from '../../core/i18n.js';
+import { t, tf, getLang } from '../../core/i18n.js';
 import { glyph } from '../glyphs.js';
 import { escapeHtml, humanizeId } from '../../core/util.js';
 
@@ -279,7 +279,7 @@ export function createCraftingPanel({ game, api, tab, onClose } = {}) {
       row.dataset.nav = 'crp:u:' + it.id;
       const nm = mk('div', 'crp-rn');
       nm.append(mk('div', 'crp-name', t(it.def.name)), mk('div', 'crp-mini', `${TIERS[tr].name}${it.affix ? ' · affixed' : ''}${it.soulbound ? ' · soulbound' : ''}`));
-      const tag = mk('span', 'crp-tier', TIERS[tr].name.toUpperCase()); tag.style.setProperty('--tc', tierColor(tr));
+      const tag = mk('span', 'crp-tier', TIERS[tr].name.toLocaleUpperCase(getLang())); tag.style.setProperty('--tc', tierColor(tr));
       row.append(icon(it.type), nm, tag);
       row.addEventListener('click', (e) => { e.stopPropagation(); if (busy) return; sel = it.id; stamp = null; sfx('ui_hover', 0.3); render(); });
       rows.appendChild(row);
@@ -300,7 +300,7 @@ export function createCraftingPanel({ game, api, tab, onClose } = {}) {
     const line = mk('div', 'crp-dn'); line.append(t(it.def.name));
     dt.append(line);
     if (u) {
-      const a = mk('div', 'crp-dd'); a.append(Object.assign(mk('span', 'crp-tier', TIERS[cur].name.toUpperCase()), {}), mk('span', 'crp-arrow', '→'), mk('span', 'crp-tier', TIERS[u.to].name.toUpperCase()));
+      const a = mk('div', 'crp-dd'); a.append(Object.assign(mk('span', 'crp-tier', TIERS[cur].name.toLocaleUpperCase(getLang())), {}), mk('span', 'crp-arrow', '→'), mk('span', 'crp-tier', TIERS[u.to].name.toLocaleUpperCase(getLang())));
       a.firstChild.style.setProperty('--tc', tierColor(cur)); a.lastChild.style.setProperty('--tc', tierColor(u.to));
       dt.appendChild(a);
     } else dt.appendChild(mk('div', 'crp-dd', t(cur !== 'mythic' && TIER_ORDER.indexOf(cur) >= 2 ? 'Workbench upgrades stop at Rare. Use the Ascension Altar at HQ.' : 'Already at the top tier.')));   // [forge]

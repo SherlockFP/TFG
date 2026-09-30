@@ -3,7 +3,7 @@
 // Model API is the CreatureView one: { root, parts, height, radius, update(dt, {state, speed, t, time, progress}), setElite, setHitFlash, dispose }.
 // `progress` = the creature `extra` flags: bit 1 engaged, 2 phase 2, 4 vulnerable / exposed, bits 3-6 aux alive, bits 7-10 aux total.
 import * as THREE from 'three';
-import { t } from '../core/i18n.js';
+import { t, getLang } from '../core/i18n.js';
 import { CREATURES } from './creatures.js';
 
 export const F_ENGAGED = 1, F_P2 = 2, F_VULN = 4;
@@ -263,7 +263,7 @@ export function createBossUi(game, bossInfo) {
     const info = bossInfo(ty), def = CREATURES[ty];
     if (!info || !def) return;
     const th = game.bossDress?.infoOf?.(ty);   // wave 8 night: themed boss name / title / intro (bossdress.js)
-    q(card, '.cy-card-name').textContent = String(th ? th.name : def.name).toUpperCase();
+    q(card, '.cy-card-name').textContent = String(th ? th.name : def.name).toLocaleUpperCase(getLang());
     q(card, '.cy-card-title').textContent = th ? th.title : t(info.title);
     q(card, '.cy-card-intro').textContent = th ? th.intro : '';
     q(card, '.cy-card-rank').textContent = t('RANK') + ' ' + info.rank;
@@ -316,7 +316,7 @@ export function createBossUi(game, bossInfo) {
     }
     if (!bv) { if (bar) bar.classList.add('cy-off'); lastId = null; return; }
     ensure(); if (!bar) return;
-    if (bv.id !== lastId) { lastId = bv.id; chip = 1; chipHold = 0; q(bar, '.cy-n').textContent = String(game.bossDress?.nameOf?.(bv.type) || bv.def.name).toUpperCase(); const info = bossInfo(bv.type); q(bar, '.cy-rank').textContent = info ? info.rank : ''; q(bar, '.cy-p2').textContent = t('PHASE 2'); }
+    if (bv.id !== lastId) { lastId = bv.id; chip = 1; chipHold = 0; q(bar, '.cy-n').textContent = String(game.bossDress?.nameOf?.(bv.type) || bv.def.name).toLocaleUpperCase(getLang()); const info = bossInfo(bv.type); q(bar, '.cy-rank').textContent = info ? info.rank : ''; q(bar, '.cy-p2').textContent = t('PHASE 2'); }
     const f = bv.maxHp ? Math.max(0, Math.min(1, bv.hp / bv.maxHp)) : 0;
     if (f >= chip) chip = f; else { chipHold += dt; if (chipHold > 0.5) chip = Math.max(f, chip - dt * 0.45); }
     if (f < chip - 0.001 && chipHold === 0) chipHold = 0.0001;

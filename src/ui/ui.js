@@ -511,7 +511,7 @@ export class UI {
         if (chosen.slot === r.slot) chosen.data = d;
         const card = el('div', { class: 'slot-card' + (chosen.slot === r.slot ? ' sel' : '') + (d ? '' : ' empty'), tabindex: 0, 'data-slot': r.slot });
         card.append(...[
-          el('div', { class: 'slot-t' }, el('span', {}, `${t('Slot').toUpperCase()} ${r.slot}`), el('span', { class: 'slot-day' }, d ? `${t('Day').toUpperCase()} ${d.day}` : t('New run').toUpperCase())),
+          el('div', { class: 'slot-t' }, el('span', {}, `${t('Slot').toLocaleUpperCase(getLang())} ${r.slot}`), el('span', { class: 'slot-day' }, d ? `${t('Day').toLocaleUpperCase(getLang())} ${d.day}` : t('New run').toLocaleUpperCase(getLang()))),
           d ? el('div', { class: 'slot-q' }, `${t('Quota')} #${(d.quotaIndex || 0) + 1} · ${fmtMoney(d.sold)}/${fmtMoney(d.quota)}`) : el('div', { class: 'slot-q dim' }, '— — —'),
           d ? el('div', { class: 'slot-c' }, `${t('Credits')} ${fmtMoney(d.credits)}`) : null,
           d ? el('div', { class: 'dim slot-crew' }, `${(d.crew || []).slice(0, 4).join(', ')}`) : null,
@@ -1293,7 +1293,7 @@ export class UI {
       [t('Fines'), d.fines, '-▮', ''],
     ];
     const box = el('div', { class: 'report', html: `
-      <div class="rp-head"><span>${t('PERFORMANCE REPORT')}</span><span>${escapeHtml(d.moon)} · ${t('Day').toUpperCase()} ${d.day}</span></div>
+      <div class="rp-head"><span>${t('PERFORMANCE REPORT')}</span><span>${escapeHtml(d.moon)} · ${t('Day').toLocaleUpperCase(getLang())} ${d.day}</span></div>
       ${d.allDead ? `<div class="rp-bad">${t('ALL CREW LOST. Scrap on board was lost.')}</div>` : ''}
       <div class="rp-rows">${rows.map(([l, v, pre, note], i) => `<div class="rp-row" style="--i:${i}"><span>${l}</span><span class="rp-note">${note}</span><b data-v="${Number(v) || 0}" data-pre="${pre}">${pre}0</b></div>`).join('')}</div>
       ${crew ? `<div class="rp-crewlist" style="--i:${rows.length}">${crew}</div>` : ''}

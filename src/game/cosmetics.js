@@ -12,7 +12,7 @@ import { MARKET } from './progression.js';
 import { registerItem, SCRAP_TABLE } from './items.js';
 import { tierColor, tierDef, TIER_ORDER } from './tiers.js';
 import { saveProfile } from '../core/save.js';
-import { addTranslations, tf } from '../core/i18n.js';
+import { addTranslations, tf, getLang } from '../core/i18n.js';
 import { unlockAt } from './wallet.js';
 
 export const SLOTS = ['suit', 'hat', 'face', 'back'];
@@ -243,7 +243,7 @@ export function installCosmetics(game) {
     const td = tierDef(e.tier);
     game.ui?.toast?.(`NEW COSMETIC: ${e.name} (${td.name})`, 'good');
     game.sfx?.(TIER_ORDER.indexOf(e.tier) >= 3 ? 'level_up_jingle' : 'ui_confirm', 0.6);
-    if (TIER_ORDER.indexOf(e.tier) >= 4) game.ui?.hud?.bigText?.(e.name.toUpperCase(), `${td.name} ${e.slot} unlocked - open the WARDROBE (ship mirror / suit rack)`);
+    if (TIER_ORDER.indexOf(e.tier) >= 4) game.ui?.hud?.bigText?.(e.name.toLocaleUpperCase(getLang()), `${td.name} ${e.slot} unlocked - open the WARDROBE (ship mirror / suit rack)`);
     game.mods?.emit('tfg:cosmeticUnlocked', e, game);
   }
 

@@ -11,7 +11,7 @@
 // Host-authoritative; net type 'g2' (see gameplay2.js): requests start / fix / jam / sync, messages faults / clear / fixed / hit / bad.
 import * as THREE from 'three';
 import { registerItem, ITEMS, isSellable, itemDef } from './items.js';
-import { addTranslations, t, tf } from '../core/i18n.js';
+import { addTranslations, t, tf, getLang } from '../core/i18n.js';
 import { createFaultStation, PANEL } from '../models/shipfaults.js';
 import { createHullPatchModel } from '../models/creeper.js';
 import { insideShip } from '../world/ship.js';
@@ -518,7 +518,7 @@ export function installShipFaults(game, ctx = {}) {
       else { h.t -= dt * 2.5; if (h.t <= 0) C.hold = null; }
     }
     const hh = C.hold;
-    const txt = hh ? `${hh.label.toUpperCase()}  ${'█'.repeat(Math.round(hh.t / hh.need * 16)).padEnd(16, '░')}  ${Math.min(hh.need, hh.t).toFixed(1)}/${hh.need.toFixed(1)}s (hold E)` : '';
+    const txt = hh ? `${hh.label.toLocaleUpperCase(getLang())}  ${'█'.repeat(Math.round(hh.t / hh.need * 16)).padEnd(16, '░')}  ${Math.min(hh.need, hh.t).toFixed(1)}/${hh.need.toFixed(1)}s (hold E)` : '';
     if (C.holdEl && C.holdEl.textContent !== txt) { C.holdEl.textContent = txt; C.holdEl.style.display = txt ? '' : 'none'; }
   }
   offs.push(game.mods.on('update', (dt, g) => { if (g === game) { try { update(Math.min(dt, 0.1)); } catch (e) { if (!st.w2) { st.w2 = 1; console.warn('[faults] client', e); } } } }));

@@ -2,7 +2,7 @@
 // A TrapView is driven by the replicated state (s, and the local time the state was entered). The host runs the state machine and the damage (horror.js).
 import * as THREE from 'three';
 import { TRAPS, laserFrac } from './horror_core.js';
-import { t } from '../core/i18n.js';
+import { t, getLang } from '../core/i18n.js';
 import { sigHex } from '../core/a11y_core.js';   // [a11y] colour-blind palette
 
 const basic = (c, o = {}) => new THREE.MeshBasicMaterial({ color: c, transparent: o.op != null, opacity: o.op ?? 1, blending: o.add ? THREE.AdditiveBlending : THREE.NormalBlending, depthWrite: !o.add && o.op == null, side: o.side ?? THREE.FrontSide, fog: o.fog !== false });
@@ -200,7 +200,7 @@ export class TrapView {
     x.font = "22px 'TFG Cyr VT', VT323, monospace"; x.textAlign = 'center'; x.fillStyle = '#0a0d10';
     x.fillText(t(TRAP_STATE_LABEL[st] || 'OFFLINE'), c.width / 2, 25, 180);
     x.fillStyle = '#e8eef4'; x.font = "26px 'TFG Cyr VT', VT323, monospace";
-    x.fillText(t(this.T.name).toUpperCase(), c.width / 2, 68, 180);
+    x.fillText(t(this.T.name).toLocaleUpperCase(getLang()), c.width / 2, 68, 180);
     x.fillStyle = '#9aa4ae'; x.font = "18px 'TFG Cyr VT', VT323, monospace";
     const lines = [];
     if (st === 'idle' || st === 'spent') { lines.push(t('PRICE')); }

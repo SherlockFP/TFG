@@ -9,7 +9,7 @@
 // Net: request 'cbskill' { op, ... } (host validates range / rate / caps), results ride fx { k: 'cb', t: ... }.
 import * as THREE from 'three';
 import { G } from '../physics/physics.js';
-import { addTranslations, t } from '../core/i18n.js';
+import { addTranslations, t, getLang } from '../core/i18n.js';
 import { hudDock } from '../ui/dock.js';
 import { createMiniTurretMesh } from '../models/combat_wave2.js';
 import { clamp, fin3, arr3, synth, sin, ex, nz, hex } from './combat_kit.js';
@@ -85,7 +85,7 @@ export function installRoleSkills(g, K) {
     sk.forEach((s, i) => {
       const e = document.createElement('div');
       e.className = 'rs-c'; e.style.setProperty('--rc', hex(COLORS[builtFor] || 0x9fd4ff));
-      e.innerHTML = `<u>${i ? 'U' : 'Y'}</u><b>${t(s.name).toUpperCase().slice(0, 10)}</b><span></span><i></i>`;
+      e.innerHTML = `<u>${i ? 'U' : 'Y'}</u><b>${t(s.name).toLocaleUpperCase(getLang()).slice(0, 10)}</b><span></span><i></i>`;
       e.title = t(s.name) + ' - ' + t(s.desc);
       row.appendChild(e);
       cells.push({ e, cd: e.querySelector('i'), sp: e.querySelector('span'), ready: true });

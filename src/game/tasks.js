@@ -23,7 +23,7 @@ import { spreadMarkers, hotbarRect } from '../ui/docklayout.js';
 import { escapeHtml } from '../core/util.js';
 import { toScreen, fx } from './funfx.js';
 import { ensureWardrobeProfile } from './cosmetics.js';
-import { t, tf } from '../core/i18n.js';
+import { t, tf, getLang } from '../core/i18n.js';
 
 HOST_ONLY.add('task');
 MINIGAMES.swipe = MINIGAMES.swipe || createSwipe;
@@ -59,7 +59,7 @@ function screenMat(type, state) {
   } else if (state === 'done') {
     x.font = '38px monospace'; x.fillText('✔', 64, 32); x.font = '18px monospace'; x.fillText('DONE', 64, 66);
   } else {
-    x.font = '34px monospace'; x.fillText(def.icon, 64, 28); x.font = '15px monospace'; x.fillText(def.name.toUpperCase(), 64, 60);
+    x.font = '34px monospace'; x.fillText(def.icon, 64, 28); x.font = '15px monospace'; x.fillText(def.name.toLocaleUpperCase(getLang()), 64, 60);
     x.font = '13px monospace'; x.globalAlpha = 0.75; x.fillText(def.mode === 'hold' ? 'HOLD [E]' : 'PRESS [E]', 64, 76);
   }
   const tx = new THREE.CanvasTexture(c); tx.magFilter = tx.minFilter = THREE.NearestFilter; tx.generateMipmaps = false; tx.colorSpace = THREE.SRGBColorSpace;
@@ -408,7 +408,7 @@ export function installTasks(game) {
         }
       } else { hold.t -= dt * 2.5; if (hold.t <= 0) hold = null; }
     }
-    const txt = hold ? `${hold.kind === 'prank' ? '🤡 SABOTAGING' : TASK_TYPES[stationOf(hold.sid)?.type]?.name.toUpperCase() || 'TASK'}  ${'█'.repeat(Math.round(hold.t / hold.need * 16)).padEnd(16, '░')}  ${Math.min(hold.need, hold.t).toFixed(1)}/${hold.need}s (hold E)` : '';
+    const txt = hold ? `${hold.kind === 'prank' ? '🤡 SABOTAGING' : TASK_TYPES[stationOf(hold.sid)?.type]?.name.toLocaleUpperCase(getLang()) || 'TASK'}  ${'█'.repeat(Math.round(hold.t / hold.need * 16)).padEnd(16, '░')}  ${Math.min(hold.need, hold.t).toFixed(1)}/${hold.need}s (hold E)` : '';
     if (dock.textContent !== txt) { dock.textContent = txt; dock.style.display = txt ? '' : 'none'; }
     // task visuals follow the local list (done state changes) at a low rate
     refreshT -= dt; if (refreshT <= 0) { refreshT = 0.5; refreshVisuals(); }

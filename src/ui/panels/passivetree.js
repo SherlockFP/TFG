@@ -206,7 +206,7 @@ export function createTreePanel({ game = null, ctl = null, profile = game?.profi
     const role = ctl.roleDef();
     roleBtn.replaceChildren();
     roleBtn.style.setProperty('--rc', role ? role.color : '#ffb347');
-    if (role) roleBtn.append(iconCanvas(role.icon, 26, role.color, false), document.createTextNode(role.name.toUpperCase()));
+    if (role) roleBtn.append(iconCanvas(role.icon, 26, role.color, false), document.createTextNode(role.name.toLocaleUpperCase(getLang())));
     else roleBtn.append(document.createTextNode(L('ROLE') + ': ' + L('Pick a role') + ' ▾'));
     const p = ctl.points();
     pts.replaceChildren(document.createTextNode(L('POINTS') + ' '), Object.assign(mk('b'), { textContent: String(p) }));
@@ -223,7 +223,7 @@ export function createTreePanel({ game = null, ctl = null, profile = game?.profi
     const h = (t) => side.appendChild(mk('h4', '', t));
     h(L('ROLE'));
     if (role) {
-      const rb = mk('div', 'k', role.name.toUpperCase()); rb.style.color = role.color; side.appendChild(rb);
+      const rb = mk('div', 'k', role.name.toLocaleUpperCase(getLang())); rb.style.color = role.color; side.appendChild(rb);
       side.appendChild(mk('div', 'd', role.tag));
     } else side.appendChild(mk('div', 'd', L('No role yet')));
     const tb = treeBonus(ctl.state());
@@ -260,7 +260,7 @@ export function createTreePanel({ game = null, ctl = null, profile = game?.profi
     tip.style.setProperty('--tc', col);
     tip.replaceChildren();
     const typeName = n.type === 'keystone' ? 'KEYSTONE' : n.type === 'notable' ? 'NOTABLE' : n.type === 'start' ? 'ROLE POST' : 'PASSIVE';
-    tip.appendChild(mk('div', 'tt', L(typeName) + (n.rare ? ' · BAG' : '') + (n.role && n.type !== 'start' ? ' · ' + ROLES[n.role].name.toUpperCase() : '')));
+    tip.appendChild(mk('div', 'tt', L(typeName) + (n.rare ? ' · BAG' : '') + (n.role && n.type !== 'start' ? ' · ' + ROLES[n.role].name.toLocaleUpperCase(getLang()) : '')));
     tip.appendChild(mk('div', 'tn', n.name));
     const isMyPost = n.type === 'start' && ctl.role() === n.role;
     const b = isMyPost ? ROLES[n.role].bonus : n.b;
@@ -559,7 +559,7 @@ export function createTreePanel({ game = null, ctl = null, profile = game?.profi
       const on = alloc.has(n.id);
       ctx.globalAlpha = matches.size && !matches.has(n.id) ? 0.3 : 1;
       ctx.font = `${fs}px VT323, monospace`;
-      const txt = (n.type === 'start' ? ROLES[n.role].name : n.name).toUpperCase();
+      const txt = (n.type === 'start' ? ROLES[n.role].name : n.name).toLocaleUpperCase(getLang());
       const yy = n.y + R + (n.type === 'keystone' ? 24 : 16) / view.z;
       ctx.lineWidth = 4 / view.z; ctx.strokeStyle = 'rgba(0,0,0,.9)'; ctx.strokeText(txt, n.x, yy);
       ctx.fillStyle = n.type === 'keystone' ? (on ? '#fff0c0' : '#ffb56a') : n.type === 'notable' ? (on ? '#ffe9b0' : '#e7d9b4') : rgba(ROLES[n.role].color, 0.95);
@@ -574,7 +574,7 @@ export function createTreePanel({ game = null, ctl = null, profile = game?.profi
       ctx.font = '46px VT323, monospace';
       const mine = ctl.role() === id;
       ctx.fillStyle = rgba(ROLES[id].color, mine ? 0.9 : 0.4);
-      ctx.fillText(ROLES[id].name.toUpperCase(), Math.cos(a) * LABEL_R, Math.sin(a) * LABEL_R);
+      ctx.fillText(ROLES[id].name.toLocaleUpperCase(getLang()), Math.cos(a) * LABEL_R, Math.sin(a) * LABEL_R);
       if (mine) { ctx.font = '22px VT323, monospace'; ctx.fillText(t('- YOUR ROLE -'), Math.cos(a) * LABEL_R, Math.sin(a) * LABEL_R + 30); }
     });
   }
@@ -633,7 +633,7 @@ export function decorateSkills(skillsEl, profile, ui) {
     skillsEl.replaceChildren();
     const el = (tag, cls, text) => mk(tag, cls, text);
     skillsEl.appendChild(el('div', 'label', `${L('PASSIVE TREE')} · ${L('POINTS')}: ${profile.skillPoints}`));
-    const info = el('div', 'dim', role ? tf('{n} · {length} nodes · {tag}', { n: role.name.toUpperCase(), length: r.nodes.length, tag: role.tag }) : L('No role yet'));
+    const info = el('div', 'dim', role ? tf('{n} · {length} nodes · {tag}', { n: role.name.toLocaleUpperCase(getLang()), length: r.nodes.length, tag: role.tag }) : L('No role yet'));
     if (role) info.style.color = role.color;
     skillsEl.appendChild(info);
     const open = () => {

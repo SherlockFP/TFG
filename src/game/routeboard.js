@@ -13,7 +13,7 @@ import { scrapCountFor, scrapValueMul, buyRate } from './progression.js';
 import { dangerOf, dangerName, interiorName } from '../ui/hud.js';
 import { AFFIX_BY_ID } from './mapmods_core.js';
 import { wrapMethod } from './dailyEvents.js';
-import { t, tf, tfIn, addTranslations } from '../core/i18n.js';
+import { t, tf, tfIn, addTranslations, getLang } from '../core/i18n.js';
 import { escapeHtml } from '../core/util.js';
 import * as C from './routeboard_core.js';
 
@@ -30,12 +30,12 @@ const TEXT = {
   weather: ['WEATHER', 'HAVA', 'ПОГОДА'],
   cur: ['CURRENT ROUTE', 'MEVCUT ROTA', 'ТЕКУЩИЙ МАРШРУТ'],
   fresh: ['NEW', 'YENİ', 'НОВОЕ'],
-  go: ['ROUTE HERE', 'BURAYA ROTA', 'ПРОЛОЖИТЬ СЮДА'],
-  go_fee: ['ROUTE HERE · ▮{c}', 'BURAYA ROTA · ▮{c}', 'ПРОЛОЖИТЬ СЮДА · ▮{c}'],
+  go: ['ROUTE HERE', 'BURAYA GİT', 'ПРОЛОЖИТЬ СЮДА'],
+  go_fee: ['ROUTE HERE · ▮{c}', 'BURAYA GİT · ▮{c}', 'ПРОЛОЖИТЬ СЮДА · ▮{c}'],
   lever: ['ROUTED. PULL THE LEVER', 'ROTA HAZIR. KOLU ÇEK', 'МАРШРУТ ЗАДАН. ДЁРНИ РЫЧАГ'],
-  orbit_only: ['Routing opens in orbit.', 'Rota yalnızca yörüngede seçilir.', 'Маршрут выбирается только на орбите.'],
+  orbit_only: ['Routing opens in orbit.', 'Rotayı yalnızca yörüngedeyken seçebilirsin.', 'Маршрут выбирается только на орбите.'],
   hq: ['0-ALGORITHM HQ · SELL SCRAP', '0-ALGORITHM HQ · HURDA SAT', '0-ALGORITHM HQ · ПРОДАТЬ ХЛАМ'],
-  hq_rate: ['buying at {r}%', '%{r} fiyattan alıyor', 'скупка по {r}%'],
+  hq_rate: ['buying at {r}%', 'alım oranı %{r}', 'скупка по {r}%'],
   hq_dl: ['deadline day pays 100 %', 'son gün %100 öder', 'в последний день платят 100 %'],   // [econ9] do not sell early: the deadline day pays full price
   keys: ['pick', 'seç', 'выбор'],
   k_route: ['route', 'rota', 'маршрут'],
@@ -259,7 +259,7 @@ export function installRouteboard(game) {
     if (r.phase !== 'orbit') { sfx('ui_error', 0.4); return; }
     if (m.id === r.moon) { hide(); term.print(tf('Already routed to {name}.', { name: m.name })); return; }
     hide();
-    term.print('> ROUTE ' + String(m.short || m.name).toUpperCase(), 'echo');
+    term.print('> ROUTE ' + String(m.short || m.name).toLocaleUpperCase(getLang()), 'echo');
     sfx('terminal_enter', 0.4);
     game.net?.request?.('term', { cmd: { op: 'route', moon: m.id } });
   }

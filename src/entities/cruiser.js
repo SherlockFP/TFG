@@ -31,7 +31,7 @@ import { G, groups } from '../physics/physics.js';
 import { createCruiserModel, VAN } from '../models/cruiser.js';
 import { insideShip } from '../world/ship.js';
 import { itemDef } from '../game/items.js';
-import { t, sysMsg } from '../core/i18n.js';
+import { t, sysMsg, getLang } from '../core/i18n.js';
 import { clamp, damp } from '../core/util.js';
 
 export const CRUISER = {
@@ -1088,7 +1088,7 @@ export function installCruiser(game) {
           return;
         }
         if (w === 'confirm' && local.pendingBuy) { local.pendingBuy = false; net()?.request('van', { op: 'buy' }); return; }
-        term.print(`${CRUISER.name.toUpperCase()}  ▮${CRUISER.price}\n${statusText()}`);
+        term.print(`${CRUISER.name.toLocaleUpperCase(getLang())}  ▮${CRUISER.price}\n${statusText()}`);
       },
     });
     const mine = mm.commands.get('van');

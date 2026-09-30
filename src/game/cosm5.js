@@ -8,7 +8,7 @@
 //   * net: 'c5look' (compact look code, see cosm5_data.js encodeLook), 'c5drop' (host -> crew boss trophy).
 import * as THREE from 'three';
 import { RNG } from '../core/rng.js';
-import { addTranslations, t, tf } from '../core/i18n.js';
+import { addTranslations, t, tf, getLang } from '../core/i18n.js';
 import { saveProfile } from '../core/save.js';
 import { EMOTES, LOCKED_EMOTES, EMOTE_BY_ID, isEmoteUnlocked, unlockEmote } from './emotes.js';
 import { owns as ownsWardrobe, grant as grantWardrobe, ensureWardrobeProfile } from './cosmetics.js';
@@ -353,7 +353,7 @@ export function installCosm5(game) {
     const td = tierDef(e.tier);
     game.ui?.toast?.(`${t('NEW COSMETIC')}: ${t(e.name)} (${t(td.name)})`, 'good');
     game.sfx?.(TIER_ORDER.indexOf(e.tier) >= 3 ? 'level_up_jingle' : 'ui_confirm', 0.6);
-    if (TIER_ORDER.indexOf(e.tier) >= 4) game.ui?.hud?.bigText?.(t(e.name).toUpperCase(), `${t(td.name)} ${how ? t(how) : t('cosmetic')} - ${t('open the WARDROBE')}`);
+    if (TIER_ORDER.indexOf(e.tier) >= 4) game.ui?.hud?.bigText?.(t(e.name).toLocaleUpperCase(getLang()), `${t(td.name)} ${how ? t(how) : t('cosmetic')} - ${t('open the WARDROBE')}`);
     game.mods?.emit('tfg:cosmeticUnlocked', { ...e, key, slot: e.slot }, game);
   }
   function grant(key, { quiet = false, how = '' } = {}) {

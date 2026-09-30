@@ -6,7 +6,7 @@ import { TIERS } from '../../game/tiers.js';
 import * as C from '../../game/inventory_core.js';
 import { iconHTML } from '../icons.js';
 import { escapeHtml } from '../../core/util.js';
-import { t, tf } from '../../core/i18n.js';
+import { t, tf, getLang } from '../../core/i18n.js';
 import { ensureInventoryStyles } from '../inventory_style.js';
 import { itemTooltipHTML } from './../inventory_panel.js';
 import * as D from '../../game/survival_data.js';
@@ -218,7 +218,7 @@ export function createStoragePanel(game, sv, crateId) {
   const inv = game.inventory;
   const crate0 = sv.crate(crateId);
   const T = S.CRATE_TIERS[crate0?.t || 1];
-  const f = frame(t(T.name).toUpperCase(), '', `
+  const f = frame(t(T.name).toLocaleUpperCase(getLang()), '', `
     <div class="svp-col">
       <div class="svp-sec" data-r="ctitle"></div>
       <div class="tinv-gridwrap svp-crate"><div class="tinv-grid" data-r="cgrid"></div><div class="tinv-items" data-r="citems"></div><div class="tinv-empty" data-r="cempty"></div></div>

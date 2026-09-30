@@ -7,7 +7,7 @@
 //                   analyze(itemId), craft(recipeId), have(type), status(recipe), gasProof(), luck(), blueprints(), dispose() }
 import * as THREE from 'three';
 import { RNG } from '../core/rng.js';
-import { addTranslations, t, tf } from '../core/i18n.js';
+import { addTranslations, t, tf, getLang } from '../core/i18n.js';
 import { ITEMS, itemDef, scrapTableFor } from './items.js';
 import { MOONS } from './moons.js';
 import { CREATURES } from './creatures.js';
@@ -805,11 +805,11 @@ export function installCrafting(game) {
       for (const cat of CATS) {
         const rs = list.filter((r) => r.cat === cat);
         if (!rs.length) continue;
-        lines.push(`[${cat.toUpperCase()}]`);
+        lines.push(`[${cat.toLocaleUpperCase(getLang())}]`);
         for (const r of rs) {
           const st = status(r);
           const tag = r.locked ? 'LOCKED ' : st.can ? 'READY  ' : '       ';
-          lines.push(` ${tag}${r.name.toUpperCase().padEnd(20)} ${fmtIn(r)}`);
+          lines.push(` ${tag}${r.name.toLocaleUpperCase(getLang()).padEnd(20)} ${fmtIn(r)}`);
         }
       }
       lines.push('', ' UPGRADE             raise a weapon tier (components + credits, may fail)', `Blueprints: ${api.blueprints().length}/${Object.keys(BLUEPRINTS).length}   Type RECIPES <name> for details.`);
@@ -819,10 +819,10 @@ export function installCrafting(game) {
       const q = rest.join(' ').toLowerCase().trim();
       const list = api.recipes();
       const r = q && (list.find((x) => x.id === q || x.name.toLowerCase() === q) || list.find((x) => x.name.toLowerCase().includes(q)));
-      if (!q || !r) { term.print(q ? t('No such recipe. Type CRAFT.') : tf('{n}\n\nRECIPES <name> shows details.', { n: list.map((x) => x.name.toUpperCase()).join('\n') })); return; }
+      if (!q || !r) { term.print(q ? t('No such recipe. Type CRAFT.') : tf('{n}\n\nRECIPES <name> shows details.', { n: list.map((x) => x.name.toLocaleUpperCase(getLang())).join('\n') })); return; }
       const st = status(r);
       const odds = tierOdds(r.tier, luck()).map((o) => `${o.tier} ${Math.round(o.p * 100)}%`).join(' / ');
-      term.print([`${r.name.toUpperCase()} -> ${ITEMS[r.out]?.name || r.out} x${r.n}`, r.desc, '',
+      term.print([`${r.name.toLocaleUpperCase(getLang())} -> ${ITEMS[r.out]?.name || r.out} x${r.n}`, r.desc, '',
         ...r.in.map(([id, n], i) => ` ${(ITEMS[id]?.name || id).padEnd(18)} ${st.rows[i].have}/${n}`),
         r.credits ? ` credits            ${st.credits.have}/${r.credits}` : '', r.bp ? ` blueprint          ${BLUEPRINTS[r.bp].name} (${st.bp.ok ? 'known' : 'UNKNOWN'})` : '',
         r.tier ? ` tier chance        ${odds}` : ' (no tier)'].filter(Boolean).join('\n'));

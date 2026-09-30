@@ -21,7 +21,7 @@ import { MOONS } from './moons.js';
 import { RNG } from '../core/rng.js';
 import { angleDiff } from '../core/util.js';
 import { rollWeaponAffixes } from './loot.js';
-import { t, addTranslations, sysMsg } from '../core/i18n.js';
+import { t, addTranslations, sysMsg, getLang } from '../core/i18n.js';
 
 addTranslations({
   'BOSS DEFEATED': 'BOSS YENİLDİ',
@@ -1637,7 +1637,7 @@ export function installBosses(game) {
     if (!show) return;
     if (v.type !== lastBarType) {
       lastBarType = v.type;
-      bar.title.textContent = String(v.def?.name || v.type).toUpperCase();
+      bar.title.textContent = String(v.def?.name || v.type).toLocaleUpperCase(getLang());
       lastRage = null;
     }
     const max = v.maxHp || 1;

@@ -17,7 +17,7 @@ import { ITEMS, STORE_ITEMS, SHIP_UPGRADES } from './items.js';
 import { TIERS, tierColor } from './tiers.js';
 import { RNG, hashString } from '../core/rng.js';
 import { isTrapItem, trapUnitPrice } from './difficulty.js';
-import { addTranslations, t, tf } from '../core/i18n.js';
+import { addTranslations, t, tf, getLang } from '../core/i18n.js';
 import { CRUISER } from '../entities/cruiser.js';
 import { createWeaponContext, installWeapons } from './weapons.js';
 import { installDeck } from './deck.js';
@@ -254,7 +254,7 @@ export function installShop(game) {
       for (const c of categoryList()) {
         const list = st.filter((e) => e.cat === c.id && !e.owned && (!e.followersAt || cloutOpenOf(g)));   // [trim] follower-milestone stock shows after the store's quota-1 unlock
         if (!list.length) continue;
-        out.push(c.name.toUpperCase() + ':');
+        out.push(c.name.toLocaleUpperCase(getLang()) + ':');
         for (const e of list) {
           const p = `▮${e.price}`;
           out.push(`* ${e.name.padEnd(20)} ${p}${e.off ? `  (was ▮${e.base}, -${Math.round(e.off * 100)}%)` : ''}${e.soldOut ? '  [SOLD OUT]' : e.left != null && e.left <= 2 ? `  [${e.left} left]` : ''}${e.locked ? '  [LOCKED]' : ''}`);

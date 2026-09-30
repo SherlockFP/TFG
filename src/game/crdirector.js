@@ -11,7 +11,7 @@
 // Knobs: game.config.crdirector = false switches the whole thing off (vanilla spawning); game.crdirector.debug() for the live state.
 import * as THREE from 'three';
 import { RNG } from '../core/rng.js';
-import { t, tf, sysMsg } from '../core/i18n.js';
+import { t, tf, sysMsg, getLang } from '../core/i18n.js';
 import { CREATURES, registerCreature, canSpawnMore } from './creatures.js';
 import { BEHAVIORS, STATE_SOUNDS, LOOPS } from '../entities/creatures.js';
 import { MOONS } from './moons.js';
@@ -437,7 +437,7 @@ export function installCrdirector(game) {
     const r = RULE_LINES[type];
     if (r) return t(r[0]);
     const lore = String(v.def?.lore || '').split(/(?<=[.!?])\s/)[0] || '';
-    return tf('{name} — {rule}', { name: String(v.def?.name || type).toUpperCase(), rule: lore });
+    return tf('{name} — {rule}', { name: String(v.def?.name || type).toLocaleUpperCase(getLang()), rule: lore });
   }
   // eyes: two emissive quads on the model, no lights (light count is constant)
   const EYE_GEO = new THREE.PlaneGeometry(0.075, 0.032);
