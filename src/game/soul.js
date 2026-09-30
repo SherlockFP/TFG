@@ -406,6 +406,7 @@ export function installSoul(game) {
   // ================================================================== 5. moments
   function showCard(moonId) {
     if (typeof document === 'undefined') return;
+    if (game.onboard?.fr?.lease?.('card', 4.4, 2) === false) return;   // [firstrun] one card at a time
     S.card?.remove?.();
     const moon = MOONS[moonId], line = C.TX['land_' + moonId] ? tx('land_' + moonId) : tx('land_any');
     const el = document.createElement('div'); el.className = 'sl-card';

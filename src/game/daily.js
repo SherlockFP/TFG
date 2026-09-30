@@ -48,7 +48,7 @@ export function installDaily(game) {
   let deliverT = DELIVER_EVERY - 8, pending = null, nonce = 0, boundNet = null;
   const lastClaim = new Map();   // host: peer -> ms of the last delivery
   const me = (d) => !d.to || d.to === game.selfId || d.to === profile.id;
-  const toast = (text, kind = 'info') => { try { game.ui?.hud?.toast?.(text, kind); } catch { /* hud optional */ } };
+  const toast = (text, kind = 'info') => { try { if (game.onboard?.locked?.('season')) return; game.ui?.hud?.toast?.(text, kind); } catch { /* hud optional */ } };   // [firstrun] no daily / season prompts before the Hub unlocks them
   const later = (fn, ms) => { const id = setTimeout(() => { timers.delete(id); if (!disposed) fn(); }, ms); timers.add(id); };
   const sfx = (n, v, p) => svc.sfx(n, v, p);
   const reduce = () => svc.reduceMotion();

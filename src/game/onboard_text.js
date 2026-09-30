@@ -26,6 +26,8 @@ export const TEXT = {
   'obj.lever': ['Pull the LEVER to land [E]', 'İnmek için KOLU çek [E]', 'Дёрни РЫЧАГ, чтобы сесть [E]'],
   'obj.door': ['Open the ship DOOR [E] and step outside', 'Gemi KAPISINI aç [E] ve dışarı çık', 'Открой ДВЕРЬ корабля [E] и выйди наружу'],
   'obj.field': ['HIRING DAY GOAL: ▮{a} / ▮{b} of scrap in the ship', 'İŞE ALIM GÜNÜ HEDEFİ: gemide ▮{a} / ▮{b} hurda', 'ЦЕЛЬ ДНЯ НАЙМА: ▮{a} / ▮{b} хлама на корабле'],
+  'obj.field_in': ['Find the facility entrance ({d} m). Goal: ▮{b} of scrap.', 'Tesis girişini bul ({d} m). Hedef: ▮{b} hurda.', 'Найди вход в комплекс ({d} м). Цель: хлам на ▮{b}.'],
+  'obj.field_cam': ['Red camera ahead: stay out of its cone, or slip under it (green ring).', 'Önde kırmızı kamera: konisine girme ya da altından geç (yeşil halka).', 'Впереди красная камера: не заходи в её конус или проскользни под ней (зелёное кольцо).'],
   'obj.field_done': ['Goal reached. Pull the lever to fly home.', 'Hedef tamam. Eve dönmek için kolu çek.', 'Цель достигнута. Дёрни рычаг, чтобы лететь домой.'],
   'obj.return': ['Read your day summary', 'Gün özetini oku', 'Прочитай итоги дня'],
   skip_hint: ['Skip the orientation: hold Backspace', 'Oryantasyonu atla: Backspace basılı tut', 'Пропустить обучение: удерживай Backspace'],

@@ -102,7 +102,7 @@ export function installFacjobs(game) {
     if (!host() || !r) return;
     mem.drone = null; mem.ids = {};
     const moon = MOONS[r.moon], F = fac();
-    if (!C.jobMoon(moon) || !F) { if (r.fj) { r.fj = null; bcast(); } return; }
+    if (!C.jobMoon(moon) || !F || game.onboard?.fr?.calm?.('facjobs')) { if (r.fj) { r.fj = null; bcast(); } return; }   // [firstrun] the first landing has ONE goal: no facility job / fee before the first sale
     const roll = C.rollJobs(r.runId ?? 'x', r.day ?? 1, r.moon, r.quotaIndex | 0);
     const rng = new RNG((r.seed ^ 0xfa11) >>> 0);
     const floor = (F.scrapSpots || []).filter((s) => !s.elevated && !s.sealed && s.room >= 0);
@@ -454,7 +454,7 @@ export function installFacjobs(game) {
     if (!r || r.phase !== 'landing' || typeof document === 'undefined') { S.briefKey = ''; return; }
     const grid = document.querySelector('.br-card .br-grid');
     if (!grid || grid.querySelector('.fj-row')) return;
-    if (!C.jobMoon(MOONS[r.moon])) return;
+    if (!C.jobMoon(MOONS[r.moon]) || game.onboard?.fr?.calm?.('facjobs')) return;
     const roll = C.rollJobs(r.runId ?? 'x', r.day ?? 1, r.moon, r.quotaIndex | 0);
     const row = (k, v) => { const d = document.createElement('div'); d.className = 'fj-row'; const a = document.createElement('span'); a.textContent = k; const b = document.createElement('b'); b.textContent = v; d.append(a, b); grid.appendChild(d); };
     row(t('JOB'), title(roll.main));

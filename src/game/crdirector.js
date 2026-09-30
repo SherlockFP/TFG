@@ -349,6 +349,7 @@ export function installCrdirector(game) {
   }
   function caption(text) {
     ensureUi(); if (!capEl) return;
+    if (game.onboard?.fr?.lease?.('caption', CAPTION_S, 1) === false) return;   // [firstrun] never on top of the touchdown card
     const i = text.indexOf(' — ');
     capEl.textContent = '';
     if (i > 0) { const b = document.createElement('b'); b.textContent = text.slice(0, i); capEl.appendChild(b); capEl.appendChild(document.createTextNode(text.slice(i))); }

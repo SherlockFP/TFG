@@ -27,6 +27,7 @@ export const FC = {
   hz: 10,              // host vision rate
 };
 export const ST = { OK: 0, BLIND: 1, DEAD: 2, CUT: 3 };
+export const TUT_PAY = 20;   // [firstrun] credits the tutorial camera pays once per run for a clean pass
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 export const angDiff = (from, to) => { let d = (to - from) % TAU; if (d > Math.PI) d -= TAU; else if (d < -Math.PI) d += TAU; return d; };
 const sm = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
@@ -85,6 +86,31 @@ function junctionWall(L, r, prefer) {
 }
 
 /**
+ * [firstrun] the tutorial camera's room: the room that lies BETWEEN the entrance and the nearest loot room (so the player meets the camera on the way to the
+ * first loot, cannot miss it, and it never guards the loot itself). spots = the facility's scrap spots ({ room, sealed }); null -> caller falls back to "nearest room".
+ */
+export function tutorialRoom(L, cand, entRoom, spots, dOf) {
+  if (!entRoom || !Array.isArray(spots) || !spots.length) return null;
+  const lootRooms = [];
+  for (const s of spots) { if (s.sealed || !(s.room >= 0)) continue; const r = L.rooms.find((q) => q.id === s.room); if (r && r !== entRoom) lootRooms.push(r); }
+  if (!lootRooms.length) return null;
+  const target = lootRooms.reduce((a, b) => (dOf(b) < dOf(a) ? b : a));   // the loot room nearest to the entrance by walking distance
+  const tD = dOf(target);
+  if (tD < 6) return null;   // loot right at the door: nothing to put in between (distOf counts BFS cells, rooms are several cells wide)
+  const ax = entRoom.cx, az = entRoom.cz, bx = target.cx - ax, bz = target.cz - az, l2 = bx * bx + bz * bz || 1;
+  let best = null, bs = Infinity;
+  for (const r of cand) {
+    const d = dOf(r);
+    if (r === target || d < Math.max(3, tD * 0.3) || d >= tD - 1) continue;   // a little way in, strictly before the loot room
+    const t = Math.max(0, Math.min(1, ((r.cx - ax) * bx + (r.cz - az) * bz) / l2));
+    const off = Math.hypot(ax + bx * t - r.cx, az + bz * t - r.cz);   // how far the room is from the straight entrance -> loot line
+    const sc = off + Math.abs(d - tD * 0.7) * 0.25;   // near the line, about two thirds of the way to the loot
+    if (sc < bs) { bs = sc; best = r; }
+  }
+  return best;
+}
+
+/**
  * Deterministic camera plan. opts: { seed, day, quotaIndex, size, extra (Watched affix: +2) }. Each camera:
  * { i, kind, x, y, z, h (base heading), amp, per, ph, fov, R, r0, lim, room, tut, jb: { x, y, z, path: [[x,y,z],...] } }
  */
@@ -129,7 +155,7 @@ export function planCams(L, opts = {}) {
   };
   // 1) the first camera guards the first room you meet (the tutorial camera); it is a wall cam with a slow sweep
   const sorted = cand.slice().sort((a, b) => entDist(a) - entDist(b));
-  const first = sorted.find((r) => entDist(r) >= 2) || sorted[0];
+  const first = tutorialRoom(L, cand, entRoom, opts.spots, dOf) || sorted.find((r) => entDist(r) >= 2) || sorted[0];
   const c0 = build(first, true);
   list.push(c0);
   // 2) the rest: rooms with long sightlines, spread out

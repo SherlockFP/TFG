@@ -37,7 +37,7 @@ export const DRONE = {
 };
 /** 1 drone early, 2 from quota 2 or on a Watched map. Deterministic from run seed + day + entrance. */
 export function planDrones(o = {}) {
-  const e = o.entrance; if (!e) return [];
+  const e = o.entrance; if (!e || o.first) return [];   // [firstrun] no outdoor drone on the very first landing: the tutorial camera indoors is the first camera the player meets
   const n = (o.quotaIndex | 0) >= 2 || o.watched ? 2 : 1;
   const rng = new RNG(((o.seed | 0) ^ 0xd20e5 ^ Math.imul((o.day | 0) + 11, 7919)) >>> 0);
   const toShip = Math.atan2(-e.z, -e.x);   // the ship lands at the origin

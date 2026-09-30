@@ -14,6 +14,7 @@ import * as THREE from 'three';
 import { sysMsg } from '../core/i18n.js';
 import { wrapMethod } from './dailyEvents.js';
 import * as K from './onboard_core.js';
+import * as FR from './firstrun_core.js';   // wave 8: the first-run message budget (game.onboard.fr)
 import { TEXT, x, xf } from './onboard_text.js';
 import { buildWing, SHUTTER } from './onboard_world.js';
 import { HUB_CMDS, hubOpen } from './hubgate_core.js';   // wave 8: what each locked id switches off
@@ -38,11 +39,11 @@ export function installOnboard(game) {
   const S = {
     decided: false, flow: null, wing: null, wingT: 0, tl: [], sh: { armed: true, t: -1, fails: 0, sprint: false, reopenAt: 0 }, blk: null, mugId: null, said: new Set(),
     board: null, histStart: 0, termWas: false, termT: 0, uT: 0, giftAt: 0, giftHint: null, skipT: 0, crewSeen: 0, retAt: 0, goalSaid: false, deadWas: false, pollT: 0, lastPos: null,
-    landSaid: false, paT: 0,
+    landSaid: false, paT: 0, entered: false, camNear: false,
   };
   const warn = (tag, e) => { try { console.warn('[onboard] ' + tag, e); } catch { /* ignore */ } };
   const save = () => { try { game.progress?.save?.(); } catch { /* optional */ } };
-  const say = (id, vars) => { const s = xf(id, vars); try { if (game.lore?.say) game.lore.say(s); else game.ui?.toast?.(s, 'info'); } catch { /* optional */ } };
+  const say = (id, vars) => { const s = xf(id, vars); try { if (game.lore?.say) game.lore.say(s, { pri: true }); else game.ui?.toast?.(s, 'info'); } catch { /* optional */ } };
   const sfx = (n, v = 0.7) => { try { game.sfx?.(n, v); } catch { /* unknown sound */ } };
   const toast = (s, kind = 'info') => { try { game.ui?.toast?.(s, kind); } catch { /* optional */ } };
   const qsp = () => { try { return new URLSearchParams(location.search); } catch { return new URLSearchParams(''); } };
@@ -378,6 +379,12 @@ export function installOnboard(game) {
     if (ph && ph !== 'orbit') { if (!f.terminal) note('terminal'); if (!f.lever) note('lever'); }   // landing started (any peer pulled it)
     if (ph === 'moon' && f.lever && !S.landSaid) { S.landSaid = true; say('say.land', { n: K.GOAL }); }
     if (ph === 'moon' && !f.door && game.ship?.door?.open) note('door');
+    if (ph === 'moon' && p.indoor) S.entered = true;
+    else if (ph !== 'moon') S.entered = false;
+    S.camNear = false;
+    if (ph === 'moon' && p.indoor && !f.camPass) {   // the tutorial camera is within 22 m and still works (objective + hint)
+      try { const c = game.feedcams?.plan?.().find((q) => q.tut); if (c && Math.hypot(c.x - p.pos.x, c.z - p.pos.z) < 22 && Math.abs(p.pos.y - (c.y - 2)) < 6 && (game.run?.fc?.c?.[c.i]?.[0] | 0) === 0) S.camNear = true; } catch { /* feedcams optional */ }
+    }
     if (ph === 'moon' && S.landSaid) {
       // collected value (host: exact, clients: the ship's items)
       const n = game.hostData?.dayStats?.collected ?? game.objectives?.clientCollected?.() ?? 0;
@@ -416,7 +423,7 @@ export function installOnboard(game) {
   offs.push(mods.on('update', (dt, g) => {
     if (g !== game || disposed) return;
     T.t += dt;
-    try { tickUnlocks(dt); } catch (e) { warn('unlocks', e); }
+    try { tickUnlocks(dt); frTick(); } catch (e) { warn('unlocks', e); }
     try { flowTick(dt); } catch (e) { warn('flow', e); }
   }));
   offs.push(mods.on('phase', (ph, g) => {
@@ -442,9 +449,13 @@ export function installOnboard(game) {
     if (!s) return out;
     const add = (text, kind = 'main', done = false, progress = null) => out.push({ text, kind, done, progress });
     if (s.id === 'field') {
-      const n = f.collected | 0;
-      add(xf('obj.field', { a: n, b: K.GOAL }), 'main', n >= K.GOAL, Math.min(1, n / K.GOAL));
-      if (n >= K.GOAL) add(x('obj.field_done'), 'sub');
+      const n = f.collected | 0, ex = game.world?.outdoor?.mainExit?.pos, p = game.player;
+      if (n < K.GOAL && !S.entered && ex && p && !p.indoor && !p.inShip && game.run?.phase === 'moon') add(xf('obj.field_in', { d: Math.round(Math.hypot(ex.x - p.pos.x, ex.z - p.pos.z)), b: K.GOAL }), 'main');   // wave 8: ONE goal at a time - the door first
+      else if (n < K.GOAL && S.camNear && !f.camPass) add(x('obj.field_cam'), 'main');   // ... then the first camera (feedcams tutorial camera)
+      else {
+        add(xf('obj.field', { a: n, b: K.GOAL }), 'main', n >= K.GOAL, Math.min(1, n / K.GOAL));
+        if (n >= K.GOAL) add(x('obj.field_done'), 'sub');
+      }
     } else add(x('obj.' + s.id), 'main', false, s.id === 'walk' ? Math.min(1, (f.dist || 0) / K.WALK_DIST) : null);
     if (s.id === 'blackout' && S.blk) add(x('say.flash'), 'hint');
     add(x('skip_hint'), 'hint');
@@ -457,7 +468,7 @@ export function installOnboard(game) {
   offs.push(mods.on('objectives', (add, g) => {
     if (g && g !== game) return;
     if (disposed) return;
-    if (!S.wing && flowActive()) for (const l of myLines()) add(l.text, l.kind, l.done, l.progress);
+    if (!S.wing && flowActive()) for (const l of myLines()) { const o = add(l.text, l.kind, l.done, l.progress); if (o && typeof o === 'object' && l.kind === 'main') o.first = true; }   // first = the one goal the budget keeps
     else if (S.giftHint && T.t < S.giftHint.until && !flowActive()) add(xf('gift_hint', { name: TEXT['u.' + S.giftHint.id]?.[0] || S.giftHint.id }), 'hint');
   }));
   // co-op: the crew can not launch the ship while the new hire is still in orientation
@@ -469,11 +480,43 @@ export function installOnboard(game) {
     return orig.call(this, from);
   }));
 
+  // ============================================================================================ FIRST-RUN MESSAGE BUDGET (wave 8, docs/wave8/firstrun.md)
+  // Other modules ask `game.onboard?.fr?.allow('mapmods')`, `.algoOk(pri)`, `.lease('card', s, pri)`, `.only(lines)`. Only a fresh staged profile is ever budgeted.
+  function frStage() {
+    if (disposed) return 'free';
+    const u = game.profile?.unlocks, ob = game.profile?.onboard;
+    return FR.stageOf({ mode: u?.mode, q: Math.max(u?.q | 0, prog().q | 0), unlockAll: unlockAll(), quick: !!game.run?.quick, flow: S.flow?.s === 'run' ? 'run' : ob?.s || null, sold: !!ob?.f?.frSold });
+  }
+  const frLease = { kind: '', until: 0, pri: 0 };
+  let frAlgoAt = 0;
+  const fr = {
+    stage: frStage,
+    active: () => frStage() !== 'free',
+    allow: (kind) => FR.allow(kind, frStage(), game.run?.day),
+    calm: (kind) => !FR.allow(kind, frStage(), game.run?.day),
+    /** one Algorithm line per 45 s while budgeted (priority lines always pass); true = show it */
+    algoOk(pri = false) { const now = performance.now(); if (!FR.algoOk(frStage(), now, frAlgoAt, pri)) return false; if (frStage() !== 'free') frAlgoAt = now; return true; },
+    /** one card / caption on screen at a time while budgeted; true = you may show yours */
+    lease(kind, secs, pri = 1) { return frStage() === 'free' || FR.lease(frLease, kind, performance.now(), secs, pri); },
+    /** ONE objective at a time while budgeted (the same list when free) */
+    only: (lines) => (frStage() === 'free' ? lines : FR.only(lines)),
+    /** after Hiring Day, with scrap aboard and nothing sold yet, the orbit objective becomes "sell it" (the first sale beat) */
+    wantSell: (value) => frStage() === 'first' && !flowActive() && (value | 0) > 0,
+    firstDay: () => FR.firstDay(game.run),
+    /** feedcams: the tutorial camera was passed (or you went live on it): the camera objective is done for good */
+    camDone() { const f = game.profile?.onboard?.f; if (f && !f.camPass) { f.camPass = true; save(); } },
+    camPassed: () => !!game.profile?.onboard?.f?.camPass,
+  };
+  function frTick() {
+    const r = game.run, f = game.profile?.onboard?.f;
+    if (r && f && !f.frSold && ((r.sold | 0) > 0 || (r.quotaIndex | 0) > 0)) { f.frSold = true; save(); }   // the first sale (or quota 1) ends the "first" stage
+  }
+
   // ---- guide: while Hiring Day runs the guide's own tutorial lines are held (see guide.js: game.onboard.active()) ------------------------
   const api = {
     /** Hiring Day is running (the guide holds its tutorial lines) */
     active: () => !disposed && flowActive(),
-    stage, step, flow: () => S.flow,
+    stage, step, flow: () => S.flow, fr,
     locked, deny, routeBlocked, lockedText,
     unlocks: () => { const u = U(); return u ? { mode: u.mode, q: u.q, boss: u.boss, given: { ...u.given }, open: K.UNLOCK_IDS.filter((id) => !locked(id)) } : null; },
     skip, begin, decide,
