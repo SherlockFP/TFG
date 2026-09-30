@@ -1,6 +1,6 @@
 # SABAH ÖZETİ (Türkçe) — gece ne değişti, önce neyi dene
 
-**Kısaca:** Gece ~30 iş main'e girdi, hepsi node testleri + build'den geçti. Tarayıcıda iki QA turu yapıldı (puan 4.5 → **5.5/10**). Direktör incelemesi: `docs/REVIEW_W8_NIGHT.md`. Sorular: `docs/session/QUESTIONS.md` (cevaplayana kadar önerilen varsayılanlarla ilerledim).
+**Kısaca:** Gece ~30 iş main'e girdi, hepsi node testleri + build'den geçti. Tarayıcıda üç QA turu yapıldı (puan 4.5 → 5.5 → **6/10**). Direktör incelemesi: `docs/REVIEW_W8_NIGHT.md`. Sorular: `docs/session/QUESTIONS.md` (cevaplayana kadar önerilen varsayılanlarla ilerledim).
 
 **Önce bunları dene (5 dk):**
 1. Yeni oyun aç → **canlı yayın açılışı** (12 sn, Boşluk ile geç) → terminalde **3 rota kartı** (56K-Dialup / 88-Chatroom metro / E9-Estate konak).
@@ -64,4 +64,5 @@ Loop rule: 2-3 Sonnet agents at a time (1 browser/QA agent max) → merge with t
 | 22 | expedlook | merged 9140dfe: barge deck lamps/portholes/crane, roof puddles/door lamps/AC LEDs/skyline glow, dune haze + sun disc + taller checkpoint beams — still reads weakly in shots (barge 95 m away). |
 | 23 | exptakeoff | merged: no expedition-specific takeoff blocker found (likely the designed pre-flight fault checklist / player not in ship in the harness); barge hull moved to 58-62 m from the dock with re-placed bubble vents, wrecks closer. |
 | 24 | trim | merged f857d00: ONE headline modifier per landing (mapmods > role day > warp > daily > trend), landing card shows only it; Algorithm ticker ranks teach > danger > flavour + drops near-duplicate lines per day; Clout hidden until the store unlock (quota 1); affix cards + facility side jobs wait until quota 2 for new crews; hub panel shows only the next unlock. Bigger cuts listed as proposals in docs/wave8/trim.md. |
-| 24 | QA night 3 | running |
+| 24 | QA night 3 | merged 644f2a0: score **6/10** (night 2: 5.5). Verified: soft drone + indoor cones, vending-machine carry ~18 % of frame, metro readable without a torch, influencer corridor best interior, barge hull from the dock, barge takeoff to orbit, boss name cards (DOM), warm set 49 models in 107 ms. Fixed: stream-end view faces the hatch, arcade tarp lid. Open: melee tools look like sticks, roof city too dark, dune beam thin, edge-marker overlap, levrek morning red cast → qafix3. |
+| 25 | qafix3 | running |
