@@ -59,7 +59,8 @@ ok('every art model builds: finite, merged, modest triangles, sane size', () => 
     assert.equal(s.nan, 0, id + ' NaN');
     assert.ok(s.meshes >= 2 && s.meshes <= 14, `${id} meshes ${s.meshes}`);
     assert.ok(s.tris >= 60 && s.tris <= 1600, `${id} tris ${s.tris}`);
-    assert.ok([b.x, b.y, b.z].every((v) => Number.isFinite(v) && v > 0.02 && v < 1.6), `${id} size ${b.x} ${b.y} ${b.z}`);
+    const maxDim = id.startsWith('hb_') ? 2.4 : 1.6;   // big valuables (bossdress/herocontent) may stand taller than hand items
+    assert.ok([b.x, b.y, b.z].every((v) => Number.isFinite(v) && v > 0.02 && v < maxDim), `${id} size ${b.x} ${b.y} ${b.z}`);
     assert.equal(o.userData.size.length, 3);
   }
 });
