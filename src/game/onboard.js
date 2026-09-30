@@ -1,4 +1,7 @@
 // ONBOARD (wave 5, module 'onboard'; docs/wave5/onboard.md; MASTERPLAN 25.1 "Hiring Day" + 23.1 staged unlocks).
+//   Wave 8       the DEFAULT opening is now the stream (docs/wave8/routeboard.md): a 12 s LIVE overlay (the Algorithm introduces the crew as its new
+//                content, viewer counter, chat with the controls pinned) over the ship, then straight to the terminal step (route board) -> lever -> landing.
+//                The orientation wing below is kept behind ?hiringday=wing / settings.hiringWing.
 //   Hiring Day   a first-time start for a fresh HOST profile: wake in Cell 07 (Company announcement, The Algorithm's first "I'm watching you") -> short linear
 //                orientation corridor (move / crouch / sprint, borrow a flashlight from a locker, first loot, blackout + a harmless Algorithm creature glimpse, first
 //                locked cabinet = openMinigame('lockpick', {tier:'simple'})) -> hangar with the Mini-Skeld -> board -> terminal / lever / door in the real ship -> first
@@ -24,11 +27,30 @@ const CSS = `.ob-pa{position:fixed;left:50%;top:clamp(48px,8vh,96px);transform:t
 .ob-pa .h{padding:4px 12px;background:repeating-linear-gradient(-45deg,#f2c230 0 10px,#15150f 10px 20px);color:#111;font-weight:800;text-transform:uppercase}
 .ob-pa .h b{background:#f2c230;padding:1px 8px}
 .ob-pa .t{padding:10px 14px}
+.ob-st{position:fixed;inset:0;z-index:57;pointer-events:none;opacity:0;transition:opacity .45s;font:600 16px/1.3 var(--font2,'Arial Narrow',Arial,sans-serif);color:var(--t-paper,#ffd9b8)}
+.ob-st.on{opacity:1}
+.ob-st .fr{position:absolute;inset:12px;border:1px solid var(--t-line-hi,#c96)}
+.ob-st .lv{position:absolute;left:24px;top:22px;display:flex;align-items:center;gap:10px}
+.ob-st .live{background:var(--t-bad,#ff5a48);color:#140404;font-weight:800;letter-spacing:.12em;padding:2px 10px}
+.ob-st .vw{background:rgba(0,0,0,.72);padding:2px 10px;font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.ob-st .ti{position:absolute;right:24px;top:22px;background:var(--t-amber,#ff8a3d);color:#120800;font-weight:800;letter-spacing:.08em;padding:2px 12px;text-transform:uppercase}
+.ob-st .ch{position:absolute;right:24px;bottom:84px;width:min(330px,34vw);display:flex;flex-direction:column;gap:3px}
+.ob-st .ch div{background:rgba(6,4,3,.78);padding:3px 8px;font:17px/1.2 var(--font,monospace)}
+.ob-st .ch b{color:var(--t-amber-hi,#ffb266);margin-right:6px;font-weight:400}
+.ob-st .ch .pin{border-left:3px solid var(--t-hazard,#ffb800)}
+.ob-st .ch .pin b{color:var(--t-hazard,#ffb800)}
+.ob-st .lt{position:absolute;left:24px;bottom:84px;width:min(560px,56vw)}
+.ob-st .lt .h{display:inline-block;padding:1px 10px;background:var(--t-stripe,#ffb800);color:#111;font-weight:800;letter-spacing:.1em}
+.ob-st .lt .h b{background:var(--t-hazard,#ffb800);padding:0 8px}
+.ob-st .lt .t{background:rgba(6,4,3,.86);padding:8px 12px;font-size:20px;min-height:1.3em}
+.ob-st .sk{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);color:var(--t-line-hi,#c96);letter-spacing:.08em}
 .ob-skip{position:fixed;left:50%;bottom:16%;transform:translateX(-50%);z-index:58;padding:5px 12px;background:#12130d;border:1px solid #f2c230;color:#f2c230;font:700 13px 'Bahnschrift','Arial Narrow',Arial,sans-serif;letter-spacing:.05em;pointer-events:none;display:none}`;
 
 const STEP_SAY = { crouch: 'say.crouch', sprint: 'say.sprint', locker: 'say.locker', flash: 'say.flash', loot: 'say.loot', lock: 'say.lock', hangar: 'say.hangar', terminal: 'say.terminal' };
 const CMD_LOCK = HUB_CMDS;   // terminal word -> unlock id (hubgate_core.js SYSTEMS)
 const SKIP_HOLD = 2.0;
+const STREAM_LEN = 12;   // s: the LIVE overlay, then the ship (wave 8: Hiring Day <= 90 s to the first landing)
+const CHATTERS = ['xX_lurker_Xx', 'ratking', 'dialup_dave', 'nightshift', '404mom', 'shrimp_enjoyer'];
 
 export function installOnboard(game) {
   const mods = game.mods;
@@ -39,7 +61,7 @@ export function installOnboard(game) {
   const S = {
     decided: false, flow: null, wing: null, wingT: 0, tl: [], sh: { armed: true, t: -1, fails: 0, sprint: false, reopenAt: 0 }, blk: null, mugId: null, said: new Set(),
     board: null, histStart: 0, termWas: false, termT: 0, uT: 0, giftAt: 0, giftHint: null, skipT: 0, crewSeen: 0, retAt: 0, goalSaid: false, deadWas: false, pollT: 0, lastPos: null,
-    landSaid: false, paT: 0, entered: false, camNear: false,
+    landSaid: false, paT: 0, entered: false, camNear: false, stream: null,
   };
   const warn = (tag, e) => { try { console.warn('[onboard] ' + tag, e); } catch { /* ignore */ } };
   const save = () => { try { game.progress?.save?.(); } catch { /* optional */ } };
@@ -161,7 +183,7 @@ export function installOnboard(game) {
   function decide() {
     S.decided = true;
     const q = qsp();
-    const forced = q.get('hiringday') === '1' && !!game.isHost;
+    const forced = ['1', 'wing', 'stream'].includes(q.get('hiringday')) && !!game.isHost;
     const ctx = {
       profile: game.profile, settings: game.settings, isHost: !!game.isHost, hasRunData: !!game.opts?.runData, phase: game.run?.phase, quotaIndex: game.run?.quotaIndex, day: game.run?.day,
       devAuto: q.has('autohost') || q.has('autojoin'), forced, quick: !!game.run?.quick,
@@ -170,8 +192,8 @@ export function installOnboard(game) {
     if (r.mark === 'skip') markSkip(r.why);
     if (r.run) begin();
   }
-  function begin() {
-    if (S.wing || disposed) return;
+  function begin(mode) {
+    if (S.wing || S.stream || disposed) return;
     const fl = K.newFlow();
     fl.startedAt = Date.now();
     game.profile.onboard = fl;
@@ -181,6 +203,10 @@ export function installOnboard(game) {
     const ui = document.getElementById('ui') || document.body;
     paEl = document.createElement('div'); paEl.className = 'ob-pa'; paEl.innerHTML = '<div class="h"><b></b></div><div class="t"></div>'; ui.appendChild(paEl);
     skipEl = document.createElement('div'); skipEl.className = 'ob-skip'; ui.appendChild(skipEl);
+    S.crewSeen = game.remotes?.size || 0;
+    // wave 8: the default opening is the LIVE stream moment; the long orientation wing stays for ?hiringday=wing / settings.hiringWing
+    const wantWing = mode === 'wing' || (mode !== 'stream' && (qsp().get('hiringday') === 'wing' || !!game.settings?.hiringWing));
+    if (!wantWing) { beginStream(); return; }
     S.wing = buildWing(game);
     const sp = S.wing.spawn();
     game.player.teleport(sp.pos, sp.yaw); game.player.pitch = 0;
@@ -198,6 +224,74 @@ export function installOnboard(game) {
     at(25.5, () => { hidePa(); sfx('door_open', 0.8); S.wing.doors.cell.set(true); note('announced'); });
     at(1.2, () => { try { game.ui?.hud?.bigText?.(x('sign.crt1'), x('sign.cell')); } catch { /* optional */ } });
     S.crewSeen = game.remotes?.size || 0;
+  }
+  // ---- the stream opening (wave 8) ---------------------------------------------------------------------------------------
+  function beginStream() {
+    const ui = document.getElementById('ui') || document.body;
+    const names = [game.profile?.name, ...[...(game.remotes?.values?.() || [])].map((r) => r.name)].filter(Boolean).join(', ') || 'Employee';
+    let h = 7; for (const ch of String(names)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    const st = S.stream = { t: 0, tl: [], v: 0, vT: 900 + (h % 700), vShown: -1, cut: false, el: document.createElement('div') };
+    const el = st.el;
+    el.className = 'ob-st';
+    el.innerHTML = '<div class="fr"></div><div class="lv"><span class="live"></span><span class="vw"></span></div><div class="ti"></div><div class="ch"></div><div class="lt"><div class="h"><b></b></div><div class="t"></div></div><div class="sk"></div>';
+    el.querySelector('.live').textContent = '\u25CF ' + x('st.live');
+    el.querySelector('.ti').textContent = x('st.title');
+    el.querySelector('.lt .h b').textContent = x('st.host');
+    el.querySelector('.sk').textContent = x('st.skip');
+    ui.appendChild(el);
+    try { game.spawnInShip?.(); } catch (e) { warn('spawn', e); }
+    game.player.pitch = 0; game.player.frozen = true;
+    game.engine.fx.fade = 1; game.engine.fadeTarget = 1;
+    const at = (t0, fn) => st.tl.push({ at: t0, fn });
+    const cap = (id, vars) => { el.querySelector('.lt .t').textContent = xf(id, vars); sfx('ui_notify', 0.3); };
+    const chat = (who, id, pin) => {
+      const box = el.querySelector('.ch'), d = document.createElement('div');
+      if (typeof box?.appendChild !== 'function') return;
+      if (pin) d.className = 'pin';
+      const b = document.createElement('b'), sp = document.createElement('span'); b.textContent = who; sp.textContent = x(id); d.appendChild(b); d.appendChild(sp);
+      box.appendChild(d);
+      while ((box.children?.length | 0) > 6) box.firstChild.remove();
+    };
+    at(0.3, () => { game.engine.fadeTarget = 0; el.classList.add('on'); sfx('onair_sting', 0.6); });
+    at(0.8, () => cap('st.l1'));
+    at(1.4, () => chat(CHATTERS[0], 'st.c1'));
+    at(2.4, () => chat(CHATTERS[1], 'st.c2'));
+    at(3.2, () => chat(x('st.mod'), 'st.pin', true));
+    at(4.4, () => cap('st.l2', { names }));
+    at(5.0, () => chat(CHATTERS[2], 'st.c3'));
+    at(6.4, () => chat(CHATTERS[3], 'st.c4'));
+    at(7.4, () => chat(CHATTERS[4], 'st.c5'));
+    at(8.2, () => cap('st.l3'));
+    at(9.2, () => chat(CHATTERS[5], 'st.c6'));
+    at(STREAM_LEN - 0.7, () => el.classList.remove('on'));
+    at(STREAM_LEN, () => endStream());
+    st.tl.sort((a, b) => a.at - b.at);
+  }
+  function streamTick(dt) {
+    const st = S.stream;
+    st.t += dt;
+    while (S.stream === st && st.tl.length && st.tl[0].at <= st.t) st.tl.shift().fn();
+    if (S.stream !== st) return;
+    st.v += (st.vT - st.v) * Math.min(1, dt * 0.5) + dt * 6;   // the viewer count climbs fast, then keeps creeping
+    const n = Math.round(st.v);
+    if (n !== st.vShown) { st.vShown = n; const vw = st.el.querySelector('.vw'); if (vw) vw.textContent = xf('st.viewers', { n: n.toLocaleString('en-US') }); }
+    if (!st.cut && st.t > 1.5 && (game.input?.codeDown?.('Space') || game.input?.codeDown?.('Enter'))) {   // cut to the ship
+      st.cut = true;
+      st.tl = [{ at: st.t + 0.05, fn: () => st.el.classList.remove('on') }, { at: st.t + 0.5, fn: () => endStream() }];
+    }
+  }
+  /** the overlay goes; quiet = no flow facts (skip / force / dispose) */
+  function endStream(quiet = false) {
+    const st = S.stream;
+    if (!st) return;
+    S.stream = null;
+    st.el?.remove();
+    try { game.player.frozen = false; game.engine.fadeTarget = 0; } catch { /* engine gone */ }
+    if (quiet || !flowActive()) return;
+    K.forceTo(S.flow, 'hangar');
+    note('boarded');   // -> step 'terminal' (+ its line)
+    S.histStart = game.terminal?.history?.length || 0;
+    save();
   }
   function pa(id) {
     if (!paEl) return;
@@ -260,6 +354,7 @@ export function installOnboard(game) {
     if (!flowActive()) return false;
     K.skipFlow(S.flow, 'skipped');
     if (S.wing) toShip();
+    endStream(true);
     hidePa();
     toast(x('skipped'), 'info');
     save();
@@ -415,6 +510,7 @@ export function installOnboard(game) {
     S.skipT = holding ? S.skipT + dt : Math.max(0, S.skipT - dt * 2);
     if (skipEl) { skipEl.style.display = S.skipT > 0.1 ? 'block' : 'none'; if (S.skipT > 0.1) skipEl.textContent = xf('skip_prog', { n: Math.min(100, Math.round((S.skipT / SKIP_HOLD) * 100)) }); }
     if (S.skipT >= SKIP_HOLD) { S.skipT = 0; skip(); return; }
+    if (S.stream) { streamTick(dt); return; }
     if (S.wing && stage() === 'wing') wingTick(dt);
     else if (!S.wing && flowActive()) shipTick(dt);
   }
@@ -428,7 +524,8 @@ export function installOnboard(game) {
   }));
   offs.push(mods.on('phase', (ph, g) => {
     if (g !== game || disposed || !flowActive()) return;
-    if (S.wing && ph !== 'orbit') abortWing(ph);   // someone landed the ship while the host was still in orientation
+    if (S.wing && ph !== 'orbit') abortWing(ph);
+    if (S.stream && ph !== 'orbit') { endStream(true); K.forceTo(S.flow, ph === 'landing' ? 'door' : 'terminal'); save(); }   // the crew launched during the stream   // someone landed the ship while the host was still in orientation
   }));
   offs.push(mods.on('interactables', (list, g) => {
     if (g !== game || disposed || !S.wing || !flowActive()) return;
@@ -456,7 +553,7 @@ export function installOnboard(game) {
         add(xf('obj.field', { a: n, b: K.GOAL }), 'main', n >= K.GOAL, Math.min(1, n / K.GOAL));
         if (n >= K.GOAL) add(x('obj.field_done'), 'sub');
       }
-    } else add(x('obj.' + s.id), 'main', false, s.id === 'walk' ? Math.min(1, (f.dist || 0) / K.WALK_DIST) : null);
+    } else add(x(S.stream ? 'obj.stream' : 'obj.' + s.id), 'main', false, s.id === 'walk' && !S.stream ? Math.min(1, (f.dist || 0) / K.WALK_DIST) : null);
     if (s.id === 'blackout' && S.blk) add(x('say.flash'), 'hint');
     add(x('skip_hint'), 'hint');
     return out;
@@ -473,7 +570,7 @@ export function installOnboard(game) {
   }));
   // co-op: the crew can not launch the ship while the new hire is still in orientation
   restores.push(wrapMethod(game, 'hostLever', (orig) => function (from) {
-    if (!disposed && flowActive() && from !== game.selfId && ['wing', 'ship'].includes(stage()) && !S.flow.f.lever && (S.wing || step() === 'terminal')) {
+    if (!disposed && flowActive() && from !== game.selfId && ['wing', 'ship'].includes(stage()) && !S.flow.f.lever && (S.wing || S.stream || step() === 'terminal')) {
       try { game.net.sendTo(from, 'sys', sysMsg(TEXT.lever_wait[0], {}, 'info')); } catch { /* net closing */ }
       return undefined;
     }
@@ -527,11 +624,11 @@ export function installOnboard(game) {
     locked, deny, routeBlocked, lockedText,
     unlocks: () => { const u = U(); return u ? { mode: u.mode, q: u.q, boss: u.boss, given: { ...u.given }, open: K.UNLOCK_IDS.filter((id) => !locked(id)) } : null; },
     skip, begin, decide,
-    force: (id) => { if (!flowActive()) return false; const ok = K.forceTo(S.flow, id); if (S.wing && K.stageOf(S.flow) !== 'wing') toShip(); return ok; },
+    force: (id) => { if (!flowActive()) return false; const ok = K.forceTo(S.flow, id); if (S.wing && K.stageOf(S.flow) !== 'wing') toShip(); if (S.stream && K.stageOf(S.flow) !== 'wing') endStream(true); return ok; },
     note,
     core: K,
     debug: () => ({
-      decided: S.decided, flow: S.flow ? JSON.parse(JSON.stringify(S.flow)) : null, stage: stage(), step: step(), wing: !!S.wing, wingT: +S.wingT.toFixed(1), sh: { ...S.sh }, blk: S.blk ? { ...S.blk } : null,
+      decided: S.decided, flow: S.flow ? JSON.parse(JSON.stringify(S.flow)) : null, stage: stage(), step: step(), wing: !!S.wing, stream: S.stream ? +S.stream.t.toFixed(1) : null, wingT: +S.wingT.toFixed(1), sh: { ...S.sh }, blk: S.blk ? { ...S.blk } : null,
       stats: S.wing?.stats || null, lines: myLines().map((l) => l.text), lockedNow: K.UNLOCK_IDS.filter((id) => locked(id)),
     }),
     wing: () => S.wing,
@@ -542,6 +639,7 @@ export function installOnboard(game) {
       for (const r of restores.reverse()) { try { r(); } catch { /* ignore */ } }
       try { S.wing?.dispose(); } catch { /* ignore */ }
       S.wing = null;
+      endStream(true);
       paEl?.remove(); skipEl?.remove(); style?.remove();
       try { game.engine.fadeTarget = 0; } catch { /* engine gone */ }
     },
