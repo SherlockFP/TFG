@@ -88,7 +88,7 @@ export const pointHitsSolid = (solids, x, y, z, m = 0) => solids.some((b) => inB
 export function planBarge(seed) {
   const R = new RNG(((seed | 0) ^ 0xba46e5) >>> 0);
   const { seabed: sb, wallH: WH, thick: T, U, V } = BARGE;
-  const sz = R.sign(), cx = Math.round(R.float(-12, 12)), cz = sz * Math.round(R.float(90, 98));
+  const sz = R.sign(), cx = Math.round(R.float(-12, 12)), cz = sz * Math.round(R.float(58, 62));
   const X = (u) => cx + u, Z = (v) => cz + v;
   const solids = [];
   const S = (u0, u1, v0, v1, y0, y1, k) => { solids.push(box(X(u0), X(u1), y0, y1, Z(v0), Z(v1), k)); };
@@ -157,7 +157,7 @@ export function planBarge(seed) {
   // bubble vents: two on the way out, one at the breach, then one per section
   const E = { x: X(ub), z: Z(vb * 1.55) };
   const vents = [];
-  for (const t of [0.42, 0.74]) vents.push({ x: E.x * t, z: E.z * t });
+  for (const [t, dx] of [[0.82, 0], [0.94, 7]]) vents.push({ x: E.x * t + dx, z: E.z * t });   // the hull is ~45 m out: the first pocket of air is ~30 m from the dock (shallows above that)
   vents.push({ x: X(ub + 5), z: Z(vb * 1.28) });
   vents.push({ x: X(R.pick([-7, 6])), z: Z(-sB * 5.5) });
   vents.push({ x: X(-30.5), z: Z(vr > 0 ? -9 : 9) });

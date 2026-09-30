@@ -202,6 +202,8 @@ const tick = (n, dt = 0.5) => { for (let i = 0; i < n; i++) { game.time += dt; m
   ok(game.run.ex.n === 3 && game.run.ex.st === 'won' && game.run.credits > c0 + K.payout('barge', 400).step * 3, 'three cores in the ship: won + paid');
   ok(spawned.length && crSpawned.filter((c) => c.id === 'ex_eel').length >= 2, 'a second eel wakes at 2 cores');
   const dmg = []; game.damageLocal = (d, c) => dmg.push([d, c]); api.state.oxy = 0; game.player.pos.set(P.vents[1].x + 6, -8.5, P.vents[1].z); game.camera.position.y = -7; tick(6, 1); ok(dmg.some(([, c]) => c === 'drown'), 'no air = drowning damage through damageLocal (downed rules apply)');
+  ok(Math.abs(K.planBarge(4242).hull.z0 + K.planBarge(4242).hull.z1) / 2 <= 62 && Math.abs(K.planBarge(4242).hull.z0 + K.planBarge(4242).hull.z1) / 2 >= 56, 'barge hull sits 56-62 m out');
+  game.run.phase = 'takeoff'; game.player.pos.set(P.vents[1].x, -8.5, P.vents[1].z); let thrown = null; try { tick(6, 1); } catch (e) { thrown = e; } ok(!thrown, 'ticking through the takeoff phase never throws'); game.run.phase = 'moon';
   mods.emit('phase', 'orbit', game); ok(game.run.ex === null && game.player.exMul === 1, 'orbit clears the expedition');
 }
 // dune flow
