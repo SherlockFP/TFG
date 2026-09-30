@@ -56,6 +56,7 @@ export function installFeedcams2(game) {
     const s = F2(); if (!host() || !s) return;
     const m = C.hlMake(kind, nameOf(id), v, extra), best = C.hlBetter(s.hl, m);
     if (best !== s.hl) { s.hl = best; sync(); }
+    try { game.highlights?.onMoment?.(kind, id, m); } catch { /* highlights optional */ }   // the clip recorder freezes a window around it
   }
   function hypeAct(kind) {
     try { if (game.algo2?.hype) game.algo2.hype(kind); else game.algo1?.bump?.(kind, kind); } catch { /* algo optional */ }
