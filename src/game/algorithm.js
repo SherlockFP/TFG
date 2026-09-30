@@ -11,7 +11,7 @@
 //        (speechSynthesis, terminal ALGO VOICE ON, off by default), line queue, cinematic-aware.
 import { LINES, FACTIONS, pickLang } from './loredata.js';
 import { isSellable } from './items.js';
-import { getLang, t, speechLang } from '../core/i18n.js';
+import { getLang, t, speechLang, upperT } from '../core/i18n.js';
 import { saveSettings } from '../core/save.js';
 import * as OG from './onegoal_core.js';
 import './algoctx_i18n.js';
@@ -243,7 +243,7 @@ export function installAlgorithm(core) {
     if (!st.el) return;
     const f = n.voice && FACTIONS[n.voice];
     st.cur = { ...n, shown: 0, t: 0, dur: 1.2 + n.text.length * 0.034 + 1.8 };
-    st.nameEl.textContent = f ? `${f.name.toLocaleUpperCase(getLang())} · ${f.leader.toLocaleUpperCase(getLang())}` : '';
+    st.nameEl.textContent = f ? `${upperT(f.name)} · ${upperT(f.leader)}` : '';
     st.el.classList.toggle('fac', !!f);
     st.nameEl.style.color = f ? f.color : '';
     st.el.classList.add('on');

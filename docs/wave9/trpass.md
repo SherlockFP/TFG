@@ -13,3 +13,9 @@
 - Menu button `CREDITS` still reads `KREDİ`: same key is the money label on the HUD (`hudcalm.js`), so a change needs a separate key for the menu (suggest `YAPIMCILAR`).
 - No browser TR screenshots (task said no browser run). Bitmap-font canvas text still upper-cases with plain `toUpperCase()`.
 - ~85 remaining raw calls are audited-as-keep or lower-visibility (guide.js terminal text, terminal codes, siege/story terminal dumps).
+
+## Review fixes
+- Added `upperT(s)` to src/core/i18n.js: EN -> toUpperCase; other langs -> translated string via toLocaleUpperCase(lang), or plain toUpperCase() when the string is untranslated English (no dotted I on English words in TR).
+- Applied at algorithm.js subtitle (faction name + leader), lore.js WAR/HIT SQUAD banners, creature_tiers.js plates, panels/crafting.js tier chips, achievements tierName, cruiser.js, game/crafting.js recipe listings.
+- guide.js:365/:396 now `toLocaleUpperCase(lang())` on TR feature names; BASE['game/guide.js'] 6 -> 4.
+- tr_pass.test.mjs gained upperT checks.

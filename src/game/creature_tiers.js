@@ -12,7 +12,7 @@ import { MOONS } from './moons.js';
 import { scrapTableFor } from './items.js';
 import * as F from './enhance.js';
 import { attachTierLook, tierLooksUpdate, clearTierLooks } from '../render/tierlooks.js';   // [skeletons] generic armour / colour per tier (all creatures)
-import { sysMsg, getLang } from '../core/i18n.js';   // [i18n8]
+import { sysMsg, getLang, upperT } from '../core/i18n.js';   // [i18n8]
 
 const RING_GEO = new THREE.RingGeometry(0.72, 1.0, 28).rotateX(-Math.PI / 2);
 const _v = new THREE.Vector3();
@@ -142,7 +142,7 @@ export function installCreatureTiers(game, forge) {
     x.clearRect(0, 0, 256, 64);
     x.textAlign = 'center'; x.textBaseline = 'alphabetic';
     x.font = '26px VT323, monospace';
-    const name = `${T.name.toLocaleUpperCase(getLang())} ${v.def?.name || v.type}`;
+    const name = `${upperT(T.name)} ${v.def?.name || v.type}`;
     x.lineWidth = 4; x.strokeStyle = 'rgba(0,0,0,.85)'; x.strokeText(name, 128, 26);
     x.fillStyle = T.color; x.fillText(name, 128, 26);
     const extra = (v.fgAff || []).map((a) => a.toUpperCase()).join(' + ');

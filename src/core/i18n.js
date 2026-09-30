@@ -513,6 +513,14 @@ export function t(s) {
   const tbl = TABLES[lang];
   return tbl && typeof s === 'string' && own.call(tbl, s) ? tbl[s] : s;
 }
+/** Upper-case English-keyed player-facing text: translated strings use the locale casing (TR i -> İ); untranslated
+ *  English falls back to plain toUpperCase() so TR mode never shows a dotted İ inside English words. */
+export function upperT(s) {
+  const str = String(s ?? '');
+  if (lang === 'en') return str.toUpperCase();
+  const x = t(str);
+  return x !== str ? x.toLocaleUpperCase(lang) : str.toUpperCase();
+}
 /** Translate for an explicit language (used to build per-recipient text on the host). */
 export function tIn(l, s) {
   if (l === 'en') return s;

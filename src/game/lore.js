@@ -18,7 +18,7 @@ import { isSellable } from './items.js';
 import { tierOfItem, tierIndex } from './tiers.js';
 import { wrapMethod } from './dailyEvents.js';
 import { RNG, hashString } from '../core/rng.js';
-import { getLang, t, tf } from '../core/i18n.js';
+import { getLang, t, tf, upperT } from '../core/i18n.js';
 import { SHIP } from '../world/ship.js';
 import { SPOTS } from '../world/shiplayout.js';
 
@@ -184,14 +184,14 @@ export function installLore(game) {
       case 'war': {
         const f = FACTIONS[d.f];
         if (!f) break;
-        hud?.bigText?.(d.on ? (t('⚔ WAR DECLARED')) : (t('CEASEFIRE')), f.name.toLocaleUpperCase(getLang()));
+        hud?.bigText?.(d.on ? (t('⚔ WAR DECLARED')) : (t('CEASEFIRE')), upperT(f.name));
         if (d.on) { game.engine?.flash?.(0xff2010, 0.35); game.engine?.shake?.(0.3); }
         break;
       }
       case 'invade': {
         const f = FACTIONS[d.f];
         if (!f) break;
-        hud?.bigText?.(`⚠ ${f.name.toLocaleUpperCase(getLang())} ${t('HIT SQUAD')}`, t('HAS ENTERED THE SECTOR'));
+        hud?.bigText?.(`⚠ ${upperT(f.name)} ${t('HIT SQUAD')}`, t('HAS ENTERED THE SECTOR'));
         game.engine?.flash?.(0xff2010, 0.45); game.engine?.shake?.(0.4);
         game.sfx?.('ship_alarm', 0.6);
         break;
