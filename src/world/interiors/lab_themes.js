@@ -7,13 +7,14 @@
 import * as THREE from 'three';
 import { layoutKit, SPECIAL_ROOMS, navClear } from './common.js';
 import { LabBuilder, hash2 } from './lab_kit.js';
+import { planLab10 } from './labyr10_plan.js';   // [labyr10]
 
 export const LAB_ROOM_TYPES = ['tunnel', 'platform', 'terminus', 'alcove', 'dome', 'hydro_bay'];
 for (const ty of LAB_ROOM_TYPES) SPECIAL_ROOMS.add(ty);
 
 // ------------------------------------------------------------------------------------------------ metro: layout
 /** ctx: { arch, W, H, ent, cells, idx, addRoom, line, spines, nodes, open, edgeKey, rng, size }; true when the plan was drawn. */
-export function planLabArch(ctx) { return ctx.arch === 'metro' ? planMetro(ctx) : false; }
+export function planLabArch(ctx) { return ctx.arch === 'metro' ? planMetro(ctx) : planLab10(ctx); }   // [labyr10] 'mall' / 'fun' plans live in labyr10_plan.js
 
 function planMetro({ W, H, ent, cells, idx, addRoom, line, spines, open, edgeKey, size }) {
   const tx = ent.cx, zBot = ent.z - 1, zTop = 3, stLen = 4;

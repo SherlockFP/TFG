@@ -846,3 +846,8 @@ first-join rejoin 35 s, lost-host 25 s, host never rejoins. NAT/SDP failures now
 everyone on Nostr; lobby browser shows real peer/relay counts; NETSTATS shows relays, TURN and per-peer ICE path.
 **Owner action still needed:** a TURN account + `VITE_TURN_*` on Render for friends behind CGNAT/mobile (no free
 public TURN works). Details: `docs/MULTIPLAYER_HOTFIX.md` → "Follow-up".
+
+
+### Wave 10 — labyr10 (Dead Mall + Mirror Funhouse)
+Two new labyrinth interiors, ids `deadmall` and `funhouse` (`src/world/interiors/labyr10_*.js`, runtime `src/game/labyr10.js`, docs `docs/wave10/labyr10.md`): a moon with `interior: 'deadmall'` / `'funhouse'` uses them. Dead Mall = cross of wide halls, shopfront arches with parody brand boards + half-down grilles, dry-fountain atrium with a guaranteed trophy spot and a stalled escalator to an elevated mezzanine. Funhouse = foyer -> midway -> spinning-tunnel hero room (visual shell, guaranteed figurine spot) -> mirror maze, crooked rooms, carnival bulb chase, clown-meme murals, ghost reflections.
+Test: `node tools/harness/labyr10.test.mjs` (3 seeds x 2 sizes each: reach, nav paths, doorways crossed, own solids out of door lanes, mesh count, determinism, sounds, TR/RU, runtime stub). NOT browser-verified: every look, escalator feel, tunnel shell scale, sound taste.

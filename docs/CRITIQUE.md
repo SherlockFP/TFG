@@ -405,3 +405,4 @@ Score **5.3/10** — content 7 · replayability 5.5 · feel 4.5 · UI 5 · visua
 landing piles a report card + moon title + 6-8 log lines on top of each other; interiors read as grey/checker tiling with
 props floating near the ceiling (metro); creatures are not legible. Wave 10 (6 Sonnet builders): creatures10, labyr10
 (Dead Mall, Mirror Funhouse), moons10 (503-Service Unavailable, ∞-Feed), outlife10, landing10, mystery10.
+- [labyr10, wave 10] Dead Mall + Mirror Funhouse added as data + decorate on the existing kits (plan hook in lab_themes.planLabArch, merged geometry, no new lights). Node-verified only (reach, nav, doorways, meshes, determinism); NOT seen in a browser: the mall halls may read as empty at scale, mirror walls are a texture trick (glare + ghost figure), and the tunnel shell / escalator have never been walked.

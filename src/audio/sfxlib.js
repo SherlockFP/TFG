@@ -12,6 +12,7 @@
 
 import * as D from './dsp.js';
 import { installW8 } from './sfxlib_w8.js';   // [sound2] wave-8 sounds (recipes live in sfxlib_w8.js)
+import { installL10 } from './sfxlib_l10.js';   // [labyr10] wave-10 mall / funhouse ambience + one-shots
 
 const TAU = D.TAU;
 const DEFS = Object.create(null);
@@ -2557,3 +2558,4 @@ danceLoop('dance_glitch', 140, { kick: 'X . . X . . X . X . . X . X . .', clap: 
 danceLoop('dance_disco', 120, { kick: 'X . . . X . . . X . . . X . . .', clap: '. . . . X . . . . . . . X . . .', hat: '. . x . . . x . . . x . . . x .', bass: 'A2 A3 A2 A3 A2 A3 A2 A3 F2 F3 F2 F3 G2 G3 G2 G3', lead: 'E5 . G5 . E5 . C5 . D5 . F5 . D5 . B4 .', pad: 'A3,C4,E4 - - - - - - - F3,A3,C4 - - - G3,B3,D4 - - -', cut: 3000 });
 danceLoop('dance_metal', 150, { kick: 'X . X . X . X . X . X . X . X X', clap: '. . . . X . . . . . . . X . . .', hat: 'x . x . x . x . x . x . x . x .', bass: 'E2 E2 . E2 E2 . E2 . G2 G2 . G2 A2 . A2 .', lead: 'E4 . . G4 . . B4 . E5 . D5 . B4 . G4 .', cut: 2400, wave: 'saw', drive: 2.2 });
 installW8(def, { nburst, thud, metal, click, hiss, creak, bubble, beep, vox, norm }, (c) => { CAT = c; });   // [sound2]
+installL10(def, {}, (c) => { CAT = c; });   // [labyr10]
