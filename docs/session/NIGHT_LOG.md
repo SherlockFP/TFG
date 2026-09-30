@@ -16,3 +16,4 @@ Loop rule: 2-3 Sonnet agents at a time (1 browser/QA agent max) → merge with t
 | 3 | artpass | merged 07579a5: new src/models/artpass.js — axe, 3 pickaxes/drill, titanium/bypass picks, jammer, NV goggles + cell, potions, sickle, forge shards, kit case, voyage relics (company-issued style, -Z grip convention). Not seen in browser. |
 | 4 | firstrun (first 15 minutes: one objective at a time, message budget, designed tutorial camera) | running |
 | 4 | netaudit (wave-8 multiplayer: handler collisions, host validation, late join, host migration; node 2-peer sim) | running |
+| 4 | firstrun | merged 4d4dfad: first-run message budget (one objective, ≤1 Algorithm line / 45 s, one card at a time), no affixes/daily modifier/job fee/wrong door/drone before the first sale/day 2, designed tutorial camera between entrance and first loot room with a green blind-spot ring + clean-pass reward. |
