@@ -71,6 +71,6 @@ Loop rule: 2-3 Sonnet agents at a time (1 browser/QA agent max) → merge with t
 | 27 | Opus morning review | merged 882c382: docs/REVIEW_W8_MORNING.md — **5.6/10 on screen**; clarity 6, identity 6, visuals 6; not moved: audio unheard, no human playtest, no creature in any shot, stale Algorithm lines. Next 10 tasks listed. |
 | 27 | i18n8 (fill ~370+ missing TR/RU strings) | running |
 | 28 | algoctx | merged 54e5e12: Algorithm lines carry context + 12 s expiry (stale terminal/HR/WASD lines dropped), one shared live viewer count, 'Host revived Client' once as a toast, TUTORIAL SKIP line removed, ship-loot-tracker plain wording. |
-| 28 | firstsight (Opus) | running |
+| 28 | firstsight (Opus) | merged 9d7f01a: designed first sighting per pool creature (12-15 m in view, frozen AI, turns to stare, leaves; flicker + sting + bodycam zoom ≤3.6×, off with reduce-motion; rule caption after). Shot: Keeper at 15 m reads as a dark silhouette with orange eyes (lamp-preference placement added after the shot, needs reshoot). |
 | 29 | heroprops | merged 367d0c6: rebuilt vending machine / server rack / Founder statue / lead pipe models, blue rarity pillars replaced by a small periodic glint + 6 m floor ring (line-of-sight), hamsi card says 'Abandoned Web Host'. |
 | 30 | homeworld tycoon (owner request: Roblox-tycoon-style base on the home planet) — multi-agent workflow: understand → 2 designs + judge → implement → adversarial review → fix | running |
