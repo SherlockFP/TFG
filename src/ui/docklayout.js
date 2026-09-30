@@ -114,4 +114,5 @@ export function startLayout(docks) {
   st.textContent = '.hud-dock-item{flex:none}.hud-dock-item.hud-clip{display:none !important}';   // flex:none: items must overflow (and get clipped by priority), never shrink onto each other
   document.head.appendChild(st);
   timer = setInterval(() => { if (!document.hidden) { try { layoutDocks(docks); } catch { /* never break the HUD */ } } }, 250);
+  timer?.unref?.();   // node harness tests: the HUD poll must not keep the process alive
 }

@@ -352,3 +352,6 @@ Three special moons (flooded barge: oxygen, dune relay: heat + escort, rooftop b
 First real look at wave 8 in a browser: no fall, no pageerror, the landing queue works, feedcams / hub door / Quick Shift / night vision / 8 interiors render. What a player would feel: the facility is black (no starter torch), arrival stacks three banners, palettes fight the clock (Dialup orange at 8 AM, 404 near black), the Keeper's cone is an opaque wall, and downed / revive only exist with a second player. One overlap fixed (THREAT dock over ASSIGNMENT); museum perf and `horror.js` handler cost are the open perf items.
 
 - downed (solo): first down per landing is a 6 s hold-E self stand-up at 25 % HP so solo players meet the downed state; second down = medkit or death as before.
+
+## Wave 8 - test regression fixes
+cycle2_flow assumed 7+ distinct bosses over 8 themes, but wave-8 greenhouse/metro interiors fall back to the Foreman (6 distinct; threshold now 6). ship2_install passed but never exited: docklayout.js 250 ms HUD interval kept node alive (now unref). No game-logic regression.
