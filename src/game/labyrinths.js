@@ -63,6 +63,10 @@ export function installLabyrinths(game) {
     } else if (d.op === 'elev' && L.id === 'tower') {
       const to = d.to | 0;
       if (S.elev.moving || to < 0 || to >= K.ELEV.levels || to === S.elev.at) return;
+      const pp = posOf(from);   // must stand in the cab or at a call panel (loose reach, lag tolerant)
+      const nearCab = pp && Math.hypot(pp.x - L.cx, pp.z - L.cz) <= 4 && Math.abs(pp.y - L.ys[S.elev.at]) < 3;
+      const nearPanel = pp && L.ys.some((y) => Math.hypot(pp.x - (L.cx + 1.6), pp.z - (L.cz + L.shaft + 0.5)) <= 5 && Math.abs(pp.y - y) < 3);
+      if (!nearCab && !nearPanel) return;
       const ride = K.elevRide(run()?.seed ?? 0, S.elev.n, S.elev.at, to);
       fx({ k: 'elev', from: S.elev.at, to, n: S.elev.n, dur: ride.dur, stall: ride.stall });
     } else if (d.op === 'sync' && L.id === 'tower') {

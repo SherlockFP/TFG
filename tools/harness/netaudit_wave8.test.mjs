@@ -148,6 +148,10 @@ const warns = []; const cw = console.warn; console.warn = (...a) => { warns.push
   ok(!aD.isDowned('C'), 'downed: (precondition) a joiner has not seen the down');
   gH.mods.emit('playerJoin', 'D', {}, gH); await tick();
   ok(aD.isDowned('C') && aD.S.down.get('C').left > 0, 'downed: late joiner learns who is down (marker + bleed clock)');
+  // KIT exploit gap: a reviver without a medkit / adrenaline cannot stand a downed player up
+  gH.items = { all: () => [], get: () => null };
+  D.request('dnreq', { k: 'kit', id: 'C', it: 'nokit' }); await tick();
+  ok(aH.S.book.e.has('C') && gC.player.downed, 'downed: kit request without a held medkit refused');
   // HOST MIGRATION: H drops, D takes over; its book is rebuilt from the mirror and D can still revive C
   wire.drop('H'); delete world.H;
   D.migrateTo('D', 1); C.migrateTo('D', 1); gD.isHost = true; gC.isHost = false;
@@ -158,7 +162,29 @@ const warns = []; const cw = console.warn; console.warn = (...a) => { warns.push
   let up = false; gC.mods.on('tfg:revived', (d) => { if (d.id === 'C') up = true; });
   for (let i = 0; i < 24 && !up; i++) { D.request('dnreq', { k: 'hold', id: 'C', m: 0 }); gD.mods.emit('update', 0.2, gD); gC.mods.emit('update', 0.2, gC); await tick(2); }
   ok(up && !gC.player.downed && gC.player.hp === 30, 'downed: revive completes on the NEW host (client stands at 30 %)');
+  // kit accepted on the new host when D really holds one (host consumes it, no separate consume request)
+  aD.S.book.down('C', aD.S.clock, 'standard', [0, 0, 0], 'x'); gC.player.downed = true;   // (a second net down inside the same second is rate limited, so book it directly)
+  ok(aD.S.book.e.has('C'), 'downed: (precondition) C down again under the new host');
+  const kitIt = { id: 'k1', type: 'medkit', holder: 'D' }; gD.items = { all: () => [kitIt], get: (i) => (i === 'k1' ? kitIt : null) };
+  D.request('dnreq', { k: 'kit', id: 'C', it: 'k1' }); await tick();
+  ok(!aD.S.book.e.has('C') && !gC.player.downed, 'downed: kit request with a held medkit stands the crewmate up');
   aH.dispose(); aC.dispose(); aD.dispose();
+}
+
+// ---------------------------------------------------------------- wave-8 leftovers: migration rebuild + exploit gates (static + pure)
+{
+  const src = (f) => fs.readFileSync(path.join(root, 'game', f), 'utf8');
+  for (const f of ['arcade.js', 'arcade2.js', 'facjobs.js', 'resto.js']) ok(/on\('hostMigrated'/.test(src(f)), `migration: ${f} handles hostMigrated`);
+  ok(/on\('hostMigrated'/.test(src('lcmonsters_fx.js') + src('lcmonsters.js')) || /case 'cu': cursed\.set/.test(src('lcmonsters_fx.js')), 'migration: lcmonsters curse map is mirrored on every peer (cu/cm), crdirector re-inits via hostUpdate (!S.st)');
+  ok(/if \(!S\.st\) \{ startLanding\(\)/.test(src('crdirector.js').replace(/[{}()]/g, (c) => '\\' + c)) || /if \(!S\.st\) \{ startLanding/.test(src('crdirector.js')), 'migration: crdirector restarts a short calm phase when S.st is missing');
+  ok(/nearCab/.test(src('labyrinths.js')) && /nearPanel/.test(src('labyrinths.js')), 'exploit: elevator call range check present');
+  ok(/charger/.test(src('host.js').split("H('charge'")[1].split("H('dropship'")[0]), 'exploit: charge request range check present');
+  const A = await import('../../src/game/arcade_core.js');
+  const tb = A.newTable('t1', 'chess'); tb.seats.w = 'C'; tb.ai.b = 1; A.aiStep?.(tb);
+  const back = A.restoreTable(A.snapshot(tb));
+  ok(JSON.stringify(A.snapshot(back)) === JSON.stringify(A.snapshot(tb)), 'migration: chess table rebuilt from its snapshot is identical');
+  const K2 = await import('../../src/game/arcade2_core.js');
+  ok(K2.wire({ day: 'd', b: { fish: [{ id: 'a', n: 'a', s: 5 }], cable: [], stack: [], invaders: [] } }).b.fish.length === 1, 'migration: arcade2 boards survive wire()');
 }
 
 // ---------------------------------------------------------------- feedcams: client cuts a camera; NaN spray; sale line hook; migration clock

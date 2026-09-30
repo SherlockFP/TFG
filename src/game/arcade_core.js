@@ -153,6 +153,14 @@ export function snapshot(t) {
   const g = GAMES[t.kind];
   return { id: t.id, kind: t.kind, pos: g.ser(t.st), seats: { ...t.seats }, ai: { ...t.ai }, ply: t.ply, over: t.over ? { ...t.over } : null, last: t.last ? t.last.slice() : null, log: t.log.slice(), ver: t.ver };
 }
+/** host migration: rebuild a host table from the last snapshot every peer holds (repetition history restarts) */
+export function restoreTable(snap) {
+  const t = newTable(snap.id, snap.kind), g = GAMES[t.kind];
+  t.st = g.parse(snap.pos); t.seats = { w: snap.seats?.w || null, b: snap.seats?.b || null }; t.ai = { w: snap.ai?.w | 0, b: snap.ai?.b | 0 };
+  t.ply = snap.ply | 0; t.over = snap.over ? { ...snap.over } : null; t.last = snap.last ? snap.last.slice() : null; t.log = (snap.log || []).slice(); t.ver = snap.ver | 0;
+  t.reps = { [g.posKey(t.st)]: 1 };
+  return t;
+}
 /** client side: decode a snapshot into { st, moves, check } for rendering + move picking */
 export function decode(snap) {
   const g = GAMES[snap.kind] || GAMES.chess;
