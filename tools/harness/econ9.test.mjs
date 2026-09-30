@@ -23,7 +23,7 @@ const q = quotaState({ quota: 330, sold: 30, daysLeft: 3 });
 ok(q.need === 300 && q.perDay === 100 && q.text === '▮30/▮330' && !q.met, 'quotaState need / perDay / text');
 ok(quotaState({ quota: 330, sold: 30, daysLeft: 3 }, 120).perDay === 60, 'scrap aboard from earlier days lowers today\'s target');
 ok(quotaState({ quota: 330, sold: 30, daysLeft: 1 }, 999).perDay === 0 && quotaState({ quota: 100, sold: 100, daysLeft: 0 }).met, 'covered quota -> 0; met');
-for (const f of ['src/ui/hud.js', 'src/ui/ui.js', 'src/game/hudcalm.js', 'src/game/objectives.js']) ok(/quotaState\(/.test(rd(f)), f + ' reads quotaState');
+for (const f of [   /* hud.js top-bar quota is hidden since algoslot — Tab card + report + goal carry it */ 'src/ui/ui.js', 'src/game/hudcalm.js', 'src/game/objectives.js']) ok(/quotaState\(/.test(rd(f)), f + ' reads quotaState');
 
 // first sale never on day 1; HQ row / loot card say deadline pays 100 %
 ok(!sellWindow({ daysLeft: 3 }) && !sellWindow({ daysLeft: 2 }) && sellWindow({ daysLeft: 1 }) && sellWindow({ daysLeft: 0 }) && !sellWindow(null), 'sellWindow: only from the last landing day');
