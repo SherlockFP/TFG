@@ -330,3 +330,9 @@ html.tfg-ui .hud-arrival-focus .hud-toasts { z-index:9; }
   html.tfg-ui .hud-arrival-focus .br-desc, html.tfg-ui .hud-arrival-focus .br-grid b { font-size:16px; }
   html.tfg-ui .hud-arrival-focus .hud-prompt { bottom:105px; font-size:16px; max-width:220px; }
 }
+
+/* A recent bag pickup may predate the encounter: retain its location, defer only the teaching row. */
+html.tfg-ui #ui:has(.hud.hud-alert-focus) .tinv-feed-hint { display:none; }
+
+/* A timed calibration must remain visible above an end-of-shift case card (40), below dialogs (45). */
+html.tfg-ui .mg-layer:has(.mg-workshop17) { z-index:41; }

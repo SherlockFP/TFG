@@ -75,7 +75,7 @@ if(valid) {
  // Same-map late peer/map reload retains completion and opens its matching gate.
  listeners.get('mapLoaded')(game.world,game);okc(api.state().done&&api.plan().door.open,'same-map completion retained');
  listeners.get('phase')('orbit',game);okc(game.run.expedition13===null,'orbit clears job and robot lease');
- game.run.seed=1234;game.world={terrain:{pathPts:Array.from({length:25},(_,i)=>({x:0,z:i*4})),heightAt:()=>0},outdoor:{group:new THREE.Group(),solidAt:()=>false}};
+ game.run.seed=1234;game.run.expedition13=K.createFieldJob('hamsi:1234:1','signal');game.world={terrain:{pathPts:Array.from({length:25},(_,i)=>({x:0,z:i*4})),heightAt:()=>0},outdoor:{group:new THREE.Group(),solidAt:()=>false}};
  listeners.get('mapLoaded')(game.world,game);const signalPlan=api.plan(),signalState=api.state();
  okc(signalPlan?.kind==='signal','same installer supports outdoor job');
  p.zone='out';p.pos.copy(signalPlan.anchor).y-=1.3;

@@ -37,11 +37,33 @@ export function planSignalRun(world) {
 }
 export function buildFieldJob(plan) {
   const B=new LabBuilder({Y:plan.Y,group:plan.group,GeoBuilder,levelMaterial});
+  // Recovery tray and amber mast sit along the real path. Keep the item centre unobstructed.
+  if(plan.kind==='repair'){const p=plan.fusePos;B.box('m:metal_dark',p.x,p.y-.15,p.z,1.2,.18,.8);B.box('m:metal_dark',p.x+.8,p.y+.4,p.z,.06,1.2,.06);B.box('g:d7ac65',p.x+.8,p.y+1.05,p.z,.24,.2,.24);}
   for(const node of plan.nodes) {
+    if(plan.kind==='repair'){B.box('m:metal_dark',node.x,node.y-.6,node.z,1.9,.55,.85);for(const side of [-1,1])B.box('m:metal_dark',node.x+side*1.1,node.y-.4,node.z,.65,.08,.65);}
+    if(plan.kind==='uplink'){B.box('m:metal_dark',node.x,node.y+1,node.z,.08,2,.08);B.box('g:68a8c0',node.x,node.y+1.7,node.z,.8,.12,.08);}
     B.box('m:metal_dark',node.x,node.y,node.z,1.15,.42,.22);
     B.box('m:metal_dark',node.x,node.y-.5,node.z,.09,1,.1);
     for(let k=0;k<=node.i;k++)B.box('g:68a8c0',node.x-.35+k*.35,node.y+.12,node.z+.13,.12,.12,.025);
     for(const side of [-1,1])B.box(side<0?'g:d7ac65':'g:84ad91',node.x+side*.4,node.y-.08,node.z+.13,.16,.12,.025);
   }
   return B.build('expedition13-job');
+}
+
+/** Outdoor jobs use the same verified path samples; repair separates recovery and work sites. */
+export function planField17(world,kind) {
+ if(kind!=='repair'&&kind!=='uplink')return null;
+ const legacy=planSignalRun(world);
+ if(legacy)return {...legacy,kind,anchor:new THREE.Vector3(legacy.nodes[1].x,legacy.nodes[1].y,legacy.nodes[1].z),fusePos:new THREE.Vector3(legacy.nodes[0].x,legacy.nodes[0].y-.9,legacy.nodes[0].z),nodes:[legacy.nodes[1]]};
+ // A single-station job must not depend on unused legacy beacon sites.
+ const terrain=world?.terrain,out=world?.outdoor,path=terrain?.pathPts;
+ if(!out?.group||!path||path.length<12||terrain.hook||terrain.lava)return null;
+ const safe=i=>{const p=path[i];if(!p)return null;const y=terrain.heightAt(p.x,p.z);if(!Number.isFinite(y)||Math.hypot(p.x,p.z)<14||out.solidAt?.(p.x,p.z,.7,y)||terrain.blocked?.(p.x,p.z,.7))return null;return {i:0,x:p.x,y:y+1.3,z:p.z};};
+ const center=Math.floor((path.length-1)*.5);let station=null;
+ for(const offset of [0,-1,1,-2,2,-3,3,-4,4]){station=safe(center+offset);if(station)break;}
+ if(!station)return null;
+ let fuse=null;
+ if(kind==='repair')for(let i=1;i<Math.min(path.length-1,65);i++){const n=safe(i);if(n&&Math.hypot(n.x-station.x,n.z-station.z)>=7){fuse=n;break;}}
+ if(kind==='repair'&&!fuse)return null;
+ return {kind,nodes:[station],anchor:new THREE.Vector3(station.x,station.y,station.z),fusePos:fuse?new THREE.Vector3(fuse.x,fuse.y-.9,fuse.z):null,Y:0,group:out.group};
 }

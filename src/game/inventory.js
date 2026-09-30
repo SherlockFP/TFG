@@ -404,10 +404,9 @@ export function installInventory(game) {
   function onHeld(it, d) {
     bump();
     it.reclaim = null;
-    if (d.h !== me()) return;
+    if (d.h !== me()) { feedback16.released(it.id); return; }
     st.pendingStash.delete(it.id);
-    feed(it, !!it.inv);
-    feedback16.confirmed(it);
+    if (feedback16.confirmed(it) !== false) feed(it, !!it.inv);
     if (it.inv?.k === 'eq') game.refreshStats?.();
     game.mods?.emit('tfg:invChanged', game);
   }
@@ -552,7 +551,9 @@ export function installInventory(game) {
       line.style.setProperty('--tc', tiered ? TIERS[tier].color : '#cfc6b8');
       const name = affixDisplayName(t(it.def.name), it.affix, it);
       const val = isSellable(it.def) && it.value ? ` ▮${it.value}` : '';
-      line.innerHTML = `${iconHTML(it.type, 'ico')}<span><b>${escapeHtml(name)}</b>${tiered ? `<i>${escapeHtml(t(TIERS[tier].name))}</i>` : ''}<i>${escapeHtml(val)}${' · ' + escapeHtml(feedback16.location(it))}</i></span>`;
+      const hint = feedback16.feedHint(it);
+      if (hint) for (const oldHint of st.feedEl.querySelectorAll('.tinv-feed-hint')) oldHint.remove();
+      line.innerHTML = `${iconHTML(it.type, 'ico')}<span><b>${escapeHtml(name)}</b>${tiered ? `<i>${escapeHtml(t(TIERS[tier].name))}</i>` : ''}<i>${escapeHtml(val)}${' · ' + escapeHtml(feedback16.location(it))}</i>${hint ? `<i class="tinv-feed-hint">${escapeHtml(hint)}</i>` : ''}</span>`;
       st.feedEl.appendChild(line);
       while (st.feedEl.children.length > 4) st.feedEl.firstChild.remove();
       setTimeout(() => line.classList.add('out'), 3600);
@@ -667,6 +668,7 @@ export function installInventory(game) {
       bump();
       const self = me();
       if (!self || !d) return;
+      if (d.e === 'drop' || d.e === 'rm' || (d.e === 'held' && d.h !== self)) feedback16.released(d.id);
       if ((d.e === 'sp' && d.h === self && d.iv?.k === 'eq') || ((d.e === 'drop' || d.e === 'rm') && items()?.get(d.id)?.holder === self && items().get(d.id).inv?.k === 'eq')) game.refreshStats?.();
     },
     equip(itemId) { const e = findEntry(itemId); if (!e || !C.isEquippable(e.def)) return false; return quickMove(itemId); },

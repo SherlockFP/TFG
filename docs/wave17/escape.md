@@ -1,0 +1,33 @@
+# Escape17: physical space and readable counterplay
+
+Wave16 browser QA exposed a genuine geometry gap: a nav-approved shelter flank could run into a real room wall. The optional pursuit now selects shelter centres inside suitable side rooms using actual floor queries and standing-player capsule clearance. Both side corridors and a path behind the shell must be physically traversable before placing it. Existing entrance/vault/generator/arena/core/hub and safe-zone exclusions remain. An 80-position ceiling bounds planning; at most three positions are attempted per update with a 1.5ms work guard. A single probe can exceed that target, so this is a work budget rather than a hard runtime guarantee.
+
+MapLoaded schedules work. Two moon updates with stepped Rapier precede placement; after the final panels are inserted, two additional updates precede route queries so the spatial query tree contains the new cover. Up to three shelters are built. Afterward the host caches one capsule-valid marked cover route and up to four compatible, nav-reachable, genuinely visible Warden start positions, one start-plan search per update. A candidate cover must block an actual eye-to-eye physics ray, not merely fall outside perception range. Planning is bounded and ends; no perpetual retry/rebuild loop or per-frame A* scan is introduced.
+
+The physical cue is one batch of fixed mint floor chevrons, with one BufferGeometry/Mesh/material and no extra lights or animation. A map+point key reuses the exact batch on unchanged e14state deliveries, including sender delivery and hide/claim updates. Unload clears the key and disposes the geometry. The warning lore explains the floor marks and that cover buys time rather than invulnerability. EN/TR/RU text is included.
+
+Activation now uses the cached plan. It still needs quota2+, two shelters, a living initiator outside safe zones, no active boss/bonus mission and an unused landing attempt. Every living crewmate must be at least7m from the selected spawn. The initiator's actual sight, body-width approach to the marked start, all route segments and physical cover occlusion are checked again. Changed doors/obstacles or no viable route mean unavailable without consuming the attempt. The physical console does not appear until an actual plan exists. The 2.2s warning, 24 damage/1.1s windup, miss recovery, actual sight reacquisition, six uninterrupted unseen search seconds, 35s cap, single physical85 recording and non-kill retirement remain unchanged. The plan provides a usable counterplay route; it does not script AI states, freeze the creature, force success or add immediate quota/credits.
+
+Real walking tests exposed a second geometry problem: centre/edge movement rays can miss a thin panel lying between the rays. The Warden now uses its actual2.35m-height/1.1m-width capsule sweep before committing a movement step, with0.02m floor clearance and static/door filtering. Its start also requires a capsule-clear body. The existing movement rays remain as a defensive fallback check. This is Warden-specific; it does not redesign other creature AI or collision dispatch.
+
+## Read-only QA contract
+
+`escape14.routes()` returns deep copied plain arrays:
+
+```
+[{id,shelter:0,console:[x,y,z],start:[feetX,feetY,feetZ],
+  spawn:[feetX,feetY,feetZ],points:[[feetX,feetY,feetZ],...],
+  cover:[feetX,feetY,feetZ],selected:false}]
+```
+
+All entries share one visible floor route; alternate entries let the host choose another safe start when crew occupy the first. The first route point is `start`; console is the actual amber switch aim point (`shelter.p+[1,1,.65]`). After accepted E, `run.escape14.route` names the selected entry and routes().selected reflects it. Wait for routes().length>0, not merely visible shelters. QA may use a labelled player setup at route.start, aim the actual console, send real E and then walk points.slice(1) with normal keyboard controls. It must observe genuine sight, movement, search/result and a physical recording claim; no creature teleport, forced state/flags or perception override is part of the contract. Peers receive plan arrays through existing host-only e14state/run replication and render the same constant floor batch.
+
+## Validation and limits
+
+The new existing-native pipeline regression in `tools/harness/escape17.test.mjs` builds real generated factory maps for seed1235 at sizes0.8,1,1.5, seed42/0.8 and seed777/1.2. Each uses real Rapier floor/intersection/capsule queries, actual HostCreature/CreatureManager hostUpdate/nav/perception and an actual standing-player Rapier character controller. Only the player's initial placement is a labelled fixture. The controller physically walks every planned waypoint at ordinary frame steps, with no subsequent teleport, forced AI state/flags or LOS override. All five witness the real warning, walk to actual cover, complete genuine six-second unseen search and retire normally. The regression also verifies copied route data and exact mesh/geometry reuse with zero disposal on unchanged state delivery. The preexisting escape14 native/whiff/physical-door/hiding/claim/failure/cleanup harness still passes.
+
+Measured cold planning work across those five maps:1930–2732 floor rays,262–380 capsule queries,143–308 LOS queries and3–4 A* searches. Instrumented module-update medians were0.001ms across180 readiness ticks; observed maxima were1.6–7.0ms across two runs, with9–46ms total module work spread across updates. Whole readiness wall time also includes180 real physics steps and must not be presented as one planning hitch. These are Node fixture measurements, not browser FPS guarantees. Broad perf5 passed (sum medians0.576ms/tick over135 handlers); SFX6,894 checks passed. No speculative audio changes were made.
+
+Shared browser QA separately passed actual console E, real keyboard movement during the native warning, genuine cover/search/escape, return walking and E claim of recording `i5y6`/85 on both peers. Repeated E retained that single item. Earlier helper overshoot and a delayed departure that suffered a native hit remain recorded in PLAYTEST.md. No AI flags, LOS or creature position were forced after player setup.
+
+Generated geometry outside the five fixtures can still reject placement or route availability. This is deliberate graceful unavailability, not a fabricated guaranteed escape. Dynamic hazards and ordinary threats can still pressure players; the module prevents its own boss/bonus overlap. Controller/local-browser evidence does not prove human difficulty, complete decoration clearance on every moon or all group encounter outcomes.

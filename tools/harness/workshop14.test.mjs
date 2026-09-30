@@ -12,9 +12,10 @@ transactIndustry(run,{op:'produce',product:'cells',physical:true});const id=indu
 completeIndustryShift(run,'hamsi',1);assert.equal(industryOf(run).goods.cells,undefined,'field shift alone cannot bypass calibration');
 const points=[];mods.emit('interactables',points);const control=points.find(p=>p.pos.equals(api.bays[0].pos));assert.equal(control.r,.45,'control target covers visible press face');assert.equal(control.reach,2.6,'aim forgiveness must not expand reach');assert.match(control.label,/1/,'numbered bay is recognizable');
 const act=handlers.get('w14act');act({op:'pack',id},'crew');assert.equal(industryOf(run).goods.cells,undefined,'unprepared parcel cannot collect');
-act({op:'hold',id},'crew');game.time=1;mods.emit('update',1);assert.equal(api.sessions.size,0,'heartbeat loss cancels calibration');
-for(let n=0;n<18;n++){game.time=1+n*.15;act({op:'hold',id},'crew');mods.emit('update',.15);}
-assert.equal(industryOf(run).jobs[0].tuned,true,'actual installed host timer calibrates only after sustained near-bay heartbeat');
+act({op:'hold',id},'crew');game.time=1;mods.emit('update',1);assert.equal(api.sessions.size,0,'legacy hold cannot bypass interactive calibration');
+act({op:'begin',id},'crew');let session=api.sessions.get('crew');const token=session.token;
+for(let n=0;n<3;n++){game.time=1+1.65+n*2.8;act({op:'beat',id,token},'crew');act({op:'step',id,token,step:n},'crew');}
+assert.equal(industryOf(run).jobs[0].tuned,true,'actual host validates three pressure pulses');
 assert.equal(run.credits,88,'calibration itself cannot pay currency');
 pl.dead=true;act({op:'pack',id},'crew');assert.equal(industryOf(run).jobs.length,1,'dead peer cannot claim');
 pl.dead=false;pl.pos.set(20,0,20);act({op:'pack',id},'crew');assert.equal(industryOf(run).jobs.length,1,'distant peer cannot claim');

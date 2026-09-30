@@ -26,6 +26,7 @@ ${tierVars}
 .tinv-feed-line .ico { width: 34px; height: 34px; image-rendering: pixelated; }
 .tinv-feed-line b { color: var(--tc); font-weight: normal; }
 .tinv-feed-line i { font-style: normal; font-size: 15px; opacity: 0.75; margin-left: 4px; }
+.tinv-feed-line .tinv-feed-hint { display:block; max-width:240px; margin:3px 0 0; white-space:normal; font-size:14px; line-height:1.2; opacity:.9; }
 .tinv-feed-line.tier-epic, .tinv-feed-line.tier-legendary, .tinv-feed-line.tier-mythic { background: linear-gradient(90deg, color-mix(in srgb, var(--tc) 30%, rgba(8,4,2,0.85)), rgba(8,4,2,0.35) 80%, transparent); }
 @keyframes tinvFeedIn { from { opacity: 0; transform: translateX(-24px); } to { opacity: 1; transform: none; } }
 @keyframes tinvFeedOut { to { opacity: 0; transform: translateX(-16px); } }

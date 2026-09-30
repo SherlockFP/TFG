@@ -1,4 +1,6 @@
 export const TR = {
+ 'Two clicks, then pursuit. Follow mint floor marks, break sight and stay quiet. Cover buys time; it can see you again.': 'İki tık, sonra takip. Mint rengi yer işaretlerini izle, görüşü kes ve sessiz kal. Siper zaman kazandırır; seni yeniden görebilir.',
+ 'Pursuit unavailable: need a clear marked route, quota 2+, and no active boss or bonus mission.': 'Takip kullanılamıyor: açık bir işaretli yol, kota 2+ ve aktif boss veya bonus görevi olmaması gerekir.',
  'No clear pursuit route here. Step into an open room and try again.': 'Burada açık bir takip yolu yok. Açık bir odaya geçip yeniden dene.',
  'Pursuit escaped. Collect the recording at the first shelter.': 'Takipten kaçtın. Kaydı ilk siper kabininden al.',
  'Pursuit ended. No recording this time.': 'Takip sona erdi. Bu kez kayıt kazanılmadı.',
@@ -19,6 +21,8 @@ export const TR = {
  'Pursuit unavailable: quota 2+, no active boss or bonus mission, and one attempt per landing.': 'Takip kullanılamıyor: kota 2+, aktif boss veya bonus görevi olmamalı; iniş başına bir deneme.'
 };
 export const RU = {
+ 'Two clicks, then pursuit. Follow mint floor marks, break sight and stay quiet. Cover buys time; it can see you again.': 'Два щелчка, затем погоня. Следуйте мятным меткам на полу, скройтесь и молчите. Укрытие даёт время; страж может снова вас увидеть.',
+ 'Pursuit unavailable: need a clear marked route, quota 2+, and no active boss or bonus mission.': 'Погоня недоступна: нужен свободный отмеченный путь, квота 2+ и отсутствие активного босса или бонусной миссии.',
  'No clear pursuit route here. Step into an open room and try again.': 'Здесь нет свободного пути для погони. Перейдите в открытую комнату и повторите.',
  'Pursuit escaped. Collect the recording at the first shelter.': 'Вы ушли от погони. Заберите запись у первого укрытия.',
  'Pursuit ended. No recording this time.': 'Погоня завершена. На этот раз записи нет.',

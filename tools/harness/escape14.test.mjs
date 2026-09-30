@@ -23,12 +23,15 @@ function fixture(host=true){
  const events=new Map(),handles=new Map(),msgs=new Map(),sent=[],removed=[],spawns=[];
  const me={id:'p',pos:new THREE.Vector3(8,-300,5),eye:new THREE.Vector3(8,-298.4,5),dead:false,inShip:false,zone:'in',voice:0};
  const other={id:'q',pos:new THREE.Vector3(8,-300,5),eye:me.eye.clone(),dead:false,inShip:false,zone:'in',voice:0};
- const items=[];let visible=true;
- const game={isHost:host,selfId:'p',scene:new THREE.Scene(),run:{phase:'moon',quotaIndex:2,day:1,cargo13:{}},world:{moonId:'hamsi',seed:9,facility:{layout:{seed:9,y:-300,ox:0,oz:0,cell:2,rooms:[{x:1,z:1,w:6,h:6,type:'storage'},{x:15,z:1,w:6,h:6,type:'archive'},{x:28,z:1,w:6,h:6,type:'office'}]},nav:{walkableAt:()=>true,findPath:(x,z,tx,tz)=>[{x:tx,z:tz}]},doors:[],scrapSpots:[{x:70,y:-300,z:10}]}},player:{frozen:false,dead:false,downed:false,crouch:false},items:{all:()=>items.values()},mods:{creatureModels:new Map(),on:(name,fn)=>{let a=events.get(name);if(!a)events.set(name,a=[]);a.push(fn);return()=>a.splice(a.indexOf(fn),1);}},net:{msgHandlers:msgs,on_:(k,h)=>msgs.set(k,h),broadcast:(k,d)=>sent.push({k,d:structuredClone(d)}),sendTo:(id,k,d)=>sent.push({id,k,d:structuredClone(d)})},physics:{raycast:()=>({normal:{y:1},point:{y:-300}}),lineOfSight:()=>visible,addStaticBox:()=>({}),removeCollider:c=>removed.push(c)},aiPlayers:()=>[me,other],aiPlayerById:id=>[me,other].find(p=>p.id===id),broadcastRun:()=>{},unloadMap:()=>{},downed:{S:{book:{e:new Map()}},isDowned:()=>false},ui:{toast:()=>{}}};
+ const items=[],boxes=[];let visible=true;
+ function sight(a,b){if(!visible)return false;for(const box of boxes){if(box.removed)continue;let lo=0,hi=1;for(const k of ['x','y','z']){const d=b[k]-a[k],min=box.center[k]-box.half[k],max=box.center[k]+box.half[k];if(Math.abs(d)<1e-9){if(a[k]<min||a[k]>max){lo=2;break;}}else{let s=(min-a[k])/d,t=(max-a[k])/d;if(s>t)[s,t]=[t,s];lo=Math.max(lo,s);hi=Math.min(hi,t);if(lo>hi)break;}}if(lo<=hi&&lo<.999&&hi>0)return false;}return true;}
+
+ const game={isHost:host,selfId:'p',scene:new THREE.Scene(),run:{phase:'moon',quotaIndex:2,day:1,cargo13:{}},world:{moonId:'hamsi',seed:9,facility:{layout:{seed:9,y:-300,ox:0,oz:0,cell:2,rooms:[{x:1,z:1,w:6,h:6,type:'storage'},{x:15,z:1,w:6,h:6,type:'archive'},{x:28,z:1,w:6,h:6,type:'office'}]},nav:{walkableAt:()=>true,findPath:(x,z,tx,tz)=>[{x:tx,z:tz}]},doors:[],scrapSpots:[{x:70,y:-300,z:10}]}},player:{frozen:false,dead:false,downed:false,crouch:false},items:{all:()=>items.values()},mods:{creatureModels:new Map(),on:(name,fn)=>{let a=events.get(name);if(!a)events.set(name,a=[]);a.push(fn);return()=>a.splice(a.indexOf(fn),1);}},net:{msgHandlers:msgs,on_:(k,h)=>msgs.set(k,h),broadcast:(k,d)=>sent.push({k,d:structuredClone(d)}),sendTo:(id,k,d)=>sent.push({id,k,d:structuredClone(d)})},physics:{raycast:()=>({normal:{y:1},point:{y:-300}}),world:{intersectionsWithShape:()=>{},castShape:()=>null},lineOfSight:sight,addStaticBox:(x,y,z,hx,hy,hz)=>{const c={center:{x,y,z},half:{x:hx,y:hy,z:hz}};boxes.push(c);return c;},removeCollider:c=>{c.removed=true;removed.push(c);}},aiPlayers:()=>[me,other],aiPlayerById:id=>[me,other].find(p=>p.id===id),broadcastRun:()=>{},unloadMap:()=>{},downed:{S:{book:{e:new Map()}},isDowned:()=>false},ui:{toast:()=>{}}};
  game.creatures={game,host:new Map(),canSee:()=>true,nearSafeZone:()=>false,hostSpawn:(type,pos,opts)=>{const c={id:'warden',type,pos,zone:'in',dmg:24,def:CREATURES[type],data:{},age:4,t:0,yaw:0,hp:240,extra:0,cooldown:0,state:opts.state,setState(s){if(s!==this.state){this.state=s;this.t=0;}}};spawns.push(c);game.creatures.host.set(c.id,c);return c;}};
  const api=installEscape14(game);game.escape14=api;
  const emit=(k,...args)=>{for(const fn of events.get(k)||[])fn(...args);};
- emit('registerHandlers',(a,h)=>handles.set(a,h));emit('mapLoaded',game.world);emit('update',1/60);emit('update',1/60);
+ emit('registerHandlers',(a,h)=>handles.set(a,h));emit('mapLoaded',game.world);for(let i=0;i<30;i++)emit('update',1/60);
+ const first=api.shelters()[0];if(first){me.pos.fromArray(first.exit).z+=.3;me.eye.copy(me.pos).add(new THREE.Vector3(0,1.62,0));other.pos.copy(me.pos);other.eye.copy(me.eye);}
  return {game,api,emit,handles,sent,spawns,me,other,items,removed,setVisible:v=>visible=v};
 }
 // Expensive activation A* must not run for candidates rejected by sight or physical body clearance.
@@ -99,7 +102,7 @@ const struck=pursuit();struck.c.pos.copy(struck.me.pos);wardenAI(struck.c,.01,st
 console.log('escape14: finite chase evidence, continuous unseen search, safe retirement, single physical reward and failure regressions pass');
 
 // Tiny/blocked facilities must not retry forever or rebuild a crewmate's occupied shelter.
-const tiny=fixture();tiny.game.world.facility.layout.rooms=tiny.game.world.facility.layout.rooms.slice(0,1);tiny.emit('mapLoaded',tiny.game.world);tiny.emit('update',1/60);tiny.emit('update',1/60);
+const tiny=fixture();tiny.game.world.facility.layout.rooms=tiny.game.world.facility.layout.rooms.slice(0,1);tiny.emit('mapLoaded',tiny.game.world);for(let i=0;i<12;i++)tiny.emit('update',1/60);
 assert.equal(tiny.api.shelters().length,1);tiny.me.pos.fromArray(tiny.api.shelters()[0].exit);tiny.me.eye.copy(tiny.me.pos).add(new THREE.Vector3(0,1.6,0));assert(tiny.api.enter('p',0));const removedBefore=tiny.removed.length;tiny.emit('update',.5);assert(tiny.api.hidden('p')&&tiny.removed.length===removedBefore,'occupied singleton is never rebuilt');tiny.api.dispose();
 const empty=fixture();empty.game.world.facility.layout.rooms=[];empty.emit('mapLoaded',empty.game.world);for(let i=0;i<10;i++)empty.emit('update',.5);const sentAfterAttempts=empty.sent.length;for(let i=0;i<10;i++)empty.emit('update',.5);assert.equal(empty.sent.length,sentAfterAttempts,'blocked facility retry/send work terminates');empty.api.dispose();
 
@@ -113,7 +116,7 @@ const real=fixture();real.api.dispose();real.game.physics=ph;real.game.scene=new
 real.game.engine={scene:real.game.scene};real.game.creatures=new CreatureManager(real.game);real.game.net.sendRows=()=>{};
 const physicalApi=installEscape14(real.game);real.game.escape14=physicalApi;real.emit('mapLoaded',real.game.world);
 assert.equal(physicalApi.shelters().length,0,'no mapLoaded probe against stale Rapier queries');
-for(let i=0;i<4;i++){ph.step(1/60);real.emit('update',1/60);}
+for(let i=0;i<120;i++){ph.step(1/60);real.emit('update',1/60);}
 assert(physicalApi.shelters().length>=2,'seed1235 real factory has reachable shelters after physics steps');
 for(const s of physicalApi.shelters()){const p=new THREE.Vector3(...s.p),floor=ph.raycast(p.clone().add(new THREE.Vector3(0,1,0)),new THREE.Vector3(0,-1,0),1.5,1);assert(floor&&Math.abs(floor.point.y-layout.y)<.2);assert(fac.nav.walkableAt(s.exit[0],s.exit[2]));}
 // A real generated facility uses actual HostCreature, nav following, perception and Rapier for activation/chase.
