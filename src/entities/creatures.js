@@ -196,6 +196,7 @@ export class CreatureView {
     }
     this.materials = [];
     this.root.traverse((o) => { if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => this.materials.push(m)); });
+    mgr.game.creatureRead?.dress(this);   // wave 8: emissive tell (glowing eyes) + pose-layer state
     this.startLoops();
   }
 
@@ -285,6 +286,7 @@ export class CreatureView {
       if (this._lodN % QUALITY.lodSkip) mdt = -1; else { mdt = this._lodT; this._lodT = 0; }
     } else this._lodT = 0;
     if (mdt >= 0) this.model.update(mdt, { state: this.state, speed: Math.min(speed, 14), t: this.stateT, time: game.time, progress: typeof this.extra === 'number' ? this.extra : 0, aim });
+    game.creatureRead?.apply(this, dt);   // wave 8: walk bob, 0.4 s attack wind-up lean, hit flinch (skips dead: feel owns the corpse)
     if (this.state === 'dead') game.feel?.deathPose(this, dt);   // wave 7: topple / bounce / dissolve on top of the model's own pose
     this.hitFlash = Math.max(0, this.hitFlash - dt * 4);
     // 'Hot Take' affix: the corpse blinks and beeps faster and faster until the host detonates it
@@ -1092,7 +1094,8 @@ export const BEHAVIORS = {
     if (watched || !players.length) { if (c.state !== 'idle') c.setState('idle'); return; }
     const n = M.nearest(c, players);
     if (!n || n.p.inShip) return;
-    if (n.d < 1.2 && c.cooldown <= 0) { c.cooldown = 0.6; M.attack(c, n.p, c.dmg); }
+    if (c.state === 'attack' && c.t < 0.45) return;   // wave 8: the 0.4 s wind-up is visible (it stops and rears) instead of an invisible delay
+    if (n.d < 1.2 && c.cooldown <= 0) { c.cooldown = 0.6; c.setState('attack'); M.attack(c, n.p, c.dmg); return; }
     c.setState('run');
     M.moveToward(c, n.p.pos, dt, c.def.run, 20);
     if (Math.random() < dt * 0.8) M.sound(c, 'mannequin_step', 0.9);

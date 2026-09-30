@@ -334,3 +334,5 @@ CRITIQUE_W8 #1/#3/#7 answered in code, not yet by eyes: a new player now gets ON
 ## Wave 8 - multiplayer audit
 Never tested with two real players; audited statically + with a 3-peer in-memory Session sim (tools/harness/netaudit_wave8.test.mjs). 10 real bugs fixed (dead viewer-tax line, NaN spray, migration clocks / DownBook / diner wipe, unenforced hub shop lock, forgeable `hg` / `mm`, late-join gaps for downs / elevator / shelves). Still unproven: real WebRTC ordering, real hostmig with live modules, and several host-only states that reset on migration (docs/wave8/netaudit.md).
 Wave-8 follow-up: migration leftovers and the charge / elevator / kit exploit gaps are closed (netaudit test 141 checks); real 2-player hostmig still untested.
+## Wave 8 - creature readability (docs/wave8/creatureart.md)
+"Creatures must be readable": all 72 model-backed hostiles now have an emissive tell, walk bob, a 0.4 s attack wind-up lean and a hit flinch, and the Dimmer / Follower / Auditor are no longer re-skins. Node-verified only; glow strength and lean on big bodies still need eyes in the browser.

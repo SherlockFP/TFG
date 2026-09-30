@@ -108,6 +108,7 @@ import { installForge } from './forge.js';
 
 import { installMusic } from './music.js';
 import { installFeel } from './feel.js';   // wave 7: game feel (hitstop, class sounds, muzzle flash, death topple, heartbeat)
+import { installCreatureRead } from './creature_read.js';   // wave 8: creature readability (emissive tell, wind-up / bob / flinch pose layer, Dimmer / Follower / Auditor models)
 import { installScore } from './score.js';   // wave 7: adaptive score
 import { installStudio } from './studio.js';   // wave 8: studio text pass (item tips EN/TR/RU)
 import { installHudCalm } from './hudcalm.js';   // wave 8: calm HUD (density setting, contextual widgets, hold-Tab status)
@@ -396,6 +397,7 @@ export class Game extends Emitter {
 
     this.useModule('music', installMusic);
     this.useModule('feel', installFeel);   // [feel] wave 7 (game.feel)
+    this.useModule('creatureRead', installCreatureRead);   // wave 8: creature readability (game.creatureRead)
     this.useModule('cvoice', installSfx);   // [sfx] stored as game.cvoice: game.sfx is the core sound-effect FUNCTION and must not be shadowed
 
 
