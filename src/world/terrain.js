@@ -33,7 +33,14 @@ setInteriorProbe((id) => {
   return T && typeof T === 'object' ? !!T[id] : null;
 });
 
-export const mapScaleOf = (moon) => Math.max(1, Math.min(1.6, +moon?.mapScale || 1));
+// [pacing] outdoor maps were "wide but empty": the effective scale (terrain size, every placement range, landmarks, fauna, mapart...) is the moon's
+// mapScale (1..1.6) times a per-tier compaction, so the outdoor half-size drops ~30 %. Independent of moon.size (worlds3 patches size around loadMapFor).
+const COMPACT = [0.68, 0.68, 0.68, 0.72, 0.76];   // tier 0/1/2, 3, 4+
+export const mapScaleOf = (moon) => Math.max(0.6, Math.min(1.6, +moon?.mapScale || 1) * COMPACT[Math.min(4, Math.max(0, (moon?.tier | 0) || 1))]);
+// ship -> main entrance walk (spawn side), metres: tier 1 40-52, 2 46-58, 3 54-66, 4+ 60-72; big generated moons add up to ~8 (never past 75)
+export const PACE = [[40, 52], [40, 52], [46, 58], [54, 66], [60, 72]];
+/** fog density cap so the entrance (distance d from the ship) keeps ~30 % of its colour through clear-weather exp2 fog */
+export const fogCapFor = (d) => Math.max(0.012, 1.1 / Math.max(30, d));
 
 function smooth01(t) { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); }
 
@@ -43,7 +50,8 @@ export function planMoon(seed, moon) {
   const sc = mapScaleOf(moon);
   // facility entrance position (bigger maps push it further out: a longer, more dangerous walk)
   const ang = rng.float(0, Math.PI * 2);
-  const dist = rng.float(70, 105) * Math.min(1.25, 0.85 + (moon.size || 1) * 0.2) * (1 + (sc - 1) * 0.9);
+  const pace = PACE[Math.min(4, Math.max(0, (moon.tier | 0) || 1))], big = Math.max(0, (+moon.mapScale || 1) - 1);
+  const dist = Math.min(80, rng.float(pace[0], pace[1]) + 3 + big * 20);   // +3: the spawn point sits a few metres in front of the door
   const entrance = { x: Math.cos(ang) * dist, z: Math.sin(ang) * dist };
   const fires = [];
   const nFire = (moon.size || 1) >= 1.2 ? 2 : 1;
@@ -180,9 +188,10 @@ export class Terrain {
     const e = this.plan.entrance;
     const pts = [];
     const n = 24;
+    const A = r.float(-6, 6), B = r.float(-2.5, 2.5), ph = r.float(0, Math.PI * 2);   // [pacing] one smooth bend (the old per-point +-8 m jitter made the walk ~1.7x the straight line)
     for (let k = 0; k <= n; k++) {
       const t = k / n;
-      const wob = Math.sin(t * Math.PI) * r.float(-8, 8);
+      const wob = Math.sin(t * Math.PI) * (A + B * Math.sin(t * Math.PI * 2 + ph));
       const px = e.x * t, pz = e.z * t;
       const nx = -e.z, nz = e.x; const l = Math.hypot(nx, nz) || 1;
       pts.push({ x: px + (nx / l) * wob, z: pz + (nz / l) * wob });
@@ -484,8 +493,8 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
   };
   const avoidBase = (x, z, m = 0) => {
     if (terrain.blocked(x, z, m)) return true;
-    if (Math.hypot(x, z) < 26 + m) return true;
-    if (Math.hypot(x - e.x, z - e.z) < 20 + m) return true;
+    if (Math.hypot(x, z) < 20 + m) return true;
+    if (Math.hypot(x - e.x, z - e.z) < 15 + m) return true;
     for (const f of plan.fires) if (Math.hypot(x - f.x, z - f.z) < 9 + m) return true;
     for (const p of plan.ponds) if (Math.hypot(x - p.x, z - p.z) < p.r * 1.4 + 2 + m) return true;
     if (terrain.distToPath(x, z) < 5 + m) return true;
@@ -569,12 +578,12 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
     const lm = rng.pick(b.landmarks || ['ext:ind_cooling_tower', 'ext:ind_liquid_reservoir_2', 'ext:kk_lights']);
     for (let t = 0; t < 20; t++) {
       const x = rng.float(-115, 115) * sc, z = rng.float(-115, 115) * sc;
-      if (avoid(x, z, 8)) continue;
+      if (avoid(x, z, 8) || solidAt(x, z, 3.5)) continue;   // [pacing] keep off rocks / trunks on the denser compact maps
       placeStatic(lm, x, z, rng.float(0, 6.28));
       break;
     }
   }
-  const nPoi = Math.round((10 + Math.round((moon.size || 1) * 6)) * sc);
+  const nPoi = Math.round((10 + Math.round((moon.size || 1) * 6)) * (0.4 + 0.6 * sc));   // [pacing] compact maps keep most of their props (denser, not emptier)
   const outdoorScrapSpots = [];
   for (const s of (decor?.scrapSpots || []).slice(0, 2)) outdoorScrapSpots.push({ x: s.x, z: s.z });
   const poiAt = [];
@@ -583,7 +592,8 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
     for (let t = 0; t < 10; t++) {
       const x = rng.float(-120, 120) * sc, z = rng.float(-120, 120) * sc;
       if (avoid(x, z, 2) || poiAt.some((q) => Math.hypot(q.x - x, q.z - z) < 4.2)) continue;   // [geomfix] POI props keep a gap between each other
-      if (rocks.some((q) => Math.hypot(q.x - x, q.z - z) < 1.2 + 3 * q.scale) || trees.some((q) => Math.hypot(q.x - x, q.z - z) < (treeIsRock ? 1.2 + 3 * q.scale : 3))) continue;   // [geomfix] POI junk never spawns inside a rock / trunk
+      const wide = id === 'radio_tower' ? 2 : 0;   // [pacing] denser compact maps: the tower's wide legs need a bigger gap
+      if (rocks.some((q) => Math.hypot(q.x - x, q.z - z) < 1.2 + wide + 3 * q.scale) || trees.some((q) => Math.hypot(q.x - x, q.z - z) < (treeIsRock ? 1.2 + 3 * q.scale : 3) + wide)) continue;   // [geomfix] POI junk never spawns inside a rock / trunk
       placeStatic(id, x, z, rng.float(0, 6.28)); poiAt.push({ x, z });
       if (rng.chance(0.4)) outdoorScrapSpots.push({ x: x + rng.float(-3, 3), z: z + rng.float(-3, 3) });
       break;

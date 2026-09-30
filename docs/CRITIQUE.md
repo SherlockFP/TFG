@@ -321,3 +321,6 @@ The economy numbers are now readable: a per-source income block in the day summa
 
 ## Wave 8 - gap closers
 Key conflicts (RPS Y, vote B/M), downed medic / kit revive / edge arrow, duplicate viewer-tax row, translated affix names in chat and translated death lines closed. Still open: the raw-KeyX modules that bypass rebinding; medic speed and kit revive are trusted from the client (co-op).
+
+## Wave 8 - pacing
+Problem 4 ("wide but empty"): outdoor area -46 %, ship->entrance 45-70 m instead of 75-108, smooth path, fog capped to the entrance distance, story beats every ~15-18 m; props per hectare +50 %. Not yet hand-walked in the real game (fog feel in rain / night, worlds3 large facilities unchanged).

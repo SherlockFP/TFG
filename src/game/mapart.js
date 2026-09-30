@@ -55,6 +55,7 @@ export function installMapArt(game) {
     const scrap = out.decor?.scrapSpots || [];
     const extraOk = (px, pz, r) => {
       if (terrain.lavaDepthAt && terrain.lavaDepthAt(px, pz) > -0.6) return false;
+      if (out.solidAt && out.solidAt(px, pz, Math.min(r, 2.5))) return false;   // [pacing] compact maps are denser: keep off rocks / POI solids too
       for (const t of trees) if (Math.abs(t.x - px) < r + 2 && Math.abs(t.z - pz) < r + 2 && Math.hypot(t.x - px, t.z - pz) < r + 1.6) return false;
       for (const s of scrap) if (Math.hypot(s.x - px, s.z - pz) < r + 3) return false;
       return true;

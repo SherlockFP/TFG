@@ -71,7 +71,7 @@ export const BEAT_R = { sponsor: 2.2, camp: 3.4, crate: 2.3, bag: 1.5, tracks: 4
 const ON_PATH = new Set(['tracks', 'tape']);
 const VARIANTS = { sponsor: 6, camp: 4, crate: 3, bag: 3, tracks: 1, drone: 2, tape: 2 };
 const TAU = Math.PI * 2;
-export const BEAT = { first: 20, gap: 25, jitter: 3, endMargin: 15, lateral: [5.8, 8.6], secondLateral: [9.5, 13], shipClear: 17, entranceClear: 16 };
+export const BEAT = { first: 10, gap: 15, jitter: 2, endMargin: 8, lateral: [5.8, 8.6], secondLateral: [9.5, 13], shipClear: 12, entranceClear: 11 };   // [pacing] tighter: the walk is ~40 % shorter
 
 /** arc-length table of the path polyline */
 export function pathTable(P) {
@@ -100,7 +100,7 @@ export function planBeats(o) {
   const h = o.heightAt, plan = o.plan || {}, e = plan.entrance;
   const tb = pathTable(o.pathPts || []);
   const out = [];
-  if (tb.len < 40 || !e) return out;
+  if (tb.len < 30 || !e) return out;
   const lim = (o.half || 200) - 10;
   const others = o.others || [];
   const flat = (x, z, r, maxDy) => {
@@ -122,7 +122,7 @@ export function planBeats(o) {
     for (const q of others) if (Math.hypot(x - q.x, z - q.z) < q.r + r + 1.2) return null;
     if (!onPath && o.avoid && o.avoid(x, z, 0.5)) return null;
     if (o.extraOk && !o.extraOk(x, z, r)) return null;
-    return flat(x, z, r, onPath ? 1.3 : 1.0);
+    return flat(x, z, r, onPath ? 1.0 : 0.9);
   };
   // kind bag: every kind once before any repeats; the first beat is always a sponsor sign (reads from far away, teaches the tone)
   let bag = [];

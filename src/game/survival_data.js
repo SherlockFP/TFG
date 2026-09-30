@@ -107,7 +107,7 @@ export const plantTable = (biome) => BIOME_PLANTS[biome] || BIOME_PLANTS.hills;
 export function plantAvoid(out) {
   return (x, z, m) => {
     try {
-      if (out.avoid?.(x, z, m) || out.solidAt?.(x, z, 0.25, out.terrain?.heightAt?.(x, z))) return true;
+      if (out.avoid?.(x, z, m) || out.solidAt?.(x, z, 0.25, (out.terrain?.heightAt?.(x, z) ?? 0) - 0.02)) return true;
       const h = out.harvest;
       return !!h && (h.rocks.some((q) => Math.hypot(q.x - x, q.z - z) < 1.8 * q.scale + 0.3) || h.trees.some((q) => Math.hypot(q.x - x, q.z - z) < (q.kind === 'rock' ? 1.8 : 0.6) * q.scale + 0.3));
     } catch { return false; }

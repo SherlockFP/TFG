@@ -10,7 +10,7 @@ import { mineshaftFootstep, mineshaftAmbience } from '../world/mineshaft.js';
 import { interiorFootstep, interiorAmbience } from '../world/interiors/index.js';
 import { updateThemeOneShots } from '../audio/extassets.js';
 import { stepSoundAt, surfaceAt } from '../world/setpieces.js';
-import { buildMoonOutdoor } from '../world/terrain.js';
+import { buildMoonOutdoor, fogCapFor } from '../world/terrain.js';
 import { buildCompany } from '../world/company.js';
 import { LocalPlayer, footSurface } from '../entities/localplayer.js';
 import { RemotePlayer, suitColor } from '../entities/remote.js';
@@ -871,6 +871,7 @@ export class Game extends Emitter {
         this.scene.add(outdoor.group);
         this.world.mapGroup = outdoor.group;
         this.env.setMoon(BIOMES[moon.biome], run.weather || 'clear', 'moon');
+        { const sp = outdoor.mainExit?.spawn; if (sp) this.env.fogCap = fogCapFor(Math.hypot(sp.x, sp.z)); }   // [pacing] the entrance stays visible from the ship
         this.weatherMud = run.weather === 'rainy' || run.weather === 'stormy';
         slide();
       });

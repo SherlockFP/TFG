@@ -186,7 +186,7 @@ async function modulePass(out, fac, tag, ctxOut, ctxFac) {
       if (ctx.outside(sp.x, sp.z)) flag('outsideMap', name, `${sp.id || sp.kind} @${f2(sp.x)},${f2(sp.z)}`);
       const gy = ctx.ground(sp.x, sp.z);
       const y0 = Number.isFinite(sp.gy) ? sp.gy : sp.y;
-      if (ctx === ctxOut && !Number.isFinite(sp.gy) && out?.solidAt?.(sp.x, sp.z, -0.05, Number.isFinite(y0) ? y0 : null)) flag('propOverlap', name, `${sp.id || sp.kind} inside a solid @${f2(sp.x)},${f2(sp.z)}`);   // hovering panels / drones carry their ground y in gy
+      if (ctx === ctxOut && !Number.isFinite(sp.gy) && out?.solidAt?.(sp.x, sp.z, -0.05, Number.isFinite(y0) ? y0 : null)) flag("propOverlap", name, `${tag.moonId} ${sp.id || sp.kind} inside a solid @${f2(sp.x)},${f2(sp.z)}`);   // hovering panels / drones carry their ground y in gy
       if (Number.isFinite(y0) && y0 > gy + 1.5) flag('floating', name, `${sp.id || sp.kind} plan y ${f2(y0)} ground ${f2(gy)}`);
       if (Number.isFinite(y0) && y0 < gy - 1.2) flag('buried', name, `${sp.id || sp.kind} plan y ${f2(y0)} ground ${f2(gy)}`);
     }
