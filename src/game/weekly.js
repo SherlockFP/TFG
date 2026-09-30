@@ -25,7 +25,7 @@ export const WEEKLY_MODS = [
   { id: 'fragile', name: 'Fragile Economy', desc: 'Scrap +30%, max health -15%.', valueMul: 1.3, hpMul: 0.85, mood: 'mixed' },
   { id: 'deadline', name: 'Crunch Time', desc: 'The clock runs 20% faster. Scrap +20%.', timeMul: 1.2, valueMul: 1.2, mood: 'bad' },
   { id: 'uplink', name: 'Clear Signal', desc: 'Scan range +50%.', scanMul: 1.5, mood: 'good' },
-  { id: 'elite', name: 'Elite Queue', desc: 'Elites +10%. Clout +20%.', eliteAdd: 0.1, coinMul: 1.2, mood: 'bad' },
+  { id: 'elite', name: 'Elite Queue', desc: 'Elites +10%. Followers +20%.', eliteAdd: 0.1, coinMul: 1.2, mood: 'bad' },
   { id: 'drops', name: 'Sponsored Week', desc: 'Air drops near the ship every ~2 min.', drops: 120, mood: 'good' },
 ];
 const MOD_BY_ID = Object.fromEntries(WEEKLY_MODS.map((m) => [m.id, m]));

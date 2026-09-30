@@ -299,7 +299,7 @@ export default {
   " · Lv.{n}": " · Ур. {n}",
   " (Black Market)": " (Чёрный рынок)",
   "Lv.{level} · {rankOf} · {xp}/{xpForLevel} XP": "Ур. {level} · {rankOf} · {xp}/{xpForLevel} XP",
-  "◈ {coins} Clout": "◈ {coins} Клаут",
+  "◈ {coins} Followers": "◈ {coins} Подписчики",
   "HP {maxHp} · Stamina {maxStamina} · Armor {n}%": "HP {maxHp} · Выносливость {maxStamina} · Броня {n}%",
   "Melee ×{n} · Crit {n2}% · Speed ×{n3}": "Ближний бой ×{n} · Крит {n2}% · Скорость ×{n3}",
   "Scan {scanRange} m · Battery ×{n} · Carry relief {carryRelief} lb": "Скан {scanRange} м · Батарея ×{n} · Облегчение веса {carryRelief} фнт",

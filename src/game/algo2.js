@@ -273,7 +273,7 @@ export function installAlgo2(game) {
     try {
       if (m.coin) game.progress?.addCoins?.(m.coin, 'Live stream bonus');
       if (m.xp) game.progress?.addXp?.(m.xp, 'Live stream bonus');
-      game.ui?.hud?.toast?.(tf('The audience loved that. {t} tier: {n} Clout each.', { t: names[m.tier] || '', n: m.coin }), 'good');
+      game.ui?.hud?.toast?.(tf('The audience loved that. {t} tier: {n} Followers each.', { t: names[m.tier] || '', n: m.coin }), 'good');
       if (m.crate && game.profile) {
         grantCrate(game.profile, m.crate.kind, 'sponsor', m.crate.tier ? { tier: m.crate.tier } : {});
         game.progress?.save?.();

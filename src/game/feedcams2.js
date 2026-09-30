@@ -31,7 +31,7 @@ const JAM_TIP = 'LMB: on / off. Cameras and drones within 8 m go blind while it 
 registerItem({ id: C.JAM.id, name: 'Signal Jammer', kind: 'tool', price: C.JAM.price, weight: 2, hands: 1, battery: C.JAM.battery, tier: 'uncommon', tip: JAM_TIP });
 if (!STORE_ITEMS.includes(C.JAM.id)) STORE_ITEMS.push(C.JAM.id);
 const TIPS = [
-  'Big scrap. Walk it past one of my cameras and my sponsors tip you Clout. I still take my cut, of course.',
+  'Big scrap. Walk it past one of my cameras and my sponsors tip you Followers. I still take my cut, of course.',
   'Night shift. My drones sweep the entrance with searchlights. Same rules as the cameras: stay out of the light, or shoot them down.',
 ];
 const ST = { OK: 0, BLIND: 1, DEAD: 2 };
@@ -314,7 +314,7 @@ export function installFeedcams2(game) {
     const me = game.selfId;
     if (d.k === 'say') { try { game.lore?.say?.(tf(d.s, d.v || {}), { mood: 'curious' }); } catch { /* lore optional */ } }
     else if (d.k === 'tip') { if (d.to === me && d.n > 0) { try { game.progress?.addCoins?.(d.n, 'Sponsor tip'); } catch { /* progress optional */ } } }
-    else if (d.k === 'show') toast(d.n > 0 ? tf('{name} showcased the {item} live: sponsors tipped {n} Clout.', { name: nameOf(d.id), item: t(d.name || '?'), n: d.n }) : tf('{name} showcased the {item} live. The sponsors are out of budget today.', { name: nameOf(d.id), item: t(d.name || '?') }), 'good');
+    else if (d.k === 'show') toast(d.n > 0 ? tf('{name} showcased the {item} live: sponsors tipped {n} Followers.', { name: nameOf(d.id), item: t(d.name || '?'), n: d.n }) : tf('{name} showcased the {item} live. The sponsors are out of budget today.', { name: nameOf(d.id), item: t(d.name || '?') }), 'good');
     else if (d.k === 'tut') { toast(tf('Clean pass. The Algorithm saw nothing: +▮{n}', { n: d.n }), 'good'); try { game.onboard?.fr?.camDone?.(); } catch { /* onboard optional */ } }   // [cam90] the outdoor pass ends the camera objective for good
     else if (d.k === 'dd' || d.k === 'dz') {
       const dr = S.drones[d.i | 0]; if (!dr || !S.ground) return;

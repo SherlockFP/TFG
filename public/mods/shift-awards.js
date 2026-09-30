@@ -11,9 +11,9 @@ KefalAPI.defineMod({
   scope: 'host',
   category: 'social',
   enabledByDefault: true,
-  description: 'After each moon the Algorithm names the Marathoner, the Life of the Party, the Chatterbox and the Homebody. Winners get 10 Clout. Needs 2+ crewmates.',
+  description: 'After each moon the Algorithm names the Marathoner, the Life of the Party, the Chatterbox and the Homebody. Winners get 10 Followers. Needs 2+ crewmates.',
   config: {
-    reward: { type: 'number', default: 10, min: 0, max: 100, label: 'Clout per award' },
+    reward: { type: 'number', default: 10, min: 0, max: 100, label: 'Followers per award' },
   },
   init(api, cfg) {
     const tf = api.tf;

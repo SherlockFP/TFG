@@ -1,4 +1,4 @@
-// Passive-tree operations on a profile: allocate (whole path), refund (Clout), respec, role switch.
+// Passive-tree operations on a profile: allocate (whole path), refund, respec, role switch. [followers] refunds / respec / role switches are FREE: Followers are never spent.
 // Used identically in game (rpg.js wires hooks to the Progress / stats / net layer) and from the main menu (profile only),
 // so both entry points obey the same rules. Pure w.r.t. three / DOM; returns { ok, msg } for the UI to show.
 import { saveProfile } from '../core/save.js';
@@ -12,7 +12,6 @@ const freshOf = (p) => { let s = freshByProfile.get(p.id); if (!s) freshByProfil
 
 /**
  * hooks (all optional):
- *   spendCoins(c) -> bool     charge Clout (default: straight from the profile)
  *   changed(kind, detail)     after any mutation: 'alloc' | 'refund' | 'respec' | 'role'  (default: save the profile)
  *   canRespec() -> {ok,msg}   gate for refunds / respec (default: always)
  *   canChangeRole() -> {ok,msg}
@@ -20,7 +19,6 @@ const freshOf = (p) => { let s = freshByProfile.get(p.id); if (!s) freshByProfil
 export function createRpgController(profile, hooks = {}) {
   ensureRpgProfile(profile);
   const st = () => profile.rpg;
-  const spend = hooks.spendCoins || ((c) => { if (profile.coins < c) return false; profile.coins -= c; return true; });
   const changed = (kind, detail) => { (hooks.changed || (() => saveProfile(profile)))(kind, detail); };
   const fresh = () => freshOf(profile);
   const gateRespec = () => (hooks.canRespec ? hooks.canRespec() : { ok: true });
@@ -65,53 +63,46 @@ export function createRpgController(profile, hooks = {}) {
       const r = T.planRefund(st(), id);
       if (!r.ok) return { ...r, cost: 0, free: false };
       const free = fresh().has(id);
-      return { ok: true, reason: '', cost: free ? 0 : T.refundCost(n), free };
+      return { ok: true, reason: '', cost: 0, free: true };
     },
     refund(id) {
       const info = ctl.refundInfo(id);
       if (!info.ok) return { ok: false, msg: info.reason };
-      if (info.cost > 0 && !spend(info.cost)) return { ok: false, msg: `Refund costs ◈${info.cost} Clout` };
       st().nodes = st().nodes.filter((x) => x !== id);
       fresh().delete(id);
       profile.skillPoints += T.nodeCost(T.NODE[id]);
       changed('refund', { id, cost: info.cost });
-      return { ok: true, msg: info.cost ? `Refunded (${'◈'}${info.cost})` : 'Refunded (free undo)' };
+      return { ok: true, msg: 'Refunded (free undo)' };
     },
 
-    respecCost() {
-      let c = 0;
-      for (const id of st().nodes) if (!fresh().has(id)) c += T.refundCost(T.NODE[id]);
-      return Math.floor(c * 0.6);
-    },
+    respecCost() { return 0; },   // [followers] free
     respecAll() {
       const g = gateRespec();
       if (!g.ok) return { ok: false, msg: g.msg };
       if (!st().nodes.length) return { ok: false, msg: 'Nothing to refund' };
       const cost = ctl.respecCost();
-      if (cost > 0 && !spend(cost)) return { ok: false, msg: `Respec costs ◈${cost} Clout` };
       const back = T.treeSpent(st());
       st().nodes = [];
       fresh().clear();
       profile.skillPoints += back;
       changed('respec', { cost, points: back });
-      return { ok: true, msg: `Respec done: ${back} points back${cost ? ` (◈${cost})` : ''}` };
+      return { ok: true, msg: `Respec done: ${back} points back` };
     },
 
-    previewRole(id) { return { ...T.planRoleSwitch(st(), id), current: st().role === id }; },
+    previewRole(id) { return { ...T.planRoleSwitch(st(), id), clout: 0, current: st().role === id }; },   // [followers] role switches are free
     setRole(id) {
       if (!T.ROLES[id]) return { ok: false, msg: 'Unknown role' };
       if (st().role === id) return { ok: true, msg: 'Already your role', same: true };
       const g = gateRole();
       if (!g.ok) return { ok: false, msg: g.msg };
       const plan = T.planRoleSwitch(st(), id);
-      if (plan.clout > 0 && !spend(plan.clout)) return { ok: false, msg: `Switching refunds ${plan.orphans.length} node(s) for ◈${plan.clout} Clout - you cannot afford it` };
       const drop = new Set([...plan.orphans, ...plan.freed]);
       st().nodes = st().nodes.filter((x) => !drop.has(x));
       for (const x of drop) fresh().delete(x);
       profile.skillPoints += plan.points;
       const prev = st().role;
       st().role = id;
-      changed('role', { role: id, prev, refunded: plan.orphans.length, clout: plan.clout });
+      changed('role', { role: id, prev, refunded: plan.orphans.length, clout: 0 });
       return { ok: true, msg: `You are now ${aAn(T.ROLES[id].name)} ${T.ROLES[id].name}`, role: id, prev };
     },
   };

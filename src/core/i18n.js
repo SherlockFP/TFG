@@ -490,7 +490,7 @@ const TR = {
   'Taking off...': 'Kalkış yapılıyor...',
   'Put scrap on the COUNTER, ring the BELL (▮{v} on board)': 'Hurdayı TEZGÂHA koy, ZİLİ çal (gemide ▮{v})',
   'Quota: ▮{a} / ▮{b} · buying at {r}%': 'Kota: ▮{a} / ▮{b} · alım %{r}',
-  'Spend your ◈{c} clout at Phish Dayı': "◈{c} nüfuzunu Phish Dayı'da harca",
+  'Claim what your ◈{c} followers unlocked at Phish Dayı': "◈{c} takipçinin açtıklarını Phish Dayı'dan al",
   'You have been deplatformed.': 'Platformdan atıldın.',
   '(claim at HQ)': "(HQ'da al)",
 };

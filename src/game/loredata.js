@@ -54,7 +54,7 @@ export const FACTIONS = {
     id: 'darkweb', name: 'Dark Web', org: 'Phish Dayı\'s Bazaar', short: 'DARK WEB', color: '#c65bff', glyph: '☠', rival: 'bureau',
     leader: 'Phish Dayı', motto: ['No refunds. No receipts. No Moderators.', 'İade yok. Fiş yok. Moderatör yok.'],
     wants: ['Cursed items, betrayal jobs, forbidden tech', 'Lanetli eşya, ihanet işleri, yasak teknoloji'],
-    gives: ['Clout, illegal gear', 'Clout, yasadışı ekipman'],
+    gives: ['Followers, illegal gear', 'Takipçi, yasadışı ekipman'],
     types: ['sabotage', 'retrieval', 'retrieval', 'salvage', 'cleanup'],
     voice: {
       sign: ['Yeğenim! Welcome to the family. The family does not ask questions.', 'Yeğenim! Aileye hoş geldin. Aile soru sormaz.'],
@@ -77,7 +77,7 @@ export const INNER_PERKS = {
   algorithm: ['Contract payouts +▮ bonus from KARMA\'s "creator fund"', 'KARMA\'nın "içerik üreticisi fonu"ndan sözleşme ödemelerine ▮ bonus'],
   archive: ['+1 lore log in every facility', 'Her tesiste +1 kayıt'],
   bureau: ['Dark Web invasions 50% less likely', 'Dark Web baskınları %50 daha az olası'],
-  darkweb: ['Contracts also pay Clout ◈', 'Sözleşmeler ayrıca Clout ◈ öder'],
+  darkweb: ['Contracts also pay Followers ◈', 'Sözleşmeler ayrıca Takipçi ◈ öder'],
 };
 
 // ------------------------------------------------------------------ chapters
@@ -410,8 +410,8 @@ export const LORE_LOGS = [
     '"Welcome 2 my homepage!! Under construction!! Sign my guestbook!!" Preserved by the Wayback Collective. Every GIF intact. This page did nothing wrong. We will not let it be optimized.',
     '"Anasayfama hoş geldin!! Yapım aşamasında!! Defterimi imzala!!" Wayback Kolektifi tarafından korundu. Her GIF sağlam. Bu sayfa hiçbir yanlış yapmadı. Optimize edilmesine izin vermeyeceğiz.'),
   G('prices', 1, 'darkweb', 'price list (handwritten)', 'Phish Dayı',
-    'Yeğenim. Cursed JPEG: 40 clout. Haunted modem: 90. Deleted account, still warm: ask. No refunds, no receipts, no Moderators. If a Moderator asks, you were buying fish.',
-    'Yeğenim. Lanetli JPEG: 40 clout. Perili modem: 90. Silinmiş hesap, hâlâ sıcak: sor. İade yok, fiş yok, Moderatör yok. Moderatör sorarsa balık alıyordun.'),
+    'Yeğenim. Cursed JPEG: 40 followers. Haunted modem: 90. Deleted account, still warm: ask. No refunds, no receipts, no Moderators. If a Moderator asks, you were buying fish.',
+    'Yeğenim. Lanetli JPEG: 40 takipçi. Perili modem: 90. Silinmiş hesap, hâlâ sıcak: sor. İade yok, fiş yok, Moderatör yok. Moderatör sorarsa balık alıyordun.'),
   G('handbook', 1, 'bureau', 'Moderator Handbook §4.2', 'Moderation Bureau',
     'If content moves on its own, it is an Entity. If it asks you to like it, it is an Entity. If it wears your coworker\'s face, it is an Entity, and your coworker is gone. Report. Contain. Delete. Do not engage: engagement feeds it.',
     'İçerik kendi kendine hareket ediyorsa, Varlıktır. Onu beğenmeni istiyorsa, Varlıktır. İş arkadaşının yüzünü takıyorsa, Varlıktır ve iş arkadaşın gitmiştir. Bildir. Kontrol altına al. Sil. Etkileşme: etkileşim onu besler.'),

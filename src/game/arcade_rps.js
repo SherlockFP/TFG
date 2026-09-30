@@ -1,8 +1,8 @@
 // ROCK - PAPER - SCISSORS (module `arcade`, pure host rules; node-tested by tools/harness/arcade.test.mjs). No DOM / three / game access.
 // Best of 3 between two crewmates. Commit-reveal: a pick travels ONLY to the host (`arreq` rps pk); the host tells both players just "X has picked" (no value)
 // and reveals both picks in a single `rpsv` event once both are in (or the pick timer ran out: the missing pick is random). Nobody can react to the other pick.
-// A draw replays the round (max 7 rounds, then the leader wins, or a draw). Optional wager in Clout (personal currency): the winner is paid by the host
-// (capped per day), the loser's client deducts exactly what the host paid. Wagers never touch the shared ship credits.
+// A draw replays the round (max 7 rounds, then the leader wins, or a draw). Optional stake in Followers: the winner is paid by the host
+// (capped per day); Followers are never spent, so the loser loses nothing. Wagers never touch the shared ship credits.
 // Host events are plain objects { to: [pids] | 'all', msg } collected in mgr.out and drained by game/arcade.js (which turns them into `ar` net messages).
 export const RPS = {
   WINS: 2, MAX_ROUNDS: 7, PICK_SEC: 8, INTRO_SEC: 1.6, RESULT_SEC: 3.8, CHALLENGE_SEC: 20,
@@ -59,7 +59,7 @@ export function createRpsHost({ rnd = Math.random, day = () => 0 } = {}) {
     challenge(now, from, to, wager) {
       if (!from || !to || from === to) return { ok: false, err: 'Pick a crewmate.' };
       wager = Math.floor(+wager) || 0;
-      if (wager < 0 || wager > RPS.WAGER_MAX) return { ok: false, err: 'Wagers go up to {n} Clout.', vars: { n: RPS.WAGER_MAX } };
+      if (wager < 0 || wager > RPS.WAGER_MAX) return { ok: false, err: 'Wagers go up to {n} Followers.', vars: { n: RPS.WAGER_MAX } };
       if (byPid.has(from)) return { ok: false, err: 'You are already in a game.' };
       if (byPid.has(to)) return { ok: false, err: 'They are busy.' };
       if (now - (lastAsk.get(from) ?? -99) < RPS.COOLDOWN) return { ok: false, err: 'Wait a moment.' };

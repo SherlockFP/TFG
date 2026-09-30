@@ -122,7 +122,7 @@ export function installResto(game) {
     if (C.contractServe(s, c.q)) {
       const ct = s.ct; game.run.credits += ct.reward; s.ct = null; s.ctAt = day(); s.ctDone += 1; cloutAll(C.ECON.contractClout, 'Food Festival');
       try { game.algo1?.bump?.('review', 'festival'); } catch { /* optional */ }
-      say(null, { k: 'banner', main: 'FOOD FESTIVAL COMPLETE', sub: '+{r} credits, +{c} Clout each', v: { r: ct.reward, c: C.ECON.contractClout } });
+      say(null, { k: 'banner', main: 'FOOD FESTIVAL COMPLETE', sub: '+{r} credits, +{c} Followers each', v: { r: ct.reward, c: C.ECON.contractClout } });
       commit(['credits']); return;
     }
     if (C.starsOf(s) > before) say(null, { k: 'banner', main: 'DINER: {n} STARS', v: { n: C.starsOf(s) }, sub: 'New menu and pieces unlocked.' });
@@ -504,7 +504,7 @@ export function installResto(game) {
       case 'dep': game.ui?.toast(tf('Stocked {n} ingredients.', { n: m.n }), 'good'); game.audio?.play?.('ui_confirm', { volume: 0.4, bus: 'ui' }); break;
       case 'till': game.ui?.toast(tf('Collected {n} credits from the till.', { n: m.n }), 'good'); game.audio?.play?.('coins', { volume: 0.7 }); break;
       case 'pay': { const at = new THREE.Vector3(m.x, HOME_Y + 1.5, m.z); game.sound2?.cue('resto_bell', at, 0.6); game.sound2?.cue('alien_chatter', at, 0.5, { pitch: 1.25, delay: 0.25 }); game.audio?.play?.('coins', { volume: 0.25 });   // [sound2]
-         game.particles?.burst?.(new THREE.Vector3(m.x, HOME_Y + 1.5, m.z), 'sparks'); if (m.by === me()) { const [n, w] = String(m.extra || '').split('|'); game.ui?.toast(`+${m.amt}${w ? ` ${n} ${t(w === 'scrap' ? 'scrap' : 'Clout tip')}` : ''}`, 'good'); } break; }
+         game.particles?.burst?.(new THREE.Vector3(m.x, HOME_Y + 1.5, m.z), 'sparks'); if (m.by === me()) { const [n, w] = String(m.extra || '').split('|'); game.ui?.toast(`+${m.amt}${w ? ` ${n} ${t(w === 'scrap' ? 'scrap' : 'Followers tip')}` : ''}`, 'good'); } break; }
       case 'cooked': game.particles?.burst?.(new THREE.Vector3(m.x, HOME_Y + 1.3, m.z), m.q === 0 ? 'dust' : 'sparks'); if (m.q === 0) game.audio?.play?.('ui_error', { volume: 0.35, bus: 'ui' }); else game.sound2?.cue('resto_sizzle', new THREE.Vector3(m.x, HOME_Y + 1.3, m.z), 0.7); break;   // [sound2] kitchen sizzle
       case 'angry': game.sound2?.cue('alien_chatter', new THREE.Vector3(m.x, HOME_Y + 1.8, m.z), 0.7, { pitch: 0.7 }); game.particles?.burst?.(new THREE.Vector3(m.x, HOME_Y + 1.8, m.z), 'dust'); break;   // [sound2] grumbling
       case 'swat': game.particles?.burst?.(new THREE.Vector3(m.x, HOME_Y + 0.2, m.z), 'goo'); break;

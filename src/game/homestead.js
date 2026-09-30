@@ -153,7 +153,7 @@ export function installHomestead(game) {
         game.particles?.burst?.(at, 'sparks');
         if (!m.a) { game.audio?.play?.('coins', { volume: 0.7 }); game.ui?.hud?.floatText?.(at, `${m.n ? `+${m.n} ▮` : ''}${m.cl ? `${m.n ? ' · ' : ''}+${m.cl} ◈` : ''}`, '#ffd23f'); }
         else game.audio?.play?.('coins', { volume: 0.2 });
-        if (m.by === me() && m.cl) game.ui?.toast(tf('+{n} Clout for the crew', { n: m.cl }), 'good');
+        if (m.by === me() && m.cl) game.ui?.toast(tf('+{n} followers for the crew', { n: m.cl }), 'good');
         break;
       }
       case 'reclaim': {

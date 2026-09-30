@@ -53,8 +53,8 @@ export const DAILY_EVENTS = [
     tr: ['GECE VARDİYASI', 'Otopilot 15:00\'te iner. Daha az gün ışığı, hurda +%45 değerli.'] },
   { id: 'supplydrop', name: 'SPONSORED DROP', desc: 'A sponsor is air-dropping content near the ship every ~90 s. Grab it before it rots.', drops: 90, mood: 'good', w: 0.9,
     tr: ['SPONSORLU DÜŞÜŞ', 'Bir sponsor her ~90 sn geminin yakınına içerik atıyor. Çürümeden kap.'] },
-  { id: 'toxic', name: 'TOXIC COMMENTS', desc: 'Elite creatures are far more common. Clout rewards +25%, scrap +10%.', eliteAdd: 0.15, coinMul: 1.25, valueMul: 1.1, dangerMul: 1.1, mood: 'bad', w: 0.9,
-    tr: ['TOKSİK YORUMLAR', 'Elit yaratıklar çok daha yaygın. Clout ödülleri +%25, hurda +%10.'] },
+  { id: 'toxic', name: 'TOXIC COMMENTS', desc: 'Elite creatures are far more common. Followers rewards +25%, scrap +10%.', eliteAdd: 0.15, coinMul: 1.25, valueMul: 1.1, dangerMul: 1.1, mood: 'bad', w: 0.9,
+    tr: ['TOKSİK YORUMLAR', 'Elit yaratıklar çok daha yaygın. Followers ödülleri +%25, hurda +%10.'] },
   { id: 'uplink', name: 'SATELLITE UPLINK', desc: 'A clean signal: scanner range +60% and batteries last 30% longer.', scanMul: 1.6, batteryMul: 1.3, mood: 'good', w: 0.9,
     tr: ['UYDU BAĞLANTISI', 'Temiz sinyal: tarama menzili +%60, piller %30 daha uzun dayanır.'] },
 ];
@@ -112,7 +112,7 @@ export function eventEffects(e) {
   if (e.dangerMul && e.dangerMul !== 1) out.push(`danger ${pct(e.dangerMul)}`);
   if (e.outdoorMul) out.push(`outdoor loot ${pct(e.outdoorMul)}`);
   if (e.xpMul) out.push(`XP ${pct(e.xpMul)}`);
-  if (e.coinMul) out.push(`Clout ${pct(e.coinMul)}`);
+  if (e.coinMul) out.push(`Followers ${pct(e.coinMul)}`);
   if (e.hpMul) out.push(`max HP ${pct(e.hpMul)}`);
   if (e.meleeMul) out.push(`melee ${pct(e.meleeMul)}`);
   if (e.jumpMul) out.push(`jump ${pct(e.jumpMul)}`);

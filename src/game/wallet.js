@@ -1,13 +1,14 @@
-// WALLET (wave 5, "unify"): the game has exactly TWO currencies.
-//   Credits  ▮  the crew's money (run.credits): sold scrap, quota, store, zone fortify, trap arming. Shared, lives with the run.
-//   Clout    ◈  your personal reputation money (profile.coins): cosmetics, forge extras, personal unlocks. Yours, kept between runs.
+// WALLET (wave 5 "unify", wave 9 "followers"): the game has ONE currency and ONE score.
+//   Credits    ▮  the crew's money (run.credits): sold scrap, quota, store, zone fortify, trap arming. Shared, lives with the run.
+//   Followers  ◈  your channel's size (profile.coins, the old Clout field: same save key, values kept). It only GROWS and is NEVER spent:
+//                 what Clout used to buy is now a MILESTONE UNLOCK at a follower count (unlockAt / claimable / nextMilestone below).
 // Everything else that used to look like money is a MATERIAL (crafting input, never a price): components (comp_*), forge shards (shard_*), the homeworld stash
 // (parts / meals / s1-s4). Season XP and level XP are PROGRESS, not money. Pure (no DOM / game access), node-tested by tools/harness/wallet.test.mjs.
 import { t, addTranslations } from '../core/i18n.js';
 
 export const CURRENCIES = {
   credits: { icon: '▮', name: 'Credits', scope: 'crew' },
-  clout: { icon: '◈', name: 'Clout', scope: 'personal' },
+  clout: { icon: '◈', name: 'Followers', scope: 'personal', spendable: false },   // id stays 'clout' (save / store keys); it is FOLLOWERS to the player
 };
 addTranslations({ Materials: 'Malzemeler', 'Materials: crafting only, not money': 'Malzeme: sadece üretim için, para değil' }, 'tr');
 addTranslations({ Materials: 'Материалы', 'Materials: crafting only, not money': 'Материал: только для крафта, не деньги' }, 'ru');
@@ -57,3 +58,25 @@ export function countMaterials(itemTypes = [], store = null) {
 /** [trim] is Clout a wallet the player can SPEND yet? Credits are the only money of the first hour: a fresh staged profile meets Clout prices (Company Store,
  *  terminal store list, Black Market) at the same unlock as the store's rare stock (hubgate 'shop', quota 1). Veterans / unlock-everything / no onboard: always. */
 export const cloutOpenOf = (game) => { try { return !game?.onboard?.locked?.('shop'); } catch { return true; } };
+
+// ---------------------------------------------------------------- [followers] milestone unlocks (pure; nothing here ever subtracts)
+/** followers needed for something that used to cost `price` Clout: the balance is never spent, so the threshold is a multiple of the old price */
+export const FOLLOWER_MULT = 2;
+export const unlockAt = (price) => Math.max(0, Math.round((Number(price) || 0) * FOLLOWER_MULT));
+/** the followers of a game / profile-like object (profile.coins is the persisted follower count) */
+export const followersOf = (game) => Math.max(0, Math.floor(Number(game?.profile?.coins ?? game?.progress?.p?.coins ?? game?.coins) || 0));
+/** true when `followers` reaches the unlock of something that used to cost `price` Clout */
+export const claimable = (followers, price) => (Number(followers) || 0) >= unlockAt(price);
+/** the general ladder shown on the Tab card when no specific unlock is closer */
+export const FOLLOWER_LADDER = [50, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000];
+/** next milestone above `followers`: { at, prev, pct (0-1 progress from prev to at), name? }. `extra` = [{ at, name }] specific unlocks (cosmetics...). null when past the ladder. */
+export function nextMilestone(followers, extra = []) {
+  const f = Math.max(0, Number(followers) || 0);
+  const pool = [...FOLLOWER_LADDER.map((at) => ({ at })), ...extra.filter((x) => x && x.at > 0)].filter((x) => x.at > f).sort((a, b) => a.at - b.at);
+  const nx = pool[0];
+  if (!nx) return null;
+  const prev = Math.max(0, ...[0, ...FOLLOWER_LADDER, ...extra.map((x) => x?.at || 0)].filter((a) => a <= f));
+  return { ...nx, prev, pct: Math.max(0, Math.min(1, (f - prev) / Math.max(1, nx.at - prev))) };
+}
+addTranslations({ 'Unlocks at {n} followers': '{n} takipçide açılır', 'Followers': 'Takipçi', 'followers': 'takipçi', 'Claim': 'Al', 'Next milestone': 'Sonraki eşik', '{n} / {m} followers': '{n} / {m} takipçi' }, 'tr');
+addTranslations({ 'Unlocks at {n} followers': 'Откроется при {n} подписчиках', 'Followers': 'Подписчики', 'followers': 'подписчики', 'Claim': 'Забрать', 'Next milestone': 'Следующая веха', '{n} / {m} followers': '{n} / {m} подписчиков' }, 'ru');

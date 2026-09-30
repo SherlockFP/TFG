@@ -89,7 +89,7 @@ export function createHomeworld2Panel(ui, game, hw2, opts = {}) {
       <div class="row"><span>${costHtml(c, hw, wallet())}</span><span class="sub">${escapeHtml(t('floor + walls + door + roof + furniture'))}</span></div></div>`;
   }
   const KIT_NAME = { storage: 'Storage Room', workshop: 'Workshop', bedroom: 'Bedroom', greenhouse: 'Greenhouse' };
-  const KIT_DESC = { storage: 'Three crates: storage +60 %.', workshop: 'Two benches: every machine +12 % speed.', bedroom: 'A bed under a roof: slow passive Clout.', greenhouse: 'A planter under a roof: trees grow twice as fast.' };
+  const KIT_DESC = { storage: 'Three crates: storage +60 %.', workshop: 'Two benches: every machine +12 % speed.', bedroom: 'A bed under a roof: slow passive Followers.', greenhouse: 'A planter under a roof: trees grow twice as fast.' };
   function renderBuild() {
     let h = `<div class="h2-note">${escapeHtml(t('Pick a piece, then LMB on the grid. Hold LMB to drag belts, floors and walls. R rotates, X removes, U upgrades, RMB / ESC leaves.'))}</div>`;
     h += `<div class="h2-cat">${escapeHtml(t('FACTORY'))}</div><div class="h2-grid">${X.TYPES.filter((k) => X.PT[k].cat === 'fac').map(card).join('')}</div>`;
@@ -142,7 +142,7 @@ export function createHomeworld2Panel(ui, game, hw2, opts = {}) {
       <span class="h2-note">${escapeHtml(t('The factory runs while you are online (any phase). While you are away it earns 10 % of the live rate for up to 8 hours, and it can never pay more than your storage holds.'))}</span></div>
       <div class="h2-box">${wave}<br><span class="h2-note">${escapeHtml(t('Waves come only while somebody is on the homeworld. A lost wave breaks a machine or two (repair it, nothing is ever deleted) and raises a shield.'))}</span></div>
       <div class="h2-row"><button class="btn" data-op="collect">${escapeHtml(t('COLLECT'))}</button><span class="h2-note">${escapeHtml(t('(the classic homeworld console also collects)'))}</span></div>
-      <div class="h2-box h2-note">${escapeHtml(t('Rooms: ') + `${m.rooms || 0} ${t('closed rooms')} · ${t('storage')} +${Math.round((m.storage || 0) * 100)}% · ${t('machine speed')} +${Math.round((m.speed || 0) * 100)}% · Clout ${f1(m.clout || 0)}/${t('min')}`)}</div>`);
+      <div class="h2-box h2-note">${escapeHtml(t('Rooms: ') + `${m.rooms || 0} ${t('closed rooms')} · ${t('storage')} +${Math.round((m.storage || 0) * 100)}% · ${t('machine speed')} +${Math.round((m.speed || 0) * 100)}% · Followers ${f1(m.clout || 0)}/${t('min')}`)}</div>`);
     mainEl.querySelectorAll('[data-op]').forEach((n) => n.addEventListener('click', () => { ui.sfx?.('ui_click', 0.5); if (n.dataset.op === 'collect') game.homeworld?.req?.('collect', {}); else hw2.req(n.dataset.op, {}); }));
   }
 

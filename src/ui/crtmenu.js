@@ -325,7 +325,7 @@ export class CRTMenu {
     ctx.fillStyle = '#ffd9b8'; ctx.fillText(fit(`${t('Lv.')}${p.level}  ${t(rankOf(p.level))}${p.title ? ' · ' + p.title : ''}`, 22, W - 100), 12, 46);
     ctx.fillStyle = '#3a2412'; ctx.fillRect(12, 78, W - 24, 10);
     ctx.fillStyle = '#ff9a4a'; ctx.fillRect(12, 78, (W - 24) * Math.min(1, p.xp / xpForLevel(p.level)), 10);
-    ctx.fillStyle = '#ffd23f'; ctx.font = FONT(24); ctx.fillText(tf('◈ {coins} clout', { coins: p.coins }), 12, 100);
+    ctx.fillStyle = '#ffd23f'; ctx.font = FONT(24); ctx.fillText(tf('◈ {coins} followers', { coins: p.coins }), 12, 100);
     ctx.fillStyle = '#c9a98a'; ctx.font = FONT(19);
     ctx.fillText(tf('kills {kills} · quotas {quotas} · deaths {deaths}', { kills: p.stats.kills, quotas: p.stats.quotasMet, deaths: p.stats.deaths }), 12, 134);
     ctx.fillText(t('[PROFILE] name / avatar'), 12, 158);

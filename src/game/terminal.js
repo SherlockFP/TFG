@@ -436,7 +436,6 @@ export class Terminal {
         return;
       }
       case 'cart': { if (g.shop?.hostCart) g.shop.hostCart(cmd, from, reply); else reply('The store is offline.', true); return; }
-      case 'coinbuy': { if (g.shop?.hostCoin) g.shop.hostCoin(cmd, from, reply); else reply('The store is offline.', true); return; }
       case 'buy': {
         if (g.shop?.hostCart) { g.shop.hostCart({ lines: [{ id: cmd.item, n: cmd.n }] }, from, reply); return; }   // same deal prices / stock / delivery as the store screen
         const d = itemDef(cmd.item);

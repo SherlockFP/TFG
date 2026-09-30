@@ -2,6 +2,7 @@
 // SKINS (collars, hats, colours, seasonal; some from achievements, some for Clout) - SHOP (HQ only). Dark CRT / amber look, self-contained DOM + CSS.
 import { t, tf } from '../../core/i18n.js';
 import * as C from '../../game/pets_core.js';
+import { unlockAt } from '../../game/wallet.js';
 import { createPetStudio, petSig } from './pets_studio.js';
 
 const STYLE_ID = 'tfg-pets-style';
@@ -63,7 +64,7 @@ export function createPetsPanel({ game, api, tab } = {}) {
   studio.start();
   const sfx = (n = 'ui_click') => { try { game?.audio?.ui?.(n, 0.5); } catch { /* ignore */ } };
   const st = () => api.state();
-  const msg = (r) => { if (r && !r.ok && r.err) game?.ui?.toast?.(t(r.err), 'warn'); sfx(r?.ok === false ? 'ui_error' : 'ui_click'); render(); };
+  const msg = (r) => { if (r && !r.ok && r.err) game?.ui?.toast?.(r.need ? tf('Unlocks at {n} followers', { n: r.need }) : t(r.err), 'warn'); sfx(r?.ok === false ? 'ui_error' : 'ui_click'); render(); };
 
   // ---- STABLE: list with portraits (left) | turntable + level / XP / loyalty + actions + abilities (right)
   const portraits = new Map();
@@ -162,7 +163,7 @@ export function createPetsPanel({ game, api, tab } = {}) {
         const acc = C.skinAccess(ctx, cat, d.id);
         const name = cat === 'v' ? t(C.colourName(p.sp, d.id)) : t(d.name);
         if (acc.ok) row.appendChild(btn(name, () => msg(api.equip(p.id, cat, d.id)), p.sk[cat] === d.id ? 'sel' : ''));
-        else if (acc.why === 'buy') row.appendChild(btn(`${name} ◈${acc.cost}`, () => { const r = api.buySkin(cat, d.id); if (r.ok) api.equip(p.id, cat, d.id); msg(r); }));
+        else if (acc.why === 'buy') row.appendChild(btn(`${name} ◈${unlockAt(acc.cost)}`, () => { const r = api.buySkin(cat, d.id); if (r.ok) api.equip(p.id, cat, d.id); msg(r); }));
         else row.appendChild(btn(`${name} (${acc.why === 'ach' ? t('Locked') : t('Seasonal')})`, null, 'dis'));
       }
       body.appendChild(row);
@@ -175,7 +176,7 @@ export function createPetsPanel({ game, api, tab } = {}) {
     for (const id of C.SHOP_SPECIES) {
       const d = C.SPECIES[id], row = mk('div', 'pt-row');
       row.append(mk('span', '', `${t(d.name)} - ${t(d.roleName)}`), mk('span', 'pt-note', t(d.desc)));
-      row.appendChild(btn(`${t('Buy')} ◈${d.price}`, () => msg(api.buyPet(id)), hq ? '' : 'dis'));
+      row.appendChild(btn(`${t('Adopt')} ◈${unlockAt(d.price)}`, () => msg(api.buyPet(id)), hq ? '' : 'dis'));
       body.appendChild(row);
     }
   }

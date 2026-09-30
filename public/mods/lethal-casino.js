@@ -1,6 +1,6 @@
 // lethal-casino — port of LethalCasino (mrgrm7) + GamblingMachineAtTheCompany.
 // Adds a roulette table to the GACHA MACHINE corner at 0-Algorithm HQ (next to the slot machines).
-// Bets use your personal Clout. Big wins are announced to the crew.
+// Bets use table CHIPS (session only): Followers are never spent. Big wins are announced to the crew.
 KefalAPI.defineMod({
   id: 'lethal-casino',
   name: 'Lethal Casino',
@@ -11,7 +11,7 @@ KefalAPI.defineMod({
   scope: 'local',
   category: 'content',
   enabledByDefault: true,
-  description: 'A roulette table in the HQ casino corner. Bet Clout on colors, parity, halves, dozens or single numbers.',
+  description: 'A roulette table in the HQ casino corner. Bet chips on colors, parity, halves, dozens or single numbers.',
   config: {
     minBet: { type: 'number', default: 10, min: 1, max: 1000, label: 'Min bet' },
     maxBet: { type: 'number', default: 500, min: 10, max: 100000, label: 'Max bet' },
@@ -27,6 +27,7 @@ KefalAPI.defineMod({
     const REDS = new Set([1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]);
     const colorOf = (n) => (n === 0 || n === '00' ? 'green' : REDS.has(n) ? 'red' : 'black');
     const minBet = Math.max(1, Math.round(Number(cfg.minBet) || 10));
+    let chips = 500;   // [followers] session table chips
     const maxBet = Math.max(minBet, Math.round(Number(cfg.maxBet) || 500));
     // bet kinds: payout multiplier is the total returned (stake included)
     const BETS = {
@@ -97,7 +98,7 @@ KefalAPI.defineMod({
 
     api.on('interactables', (list, game) => {
       if (!table || !game.world.company) return;
-      list.push({ pos: table.pos.clone().add(new THREE.Vector3(0, 1.1, 0)), r: 1.1, reach: 2.8, noLos: true, label: 'GACHA MACHINE - Roulette [E]', sub: () => `◈ ${game.profile.coins}`, action: () => openRoulette(game) });
+      list.push({ pos: table.pos.clone().add(new THREE.Vector3(0, 1.1, 0)), r: 1.1, reach: 2.8, noLos: true, label: 'GACHA MACHINE - Roulette [E]', sub: () => `${chips} chips`, action: () => openRoulette(game) });
     });
 
     api.on('update', (dt) => {
@@ -143,10 +144,10 @@ KefalAPI.defineMod({
       const res = mk('div', 'res', '');
       const hist = mk('div', 'dim hist');
       const btn = (label, fn, cls = 'small') => { const b = mk('button', 'btn ' + cls, label); b.addEventListener('click', (e) => { e.stopPropagation(); game.audio.ui('ui_click', 0.5); fn(); }); return b; };
-      const renderInfo = () => { info.textContent = `You have ◈ ${game.profile.coins} · bets ◈${minBet}–${maxBet} · ${AMERICAN ? 'American wheel (0, 00)' : 'European wheel (single 0)'}`; };
+      const renderInfo = () => { info.textContent = `You have ${chips} chips · bets ${minBet}–${maxBet} · ${AMERICAN ? 'American wheel (0, 00)' : 'European wheel (single 0)'}`; };
       const renderBet = () => {
         betLine.innerHTML = '';
-        betLine.append(mk('span', '', 'Bet: '), btn('-', () => { if (spinning) return; bet = Math.max(minBet, Math.round(bet / 2)); renderBet(); }), mk('b', '', ` ◈ ${bet} `), btn('+', () => { if (spinning) return; bet = Math.max(minBet, Math.min(maxBet, game.profile.coins, bet * 2)); renderBet(); }), btn('MAX', () => { if (spinning) return; bet = Math.max(minBet, Math.min(maxBet, game.profile.coins)); renderBet(); }));
+        betLine.append(mk('span', '', 'Bet: '), btn('-', () => { if (spinning) return; bet = Math.max(minBet, Math.round(bet / 2)); renderBet(); }), mk('b', '', ` ${bet} chips `), btn('+', () => { if (spinning) return; bet = Math.max(minBet, Math.min(maxBet, game.profile.coins, bet * 2)); renderBet(); }), btn('MAX', () => { if (spinning) return; bet = Math.max(minBet, Math.min(maxBet, game.profile.coins)); renderBet(); }));
       };
       const renderBets = () => {
         betsBox.innerHTML = '';
@@ -181,10 +182,12 @@ KefalAPI.defineMod({
       };
       const spin = () => {
         if (spinning) return;
-        if (bet < minBet || bet > maxBet) { res.textContent = `Bets are ◈${minBet}–${maxBet}.`; return; }
-        if (!game.progress.spendCoins(bet)) { res.className = 'res lose'; res.textContent = 'Not enough Clout.'; game.audio.ui('ui_error', 0.6); return; }
+        if (bet < minBet || bet > maxBet) { res.textContent = `Bets are ${minBet}–${maxBet} chips.`; return; }
+        if (chips < minBet) chips = 500;
+        if (chips < bet) { res.className = 'res lose'; res.textContent = 'Not enough chips.'; game.audio.ui('ui_error', 0.6); return; }
         // the wager is frozen here: settle() must only use this snapshot (BUGS.md: payout used to read the
         // live bet / kind / number when the wheel stopped, so changing them mid-spin farmed Clout)
+        chips -= bet;   // [followers] the table plays with CHIPS: Followers are never wagered or spent
         const wager = { bet, kind, pick, b: BETS[kind] };
         spinning = true; numIn.disabled = true; res.className = 'res'; res.textContent = 'No more bets...';
         renderInfo();
@@ -221,11 +224,11 @@ KefalAPI.defineMod({
         hist.innerHTML = 'Last: ' + history.map((x) => `<span style="color:${colorOf(x) === 'red' ? '#ff6a6a' : colorOf(x) === 'green' ? '#7dff7d' : '#ddd'}">${x}</span>`).join('');
         if (won) {
           const pay = w.bet * b.pays;
-          game.progress.addCoins(pay, 'Roulette');
+          chips += pay;
           res.className = 'res win';
-          res.textContent = `${result} ${col.toUpperCase()} — YOU WIN ◈ ${pay}!`;
+          res.textContent = `${result} ${col.toUpperCase()} — YOU WIN ${pay} chips!`;
           game.audio.ui(b.pays >= 36 ? 'slot_jackpot' : 'slot_win', 0.8);
-          if (cfg.announceWins && (b.pays >= 36 || pay >= 500)) game.net.broadcast('sys', { text: `GACHA MACHINE: ${game.profile.name} won ◈${pay} on ${result} ${col.toUpperCase()}!`, kind: 'good' });
+          if (cfg.announceWins && (b.pays >= 36 || pay >= 500)) game.net.broadcast('sys', { text: `GACHA MACHINE: ${game.profile.name} won ${pay} chips on ${result} ${col.toUpperCase()}!`, kind: 'good' });
         } else {
           res.className = 'res lose';
           res.textContent = `${result} ${col.toUpperCase()} — the house wins.`;

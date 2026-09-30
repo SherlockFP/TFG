@@ -7,6 +7,7 @@ import {
 import { ROLES, NODE, TREE_VERSION, nodeCost, pruneState } from './passivetree.js';
 import { CREATURES } from './creatures.js';
 import { t, tf } from '../core/i18n.js';
+import { claimable } from './wallet.js';
 
 // Rewards that are already "final" numbers: never multiplied by stars / mastery / events / crew.
 const FLAT_REASONS = /^(Achievement|Daily|Season|Codex|Weekly|Rebirth|Bounty|Trade)/i;   // [trade] traded Clout is never multiplied
@@ -119,19 +120,17 @@ export class Progress {
     this.save();
   }
   addCoins(c, reason) {
-    if (!c) return;
+    if (!(c > 0)) return;   // [followers] only grows
     if (c > 0 && !FLAT_REASONS.test(String(reason || ''))) c = c * this.coinMultiplier();
     this.p.coins += Math.round(c);
     this.game.ui.hud?.setCoins(this.p.coins, Math.round(c));
     this.save();
   }
-  spendCoins(c) {
-    if (this.p.coins < c) return false;
-    this.p.coins -= c;
-    this.game.ui.hud?.setCoins(this.p.coins, -c);
-    this.save();
-    return true;
-  }
+  // [followers] there is NO spend path: profile.coins is the channel's FOLLOWER count, it only grows. Things that cost Clout are milestone unlocks (wallet.js claimable()).
+  addFollowers(n, reason) { this.addCoins(n, reason); }
+  followers() { return Math.max(0, Math.floor(this.p.coins) || 0); }
+  /** true when the channel has enough followers for something that used to cost `price` Clout (never subtracts) */
+  canClaim(price) { return claimable(this.p.coins, price); }
   allocate(skill) {
     const p = this.p;
     // legacy base skills were replaced by the passive tree (K): refuse instead of silently re-spending into a dead system

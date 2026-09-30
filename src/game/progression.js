@@ -133,7 +133,7 @@ export const MASTERY = {
   radar: { tier: 2, icon: '📡', name: 'Radar Ping', tr: 'Radar', max: 5, desc: '+2 m scan range per rank', trDesc: 'Rütbe başına +2 m tarama menzili', fx: { scanRange: 2 } },
   script: { tier: 3, icon: '⌨', name: 'Script Kiddie', tr: 'Script Kiddie', max: 5, desc: 'Minigames 2% easier per rank', trDesc: 'Rütbe başına mini oyunlar %2 daha kolay', fx: { minigameEase: 0.02 } },
   grind: { tier: 3, icon: '📈', name: 'Grindset', tr: 'Grindset', max: 5, desc: '+4% XP from gameplay per rank', trDesc: 'Rütbe başına oyundan +%4 XP', fx: { xpPct: 0.04 } },
-  hustle: { tier: 3, icon: '◈', name: 'Side Hustle', tr: 'Yan Gelir', max: 5, desc: '+4% Clout from gameplay per rank', trDesc: 'Rütbe başına oyundan +%4 Clout', fx: { coinPct: 0.04 } },
+  hustle: { tier: 3, icon: '◈', name: 'Side Hustle', tr: 'Yan Gelir', max: 5, desc: '+4% Followers from gameplay per rank', trDesc: 'Rütbe başına oyundan +%4 Followers', fx: { coinPct: 0.04 } },
   heart: { tier: 3, icon: '❤', name: 'Second Heart', tr: 'İkinci Kalp', max: 5, desc: '+8 max health per rank', trDesc: 'Rütbe başına +8 maksimum can', fx: { maxHp: 8 } },
 };
 export const MASTERY_POINTS_TOTAL = Object.values(MASTERY).reduce((a, m) => a + m.max, 0);

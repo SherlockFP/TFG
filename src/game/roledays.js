@@ -41,7 +41,7 @@ export function installRoledays(game) {
     else if (m.k === 'pay') {
       if (!Array.isArray(m.alive) || !m.alive.includes(me()) || !m.cur) return;
       const n = K.payFor(m.cur, me());
-      if (n > 0) { try { game.progress?.addCoins?.(n, 'Role day'); game.ui?.toast?.(tf('Role day done: +{n} Clout.', { n }), 'good'); } catch { /* ui optional */ } }
+      if (n > 0) { try { game.progress?.addCoins?.(n, 'Role day'); game.ui?.toast?.(tf('Role day done: +{n} Followers.', { n }), 'good'); } catch { /* ui optional */ } }
     }
   }
   function bindNet(net) {
@@ -65,7 +65,7 @@ export function installRoledays(game) {
     const mine = c.all || c.holder === me();
     const who = c.all ? t('WHOLE CREW') : mine ? t('YOU') : tf('Holder: {n}', { n: nameOf(c.holder) });
     const html = `<div class="rd-card tfg-card${S.active ? '' : ' pend'}"><div class="h"><span class="tfg-tag">${t('ROLE DAY')}</span><span class="${mine ? 'me' : ''}">${esc(who)}</span></div>`
-      + `<div class="n">${esc(t(def.name))}</div><div class="d">${esc(t(def.short))}</div><div class="b">${esc(tf('Bonus: +{n} Clout if you finish the day', { n: K.payFor(c, me()) }))}</div></div>`;
+      + `<div class="n">${esc(t(def.name))}</div><div class="d">${esc(t(def.short))}</div><div class="b">${esc(tf('Bonus: +{n} Followers if you finish the day', { n: K.payFor(c, me()) }))}</div></div>`;
     dock.style.display = '';
     if (dock.dataset.h !== html) { dock.dataset.h = html; dock.innerHTML = html; }
   }

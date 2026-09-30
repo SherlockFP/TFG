@@ -213,7 +213,7 @@ export function createEndless(ctx) {
     out.push(e.mutators.length ? t('ACTIVE MUTATORS:') : t('No mutators yet (PATCH NOTES every 3 depths).'));
     for (const id of e.mutators) out.push(`  * ${t(C.MUTATORS[id].name)}: ${t(C.MUTATORS[id].desc)}`);
     if (e.gate) out.push(`${t('GATE')}: ${e.gate.kind === 'finale' ? t('SEASON FINALE') : e.gate.red ? t('RED GATE') : t('S-RANK GATE')} ${t('rank')} ${e.gate.rank} - ${tf('type GATE to enter (chest x{c}).', { c: e.gate.chests })}`);
-    out.push(`CASHOUT: ${co.clout} Clout, ${co.xp} XP${co.stars ? ', +' + co.stars + ' ' + t('prestige star') : ''}${co.title ? ', ' + t('title') + ' "' + co.title + '"' : ''}.`);
+    out.push(`CASHOUT: ${co.clout} Followers, ${co.xp} XP${co.stars ? ', +' + co.stars + ' ' + t('prestige star') : ''}${co.title ? ', ' + t('title') + ' "' + co.title + '"' : ''}.`);
     return out;
   }
 

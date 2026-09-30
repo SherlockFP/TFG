@@ -1194,7 +1194,9 @@ export const actionMethods = {
     });
   },
   startSlots() {
-    this.openMinigame('slots', { difficulty: 0.5, balance: this.profile.coins, bets: [10, 25, 50, 100, 250], onSpin: (bet, win) => { this.profile.coins += win - bet; this.progress.save(); this.ui.hud?.setCoins(this.profile.coins); return this.profile.coins; } }, () => {});
+    // [followers] slots play with session CHIPS: Followers are never wagered or lost
+    this._slotChips = this._slotChips ?? 250;
+    this.openMinigame('slots', { difficulty: 0.5, balance: this._slotChips, bets: [10, 25, 50, 100, 250], onSpin: (bet, win) => { this._slotChips = Math.max(0, this._slotChips + win - bet); if (this._slotChips < 10) this._slotChips = 250; return this._slotChips; } }, () => {});
   },
   hostDangerGuess() {
     const m = MOONS[this.run?.moon];

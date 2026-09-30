@@ -115,6 +115,12 @@ export function defaultProfile() {
   };
 }
 
+/** [followers] Clout -> Followers migration: the persisted count is the max of every name it ever had (coins = Clout, followers, clout); >= 0 */
+export function followersFromSave(p, d = { coins: 0 }) {
+  const c = [p?.coins, p?.followers, p?.clout].filter((v) => Number.isFinite(v));
+  return c.length ? Math.max(0, ...c) : d.coins;
+}
+
 export function loadProfile() {
   const d = defaultProfile();
   const p = load(KEY_PROFILE, null);
@@ -131,7 +137,7 @@ export function loadProfile() {
     owned: arr(p.owned, d.owned),
     level: Number.isFinite(p.level) ? p.level : d.level,
     xp: Number.isFinite(p.xp) ? p.xp : d.xp,
-    coins: Number.isFinite(p.coins) ? p.coins : d.coins,
+    coins: followersFromSave(p, d),   // [followers] profile.coins IS the follower count (the old Clout field): never lost, never spent
     skills: { ...d.skills, ...(p.skills || {}) },
     loadout: { ...d.loadout, ...(p.loadout || {}) },
     cosmetics: { ...obj(p.cosmetics, {}), suits: [...new Set([...d.cosmetics.suits, ...arr(p.cosmetics?.suits, [])])], hats: [...new Set([...d.cosmetics.hats, ...arr(p.cosmetics?.hats, [])])] },

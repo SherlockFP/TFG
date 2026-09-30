@@ -51,7 +51,7 @@ export function createTradeHost(game, opts = {}) {
   }
   function refund(s) {
     if (!s.debit) return;
-    for (const [p, st] of Object.entries(s.debit)) if (st === 'ok') net().broadcast('xp', { to: p, xp: 0, coin: s.offer[p].clout, reason: 'Trade: Clout refund' });
+    for (const [p, st] of Object.entries(s.debit)) if (st === 'ok') net().broadcast('xp', { to: p, xp: 0, coin: s.offer[p].clout, reason: 'Trade: Followers refund' });
     s.debit = null;
   }
   function cancel(s, why, by = null) {
@@ -187,7 +187,7 @@ export function createTradeHost(game, opts = {}) {
     for (const [peer, mv] of Object.entries(plan.repack || {})) if (mv.length) n.broadcast('it', { e: 'inv', h: peer, mv });
     for (const p of [s.a, s.b]) {
       const c = s.offer[s.other(p)].clout;
-      if (c > 0) n.broadcast('xp', { to: p, xp: 0, coin: c, reason: 'Trade: Clout' });
+      if (c > 0) n.broadcast('xp', { to: p, xp: 0, coin: c, reason: 'Trade: Followers' });
     }
     s.state = 'done'; s.debit = null; s.ver++;
     for (const p of [s.a, s.b]) send(p, 'trm', { k: 'done', tid: s.id, with: s.other(p), gave: gave[p], got: got[p], cg: s.offer[p].clout, cr: s.offer[s.other(p)].clout });

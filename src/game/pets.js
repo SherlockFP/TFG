@@ -25,7 +25,7 @@ for (const d of EGG_ITEM_DEFS) if (!ITEMS[d.id]) { try { registerItem(d); } catc
 const TR = {
   PETS: 'EVCİL HAYVANLAR', 'PET STABLE': 'AHIR', Stable: 'Ahır', Nest: 'Yuva', Skins: 'Görünüm', Shop: 'Dükkan', Active: 'Aktif', 'Set active': 'Aktif yap', Rename: 'İsim ver', Release: 'Bırak',
   Level: 'Seviye', Loyalty: 'Sadakat', Trait: 'Özellik', Abilities: 'Yetenekler', Evolution: 'Evrim', Close: 'Kapat', Buy: 'Satın al', Equip: 'Kuşan', Owned: 'Sahip', Locked: 'Kilitli',
-  'The stable is full.': 'Ahır dolu.', 'Not enough Clout.': 'Yeterli Clout yok.', 'Not sold here.': 'Burada satılmıyor.', 'Pet Shop (HQ only)': 'Evcil Dükkanı (sadece HQ)',
+  'The stable is full.': 'Ahır dolu.', 'Not enough Followers.': 'Yeterli Takipçi yok.', 'Not sold here.': 'Burada satılmıyor.', 'Pet Shop (HQ only)': 'Evcil Dükkanı (sadece HQ)',
   'Incubator': 'Kuluçka', 'Put egg in incubator': 'Yumurtayı kuluçkaya koy', 'An egg hatched!': 'Bir yumurta çatladı!', 'is ready again.': 'yeniden hazır.', Shiny: 'Parlak',
   'Use the egg inside the ship.': 'Yumurtayı gemide kullan.', 'The incubator is full.': 'Kuluçka dolu.', 'Incubating': 'Kuluçkada', 'day(s) left': 'gün kaldı', Empty: 'Boş',
   Cat: 'Kedi', Dog: 'Köpek', Fox: 'Tilki', Bear: 'Ayı', 'Bee Swarm': 'Arı Sürüsü', Owl: 'Baykuş', Parrot: 'Papağan', Crow: 'Karga', 'Tamagotchi-bot': 'Tamagotchi-bot',
@@ -36,7 +36,7 @@ const TR = {
 const RU = {
   PETS: 'ПИТОМЦЫ', Stable: 'Стойло', Nest: 'Гнездо', Skins: 'Скины', Shop: 'Магазин', Active: 'Активный', 'Set active': 'Сделать активным', Rename: 'Переименовать', Release: 'Отпустить',
   Level: 'Уровень', Loyalty: 'Верность', Trait: 'Черта', Abilities: 'Способности', Evolution: 'Эволюция', Close: 'Закрыть', Buy: 'Купить', Equip: 'Надеть', Owned: 'Есть', Locked: 'Закрыто',
-  'The stable is full.': 'Стойло заполнено.', 'Not enough Clout.': 'Не хватает Clout.', Cat: 'Кот', Dog: 'Собака', Fox: 'Лиса', Bear: 'Медведь', 'Bee Swarm': 'Рой пчёл', Owl: 'Сова', Parrot: 'Попугай', Crow: 'Ворона',
+  'The stable is full.': 'Стойло заполнено.', 'Not enough Followers.': 'Не хватает подписчики.', Cat: 'Кот', Dog: 'Собака', Fox: 'Лиса', Bear: 'Медведь', 'Bee Swarm': 'Рой пчёл', Owl: 'Сова', Parrot: 'Попугай', Crow: 'Ворона',
   'Tamagotchi-bot': 'Тамагочи-бот', 'An egg hatched!': 'Яйцо проклюнулось!', Shiny: 'Сияющий', Incubator: 'Инкубатор', 'Pet Carrier': 'Переноска', 'Pet Treat': 'Лакомство', 'Pet Egg (Spotted)': 'Яйцо питомца (пятнистое)',
   'Pet Egg (Wild)': 'Яйцо питомца (дикое)', 'Pet Egg (Glitch)': 'Яйцо питомца (глюк)',
 };

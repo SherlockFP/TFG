@@ -213,7 +213,7 @@ export function createTreePanel({ game = null, ctl = null, profile = game?.profi
     pts.classList.toggle('pulse', p > 0);
     clout.textContent = '◈ ' + ctl.coins();
     const cost = ctl.respecCost();
-    respecBtn.textContent = respecArm > Date.now() ? tf('CONFIRM ◈{cost}?', { cost }) : L('RESPEC') + (cost ? ` ◈${cost}` : '');
+    respecBtn.textContent = respecArm > Date.now() ? t('CONFIRM?') : L('RESPEC') + (cost ? ` ◈${cost}` : '');
     respecBtn.classList.toggle('warn', respecArm > Date.now());
     respecBtn.style.opacity = ctl.state().nodes.length ? '1' : '.4';
     count.textContent = matches.size ? `${matches.size} match${matches.size > 1 ? 'es' : ''}` : (search.value ? '0 matches' : '');
@@ -273,7 +273,7 @@ export function createTreePanel({ game = null, ctl = null, profile = game?.profi
     else if (on) {
       const info = ctl.refundInfo(id);
       st.style.color = '#ffd98a';
-      st.textContent = L('ALLOCATED') + (info.ok ? tf(' · right-click to refund ({n})', { n: info.free ? 'free undo' : '◈' + info.cost }) : ` · ${info.reason}`);
+      st.textContent = L('ALLOCATED') + (info.ok ? tf(' · right-click to refund ({n})', { n: 'free undo' }) : ` · ${info.reason}`);
     } else if (!ctl.role()) { st.style.color = '#ff8d7d'; st.textContent = t('Pick a role first (ROLE button).'); }
     else if (prevPlan?.ok) {
       const c = prevPlan.cost, k = prevPlan.path.length;

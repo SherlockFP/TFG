@@ -41,7 +41,8 @@ import { x as obx } from '../game/onboard_text.js';   // [onboard] Settings: unl
 import { soundPackSection } from './soundpack_ui.js';   // [sfx] Settings > Audio > Sound pack
 import { hudDensitySelect } from './hudcalm_ui.js';   // [hudcalm] Settings > HUD > density
 import { syncArtdir } from './artdir.js';   // [artdir] html.tfg-artdir / ad-calm from settings
-import { cloutOpenOf } from '../game/wallet.js';   // [trim] Clout is spendable after the store unlock
+import { followerCard } from '../game/followers.js';
+import { cloutOpenOf, unlockAt, claimable } from '../game/wallet.js';   // [trim] follower unlocks show after the store unlock; [followers] nothing is spent
 
 // [profile] tiny avatar icon (16x16 thumbnail) for chat / lists
 const avIcon = (av, px = 16) => { const c = avatarCanvas(av, px, { thumb: true }); c.style.marginRight = '4px'; return c; };
@@ -55,6 +56,16 @@ const NAV_SEL = 'button:not(.disabled):not([disabled]), input:not([type=hidden])
 const HOVER_SEL = '.btn, .slot-card, .lobby-row, .chip, .swatch, .mod-row, .shop-card, .bounty-row, .rec-tab, .rec-btn, select, input[type=checkbox], input[type=range], [tabindex="0"]';
 // tab strips LB / RB (or PageUp / PageDown) cycle through: our panels, the SERVICE RECORD panel, the mods screen
 const TAB_SEL = '.tabs .btn, .rec-tabs .rec-tab, .tfgm-tabs .btn';
+
+
+/** [followers] Tab card block: "Next milestone: X at N followers" + a thin progress bar. Followers only grow; nothing is spent. */
+function followerCardEl(p) {
+  const { next } = followerCard(p);
+  if (!next) return el('div', { class: 'dim' }, t('Followers only grow. Milestones unlock gear and cosmetics.'));
+  return el('div', { class: 'fol-next' },
+    el('div', { class: 'dim' }, next.name ? tf('Next milestone: {name} at {n} followers', { name: t(next.name), n: next.at }) : tf('Next milestone: {n} followers', { n: next.at })),
+    el('div', { class: 'xpbar' }, el('div', { style: { width: Math.round(next.pct * 100) + '%' } })));
+}
 
 export class UI {
   constructor(app) {
@@ -668,7 +679,8 @@ export class UI {
         el('div', { class: 'label' }, t('Hat')), hats,
         el('div', { class: 'label' }, tf('Lv.{level} · {rankOf} · {xp}/{xpForLevel} XP', { level: p.level, rankOf: rankOf(p.level), xp: p.xp, xpForLevel: xpForLevel(p.level) })),
         el('div', { class: 'xpbar' }, el('div', { style: { width: (p.xp / xpForLevel(p.level) * 100) + '%' } })),
-        el('div', { class: 'label clout' }, tf('◈ {coins} Clout', { coins: p.coins })),
+        el('div', { class: 'label clout' }, tf('◈ {coins} Followers', { coins: p.coins })),
+        followerCardEl(p),   // [followers] next milestone + progress
       );
       // skills
       const skills = el('div', { class: 'skills' }, el('div', { class: 'label' }, `${t('Skills')} · ${t('Skill points')}: ${p.skillPoints}`));
@@ -1016,8 +1028,8 @@ export class UI {
       `<b>THE SHIP</b><br>The <b>terminal</b> takes typed commands (MOONS, ROUTE, STORE, BUY, SCAN, BESTIARY, door codes). Pull the <b>lever</b> to land or take off. The ship leaves at <b>midnight</b>, with or without you.`,
       `<b>CONTROLS</b><br>WASD move · Shift sprint · Ctrl crouch · Alt sneak (quiet) · Space jump · E interact / pick up · LMB use / attack / grab big loot · RMB scan · MMB / P ping · G drop · Q throw · F flashlight · 1-4 slots · R reload · V push-to-talk · Z/X emotes · Enter chat · I inventory · K passive tree · hold C spell wheel (or say / type the spell word) · J service record · hold B emote wheel · Tab character · Esc menu`,
       `<b>SURVIVAL</b><br>Every creature has a rule. <i>Scan</i> them and read the BESTIARY. Sound matters: sprinting, horns and <b>your voice</b> attract things. Some exits are not what they seem.`,
-      `<b>PROGRESSION</b><br>You earn XP and <b>Clout</b> from scrap, kills, bounties, fishing and minigames. Every level gives a skill point for the passive tree [K]. The Black Market at HQ, run by <b>Phish Dayı</b>, sells soulbound weapons, armor and cosmetics for Clout. Higher-tier moons and later quotas hurt more and pay more.`,
-      `<b>MINIGAMES</b><br>Crack vault keypads, rewire fuse boxes, pick locks, fish at ponds and the HQ dock, play FLAPPY PHISH on the ship's arcade, and gamble Clout at the GACHA MACHINE.`,
+      `<b>PROGRESSION</b><br>You earn XP and <b>Followers</b> from scrap, kills, bounties, fishing and minigames. Every level gives a skill point for the passive tree [K]. The Black Market at HQ, run by <b>Phish Dayı</b>, unlocks soulbound weapons, armor and cosmetics as your Followers grow (they are never spent). Higher-tier moons and later quotas hurt more and pay more.`,
+      `<b>MINIGAMES</b><br>Crack vault keypads, rewire fuse boxes, pick locks, fish at ponds and the HQ dock, play FLAPPY PHISH on the ship's arcade, and gamble table chips at the GACHA MACHINE.`,
       `<b>MULTIPLAYER</b><br>Host a lobby (public or private with password) and friends can find it in the lobby browser or join with the 6-letter code. Everything is peer-to-peer; the host runs the world.`,
     ].map((p) => t(p)).join('<br><br>');
     const f = this.frame(t('HOW TO PLAY'), el('div', { class: 'howto', html: txt }), el('div', { class: 'menu-row' }, this.backButton(() => this.showMenu('title'))));
@@ -1126,11 +1138,11 @@ export class UI {
             el('div', {}, el('div', { class: 'sc-name', style: { color: r.color } }, name), el('div', { class: 'sc-rar' }, r.name + (minLevel > 1 ? tf(' · Lv.{minLevel}+', { minLevel }) : '')))),
           el('div', { class: 'sc-desc' }, desc),
           owned ? (onEquip ? this.button(equipped ? t('Equipped') : t('Equip'), onEquip, equipped ? 'small disabled' : 'small') : el('div', { class: 'dim' }, t('Owned')))
-            : this.button(`◈ ${price}`, onBuy, 'small' + (locked || p.coins < price ? ' disabled' : ' primary')),
+            : this.button(claimable(p.coins, price) ? t('Claim') : tf('Unlocks at {n} followers', { n: unlockAt(price) }), onBuy, 'small' + (locked || !claimable(p.coins, price) ? ' disabled' : ' primary')),   // [followers] milestone
         );
       };
       const buy = (price, fn) => () => {
-        if (!game.progress.spendCoins(price)) { this.sfx('ui_error'); return; }
+        if (!game.progress.canClaim(price)) { this.sfx('ui_error'); return; }
         fn(); saveProfile(p); game.audio.ui('ui_buy', 0.7); render();
       };
       if (tab === 'Weapons') {
@@ -1333,7 +1345,7 @@ export class UI {
       t('> action .............. PERMANENT SUSPENSION'),
     ];
     const box = el('div', { class: 'fired', html: `<div class="f-term"></div><div class="f-main" data-t="${t('DEPLATFORMED')}">${t('DEPLATFORMED')}</div>
-      <div class="f-sub">${t('The Algorithm thanks you for your service.')}<br><span>${t('Your level, skills and Clout were kept. The run starts over.')}</span></div>` });
+      <div class="f-sub">${t('The Algorithm thanks you for your service.')}<br><span>${t('Your level, skills and Followers were kept. The run starts over.')}</span></div>` });
     this.root.appendChild(box);
     const term = box.querySelector('.f-term');
     lines.forEach((ln, i) => setTimeout(() => {

@@ -90,7 +90,7 @@ for (const id of K.IDS) ok(K.CARDS[id].coins > 0, 'pays ' + id);
 // --- i18n: every English key used by the cards + module strings has TR and RU
 const keys = [];
 for (const c of Object.values(K.CARDS)) keys.push(c.name, c.line, c.short);
-keys.push('ROLE DAY', 'YOU', 'WHOLE CREW', 'Holder: {n}', 'Bonus: +{n} Clout if you finish the day', 'Role day done: +{n} Clout.', 'You cannot hold weapons today.', 'You cannot pick that up today.',
+keys.push('ROLE DAY', 'YOU', 'WHOLE CREW', 'Holder: {n}', 'Bonus: +{n} Followers if you finish the day', 'Role day done: +{n} Followers.', 'You cannot hold weapons today.', 'You cannot pick that up today.',
   'Only the Mechanic can do this today.', 'Only the Mechanic', 'You cannot speak today. Ping or emote.', 'Tomorrow, casting call: {@n}. {@l}', 'Role day: {@n}. {@l}', 'Constraint met. The feed adores you. Do not let it go to your head.');
 for (const k of keys) ok(I18N.TR[k] && I18N.RU[k], 'TR+RU: ' + k);
 

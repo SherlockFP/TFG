@@ -16,7 +16,7 @@ fillGaps([
   ['Noise', 'Gürültü', 'Шум'], ['Max Mana', 'Maks. Mana', 'Макс. мана'], ['Mana Regeneration', 'Mana Yenilenmesi', 'Восстановление маны'],
   ['Spell Power', 'Büyü Gücü', 'Сила заклинаний'], ['Cooldown Reduction', 'Bekleme Süresi Azaltma', 'Сокращение перезарядки'],
   ['Bag Column', 'Çanta Sütunu', 'Колонка рюкзака'], ['Bag Columns', 'Çanta Sütunu', 'Колонки рюкзака'],
-  ['XP Gain', 'XP Kazancı', 'Получаемый опыт'], ['Clout Gain', 'Clout Kazancı', 'Получаемый клаут'],
+  ['XP Gain', 'XP Kazancı', 'Получаемый опыт'], ['Followers Gain', 'Takipçi Kazancı', 'Получаемый подписчики'],
   // ---- roles
   ['Scout Post', 'Gözcü Noktası', 'Пост разведчика'], ['Enforcer Post', 'Tetikçi Noktası', 'Пост силовика'], ['Occultist Post', 'Büyücü Noktası', 'Пост оккультиста'],
   ['Field Medic Post', 'Saha Sağlıkçısı Noktası', 'Пост медика'], ['Technician Post', 'Teknisyen Noktası', 'Пост техника'], ['Hauler Post', 'Yükçü Noktası', 'Пост грузчика'],

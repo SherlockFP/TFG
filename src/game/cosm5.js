@@ -17,6 +17,7 @@ import { glowLevel } from './enhance.js';
 import { createItemModel } from '../models/items.js';
 import { applySkin, clearSkin, skinClock, skinOf, SKIN_IDS } from '../render/weaponskins.js';
 import { WARDROBE_EXT, TABS } from '../ui/panels/wardrobe.js';
+import { claimable, unlockAt } from './wallet.js';
 import { installCosm5I18n } from './cosm5_i18n.js';
 import { installCosm8I18n } from './cosm8_i18n.js';
 import {
@@ -197,18 +198,16 @@ export function offersFor(profile, day = utcDay()) {
   const mk = (key, featured) => { const e = C5_BY_KEY[key]; return e ? { ...e, key, price: offerPrice(e, featured), featured, minLevel: e.minLevel || 1, owned: owns5(profile, e) } : null; };
   return { day, offers: r.daily.map((k) => mk(k, false)).filter(Boolean), featured: r.featured ? mk(r.featured, true) : null, left: secondsToRotation() };
 }
-/** buy a rotation offer. spend(price) -> bool (default: straight from profile.coins). Returns { ok, why?, key? } */
-export function buyOffer(profile, key, { spend, day = utcDay() } = {}) {
+/** [followers] claim a rotation offer: it unlocks at unlockAt(price) followers and NOTHING is spent (the old `spend` option is ignored). Returns { ok, why?, key? } */
+export function buyOffer(profile, key, { day = utcDay() } = {}) {
   ensureC5Profile(profile);
   const { offers, featured } = offersFor(profile, day);
   const o = offers.find((x) => x.key === key) || (featured && featured.key === key ? featured : null);
   if (!o) return { ok: false, why: 'Not in today\'s rotation' };
   if (o.owned) return { ok: false, why: 'Owned' };
   if ((profile.level || 1) < o.minLevel) return { ok: false, why: `Requires level ${o.minLevel}` };
-  const pay = spend || ((c) => { if (profile.coins < c) return false; profile.coins -= c; return true; });
-  if (!pay(o.price)) return { ok: false, why: 'Not enough Clout' };
+  if (!claimable(profile.coins, o.price)) return { ok: false, why: tf('Unlocks at {n} followers', { n: unlockAt(o.price) }) };
   grantC5(profile, key);
-  profile.cosm5.spent += o.price;
   return { ok: true, key, price: o.price };
 }
 
@@ -370,11 +369,11 @@ export function installCosm5(game) {
     if (r !== 'dup') return { key, dup: false, coins: 0 };
     const coins = DUPE_COINS[e.tier] || 30;
     game.progress?.addCoins?.(coins, 'Duplicate cosmetic');
-    if (!quiet) game.ui?.toast?.(tf('{name} (duplicate): +{coins} Clout', { name: t(e.name), coins }), 'info');
+    if (!quiet) game.ui?.toast?.(tf('{name} (duplicate): +{coins} Followers', { name: t(e.name), coins }), 'info');
     return { key, dup: true, coins };
   }
   function buy(key) {
-    const r = buyOffer(game.profile, key, { spend: (c) => game.progress.spendCoins(c) });
+    const r = buyOffer(game.profile, key);
     if (r.ok) { game.progress?.save?.(); game.audio?.ui?.('ui_buy', 0.7); announce(key, 'shop'); }
     return r;
   }

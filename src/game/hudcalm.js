@@ -12,6 +12,7 @@ import { MOONS } from './moons.js';
 import { hudDensityOf } from '../ui/hudcalm_ui.js';
 import { walletRowOf } from './wallet.js';
 import { quotaState } from './progression.js';   // [econ9] one quota source
+import { followerCard } from './followers.js';
 
 const FLASH_S = { standard: 6, minimal: 3 };
 // dock item id -> rule.  f: shown for FLASH_S s after each change of its text (digits ignored, so ticking timers do not re-trigger)
@@ -133,6 +134,7 @@ export function installHudCalm(game) {
   function render() {
     const run = game.run || {}, p = game.player, hud = game.ui?.hud?.el;
     const txt = (s) => hud?.querySelector(s)?.textContent?.trim() || '';
+    const fc = followerCard(game.profile);
     const keyName = keyCode().replace(/^Key/, '').replace(/^Digit/, '');
     const moon = MOONS[run.moon]?.name || run.moon || '';
     const objs = (game.objectives?.full || []).map((o) => `<div class="hc-o ${o.kind}${o.done ? ' done' : ''}">${o.done ? '✔' : o.kind === 'warn' ? '!' : '◆'} ${escapeHtml(o.text)}</div>`).join('');
@@ -143,7 +145,8 @@ export function installHudCalm(game) {
       [t('CREDITS'), `▮${run.credits ?? 0}`],   // [algoslot] CREDITS / ROUTE left the top bar
       ...(run.phase === 'orbit' && moon ? [[t('ROUTE'), escapeHtml(moon)]] : []),
       [t('Clock'), txt('.clock-time')],
-      [`${txt('.lvl')} ${txt('.rank')}`, walletRowOf(game)],   // [hud6] the Tab card is where Clout lives
+      [`${txt('.lvl')} ${txt('.rank')}`, walletRowOf(game)],   // [hud6] the Tab card is where the wallet (credits + followers) lives
+      ...(fc.next ? [[t('Followers'), `◈ ${fc.followers}`], [t('Next milestone'), escapeHtml(`${fc.next.name ? t(fc.next.name) + ' · ' : ''}${fc.next.at}`)]] : [[t('Followers'), `◈ ${fc.followers}`]]),   // [followers] channel size + the closest unlock
       [t('Weight'), txt('.hud-weight')],
     ].filter((r) => r[1] || r[0].trim());
     const crew = [`<div class="hc-r"><span>${escapeHtml(game.playerName?.(game.selfId) || '')} (${t('you')})</span><b>${p ? Math.round(p.hp || 0) + '/' + Math.round(p.maxHp || 100) : ''}</b></div>`];

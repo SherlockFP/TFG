@@ -4,6 +4,8 @@
 //  - profile.pets = { v, stable: [pet x6], active: petId|null, incubator: [egg x2], eggs: n(unused), clock: game days, skins: {cat: [ids]}, dex: {sp: true}, stats: {...} }
 // All randomness takes an injected rng (() => [0,1)), so tests are deterministic and world gen is never touched.
 
+import { unlockAt } from './wallet.js';
+
 export const MAX_STABLE = 6;
 export const MAX_LEVEL = 30;
 export const SHINY_CHANCE = 0.02;
@@ -474,9 +476,8 @@ export function buySkin(ctx, cat, id) {
   const a = skinAccess(ctx, cat, id);
   if (a.ok) return { ok: true, cost: 0 };
   if (a.why !== 'buy') return { ok: false, err: a.why === 'season' ? 'Out of season.' : 'Locked.' };
-  const coins = num(ctx.profile?.coins);
-  if (coins < a.cost) return { ok: false, err: 'Not enough Clout.' };
-  ctx.profile.coins = coins - a.cost;
+  const need = unlockAt(a.cost);   // [followers] a milestone, nothing is spent
+  if (num(ctx.profile?.coins) < need) return { ok: false, err: 'Not enough Followers.', need };
   ctx.state.skins[cat].push(id);
   return { ok: true, cost: a.cost };
 }
@@ -489,18 +490,18 @@ export function equipSkin(ctx, petId, cat, id) {
 }
 
 // ---------------------------------------------------------------------------------------------------- shop
-/** Species sold at the HQ Pet Shop for Clout. */
+/** Species adopted at the HQ Pet Shop at a follower milestone (unlockAt(price)). */
 export const SHOP_SPECIES = SPECIES_IDS.filter((id) => SPECIES[id].price);
 export function buyPet(ctx, sp, rng = Math.random) {
   const d = SPECIES[sp];
   if (!d?.price) return { ok: false, err: 'Not sold here.' };
   if (ctx.state.stable.length >= MAX_STABLE) return { ok: false, err: 'The stable is full.' };
-  if (num(ctx.profile?.coins) < d.price) return { ok: false, err: 'Not enough Clout.' };
+  const need = unlockAt(d.price);   // [followers] a milestone, nothing is spent
+  if (num(ctx.profile?.coins) < need) return { ok: false, err: 'Not enough Followers.', need };
   const pet = makePet({ sp, source: 'adopt', rng });
-  ctx.profile.coins -= d.price;
   adoptPet(ctx.state, pet);
   ctx.state.stats.adopted++;
-  return { ok: true, pet, cost: d.price };
+  return { ok: true, pet, cost: 0 };
 }
 
 /** Compact network form of the active pet (owner -> host sync). Sanitised again by the host. */

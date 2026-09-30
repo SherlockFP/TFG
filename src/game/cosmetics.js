@@ -12,7 +12,8 @@ import { MARKET } from './progression.js';
 import { registerItem, SCRAP_TABLE } from './items.js';
 import { tierColor, tierDef, TIER_ORDER } from './tiers.js';
 import { saveProfile } from '../core/save.js';
-import { addTranslations } from '../core/i18n.js';
+import { addTranslations, tf } from '../core/i18n.js';
+import { unlockAt } from './wallet.js';
 
 export const SLOTS = ['suit', 'hat', 'face', 'back'];
 const LIST_KEY = { suit: 'suits', hat: 'hats', face: 'faces', back: 'backs' };
@@ -74,7 +75,7 @@ addTranslations(W3_TR); addTranslations(W3_RU, 'ru');
 addTranslations({
   WARDROBE: 'GARDIROP', 'WARDROBE [E]': 'GARDIROP [E]', Suits: 'Tulumlar', Hats: 'Şapkalar', Face: 'Yüz', Back: 'Sırt', Equip: 'Kuşan', Equipped: 'Kuşanıldı',
   Owned: 'Sahip', Locked: 'Kilitli', 'Try on': 'Dene', Unlock: 'Açılış', 'NEW COSMETIC': 'YENİ KOZMETİK', 'Symbiote Sample': 'Symbiote Örneği',
-  'Open wardrobe [E]': 'Gardırobu aç [E]', 'Bare visor.': 'Çıplak vizör.', Buy: 'Satın al', 'Not enough Clout': 'Yeterli Clout yok',
+  'Open wardrobe [E]': 'Gardırobu aç [E]', 'Bare visor.': 'Çıplak vizör.', Buy: 'Satın al',
   'Drag to rotate': 'Döndürmek için sürükle', None: 'Yok', 'Standard tank.': 'Standart tüp.',
 });
 
@@ -252,7 +253,7 @@ export function installCosmetics(game) {
     const p = ensureWardrobeProfile(profile());
     if (owns(p, e.slot, e.id)) return { ok: false, why: 'Owned' };
     if (p.level < (e.minLevel || 1)) return { ok: false, why: `Requires level ${e.minLevel}` };
-    if (!game.progress.spendCoins(e.price)) return { ok: false, why: 'Not enough Clout' };
+    if (!game.progress.canClaim(e.price)) return { ok: false, why: tf('Unlocks at {n} followers', { n: unlockAt(e.price) }) };   // [followers] milestone, nothing is spent
     unlock(key, true);
     game.audio?.ui?.('ui_buy', 0.7);
     return { ok: true };

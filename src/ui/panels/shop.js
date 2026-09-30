@@ -3,7 +3,7 @@
 // Left: category tabs (LB/RB or PageUp/PageDown) + item cards (icon, tier colour, stats, weight, price in ▮ / ◈, deal badge,
 // sold-out / locked / can't-afford states). Right: DEALS, EMPLOYEE OF THE MONTH and the CART with BUY.
 // Items are click / Enter (or A on a pad) to add; the price the cart shows is only a preview - the host reprices everything.
-import { el } from '../../core/util.js';
+import { el, escapeHtml } from '../../core/util.js';
 import { t } from '../../core/i18n.js';
 import { iconHTML } from '../icons.js';
 import { glyph } from '../glyphs.js';
@@ -66,7 +66,7 @@ function ensureCss() {
   const s = document.createElement('style'); s.id = 'tfg-shop-css'; s.textContent = CSS; document.head.appendChild(s); cssDone = true;
 }
 const fmt = (n) => Math.round(n).toLocaleString('en-US');
-const money = (e, v = e.price) => (e.currency === 'clout' ? `◈${fmt(v)}` : `▮${fmt(v)}`);
+const money = (e, v = e.price) => `▮${fmt(v)}`;   // [followers] one money: credits; milestone stock only unlocks at a follower count
 
 export function createShopPanel(ui, game, opts = {}) {
   ensureCss();
@@ -74,7 +74,7 @@ export function createShopPanel(ui, game, opts = {}) {
   let cat = opts.category && categoryList().some((c) => c.id === String(opts.category).toLowerCase()) ? String(opts.category).toLowerCase() : (ui.shopTab || 'weapons');
   const cart = new Map();   // id -> { n, trade }
   const cloutOpen = () => cloutOpenOf(g);   // [trim] Clout is a wallet only after the store's quota-1 unlock: credits are the only money of the first hour
-  const vis = (l) => (cloutOpen() ? l : l.filter((e) => e.currency !== 'clout'));
+  const vis = (l) => (cloutOpen() ? l : l.filter((e) => !e.followersAt));
   let stock = vis(shop.stock());
   const byId = (id) => stock.find((e) => e.id === id);
   const wrap = ui.panel('wide shop');
@@ -88,14 +88,14 @@ export function createShopPanel(ui, game, opts = {}) {
   body.appendChild(el('div', { class: 'sh-wrap' }, main, sideEl));
   wrap.append(head, body, ui.panelFoot([['LB/RB', t('TAB')], ['E', t('ADD')]]));
 
-  const balance = () => `<b>▮${fmt(g.run?.credits || 0)}</b>${cloutOpen() ? ` · <b style="color:#ff7ad9">◈${fmt(g.profile?.coins || 0)}</b>` : ''}`;
+  const balance = () => `<b>▮${fmt(g.run?.credits || 0)}</b>${cloutOpen() ? ` · <span style="color:#ff7ad9">◈${fmt(g.profile?.coins || 0)} ${escapeHtml(t('followers'))}</span>` : ''}`;
   const cartTotal = () => { let s = 0; for (const [id, l] of cart) { const e = byId(id); if (e && e.currency === 'credits') s += (l.trade && e.def?.upgradePrice ? e.def.upgradePrice : e.price) * l.n; } return s; };
   const hasBat = (e) => !!e.def?.upgradeFrom && [...g.items.all()].some((it) => it.holder === g.selfId && it.type === e.def.upgradeFrom && !it.affix);
 
   // ---------------------------------------------------------------- cards
   function card(e, compact = false) {
     const tc = tierColor(e.tier);
-    const poor = e.currency === 'credits' ? (g.run?.credits || 0) < e.price : (g.profile?.coins || 0) < e.price;
+    const poor = (g.run?.credits || 0) < e.price;
     const can = !e.soldOut && !e.locked;
     const inCart = cart.get(e.id)?.n || 0;
     const node = el('div', { class: 'sh-card' + (e.soldOut ? ' sold' : '') + (e.locked ? ' locked' : ''), style: { '--tc': tc }, tabindex: can ? '0' : '-1', 'data-id': e.id, title: e.locked ? e.lockReason : '' });
@@ -107,9 +107,10 @@ export function createShopPanel(ui, game, opts = {}) {
     const stats = statsOf(e.def);
     if (stats.length && !compact) node.appendChild(el('div', { class: 'sh-stats', html: stats.map(([k, v]) => `<span>${k}${v !== '' ? ' <b>' + v + '</b>' : ''}</span>`).join('') }));
     node.appendChild(el('div', { class: 'sh-desc' }, t(e.def?.blurb || e.def?.tip || e.desc || '')));
-    const bot = el('div', { class: 'sh-bot' }, el('span', { class: 'sh-price' + (poor ? ' poor' : '') + (e.currency === 'clout' ? ' clout' : '') }, money(e)), e.off ? el('span', { class: 'sh-was' }, money(e, e.base)) : null,
+    const bot = el('div', { class: 'sh-bot' }, el('span', { class: 'sh-price' + (poor ? ' poor' : '') + '' }, money(e)), e.off ? el('span', { class: 'sh-was' }, money(e, e.base)) : null,
       e.left != null && e.left > 0 && e.left <= 3 ? el('span', { class: 'sh-left' }, `${e.left} ${t('left')}`) : null);
     node.appendChild(bot);
+    if (e.followersAt && e.locked) node.appendChild(el('div', { class: 'sh-desc', style: { color: '#ff7ad9' } }, `◈ ${e.lockReason}`));   // [followers] milestone
     if (e.soldOut) node.appendChild(el('div', { class: 'sh-stamp' }, e.owned ? t('INSTALLED') : t('SOLD OUT')));
     if (inCart) node.appendChild(el('div', { class: 'sh-incart' }, `x${inCart}`));
     if (can) {
@@ -122,10 +123,7 @@ export function createShopPanel(ui, game, opts = {}) {
   // ---------------------------------------------------------------- actions
   function add(e, trade = false) {
     ui.sfx('ui_click', 0.5);
-    if (e.currency === 'clout') {
-      ui.confirmBox(t('COMPANY STORE'), `${t('Buy for Clout?')} ${e.name} ◈${e.price}`, t('BUY')).then((ok) => { if (ok) shop.buyCoin(e.id, 1); });
-      return;
-    }
+    if (e.locked) return;
     const cur = cart.get(e.id);
     const max = e.ship || trade ? 1 : e.left != null ? e.left : 10;
     if (cur) { cur.n = Math.min(max, cur.n + 1); if (trade) cur.trade = true; } else cart.set(e.id, { n: 1, trade });
