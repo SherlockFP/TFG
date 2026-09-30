@@ -60,3 +60,9 @@ Last updated: 2026-09-29, end of wave 8. Main = `6c29324` or later. Written by t
 - Wave 11 (docs/wave11/): creatures11 (Captcha, Shadowban, Recommender), swarm11 (Scrapers + nest, Streamer, AutoMod), loop11 (The Loop, Exit-8 corridor), shift11 (Recycle Bin shifting sectors on 404 / Chatroom), events11 (Lockdown, Flood, Power reroute, Viral moment), gear11 (decoy speaker, scout drone, door jammer, glow trail, zipline).
 - Score 5.3 → 6.2 (docs/CRITIQUE.md). Each module has a debug API (kefal.game.<module>.debug...) listed in its doc.
 - Next: a real 2-player session with the new content; balance pass (tools/sim/economy.mjs) for 12 new threats + 5 gadgets; look at Buffering / Doomscroller in darkness; fix the 4 old failing tests (artpass, followers crash on Windows paths?; hubgate expects the removed QUICK SHIFT entry; netaudit hubgate/repomaps checks).
+
+## 8. Update — wave 12 (2026-09-30 evening) — merged without a browser pass (owner: "test yapma direk maine")
+- docs/wave12/: creatures12 (404 invisible-unless-scanned, Cookie tracker, Echo Chamber, Lag Spike), labyr12 (Dark Web echolocation M-knock, Overload Hotel elevator + hidden floor 13), moons12 (CLOUD-9 dish uplink goal, DEEP CABLE data-core carry goal), atmos12 (interior dust/shafts/decals/grade), coop12 (team lift giants, heavy doors, buddy bond, high-five), balance12 (quota ramp, new-threat cap per pool, staggered minQ).
+- Settings > Voice has a TURN section (only the host needs it; stored in localStorage tfg.turn).
+- NOT seen in a browser: labyr12 + balance12 (landing smoke of c9sky / dcable / hamsi before them: 0 errors, draw calls 415-540 - watch perf).
+- threatpool HEADLINE: balance12 now reads minQ from creatures10/11 + swarm11 core TUNE tables (duplicate old rows removed at merge).
