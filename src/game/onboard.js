@@ -244,7 +244,9 @@ export function installOnboard(game) {
     game.player.pitch = 0; game.player.frozen = true;
     try {   // [feelfix2] the first frame after the overlay looks at the terminal (the objective), never at a tarped fixture
       const tp = game.ship?.points?.terminal, pp = game.player.pos;
-      if (tp) game.player.yaw = Math.atan2(-(tp.x - pp.x), -(tp.z - pp.z));
+      // [qa3] the terminal stands in the cockpit, behind the bulkhead (x -4.0, hatch at z 0): from the hub aim at the hatch, not at the wall / trophy wall
+      const BULK = -4.0;
+      if (tp) game.player.yaw = (pp.x > BULK + 0.2 && tp.x < BULK - 0.2) ? Math.atan2(-(BULK - pp.x), -(0 - pp.z)) : Math.atan2(-(tp.x - pp.x), -(tp.z - pp.z));
     } catch (e) { warn('face', e); }
     game.engine.fx.fade = 1; game.engine.fadeTarget = 1;
     const at = (t0, fn) => st.tl.push({ at: t0, fn });

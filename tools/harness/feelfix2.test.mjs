@@ -25,6 +25,9 @@ ok(/platform: R\(\{ floor: 'tiles_checker'/.test(read('src/world/interiors/lab_t
 ok(/softDisc\(/.test(read('src/game/feedcams2.js')) && /const M = 20/.test(read('src/game/feedcams.js')), 'round drone cone + 20-slice camera cone');
 ok(/body:has\(\.report\) \.hud-quota/.test(read('src/ui/docklayout.js')), 'report hides the top quota banner');
 ok(/LOCK_NEAR = 1\.5/.test(read('src/game/hubgate.js')), 'locked-fixture prompt only within 1.5 m');
+// QA night 3 fixes: the tarp covers the whole fixture (the arcade marquee stuck out of a 0.94 x box), the stream end aims at the hatch, not through the bulkhead
+ok(/const h = dm\.h \+ 0\.03/.test(read('src/game/hubgate.js')) && !/dm\.h \* 0\.94/.test(read('src/game/hubgate.js')), 'tarp is at least as tall as the fixture');
+ok(/const BULK = -4\.0/.test(read('src/game/onboard.js')) && /tp\.x < BULK - 0\.2/.test(read('src/game/onboard.js')), 'stream end from the hub aims at the cockpit hatch');
 
 console.log(bad ? `feelfix2: ${bad} FAILED` : 'feelfix2: all ok');
 process.exit(bad ? 1 : 0);
