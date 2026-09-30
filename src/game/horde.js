@@ -15,7 +15,7 @@ import { ITEMS } from './items.js';
 import { RNG, hashString } from '../core/rng.js';
 import { FACILITY_Y } from '../world/facility.js';
 import { hudDock } from '../ui/dock.js';
-import { t, tf, addTranslations } from '../core/i18n.js';
+import { t, tf, addTranslations, sysMsg } from '../core/i18n.js';
 import { applyNameTagTitle, titleOf } from './achievements.js';
 import { suitColor } from '../entities/remote.js';
 import { installCamera } from './camera_item.js';
@@ -203,7 +203,7 @@ export function installHorde(game) {
     const x = clampN(Math.cos(a) * d, -lim, lim), z = clampN(Math.sin(a) * d, -lim, lim);
     const y = game.world.terrain?.heightAt(x, z) ?? 0;
     game.net.broadcast('fx', { k: 'hdrop', p: [+x.toFixed(2), +y.toFixed(2), +z.toFixed(2)], f: factionIndex(inv.faction) });
-    game.net.broadcast('sys', { text: `⚠ ${F.name.toUpperCase()} SQUAD HAS INVADED THIS SECTOR`, kind: 'bad' });
+    game.net.broadcast('sys', sysMsg('⚠ {name} SQUAD HAS INVADED THIS SECTOR', { name: F.name.toUpperCase() }, 'bad'));
     game.net.broadcast('fx', { k: 'hbanner', t: `${F.short.toUpperCase()} ${t('HIT SQUAD')}`, s: t('has invaded this sector'), c: F.color });
     const n = 3 + (sector() >= 2 ? 1 : 0) + (sector() >= 4 ? 1 : 0);
     game.later(() => { if (!S.disposed && game.run?.phase === 'moon') spawnHitSquad(inv.faction, new THREE.Vector3(x, y, z), n); }, 3500);

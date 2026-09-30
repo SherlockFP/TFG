@@ -308,7 +308,7 @@ export class InventoryPanel {
       if (!this.tip) { this.tip = document.createElement('div'); this.tip.className = 'tinv-tip'; document.body.appendChild(this.tip); }
       const tier = e.tier;
       this.tip.style.setProperty('--tc', (TIERS[tier] || TIERS.common).color);
-      const hint = e.inv?.k === 'eq' ? 'RMB: unequip · SHIFT+CLICK: drop' : C.isEquippable(e.def) ? 'RMB: equip · SHIFT+CLICK: drop' : e.inv ? 'RMB: to hotbar · 1-4: hotbar slot · SHIFT+CLICK: drop' : 'RMB: stash in bag · SHIFT+CLICK: drop';
+      const hint = t(e.inv?.k === 'eq' ? 'RMB: unequip · SHIFT+CLICK: drop' : C.isEquippable(e.def) ? 'RMB: equip · SHIFT+CLICK: drop' : e.inv ? 'RMB: to hotbar · 1-4: hotbar slot · SHIFT+CLICK: drop' : 'RMB: stash in bag · SHIFT+CLICK: drop');
       this.tip.innerHTML = itemTooltipHTML(e.it, e.def, { grid: this.api.grid(), hint });
     }
     if (ev && this.tip) this.placeTip(ev.clientX, ev.clientY);

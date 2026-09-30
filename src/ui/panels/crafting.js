@@ -123,7 +123,7 @@ export function createCraftingPanel({ game, api, tab, onClose } = {}) {
     root.replaceChildren();
     const st = state();
     const head = mk('div', 'crp-head');
-    head.append(mk('div', 'crp-title', t('WORKBENCH')), mk('div', 'crp-sub', 'FABRICATOR MK-I'), mk('div', 'crp-sp'),
+    head.append(mk('div', 'crp-title', t('WORKBENCH')), mk('div', 'crp-sub', t('FABRICATOR MK-I')), mk('div', 'crp-sp'),
       mk('div', 'crp-pill', `▮ ${fmt(game.run?.credits || 0)}`),
       mk('div', 'crp-pill', `${t('LUCK')} +${Math.round(st.luck * 100)}%`),
       mk('div', 'crp-pill', `${t('BLUEPRINTS')} ${api.blueprints().length}/${Object.keys(BLUEPRINTS).length}`));

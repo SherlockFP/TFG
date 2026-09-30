@@ -4,13 +4,14 @@
 // No scene lights are added (emissive / Basic materials + pooled emitters listed in `lights`).
 import * as THREE from 'three';
 import { LAYOUT, TILE, SHORTCUTS, ringCell, slotOffset } from '../game/board_rules.js';
+import { t } from '../core/i18n.js';
 
 export const BOARD = Object.freeze({ P: 3.4, TILE: 3.14, TOP: 0.1, DIE: 2.6, HALF_X: 20, HALF_Z: 18, SEAT: { x: 0, y: 0, z: -14.6 } });
 const TILE_STYLE = {
   [TILE.START]: { bg: '#2e5a3a', fg: '#dfffe0', label: 'START' }, [TILE.LOOT]: { bg: '#8a6a12', fg: '#fff1b0', label: 'LOOT' },
   [TILE.TRAP]: { bg: '#7a1a1a', fg: '#ffd0c8', label: 'TRAP' }, [TILE.CARD]: { bg: '#4a2a7a', fg: '#e6d2ff', label: 'CARD' },
-  [TILE.DUEL]: { bg: '#8a4310', fg: '#ffe0b8', label: 'DUEL' }, [TILE.SHORT]: { bg: '#12626a', fg: '#c8fbff', label: 'SHORTCUT' },
-  [TILE.REST]: { bg: '#2a4f7a', fg: '#d4e8ff', label: 'REST' }, [TILE.EXIT]: { bg: '#16a04a', fg: '#eaffee', label: 'EXIT' },
+  [TILE.DUEL]: { bg: '#8a4310', fg: '#ffe0b8', get label() { return t('DUEL'); } }, [TILE.SHORT]: { bg: '#12626a', fg: '#c8fbff', get label() { return t('SHORTCUT'); } },
+  [TILE.REST]: { bg: '#2a4f7a', fg: '#d4e8ff', get label() { return t('REST'); } }, [TILE.EXIT]: { bg: '#16a04a', fg: '#eaffee', label: 'EXIT' },
 };
 const tex = (c) => { const t = new THREE.CanvasTexture(c); t.magFilter = THREE.NearestFilter; t.minFilter = THREE.NearestFilter; t.colorSpace = THREE.SRGBColorSpace; return t; };
 const canvas = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
@@ -42,8 +43,8 @@ function sealCanvas() {
   x.fillStyle = '#15121c'; x.fillRect(0, 0, 256, 256);
   x.strokeStyle = '#9aa3c0'; x.lineWidth = 3;
   for (const r of [120, 104, 60]) { x.beginPath(); x.arc(128, 128, r, 0, Math.PI * 2); x.stroke(); }
-  x.fillStyle = '#9aa3c0'; x.textAlign = 'center'; x.font = 'bold 22px monospace'; x.fillText('THE  BOARD', 128, 112);
-  x.font = '14px monospace'; x.fillText('SIGN HERE ________', 128, 146);
+  x.fillStyle = '#9aa3c0'; x.textAlign = 'center'; x.font = 'bold 22px monospace'; x.fillText(t('THE  BOARD'), 128, 112);
+  x.font = '14px monospace'; x.fillText(t('SIGN HERE ________'), 128, 146);
   x.fillText('turns are final', 128, 168);
   return c;
 }

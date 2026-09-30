@@ -13,6 +13,7 @@
 //   'pct'  keys are FRACTIONS (0.03 = +3 %), 'flat' keys are absolute numbers (maxMana +5, stamina +5, carry +8 lb ...).
 //   noise: negative = quieter.  cooldown: positive = shorter cooldowns (0.12 = -12 %).
 
+import { getLang } from '../core/i18n.js';   // [i18n8] only for the Turkish percent order (%3)
 export const TREE_VERSION = 1;
 
 // ---------------------------------------------------------------- bonus keys
@@ -56,7 +57,7 @@ export function formatBonus(key, v) {
   const sign = v > 0 ? '+' : '-';
   const a = Math.abs(v);
   let text;
-  if (k.unit === 'pct') text = `${sign}${trim(a * 100)}% ${k.label}`;
+  if (k.unit === 'pct') text = getLang() === 'tr' ? `${sign}%${trim(a * 100)} ${k.label}` : `${sign}${trim(a * 100)}% ${k.label}`;
   else if (k.many) text = `${sign}${trim(a)} ${a === 1 ? k.one : k.many}`;
   else text = `${sign}${trim(a)}${k.suffix || ''} ${k.label}`;
   return { key, text, good };

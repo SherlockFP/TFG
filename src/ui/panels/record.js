@@ -17,7 +17,7 @@ import { crewLevelOf, ensureCrewProfile, publicCrew } from '../../game/crew.js';
 import { EMOTES, LOCKED_EMOTES, isEmoteUnlocked } from '../../game/emotes.js';
 import { iconImg } from '../icons.js';
 import { glyphFromEmoji } from '../glyphs.js';   // [ui2]
-import { getLang, addTranslations, t, t as _t } from '../../core/i18n.js';
+import { getLang, addTranslations, t, t as _t, tf as _tf } from '../../core/i18n.js';
 import { saveProfile } from '../../core/save.js';
 
 const TR = {
@@ -198,8 +198,8 @@ export function createServiceRecord({ game = null, profile = game?.profile, tab,
       for (const id of ids) {
         const d = CREATURES[id], e = p.bestiary[id];
         const on = !!e?.seen;
-        grid.appendChild(card(on, CREATURE_ICONS[id] || (d.boss ? '👹' : '👾'), on ? d.name : '???', d.hazard ? 'HAZARD' : (d.boss ? 'BOSS' : (on ? `${e.kills || 0} ${L('kills')}` : '')), on
-          ? [['rec-d', d.lore || ''], ['rec-note', FIELD_NOTES[id] ? '▸ ' + FIELD_NOTES[id] : '']]
+        grid.appendChild(card(on, CREATURE_ICONS[id] || (d.boss ? '👹' : '👾'), on ? d.name : '???', d.hazard ? _t('HAZARD') : (d.boss ? _t('BOSS') : (on ? `${e.kills || 0} ${L('kills')}` : '')), on
+          ? [['rec-d', _t(d.lore || '')], ['rec-note', FIELD_NOTES[id] ? '▸ ' + _t(FIELD_NOTES[id]) : '']]
           : [['rec-d', L('Not yet encountered')]]));
       }
     } else if (lastSub === 'scrap') {
@@ -209,11 +209,11 @@ export function createServiceRecord({ game = null, profile = game?.profile, tab,
         const on = (e?.n || 0) > 0;
         let ic = '📦';
         try { ic = iconImg(id); } catch { /* icons unavailable */ }
-        grid.appendChild(card(on, ic, on ? ITEMS[id].name : '???', on ? `x${e.n}` : '', on ? [['rec-d', `${L('best')}: ▮${fmt(e.best)}`]] : [['rec-d', ITEMS[id].kind === 'big' ? 'Large valuable' : ITEMS[id].kind === 'fish' ? 'Catch of the day' : '']]));
+        grid.appendChild(card(on, ic, on ? ITEMS[id].name : '???', on ? `x${e.n}` : '', on ? [['rec-d', `${L('best')}: ▮${fmt(e.best)}`]] : [['rec-d', ITEMS[id].kind === 'big' ? _t('Large valuable') : ITEMS[id].kind === 'fish' ? _t('Catch of the day') : '']]));
       }
     } else if (lastSub === 'moons') {
       const ids = Object.keys(p.codex.moons).sort((a, b) => (p.codex.moons[b].n || 0) - (p.codex.moons[a].n || 0));
-      if (!ids.length) grid.appendChild(mk('div', 'rec-d', 'Land somewhere first.'));
+      if (!ids.length) grid.appendChild(mk('div', 'rec-d', _t('Land somewhere first.')));
       for (const id of ids) {
         const e = p.codex.moons[id], m = MOONS[id];
         grid.appendChild(card(true, m?.company ? '🏢' : '🪐', e.name || m?.name || id, m ? (m.company ? 'HQ' : 'T' + (m.tier ?? '?')) : 'GENERATED', [['rec-d', `${e.n || 0} ${L('visits')}${e.biome ? ' · ' + e.biome : ''}`], ['rec-note', m?.desc || '']]));
@@ -224,7 +224,7 @@ export function createServiceRecord({ game = null, profile = game?.profile, tab,
       const ids = new Set(['factory', 'mansion', 'mineshaft', ...Object.keys(p.codex.interiors)]);
       for (const id of ids) {
         const e = p.codex.interiors[id];
-        grid.appendChild(card(!!e, '🏚️', e ? interiorName(id) : '???', e ? `x${e.n}` : '', [['rec-d', e ? `First explored ${e.at ? new Date(e.at).toISOString().slice(0, 10) : 'long ago'}` : 'Unexplored interior']]));
+        grid.appendChild(card(!!e, '🏚️', e ? interiorName(id) : '???', e ? `x${e.n}` : '', [['rec-d', e ? _tf('First explored {d}', { d: e.at ? new Date(e.at).toISOString().slice(0, 10) : _t('long ago') }) : _t('Unexplored interior')]]));
       }
     } else if (lastSub === 'events') {
       for (const ev of DAILY_EVENTS) {
@@ -237,7 +237,7 @@ export function createServiceRecord({ game = null, profile = game?.profile, tab,
     } else if (lastSub === 'emotes') {
       for (const e of EMOTES.filter((x) => LOCKED_EMOTES.includes(x.id))) {
         const on = isEmoteUnlocked(p, e.id);
-        grid.appendChild(card(on, e.icon, e.name, on ? L('Unlocked') : L('Locked'), [['rec-d', on ? 'Hold B to use it.' : 'Unlock: ' + e.lock]]));
+        grid.appendChild(card(on, e.icon, e.name, on ? L('Unlocked') : L('Locked'), [['rec-d', on ? _t('Hold B to use it.') : _tf('Unlock: {x}', { x: e.lock })]]));
       }
     } else {
       for (const m of MILESTONES) {
@@ -259,7 +259,7 @@ export function createServiceRecord({ game = null, profile = game?.profile, tab,
       const below = masterySpent(p, t.tier);
       const open = ((p.level || 1) >= t.minLevel || prestigeStars(p) > 0) && below >= t.need;
       const col = mk('div', 'rec-tier' + (open ? '' : ' locked'));
-      col.appendChild(mk('div', 'rec-h', `${t.name} · Lv.${t.minLevel}${t.need ? ` · ${t.need} pts below` : ''}`));
+      col.appendChild(mk('div', 'rec-h', `${t.name} · ${_tf('Lv.{n}', { n: t.minLevel })}${t.need ? ' · ' + _tf('{n} pts below', { n: t.need }) : ''}`));
       for (const [id, m] of Object.entries(MASTERY)) {
         if (m.tier !== t.tier) continue;
         const r = masteryRank(p, id);
@@ -295,11 +295,11 @@ export function createServiceRecord({ game = null, profile = game?.profile, tab,
     const cur = prestigeBonus(s), next = prestigeBonus(s + 1);
     body.appendChild(mk('div', 'rec-d', `Current: +${Math.round(cur.xpPct * 100)}% XP · +${Math.round(cur.coinPct * 100)}% Clout · +${cur.maxHp} max HP · +${Math.round(cur.staminaPct * 100)}% stamina`));
     if (s < STAR_BONUS_CAP) body.appendChild(mk('div', 'rec-good', `Next star: +${Math.round(next.xpPct * 100)}% XP · +${Math.round(next.coinPct * 100)}% Clout · +${next.maxHp} max HP`));
-    body.appendChild(mk('div', 'rec-h', 'STAR REWARDS'));
+    body.appendChild(mk('div', 'rec-h', _t('STAR REWARDS')));
     const grid = mk('div', 'rec-grid');
     for (const r of STAR_REWARDS) grid.appendChild(card(s >= r.stars, '★', `★${r.stars}`, s >= r.stars ? L('Unlocked') : '', [['rec-d', rewardLine(r)]]));
     body.appendChild(grid);
-    body.appendChild(mk('div', 'rec-h', 'REBIRTH'));
+    body.appendChild(mk('div', 'rec-h', L('REBIRTH')));
     const pv = rebirthPreview(p);
     body.appendChild(mk('div', 'rec-d', `Requires Lv.${REBIRTH_LEVEL} (you: Lv.${p.level}/${MAX_LEVEL}). You go back to level 1; base skills reset (${pv.spent} spent → ${pv.keep} refunded + ${pv.extra} bonus points; unspent points kept). KEPT: Mastery, gear, Clout, cosmetics, titles, achievements, Codex.`));
     let armed = false;
@@ -322,7 +322,7 @@ export function createServiceRecord({ game = null, profile = game?.profile, tab,
     const active = run?.weekly;
     const spec = active ? { key: active.key, mods: active.mods, featured: active.featured } : weeklySpec(wk.key);
     const left = Math.max(0, wk.endsAt - Date.now());
-    body.appendChild(mk('div', 'rec-h', `WEEK ${spec.key} · resets in ${Math.floor(left / 86400000)}d ${Math.floor((left % 86400000) / 3600000)}h`));
+    body.appendChild(mk('div', 'rec-h', _tf('WEEK {k} · resets in {d}d {h}h', { k: spec.key, d: Math.floor(left / 86400000), h: Math.floor((left % 86400000) / 3600000) })));
     for (const m of weeklyMods(spec.mods)) {
       const r = mk('div', 'rec-mod');
       r.style.borderLeftColor = MOOD_COLOR[m.mood] || '#ffd23f';
@@ -330,15 +330,15 @@ export function createServiceRecord({ game = null, profile = game?.profile, tab,
       body.appendChild(r);
     }
     if (spec.featured) body.appendChild(mk('div', 'rec-gold', `Featured moon: ${MOONS[spec.featured]?.name || spec.featured} (+25% scrap)`));
-    body.appendChild(mk('div', 'rec-d', 'Every crew gets the SAME facility for the same day + moon this week. Score = scrap sold before you get deplatformed.'));
-    if (active) body.appendChild(mk('div', 'rec-good', `THIS RUN IS THE WEEKLY CHALLENGE · score ▮${fmt(active.score)} · quotas ${active.quotas || 0}${active.fin ? ' · FINAL' : ''}`));
+    body.appendChild(mk('div', 'rec-d', _t('Every crew gets the SAME facility for the same day + moon this week. Score = scrap sold before you get deplatformed.')));
+    if (active) body.appendChild(mk('div', 'rec-good', _tf('THIS RUN IS THE WEEKLY CHALLENGE · score ▮{s} · quotas {q}', { s: fmt(active.score), q: active.quotas || 0 }) + (active.fin ? ' · ' + _t('FINAL') : '')));
     else if (game?.meta?.weekly) {
       const why = game.meta.weekly.startBlock();
       const row = mk('div', 'rec-row');
       row.appendChild(btn(L('Start Weekly Challenge'), () => { game.meta.weekly.requestStart(); sfx('ui_confirm', 0.6); setTimeout(render, 300); }, why ? 'dis' : ''));
       if (why) row.appendChild(mk('span', 'rec-d', why));
       body.appendChild(row);
-    } else body.appendChild(mk('div', 'rec-d', 'Host a game and type WEEKLY START in the ship terminal (fresh run only).'));
+    } else body.appendChild(mk('div', 'rec-d', _t('Host a game and type WEEKLY START in the ship terminal (fresh run only).')));
     body.appendChild(mk('div', 'rec-h', L('Leaderboard') + ` · ${spec.key}`));
     const list = p.weekly.boards[spec.key] || [];
     if (!list.length) body.appendChild(mk('div', 'rec-d', L('No runs yet this week.')));
@@ -368,12 +368,12 @@ export function createServiceRecord({ game = null, profile = game?.profile, tab,
     body.appendChild(mk('div', 'rec-n', c.name));
     const lv = crewLevelOf(c.xp);
     const row = mk('div', 'rec-row');
-    row.append(mk('span', 'rec-gold', `Crew Lv.${lv.level}`), bar(lv.need ? lv.into / lv.need : 1), mk('span', 'rec-d', `${fmt(lv.into)}/${fmt(lv.need)}`));
+    row.append(mk('span', 'rec-gold', _tf('Crew Lv.{n}', { n: lv.level })), bar(lv.need ? lv.into / lv.need : 1), mk('span', 'rec-d', `${fmt(lv.into)}/${fmt(lv.need)}`));
     body.appendChild(row);
     body.appendChild(mk('div', 'rec-d', `Perk: every member earns +${Math.min(25, lv.level > 1 ? lv.level : 0)}% XP in this crew's sessions. Crew XP: days survived, scrap sold, quotas met (host sessions). Crew Lv.5 unlocks the "Rally the Crew" emote for members.`));
     if (shared && !isOwner) body.appendChild(mk('div', 'rec-note', `You are playing in the host's crew. Your own crew: [${own.tag}] ${own.name} (Lv.${own.level}) - it shows when you host.`));
     if (isOwner) {
-      body.appendChild(mk('div', 'rec-h', 'RENAME'));
+      body.appendChild(mk('div', 'rec-h', _t('RENAME')));
       const nameIn = mk('input', 'rec-in'); nameIn.value = p.crew.name; nameIn.maxLength = 24;
       const tagIn = mk('input', 'rec-in'); tagIn.value = p.crew.tag; tagIn.maxLength = 4; tagIn.style.width = '80px';
       for (const i of [nameIn, tagIn]) i.addEventListener('keydown', (e) => e.stopPropagation());
@@ -388,10 +388,10 @@ export function createServiceRecord({ game = null, profile = game?.profile, tab,
         if (!why) setTimeout(render, 500);
       }), msg);
       body.appendChild(r2);
-      body.appendChild(mk('div', 'rec-h', `${L('Members')} (${Object.keys(p.crew.members).length}) · days ${p.crew.days || 0} · quotas ${p.crew.quotas || 0}`));
+      body.appendChild(mk('div', 'rec-h', _tf('{m} ({n}) · days {d} · quotas {q}', { m: L('Members'), n: Object.keys(p.crew.members).length, d: p.crew.days || 0, q: p.crew.quotas || 0 })));
       const grid = mk('div', 'rec-grid');
       const mem = Object.values(p.crew.members).sort((a, b) => (b.days || 0) - (a.days || 0)).slice(0, 24);
-      if (!mem.length) grid.appendChild(mk('div', 'rec-d', 'Survive a day with your crew to fill the roster.'));
+      if (!mem.length) grid.appendChild(mk('div', 'rec-d', _t('Survive a day with your crew to fill the roster.')));
       for (const m of mem) grid.appendChild(card(true, '👤', m.name || '?', `${m.days || 0}d`, [['rec-d', m.last ? 'last seen ' + new Date(m.last).toISOString().slice(0, 10) : '']]));
       body.appendChild(grid);
     }

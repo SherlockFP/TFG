@@ -12,6 +12,19 @@ import { RECIPES, BLUEPRINTS } from '../game/recipes.js';
 import { MILESTONES } from '../game/collection.js';
 import { STRANGE } from '../game/research.js';
 import { EMOTES } from '../game/emotes.js';
+import { KEYS as PT_KEYS, ROLES as PT_ROLES, KEYSTONES as PT_KEYSTONES, NODES as PT_NODES } from '../game/passivetree.js';
+import { LORE_LOGS } from '../game/loredata.js';
+import '../game/passivetree_i18n.js';   // [i18n8] wave 8 gap-fill dictionaries (data-table strings the static audit could not see)
+import '../game/pets_core_i18n.js';
+import '../game/items_data_i18n.js';
+import '../game/cosmetics_data_i18n.js';
+import '../game/world_data_i18n.js';
+import '../game/creatures_text_i18n.js';
+import '../game/misc_data_i18n.js';
+import '../game/flow_i18n.js';
+import './ru_gap8_gear.js';
+import './ru_gap8_rpg.js';
+import './ru_gap8_fun.js';
 
 const NAME = ['name'];
 const NAME_TIP = ['name', 'tip', 'desc'];
@@ -41,3 +54,9 @@ localizeDeep(BLUEPRINTS, ['name', 'desc'], 1);
 localizeDeep(MILESTONES, NAME, 2);
 localizeDeep(STRANGE, ['tip', 'lore'], 2);
 localizeDeep(EMOTES, NAME, 1);
+// [i18n8] passive tree: stat labels, roles, keystones and node names / tips (node `text` lines are wrapped in the panel)
+localizeDeep(PT_KEYS, ['label', 'one', 'many'], 1);
+localizeDeep(PT_ROLES, ['name', 'tag', 'desc'], 1);
+localizeDeep(PT_KEYSTONES, ['name', 'tip'], 1);
+localizeDeep(PT_NODES, ['name', 'tip'], 1);
+localizeDeep(LORE_LOGS, ['title'], 1);   // lore log titles

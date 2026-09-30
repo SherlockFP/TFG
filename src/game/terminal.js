@@ -13,6 +13,7 @@ import { dropPoint } from '../world/shiplayout.js';
 import { escapeHtml } from '../core/util.js';
 const n0 = (v) => Math.round(v || 0).toLocaleString('en-US');   // credits are always shown with thousands separators (docs/wave8/studio_style.md)
 import { t, tf, tfIn, sysMsg } from '../core/i18n.js';
+import { tNum } from '../i18n/tnum.js';   // [i18n8] safety net for literal terminal lines that were not wrapped
 import { LAB_HINT } from './labyrinths_core.js';   // [labyrinths]
 
 const BANNER = [
@@ -102,7 +103,7 @@ export class Terminal {
   }
 
   print(text, cls = '') {
-    for (const line of String(text).split('\n')) this.lines.push({ text: line, cls });
+    for (const line of String(text).split('\n')) this.lines.push({ text: tNum(line), cls });
     if (this.lines.length > 400) this.lines.splice(0, this.lines.length - 400);
     this.render();
     this.game.shipScreens?.markTerminalDirty();

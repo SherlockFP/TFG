@@ -12,6 +12,7 @@ import { MOONS } from './moons.js';
 import { scrapTableFor } from './items.js';
 import * as F from './enhance.js';
 import { attachTierLook, tierLooksUpdate, clearTierLooks } from '../render/tierlooks.js';   // [skeletons] generic armour / colour per tier (all creatures)
+import { sysMsg } from '../core/i18n.js';   // [i18n8]
 
 const RING_GEO = new THREE.RingGeometry(0.72, 1.0, 28).rotateX(-Math.PI / 2);
 const _v = new THREE.Vector3();
@@ -56,7 +57,7 @@ export function installCreatureTiers(game, forge) {
     if (tier === 'mythic') {
       const nm = def.name || type;
       game.later?.(() => {
-        game.net?.broadcast('sys', { text: `A MYTHIC ${nm.toUpperCase()} HAS SPAWNED.`, kind: 'bad' });
+        game.net?.broadcast('sys', sysMsg('A MYTHIC {name} HAS SPAWNED.', { name: nm.toUpperCase() }, 'bad'));
         game.lore?.say?.(`A MYTHIC ${nm}. Please do not make it a clip.`, { all: true, mood: 'ecstatic' });
       }, 800);
     }
