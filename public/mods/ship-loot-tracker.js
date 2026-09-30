@@ -105,6 +105,7 @@ KefalAPI.defineMod({
       html += `<div class="dim">${esc(api.tf(n === 1 ? '{n} item' : '{n} items', { n }))}</div>`;
       html += `<div class="bar"><i class="pr" style="width:${(fullF * 100).toFixed(1)}%"></i><i style="width:${(projF * 100).toFixed(1)}%;opacity:.55"></i><i style="width:${(soldF * 100).toFixed(1)}%"></i></div>`;
       html += `<div class="dim">${esc(api.tf('The Company pays {r}% today', { r: Math.round(rate * 100) }))}: <span class="${cls}">▮${worth}</span>${need > 0 ? ` · ${esc(api.tf('▮{n} to go', { n: need }))}` : ` · <span class="ok">${esc(api.t('QUOTA MET'))}</span>`}</div>`;
+      if (rate < 1 && (run.daysLeft | 0) > 0) html += `<div class="dim">${esc(api.t('Deadline day pays 100 %'))}</div>`;   // [econ9]
       if (cfg.showBreakdown && list.length) {
         for (const it of list.slice(0, 4)) html += `<div class="it"><span>${esc(it.label || it.def.name)}</span><span>▮${it.value}</span></div>`;
         if (list.length > 4) html += `<div class="it"><span>${esc(api.tf('+{n} more', { n: list.length - 4 }))}</span><span></span></div>`;

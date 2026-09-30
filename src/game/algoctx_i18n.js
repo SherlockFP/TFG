@@ -8,6 +8,7 @@ addTranslations({
   'The Company pays {r}% today': 'Şirket bugün %{r} ödüyor',
   '▮{n} to go': '▮{n} kaldı',
   '+{n} more': '+{n} tane daha',
+  'Deadline day pays 100 %': 'Son gün %100 öder',
 }, 'tr');
 addTranslations({
   'LOOT ABOARD': 'ДОБЫЧА НА БОРТУ',
@@ -16,4 +17,5 @@ addTranslations({
   'The Company pays {r}% today': 'Компания платит сегодня {r}%',
   '▮{n} to go': 'осталось ▮{n}',
   '+{n} more': 'ещё +{n}',
+  'Deadline day pays 100 %': 'В последний день платят 100 %',
 }, 'ru');

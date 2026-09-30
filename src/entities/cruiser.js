@@ -36,7 +36,7 @@ import { clamp, damp } from '../core/util.js';
 
 export const CRUISER = {
   name: 'Uplink Van',
-  price: 350,
+  price: 800,
   dockRadius: 38,          // parked within this distance of the ship at takeoff -> winched aboard
   maxSpeed: 19,            // m/s (~68 km/h)
   maxReverse: 6,

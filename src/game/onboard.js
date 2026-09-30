@@ -616,7 +616,7 @@ export function installOnboard(game) {
     /** ONE objective at a time while budgeted (the same list when free) */
     only: (lines) => (frStage() === 'free' ? lines : FR.only(lines)),
     /** after Hiring Day, with scrap aboard and nothing sold yet, the orbit objective becomes "sell it" (the first sale beat) */
-    wantSell: (value) => frStage() === 'first' && !flowActive() && (value | 0) > 0,
+    wantSell: (value) => frStage() === 'first' && !flowActive() && (value | 0) > 0 && FR.sellWindow(game.run),   // [econ9] never on day 1: the deadline day pays 100 %
     firstDay: () => FR.firstDay(game.run),
     /** feedcams: the tutorial camera was passed (or you went live on it): the camera objective is done for good */
     camDone() { const f = game.profile?.onboard?.f; if (f && !f.camPass) { f.camPass = true; save(); } },

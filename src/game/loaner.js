@@ -1,4 +1,4 @@
-// LOANER (wave 8 QA night 1): flashlights must be BOUGHT, so a brand-new profile's first landing (firstrun budget still on, day 1, quota 0) gets one weak
+// LOANER (wave 8 QA night 1): flashlights must be BOUGHT, so a brand-new profile's landing until quota 1 is met (firstrun budget still on) gets one weak
 // "Company loaner torch" per crew member on the ship floor: a normal 'flashlight' item with a short battery and a label. It is taken back (removed) at takeoff.
 // Host spawns / removes (net 'it' sp / rm, the normal item path); every peer just shows the toast. No new item type, no new net message.
 import { addTranslations, t } from '../core/i18n.js';
@@ -13,7 +13,7 @@ export function installLoaner(game) {
   addTranslations(TR, 'tr'); addTranslations(RU, 'ru');
   let ids = [], disposed = false, prev = null;
   const fr = () => game.onboard?.fr;
-  const wanted = () => { const f = fr(); return !!f && f.stage() !== 'free' && f.firstDay() && !!game.world?.facility; };
+  const wanted = () => { const f = fr(); return !!f && f.stage() !== 'free' && !!game.world?.facility; };
   const returnAll = () => {
     if (game.isHost) for (const id of ids) { try { if (game.items?.get?.(id)) game.net.broadcast('it', { e: 'rm', id }); } catch { /* item gone */ } }
     ids = [];

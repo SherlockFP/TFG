@@ -12,7 +12,7 @@ import { forgeName } from '../game/enhance.js';   // [forge]
 import { durBarHTML, durClass } from './durability_style.js';   // [durability]
 import { TIERS } from '../game/tiers.js';
 import { ensureInventoryStyles } from './inventory_style.js';
-import { xpForLevel, rankOf } from '../game/progression.js';
+import { xpForLevel, rankOf, quotaState } from '../game/progression.js';
 import { MOONS, WEATHER } from '../game/moons.js';
 import * as DailyEvents from '../game/dailyEvents.js';
 import { t, getLang, tf } from '../core/i18n.js';

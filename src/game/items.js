@@ -85,7 +85,7 @@ export const ITEMS = {
   rod: { id: 'rod', name: 'Fishing Rod', kind: 'tool', price: 40, weight: 4, hands: 1 },
   key: { id: 'key', name: 'Key', kind: 'tool', price: 0, weight: 0, hands: 1, value: [3, 3] },
   lockpick: { id: 'lockpick', name: 'Lockpicker', kind: 'tool', price: 20, weight: 3, hands: 1, charges: 3 },
-  jetpack: { id: 'jetpack', name: 'Jetpack', kind: 'tool', price: 700, weight: 52, hands: 2, battery: 60 },
+  jetpack: { id: 'jetpack', name: 'Jetpack', kind: 'tool', price: 1200, weight: 52, hands: 2, battery: 60 },
   stungrenade: { id: 'stungrenade', name: 'Stun Grenade', kind: 'consumable', price: 30, weight: 5, hands: 1, throwable: true },
   medkit: { id: 'medkit', name: 'Medkit', kind: 'consumable', price: 40, weight: 3, hands: 1, heal: 60 },
   adrenaline: { id: 'adrenaline', name: 'Adrenaline', kind: 'consumable', price: 60, weight: 0, hands: 1 },
@@ -97,7 +97,7 @@ export const ITEMS = {
   stopsign: { id: 'stopsign', name: 'Stop Sign', kind: 'weapon', price: 0, weight: 12, hands: 1, dmg: 22, cd: 0.9, reach: 2.5, charge: true, rarity: 'uncommon', value: [20, 30] },
   machete: { id: 'machete', name: 'Machete', kind: 'weapon', price: 90, coin: 350, weight: 5, hands: 1, dmg: 26, cd: 0.5, reach: 2.1, rarity: 'rare' },
   sledge: { id: 'sledge', name: 'Sledgehammer', kind: 'weapon', price: 150, coin: 600, weight: 20, hands: 2, dmg: 48, cd: 1.3, reach: 2.6, charge: true, knock: 2, rarity: 'rare' },
-  taser: { id: 'taser', name: 'Zap Gun', kind: 'weapon', price: 400, coin: 900, weight: 11, hands: 1, dmg: 4, cd: 1.5, reach: 12, stun: 3.5, battery: 60, rarity: 'epic', ranged: true },
+  taser: { id: 'taser', name: 'Zap Gun', kind: 'weapon', price: 650, coin: 900, weight: 11, hands: 1, dmg: 4, cd: 1.5, reach: 12, stun: 3.5, battery: 60, rarity: 'epic', ranged: true },
   harpoon: { id: 'harpoon', name: 'Kefal Harpoon', kind: 'weapon', price: 600, coin: 1400, weight: 14, hands: 2, dmg: 70, cd: 1.6, reach: 30, ranged: true, rarity: 'epic' },
   shotgun: { id: 'shotgun', name: 'Double Barrel', kind: 'weapon', price: 0, coin: 2500, weight: 16, hands: 2, dmg: 90, cd: 0.7, reach: 25, ranged: true, ammo: 2, rarity: 'legendary' },
 
@@ -149,7 +149,7 @@ export const ITEMS = {
   //  size: [w, h] grid footprint override. Store copies are Common; loot copies roll a tier (luck: moon danger + Lucky Dongles).
   bag_fieldpack: { id: 'bag_fieldpack', name: 'Field Pack', kind: 'bag', price: 180, value: [40, 60], weight: 3, hands: 1, tier: 'uncommon', shopCat: 'bag', size: [1, 2], bag: { cols: 6, rows: 4, weightMul: 0.85 },
     tip: 'A proper backpack: 6x4 grid, stashed loot weighs 15% less. LMB to wear it.' },
-  bag_hauler: { id: 'bag_hauler', name: 'Hauler Frame', kind: 'bag', price: 420, value: [90, 130], weight: 8, hands: 1, tier: 'rare', shopCat: 'bag', size: [2, 2], bag: { cols: 7, rows: 5, weightMul: 0.8, speed: -0.05 },
+  bag_hauler: { id: 'bag_hauler', name: 'Hauler Frame', kind: 'bag', price: 650, value: [90, 130], weight: 8, hands: 1, tier: 'rare', shopCat: 'bag', size: [2, 2], bag: { cols: 7, rows: 5, weightMul: 0.8, speed: -0.05 },
     tip: 'Steel-frame pack: 7x5 grid, stashed loot weighs 20% less, but you walk 5% slower. LMB to wear it.' },
   bag_void: { id: 'bag_void', name: 'Void Satchel', kind: 'bag', value: [260, 360], weight: 2, hands: 1, tier: 'mythic', shopCat: 'bag', bag: { cols: 8, rows: 6, weightMul: 0.7 },
     tip: 'Bigger on the inside. Nobody knows who uploaded it. 8x6 grid, stashed loot weighs 30% less.' },
@@ -157,7 +157,7 @@ export const ITEMS = {
     tip: 'Comfy, and it stops a little bit of pain. Wear it in the SUIT slot.' },
   arm_riot: { id: 'arm_riot', name: 'Riot Vest', kind: 'armor', price: 220, value: [50, 80], weight: 12, hands: 1, shopCat: 'suit', gear: { armor: 0.12, speed: -0.02 },
     tip: 'Moderation Bureau surplus. Solid protection, a little stiff.' },
-  arm_kevlar: { id: 'arm_kevlar', name: 'Kevlar Suit', kind: 'armor', price: 480, value: [110, 160], weight: 18, hands: 1, shopCat: 'suit', gear: { armor: 0.18, speed: -0.04 },
+  arm_kevlar: { id: 'arm_kevlar', name: 'Kevlar Suit', kind: 'armor', price: 750, value: [110, 160], weight: 18, hands: 1, shopCat: 'suit', gear: { armor: 0.18, speed: -0.04 },
     tip: 'Heavy plates. The best protection money can buy, at a walking-speed cost.' },
   trk_dongle: { id: 'trk_dongle', name: 'Lucky Dongle', kind: 'trinket', price: 150, value: [30, 55], weight: 0.5, hands: 1, shopCat: 'trinket', gear: { luck: 0.06, crit: 0.02 },
     tip: 'Plug it in for luck. The whole crew finds higher-tier loot (and you crit more).' },
@@ -271,9 +271,9 @@ export const GEAR_IDS = Object.freeze(['beltbag', 'bag_fieldpack', 'bag_hauler',
 // Ship upgrades (credits)
 export const SHIP_UPGRADES = {
   loudhorn: { name: 'Loud Horn', price: 100, desc: 'A deafening horn to call your crew back.' },
-  teleporter: { name: 'Teleporter', price: 375, desc: 'Beam a crewmate (and their body) back to the ship.' },
-  signal: { name: 'Signal Translator', price: 255, desc: 'Send short messages to crew visors via "transmit".' },
-  lightsplus: { name: 'Brighter Floodlight', price: 150, desc: 'Ship floodlight reaches twice as far.' },
+  teleporter: { name: 'Teleporter', price: 900, desc: 'Beam a crewmate (and their body) back to the ship.' },
+  signal: { name: 'Signal Translator', price: 400, desc: 'Send short messages to crew visors via "transmit".' },
+  lightsplus: { name: 'Brighter Floodlight', price: 300, desc: 'Ship floodlight reaches twice as far.' },
   arcade: { name: 'Arcade Cabinet', price: 0, desc: 'FLAPPY PHISH. Always installed.', owned: true },
   disco: { name: 'Disco Ball', price: 60, desc: 'Essential equipment.' },
 };

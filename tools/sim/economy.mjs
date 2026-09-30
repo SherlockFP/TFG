@@ -349,7 +349,7 @@ function simRun(crew, runKey, stats) {
     xp += META_XP_PER_HOUR(stats.level) * ((REAL_DAY_MIN * 3 + CYCLE_OVERHEAD_MIN) / 60);
     perCycle.push({ q, quota, sold, moon: m.id, tier: m.tier, cost: best.cost, credits, wipes, deaths, r: rSum / 3, met: sold >= quota });
     if (sold < quota) break;
-    credits += Math.floor((sold - quota) / 5);
+    credits += Math.floor((sold - quota) / BALANCE.overtimeDiv);
     xp += 150 + (q + 1) * 80;
     const surplusRatio = (sold - quota) / quota;
     q += 1;
