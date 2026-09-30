@@ -348,3 +348,6 @@ Three special moons (flooded barge: oxygen, dune relay: heat + escort, rooftop b
 
 ## Wave 8 - sound pass 2 (docs/wave8/sound2.md)
 64 procedural sounds + mix-policy categories for everything added in wave 8 (feed cams, downed, carry, CRT replay, labyrinths, expeditions, one distinct cue per LC / director creature, resto, mining, arcade 2, hub unlock, coin pop) and atmos beds for the 4 labyrinth themes, 4 repomap themes and 3 expedition moons; missing ids (`battery_charge`, `bell`, `door_knock`) and always-fallback candidate lists fixed. Node-verified only (every referenced id exists, has a category, renders non-silent); nothing was heard in a browser, so every level, the underwater muffle and the positional drone / jammer loops need an ear-check.
+
+## Wave 8 - test regression fixes
+cycle2_flow assumed 7+ distinct bosses over 8 themes, but wave-8 greenhouse/metro interiors fall back to the Foreman (6 distinct; threshold now 6). ship2_install passed but never exited: docklayout.js 250 ms HUD interval kept node alive (now unref). No game-logic regression.
