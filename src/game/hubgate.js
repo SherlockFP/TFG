@@ -200,7 +200,7 @@ export function installHubgate(game) {
       if (!lk.has(id)) { if (e) { for (const o of e.hidden) o.visible = true; e.grp.parent?.remove(e.grp); tarps.delete(key); } continue; }
       if (!e) {
         const grp = new THREE.Group(); grp.position.set(spot.x, spot.y || 0, spot.z); grp.rotation.y = spot.ry || 0;
-        const h = dm.h * 0.94, m = new THREE.Mesh(new THREE.BoxGeometry(dm.x1 - dm.x0 + 0.04, h, dm.z1 - dm.z0 + 0.04), new THREE.MeshLambertMaterial({ color: 0x4a4f43 }));
+        const h = dm.h + 0.03, m = new THREE.Mesh(new THREE.BoxGeometry(dm.x1 - dm.x0 + 0.04, h, dm.z1 - dm.z0 + 0.04), new THREE.MeshLambertMaterial({ color: 0x4a4f43 }));
         m.position.set((dm.x0 + dm.x1) / 2, h / 2, (dm.z0 + dm.z1) / 2); grp.add(m);
         grp.userData.hgTarp = true; sg.add(grp);
         e = { grp, hidden: new Set() }; tarps.set(key, e);
