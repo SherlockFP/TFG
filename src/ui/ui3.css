@@ -11,7 +11,7 @@
 
 /* THE ALGORITHM intercom banner: it lived at z-index 25 inside #ui, i.e. ABOVE every open panel (.overlay is 20). It now sits under
    the panels and disappears while one is open (openPanel() only toggles `.hidden` on the one .overlay element). */
-html.tfg-ui3 #ui .algo-sub { z-index: 15; border-radius: 0; box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.55); }
+html.tfg-ui3 #ui .algo-sub { z-index: 15; }   /* [algoslot] react-only subtitle: no box, no shadow */
 html.tfg-ui3 #ui:has(> .overlay:not(.hidden)) .algo-sub { opacity: 0 !important; visibility: hidden; }
 html.tfg-ui3 .algo-who { text-shadow: none; }
 html.tfg-ui3 .algo-text { text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.7); }

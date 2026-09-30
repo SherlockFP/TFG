@@ -64,10 +64,10 @@ export class Terminal {
     if (this.el) return;
     const el = document.createElement('div');
     el.className = 'terminal hidden';
-    el.innerHTML = `<div class="term-screen"><div class="term-out"></div><div class="term-line"><span class="term-prompt">&gt;</span><input class="term-in" spellcheck="false" autocomplete="off" maxlength="80"/></div></div><div class="term-hint">${escapeHtml(t('[ESC] leave terminal · type HELP'))}</div>`;
+    el.innerHTML = `<div class="term-screen"><div class="term-head"></div><div class="term-out"></div><div class="term-line"><span class="term-prompt">&gt;</span><input class="term-in" spellcheck="false" autocomplete="off" maxlength="80"/></div></div><div class="term-hint">${escapeHtml(t('[ESC] leave terminal · type HELP'))}</div>`;
     document.getElementById('ui').appendChild(el);
     this.el = el;
-    this.out = el.querySelector('.term-out');
+    this.out = el.querySelector('.term-out'); this.head = el.querySelector('.term-head');
     this.inp = el.querySelector('.term-in');
     this.inp.addEventListener('keydown', (e) => {
       e.stopPropagation();
@@ -109,8 +109,18 @@ export class Terminal {
     this.game.shipScreens?.markTerminalDirty();
   }
   clear() { this.lines = []; this.render(); }
+  /** [algoslot] QUOTA / CREDITS / ROUTE moved here from the top bar: one status line above the output */
+  headText() {
+    const run = this.game.run;
+    if (!run) return '';
+    let s = `${t('QUOTA')} ▮${run.sold ?? 0}/${run.quota ?? 0} · ${run.daysLeft ?? 3} ${t('DAYS LEFT')} · ${t('CREDITS')} ▮${run.credits ?? 0}`;
+    if (run.phase === 'orbit') s += ` · ${t('ROUTE')}: ${MOONS[run.moon]?.name || '-'}`;
+    else if (run.phase === 'company') s += ` · ${t('BUYING AT')} ${Math.round((run.buyRate || 0) * 100)}%`;
+    return s;
+  }
   render() {
     if (!this.out) return;
+    if (this.head) { const h = this.headText(); if (this.head.textContent !== h) this.head.textContent = h; }
     const html = this.lines.slice(-120).map((l) => `<div class="tl ${l.cls}">${escapeHtml(l.text) || '&nbsp;'}</div>`).join('');
     this.out.innerHTML = html;
     this.game.ui?.decorateTerminal?.(this.out);
