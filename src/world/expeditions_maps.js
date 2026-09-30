@@ -6,6 +6,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { Terrain } from './terrain.js';
+import { freeTree } from '../render/textures.js';
 import { Kit } from './voyage_kit.js';
 import { planStairs, emitStairs, checkStairs } from './stairs.js';
 import { RNG } from '../core/rng.js';
@@ -59,6 +60,7 @@ const finishOut = (B, extra) => {
       for (const c of colliders) physicsRef.removeCollider(c);
       for (const em of emitters) lightPool.remove(em);
       extra.dispose?.();
+      freeTree(group);   // [leak] kit / voyage materials (pad, wreck, kiosk ...) the lists above do not own
       group.traverse((o) => { if (o.geometry && o.isMesh && !o.isInstancedMesh) o.geometry.dispose(); });
       for (const g of geos) g.dispose();
       for (const m of [...mats, ...ownMats]) m.dispose();

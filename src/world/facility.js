@@ -5,6 +5,7 @@ import { RNG } from '../core/rng.js';
 import { addPracticals } from './interiors/practicals.js';
 import { GeoBuilder, levelMaterial, mergeStaticMeshes, compactSubtree } from './geobuilder.js';
 import { NavGrid } from './nav.js';
+import { freeTree } from '../render/textures.js';
 import { createAnyProp as createProp } from './propfactory.js';
 import { applyExtThemeProps } from './extmodels.js';
 import { G } from '../physics/physics.js';
@@ -1445,6 +1446,7 @@ export function buildFacility(layout, { physics, lightPool }) {
     // facility systems runtime data + chest spots (dead-end / treasure / vault rooms) for the world module
     interior: def.id, interiorName: def.name, atmosphere: def.atmosphere || null,
     dispose(physicsRef) {
+      freeTree(group);   // [leak] first: maps2 / variety / lab detach their groups below, the traverse at the end never saw them
       try { sys?.dispose(); } catch (e) { console.warn('facility systems dispose', e); }
       try { m2?.dispose?.(); } catch (e) { console.warn('maps2 dispose', e); }   // [maps2]
       try { variety?.dispose?.(); } catch (e) { console.warn('variety dispose', e); }   // [stealth]

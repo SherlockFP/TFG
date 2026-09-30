@@ -2036,3 +2036,20 @@ alias('sewer_stone', 'sewer_brick');
 alias('backrooms_base', 'wallpaper_yellow');
 alias('marble_lobby', 'marble');
 alias('server_ceiling', 'metal_dark');
+
+const TREE_TEX = ['map', 'emissiveMap', 'alphaMap', 'lightMap', 'aoMap', 'normalMap', 'bumpMap', 'roughnessMap', 'metalnessMap'];
+/** [leak] free what a map built into `root` owns: geometries (instanced meshes too; userData.shared = keep) and every material / texture that is NOT
+ *  in the shared getMaterial / getTexture caches (per-prop screen canvases, cloned water, tinted clones ...). Cached ones are bounded by the cache and stay.
+ *  Idempotent; call it BEFORE sub-systems detach their own groups. dispose() only drops the GPU copy: three re-uploads if something still draws it. */
+export function freeTree(root) {
+  if (!root) return;
+  const cm = new Set(_matCache.values()), ct = new Set(_texCache.values());
+  root.traverse((o) => {
+    if (o.geometry && !o.geometry.userData?.shared) o.geometry.dispose();
+    for (const m of [].concat(o.material || [])) {
+      if (!m || cm.has(m) || m.userData?.shared) continue;
+      for (const k of TREE_TEX) { const t = m[k]; if (t && t.isTexture && !ct.has(t) && !t.isRenderTargetTexture && !t.userData?.keep) t.dispose(); }
+      m.dispose();
+    }
+  });
+}

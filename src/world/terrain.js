@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { RNG, Noise2D } from '../core/rng.js';
 import { BIOMES } from '../game/moons.js';
 import { createAnyProp as createProp } from './propfactory.js';
-import { getTexture } from '../render/textures.js';
+import { getTexture, freeTree } from '../render/textures.js';
 import { levelTexture, mergeStaticMeshes } from './geobuilder.js';
 import { G } from '../physics/physics.js';
 import { buildOutposts } from './outposts.js';
@@ -630,6 +630,7 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
     dispose(physicsRef) {
       for (const c of colliders) physicsRef.removeCollider(c);
       for (const em of emitters) lightPool.remove(em);
+      freeTree(group);   // [leak] first: sub-systems detach their groups below (instanced geometry / uncached materials were never freed)
       outposts?.dispose(physicsRef);
       landmarks?.dispose();
       voyage?.dispose();
