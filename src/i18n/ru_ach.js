@@ -143,5 +143,13 @@ export default {
   "Galaxy Brain": "Галактический мозг",
   "Max out every Mastery node.": "Прокачай до максимума все узлы Мастерства.",
   "Crew Legend": "Легенда экипажа",
+  "Land Baron": "Землевладелец",
+  "Claim your plot on the homeworld.": "Займите свой участок на родной планете.",
+  "Production Line": "Производственная линия",
+  "Build all three gates of the Homestead line.": "Постройте все три ворота линии Усадьбы.",
+  "Homeowner": "Домовладелец",
+  "Put a roof on your lodge.": "Накройте свой дом крышей.",
+  "Fresh Start": "Новый старт",
+  "Re-Claim your Homestead line for a star.": "Займите линию Усадьбы заново ради звезды.",
   "Play in a crew of level 10 or higher.": "Сыграй в экипаже 10-го уровня или выше.",
 };

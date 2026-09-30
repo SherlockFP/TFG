@@ -142,6 +142,9 @@ ACHIEVEMENTS.push(A('kefal_master', '🐠', 'kefal', 'TFG Legend', 'Unlock every
 // TFG Legend does not start requiring the long-tail goals; spliced before it so the meta achievement stays last.
 const codexPct = (p) => n(p.codex?.pct);
 const weeklyBest = (p) => { let m = 0; for (const v of Object.values(p.weekly?.best || {})) m = Math.max(m, n(v)); return m; };
+// Kefal Homestead: the host reads profile.homestead, crew members a tiny monotone mark (profile.hsMark, written by homestead.js from the synced plot)
+const hsHas = (p, id) => !!(p.homestead?.b?.includes(id) || p.hsMark?.b?.includes(id));
+const hsStars = (p) => Math.max(n(p.homestead?.rb), n(p.hsMark?.rb));
 const masteryMaxed = (p) => Object.keys(MASTERY).filter((id) => masteryRank(p, id) >= MASTERY[id].max).length;
 ACHIEVEMENTS.splice(ACHIEVEMENTS.length - 1, 0,
   A('reborn_1', '🌟', 'gold', 'Reborn', 'Rebirth for the first time.', ['Yeniden Doğan', 'İlk kez yeniden doğ.'], counter(prestigeStars, 1)),
@@ -155,6 +158,10 @@ ACHIEVEMENTS.splice(ACHIEVEMENTS.length - 1, 0,
   A('mastery_1', '🧠', 'silver', 'Specialist', 'Max out any Mastery node.', ['Uzman', 'Herhangi bir Ustalık düğümünü tamamla.'], counter(masteryMaxed, 1)),
   A('mastery_all', '🪬', 'kefal', 'Galaxy Brain', 'Max out every Mastery node.', ['Galaksi Beyin', 'Tüm Ustalık düğümlerini tamamla.'], counter(masteryMaxed, Object.keys(MASTERY).length), { title: 'Galaxy Brain' }),
   A('crew_10', '🏴', 'gold', 'Crew Legend', 'Play in a crew of level 10 or higher.', ['Ekip Efsanesi', '10. seviye veya üstü bir ekipte oyna.'], counter((p) => n(p.stats?.bestCrewLevel), 10), { title: 'Crew Legend' }),
+  A('hs_claim', '🏗️', 'bronze', 'Land Baron', 'Claim your plot on the homeworld.', ['Toprak Ağası', 'Ana gezegende yurdunu sahiplen.'], counter((p) => (hsHas(p, 'claim') ? 1 : 0), 1), { xp: 60, coin: 10 }),
+  A('hs_line', '🏦', 'silver', 'Production Line', 'Build all three gates of the Homestead line.', ['Üretim Hattı', 'Kefal Yurdu hattının üç kapısını da kur.'], counter((p) => ['gate1', 'gate2', 'gate3'].filter((id) => hsHas(p, id)).length, 3), { xp: 200, coin: 30 }),
+  A('hs_roof', '🏠', 'gold', 'Homeowner', 'Put a roof on your lodge.', ['Ev Sahibi', 'Evinin çatısını kapat.'], counter((p) => (hsHas(p, 'roof') ? 1 : 0), 1), { xp: 400, coin: 60, title: 'Homeowner' }),
+  A('hs_reclaim', '🌟', 'silver', 'Fresh Start', 'Re-Claim your Homestead line for a star.', ['Yeni Başlangıç', 'Yurdun hattını bir yıldız için yeniden sahiplen.'], counter(hsStars, 1), { xp: 250, coin: 40 }),
 );
 
 /** Add an achievement at runtime (other systems / mods). Same shape as ACHIEVEMENTS entries. */

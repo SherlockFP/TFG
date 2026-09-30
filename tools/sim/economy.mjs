@@ -32,6 +32,7 @@ import { CREATURES, spawnTable, creatureLevelStats } from '../../src/game/creatu
 import * as DIFF from '../../src/game/difficulty.js';
 import { rollMap, addAffix, effectsOf, rewardOf } from '../../src/game/mapmods_core.js';   // wave 8 layer (see below)
 import * as RS from '../../src/game/resto_core.js';
+import * as HS from '../../src/game/homestead_core.js';   // wave 8 tycoon: Kefal Homestead (docs/wave8/tycoon.md)
 import { JOBS as FJ, SIDE_MUL as FJ_SIDE, FAIL_FEE as FJ_FEE, ARCH_CHANCE as FJ_ARCH } from '../../src/game/facjobs_core.js';
 import { TUNE as LCT } from '../../src/game/lcmonsters_core.js';
 import { THEMES as W3T, W3_ITEMS, doorChance as w3DoorChance } from '../../src/game/worlds3_core.js';
@@ -209,6 +210,7 @@ const W8K = Object.assign({
   mineP: { average: 0.25, competent: 0.35, great: 0.35 }, mineMin: { average: 3, competent: 5, great: 6 }, orePerMin: 30,   // mining: share of days a crew digs / minutes of ONE player / ore value per minute
   pocketEnter: { average: 0.5, competent: 0.7, great: 0.8 }, pocketDivert: 0.18, pocketWipe: 0.008,   // worlds3 pockets
   restoP: 0.5, restoMin: 5, restoSetup: 500, restoDone: 0.7,   // resto: share of runs that keep a diner / minutes on the homeworld per cycle / cost of the first pieces / contract + inspector success
+  hsP: 0.5, hsCushion: 300, hsShareMax: 3, hsSide: 25,   // homestead: share of runs that keep a plot / credits kept back when buying a piece / gate: hs share of all income (%) / the owner's combined side-share ceiling (%)
   arcadeClout: 40,              // arcade2: per player per UTC day (a ~5 h session), counted 1 Clout = 1 credit for the share
 }, JSON.parse(argv('--w8', '{}')));
 const POCKET_VAL = (() => {   // mean sale value of a pocket's loot at scrapValueMul 1 (theme loot tables x the theme's lootMul; Level 0 keeps the stock loot)
@@ -266,13 +268,24 @@ function restoCycle(k) {
   return { active, passive, contract, insp, stars, total: active + passive + contract + insp };
 }
 
+/** Kefal Homestead income of cycle k for a crew that has bought the first k paid pieces (about one per cycle, catalogue order) and visits HOME once per cycle: the belt makes 3 days of cap
+ *  per cycle but the pile only holds 2 days (pileMul), so one visit cashes min(3 cap, 2 cap); plus the once-per-day Clout of that collect (1 Clout = 1 credit for the share). */
+const HS_ORDER = HS.PIECES.filter((p) => p.cost > 0);
+function hsCycle(k) {
+  const s = HS.blank(); s.b = ['claim', ...HS_ORDER.slice(0, k).map((p) => p.id)];
+  const cap = HS.capOf(s), gain = Math.min(3 * cap, HS.pileCap(s)), clout = cap > 0 ? HS.cloutOf(s) : 0;
+  return { cap, gain, clout, total: gain + clout };
+}
+const hashRun = (k) => { let h = 2166136261; for (const c of String(k)) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return (h >>> 0) % 100; };   // no rand() call: the old streams stay identical
+
 // ---------------------------------------------------------------- one run
 function simRun(crew, runKey, stats) {
   let q = 0, quota = nextQuota(0, 0, rand), credits = 60, stash = 0, minutes = 0, xp = 0, current = 'hamsi', van = false;
   const perCycle = [];
-  const inc = { scrap: 0, ore: 0, crate: 0, job: 0, pocket: 0, lantern: 0, resto: 0, arcade: 0, map: 0 };   // where the run's income came from (wave 8 layer)
+  const inc = { scrap: 0, ore: 0, crate: 0, job: 0, pocket: 0, lantern: 0, resto: 0, arcade: 0, map: 0, hs: 0 };   // where the run's income came from (wave 8 layer)
   const sk0 = crew.skill, usesResto = W8 && rand() < W8K.restoP;
-  let restoK = -1, restoSpent = 0, mapNow = null;
+  let restoK = -1, restoSpent = 0, mapNow = null, hsK = 0;
+  const usesHs = W8 && hashRun(runKey) < W8K.hsP * 100;
   for (;;) {
     // ---- routing (quota-aware, like real crews): the safest affordable moon whose expected 3-day haul covers
     // the quota with a margin; ambitious crews also want surplus. Nothing covers it -> best risk-adjusted value.
@@ -343,6 +356,10 @@ function simRun(crew, runKey, stats) {
       if (usesResto) {   // keep a diner: first the setup, then gross income per cycle; half of it is re-invested in pieces until the ~6.5k build is done
         if (restoK < 0 && credits >= W8K.restoSetup + 300) { credits -= W8K.restoSetup; restoK = 0; }
         else if (restoK >= 0) { restoK++; const r = restoCycle(restoK); credits += r.total; inc.resto += r.total; const sp = Math.min(6500 - restoSpent, r.total * 0.5); restoSpent += sp; credits -= sp; }
+      }
+      if (usesHs) {   // keep a homestead: buy the next pad when the wallet covers it with a cushion (one per cycle), then that cycle's cash-in
+        if (hsK < HS_ORDER.length && credits >= HS_ORDER[hsK].cost + W8K.hsCushion) { credits -= HS_ORDER[hsK].cost; hsK++; }
+        if (hsK > 0) { const r = hsCycle(hsK); credits += r.total; inc.hs += r.total; }
       }
     }
     xp += 0.25 * sold / Math.sqrt(crew.n);
@@ -417,10 +434,23 @@ function w8Report() {
     const A = [], D = [], qs = [];
     for (let i = 0; i < N; i++) { rand = mulberry(SEED ^ (n * 7919) ^ skill.length * 104729 ^ Math.imul(i + 1, 2654435761)); const r = simRun({ n, skill }, 'R' + i, { level: 25 }); qs.push(r.quotas); (r.usesResto ? D : A).push(r.inc); }
     const all = [...A, ...D], mean = (L, k) => (L.length ? L.reduce((a, x) => a + x[k], 0) / L.length : 0);
-    const share = (L) => { const t = L.reduce((a, x) => a + x.scrap + x.ore + x.crate + x.job + x.pocket + x.lantern + x.resto + x.arcade, 0), p = L.reduce((a, x) => a + x.resto + x.ore + x.arcade, 0), sd = L.reduce((a, x) => a + x.resto + x.ore + x.arcade + x.job + x.crate + x.pocket, 0); return [p / t * 100, sd / t * 100]; };
+    const share = (L) => { const t = L.reduce((a, x) => a + x.scrap + x.ore + x.crate + x.job + x.pocket + x.lantern + x.resto + x.arcade + x.hs, 0), p = L.reduce((a, x) => a + x.resto + x.ore + x.arcade + x.hs, 0), sd = L.reduce((a, x) => a + x.resto + x.ore + x.arcade + x.hs + x.job + x.crate + x.pocket, 0); return [p / t * 100, sd / t * 100]; };
     const sa = share(all), sd = share(D);
     console.log(`${label.padEnd(11)} | ${pad(pct(qs, 0.5), 5)}  | ${['scrap', 'ore', 'crate', 'pocket', 'lantern'].map((k) => pad(fmt(mean(all, k)), 6)).join(' ')} | ${pad(fmt(mean(all, 'job')), 4)} | ${pad(fmt(mean(D, 'resto')), 7)} | ${pad(fmt(mean(all, 'arcade')), 5)} | ${fmt(sa[0], 1)}% / ${fmt(sd[0], 1)}% | ${fmt(sa[1], 1)}% / ${fmt(sd[1], 1)}%`);
   }
+  // wave 8 tycoon: the Homestead gate (hs share of ALL income + median quotas). The owner's 25 % ceiling is for the combined side share; the baseline is already above it without the plot
+  // (docs/wave8/tycoon.md), so the gate here is: the plot adds <= hsShareMax % of income, the medians stay 7 +/- 1, and only capScale (never prices) may be lowered if it fails.
+  console.log('\nHOMESTEAD gate (hs = plot cash-ins + Clout, runs that keep a plot ' + Math.round(W8K.hsP * 100) + '%): hs share of all income | hs mean per plot run | median quotas | verdict');
+  let hsOk = true;
+  for (const [label, n, skill] of [['4 average', 4, 'average'], ['4 competent', 4, 'competent'], ['2 great', 2, 'great']]) {
+    const R = [], qs = [];
+    for (let i = 0; i < N; i++) { rand = mulberry(SEED ^ (n * 7919) ^ skill.length * 104729 ^ Math.imul(i + 1, 2654435761)); const r = simRun({ n, skill }, 'R' + i, { level: 25 }); qs.push(r.quotas); R.push(r.inc); }
+    const tot = R.reduce((a, x) => a + x.scrap + x.ore + x.crate + x.job + x.pocket + x.lantern + x.resto + x.arcade + x.hs, 0), hs = R.reduce((a, x) => a + x.hs, 0), users = R.filter((x) => x.hs > 0).length || 1, sh = hs / tot * 100, med = pct(qs, 0.5);
+    const ok = sh <= W8K.hsShareMax && med >= 6 && med <= 8; hsOk = hsOk && ok;
+    console.log(`${label.padEnd(11)} | ${fmt(sh, 2)}% (max ${W8K.hsShareMax}%) | ${fmt(hs / users)} | ${med} | ${ok ? 'PASS' : 'FAIL'}`);
+  }
+  console.log(`HOMESTEAD gate: ${hsOk ? 'PASS' : 'FAIL (lower HS.TY.capScale only, never the prices)'}`);
+  console.log('homestead cash-in per cycle k (pieces bought in catalogue order): ' + [1, 2, 3, 4, 5, 6, 7, 8, 12, 15].map((k) => { const r = hsCycle(k); return `k${k} cap ${fmt(r.cap)} -> ${fmt(r.total)}`; }).join(' | '));
   // diner per cycle (upper bound: a crew that keeps it open every cycle)
   console.log('\ndiner gross per cycle by cycle number k (stars 1,1,2,2,3...): active / passive / contract / inspector = total');
   for (const k of [1, 2, 3, 4, 6, 8]) { const r = restoCycle(k); console.log(`k=${k} stars ${r.stars}: ${fmt(r.active)} / ${fmt(r.passive)} / ${fmt(r.contract)} / ${fmt(r.insp)} = ${fmt(r.total)}`); }

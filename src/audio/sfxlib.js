@@ -488,16 +488,16 @@ def('ui_error', { dur: 0.38, vol: 0.55 }, c => {
   sat(o, 1.5);
   return o;
 });
-def('ui_buy', { dur: 0.75, vol: 0.6 }, c => {
-  const o = c.buf();
-  c.place(o, click(c, { f: 1500, q: 3, len: 0.03 }), 0, 0.6);
-  c.place(o, click(c, { f: 2100, q: 3, len: 0.03 }), 0.028, 0.5);
+for (const [nm, semi] of [['ui_buy', 0], ['ui_buy_b', 3], ['ui_buy_c', 5]]) def(nm, { dur: 0.75, vol: 0.6 }, c => {   // _b / _c: the same "cha-ching" +3 / +5 semitones (Homestead buy streaks climb)
+  const k = 2 ** (semi / 12), o = c.buf();
+  c.place(o, click(c, { f: 1500 * k, q: 3, len: 0.03 }), 0, 0.6);
+  c.place(o, click(c, { f: 2100 * k, q: 3, len: 0.03 }), 0.028, 0.5);
   c.place(o, hiss(c, { len: 0.1, lo: 1800, hi: 9000, a: 0.004, r: 0.08 }), 0.005, 0.45);   // "cha"
   const e = new Float32Array(c.S(0.7)); e[0] = 1;
-  const f = 2093;
+  const f = 2093 * k;
   const bell = D.modal(e, c.sr, [[f, 0.65, 1], [f * 1.003, 0.6, 0.5], [f * 2.02, 0.4, 0.45], [f * 2.74, 0.35, 0.4], [f * 4.18, 0.2, 0.2], [f * 5.6, 0.12, 0.1]]);
   c.place(o, bell, 0.07, 0.9);                                                               // "ching"
-  for (let k = 0; k < 5; k++) c.place(o, coin(c, { len: 0.15 }), 0.12 + k * 0.05 + c.rng() * 0.03, 0.25 * (1 - k * 0.12));
+  for (let n = 0; n < 5; n++) c.place(o, coin(c, { len: 0.15 }), 0.12 + n * 0.05 + c.rng() * 0.03, 0.25 * (1 - n * 0.12));
   return o;
 });
 def('ui_levelup', { dur: 1.6, vol: 0.6 }, c => {

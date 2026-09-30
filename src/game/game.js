@@ -283,6 +283,7 @@ import { installRepomaps } from './repomaps.js';   // [import:repomaps] wave 8: 
 import { installHighlights } from './highlights.js';   // [import:highlights] wave 8: the Algorithm's highlight clip (docs/wave8/highlights.md)
 import { installCarry2 } from './carry2.js';   // [import:carry2] wave 8: carry comedy (docs/wave8/carry2.md)
 import { installResto } from './resto.js';   // [import:resto] wave 8: alien restaurant tycoon on the homeworld
+import { installHomestead } from './homestead.js';   // [import:tycoon] wave 8: Kefal Homestead plot tycoon on the homeworld (docs/wave8/tycoon.md)
 
 
 
@@ -585,6 +586,7 @@ export class Game extends Emitter {
     // [slot:mapmods]
     this.useModule('repomaps', installRepomaps);   // [slot:repomaps]
     this.useModule('resto', installResto);   // [slot:resto]
+    this.useModule('homestead', installHomestead);   // [slot:tycoon]
 
 
 

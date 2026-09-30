@@ -3,8 +3,8 @@ export const POP_MIN = 100;            // payouts >= this get a sound + fly-up n
 export const ORE_CAP = 240;            // mirrors mining_core MN.valueCap (display only)
 export const WARN_SECS = 6;            // the lever confirm window
 
-export const SRC = ['job', 'crate', 'pocket', 'map', 'till', 'ore', 'clout', 'fine', 'fee', 'tax'];
-export const freshLedger = () => ({ job: 0, crate: 0, pocket: 0, till: 0, ore: 0, clout: 0, fee: 0, tax: 0 });
+export const SRC = ['job', 'crate', 'pocket', 'map', 'till', 'yard', 'ore', 'clout', 'fine', 'fee', 'tax'];
+export const freshLedger = () => ({ job: 0, crate: 0, pocket: 0, till: 0, yard: 0, ore: 0, clout: 0, fee: 0, tax: 0 });
 
 /** add n of a source to the ledger (unknown sources / non-numbers are ignored) */
 export function note(L, src, n) {
@@ -34,6 +34,7 @@ export function rowsOf(L, d, mapVal) {
   add('pocket', '◐', L.pocket);
   add('map', '★', mapBonus(d?.collected, mapVal));
   add('till', '▤', L.till);
+  add('yard', '⌂', L.yard);
   add('ore', '◆', L.ore);
   add('clout', '◈', L.clout);
   add('fine', '✖', d?.fines, '-');
