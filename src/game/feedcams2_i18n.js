@@ -53,6 +53,10 @@ const ROWS = [
   [HL_TEXT.live, 'Algoritmanın seçimi: {name} kadraja dalıyor. Çıta düşük ama elimizdeki bu.', 'Выбор Алгоритма: {name} забредает в кадр. Планка низкая, но что есть.'],
   [HL_TEXT.crack, 'Algoritmanın seçimi: {name}, {x} eşyasını (▮{v} gitti) kamera önünde kırıyor. Kimse şaşırmadı.', 'Выбор Алгоритма: {name} разбивает {x} (▮{v} потеряно) в кадре. Никто не удивился.'],
   [HL_TEXT.catch, 'Algoritmanın seçimi: {name}, {x} eşyasını odanın öbür ucuna fırlatıyor ve biri gerçekten yakalıyor. İlk kez oluyor.', 'Выбор Алгоритма: {name} бросает {x} через всю комнату, и кто-то правда ловит. Впервые.'],
+  // [cam90] the outdoor path drone lesson + the indoor "cut the feed" follow-up
+  ["Red light = you're LIVE. Heat brings them.", 'Kırmızı ışık = CANLI yayındasın. Isı onları çeker.', 'Красный свет = вы В ЭФИРЕ. Жар привлекает их.'],
+  ['Same red light indoors. This time cut the feed: the junction box [E] on the wall, or spray the lens.', 'İçeride yine aynı kırmızı ışık. Bu sefer yayını kes: duvardaki bağlantı kutusu [E] ya da merceğe sprey.', 'Внутри тот же красный свет. Теперь отрежьте эфир: распределительная коробка [E] на стене или баллончик на объектив.'],
+  ['Feed cut. Nobody saw who: +▮{n}', 'Yayın kesildi. Kimin yaptığını kimse görmedi: +▮{n}', 'Эфир отрезан. Никто не видел, кто: +▮{n}'],
 ];
 const TR = {}, RU = {};
 for (const [en, tr, ru] of ROWS) { TR[en] = tr; RU[en] = ru; }

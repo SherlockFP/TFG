@@ -18,7 +18,7 @@ import { G } from '../physics/physics.js';
 import { HYPE } from './algo2_core.js';
 import { VIEW_GAIN } from './algo1_core.js';
 import { firstDay } from './firstrun_core.js';
-import { segNear } from './feedcams_core.js';
+import { segNear, TUT_PAY } from './feedcams_core.js';
 import * as C from './feedcams2_core.js';
 import { HL_TEXT } from './feedcams2_i18n.js';
 import { createArtModel } from '../models/artpass.js';
@@ -41,7 +41,7 @@ export function installFeedcams2(game) {
   if (!mods) return null;
   if (mods.itemModels && !mods.itemModels.has(C.JAM.id)) mods.itemModels.set(C.JAM.id, () => createArtModel(C.JAM.id));   // [artpass] Signal Jammer model
   const offs = [], wraps = [], V3 = THREE.Vector3;
-  const S = { key: null, drones: [], vis: null, tick: 0, jamT: 0, humT: 0, tipNow: 0, tipT: 0, streak: new Map(), paid: new Map(), sumHl: null, jams: [] };
+  const S = { key: null, drones: [], vis: null, tick: 0, jamT: 0, humT: 0, tipNow: 0, tipT: 0, streak: new Map(), tainted: new Set(), paid: new Map(), sumHl: null, jams: [] };
   let disposed = false, boundNet = null;
   const run = () => game.run, F2 = () => game.run?.fc2 || null, host = () => !!game.isHost, FC = () => game.feedcams;
   const toast = (s, k = 'info') => { try { game.ui?.toast?.(s, k); } catch { /* ui optional */ } };
@@ -111,14 +111,16 @@ export function installFeedcams2(game) {
   }
   function ensureDrones() {
     const out = game.world?.outdoor, r = run();
-    const want = onMoon() && out?.plan?.entrance && out.terrain?.heightAt && out.group ? out : null;
+    const want = onMoon() && out?.plan?.entrance && !out.ex && out.terrain?.heightAt && out.group ? out : null;   // [cam90] out.ex: expedition maps (barge / dune / roof) never get outdoor drones
     const watched = !!(r?.dailyEvent?.mm || []).includes('watched');
     if (want === S.key) return;
     S.key = want; clearVis(); S.drones = [];
     if (!want) return;
     const T = want.terrain, e = want.plan.entrance;
-    S.drones = C.planDrones({ entrance: e, seed: r.seed, day: r.day, quotaIndex: r.quotaIndex, watched, first: firstDay(r) && !watched });
     S.ground = (x, z) => { try { return Math.max(T.heightAt(x, z), T.floodY ?? -1e9); } catch { return 0; } };
+    const dry = (x, z) => { try { return T.heightAt(x, z) > (T.floodY ?? -1e9) + 0.3 && !want.solidAt?.(x, z, 1.2); } catch { return true; } };   // [cam90] the path drone hovers over dry, open ground
+    S.drones = C.planDrones({ entrance: e, seed: r.seed, day: r.day, quotaIndex: r.quotaIndex, watched, first: firstDay(r) && !watched });
+    S.drones.push(...C.planPathDrone({ entrance: e, seed: r.seed, day: r.day, ok: dry }, S.drones.length));   // [cam90] flies day and night, every landing
     const n = S.drones.length; if (!n) return;
     const bx = (sx, sy, sz, x, y, z) => new THREE.BoxGeometry(sx, sy, sz).translate(x, y, z);
     const parts = [bx(0.55, 0.16, 0.55, 0, 0, 0), bx(1.3, 0.05, 0.08, 0, 0.05, 0).rotateY(Math.PI / 4), bx(1.3, 0.05, 0.08, 0, 0.05, 0).rotateY(-Math.PI / 4), bx(0.2, 0.14, 0.2, 0, -0.14, 0)];
@@ -129,8 +131,9 @@ export function installFeedcams2(game) {
     for (let i = 0; i < n; i++) lamp.setColorAt(i, new THREE.Color(0xff2020));
     const beams = [], discs = [];
     for (let i = 0; i < n; i++) {
-      const bm = new THREE.Mesh(new THREE.ConeGeometry(C.DRONE.R, C.DRONE.alt, 20, 1, true), new THREE.MeshBasicMaterial({ color: 0xfff0c8, transparent: true, opacity: 0.07, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, fog: false }));
-      const dc = new THREE.Mesh(new THREE.CircleGeometry(C.DRONE.R, 24).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xfff0c8, transparent: true, opacity: 0.16, depthWrite: false, blending: THREE.AdditiveBlending, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, fog: false }));
+      const dayD = !!S.drones[i].day;   // [cam90] the daylight path drone: a stronger, warmer disc so the cone reads in the sun
+      const bm = new THREE.Mesh(new THREE.ConeGeometry(C.DRONE.R, C.DRONE.alt, 20, 1, true), new THREE.MeshBasicMaterial({ color: 0xfff0c8, transparent: true, opacity: dayD ? 0.12 : 0.07, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, fog: false }));
+      const dc = new THREE.Mesh(new THREE.CircleGeometry(C.DRONE.R, 24).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xfff0c8, transparent: true, opacity: dayD ? 0.3 : 0.16, depthWrite: false, blending: THREE.AdditiveBlending, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, fog: false }));
       bm.frustumCulled = dc.frustumCulled = false; bm.renderOrder = dc.renderOrder = 4;
       beams.push(bm); discs.push(dc);
     }
@@ -149,11 +152,11 @@ export function installFeedcams2(game) {
   const night = () => C.isNight(run()?.time, run()?.weather);
   function visuals() {
     const v = S.vis; if (!v) return;
-    const now = hostNow(), on = night(), s = F2();
+    const now = hostNow(), nt = night(), s = F2(), netOff = !!FC()?.netOff?.();
     for (const d of S.drones) {
       const e = s?.dr?.[d.i] || [0, 0, 0, 0, 0, 0, 0], st = e[0] === ST.BLIND && now >= e[1] ? ST.OK : e[0];
-      const p = dronePos(d, now), dm = v.dummy, jam = C.jammed(p.x, p.y, p.z, S.jams);
-      const active = on && st === ST.OK && !jam;
+      const p = dronePos(d, now), dm = v.dummy, jam = C.jammed(p.x, p.y, p.z, S.jams), on = d.day || nt;
+      const active = on && st === ST.OK && !jam && !(d.day && netOff);
       if (!on) dm.position.set(p.x, -9999, p.z);
       else if (st === ST.DEAD) dm.position.set(e[2], S.ground(e[2], e[3]) + 0.2, e[3]);   // crashed where it was shot
       else dm.position.set(p.x, p.y + Math.sin(now * 1.7 + d.i) * 0.15, p.z);
@@ -165,14 +168,14 @@ export function installFeedcams2(game) {
       bm.visible = dc.visible = active;
       if (active) {
         bm.position.set(p.x, p.gy + C.DRONE.alt / 2, p.z); dc.position.set(p.x, p.gy + 0.12, p.z);
-        const hot = !!e[6]; bm.material.color.setHex(hot ? 0xff6a50 : 0xfff0c8); dc.material.color.setHex(hot ? 0xff6a50 : 0xfff0c8);
+        const hot = !!e[6], base = d.day ? 0xffc09a : 0xfff0c8; bm.material.color.setHex(hot ? 0xff6a50 : base); dc.material.color.setHex(hot ? 0xff6a50 : base);
       }
     }
     v.body.instanceMatrix.needsUpdate = v.lamp.instanceMatrix.needsUpdate = true;
   }
 
   // ------------------------------------------------------------------ drones + jammer (host)
-  function initF2() { const r = run(); if (!r) return; r.fc2 = { dr: S.drones.map(() => [0, 0, 0, 0, 0, 0, 0]), hl: null }; S.streak.clear(); S.paid.clear(); sync(); }
+  function initF2() { const r = run(); if (!r) return; r.fc2 = { dr: S.drones.map(() => [0, 0, 0, 0, 0, 0, 0]), hl: null }; S.streak.clear(); S.paid.clear(); S.tainted.clear(); sync(); }
   function jamList() {
     const out = [], ai = game.aiPlayers?.() || [];
     for (const it of game.items?.all?.() || []) {
@@ -185,10 +188,10 @@ export function installFeedcams2(game) {
     return out;
   }
   function droneBait(pos, loud) {
-    const s = F2(), now = game.time; if (!s || !pos || loud < C.DRONE.baitLoud || !night()) return;
+    const s = F2(), now = game.time; if (!s || !pos || loud < C.DRONE.baitLoud) return;
     let ch = false;
     for (const d of S.drones) {
-      const e = s.dr[d.i]; if (!e || e[0] === ST.DEAD || now < e[5] + C.DRONE.baitGap) continue;   // (dead drones keep their crash spot in e[2], e[3])
+      const e = s.dr[d.i]; if (!e || (!d.day && !night()) || e[0] === ST.DEAD || now < e[5] + C.DRONE.baitGap) continue;   // (dead drones keep their crash spot in e[2], e[3])
       const g = C.dronePos(d, now, baitOf(e)); if (Math.hypot(pos.x - g.x, pos.z - g.z) > C.DRONE.baitR) continue;
       e[2] = Math.round(pos.x * 10) / 10; e[3] = Math.round(pos.z * 10) / 10; e[4] = Math.round(now * 10) / 10; e[5] = Math.round((now + C.DRONE.bait) * 10) / 10; ch = true;
     }
@@ -212,11 +215,13 @@ export function installFeedcams2(game) {
       if (S.jams.length && S.humT <= 0) { S.humT = C.JAM.hum; for (const j of S.jams) { try { game.creatures?.noise?.(new V3(j.x, j.y, j.z), C.JAM.humLoud); } catch { /* creatures optional */ } } }
     }
     // drones
-    if (!S.drones.length || !night() || fc.netOff?.()) { for (const e of s.dr) e[6] = 0; return; }
+    if (!S.drones.length || fc.netOff?.()) { for (const e of s.dr) e[6] = 0; return; }
     const out = (game.aiPlayers?.() || []).filter((p) => !p.dead && !p.inShip && p.zone === 'out');
     let ch = false;
+    const nt = night();
     for (const d of S.drones) {
       const e = s.dr[d.i]; if (!e) continue;
+      if (!d.day && !nt) { if (e[6]) { e[6] = 0; ch = true; } continue; }
       if (e[0] === ST.BLIND && now >= e[1]) { e[0] = ST.OK; ch = true; }
       let see = 0;
       if (e[0] === ST.OK) {
@@ -231,14 +236,26 @@ export function installFeedcams2(game) {
       }
       if (e[6] !== see) { e[6] = see; ch = true; }
     }
+    // [cam90] the outdoor lesson pays once per run: reach the entrance without ever going live on the way (the blind route or a timed dash both count)
+    const pd = S.drones.find((d) => d.day), r = run(), en = game.world?.outdoor?.plan?.entrance;
+    if (pd && en && r && !r.fcTut) {
+      for (const q of out) {
+        if (fc.meter(q.id).live) S.tainted.add(q.id);
+        else if (!S.tainted.has(q.id) && Math.hypot(q.pos.x - en.x, q.pos.z - en.z) < 14) {
+          r.fcTut = 1; r.credits = Math.max(0, (r.credits | 0) + TUT_PAY);
+          try { game.broadcastRun?.(['credits', 'fcTut']); } catch { /* net closing */ }
+          fx({ k: 'tut', n: TUT_PAY }); break;
+        }
+      }
+    }
     if (ch) sync();
   }
   // a rifle tracer through a drone downs it
   offs.push(mods.on('fx', (d, from) => {
-    const s = F2(); if (!host() || !s || !d || d.k !== 'cb' || d.t !== 'tr' || !Array.isArray(d.a) || !Array.isArray(d.b) || !night()) return;
+    const s = F2(); if (!host() || !s || !d || d.k !== 'cb' || d.t !== 'tr' || !Array.isArray(d.a) || !Array.isArray(d.b)) return;
     const now = game.time;
     for (const dr of S.drones) {
-      const e = s.dr[dr.i]; if (!e || e[0] === ST.DEAD) continue;
+      const e = s.dr[dr.i]; if (!e || e[0] === ST.DEAD || (!dr.day && !night())) continue;
       const p = dronePos(dr, now);
       if (!segNear(d.a, d.b, [p.x, p.y, p.z], C.DRONE.hitR)) continue;
       e[0] = ST.DEAD; e[6] = 0; e[2] = Math.round(p.x * 10) / 10; e[3] = Math.round(p.z * 10) / 10; e[5] = 0; FC()?.untag?.('d' + dr.i); record('drone', from); fx({ k: 'dd', i: dr.i }); sync();
@@ -260,10 +277,10 @@ export function installFeedcams2(game) {
     game[name] = mine; wraps.push([name, orig, mine, own]);
   }
   wrap('fireRanged', (it) => {
-    if (!S.drones.length || it?.type !== 'taser' || !night() || !game.camera) return;
+    if (!S.drones.length || it?.type !== 'taser' || !game.camera) return;
     const eye = game.camera.position, f = new V3(0, 0, -1).applyQuaternion(game.camera.quaternion), reach = it.def?.reach || 12;
     const a = [eye.x, eye.y, eye.z], b = [eye.x + f.x * reach, eye.y + f.y * reach, eye.z + f.z * reach], now = hostNow();
-    const dr = S.drones.find((d) => { const p = dronePos(d, now); return segNear(a, b, [p.x, p.y, p.z], 1.3); });
+    const dr = S.drones.find((d) => { if (!d.day && !night()) return false; const p = dronePos(d, now); return segNear(a, b, [p.x, p.y, p.z], 1.3); });
     if (dr) { try { game.net.request('fc2req', { op: 'zap', i: dr.i }); } catch { /* net closing */ } }
   });
 
@@ -283,6 +300,7 @@ export function installFeedcams2(game) {
     if (d.k === 'say') { try { game.lore?.say?.(tf(d.s, d.v || {}), { mood: 'curious' }); } catch { /* lore optional */ } }
     else if (d.k === 'tip') { if (d.to === me && d.n > 0) { try { game.progress?.addCoins?.(d.n, 'Sponsor tip'); } catch { /* progress optional */ } } }
     else if (d.k === 'show') toast(d.n > 0 ? tf('{name} showcased the {item} live: sponsors tipped {n} Clout.', { name: nameOf(d.id), item: t(d.name || '?'), n: d.n }) : tf('{name} showcased the {item} live. The sponsors are out of budget today.', { name: nameOf(d.id), item: t(d.name || '?') }), 'good');
+    else if (d.k === 'tut') { toast(tf('Clean pass. The Algorithm saw nothing: +▮{n}', { n: d.n }), 'good'); try { game.onboard?.fr?.camDone?.(); } catch { /* onboard optional */ } }   // [cam90] the outdoor pass ends the camera objective for good
     else if (d.k === 'dd' || d.k === 'dz') {
       const dr = S.drones[d.i | 0]; if (!dr || !S.ground) return;
       const p = dronePos(dr, hostNow()), v = new V3(p.x, p.y, p.z);
@@ -309,9 +327,15 @@ export function installFeedcams2(game) {
     if (p.indoor && fc?.plan?.().length) {
       const it = p.heldItem?.();
       if (it && it.value >= C.SHOW.min && isSellable(it.def)) tip(1);
-    } else if (!p.indoor && S.drones.length && night()) {
-      const now = hostNow();
-      if (S.drones.some((d) => { const g = C.dronePos(d, now); return Math.hypot(g.x - p.pos.x, g.z - p.pos.z) < 40; })) tip(2);
+    } else if (!p.indoor && S.drones.length) {
+      const now = hostNow(), pd = S.drones.find((d) => d.day);
+      if (pd && !game.profile?.hints?.cam90 && F2()?.dr?.[pd.i]?.[0] !== ST.DEAD) {   // [cam90] the one-line lesson, once per profile, through the algorithm message budget (lore -> algorithm)
+        const g = C.dronePos(pd, now);
+        if (Math.hypot(g.x - p.pos.x, g.z - p.pos.z) < 32) {
+          try { (game.profile.hints ||= {}).cam90 = 1; game.progress?.save?.(); game.lore?.say?.(t("Red light = you're LIVE. Heat brings them."), { mood: 'curious', pri: true }); } catch { /* lore / profile optional */ }
+        }
+      }
+      if (night() && S.drones.some((d) => { const g = C.dronePos(d, now); return Math.hypot(g.x - p.pos.x, g.z - p.pos.z) < 40; })) tip(2);
     }
   }
   offs.push(mods.on('phase', (ph, g) => {
@@ -333,9 +357,9 @@ export function installFeedcams2(game) {
     let jb = null, jd = 14;
     for (const j of S.jams || []) { const d = Math.hypot(p.pos.x - j.x, p.pos.z - j.z); if (d < jd) { jd = d; jb = j; } }
     if (jb) s2.hold('jam', 'jammer_hum', { pos: new V3(jb.x, jb.y, jb.z), vol: 0.6, lease: 1.1, ref: 2, max: 14 });
-    if (!S.drones.length || !night() || p.inShip) return;
+    if (!S.drones.length || p.inShip) return;
     let db = null, dd = 42;
-    for (const d of S.drones) { const e = F2()?.dr?.[d.i]; if (e && e[0] === ST.DEAD) continue; const q = dronePos(d, hostNow()), m = Math.hypot(p.pos.x - q.x, p.pos.z - q.z); if (m < dd) { dd = m; db = q; } }
+    for (const d of S.drones) { if (!d.day && !night()) continue; const e = F2()?.dr?.[d.i]; if (e && e[0] === ST.DEAD) continue; const q = dronePos(d, hostNow()), m = Math.hypot(p.pos.x - q.x, p.pos.z - q.z); if (m < dd) { dd = m; db = q; } }
     if (db) s2.hold('drone', 'drone_rotor', { pos: new V3(db.x, db.y, db.z), vol: 0.7, lease: 1.1, ref: 5, max: 42 });
   }
 

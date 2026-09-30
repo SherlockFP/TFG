@@ -68,6 +68,7 @@ const ru = {
   'stared at The Follower for too long.': 'слишком долго смотрел на Подписчика.',
   'failed an audit by The Auditor.': 'не прошёл проверку Аудитора.',
 };
+tr['HEAT — the stream is calling them in.'] = 'ISI — yayın onları çağırıyor.'; ru['HEAT — the stream is calling them in.'] = 'ЖАР — трансляция зовёт их.';   // [cam90]
 for (const [en, a, b] of Object.values(RULE_LINES)) { tr[en] = a; ru[en] = b; }
 addTranslations(tr, 'tr');
 addTranslations(ru, 'ru');
