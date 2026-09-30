@@ -849,6 +849,43 @@ export class UI {
         body.append(row(t('Microphone'), el('div', { class: 'slider' }, micBtn || el('span'), micState)), row(t('Voice mode'), mode), row(t('Device'), dev), slider(t('Mic gain'), 'micGain', 0.2, 3, 0.1, (v) => v.toFixed(1) + 'x'), row(t('Level'), meter),
           el('div', { class: 'dim note' }, t('Proximity voice chat: nearby crewmates hear you in 3D. Walls muffle. Hold a walkie-talkie (turned on) to talk across the map. Creatures like the Blind Hound can HEAR you talk.')));
         body.append(check(t('Voice spells'), 'voiceSpells', t('hold V and say a spell word (Chrome / Edge)'), true));   // magic.js
+        // TURN relay (docs/MULTIPLAYER_HOTFIX.md): only the HOST needs it - its relay address is reachable from a friend behind
+        // CGNAT / mobile data. Stored in this browser only (localStorage 'tfg.turn', read by net/transport.js at the next session).
+        {
+          const METERED_TURN = ['turn:global.relay.metered.ca:80', 'turn:global.relay.metered.ca:80?transport=tcp', 'turn:global.relay.metered.ca:443', 'turns:global.relay.metered.ca:443?transport=tcp'];
+          let cur = {};
+          try { const v = JSON.parse(localStorage.getItem('tfg.turn') || 'null'); cur = (Array.isArray(v) ? v[0] : v) || {}; } catch { /* bad json */ }
+          const urls = el('input', { placeholder: 'turn:global.relay.metered.ca:80, turns:…:443?transport=tcp', value: [].concat(cur.urls || METERED_TURN).join(', '), spellcheck: 'false', autocomplete: 'off' });   // public metered.ca URLs prefilled: only username + password to paste
+          const user = el('input', { placeholder: t('username'), value: cur.username || '', autocomplete: 'off' });
+          const cred = el('input', { type: 'password', placeholder: t('password'), value: cur.credential || '', autocomplete: 'off' });
+          const state = el('span', { class: 'dim' }, cur.urls ? t('TURN relay saved (used from the next session).') : t('No TURN relay: friends behind strict NAT / mobile data may not be able to join you.'));
+          const read = () => ({ urls: urls.value.split(',').map((x) => x.trim()).filter((x) => /^turns?:/i.test(x)), username: user.value.trim(), credential: cred.value });
+          const save = this.button(t('Save'), () => {
+            const v = read();
+            try { if (v.urls.length) localStorage.setItem('tfg.turn', JSON.stringify(v)); else localStorage.removeItem('tfg.turn'); } catch { /* storage blocked */ }
+            state.textContent = v.urls.length ? t('TURN relay saved (used from the next session).') : t('TURN relay removed.');
+          }, 'small primary');
+          const test = this.button(t('Test'), async () => {
+            const v = read();
+            if (!v.urls.length) { state.textContent = t('Enter at least one turn: or turns: URL.'); return; }
+            state.textContent = t('Testing the relay...');
+            let ok = false, err = '';
+            try {
+              const pc = new RTCPeerConnection({ iceServers: [v], iceTransportPolicy: 'relay' });
+              pc.createDataChannel('t');
+              pc.onicecandidate = (e) => { if (e.candidate && / typ relay /.test(e.candidate.candidate)) ok = true; };
+              pc.onicecandidateerror = (e) => { err = `${e.errorCode || ''} ${e.errorText || ''}`.trim(); };
+              await pc.setLocalDescription(await pc.createOffer());
+              for (let i = 0; i < 16 && !ok; i++) await new Promise((r) => setTimeout(r, 400));
+              pc.close();
+            } catch (e) { err = String(e?.message || e); }
+            state.textContent = ok ? t('TURN relay works.') : t('TURN relay did not answer:') + ' ' + (err || t('check the URL, username and password'));
+          }, 'small');
+          const clear = this.button(t('Forget relay'), () => { try { localStorage.removeItem('tfg.turn'); } catch { /* ignore */ } urls.value = ''; user.value = ''; cred.value = ''; state.textContent = t('TURN relay removed.'); }, 'small');
+          body.append(section(t('Network relay (TURN)')), row(t('TURN URLs'), urls), row(t('Username'), user), row(t('Password'), cred),
+            row('', el('div', { class: 'slider' }, save, test, clear)), el('div', { class: 'dim note' }, state),
+            el('div', { class: 'dim note' }, t('Only the host needs this. Get free TURN credentials (e.g. metered.ca), paste them here, Test, Save, then host a new lobby.')));
+        }
         const g = this.app.game;
         const tick = () => { if (!meter.isConnected) return; meter.firstChild.style.width = ((g?.voice.localLevel || 0) * 100) + '%'; requestAnimationFrame(tick); };
         tick();
