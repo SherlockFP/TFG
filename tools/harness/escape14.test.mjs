@@ -128,6 +128,27 @@ stepReal(200);assert.equal(actual.state,'chase');assert(actual.data.hadSight);as
 const toPlayer=new THREE.Vector3().subVectors(real.me.pos,actual.pos).normalize(),doorPos=actual.pos.clone().addScaledVector(toPlayer,1.7);
 const testDoor={id:'escape-test-forward',kind:'door',open:false,locked:false,pos:doorPos,collider:ph.addStaticBox(doorPos.x,doorPos.y+1.2,doorPos.z,1.5,1.2,.1,Math.atan2(toPlayer.x,toPlayer.z),G.DOOR,{kind:'door'})};fac.doors.push(testDoor);ph.step(1/60);
 const paused=actual.pos.clone();stepReal(100);assert(!testDoor.open,'real physical closed door cannot open early');assert(actual.pos.distanceTo(paused)<.05,'real host pursuit pauses at forward door');stepReal(20);assert(testDoor.open,'actual forward door opens after the 1.8-second counterplay window');
+// Genuine native windup, then a reachable visible retreat into the no-hit 1.8–2.5m band.
+// No creature state, AI flags, perception or creature position is forced.
+let approach=null;for(let i=0;i<24;i++){
+ const a=i*Math.PI/12,p=actual.pos.clone().add(new THREE.Vector3(Math.cos(a)*2.2,0,Math.sin(a)*2.2));
+ const eye=p.clone().add(new THREE.Vector3(0,1.6,0));
+ if(!fac.nav.walkableAt(p.x,p.z)||!real.game.creatures.canSee(actual,{...real.me,pos:p,eye},24,360))continue;
+ if(!ph.lineOfSight(actual.pos.clone().add(new THREE.Vector3(0,.7,0)),p.clone().add(new THREE.Vector3(0,.7,0)),G.STATIC|G.DOOR))continue;
+ const floor=ph.raycast(p.clone().add(new THREE.Vector3(0,1,0)),new THREE.Vector3(0,-1,0),1.3,G.STATIC|G.DOOR);if(floor&&Math.abs(floor.point.y-layout.y)<.2){approach=p;break;}
+}
+assert(approach,'labelled nearby player fixture has actual floor/LOS');real.me.pos.copy(approach);real.me.eye.copy(approach).add(new THREE.Vector3(0,1.6,0));
+for(let i=0;i<120&&actual.state!=='windup';i++)stepReal(1);
+assert.equal(actual.state,'windup','native chase naturally reaches its telegraphed strike');
+let retreat=null;for(let i=0;i<24;i++){
+ const angle=i*Math.PI/12,p=actual.pos.clone().add(new THREE.Vector3(Math.cos(angle)*2.15,0,Math.sin(angle)*2.15));
+ const eye=p.clone().add(new THREE.Vector3(0,1.6,0));
+ if(!fac.nav.walkableAt(p.x,p.z)||real.me.pos.distanceTo(p)>3||!ph.lineOfSight(real.me.eye,eye,G.STATIC|G.DOOR)||!real.game.creatures.canSee(actual,{...real.me,pos:p,eye},24,360))continue;
+ const floor=ph.raycast(p.clone().add(new THREE.Vector3(0,1,0)),new THREE.Vector3(0,-1,0),1.3,G.STATIC|G.DOOR);
+ if(floor&&Math.abs(floor.point.y-layout.y)<.2){retreat=p;break;}
+}
+assert(retreat,'real floor/LOS permits readable retreat beyond hit reach');real.me.pos.copy(retreat);real.me.eye.copy(retreat).add(new THREE.Vector3(0,1.6,0));
+stepReal(82);assert(!['strike','rest','watch'].includes(actual.state),'missed native strike must recover pursuit, never orphan ACTIVE into rest/watch');assert.equal(real.game.run.escape14.result,'active');
 // Physical panels must obstruct both perception and the movement step, without forcing creature state.
 const alcove=physicalApi.shelters()[0];real.me.pos.fromArray(alcove.p);real.me.eye.copy(real.me.pos).add(new THREE.Vector3(0,1.6,0));
 // Find a real floor point behind its back panel, using nav and Rapier to ensure the player position is legitimate.

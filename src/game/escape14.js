@@ -110,6 +110,9 @@ export function wardenAI(c,dt,M){
    if(next==='search'){d.inspect=false;d.inspectT=0;const alive=g.aiPlayerById?.(c.target);d.validEscape=!!(d.hadSight&&alive&&!alive.dead&&!g.downed?.isDowned?.(alive.id)&&(hidden||!visible||d.lost>=T.lost));}
    if(next==='strike'){
      if(p&&attackConnects({visible,hidden,distance,safe:M.nearSafeZone(p),age:c.age})){M.attack(c,p,Math.min(32,c.dmg),ID,true);api.finish(c,false);}
+     else { // Windup tolerates 0.7m of retreat; a visible miss must resume the finite pursuit.
+       d.lost=0;c.setState('chase');return;
+     }
      c.cooldown=4;
    }
    if(next==='rest')c.target=null;

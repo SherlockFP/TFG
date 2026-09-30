@@ -318,3 +318,15 @@ html.tfg-ui #ui .hud-toasts .toast:is(.bad, .warn, .warning, .danger) { border-l
 html.tfg-ui #ui:has(.hud.hud-alert-focus) .chat:not(.open) .chat-line:not(:has(.cn)),
 html.tfg-ui #ui:has(.hud.hud-alert-focus) .chat:not(.open) .chat-line.old { display: none; }
 html.tfg-ui #ui:has(.hud.hud-alert-focus) .chat:not(.open) .chat-log { max-height: 62px; }
+
+/* Safe descent: reserve the left health rail and give the existing briefing one readable region. */
+html.tfg-ui .hud-arrival-focus .br-card { left:max(190px,20vw); width:min(420px,calc(100vw - 230px)); background:#100c08; }
+html.tfg-ui #ui:has(.hud-arrival-focus) .objectives .obj:not(.warn) { visibility:hidden; }
+html.tfg-ui .hud-arrival-focus .hud-prompt { left:auto; right:30px; top:auto; bottom:110px; transform:none; max-width:270px; text-align:right; z-index:8; }
+html.tfg-ui .hud-arrival-focus .hud-toasts { z-index:9; }
+@media (max-width:700px) {
+  html.tfg-ui .hud-arrival-focus .br-card { left:180px; width:calc(100vw - 200px); padding:10px; }
+  html.tfg-ui .hud-arrival-focus .br-moon { font-size:30px; }
+  html.tfg-ui .hud-arrival-focus .br-desc, html.tfg-ui .hud-arrival-focus .br-grid b { font-size:16px; }
+  html.tfg-ui .hud-arrival-focus .hud-prompt { bottom:105px; font-size:16px; max-width:220px; }
+}

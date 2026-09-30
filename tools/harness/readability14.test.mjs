@@ -61,3 +61,50 @@ assert.equal(guide.tutorial().done,beforeLamp);assert.equal(guide.used('flashlig
 events.get('itemState')({id:'local-lamp',type:'flashlight',on:false});assert.equal(guide.tutorial().done,beforeLamp);
 events.get('itemState')({id:'local-lamp',type:'flashlight',on:true});assert.equal(guide.tutorial().done,beforeLamp+1);assert.equal(guide.used('flashlight'),true);
 guide.dispose();
+
+// Real HUD descent update: threat removes the card immediately and calm reuses the unread content.
+const briefClasses = new Set(['hidden']), hudClasses = new Set();
+const classList = set => ({contains:n=>set.has(n),add(...names){names.forEach(n=>set.add(n));},remove(...names){names.forEach(n=>set.delete(n));},toggle(n,on){on?set.add(n):set.delete(n);}});
+const arrival = Object.create(HUD.prototype);arrival.el={classList:classList(hudClasses)};arrival.$={brief:{classList:classList(briefClasses)}};arrival.run={phase:'landing',moon:'hq',seed:12};
+let built=0;arrival.buildBrief=()=>{built++;arrival.briefKey='hq|12|event';};
+const descentGame={player:{},stateTimer:2,director:{chaseLevel:()=>0}};
+arrival.updateBrief(.1,descentGame);assert.equal(built,1);assert.ok(hudClasses.has('hud-arrival-focus'));assert.ok(!briefClasses.has('hidden'));
+descentGame.director.chaseLevel=()=>.8;arrival.updateBrief(.1,descentGame);assert.ok(briefClasses.has('hidden'));assert.ok(!briefClasses.has('out'));assert.ok(!hudClasses.has('hud-arrival-focus'));
+descentGame.director.chaseLevel=()=>0;arrival.updateBrief(.1,descentGame);assert.equal(built,1);assert.ok(!briefClasses.has('hidden'));
+const realSetTimeout=globalThis.setTimeout, realClearTimeout=globalThis.clearTimeout;
+let finishFade;globalThis.setTimeout=fn=>{finishFade=fn;return 1;};globalThis.clearTimeout=()=>{};
+try {
+ arrival.run.phase='company';arrival.updateBrief(.1,descentGame);assert.ok(briefClasses.has('out'));assert.ok(!briefClasses.has('hidden'));assert.ok(hudClasses.has('hud-arrival-focus'));
+ finishFade();assert.ok(briefClasses.has('hidden'));assert.ok(!hudClasses.has('hud-arrival-focus'));
+ arrival.run.phase='landing';arrival.updateBrief(.1,descentGame);arrival.run.phase='company';arrival.updateBrief(.1,descentGame);assert.ok(briefClasses.has('out'));
+ descentGame.director.chaseLevel=()=>.8;arrival.updateBrief(.1,descentGame);assert.ok(briefClasses.has('hidden'));assert.ok(!briefClasses.has('out'));assert.ok(!hudClasses.has('hud-arrival-focus'));assert.equal(arrival.briefPaused,false);
+ finishFade();assert.ok(briefClasses.has('hidden'));
+} finally {globalThis.setTimeout=realSetTimeout;globalThis.clearTimeout=realClearTimeout;}
+
+
+// Optional Warden's real host/replica state must reach the shared attention gate without director pressure.
+const ward={id:'c13',state:'warning',target:'self'};
+const wardGame={selfId:'self',player:{},run:{phase:'moon',escape14:{result:'active',warden:'c13',target:'self'}},creatures:{host:new Map([['c13',ward]]),views:new Map()}};
+for(const state of ['warning','chase','windup','attack','strike','search']) {ward.state=state;assert.equal(attentionHot(wardGame),true);}
+for(const state of ['rest','watch','idle','stunned']) {ward.state=state;assert.equal(attentionHot(wardGame),false);}
+ward.state='chase';ward.target='other';assert.equal(attentionHot(wardGame),false);ward.target='self';
+wardGame.run.escape14.result='escaped';assert.equal(attentionHot(wardGame),false);wardGame.run.escape14.result='active';
+wardGame.creatures.host.clear();wardGame.creatures.views.set('c13',{state:'chase',target:{x:0,z:0}});assert.equal(attentionHot(wardGame),true);
+wardGame.run.escape14.target='other';assert.equal(attentionHot(wardGame),false);wardGame.run.escape14.target='self';wardGame.player.dead=true;assert.equal(attentionHot(wardGame),false);
+
+// Real intercom show/update lifecycle, with native Warden pressure and a minimal DOM surface.
+const { installAlgorithm } = await import('../../src/game/algorithm.js');
+const oldDoc=globalThis.document;
+const makeNode=()=>({classList:classList(new Set()),style:{},append(){},appendChild(){},remove(){},querySelector(){return makeNode();}});
+globalThis.document={getElementById:()=>null,createElement:makeNode,createTextNode:text=>({textContent:text}),head:makeNode(),body:makeNode()};
+try {
+ wardGame.player.dead=false;wardGame.run.escape14.result='ready';wardGame.run.escape14.target='self';wardGame.settings={};
+ const intercom=installAlgorithm({game:wardGame});
+ intercom.show({text:'Inspect the service counter.',cls:'teach'});intercom.update(.1);assert.equal(intercom.speaking,true);
+ wardGame.run.escape14.result='active';
+ for(const state of ['warning','chase','search']) {wardGame.creatures.views.get('c13').state=state;intercom.update(.1);assert.equal(intercom.speaking,false);assert.equal(intercom.state.q.length,1);}
+ intercom.show({text:'Threat approaching your position.',cls:'danger'});intercom.update(.1);assert.equal(intercom.state.cur.cls,'danger');
+ intercom.update(10);assert.equal(intercom.speaking,false);assert.equal(intercom.state.q.length,1);
+ wardGame.run.escape14.result='escaped';intercom.update(.1);assert.equal(intercom.state.cur.cls,'teach');assert.equal(intercom.state.cur.text,'Inspect the service counter.');
+ intercom.dispose();
+} finally {if(oldDoc===undefined)delete globalThis.document;else globalThis.document=oldDoc;}

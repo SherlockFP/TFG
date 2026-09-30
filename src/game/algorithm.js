@@ -9,6 +9,7 @@
 //        host (pool + index) and broadcast, so every peer shows the same line in its own language.
 // CLIENT the intercom: ONE react-only subtitle under the compass (wave 9: no face card, hidden while calm), typewriter reveal, optional robot voice
 //        (speechSynthesis, terminal ALGO VOICE ON, off by default), line queue, cinematic-aware.
+import { attentionHot } from '../ui/hud_attention.js';
 import { LINES, FACTIONS, pickLang } from './loredata.js';
 import { isSellable } from './items.js';
 import { getLang, t, speechLang, upperT } from '../core/i18n.js';
@@ -235,9 +236,10 @@ export function installAlgorithm(core) {
     st.q = OG.enqueue(st.q, { text, pri: rank < 2, cls, voice: d.voice || null, mood: d.mood || game.run?.algo?.mood, ctx, exp: st.t + OG.ttlOf(d) });
     if (rank < 2 && st.cur && OG.CLS[st.cur.cls] === 2) st.cur.dur = Math.min(st.cur.dur, st.cur.t + 0.6);   // a warning / lesson cuts a flavour line short
   }
-  function startNext() {
+  function startNext(dangerOnly = false) {
     st.q = OG.prune(st.q, st.t, tagsNow());
-    const n = st.q.shift();
+    const idx = dangerOnly ? st.q.findIndex(line => line.cls === 'danger') : 0;
+    const n = idx < 0 ? null : st.q.splice(idx, 1)[0];
     if (!n) return;
     ensureDom();
     if (!st.el) return;
@@ -272,8 +274,14 @@ export function installAlgorithm(core) {
   }
   function clientUpdate(dt) {
     const busy = game.ui?.fullscreenOpen?.();
+    const danger = attentionHot(game);
+    if (danger && st.cur && st.cur.cls !== 'danger') {
+      st.q = OG.enqueue(st.q, st.cur);
+      st.el?.classList.remove('on'); st.cur = null;
+      try { if (game.settings?.algoVoice) window.speechSynthesis?.cancel(); } catch { /* optional voice */ }
+    }
     if (st.q.length) st.q = OG.prune(st.q, st.t, tagsNow());   // [algoctx] stale / wrong-context lines never wait for their turn
-    if (!st.cur && st.q.length && !busy && (st.q[0].pri || !(game.onboard?.fr?.busy?.() > 0))) startNext();   // [qa] the Algorithm box waits for the arrival cards (soul / sector map / wave)
+    if (!st.cur && st.q.length && !busy && (!danger || st.q.some(line => line.cls === 'danger')) && (st.q[0].pri || !(game.onboard?.fr?.busy?.() > 0))) startNext(danger);   // [qa] the Algorithm box waits for the arrival cards (soul / sector map / wave)
     const c = st.cur;
     if (c && st.el) {
       c.t += dt;

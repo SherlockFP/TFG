@@ -1,6 +1,18 @@
 # Honest critique log (updated every development round)
 
-## Current direction — wave 15 (2026-09-30)
+## Current direction — wave 16 (2026-09-30)
+
+**Current independent assessment: 7/10.** [wave16/REVIEW.md](wave16/REVIEW.md) owns the assessment, and [wave16/PLAYTEST.md](wave16/PLAYTEST.md) records the actual inputs, initial failures and bounded rechecks. Eight remains the quality target; this round does not establish human fun or retention.
+
+The improvements address observed friction. The descent briefing now stays clear of health through its visible exit and disappears immediately during danger. The brighter archive tray and smaller receipt make the physical sale surface clearer. Confirmed salvage states whether it entered the bag or hotbar and uses current key bindings; selected gear is preserved. Beginner loaners cover a real charged-light shortfall, while daily role rewards remain intentional. Visible pickup location is proven; the expanded instruction can wait behind startup/cinematic toast queues and should not be presented as immediate in every situation.
+
+The gauntlet exposed a meaningful counterplay bug. A retreat beyond hit reach during the Warden's telegraphed strike could miss, then leave the active objective in rest/watch. A miss now resumes chase, with actual HostCreature/Rapier failing-before/passing-after coverage. Its optional encounter also bypassed the ambient director's HUD attention: native host/replica state now suppresses routine teaching/chat, and the Algorithm defers ordinary captions while allowing a threat to bypass a queued teaching line. These corrections make surviving a threat more coherent than adding another enemy would.
+
+Actual keyboard/mouse inventory recovery, drop and bell sold the same 30-value copper at the native 34% rate for 10 credits; the item was removed and the full receipt agreed with the ledger. The 12 relevant regression files and final production build passed. Browser fixtures disclose phase/quota/item/camera setup and retain genuine perception, AI and input; they are not an unassisted first session or human combat benchmark. A nav-only escape waypoint hit a physical wall in one follow-up; that run correctly reached its finite failure cap, and remains recorded rather than being counted as a successful escape.
+
+The core still inherits the familiar expedition/salvage/quota skeleton. Its strongest distinctive decisions are surveillance losses, staffed districts, shared awkward cargo, physical workshops and competing uses of field profits. Generated rooms and box-heavy scenery still need stronger art direction. The next material evidence is an unassisted human crew shift, combat/headphone feedback and representative hardware frame times. Avoid another compulsory meter or more catalogue entries as a substitute for improving those decisions.
+
+## Wave 15 snapshot (2026-09-30)
 
 **Current independent assessment: 7/10**, unchanged from wave14's reviewed slice. The assessment and browser evidence belong to [wave15/REVIEW.md](wave15/REVIEW.md) and [wave15/PLAYTEST.md](wave15/PLAYTEST.md). Eight remains the quality target. Regression counts establish specific contracts, not enjoyment or retention.
 

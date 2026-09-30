@@ -24,6 +24,7 @@ import { ensureInventoryStyles } from '../ui/inventory_style.js';
 import { InventoryPanel } from '../ui/inventory_panel.js';
 import { registerGearModels } from '../models/gear.js';
 import { affixDisplayName } from './loot.js';
+import { createInventoryFeedback16 } from './inventory_feedback16.js';
 import { createGlints } from './lootglint.js';   // [heroprops] horror-safe loot glint
 
 export const INVENTORY_KEY = 'KeyI';
@@ -69,6 +70,7 @@ export function installInventory(game) {
   const items = () => game.items;
   const net = () => game.net;
   const me = () => game.selfId;
+  const feedback16 = createInventoryFeedback16(game);
   const bump = () => { st.ver++; };
 
   // ------------------------------------------------------------------ entries
@@ -394,6 +396,7 @@ export function installInventory(game) {
     bump();
     if (d.h !== me()) return;
     reconcile();
+    feedback16.changed();
     game.refreshStats?.();
     if (d.full && d.why) api.flash?.(d.why === 'hotbar full' ? t('Hotbar full.') : t('Does not fit there.'));
     game.mods?.emit('tfg:invChanged', game);
@@ -404,6 +407,7 @@ export function installInventory(game) {
     if (d.h !== me()) return;
     st.pendingStash.delete(it.id);
     feed(it, !!it.inv);
+    feedback16.confirmed(it);
     if (it.inv?.k === 'eq') game.refreshStats?.();
     game.mods?.emit('tfg:invChanged', game);
   }
@@ -548,7 +552,7 @@ export function installInventory(game) {
       line.style.setProperty('--tc', tiered ? TIERS[tier].color : '#cfc6b8');
       const name = affixDisplayName(t(it.def.name), it.affix, it);
       const val = isSellable(it.def) && it.value ? ` ▮${it.value}` : '';
-      line.innerHTML = `${iconHTML(it.type, 'ico')}<span><b>${escapeHtml(name)}</b>${tiered ? `<i>${escapeHtml(t(TIERS[tier].name))}</i>` : ''}<i>${escapeHtml(val)}${toBag ? ' · ' + escapeHtml(t(it.inv?.k === 'eq' ? 'Equipped' : 'Stashed in bag')) : ''}</i></span>`;
+      line.innerHTML = `${iconHTML(it.type, 'ico')}<span><b>${escapeHtml(name)}</b>${tiered ? `<i>${escapeHtml(t(TIERS[tier].name))}</i>` : ''}<i>${escapeHtml(val)}${' · ' + escapeHtml(feedback16.location(it))}</i></span>`;
       st.feedEl.appendChild(line);
       while (st.feedEl.children.length > 4) st.feedEl.firstChild.remove();
       setTimeout(() => line.classList.add('out'), 3600);
@@ -697,6 +701,7 @@ export function installInventory(game) {
     dispose() {
       if (st.disposed) return;
       st.disposed = true;
+      feedback16.dispose();
       for (const off of st.offs) off?.();
       st.offs.length = 0;
       if (typeof window !== 'undefined') window.removeEventListener('keydown', onKey);

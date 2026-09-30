@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { GeoBuilder, levelTexture } from './geobuilder.js';
 import { t, onLangChange } from '../core/i18n.js';
 import './port14_text.js';
-const C={metal:0x354d59,rust:0x7d5443,mint:0x72cdbb,amber:0xc7a35d,plum:0xa982b3,dark:0x17272d,ivory:0xc4cabb};
+const C={metal:0x354d59,rust:0x7d5443,mint:0x72cdbb,amber:0xc7a35d,plum:0xa982b3,dark:0x17272d,ivory:0xc4cabb,intake:0x809996,tray:0x586f6c};
 export function dressPort14(parent,kind,groundY=-1.25){
  let receiptTab=null,receiptTime=0;
  const root=new THREE.Group();root.name=`port14-${kind}`;parent.add(root);
@@ -83,11 +83,11 @@ export function dressPort14(parent,kind,groundY=-1.25){
   box('amber',0,14.4,-20.26,.45,.45,.12);
   // Archive Intake: one asymmetric staffed processing machine, no shutter/tentacle presentation.
   // Main delivery tray has exactly the legacy counter floor/top/width; its mint inset is the real drop zone.
-  box('metal',0,groundY+.49,-35.8,6.1,.98,1.35);
-  box('dark',0,groundY+1.102,-35.8,5,.008,1.12);
+  box('intake',0,groundY+.49,-35.8,6.1,.98,1.35);
+  box('tray',0,groundY+1.102,-35.8,5,.008,1.12);
   for(const x of [-2.7,2.7])box('mint',x,groundY+1.12,-35.8,.1,.035,1.1);
   for(let i=0;i<9;i++){
-   box('metal',-2.3+i*.575,groundY+1.107,-35.8,.08,.015,.96);
+   box('intake',-2.3+i*.575,groundY+1.107,-35.8,.08,.015,.96);
    box('amber',-2.3+i*.575,groundY+.65,-35.09,.06,.2,.015);
   }
   box('mint',0,groundY+.87,-35.09,5.5,.045,.025);
@@ -117,7 +117,7 @@ export function dressPort14(parent,kind,groundY=-1.25){
    box('amber',x,groundY+1.42,-35.74,.1,.29,.02);
   }
   // The hero silhouette is a tilted receipt feed: wide drum, offset arm and a folded paper ribbon.
-  beam('metal',new THREE.Vector3(2.9,groundY+1.25,-37.07),new THREE.Vector3(1.4,groundY+5.2,-37.07),.48,.65);
+  beam('intake',new THREE.Vector3(3.8,groundY+1.25,-37.07),new THREE.Vector3(3.1,groundY+3.3,-37.07),.38,.5);
   function drum(key,x,y,z,r=.63,depth=.45){
    for(let i=0;i<10;i++){
     const a=i*Math.PI/5,b=(i+1)*Math.PI/5;
@@ -126,14 +126,14 @@ export function dressPort14(parent,kind,groundY=-1.25){
     const center=new THREE.Vector3(x,y,z+.004);gb.quad(key,center,p,q,q,[[.5,.5],[0,0],[1,0],[1,0]]);
    }
   }
-  drum('ivory',1.4,groundY+5.1,-36.52,.72,.55);drum('amber',1.4,groundY+5.1,-36.48,.23,.05);
-  const folds=[[groundY+5,-36.42],[groundY+3.95,-36.45],[groundY+3.4,-36.68],[groundY+2.65,-36.4],[groundY+1.7,-36.55]];
+  drum('ivory',3.1,groundY+3.25,-36.52,.53,.45);drum('amber',3.1,groundY+3.25,-36.48,.18,.05);
+  const folds=[[groundY+3.16,-36.42],[groundY+2.76,-36.45],[groundY+2.38,-36.68],[groundY+2.05,-36.4],[groundY+1.7,-36.55]];
   for(let i=1;i<folds.length;i++){
    const [y0,z0]=folds[i-1],[y1,z1]=folds[i];
-   gb.quad('ivory',new THREE.Vector3(.91,y1,z1),new THREE.Vector3(1.89,y1,z1),new THREE.Vector3(1.89,y0,z0),new THREE.Vector3(.91,y0,z0),[[0,0],[1,0],[1,1],[0,1]]);
+   gb.quad('ivory',new THREE.Vector3(2.75,y1,z1),new THREE.Vector3(3.45,y1,z1),new THREE.Vector3(3.45,y0,z0),new THREE.Vector3(2.75,y0,z0),[[0,0],[1,0],[1,1],[0,1]]);
    for(let j=1;j<5;j++){
     const k=j/5,y=y0+(y1-y0)*k,z=z0+(z1-z0)*k+.012;
-    box('dark',1.4,y,z,j%2?.63:.45,.033,.013);
+    box('dark',3.1,y,z,j%2?.45:.32,.033,.013);
    }
   }
   // A bright suspended ticker identifies the hall without a new point light.
@@ -156,14 +156,14 @@ export function dressPort14(parent,kind,groundY=-1.25){
   sign('SUPPLIES / FIELD WORKSHOP',20,groundY+2.7,11.6,8,.65,0,'amber');
  }
  const materialFor=(key,paint=false)=>{
-  const mat=paint?new THREE.MeshBasicMaterial({color:C[key],vertexColors:true}):new THREE.MeshLambertMaterial({color:C[key],vertexColors:true,map:['metal','rust','dark'].includes(key)?levelTexture('metal_dark'):null,emissive:['mint','amber','plum'].includes(key)?C[key]:0,emissiveIntensity:.22});
+  const mat=paint?new THREE.MeshBasicMaterial({color:C[key],vertexColors:true}):new THREE.MeshLambertMaterial({color:C[key],vertexColors:true,map:['metal','rust','dark'].includes(key)?levelTexture('metal_dark'):null,emissive:['mint','amber','plum','intake','tray'].includes(key)?C[key]:0,emissiveIntensity:['intake','tray'].includes(key)?.28:.22});
   if(paint){mat.defines={PSX_NOSNAP:''};mat.polygonOffset=true;mat.polygonOffsetFactor=-8;mat.polygonOffsetUnits=-8;}
   materials.push(mat);return mat;
  };
  root.add(gb.build(key=>materialFor(key)));root.add(floor.build(key=>materialFor(key,true)));
  if(kind==='company'){
   const mat=new THREE.MeshBasicMaterial({color:C.ivory});materials.push(mat);
-  receiptTab=new THREE.Mesh(new THREE.PlaneGeometry(.96,.34),mat);receiptTab.position.set(1.4,groundY+1.63,-36.50);root.add(receiptTab);
+  receiptTab=new THREE.Mesh(new THREE.PlaneGeometry(.68,.24),mat);receiptTab.position.set(3.1,groundY+1.63,-36.50);root.add(receiptTab);
  }
  // A single 1024x512 atlas batches all map signs into one draw call and updates on language changes.
  let offLang=()=>{};

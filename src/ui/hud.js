@@ -547,12 +547,20 @@ export class HUD {
   }
   updateBrief(dt, game) {
     const run = this.run || {};
-    const want = run.phase === 'landing' && !game.player.dead;
+    const descending = run.phase === 'landing' && !game.player.dead;
+    const danger = attentionHot(game);
+    const want = descending && !danger;
     const b = this.$.brief;
+    if (!descending) this.briefPaused = false;
+    // A threatened descent yields immediately, rather than leaving its animated exit over warnings.
+    if (danger && (this.briefOn || !b.classList.contains('hidden'))) {
+      this.briefOn = false; this.briefPaused = descending; clearTimeout(this.briefHideT); b.classList.add('hidden'); b.classList.remove('out');
+    }
     if (want) {
       const key = `${run.moon}|${run.seed}`;
       if (!this.briefOn || !String(this.briefKey || '').startsWith(key + '|')) {
-        this.buildBrief(game);
+        if (!this.briefPaused || !String(this.briefKey || '').startsWith(key + '|')) this.buildBrief(game);
+        this.briefPaused = false;
         this.briefOn = true;
         clearTimeout(this.briefHideT);
         b.classList.remove('hidden', 'out');
@@ -565,8 +573,12 @@ export class HUD {
       this.briefOn = false;
       b.classList.add('out');
       clearTimeout(this.briefHideT);
-      this.briefHideT = setTimeout(() => { if (!this.briefOn) b.classList.add('hidden'); }, 700);
+      this.briefHideT = setTimeout(() => {
+        if (!this.briefOn) { b.classList.add('hidden'); this.el.classList.remove('hud-arrival-focus'); }
+      }, 700);
     }
+    // Layout and routine objective suppression last through the real visible exit, not just the phase.
+    this.el.classList.toggle('hud-arrival-focus', !danger && !b.classList.contains('hidden'));
   }
 
   update(dt, game) {
