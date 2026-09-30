@@ -119,6 +119,7 @@ export function installGrenades(game) {
   const tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3();
 
   const on = (ev, fn) => { const off = mm?.on?.(ev, fn); if (off) offs.push(off); };
+  const safe1 = (label, fn, a) => { try { return fn(a); } catch (e) { if (!safe.w) safe.w = new Set(); if (!safe.w.has(label)) { safe.w.add(label); console.warn('[grenades] ' + label, e); } } };   // [perf5] no closure per call in the per-frame update
   const safe = (label, fn) => { try { return fn(); } catch (e) { if (!safe.w) safe.w = new Set(); if (!safe.w.has(label)) { safe.w.add(label); console.warn('[grenades] ' + label, e); } } };
   function wrap(obj, name, make) {
     const raw = obj?.[name];
@@ -1038,26 +1039,27 @@ export function installGrenades(game) {
     anims.length = 0;
     cancelCook(); danceT = 0; flashS.t = 0;
   }
+  function tickAnims(dt) {
+    for (let i = anims.length - 1; i >= 0; i--) {
+      const a = anims[i];
+      a.t += dt;
+      const u = Math.min(1, a.t / a.dur);
+      a.upd(u, a.t);
+      if (u >= 1) { anims.splice(i, 1); a.end?.(); }
+    }
+  }
   on('phase', (ph, gg) => { if (gg === g) safe('phase', clearAll); });
   on('update', (dt, gg) => {
     if (gg !== g || disposed) return;
-    safe('throw', () => updateThrow(dt));
-    safe('balls', () => updateBalls(dt));
-    safe('anims', () => {
-      for (let i = anims.length - 1; i >= 0; i--) {
-        const a = anims[i];
-        a.t += dt;
-        const u = Math.min(1, a.t / a.dur);
-        a.upd(u, a.t);
-        if (u >= 1) { anims.splice(i, 1); a.end?.(); }
-      }
-    });
+    safe1('throw', updateThrow, dt);
+    safe1('balls', updateBalls, dt);
+    if (anims.length) safe1('anims', tickAnims, dt);
     safe('clouds', updateClouds);
-    safe('dark', () => updateDark(dt));
+    safe1('dark', updateDark, dt);
     safe('decoys', updateDecoys);
     safe('frozen', updateFrozen);
-    safe('flash', () => updateFlash(dt));
-    if (g.isHost) safe('zones', () => hostZoneTick(dt));
+    safe1('flash', updateFlash, dt);
+    if (g.isHost) safe1('zones', hostZoneTick, dt);
   });
 
   const api = {

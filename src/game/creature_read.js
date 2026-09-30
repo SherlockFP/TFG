@@ -26,21 +26,25 @@ export const lum = (c) => 0.3 * c.r + 0.59 * c.g + 0.11 * c.b;
 
 // ------------------------------------------------------------------------------------------------ pure pose maths
 /** lean (rad, negative = back) and crouch fraction for a striking / holding state t seconds in. {pitch:0, crouch:0} for any other state. */
-export function windupPose(state, t) {
+export function windupPose(state, t) { return windupInto({ pitch: 0, crouch: 0, phase: 'none' }, state, t); }
+/** [perf5] same maths writing into a caller-owned object (apply() runs per creature per frame: no per-call objects) */
+function windupInto(o, state, t) {
   const strike = STRIKE_STATES.has(state);
-  if (!strike && !HOLD_STATES.has(state)) return { pitch: 0, crouch: 0, phase: 'none' };
+  if (!strike && !HOLD_STATES.has(state)) { o.pitch = 0; o.crouch = 0; o.phase = 'none'; return o; }
   const w = RULES.windup || 0.4;
-  if (t < w || !strike) { const u = easeOut(clamp(t / w, 0, 1)); return { pitch: -READ.windBack * u, crouch: 0.6 * u, phase: 'windup' }; }
+  if (t < w || !strike) { const u = easeOut(clamp(t / w, 0, 1)); o.pitch = -READ.windBack * u; o.crouch = 0.6 * u; o.phase = 'windup'; return o; }
   const k = clamp((t - w) / READ.strikeT, 0, 1);
-  return { pitch: lerp(READ.strike, 0, k * k), crouch: 0, phase: k < 1 ? 'strike' : 'recover' };
+  o.pitch = lerp(READ.strike, 0, k * k); o.crouch = 0; o.phase = k < 1 ? 'strike' : 'recover'; return o;
 }
 /** hit flinch: hitFlash is 1 on the hit and decays to 0 in 0.25 s */
 export const flinchPitch = (hitFlash) => -READ.flinch * clamp(hitFlash, 0, 1);
 /** walk bob: phase advances by distance. Returns {dy (fraction of height), pitch, roll}. */
-export function bobPose(phase, speed) {
-  const k = clamp(speed / 3, 0, 1);
-  return { dy: Math.abs(Math.sin(phase)) * READ.bob * k, pitch: READ.lean * clamp(speed / 6, 0, 1), roll: Math.sin(phase) * 0.035 * k };
+export function bobPose(phase, speed) { return bobInto({ dy: 0, pitch: 0, roll: 0 }, phase, speed); }
+function bobInto(o, phase, speed) {
+  const k = clamp(speed / 3, 0, 1), sn = Math.sin(phase);
+  o.dy = Math.abs(sn) * READ.bob * k; o.pitch = READ.lean * clamp(speed / 6, 0, 1); o.roll = sn * 0.035 * k; return o;
 }
+const _wp = { pitch: 0, crouch: 0, phase: 'none' }, _bp = { dy: 0, pitch: 0, roll: 0 };
 /** big bodies lean less (a 8 m giant tipping 0.3 rad would sweep 2.4 m) */
 export const sizeK = (height) => clamp(1.9 / Math.max(height || 1.5, 0.5), 0.2, 1.4);
 
@@ -129,13 +133,13 @@ export function apply(view, dt) {
   if (view.state === 'dead') return;                                  // feel.deathPose owns the corpse
   const cam = view.mgr?.game?.camera?.position;
   const far = QUALITY.lodFar && cam && view.pos.distanceToSquared(cam) > QUALITY.lodFar * QUALITY.lodFar;
-  const sp = Math.min(14, Math.hypot(view.pos.x - s.px, view.pos.z - s.pz) / Math.max(dt, 1e-4));
+  const mx = view.pos.x - s.px, mz = view.pos.z - s.pz, sp = Math.min(14, Math.sqrt(mx * mx + mz * mz) / Math.max(dt, 1e-4));
   s.px = view.pos.x; s.pz = view.pos.z;
   if (far) { root.rotation.x = 0; root.rotation.z = 0; return; }       // perf2 LOD: far bodies keep the model's own pose only
   const h = view.height || view.model?.height || 1.5, k = sizeK(h);
   const speed = view.state === 'stunned' || view.state === 'idle' ? 0 : sp;
   s.ph = (s.ph + speed * dt / (0.9 * Math.sqrt(Math.max(h, 0.6)) ) * 6.2832) % 6.2832;
-  const b = bobPose(s.ph, speed), w = windupPose(view.state, view.stateT);
+  const b = bobInto(_bp, s.ph, speed), w = windupInto(_wp, view.state, view.stateT);
   const pitch = clamp((w.pitch + b.pitch + flinchPitch(view.hitFlash)) * k, -READ.amax, READ.amax);
   root.rotation.x = pitch;
   root.rotation.z = b.roll * k;

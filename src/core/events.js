@@ -29,8 +29,11 @@ export class Emitter {
     // [perf3] the snapshot array is cached per event (handlers may add/remove during an emit): 'update' fires every frame, so no [...set] copy per call
     let arr = this._a.get(ev);
     if (!arr) { arr = [...set]; this._a.set(ev, arr); }
+    // [perf5] fixed-arity calls: `fn(...args)` allocated + iterated an array per handler (~100 'update' handlers x 60 Hz)
+    const n = args.length, a0 = args[0], a1 = args[1], a2 = args[2];
     for (let i = 0; i < arr.length; i++) {
-      try { arr[i](...args); } catch (e) { console.error(`[event ${ev}]`, e); }
+      const fn = arr[i];
+      try { if (n === 2) fn(a0, a1); else if (n === 1) fn(a0); else if (n === 0) fn(); else if (n === 3) fn(a0, a1, a2); else fn(...args); } catch (e) { console.error(`[event ${ev}]`, e); }
     }
   }
   clear() { this._h.clear(); this._a.clear(); }

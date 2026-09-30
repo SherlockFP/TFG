@@ -686,6 +686,7 @@ export function installRoulette(ctx) {
     if (game.isHost) { hostT += dt; if (hostT >= 0.25) { hostT = 0; hostTick(); } }
     const p = game.player, cam = game.camera;
     for (const T of tables.values()) {
+      if (cam && T.pos.distanceToSquared(cam.position) > 3600) continue;   // [perf5] a table 60 m away is not drawn / heard: its model animates again (from its targets) when you come back
       const v = T.v, m = T.model;
       const lv = [0, 0, 0, 0];
       for (let i = 0; i < RR.seats; i++) lv[i] = v.seats[i] ? Math.min(5, v.pots[v.seats[i]] || 0) : 0;

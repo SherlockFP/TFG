@@ -49,7 +49,7 @@ export function installPets(game) {
   const mods = game.mods;
   const offs = [];
   const S = { view: null, sig: '', lastDay: null, disposed: false, panelEl: null, hatchT: 0, speed: 0, last: new THREE.Vector3(), yaw: 0 };
-  const state = () => C.ensurePets(game.profile);
+  const state = C.petStateMemo(() => game.profile, () => game.time);   // [perf5] was a full re-sanitise per call, several per frame
   const save = () => { try { game.progress?.save?.(); } catch { /* profile save is best effort */ } };
   const say = (text, kind = 'info') => { try { game.ui?.toast(text, kind); } catch { /* ui optional */ } };
   const atHq = () => game.run?.phase === 'company';

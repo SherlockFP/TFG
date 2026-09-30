@@ -203,15 +203,21 @@ export function installAnomaly(game) {
   }
 
   // ------------------------------------------------------------------ frame
+  let sysList = null;
   function update(dt) {
     if (disposed) return;
     const now = game.time;
     ctx.screen.noise = 0; ctx.screen.warp = 0; ctx.screen.stage = 0;
     // expiry
-    for (const r of [...B.values()]) if (now >= r.until) buffs.remove(r.id, 'expired');
+    // [perf5] no per-frame copy of the buff map / literal system table: collect only what expired (buffs.remove mutates B)
+    let gone = null;
+    for (const r of B.values()) if (now >= r.until) (gone ||= []).push(r);
+    if (gone) for (const r of gone) buffs.remove(r.id, 'expired');
     // sub-systems (each adds to ctx.screen)
-    for (const [name, sys] of [['static', ctx.static], ['mutations', ctx.mutations], ['powerups', ctx.powerups], ['dice', ctx.dice], ['roulette', ctx.roulette]]) {
-      try { sys.update(dt); } catch (e) { if ((errCount[name] = (errCount[name] || 0) + 1) <= 3) console.warn('[anomaly] ' + name + ' update', e); }
+    const SYS = (sysList ||= [['static', ctx.static], ['mutations', ctx.mutations], ['powerups', ctx.powerups], ['dice', ctx.dice], ['roulette', ctx.roulette]]);
+    for (let i = 0; i < SYS.length; i++) {
+      const name = SYS[i][0];
+      try { SYS[i][1].update(dt); } catch (e) { if ((errCount[name] = (errCount[name] || 0) + 1) <= 3) console.warn('[anomaly] ' + name + ' update', e); }
     }
     // engine noise / warp with ownership (other systems write these too)
     const bl = now < blip.until ? blip : null;

@@ -3,6 +3,7 @@
 // this layer only adds the visual pulse, same rhythm formula). The speed / burst / door rules are host side in
 // chase_tuning.js + CreatureManager.follow().
 import { tension, pulseInterval } from './chase_tuning.js';
+import { setStyle } from '../ui/domdiff.js';
 
 const CHASING = new Set(['run', 'chase', 'hunt', 'lunge', 'windup', 'charge']);
 
@@ -29,11 +30,11 @@ export function installChase(game) {
   function update(dt) {
     const target = game.player?.dead ? 0 : tension(nearestChaser());
     k += (target - k) * Math.min(1, dt * (target > k ? 3 : 1.2));
-    if (k < 0.01) { if (el) el.style.opacity = '0'; beat = 0; return; }
+    if (k < 0.01) { if (el) setStyle(el, 'opacity', '0'); beat = 0; return; }
     beat -= dt;
     if (beat <= 0) { beat = pulseInterval(k); pulse = 1; }   // (sound: the director's heartbeat already follows chaser distance; not doubled here)
     pulse = Math.max(0, pulse - dt * 4);
-    if (el) el.style.opacity = String(Math.min(0.9, k * 0.55 + pulse * k * 0.3).toFixed(3));
+    if (el) setStyle(el, 'opacity', String(Math.min(0.9, k * 0.55 + pulse * k * 0.3).toFixed(3)));
   }
   offs.push(game.mods.on('update', (dt, g) => { if (!disposed && g === game) update(dt); }));
   return {

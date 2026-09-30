@@ -55,7 +55,7 @@ export function installPetsNet(game, api, S, { save, say }) {
   const isMe = (id) => id === game.selfId;
 
   // ------------------------------------------------------------------------------------------------ owner: mode / dest / sync
-  const petState = () => C.ensurePets(game.profile);
+  const petState = C.petStateMemo(() => game.profile, () => game.time);   // [perf5] was a full re-sanitise per call, several per frame
   const modeOf = () => { const m = petState().mode; return C.MODES.includes(m) ? m : 'follow'; };
   const blocked = () => !!(game.mirror?.active || game.boardgame?.active || game.petsBlocked);
   function sendSync(force = false) {

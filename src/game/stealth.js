@@ -11,7 +11,7 @@
 //      (host spawns a prize), latch-controlled SHORTCUT doors (locked from the entrance side, released with E from the deep side).
 // Net: 'stn' (client -> host request: {e:[[kind,x,y,z,loud]...]}), 'stv' (host -> all, HOST_ONLY: {e:[[x,z,loud,kind]...]} rings). Everything else is local.
 import * as THREE from 'three';
-import { addTranslations, t, tf, sysMsg } from '../core/i18n.js';
+import { addTranslations, t, tf, sysMsg, getLang } from '../core/i18n.js';
 import { HOST_ONLY } from '../net/session.js';
 import { RNG } from '../core/rng.js';
 import { hudDock } from '../ui/dock.js';
@@ -202,15 +202,18 @@ export function installStealth(game) {
     if (!els) return;
     const p = g.player;
     const on = enabled() && isMoon() && p && !p.inShip && !p.dead && g.settings?.stealthMeter !== false;
-    els.root.classList.toggle('off', !on);
+    if (on !== els._on) { els._on = on; els.root.classList.toggle('off', !on); }   // [perf5] DOM only when the value changed (was 5 writes + a tf() per frame)
     if (!on) return;
     shown += (Math.max(p.noise || 0, 0) - shown) * Math.min(1, dt * 10);
     const band = S.bandOf(shown);
-    els.root.style.setProperty('--tc', COLORS[band]);
-    els.name.textContent = t(band);
-    els.fill.style.width = Math.round(clamp(shown, 0, 1) * 100) + '%';
-    els.r.textContent = tf('heard within ~{n} m', { n: Math.max(1, Math.round(S.radiusOf(shown, 16))) });
-    els.sneak.textContent = p.sneak || p.crouch ? t('SNEAKING') : '';
+    if (band !== els._band) { els._band = band; els.root.style.setProperty('--tc', COLORS[band]); }
+    const nm = t(band); if (nm !== els._nm) { els._nm = nm; els.name.textContent = nm; }
+    const w = Math.round(clamp(shown, 0, 1) * 100);
+    if (w !== els._w) { els._w = w; els.fill.style.width = w + '%'; }
+    const rad = Math.max(1, Math.round(S.radiusOf(shown, 16)));
+    const rk = rad + getLang(); if (rk !== els._rad) { els._rad = rk; els.r.textContent = tf('heard within ~{n} m', { n: rad }); }
+    const sn = p.sneak || p.crouch ? t('SNEAKING') : '';
+    if (sn !== els._sn) { els._sn = sn; els.sneak.textContent = sn; }
   }
 
   // footstep / event rings (pooled flat meshes: no lights)

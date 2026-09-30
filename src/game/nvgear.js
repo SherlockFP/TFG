@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { t, tf, addTranslations } from '../core/i18n.js';
 import { STORE_ITEMS, registerItem, itemDef } from './items.js';
+import { setStyle, setHTML, setClass } from '../ui/domdiff.js';
 import * as C from './nvgear_core.js';
 import { createArtModel } from '../models/artpass.js';
 
@@ -187,17 +188,17 @@ export function installNvgear(game) {
     if (ov) {
       const mut = !!game.anomaly?.buffs?.has?.('m_nv');
       const low = act ? act.battery / (S.active.def.battery || 1) < C.LOW_BATTERY : false;
-      ov.style.display = act && !mut ? 'block' : 'none';
-      if (act) ov.style.opacity = low ? String(0.55 + 0.4 * Math.abs(Math.sin(game.time * 17))) : '1';
+      setStyle(ov, 'display', act && !mut ? 'block' : 'none');
+      if (act) setStyle(ov, 'opacity', low ? String(0.55 + 0.4 * Math.abs(Math.sin(game.time * 17))) : '1');
       const gl = S.dazzle > 0 ? Math.min(1, S.dazzle / Math.min(S.dazzleMax, 1.2)) * (eng?.settings?.reduceFlash ? 0.5 : 0.95) : 0;
-      glare.style.display = gl > 0 ? 'block' : 'none';
-      if (gl > 0) glare.style.opacity = gl.toFixed(2);
+      setStyle(glare, 'display', gl > 0 ? 'block' : 'none');
+      if (gl > 0) setStyle(glare, 'opacity', gl.toFixed(2));
       // small held-only readout (the hotbar already draws the battery bar; this adds seconds + state)
       if (isGoggles(held) && !p.dead) {
         const d = itemDef(held.type);
-        hud.style.display = 'block'; hud.classList.toggle('low', (held.battery / d.battery) < C.LOW_BATTERY);
-        hud.innerHTML = `${t('NV')} Mk ${d.nv.mk} · <b>${Math.max(0, Math.ceil(held.battery || 0))} s</b> · ${held.on ? 'ON' : 'OFF'}`;
-      } else hud.style.display = 'none';
+        setStyle(hud, 'display', 'block'); setClass(hud, 'low', (held.battery / d.battery) < C.LOW_BATTERY);
+        setHTML(hud, `${t('NV')} Mk ${d.nv.mk} · <b>${Math.max(0, Math.ceil(held.battery || 0))} s</b> · ${held.on ? 'ON' : 'OFF'}`);
+      } else setStyle(hud, 'display', 'none');
     }
     // charging progress
     const c = S.chg;

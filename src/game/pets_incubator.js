@@ -52,6 +52,7 @@ export function installIncubator(game, api) {
   try { col = game.physics?.addStaticBox(INCUBATOR_POS.x, 0.4, INCUBATOR_POS.z, 0.52, 0.4, 0.33, 0, G.STATIC, { kind: 'static' }); } catch { /* physics not ready */ }
 
   let time = 0, sigT = 0, sig = '';
+  const petSt = C.petStateMemo(() => game.profile, () => game.time);
   function refresh() {
     const s = C.ensurePets(game.profile);
     const key = s.incubator.map((e) => `${e.id}:${C.eggProgress(e, s.clock).toFixed(2)}`).join('|');
@@ -71,7 +72,7 @@ export function installIncubator(game, api) {
     if (g !== game) return;
     time += dt; sigT -= dt;
     if (sigT <= 0) { sigT = 0.5; try { refresh(); } catch { /* profile not ready */ } }
-    const s = C.ensurePets(game.profile);
+    const s = petSt();   // [perf5] memoised: the full normalisation ran every frame
     slots.forEach((sl, i) => {
       const e = s.incubator[i];
       if (!e) return;

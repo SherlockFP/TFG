@@ -63,6 +63,7 @@ export function createKit(game) {
   /** RMB hook (the melee module owns scan-as-tap): fn(heldItem) -> true when it used the click */
   K.onRmb = (fn) => { K.rmbHooks.push(fn); };
   K.after = (sec, fn) => { K.timers.push({ t: g.time + sec, fn }); };
+  K.safe1 = (label, fn, a, ctx) => { try { return fn.call(ctx, a); } catch (e) { if (!K.warned.has(label)) { K.warned.add(label); console.warn('[combat] ' + label, e); } } };   // [perf5] no closure per call in the per-frame loop
   K.safe = (label, fn) => { try { return fn(); } catch (e) { if (!K.warned.has(label)) { K.warned.add(label); console.warn('[combat] ' + label, e); } } };
 
   // ---------------------------------------------------------------- audio
@@ -240,16 +241,16 @@ export function createKit(game) {
   // ---------------------------------------------------------------- one update loop, one 'fx' listener, one host-handler hook
   K.on('update', (dt, gg) => {
     if (gg !== g || K.disposed) return;
-    for (const fn of K.updaters) K.safe('update', () => fn(dt));
+    for (let i = 0; i < K.updaters.length; i++) K.safe1('update', K.updaters[i], dt);
     for (let i = K.anims.length - 1; i >= 0; i--) {
       const a = K.anims[i];
       a.t += dt;
       const u = Math.min(1, a.t / a.dur);
-      K.safe('anim', () => a.upd(u));
+      K.safe1('anim', a.upd, u, a);
       if (u >= 1) { K.anims.splice(i, 1); K.safe('animend', () => a.end?.()); }
     }
     for (let i = K.timers.length - 1; i >= 0; i--) if (g.time >= K.timers[i].t) { const tm = K.timers.splice(i, 1)[0]; K.safe('timer', tm.fn); }
-    if (g.isHost) K.safe('host', () => hostTick(dt));
+    if (g.isHost) K.safe1('host', hostTick, dt);
     bleedTick(dt);
   });
   K.on('fx', (d, from) => { if (d?.k === 'cb') K.safe('fx:' + d.t, () => K.fxH.get(d.t)?.(d, from)); });

@@ -9,6 +9,7 @@
 // Net (all 'vy*'): 'vyreq' client -> host request {op}, 'vyx' host -> everyone/one peer {k}, 'vyn' host -> everyone npc stream.
 // Host-authoritative: the host owns run.vy (synced with broadcastRun(['vy']), saved with the run), NPCs, missions, loot, meteors. Clients only render + send requests.
 import * as THREE from 'three';
+import { setStyle, setText } from '../ui/domdiff.js';
 import { MOONS, MOON_ORDER } from './moons.js';
 import { RNG, hashString } from '../core/rng.js';
 import { addTranslations, t, tf, tfIn, sysMsg } from '../core/i18n.js';
@@ -1023,13 +1024,13 @@ export function installVoyage(game) {
     const w = window.innerWidth, h = window.innerHeight;
     S.marks.forEach((el, i) => {
       const o = tg[i];
-      if (!o) { el.style.display = 'none'; return; }
+      if (!o) { setStyle(el, 'display', 'none'); return; }
       _v.set(o.p.x, (o.p.y ?? 0) + (o.p.y === undefined ? 2 : 0), o.p.z).project(game.camera);
       let x = (_v.x * 0.5 + 0.5) * w, y = (1 - (_v.y * 0.5 + 0.5)) * h;
       if (_v.z > 1) { x = w - x; y = h - 40; }
       x = clamp(x, 40, w - 40); y = clamp(y, 60, h - 60);
-      el.style.display = ''; el.style.left = x + 'px'; el.style.top = y + 'px'; el.style.opacity = o.soft ? '0.65' : '1';
-      el.lastChild.textContent = `${t(o.label)} ${dist2(o.p)} m`;
+      setStyle(el, 'display', ''); setStyle(el, 'left', Math.round(x) + 'px'); setStyle(el, 'top', Math.round(y) + 'px'); setStyle(el, 'opacity', o.soft ? '0.65' : '1');   // [perf5] write-if-changed (was 5 DOM writes per marker per frame)
+      setText(el.lastChild, `${t(o.label)} ${dist2(o.p)} m`);
     });
   }
 
@@ -1103,7 +1104,7 @@ export function installVoyage(game) {
     updateFx(dt);
     if (S.prompt) { S.prompt.tick = (S.prompt.tick || 0) - dt; if (S.prompt.tick <= 0) { S.prompt.tick = 0.25; renderPrompt(); } }
     if (run()?.phase === 'moon') { updateMarkers(); acidTick(dt); pollPhoto(); }
-    else if (S.marks.length) S.marks.forEach((el) => { el.style.display = 'none'; });
+    else if (S.marks.length) S.marks.forEach((el) => { setStyle(el, 'display', 'none'); });
     if (host() && enabled()) {
       try { hostTick(dt); } catch (e) { if (!S._warned) { S._warned = 1; console.warn('[voyage] tick', e); } }
       hostSendT -= dt;
@@ -1111,7 +1112,7 @@ export function installVoyage(game) {
     }
   });
   on('moonPopulated', (g) => { if (g && g !== game) return; try { hostPopulate(); } catch (e) { console.warn('[voyage] populate', e); } });
-  on('mapLoaded', () => { S.interKey = ''; S.inter = []; clearViews(); S.markEl && S.marks.forEach((el) => { el.style.display = 'none'; }); });
+  on('mapLoaded', () => { S.interKey = ''; S.inter = []; clearViews(); S.markEl && S.marks.forEach((el) => { setStyle(el, 'display', 'none'); }); });
   on('phase', (ph, g) => {
     if (g !== game || disposed) return;
     if (ph === 'orbit' || ph === 'takeoff') { clearViews(); for (const f of fxObjs.splice(0)) disposeFx(f); S.interKey = ''; }

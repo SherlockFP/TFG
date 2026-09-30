@@ -440,10 +440,11 @@ export function installFood(game) {
   // ---------------------------------------------------------------- crew state (drunk sway / squeak / hiccups / passed out), 'fds'
   function sendState(force) {
     if (!game.net?.send) return;
-    const st = { l: +F.fx.level.toFixed(1), c: F.fx.count, sq: hasBuff('f_cringe') ? 1 : 0, sk: hasBuff('f_meat_sick') ? 1 : 0, hi: F.hiccup.n, ps: F.pass ? 1 : 0 };
-    const sig = JSON.stringify(st);
-    if (!force && sig === F.stateSig && now() - F.stateT < 2) return;
-    F.stateSig = sig; F.stateT = now();
+    // [perf5] the signature is a number tuple compared field by field (was an object + JSON.stringify per frame)
+    const l = +F.fx.level.toFixed(1), c = F.fx.count, sq = hasBuff('f_cringe') ? 1 : 0, sk = hasBuff('f_meat_sick') ? 1 : 0, hi = F.hiccup.n, ps = F.pass ? 1 : 0, q = F.stateSig;
+    if (!force && q && q.l === l && q.c === c && q.sq === sq && q.sk === sk && q.hi === hi && q.ps === ps && now() - F.stateT < 2) return;
+    const st = { l, c, sq, sk, hi, ps };
+    F.stateSig = st; F.stateT = now();
     try { game.net.send('fds', st); } catch { /* not connected yet */ }
   }
   function onPeerState(d, from) {

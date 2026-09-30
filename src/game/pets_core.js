@@ -342,6 +342,16 @@ export function ensurePets(profile) {
   if (!s.active && s.stable.length) s.active = s.stable[0].id;
   return s;
 }
+/** [perf5] ensurePets re-sanitises every stable pet + the skin sets on EVERY call and the pets modules called it several times per frame:
+ *  this returns a getter that re-normalises at most every `ttl` seconds of game time (same object, same in-place semantics in between). */
+export function petStateMemo(getProfile, getNow, ttl = 0.25) {
+  let at = -1e9, val = null;
+  return () => {
+    const p = getProfile(), n = getNow();
+    if (val && p && p.pets === val && Number.isFinite(n) && n >= at && n - at < ttl) return val;
+    val = ensurePets(p); at = Number.isFinite(n) ? n : -1e9; return val;
+  };
+}
 export const findPet = (state, id) => state.stable.find((p) => p.id === id) || null;
 export const activePet = (state) => (state.active ? findPet(state, state.active) : null);
 export function adoptPet(state, pet) {

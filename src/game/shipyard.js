@@ -509,7 +509,8 @@ export function installShipyard(game) {
   const rest = { t: 0, toast: false };
   const lounge = { t: 0 };
   let turretT = 0, turretCd = 0, turretTarget = null;
-  const eff = () => Y.effects(cur);
+  let effFor = null, effVal = null;   // [perf5] effects() walks every socket several times per call and eff() ran many times a frame; `cur` is replaced (never mutated) on every sync
+  const eff = () => { if (effFor !== cur) { effVal = Y.effects(cur); effFor = cur; } return effVal; };
   if (game.crafting) game.crafting.timeMul = () => eff().craftTimeMul;   // ui/panels/crafting.js scales the CRAFT progress bar with it
 
   // item models for the ship parts (world drops + inventory icons read the mod registry)

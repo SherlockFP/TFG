@@ -142,11 +142,18 @@ export function installFeedcams(game) {
     if (seeing) return Math.sin(phase * 12) > 0 ? 0xff6060 : 0x500808;
     return Math.sin(phase * 3) > 0 ? 0xff2020 : 0x3a0808;
   };
+  // [perf5] cone writer state: the closures were re-created per camera per frame; one shared object now (bait hint is only built while a bait is live)
+  const vt = {
+    tab: null, c: null, o: 0, oc: 0, w: 0, wc: 0, gg: 0, bb: 0, cp: null, cc: null, floorY: 0,
+    dist(a) { const tab = this.tab, f = Math.max(0, Math.min(tab.d.length - 1.001, (a - tab.a0) / tab.step)), i0 = f | 0; return tab.d[i0] + (tab.d[i0 + 1] - tab.d[i0]) * (f - i0); },
+    vert(a, r, al) { const c = this.c, pa = this.cp.array, ca = this.cc.array; pa[this.o + this.w++] = c.x + Math.cos(a) * r; pa[this.o + this.w++] = this.floorY + 0.01; pa[this.o + this.w++] = c.z + Math.sin(a) * r; const q = this.oc + this.wc; ca[q] = 1; ca[q + 1] = this.gg; ca[q + 2] = this.bb; ca[q + 3] = al; this.wc += 4; },
+  };
   function visuals(dt) {
     const v = S.vis, F = fc(); if (!v || !S.plan.length) return;
     const tH = game.time + S.off, off = netOff(), pp = game.player?.pos;
     const cp = v.cone.geometry.attributes.position, cc = v.cone.geometry.attributes.color;
     const per = v.M * 18, perC = v.M * 24;
+    vt.cp = cp; vt.cc = cc; vt.floorY = v.floorY;
     let dirty = false;
     for (const c of S.plan) {
       const e = F?.c?.[c.i] || [0, 0, 0, 0, 0, 0], st = e[0] === ST.BLIND && game.time + S.off >= e[1] ? 0 : e[0];
@@ -168,15 +175,13 @@ export function installFeedcams(game) {
         continue;
       }
       v.coneOn[c.i] = true; dirty = true;
-      const tab = v.tabs[c.i], A = e[5] ? 0.5 : 0.24;
-      const distAt = (a) => { const f = Math.max(0, Math.min(tab.d.length - 1.001, (a - tab.a0) / tab.step)), i0 = f | 0; return tab.d[i0] + (tab.d[i0 + 1] - tab.d[i0]) * (f - i0); };
-      let w = 0, wc = 0;
-      const gg = e[5] ? 0.12 : 0.28, bb = e[5] ? 0.1 : 0.12;
-      const vert = (a, r, al) => { cp.array[o + w++] = c.x + Math.cos(a) * r; cp.array[o + w++] = v.floorY + 0.01; cp.array[o + w++] = c.z + Math.sin(a) * r; const q = oc + wc; cc.array[q] = 1; cc.array[q + 1] = gg; cc.array[q + 2] = bb; cc.array[q + 3] = al; wc += 4; };
+      vt.tab = v.tabs[c.i]; vt.c = c; vt.o = o; vt.oc = oc; vt.w = 0; vt.wc = 0;
+      const A = e[5] ? 0.5 : 0.24;
+      vt.gg = e[5] ? 0.12 : 0.28; vt.bb = e[5] ? 0.1 : 0.12;
       for (let j = 0; j < v.M; j++) {
-        const a0 = yaw - c.fov / 2 + c.fov * j / v.M, a1 = yaw - c.fov / 2 + c.fov * (j + 1) / v.M, r0 = distAt(a0), r1 = distAt(a1);
-        vert(a0, c.r0, A); vert(a0, r0, A * 0.2); vert(a1, c.r0, A);
-        vert(a1, c.r0, A); vert(a0, r0, A * 0.2); vert(a1, r1, A * 0.2);
+        const a0 = yaw - c.fov / 2 + c.fov * j / v.M, a1 = yaw - c.fov / 2 + c.fov * (j + 1) / v.M, r0 = vt.dist(a0), r1 = vt.dist(a1);
+        vt.vert(a0, c.r0, A); vt.vert(a0, r0, A * 0.2); vt.vert(a1, c.r0, A);
+        vt.vert(a1, c.r0, A); vt.vert(a0, r0, A * 0.2); vt.vert(a1, r1, A * 0.2);
       }
     }
     v.body.instanceMatrix.needsUpdate = v.lamp.instanceMatrix.needsUpdate = true;
@@ -525,7 +530,7 @@ export function installFeedcams(game) {
       if (host()) S.off = 0;
       if (host() && S.plan.length && !F && run()?.phase === 'moon') initFc();
       else if (host() && F && F.c.length !== S.plan.length && S.plan.length) initFc();
-      if (S.vis) visuals(dt);
+      if (S.vis) { S.visT = (S.visT || 0) + dt; if (S.visT >= 1 / 30 - 1e-3) { S.visT = 0; visuals(dt); } }   // [perf5] sweep + cones at 30 Hz (a camera turns ~1 rad/s)
       clientTick(dt);
       if (host() && run()?.phase === 'moon') {
         wrapNoise();
