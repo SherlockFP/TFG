@@ -18,6 +18,7 @@ import { G } from '../physics/physics.js';
 import { t, addTranslations } from '../core/i18n.js';
 import { registerItem } from './items.js';
 import * as C from './harvest2_core.js';
+import { createArtModel } from '../models/artpass.js';
 
 const MSG_HP = 'wxHp', MSG_FELL = 'wxFell', REQ_HIT = 'wxHit', REQ_SYNC = 'wxHSync';
 const ZERO = new THREE.Matrix4().makeScale(0, 0, 0);
@@ -41,16 +42,6 @@ const TR = {
   'Swing at it to chop': ['Kesmek için vur', 'Бейте, чтобы рубить'], 'Swing at it to mine': ['Kırmak için vur', 'Бейте, чтобы добывать'],
   'Hit it (LMB) - axe: x2': ['Vur (SOL TIK) - balta: x2', 'Бейте (ЛКМ) - топор: x2'], 'Hit it (LMB) - pickaxe: x2': ['Vur (SOL TIK) - kazma: x2', 'Бейте (ЛКМ) - кирка: x2'],
 };
-function toolModel() {
-  return (id) => () => {
-    const g = new THREE.Group(), wood = new THREE.MeshStandardMaterial({ color: 0x7a5230, roughness: 0.9 }), steel = new THREE.MeshStandardMaterial({ color: 0x8a9096, roughness: 0.5, metalness: 0.7 });
-    const h = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.02, 0.62, 6), wood); h.rotation.x = Math.PI / 2; h.position.z = -0.26; g.add(h);
-    if (id === 'tool_axe') { const b = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.13, 0.15), steel); b.position.set(0, 0.03, -0.53); g.add(b); }
-    else { const b = new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.03, 0.44), steel); b.position.set(0, 0.02, -0.5); b.rotation.x = 0.12; g.add(b); }
-    return g;
-  };
-}
-
 export function installHarvest(game, api) {
   const state = new Map();      // id -> { hp, max, fallen }
   const falling = [];           // running fall animations
@@ -64,7 +55,7 @@ export function installHarvest(game, api) {
   addTranslations(tr.tr, 'tr'); addTranslations(tr.ru, 'ru');
   for (const d of TOOLS) {
     if (!ITEMS[d.id]) registerItem({ ...d });
-    if (game.mods?.itemModels && !game.mods.itemModels.has(d.id)) game.mods.itemModels.set(d.id, toolModel()(d.id));
+    if (game.mods?.itemModels && !game.mods.itemModels.has(d.id)) game.mods.itemModels.set(d.id, () => createArtModel(d.id));   // [artpass]
   }
   let time = 0;
   const _v = new THREE.Vector3(), _f = new THREE.Vector3();

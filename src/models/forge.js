@@ -3,6 +3,7 @@
 // parts) - no lights are ever added; glow is emissive / additive only. game/forge.js animates the userData handles.
 import * as THREE from 'three';
 import { SHARD_DEFS } from '../game/enhance.js';
+import { createArtModel, createShardModel } from './artpass.js';   // [artpass]
 
 const L = (c) => new THREE.MeshLambertMaterial({ color: c });
 const B = (c, o = {}) => new THREE.MeshBasicMaterial({ color: c, ...o });
@@ -123,23 +124,7 @@ export function createExchange() {
 const glowBasic = (c) => B(new THREE.Color(c));
 /** Small pickup models: shards (one per tier) and the Backup Drive. */
 export function createForgeItemModel(id) {
-  const g = new THREE.Group();
   const def = SHARD_DEFS.find((s) => s.id === id);
-  if (def) {
-    const col = new THREE.Color(def.color);
-    switch (def.key) {
-      case 'scrap': { const m = new THREE.Mesh(new THREE.DodecahedronGeometry(0.075, 0), L(0x8a908a)); m.scale.set(1.2, 0.7, 1); g.add(m); g.add(box(0.05, 0.02, 0.05, L(0xc8581c), 0.04, 0.05, 0.02)); break; }
-      case 'circuit': { g.add(box(0.2, 0.02, 0.14, L(0x1d6a3a))); g.add(box(0.07, 0.03, 0.07, L(0x111111), 0.02, 0.025, 0)); g.add(box(0.15, 0.005, 0.01, glowBasic(def.color), 0, 0.012, 0.045)); break; }
-      case 'crystal': { const m = new THREE.Mesh(new THREE.OctahedronGeometry(0.075, 0), glowBasic(def.color)); m.scale.set(0.7, 1.4, 0.7); g.add(m); break; }
-      case 'ecto': { const m = new THREE.Mesh(new THREE.IcosahedronGeometry(0.085, 0), glowBasic(def.color)); g.add(m); g.add(new THREE.Mesh(new THREE.IcosahedronGeometry(0.11, 0), B(col, { transparent: true, opacity: 0.25 }))); break; }
-      case 'algo': { const t = new THREE.Mesh(new THREE.TorusGeometry(0.075, 0.02, 5, 12), glowBasic(def.color)); g.add(t); g.add(new THREE.Mesh(new THREE.OctahedronGeometry(0.045, 0), B(0xffffff))); break; }
-      default: { g.add(box(0.11, 0.11, 0.11, glowBasic(def.color))); const o = box(0.16, 0.16, 0.16, B(col, { transparent: true, opacity: 0.35 })); o.rotation.set(0.6, 0.6, 0); g.add(o); break; }
-    }
-  } else {
-    g.add(box(0.06, 0.02, 0.16, L(0x1a1c22)));
-    g.add(box(0.045, 0.015, 0.05, L(0xc8c8c8), 0, 0, -0.1));
-    g.add(box(0.03, 0.022, 0.03, glowBasic('#ff8a3d'), 0, 0.005, 0.05));
-  }
-  return g;
+  return def ? createShardModel(def.key, def.color) : createArtModel('forge_backup');
 }
 export const FORGE_ITEM_IDS = [...SHARD_DEFS.map((s) => s.id), 'forge_backup'];

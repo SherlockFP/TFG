@@ -5,6 +5,7 @@
 // Conventions: metres, +Y up, origin = floor point, the deployable looks along +Z (rotation.y = aim yaw).
 import { sigHex } from '../core/a11y_core.js';   // [a11y]
 import * as THREE from 'three';
+import { createKitCase, createRelicModel as artRelic } from './artpass.js';   // [artpass]
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 const PI = Math.PI, HP = PI / 2, TAU = PI * 2;
@@ -261,7 +262,7 @@ export function createDeployableModel(type, opts = {}) {
 export function createKitModel(type) {
   const root = new THREE.Group();
   root.name = 'kit_' + type;
-  root.add(meshOf([P('box', [0.5, 0.14, 0.36], [0, 0.07, 0], [0, 0, 0], C.yellow), P('box', [0.52, 0.045, 0.1], [0, 0.07, 0], [0, 0, 0], C.dark), P('box', [0.08, 0.06, 0.04], [0, 0.14, 0.18], [0, 0, 0], C.mid), P('box', [0.16, 0.03, 0.04], [0.16, 0.15, 0], [0, 0, 0], C.red)]));
+  root.add(createKitCase());
   try {
     const mini = createDeployableModel(type, { radius: 1 });
     const s = Math.min(0.42, 0.5 / (mini.height || 1));
@@ -295,10 +296,4 @@ export function createGhost(type, opts = {}) {
 }
 
 /** a small glowing relic (strange finds that unlock the tech blueprints) */
-export function createRelicModel(color = 0x50d8ff) {
-  const root = new THREE.Group();
-  root.add(meshOf([P('box', [0.24, 0.05, 0.18], [0, 0.025, 0], [0, 0, 0], C.dark), P('cyl', [0.03, 0.05, 0.08, 5], [0, 0.09, 0], [0, 0, 0], C.mid)]));
-  const crystal = meshOf([P('sph', [0.09, 5, 3], [0, 0.2, 0], [0.3, 0.6, 0], color)], EMIT);
-  root.add(crystal);
-  return root;
-}
+export function createRelicModel(color = 0x50d8ff) { return artRelic(color); }

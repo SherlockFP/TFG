@@ -25,6 +25,7 @@ import { biomeName, INTERIOR_NAMES } from './moongen.js';
 import { createNpcModel, createSpecimenModel } from '../world/voyage_sites.js';
 import { NO_LOOK } from '../render/tierlooks.js';
 import * as V from './voyage_core.js';
+import { createArtModel } from '../models/artpass.js';
 import { TR, RU } from './voyage_i18n.js';
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
@@ -44,25 +45,6 @@ const ITEM_DEFS = {
   vy_relic: { id: 'vy_relic', name: 'Alien Relic', kind: 'scrap', hands: 1, weight: 6, value: [230, 330], tip: 'A humming relic from a temple altar. It knows who took it.' },
   vy_meteorite: { id: 'vy_meteorite', name: 'Meteorite', kind: 'scrap', hands: 1, weight: 5, value: [55, 95], tip: 'A warm chunk of sky. Collectors pay well.' },
 };
-function blackboxModel() {
-  const g = new THREE.Group();
-  g.add(new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.26, 0.28), new THREE.MeshLambertMaterial({ color: 0xe8781c })));
-  const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.43, 0.06, 0.29), new THREE.MeshBasicMaterial({ color: 0x1a1a1a })); stripe.position.y = 0.05; g.add(stripe);
-  const led = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.05), new THREE.MeshBasicMaterial({ color: 0xff3020 })); led.position.set(0.14, 0.15, 0); g.add(led);
-  return g;
-}
-function relicModel() {
-  const g = new THREE.Group();
-  const m = new THREE.Mesh(new THREE.OctahedronGeometry(0.26, 0), new THREE.MeshBasicMaterial({ color: 0x40f0d0 })); m.scale.y = 1.5; m.position.y = 0.32; g.add(m);
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.2, 0.1, 6), new THREE.MeshLambertMaterial({ color: 0x5a564e })); g.add(base);
-  return g;
-}
-function meteoriteModel() {
-  const g = new THREE.Group();
-  g.add(new THREE.Mesh(new THREE.IcosahedronGeometry(0.24, 0), new THREE.MeshLambertMaterial({ color: 0x35302c, flatShading: true })));
-  const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.17, 0), new THREE.MeshBasicMaterial({ color: 0xff6a20 })); core.position.set(0.05, 0.03, 0.05); g.add(core);
-  return g;
-}
 let registered = false;
 function registerContent() {
   if (registered) return;
@@ -107,7 +89,7 @@ export function installVoyage(game) {
   const enabled = () => game.config?.voyage !== false && !game.onboard?.locked?.('voyage');   // [onboard] gifted at quota 2
   const run = () => game.run;
   const mm = typeof window !== 'undefined' ? window.__kefalMods : null;
-  if (mm?.itemModels) { mm.itemModels.set('vy_blackbox', blackboxModel); mm.itemModels.set('vy_relic', relicModel); mm.itemModels.set('vy_meteorite', meteoriteModel); }
+  if (mm?.itemModels) { for (const id of ['vy_blackbox', 'vy_relic', 'vy_meteorite']) mm.itemModels.set(id, () => createArtModel(id)); }   // [artpass]
   if (mm?.creatureModels) mm.creatureModels.set('vy_specimen', () => createSpecimenModel());
   if (typeof document !== 'undefined' && !document.getElementById('tfg-voyage-style')) { const s = document.createElement('style'); s.id = 'tfg-voyage-style'; s.textContent = STYLE; document.head.appendChild(s); }
 

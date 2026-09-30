@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { t, tf, addTranslations } from '../core/i18n.js';
 import { STORE_ITEMS, registerItem, itemDef } from './items.js';
 import * as C from './nvgear_core.js';
+import { createArtModel } from '../models/artpass.js';
 
 const TR = {
   'Night Vision Goggles Mk I': 'Gece Görüş Gözlüğü Mk I', 'Night Vision Goggles Mk II': 'Gece Görüş Gözlüğü Mk II', 'Spare Battery Cell': 'Yedek Pil',
@@ -44,31 +45,12 @@ const CSS = `
 .nv-chg i{display:block;height:6px;margin-top:4px;background:rgba(0,0,0,.6);border:1px solid rgba(207,198,184,.35)}.nv-chg i b{display:block;height:100%;width:0;background:#ffd23f}
 `;
 
-function goggleModel(mk) {
-  const g = new THREE.Group();
-  const body = new THREE.MeshLambertMaterial({ color: mk === 2 ? '#22262a' : '#3a3f36' });
-  const lens = new THREE.MeshBasicMaterial({ color: mk === 2 ? '#7dffa8' : '#4dd06e' });
-  const box = (w, h, d, m, x, y, z) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); o.position.set(x, y, z); g.add(o); return o; };
-  box(0.2, 0.07, 0.07, body, 0, 0, 0);
-  for (const x of [-0.05, 0.05]) {
-    const c = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.034, 0.08, 10), body); c.rotation.x = Math.PI / 2; c.position.set(x, 0, -0.07); g.add(c);
-    const l = new THREE.Mesh(new THREE.CircleGeometry(0.024, 10), lens); l.position.set(x, 0, -0.112); l.rotation.y = Math.PI; g.add(l);
-  }
-  box(0.22, 0.012, 0.012, body, 0, 0.045, 0.04);
-  return g;
-}
-function cellModel() {
-  const g = new THREE.Group();
-  g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.12, 10), new THREE.MeshLambertMaterial({ color: '#d9a21b' })));
-  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.02, 8), new THREE.MeshLambertMaterial({ color: '#c8c8c8' })); cap.position.y = 0.07; g.add(cap);
-  return g;
-}
 function registerModels() {
   const mm = typeof window !== 'undefined' ? window.__kefalMods : null;
   if (!mm?.itemModels) return;
-  if (!mm.itemModels.has('nvg1')) mm.itemModels.set('nvg1', () => goggleModel(1));
-  if (!mm.itemModels.has('nvg2')) mm.itemModels.set('nvg2', () => goggleModel(2));
-  if (!mm.itemModels.has('nvcell')) mm.itemModels.set('nvcell', () => cellModel());
+  if (!mm.itemModels.has('nvg1')) mm.itemModels.set('nvg1', () => createArtModel('nvg1'));
+  if (!mm.itemModels.has('nvg2')) mm.itemModels.set('nvg2', () => createArtModel('nvg2'));
+  if (!mm.itemModels.has('nvcell')) mm.itemModels.set('nvcell', () => createArtModel('nvcell'));
 }
 
 export function installNvgear(game) {

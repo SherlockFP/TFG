@@ -13,6 +13,7 @@ import { ITEMS, registerItem } from './items.js';
 import { MOONS } from './moons.js';
 import { RECIPES } from './recipes.js';
 import { G } from '../physics/physics.js';
+import { createArtModel } from '../models/artpass.js';
 import * as C from './mining_core.js';
 
 HOST_ONLY.add('mnd');
@@ -85,7 +86,7 @@ const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 export function installMining(game) {
   addTranslations(Object.fromEntries(Object.entries(TR).map(([k, v]) => [k, v[0]])), 'tr');
   addTranslations(Object.fromEntries(Object.entries(TR).map(([k, v]) => [k, v[1]])), 'ru');
-  if (game.mods?.itemModels) for (const id of ['tool_pickaxe_steel', 'tool_drill', 'mn_beam', 'mn_torch']) if (!game.mods.itemModels.has(id)) game.mods.itemModels.set(id, () => toolModel(id));
+  if (game.mods?.itemModels) for (const id of ['tool_pickaxe_steel', 'tool_drill', 'mn_beam', 'mn_torch']) if (!game.mods.itemModels.has(id)) game.mods.itemModels.set(id, () => createArtModel(id) || toolModel(id));   // [artpass] pick + drill are art-pass models
 
   const offs = [];
   const saved = new Map();          // 'seed|moon|day' -> per-volume packed edit logs (tunnels stay for the day, also across a leave / return)
