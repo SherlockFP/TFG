@@ -3,7 +3,7 @@
 import * as THREE from 'three';
 import { GeoBuilder, levelMaterial } from './geobuilder.js';
 import { createAnyProp as createProp } from './propfactory.js';
-import { getTexture } from '../render/textures.js';
+import { getTexture, freeTree } from '../render/textures.js';
 import { G } from '../physics/physics.js';
 
 export function buildCompany({ physics, lightPool }) {
@@ -131,7 +131,7 @@ export function buildCompany({ physics, lightPool }) {
     dispose(physicsRef) {
       for (const c of colliders) physicsRef.removeCollider(c);
       for (const e of emitters) lightPool.remove(e);
-      group.traverse((o) => { if (o.isMesh && o.geometry) o.geometry.dispose(); });
+      freeTree(group);   // [leak] geometry + uncached screen / water materials and canvases
       group.removeFromParent();
     },
   };
