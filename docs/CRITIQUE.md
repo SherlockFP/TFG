@@ -427,3 +427,4 @@ skyline and ground life; Dead Mall (parody neon, grilles, dry fountain atrium) r
 corridor with EXIT counter, mascot poster, door 101) is the strongest new idea; Captcha tile test reads well; Ratio twins
 readable; centre cards now queue one at a time. Still weak: Buffering tell only fixed in code (re-check in the dark), new
 creatures/crises/gear never played by a human or with 2 real players, balance of 12 new threats + 5 gadgets is paper-only.
+Wave 12 moons12 (paper only): CLOUD-9 + DEEP CABLE give maps their own goal (dish alignment under telegraphed gusts / heavy beacon-pulsing cores under an air meter); heightfield islands, deep-cable fog and the carry2 x water slowness are the unverified risks.
