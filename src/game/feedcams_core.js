@@ -279,8 +279,8 @@ export function segNear(a, b, p, r) {
 
 // ------------------------------------------------------------------------------------------ CLEAN SHIFT (wave 9 greed, docs/wave9/greed.md)
 export const CLEAN = { pct: 0.1, max: 200 };   // a crew nobody of whom was tagged all day: +10 % of the day's haul (capped), the verb finally pays
-/** bonus credits for a clean shift: `tags` = fresh tags this day (F.tg), `cams` = cameras on the moon, `collected` = the day's haul */
-export function cleanBonus(collected, tags, cams) {
-  if (!(cams > 0) || (tags | 0) > 0 || !(collected > 0)) return 0;
+/** bonus credits for a clean shift: `tags` = fresh tags this day (F.tg), `cams` = cameras on the moon, `exposed` = a camera's meter rose on somebody today (F.ex; staying out of the facility earns nothing), `collected` = the day's haul */
+export function cleanBonus(collected, tags, cams, exposed) {
+  if (!(cams > 0) || !exposed || (tags | 0) > 0 || !(collected > 0)) return 0;
   return Math.min(CLEAN.max, Math.max(1, Math.round(collected * CLEAN.pct)));
 }

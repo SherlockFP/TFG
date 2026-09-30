@@ -10,3 +10,5 @@
 **Knobs**: `CLEAN.pct`, `CLEAN.max`.
 **Tests**: `node tools/harness/onegoal.test.mjs` (extended, 48 checks), feedcams.test, feedcams2.test, rewardviz.test, `npm run build`.
 **Gaps**: no browser run; ship leaves at 24:00 (the mock text said 23:00); client-only late joiners see no CLEAN line until fc syncs (tg is in the fc sync); a player tagged and back home still counts as tagged (strict).
+
+**Review fixes (round 2)**: the preview also shows while the meter is rising (`fcp[0] > 0`), the TAGGED goal itself carries the price ("TAGGED ▮251 → ▮188: ..."; the carry line loses to it on the Standard HUD), the greed line is skipped on home / expedition / company moons, and CLEAN SHIFT now needs real exposure (`F.ex` = a camera meter rose on somebody today; `cleanBonus(collected, tags, cams, exposed)`). Not modelled in tools/harness/economy.mjs yet.
