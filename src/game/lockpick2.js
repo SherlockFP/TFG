@@ -12,7 +12,7 @@ import { createLockpick2 } from '../minigames/lockpick2.js';
 import { ITEMS, registerItem } from './items.js';
 import { addTranslations, t, tf } from '../core/i18n.js';
 import { saveProfile } from '../core/save.js';
-import { createItemModel } from '../models/items.js';
+import { createArtModel } from '../models/artpass.js';
 import { TR_LOCKPICK2, RU_LOCKPICK2 } from './lockpick2_i18n.js';
 import * as L from './lockpick2_core.js';
 
@@ -35,8 +35,7 @@ export function installLockpick2(game) {
   // ---- content: items (+ models reuse the lockpick / hack tool look) ------------------------------------------------------
   for (const d of L.ITEM_DEFS) if (!ITEMS[d.id]) registerItem({ ...d });
   if (mods.itemModels) {
-    if (!mods.itemModels.has(L.PICK.TITANIUM)) mods.itemModels.set(L.PICK.TITANIUM, () => createItemModel('lockpick'));
-    if (!mods.itemModels.has(L.PICK.BYPASS)) mods.itemModels.set(L.PICK.BYPASS, () => { const f = mods.itemModels.get('sl_hacktool'); return f ? f() : null; });
+    for (const id of [L.PICK.TITANIUM, L.PICK.BYPASS]) if (!mods.itemModels.has(id)) mods.itemModels.set(id, () => createArtModel(id));   // [artpass] own models
   }
 
   // ---- skill -----------------------------------------------------------------------------------------------------------

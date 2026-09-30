@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { PLANTS, PROPS, MAINS } from '../game/survival_data.js';
+import { createArtModel, createPotionModel } from './artpass.js';   // [artpass]
 import { CRATE_TIERS, PLANTER_SIZE, STAND_SIZE, PLANTER_CELLS } from '../game/survival_store.js';
 
 const lam = (color, o = {}) => new THREE.MeshLambertMaterial({ color, flatShading: true, ...o });
@@ -164,22 +165,8 @@ function dishModel(main, bonus) {
     return g;
   };
 }
-function potionModel(prop) {
-  return () => {
-    const g = new THREE.Group(), col = new THREE.Color(PROPS[prop].color).getHex();
-    add(g, sph(0.06, 8, 6), lam(0xdfe9ee, { transparent: true, opacity: 0.85 }), [0, 0.06, 0]);
-    add(g, sph(0.05, 8, 6), bas(col, { transparent: true, opacity: 0.9 }), [0, 0.05, 0], null, [1, 0.8, 1]);
-    add(g, cyl(0.02, 0.028, 0.08, 7), lam(0xdfe9ee, { transparent: true, opacity: 0.85 }), [0, 0.13, 0]);
-    add(g, cyl(0.024, 0.02, 0.025, 7), lam(0x8a5a2a), [0, 0.18, 0]);
-    return g;
-  };
-}
-function sickleModel() {
-  const g = new THREE.Group();
-  add(g, cyl(0.014, 0.016, 0.22, 6), lam(0x8a5a2a), [0, 0.11, 0]);
-  add(g, new THREE.TorusGeometry(0.09, 0.011, 4, 10, Math.PI * 1.15), lam(0xc9ced4), [0.055, 0.25, 0], [0, 0, 0.5]);
-  return g;
-}
+function potionModel(prop) { return () => createPotionModel(PROPS[prop].color); }
+function sickleModel() { return createArtModel('sv_sickle'); }
 function canModel() {
   const g = new THREE.Group();
   add(g, cyl(0.06, 0.065, 0.11, 9), lam(0x5a8ab0), [0, 0.055, 0]);

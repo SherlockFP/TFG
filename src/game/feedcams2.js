@@ -20,6 +20,7 @@ import { VIEW_GAIN } from './algo1_core.js';
 import { segNear } from './feedcams_core.js';
 import * as C from './feedcams2_core.js';
 import { HL_TEXT } from './feedcams2_i18n.js';
+import { createArtModel } from '../models/artpass.js';
 
 HOST_ONLY.add('fc2fx');
 Object.assign(HYPE.pts, { showcase: C.SHOW.hype, downed_live: 10 });
@@ -37,6 +38,7 @@ const ST = { OK: 0, BLIND: 1, DEAD: 2 };
 export function installFeedcams2(game) {
   const mods = game.mods;
   if (!mods) return null;
+  if (mods.itemModels && !mods.itemModels.has(C.JAM.id)) mods.itemModels.set(C.JAM.id, () => createArtModel(C.JAM.id));   // [artpass] Signal Jammer model
   const offs = [], wraps = [], V3 = THREE.Vector3;
   const S = { key: null, drones: [], vis: null, tick: 0, jamT: 0, humT: 0, tipNow: 0, tipT: 0, streak: new Map(), paid: new Map(), sumHl: null, jams: [] };
   let disposed = false, boundNet = null;
