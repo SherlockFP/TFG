@@ -225,7 +225,7 @@ import { installCreatures10 } from './creatures10.js';
 import { installLabyr10 } from './labyr10.js';   // [import:labyr10] wave 10: Dead Mall + Mirror Funhouse life
 import { installMoons10 } from './moons10.js';
 // [import:moons10]
-// [import:outlife10]
+import { installOutlife10 } from './outlife10.js';
 // [import:landing10]
 // [import:mystery10]
 import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
@@ -615,7 +615,7 @@ export class Game extends Emitter {
     this.useModule('labyr10', installLabyr10);   // [slot:labyr10]
     this.useModule('moons10', installMoons10);
     // [slot:moons10]
-    // [slot:outlife10]
+    this.useModule('outlife10', installOutlife10);
     // [slot:landing10]
     // [slot:mystery10]
 
