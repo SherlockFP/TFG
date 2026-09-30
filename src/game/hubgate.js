@@ -17,7 +17,7 @@ import { MOONS } from './moons.js';
 import { tierIndex } from './tiers.js';
 import { newRun } from './host.js';
 import { listRuns } from '../core/save.js';
-import { SPOTS } from '../world/shiplayout.js';
+import { SPOTS, DIMS } from '../world/shiplayout.js';
 import { TEXT as OB } from './onboard_text.js';
 import { NET, SYSTEMS, HUB_ORDER, requirement, hiddenDocks, zoneOwner, hubOf, sameHub, hubOpen, openIds, QUICK, quickFields, quickResult, quickReward } from './hubgate_core.js';
 import { HOST_ONLY } from '../net/session.js';
@@ -177,6 +177,28 @@ export function installHubgate(game) {
     door.leaf.position.x = doorOpenK * (door.w - 0.25);
     door.lampM.color.setHex(n > 0 ? 0x40d060 : 0xd04030);
   }
+  // [threatmerge] locked ship fixtures (arcade cabinet, chess table, stove, brewing stand, planter) are hidden under a grey tarp block until their Hub system opens
+  const tarps = new Map();
+  function coverTick() {
+    const sg = game.ship?.group;
+    if (!sg) return;
+    const lk = new Set(lockedIds());
+    for (const [id, def] of Object.entries(SYSTEMS)) for (const key of def.cover || []) {
+      const spot = SPOTS[key], dm = DIMS[key];
+      if (!spot || !dm) continue;
+      let e = tarps.get(key);
+      if (e && e.grp.parent !== sg) { tarps.delete(key); e = null; }   // ship rebuilt
+      if (!lk.has(id)) { if (e) { for (const o of e.hidden) o.visible = true; e.grp.parent?.remove(e.grp); tarps.delete(key); } continue; }
+      if (!e) {
+        const grp = new THREE.Group(); grp.position.set(spot.x, spot.y || 0, spot.z); grp.rotation.y = spot.ry || 0;
+        const h = dm.h * 0.94, m = new THREE.Mesh(new THREE.BoxGeometry(dm.x1 - dm.x0 + 0.04, h, dm.z1 - dm.z0 + 0.04), new THREE.MeshLambertMaterial({ color: 0x4a4f43 }));
+        m.position.set((dm.x0 + dm.x1) / 2, h / 2, (dm.z0 + dm.z1) / 2); grp.add(m);
+        grp.userData.hgTarp = true; sg.add(grp);
+        e = { grp, hidden: new Set() }; tarps.set(key, e);
+      }
+      for (const o of sg.children) if (o !== e.grp && !o.userData.hgTarp && o.visible && Math.hypot(o.position.x - spot.x, o.position.z - spot.z) < 0.06) { o.visible = false; e.hidden.add(o); }   // fixture roots stand exactly on their spot
+    }
+  }
   function openPanel() {
     const ui = game.ui;
     if (!ui?.openPanel || !ui.panel) return;
@@ -288,6 +310,7 @@ export function installHubgate(game) {
     if (g !== game || disposed) return;
     time += dt; tickT -= dt;
     try { doorTick(dt); } catch (e) { warn('door', e); }
+    if (tickT <= 0) { try { coverTick(); } catch (e) { warn('cover', e); } }
     if (!S.told && quickOn() && time > 3) { S.told = true; toast(tx('hg.qs_start', { q: game.run.quota }), 'info'); }   // host and joiner alike (run.quick came with the run state)
     if (tickT > 0) return;
     tickT = 0.5;
@@ -304,6 +327,7 @@ export function installHubgate(game) {
       for (const r of restores.reverse()) { try { r(); } catch { /* ignore */ } }
       style?.remove(); docksStyle?.remove(); endEl?.remove();
       try { door?.grp.parent?.remove(door.grp); } catch { /* ignore */ }
+      for (const e of tarps.values()) { for (const o of e.hidden) o.visible = true; e.grp.parent?.remove(e.grp); } tarps.clear();
     },
   };
   void panelEl; void hubOpen;

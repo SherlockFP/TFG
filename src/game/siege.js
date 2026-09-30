@@ -260,7 +260,7 @@ export function installSiege(game) {
     if (run.phase !== 'moon' || MOONS[run.moon]?.company || !game.world?.terrain) return false;
     if (force) return true;
     if ((run.quotaIndex || 0) < TUNE.minQuotaIndex) return false;
-    if (!wavesAllowed(run.quotaIndex)) return false;   // [onegoal] no siege before quota 3 is met (every profile)
+    if (!(game.crdirector?.canSpawn ? game.crdirector.canSpawn('siege', null, 'siege') : wavesAllowed(run.quotaIndex))) return false;   // [threatmerge] crdirector is the gate   // [onegoal] no siege before quota 3 is met (every profile)
     if (run.siegeDay === run.day) return false;
     if (!game.aiPlayers().some((p) => !p.dead)) return false;
     return true;

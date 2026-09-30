@@ -19,6 +19,7 @@ import { getMode } from './difficulty.js';
 import * as K from './crdirector_core.js';
 import * as N from './crdirector_creatures.js';
 import { RULE_LINES } from './crdirector_i18n.js';
+import { poolFor, poolBlocks } from './threatpool.js';   // [threatmerge]
 
 const TICK = 0.25;                 // s between host evaluations
 const TRACK_R = 36;                // m: a hunter this close that starts tracking you triggers the edge cue
@@ -206,7 +207,7 @@ export function installCrdirector(game) {
     const w = [
       ['cd_dimmer', lit ? 2 : 0.6], ['cd_follower', 1.2],
       ['cd_auditor', [...carried.values()].some((v) => v >= N.AUD.minLoot) ? 2.5 : 0],
-    ].filter(([id, x]) => x > 0 && !alive.has(id) && CREATURES[id]);
+    ].filter(([id, x]) => x > 0 && !alive.has(id) && CREATURES[id] && !poolBlocks(id, poolFor(run(), MOONS[run().moon])));   // [threatmerge] only the moon's pool
     let tot = 0; for (const [, x] of w) tot += x;
     if (!tot) return null;
     let r = S.rng.float(0, tot);
@@ -535,12 +536,16 @@ export function installCrdirector(game) {
     /** may a spawner add `cost` threat points right now? (advisory: modules that spawn hostiles by themselves can ask) */
     ask(cost = 1) { return !enabled() || !S.st || K.mayRelease({ ...S.st, gapT: 0 }, ctxNow(), K.activeThreat(hostCreatures(), crewNow()).sum, cost); },
     cap() { return K.capOf(ctxNow()); },
-    /** lcmonsters / any scripted spawner: false = veto (the crew is already carrying more than 1.6 x the cap) */
-    canSpawn(type, pos) {
-      if (!enabled() || !S.st || !host()) return true;
+    /** [threatmerge] the ONE gate for scripted spawners (lcmonsters, backrooms residents, skeleton raids / crypt swarms, feedcams) and set-piece
+     *  starts (kind 'horde' | 'siege' | 'mirror': quota 3+). false = veto; the caller just skips / retries later. Off-host, disabled or between landings: allowed. */
+    canSpawn(type, pos, kind) {
+      if (K.WAVE_KINDS.includes(kind)) return K.wavesAllowed(run()?.quotaIndex | 0);   // set pieces: quota 3+ in every profile, director on or off
+      if (!enabled() || !host() || !S.st) return true;
       const cost = K.costOf(type, CREATURES[type]) || 1;
-      return K.activeThreat(hostCreatures(), crewNow()).sum + cost <= K.capOf(ctxNow()) * 1.6;
+      return K.gateOk(kind, S.st.phase, ctxNow(), K.activeThreat(hostCreatures(), crewNow()).sum, cost);
     },
+    /** [threatmerge] the curated headline pool of the current moon (see threatpool.js) */
+    pool() { const r = run(); return r ? poolFor(r, MOONS[r.moon]) : null; },
     /** siege.js: wave power / count ceilings for the current quota */
     siegeCaps() { return enabled() && S.st ? K.siegeCaps(run().quotaIndex | 0) : null; },
     phase() { return S.st?.phase || null; },

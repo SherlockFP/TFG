@@ -12,6 +12,7 @@ export const NET = 'hg';
 const zone = (s, r) => ({ x: s.x, z: s.z, r });
 /**
  * id -> what is inert while locked.
+ *   cover  SPOTS keys of ship fixtures shown as a tarped block while locked (hubgate.js coverTick)
  *   cmds   terminal words                  keys   settings.keys action names (the module itself asks game.onboard.deny(id); listed for the docs / test)
  *   docks  hud dock item ids (hidden)      zones  ship interactables inside these circles are replaced by one "Unlocks at quota N" prompt
  *   hint   where the system lives (Hub panel line, EN; translated in hubgate.js)
@@ -19,10 +20,10 @@ const zone = (s, r) => ({ x: s.x, z: s.z, r });
 export const SYSTEMS = {
   shop: { hint: 'Company Store kiosk: rare and better stock.' },
   tree: { cmds: ['tree', 'respec', 'role'], keys: ['skillTree'], hint: 'Press K for the skill tree.' },
-  arcade: { cmds: ['arcade'], zones: [zone(SPOTS.arcade, 0.8), zone(SPOTS.chess, 1.5)], hint: 'The arcade cabinet and the chess table in the ship.' },
+  arcade: { cmds: ['arcade'], cover: ['arcade', 'chess'], zones: [zone(SPOTS.arcade, 0.8), zone(SPOTS.chess, 1.5)], hint: 'The arcade cabinet and the chess table in the ship.' },
   pets: { cmds: ['pets'], keys: ['pets'], zones: [zone(SPOTS.incubator, 0.8)], hint: 'Press N for your pets. The incubator is in the ship.' },
   homeworld: { cmds: ['home', 'factory', 'ghost'], docks: ['h2', 'h2g'], hint: 'Terminal: ROUTE HOME.' },
-  farming: { zones: [zone(SPOTS.svPlanter, 0.9), zone(SPOTS.stove, 0.75), zone(SPOTS.brew, 0.7), ...DECOR.filter((d) => d.planter).map((d) => zone(d, 0.7))], hint: 'The planters, the stove and the brewing stand in the ship.' },
+  farming: { cover: ['stove', 'brew', 'svPlanter'], zones: [zone(SPOTS.svPlanter, 0.9), zone(SPOTS.stove, 0.75), zone(SPOTS.brew, 0.7), ...DECOR.filter((d) => d.planter).map((d) => zone(d, 0.7))], hint: 'The planters, the stove and the brewing stand in the ship.' },
   restaurant: { hint: 'The restaurant.' },
   forge: { hint: 'The Monetizer at HQ.' },
   zones: { cmds: ['zones'], hint: 'Reclaim sectors: capture zone cores on the moons.' },

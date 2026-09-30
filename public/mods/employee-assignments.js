@@ -166,6 +166,7 @@ KefalAPI.defineMod({
           if (a.st !== 'active') continue;
           const p = game.aiPlayerById(a.pid);
           if (!p) continue;
+          if (p.dead && (game.downed?.isDowned?.(a.pid) || (game.remotes?.get?.(a.pid)?.flags & 64))) continue;   // [threatmerge] bleeding out is not fired: the assignment stays open until a real death
           if (p.dead) { a.st = 'failed'; dirty = true; game.net.broadcast('sys', { text: `Assignment failed: ${a.name} is no longer with the company.`, kind: 'bad' }); continue; }
           const v = KINDS[a.kind].prog(game, a, ctx);
           if (a.kind === 'hoarder') a.best = Math.max(a.best || 0, v);

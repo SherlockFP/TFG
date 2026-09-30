@@ -6,6 +6,7 @@ import * as FACILITY from '../world/facility.js';
 import { RNG, hashString } from '../core/rng.js';
 import { ITEMS, STORE_ITEMS, SHIP_UPGRADES, itemDef, isSellable } from './items.js';
 import { CREATURES } from './creatures.js';
+import { poolFor } from './threatpool.js';   // [threatmerge]
 import { buyRate } from './progression.js';
 import { insideShip } from '../world/ship.js';
 import { dropPoint } from '../world/shiplayout.js';
@@ -338,6 +339,8 @@ export class Terminal {
     lines.push(`${t('Tier')} ${m.tier}  ·  ${t('Risk')} ${riskBar(m)} ${t(m.risk || ['', 'LOW', 'MODERATE', 'HIGH', 'SEVERE', 'LETHAL'][Math.min(5, m.tier)])}  ·  ${costText(m)}`);
     lines.push(`${t('Biome')}: ${t(biomeName(m.biome))}   ${t('Interior')}: ${interiorName(m.interior)}   ${t('Size')}: ${sizeLabel(m.size || 1)}${(m.mapScale || 1) > 1 ? ' (' + t('big map') + ')' : ''}`);
     lines.push(`${t('Forecast')}: ${weatherName(run, m)}   ${t('Scrap value')}: x${(m.scrapMul || 1).toFixed(2)}`);
+    const pool = run ? poolFor(run, m) : null;   // [threatmerge] the curated headline residents of this moon (seeded per run + moon + sector)
+    if (pool?.all.length) lines.push(`${t('KNOWN RESIDENTS')}: ${pool.all.map((id) => t(id === 'zombie' ? 'Zombie Accounts' : CREATURES[id]?.name || id)).join(', ')}`);
     if (LAB_HINT[m.interior]) lines.push(`${t('Hazard')}: ${t(LAB_HINT[m.interior])}`);   // [labyrinths] the interior's signature mechanic
     for (const k of m.mods || []) lines.push(`+ ${MODIFIERS[k]?.name || k}: ${MODIFIERS[k]?.desc || ''}`);
     if (!brief || !m.generated) lines.push(m.desc || '');

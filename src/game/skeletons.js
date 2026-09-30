@@ -280,6 +280,7 @@ BEHAVIORS.skel_swarm = function swarmBehavior(c, dt, M) {
       const n = 2 + ((rnd() * 3) | 0);
       for (let k = 0; k < n; k++) {
         if (!canSpawnMore('skel_swarm', M.host)) break;
+        if (M.game?.crdirector?.canSpawn?.('skel_swarm', c.pos, 'crypt') === false) break;   // [threatmerge] director budget
         const o = M.hostSpawn('skel_swarm', new THREE.Vector3(c.pos.x + (rnd() - 0.5) * 1.6, c.pos.y, c.pos.z + (rnd() - 0.5) * 1.6), { level: c.level, zone: c.zone, data: { grouped: true } });
         if (o) M.placeAt(o, o.pos.x, o.pos.z);
       }
@@ -425,7 +426,7 @@ export function installSkeletons(game) {
     if (!ok) return;
     const level = 1 + Math.floor(sector() / 2), roll = rnd();
     const at = (dx, dz) => new THREE.Vector3(x + dx, game.world.terrain.heightAt(x + dx, z + dz), z + dz);
-    const make = (type, dx, dz) => { const c = M.hostSpawn(type, at(dx, dz), { level, zone: 'out', yaw: rnd() * 6.28 }); if (c) { M.placeAt(c, c.pos.x, c.pos.z); S.stats.night++; } return c; };
+    const make = (type, dx, dz) => { if (game.crdirector?.canSpawn?.(type, null, 'night') === false) return null; const c = M.hostSpawn(type, at(dx, dz), { level, zone: 'out', yaw: rnd() * 6.28 }); if (c) { M.placeAt(c, c.pos.x, c.pos.z); S.stats.night++; } return c; };
     if (roll < 0.55) { const n = 2 + ((rnd() * 2) | 0); for (let i = 0; i < n; i++) make('skel_walker', (rnd() - 0.5) * 5, (rnd() - 0.5) * 5); }
     else if (roll < 0.8) make('skel_swarm', 0, 0);
     else { make('skel_archer', 0, 0); make('skel_walker', 2, 1); if (sector() >= 2) make('skel_knight', -2, 2); }

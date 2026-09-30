@@ -648,6 +648,7 @@ export function installBackroomsCreatures(game) {
     return cand.length ? cand[Math.floor(Math.random() * cand.length)] : null;
   }
   function spawnAt(type, s, opts = {}) {
+    if (game.crdirector?.canSpawn?.(type, null, 'backrooms') === false) return null;   // [threatmerge] director budget
     const c = game.creatures.hostSpawn(type, new THREE.Vector3(s.x, s.y, s.z), { level: game.rollLevel?.() || 1, elite: game.rollElite?.() || false, zone: 'in', ...opts });
     if (c) S.spawned[type] = (S.spawned[type] || 0) + 1;
     return c;

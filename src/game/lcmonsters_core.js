@@ -41,8 +41,9 @@ export function hash32(s) {
 export const budgetFor = (q) => { let n = TUNE.budget[0][1]; for (const [from, v] of TUNE.budget) if ((q || 0) >= from) n = v; return n; };
 
 /** weights per kind (indoor-only kinds need a facility, the witch needs an outdoor moon). Early game: no hunter and no masked before quota 1. */
-export function kindWeights(q, { indoor = true, outdoor = true } = {}) {
+export function kindWeights(q, { indoor = true, outdoor = true, block = null } = {}) {
   const w = { witch: outdoor ? 3 : 0, keeper: indoor ? 3 : 0, treat: indoor ? 3 : 0, otherside: indoor && q >= 1 ? 2.5 : 0, lootmimic: indoor ? 3.2 : 0, masked: indoor && q >= 1 ? 2 : 0 };
+  if (block) for (const k of KINDS) if (block(k)) w[k] = 0;   // [threatmerge] kinds outside the moon's curated pool
   return w;
 }
 /** The day plan: [{ kind, at }] (at = seconds after landing for indoor events, 'dusk' for the witch). Deterministic per (seed, day). */

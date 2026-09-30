@@ -20,7 +20,8 @@ import { applyNameTagTitle, titleOf } from './achievements.js';
 import { suitColor } from '../entities/remote.js';
 import { installCamera } from './camera_item.js';
 import { G } from '../physics/physics.js';
-import { wavesAllowed } from './crdirector_core.js';   // [onegoal] no swarm waves before quota 3
+import { wavesAllowed } from './crdirector_core.js';
+import { poolBlocks } from './threatpool.js';   // [onegoal] no swarm waves before quota 3
 
 addTranslations({
   'SWARM INCOMING': 'SÜRÜ GELİYOR', 'WAVE {i}/{n}': 'DALGA {i}/{n}', '{c} zombie accounts': '{c} zombi hesap', 'SWARM CLEARED': 'SÜRÜ TEMİZLENDİ',
@@ -79,7 +80,7 @@ export function installHorde(game) {
   // ================================================================================== host: swarm waves
   function startWaves(reason = 'night', zone = null, force = false) {
     if (!isHost() || S.disposed || S.waves || game.run?.phase !== 'moon') return false;
-    if (!force && !wavesAllowed(sector())) return false;   // [onegoal] quota 0-2: no swarm waves at all (night / alarm / extraction); force = debug / harness
+    if (!force && !(game.crdirector?.canSpawn ? game.crdirector.canSpawn('horde', null, 'horde') : wavesAllowed(sector()))) return false;   // [threatmerge] crdirector is the gate   // [onegoal] quota 0-2: no swarm waves at all (night / alarm / extraction); force = debug / harness
     if (!zone) { const ps = livePlayers(); const ins = ps.filter((p) => p.zone === 'in').length; zone = ps.length && ins > ps.length / 2 ? 'in' : 'out'; }
     if (zone === 'in' && !game.world.facility) zone = 'out';
     const sec = sector(), th = threat();
@@ -161,6 +162,7 @@ export function installHorde(game) {
   }
   function spawnHitSquad(factionId = 'bureau', pos = null, n = 3) {
     if (!isHost() || S.disposed || !game.world.moonId) return [];
+    if (game.crdirector?.canSpawn?.('hs_leader', pos, 'squad') === false) return [];   // [threatmerge] director budget
     const fi = factionIndex(factionId);
     const Mg = M();
     pos = pos ? new THREE.Vector3(pos.x, pos.y, pos.z) : new THREE.Vector3(40, 0, 40);
@@ -217,8 +219,8 @@ export function installHorde(game) {
     S.dayKey = key; S.day = {}; S.waves = null;
     const r = new RNG(((run.seed ^ 0x2b07a11) >>> 0) || 1);
     // loose ambient groups of zombie accounts outdoors, far from the ship and the main entrance
-    if (game.world.outdoor) {
-      const tier = Math.max(1, moon.tier || 1);
+    const zPool = game.crdirector?.pool?.(), zombiesOk = game.crdirector?.canSpawn ? game.crdirector.canSpawn('zombie', null, 'horde') : wavesAllowed(sector());
+    if (game.world.outdoor && zombiesOk && !poolBlocks('zombie', zPool)) {   // [threatmerge] loose zombies: quota 3+ and only when Zombie Accounts are in the moon's pool
       const groups = Math.min(4, tier + (sector() >= 3 ? 1 : 0));
       const ent = game.world.outdoor.mainExit?.pos;
       const lim = (game.world.terrain?.playHalf ?? 130) - 8;
