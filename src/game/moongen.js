@@ -19,6 +19,7 @@ import { RNG, hashString } from '../core/rng.js';
 import { getLang } from '../core/i18n.js';
 import { CREATURES } from './creatures.js';
 import { labInterior } from './labyrinths_core.js';   // [labyrinths]
+import { labInterior12 } from './labyr12_core.js';   // [labyr12] darkweb / hotel join the generated-moon interior pool
 import '../world/biomes_wave1_data.js';   // registers lava / ice / jungle into BIOMES (data only) so every peer rolls the same sectors
 import '../world/worlds2_data.js';   // wave 3: soviet / twinsun biomes + the two fixed moons (own RNG stream below, older rolls stay identical)
 
@@ -235,6 +236,7 @@ function generateMoon({ runKey, index, k, biome, tier, usedNames, safe, deep }) 
   const wanted = R.weighted(iw).id;
   let interior = interiorAvailable(wanted) ? wanted : 'factory';
   { const li = labInterior(runKey, index, k, biome, tier, interior); if (li && interiorAvailable(li)) interior = li; }   // [labyrinths]
+  { const l12 = labInterior12(runKey, index, k, biome, tier, interior); if (l12 && interiorAvailable(l12)) interior = l12; }   // [labyr12] feature-detected: falls back to the interior picked above
   // size / scale
   let size = 1.0 + (tier - 1) * 0.28 + R.float(-0.1, 0.35) + (deep ? 0.15 : 0);
   size = +Math.max(1.0, Math.min(2.6, size)).toFixed(2);

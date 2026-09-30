@@ -236,7 +236,7 @@ import { installEvents11 } from './events11.js';
 import { installGear11 } from './gear11.js';
 // wave 12 placeholders
 // [import:creatures12]
-// [import:labyr12]
+import { installLabyr12 } from './labyr12.js';   // [import:labyr12] wave 12: Dark Web echolocation + Overload Hotel elevator
 // [import:moons12]
 // [import:atmos12]
 // [import:coop12]
@@ -637,7 +637,7 @@ export class Game extends Emitter {
     this.useModule('events11', installEvents11);
     this.useModule('gear11', installGear11);
     // [slot:creatures12]
-    // [slot:labyr12]
+    this.useModule('labyr12', installLabyr12);   // [slot:labyr12]
     // [slot:moons12]
     // [slot:atmos12]
     // [slot:coop12]

@@ -427,3 +427,4 @@ skyline and ground life; Dead Mall (parody neon, grilles, dry fountain atrium) r
 corridor with EXIT counter, mascot poster, door 101) is the strongest new idea; Captcha tile test reads well; Ratio twins
 readable; centre cards now queue one at a time. Still weak: Buffering tell only fixed in code (re-check in the dark), new
 creatures/crises/gear never played by a human or with 2 real players, balance of 12 new threats + 5 gadgets is paper-only.
+W12 labyr12: Dark Web (noise = sonar map + alarm) and Overload Hotel (one elevator, doors close 3 s after the chime, hidden floor 13 by stairs, DND rooms + keys) are the first interiors whose rule is a verb the crew argues about; both are node-tested only - check echo line thickness / darkness in the PSX pass and the hotel lobby proportions in a browser.

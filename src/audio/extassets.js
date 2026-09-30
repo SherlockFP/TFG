@@ -93,6 +93,8 @@ const THEME_ONESHOTS = {
   hospital: [['heart_monitor_beep', 0.3], ['flatline', 0.22], ['light_flicker', 0.3], ['phone_ring', 0.2], ['elevator_ding', 0.25]],
   deadmall: [['mall_chime', 0.3], ['light_flicker', 0.35], ['light_flicker', 0.35], ['drip', 0.25, 4], ['elevator_ding', 0.2]],   // [labyr10]
   funhouse: [['fun_honk', 0.35], ['lm_giggle', 0.28], ['light_flicker', 0.3], ['drip', 0.2, 4]],   // [labyr10]
+  darkweb: [['hdd_click', 0.4], ['dialup_modem', 0.22], ['drip', 0.3, 4], ['bios_beep', 0.2]],   // [labyr12]
+  hotel: [['elevator_ding', 0.3], ['phone_ring', 0.18], ['light_flicker', 0.3], ['drip', 0.15, 4]],   // [labyr12]
 };
 const _oneShot = { t: 12, theme: null };
 /** Call every frame from Game.update(dt). Plays one themed sound every ~14-35 s, 7-16 m away, while the
