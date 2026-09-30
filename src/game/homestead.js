@@ -22,6 +22,7 @@ addTranslations(fresh(TR, 'tr'), 'tr'); addTranslations(fresh(RU, 'ru'), 'ru');
 
 const CSS = `.hs-hint{position:fixed;left:50%;bottom:118px;transform:translateX(-50%);z-index:30;font:20px var(--font,'VT323',monospace);color:#ffe9c8;background:rgba(10,6,12,.86);border:1px solid #ffd23f;padding:3px 12px;pointer-events:none}`;
 const BUY_SFX = ['ui_buy', 'ui_buy_b', 'ui_buy_c'];
+const RECLAIM_DWELL = 2.5;   // Re-Claim wipes the line and costs 1.2k+: a much longer hold than a 0.7 s buy pad
 
 export function installHomestead(game) {
   const mods = game.mods, offs = [];
@@ -150,7 +151,7 @@ export function installHomestead(game) {
         if (!onHome()) break;
         const at = vec(C.COLLECTOR.x, 1.4, C.COLLECTOR.z);
         game.particles?.burst?.(at, 'sparks');
-        if (!m.a) { game.audio?.play?.('coins', { volume: 0.7 }); game.ui?.hud?.floatText?.(at, `+${m.n} ▮${m.cl ? ` · +${m.cl} ◈` : ''}`, '#ffd23f'); }
+        if (!m.a) { game.audio?.play?.('coins', { volume: 0.7 }); game.ui?.hud?.floatText?.(at, `${m.n ? `+${m.n} ▮` : ''}${m.cl ? `${m.n ? ' · ' : ''}+${m.cl} ◈` : ''}`, '#ffd23f'); }
         else game.audio?.play?.('coins', { volume: 0.2 });
         if (m.by === me() && m.cl) game.ui?.toast(tf('+{n} Clout for the crew', { n: m.cl }), 'good');
         break;
@@ -180,11 +181,11 @@ export function installHomestead(game) {
     const time = performance.now() / 1000;
     if (!on) { standId = ''; stand = 0; return null; }
     if (standId !== on.id) { standId = on.id; stand = 0; }
-    stand += dt; on.grp.userData.ring?.scale.setScalar(1 + Math.sin(stand * 20) * 0.06);
-    if (on.id === 'collect') { if (snap.p >= 1 && stand >= 0.7 && time - reqAt > 1.5) { reqAt = time; req('collect'); } return snap.p >= 1 ? 'collect' : null; }
+    const rc = on.id === 'reclaim'; stand += dt; on.grp.userData.ring?.scale.setScalar(1 + Math.sin(stand * (rc ? 20 + stand * 12 : 20)) * (rc ? 0.06 + Math.min(0.1, stand * 0.04) : 0.06));
+    if (on.id === 'collect') { const can = snap.p >= 1 || (snap.cl && snap.g >= 0.01); if (can && stand >= 0.7 && time - reqAt > 1.5) { reqAt = time; req('collect'); } return can ? 'collect' : null; }
     if (!on.afford) { if (time - reqAt > 2.5) { reqAt = time; game.ui?.toast(t('Not enough credits.'), 'bad'); } return null; }
-    if (stand >= 0.7 && time - reqAt > 1.6) { reqAt = time; if (on.id === 'reclaim') req('reclaim'); else req('buy', { id: on.id }); }
-    return 'build';
+    if (stand >= (rc ? RECLAIM_DWELL : 0.7) && time - reqAt > 1.6) { reqAt = time; if (rc) req('reclaim'); else req('buy', { id: on.id }); }
+    return rc ? 'reclaim' : 'build';
   }
   function interactables(list) {
     const s = S(); if (!C.has(s, 'claim')) return;
@@ -236,7 +237,7 @@ export function installHomestead(game) {
       const time = performance.now() / 1000;
       v.update(dt, time, { pp: game.player?.pos, cr: game.run?.credits || 0 });
       const act = padUpdate(dt);
-      setHint(act === 'build' ? t('Hold still on the pad to build...') : act === 'collect' ? t('Collecting...') : null);
+      setHint(act === 'build' ? t('Stand on the pad to build...') : act === 'reclaim' ? t('Hold to Re-Claim: the line resets') : act === 'collect' ? t('Collecting...') : null);
       if (!welcomed) { welcomed = true; if (!C.has(s, 'claim') && !toldFirst) { toldFirst = true; game.ui?.toast(t('A gold pad is blinking in the south. Follow the arrows.'), 'good'); } }
       markT -= dt; if (markT <= 0) { markT = 2; markProgress(s); panel?.refresh?.(); }
     } catch (e) { if (++errs <= 3) console.warn('[hs] update', e); }

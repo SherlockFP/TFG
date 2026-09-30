@@ -178,7 +178,7 @@ export function createHomesteadView() {
     if (!ABS.has(id)) grp.position.set(p.at[0], 0, p.at[1]);
     if (id === 'auto' || id === 'drop1') grp.rotation.y = 0;
     root.add(grp); pieces.set(id, grp);
-    if (id === 'roof') { const sm = signMat(snap.rb); const sg = new THREE.Mesh(new THREE.PlaneGeometry(3.0, 0.75), sm); sg.position.set(C.LODGE.x0 + 8.3, 3.3, C.LODGE.z0 - 0.13); grp.add(sg); grp.userData.sign = sg; signRb = snap.rb; own.push(sg.geometry); }
+    if (id === 'roof') { const sm = signMat(snap.rb); const sg = new THREE.Mesh(new THREE.PlaneGeometry(3.0, 0.75), sm); sg.position.set(C.LODGE.x0 + 8.3, 3.3, C.LODGE.z0 - 0.13); sg.rotation.y = Math.PI; grp.add(sg); grp.userData.sign = sg; signRb = snap.rb; own.push(sg.geometry); }
     if (animate) pops.set(id, { t: 0, grp, kind: id === 'roof' ? 'drop' : ABS.has(id) ? 'rise' : 'scale' });
     if (animate) { if (id === 'roof') grp.position.y = 5; else if (ABS.has(id)) grp.scale.y = 0.01; else grp.scale.setScalar(0.01); }
   }

@@ -126,6 +126,13 @@ ok('collect: pays exactly floor(pile); Clout once per game day; the auto sweep p
   assert.equal(C.collect(s, w, true).clout, 0, 'sweeper pays no Clout'); assert.equal(s.cl, 1);
   s.pile = 3; assert.ok(C.collect(s, w).clout > 0);
 });
+ok('collect: after the sweeper emptied the pot the day\'s Clout is still claimable exactly once', () => {
+  const s = full(), w = { cr: 0 }; s.cl = 1; s.g.n = 8; s.pile = 6;
+  assert.equal(C.collect(s, w, true).clout, 0); assert.equal(s.pile, 0);
+  const r = C.collect(s, w); assert.ok(r.ok && r.n === 0 && r.clout === C.cloutOf(s) && s.cl === 0);
+  assert.equal(C.collect(s, w).ok, false, 'Clout only once per day');
+  s.cl = 1; s.g.n = 0; assert.equal(C.collect(s, w).ok, false, 'no production today: nothing to claim');
+});
 ok('reclaim: needs roof + gate3, costs 1200 / 1800 / 2400, keeps the lodge, resets the line, stars <= 3, caps unchanged', () => {
   const s = C.blank(), w = { cr: 1e6 }; s.b = ['claim'];
   assert.equal(C.reclaim(s, w).ok, false);

@@ -137,10 +137,13 @@ export function tick(s, dt, runId, day) {
   const add = Math.max(0, Math.min(cap / TY.rampS * dt, cap - s.g.n, pileCap(s) - s.pile));
   s.g.n += add; s.pile += add; return add;
 }
-/** pay floor(pile) into the wallet. auto = the sweeper arm (never pays Clout). Returns {ok, n, clout}. */
+/** pay floor(pile) into the wallet. auto = the sweeper arm (never pays Clout). With an empty pot a manual collect still pays the day's Clout once (n = 0). Returns {ok, n, clout}. */
 export function collect(s, wallet, auto = false) {
   const n = Math.floor(s.pile + 1e-9);
-  if (n < 1) return { ok: false, n: 0, clout: 0 };
+  if (n < 1) {   // the sweeper arm may have emptied the pot: the day's Clout is still claimable once the line has produced something today
+    if (!auto && s.cl && capOf(s) > 0 && s.g.n > 0) { s.cl = 0; return { ok: true, n: 0, clout: cloutOf(s) }; }
+    return { ok: false, n: 0, clout: 0 };
+  }
   s.pile = Math.max(0, s.pile - n); wallet.cr += n; s.st.earned += n; s.st.collects += 1;
   let clout = 0;
   if (!auto && s.cl) { clout = cloutOf(s); s.cl = 0; }

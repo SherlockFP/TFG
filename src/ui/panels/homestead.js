@@ -38,7 +38,8 @@ export function createHomesteadPanel(ui, game, api) {
     const sub = head.querySelector('.cp-sub'); if (sub) sub.textContent = '★'.repeat(s.rb) || ' ';
     let h = `<div class="hs-grid">
       <div class="tfg-card"><div class="row"><b>${escapeHtml(t('Pot'))}</b><span class="${pile >= 1 ? 'ok' : 'dim'}">▮${f0(pile)} / ${f0(pc)}</span></div>${bar(pc > 0 ? pile / pc : 0)}
-        <div class="sub">${escapeHtml(cap > 0 ? tf('{n} per minute while the line runs. Stand on the gold pad to cash in.', { n: Math.round(rate * 10) / 10 }) : t('Build the belt and the line starts paying.'))}</div></div>
+        <div class="sub">${escapeHtml(cap > 0 ? tf('{n} per minute while the line runs. Stand on the gold pad to cash in.', { n: Math.round(rate * 10) / 10 }) : t('Build the belt and the line starts paying.'))}</div>
+        <div class="sub">${escapeHtml(t('Clout: once per game day, stand on the gold pad.'))}</div></div>
       <div class="tfg-card"><div class="row"><b>${escapeHtml(t('Today'))}</b><span>${f0(g)} / ${f0(cap)}</span></div>${bar(cap > 0 ? g / cap : 0)}
         <div class="sub">${escapeHtml(t('The line makes a fixed amount per game day. Past that it waits: fly a run to reset it.'))}</div></div>
       <div class="tfg-card"><div class="row"><b>${escapeHtml(t('Stars'))}</b><span class="warn">${'★'.repeat(s.rb)}${'☆'.repeat(C.MAX_RB - s.rb)}</span></div>
