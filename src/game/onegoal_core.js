@@ -4,6 +4,8 @@
 // (+ at most one warning). Priority follows the core verb: survive / escape > get the loot out > job > everything else.
 // The rest lives on the hold-Tab FULL STATUS card (hudcalm reads objectives.full).
 
+import { taxOf } from './feedcams_core.js';
+
 /** category rank (lower = more important) */
 export const TIER = Object.freeze({ survive: 0, escape: 0, loot: 1, job: 2, teach: 3, other: 4 });
 
@@ -168,3 +170,15 @@ export function reactKey(kind, since, r01) {
   if (!k || !(since >= REACT_GAP) || r01 > 0.6) return null;
   return k;
 }
+
+// ------------------------------------------------------------------------------------------ greed line + tax preview (wave 9, docs/wave9/greed.md)
+/** the carry line while on air: the values of the carried scrap -> { v: before tax, net: after the viewer tax } */
+export function carryPreview(values) {
+  let v = 0, net = 0;
+  for (const x of values || []) { const a = Math.round(x) || 0; if (a <= 0) continue; v += a; net += taxOf(a).v; }
+  return { v, net };
+}
+/** greed line: the day target is met (target <= 0 = covered by the scrap aboard) and there is still loot on the moon */
+export const greedOn = (today, target, left) => (target <= 0 || today >= target) && left > 0;
+/** the TAGGED goal only matters to someone holding scrap (an empty-handed tagged player pays nothing) */
+export const taggedGoalOn = (tagged, carried) => !!tagged && carried > 0;

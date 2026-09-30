@@ -8,6 +8,13 @@ addTranslations({
   'TAGGED: get out to the ship or kill the camera that tagged you': 'ETİKETLENDİN: dışarı, gemiye dön ya da seni etiketleyen kamerayı yok et',
   'TAGGED: get to the ship ({d} m) or kill the camera that tagged you': 'ETİKETLENDİN: gemiye dön ({d} m) ya da seni etiketleyen kamerayı yok et',
   'Assignment: {text}': 'Görev: {text}',
+  '▮{left} still in here · deep room {m} m · leaves {time}': '▮{left} hâlâ içeride · derin oda {m} m · {time}\'de kalkıyor',
+  '▮{left} still in here · leaves {time}': '▮{left} hâlâ içeride · {time}\'de kalkıyor',
+  '▮{v} → ▮{n} if tagged': '▮{v} → ▮{n} etiketlenirsen',
+  '▮{v} → ▮{n} (viewer tax)': '▮{v} → ▮{n} (izleyici vergisi)',
+  'CLEAN SHIFT': 'TEMİZ VARDİYA',
+  'Nobody was tagged all day: +▮{n} bonus': 'Gün boyu kimse etiketlenmedi: +▮{n} bonus',
+  'Nobody was tagged all day.': 'Gün boyu kimse etiketlenmedi.',
 }, 'tr');
 addTranslations({
   'Chatty Algorithm': 'Болтливый Алгоритм',
@@ -16,4 +23,11 @@ addTranslations({
   'TAGGED: get out to the ship or kill the camera that tagged you': 'ТЕБЯ ПОМЕТИЛИ: выбирайся на корабль или уничтожь камеру, которая тебя пометила',
   'TAGGED: get to the ship ({d} m) or kill the camera that tagged you': 'ТЕБЯ ПОМЕТИЛИ: вернись на корабль ({d} м) или уничтожь камеру, которая тебя пометила',
   'Assignment: {text}': 'Задание: {text}',
+  '▮{left} still in here · deep room {m} m · leaves {time}': '▮{left} ещё внутри · дальняя комната {m} м · отлёт в {time}',
+  '▮{left} still in here · leaves {time}': '▮{left} ещё внутри · отлёт в {time}',
+  '▮{v} → ▮{n} if tagged': '▮{v} → ▮{n} при пометке',
+  '▮{v} → ▮{n} (viewer tax)': '▮{v} → ▮{n} (налог зрителей)',
+  'CLEAN SHIFT': 'ЧИСТАЯ СМЕНА',
+  'Nobody was tagged all day: +▮{n} bonus': 'Весь день никого не помечали: бонус +▮{n}',
+  'Nobody was tagged all day.': 'Весь день никого не помечали.',
 }, 'ru');

@@ -45,7 +45,7 @@ ok(OG.algoOk({ nowMs: 2000, lastMs: 1000, chatty: true, peak: true }), 'Chatty A
 // ---- module: tagged emit + the TAGGED line + lease
 globalThis.performance ??= { now: () => Date.now() };
 const mods = new Emitter();
-const game = { mods, selfId: 'me', settings: {}, run: { phase: 'moon', fc: { p: { me: [80, 1, 1] } } }, player: { pos: { x: 30, z: 40 }, dead: false, inShip: false } };
+const game = { mods, selfId: 'me', settings: {}, run: { phase: 'moon', fc: { p: { me: [80, 1, 1] } } }, player: { pos: { x: 30, z: 40 }, dead: false, inShip: false, slots: ['a'] }, items: { get: (id) => ({ type: 'scrap', value: 50, def: { kind: 'scrap' } }) } };
 const h1 = (add) => add('Job line', 'main'); h1._src = 'facjobs'; mods.on('objectives', h1);
 mods.on('objectives', (add) => add('mod line', 'sub'));
 const { installOneGoal } = await import('../../src/game/onegoal.js');
@@ -79,6 +79,19 @@ const need = [['src/game/game.js', "useModule('onegoal'"], ['src/game/game.js', 
   ['public/mods/employee-assignments.js', 'if ((ctx.qi | 0) < 3) return null'], ['src/game/onboard.js', 'onegoal?.algoOk'], ['src/game/onboard.js', 'onegoal?.lease'],
   ['src/game/crdirector.js', 'peakNow()'], ['src/game/guide.js', 'tutCredit(g'], ['src/ui/ui.js', "'chattyAlgo'"]];
 for (const [f, s] of need) ok(src(f).includes(s), `${f} has ${s}`);
+
+// ---- wave 9 greed: greed line, tax preview, TAGGED only with scrap, CLEAN SHIFT
+{
+  const FC = await import('../../src/game/feedcams_core.js');
+  ok(OG.greedOn(300, 250, 90) && OG.greedOn(0, 0, 40) && !OG.greedOn(100, 250, 90) && !OG.greedOn(300, 250, 0), 'greed: target met + loot left');
+  const pv = OG.carryPreview([151, 100, 0]);
+  ok(pv.v === 251 && pv.net === FC.taxOf(151).v + FC.taxOf(100).v && pv.net < pv.v, 'carry preview ' + JSON.stringify(pv));
+  ok(OG.carryPreview([]).v === 0 && OG.carryPreview([1]).net === 1, 'preview: empty / 1-credit scrap pays no tax');
+  ok(OG.taggedGoalOn(1, 2) && !OG.taggedGoalOn(1, 0) && !OG.taggedGoalOn(0, 3), 'TAGGED goal only while carrying scrap');
+  ok(FC.cleanBonus(400, 0, 3) === 40 && FC.cleanBonus(9000, 0, 3) === FC.CLEAN.max, 'clean shift: 10 % capped');
+  ok(FC.cleanBonus(400, 1, 3) === 0 && FC.cleanBonus(400, 0, 0) === 0 && FC.cleanBonus(0, 0, 3) === 0, 'clean shift: none when tagged / no cams / no haul');
+  for (const [f, s] of [['src/game/objectives.js', 'greedOn('], ['src/game/objectives.js', 'if tagged'], ['src/game/onegoal.js', 'taggedGoalOn('], ['src/game/feedcams.js', 'CLEAN SHIFT'], ['src/game/host.js', 'cleanBonus?.(']]) ok(src(f).includes(s), `${f} has ${s}`);
+}
 
 console.log(bad ? `onegoal: ${bad} FAIL / ${n}` : `onegoal: all ${n} checks pass`);
 process.exit(bad ? 1 : 0);

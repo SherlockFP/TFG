@@ -6,6 +6,7 @@
 //   core verb   while you are TAGGED by a feed camera the goal is "get to the ship or kill that camera".
 // Net: none (reads run.fc, which feedcams already syncs).
 import { t, tf } from '../core/i18n.js';
+import { isSellable } from './items.js';
 import * as OG from './onegoal_core.js';
 import * as FR from './firstrun_core.js';
 import './onegoal_i18n.js';
@@ -30,17 +31,24 @@ export function installOneGoal(game) {
     }
   }
 
+  /** [greed] values of the sellable scrap in the local player's hands / bag slots */
+  const carriedValues = () => {
+    const out = [];
+    for (const id of game.player?.slots || []) { const it = id && game.items?.get?.(id); if (it && it.type !== 'body' && !it.soulbound && isSellable(it.def || {})) out.push(it.value || 0); }
+    return out;
+  };
+
   // the core verb: a TAGGED player's one goal is to get home (feedcams keeps run.fc.p[id] = [meter, live, tagged])
   offs.push(game.mods?.on?.('objectives', (add, g, phase) => {
     if (disposed || (g && g !== game) || phase !== 'moon') return;
     const p = game.player, fp = game.run?.fc?.p?.[game.selfId];
-    if (!p || p.dead || p.inShip || !fp?.[2]) return;
+    if (!p || p.dead || p.inShip || !OG.taggedGoalOn(fp?.[2], carriedValues().length)) return;   // [greed] only when the tagged player carries scrap
     const o = add(p.indoor ? t('TAGGED: get out to the ship or kill the camera that tagged you') : tf('TAGGED: get to the ship ({d} m) or kill the camera that tagged you', { d: Math.round(Math.hypot(p.pos.x, p.pos.z)) }), 'main');   // [qa2] indoors the x/z distance is meaningless (the facility is offset)
     if (o && typeof o === 'object') { o.cat = 'escape'; o.lead = true; }
   }));
 
   return {
-    emit,
+    emit, carriedValues, preview: () => OG.carryPreview(carriedValues()),
     /** the lines the HUD shows for a density ('full' = the whole list in priority order, max 7) */
     shown(lines, dens) { return dens === 'full' ? OG.sortAll(lines).slice(0, 7) : OG.resolve(lines, dens === 'minimal' ? 1 : 2); },
     sortAll: OG.sortAll,
