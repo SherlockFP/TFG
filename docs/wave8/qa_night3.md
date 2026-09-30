@@ -35,7 +35,15 @@ Expedition landings: not measured (`land()` in run F did not log `landQ`; run D 
 1. (medium) Stream end faced the terminal's bearing through the bulkhead, so the first frame was a wall (`onboard.js`).
 2. (low) Arcade tarp showed the cabinet's black marquee (`hubgate.js`, tarp height `dm.h + 0.03`).
 
-**Open**
+**Fixed after this run (n3fix, `tools/harness/n3fix.test.mjs`, shots `n3fix_shovel|pickaxe|roof_a.jpg`)**
+- Open 2 (roof): dim emissive strips on plank edges and stair treads, billboard frames lit before relight, window grids on the skyline towers (`expeditions_maps.js`). `n3fix_roof_a.jpg`: pink frame + window dots read from the street.
+- Open 3 (melee): `fitGrip` lowers the pitch of a one-hand melee in 0.07 rad steps until its top is under NDC 0.62 (`MELEE_TOP`); shovel head now in frame (`n3fix_shovel.jpg`), pickaxe head in frame (`n3fix_pickaxe.jpg`).
+- Open 4 (dune beam): core radius 0.35 -> 0.85-1.05, opacity 0.62 normal blend + a 3.2 m soft additive halo. Not shot.
+- Open 5 (markers): `docklayout.spreadMarkers` stacks / hides overlapping edge labels and lifts them above the hotbar (tasks.js, voyage.js). Not shot.
+- Open 6 (x_pickaxe empty hand): the ext model is preloaded before registration, so no late load was found; an item visual with an empty bounding box now gets a placeholder block, and the melee clamp keeps a long pickaxe in frame. Root cause not reproduced.
+- Feel 3 (levrek): new palette key `morn` (0.28 vs 0.45 default = palette weight at 8:00), hemisphere ground / terrain tints / sat softened. Not shot.
+
+**Open (as found)**
 1. (high, harness or real) Real-time takeoff from the dune moon OOM-killed the tab (7.7 GB); the takeoff phase is the second software-GL memory hog after landings. Needs a run on a real GPU.
 2. (medium) Rooftop Blackout City is nearly black from the ground: only the violet rim line and one lamp show. Suggest a dim emissive strip on plank edges and stairs, and the billboard frames lit even before relight.
 3. (medium) Shovel / lead pipe (and every melee viewmodel at rest) is a long pole out of the top of the frame; no head, so it does not read as a shovel. Suggest lowering the rest pitch (`fpbody_grip.js` melee `[1.0, -0.12, 0]`) or shortening the visual. `fpbody_offline.mjs` passes because it only checks the box corners against a 90 degree FOV.

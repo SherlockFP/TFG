@@ -251,7 +251,7 @@ export class Environment {
     if (this.eclipse) night = Math.max(night, 0.75);
     // [qa] soul palettes follow the clock: morning is mostly neutral daylight (45 % palette), the palette is strongest at dusk (t = 0.62), and the night never
     // goes fully black (darkness capped, night colour lifted) so e.g. 404 stays readable
-    const pal = b.palBlend ? 1 : 0, pw = pal ? 0.45 + 0.55 * clamp(t / 0.62, 0, 1) : 1;
+    const pal = b.palBlend ? 1 : 0, m0 = b.morn ?? 0.45, pw = pal ? m0 + (1 - m0) * clamp(t / 0.62, 0, 1) : 1;
     const blendC = (c, neutral) => (pal ? new THREE.Color(neutral).lerp(new THREE.Color(c), pw) : new THREE.Color(c));
     if (pal && !this.eclipse) night = Math.min(night, 0.82);
     const skyC = blendC(b.sky ?? 0x6f8a99, 0x8fa4ae);

@@ -115,6 +115,8 @@ export class WorldItem {
     const custom = window.__kefalMods?.itemModels.get(this.type);
     try { obj = custom ? custom(window.KefalAPI.THREE) : createItemModel(this.type); } catch (e) { console.warn('item model', this.type, e); obj = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), new THREE.MeshLambertMaterial({ color: 0x888888 })); }
     const root = new THREE.Group();
+    // [n3fix] a model that is missing / not built (ext GLB failed or late) must not leave an empty hand: hold a small placeholder block
+    if (new THREE.Box3().setFromObject(obj).isEmpty()) obj.add(new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.4), new THREE.MeshLambertMaterial({ color: 0x8a6a48 })));
     root.add(obj);
     // center the visual on its bounding box so the physics cuboid matches
     const bb = new THREE.Box3().setFromObject(obj);
