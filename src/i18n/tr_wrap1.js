@@ -299,7 +299,7 @@ export default {
   " · Lv.{n}": " · Sv. {n}",
   " (Black Market)": " (Karaborsa)",
   "Lv.{level} · {rankOf} · {xp}/{xpForLevel} XP": "Sv. {level} · {rankOf} · {xp}/{xpForLevel} XP",
-  "◈ {coins} Clout": "◈ {coins} Clout",
+  "◈ {coins} Followers": "◈ {coins} Takipçi",
   "HP {maxHp} · Stamina {maxStamina} · Armor {n}%": "HP {maxHp} · Dayanıklılık {maxStamina} · Zırh %{n}",
   "Melee ×{n} · Crit {n2}% · Speed ×{n3}": "Yakın dövüş ×{n} · Kritik %{n2} · Hız ×{n3}",
   "Scan {scanRange} m · Battery ×{n} · Carry relief {carryRelief} lb": "Tarama {scanRange} m · Pil ×{n} · Taşıma rahatlaması {carryRelief} lb",

@@ -44,7 +44,7 @@ export const KEYS = {
   cooldown:      { unit: 'pct',  label: 'Cooldown Reduction' },
   bagSlots:      { unit: 'flat', label: 'Bag Column', one: 'Bag Column', many: 'Bag Columns' },
   xpGain:        { unit: 'pct',  label: 'XP Gain' },
-  cloutGain:     { unit: 'pct',  label: 'Clout Gain' },
+  cloutGain:     { unit: 'pct',  label: 'Followers Gain' },
 };
 export const KEY_IDS = Object.keys(KEYS);
 

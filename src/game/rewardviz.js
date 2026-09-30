@@ -13,20 +13,22 @@ import { insideShip } from '../world/ship.js';
 import { rewardOf } from './mapmods_core.js';
 import { FAIL_FEE } from './facjobs_core.js';
 import * as C from './rewardviz_core.js';
+import { followersOf } from './wallet.js';
+import './followers.js';
 
 HOST_ONLY.add('rvpk');
 
-const LABEL = { scrap: 'Scrap', job: 'Job pay', crate: 'Job crate', pocket: 'Pocket loot', map: 'MAP BONUS', till: 'Diner', ore: 'Ore mined', clout: 'Clout', fine: 'Casualty fine', fee: 'Job fee', tax: 'Viewer tax' };
+const LABEL = { scrap: 'Scrap', job: 'Job pay', crate: 'Job crate', pocket: 'Pocket loot', map: 'MAP BONUS', till: 'Diner', ore: 'Ore mined', clout: 'Followers', fine: 'Casualty fine', fee: 'Job fee', tax: 'Viewer tax' };
 const TR = {
   'INCOME BY SOURCE': 'KAYNAĞA GÖRE GELİR', Scrap: 'Hurda', 'Job pay': 'Görev ödemesi', 'Job crate': 'Görev sandığı', 'Pocket loot': 'Cep ganimeti', 'MAP BONUS': 'HARİTA BONUSU',
-  Diner: 'Lokanta', 'Ore mined': 'Çıkarılan cevher', Clout: 'Clout', 'Casualty fine': 'Kayıp cezası', 'Job fee': 'Görev harcı', 'Viewer tax': 'İzleyici vergisi',
+  Diner: 'Lokanta', 'Ore mined': 'Çıkarılan cevher', Followers: 'Takipçi', 'Casualty fine': 'Kayıp cezası', 'Job fee': 'Görev harcı', 'Viewer tax': 'İzleyici vergisi',
   'Job not started: -▮{n} fee': 'Görev başlamadı: -▮{n} ücret', 'Job not started: -▮{n} fee. Press E again to leave anyway': 'Görev başlamadı: -▮{n} ücret. Yine de kalkmak için tekrar E',
   'ORE {a}/{b} today': 'CEVHER {a}/{b} bugün', 'The diner made ▮{n} while you were away': 'Lokanta sen yokken ▮{n} kazandı',
   '+{n} % VALUE': '+%{n} DEĞER', 'CURSED ×{n}': 'LANETLİ ×{n}',
 };
 const RU = {
   'INCOME BY SOURCE': 'ДОХОД ПО ИСТОЧНИКАМ', Scrap: 'Хлам', 'Job pay': 'Оплата задания', 'Job crate': 'Ящик задания', 'Pocket loot': 'Добыча из кармана', 'MAP BONUS': 'БОНУС КАРТЫ',
-  Diner: 'Закусочная', 'Ore mined': 'Добыто руды', Clout: 'Клаут', 'Casualty fine': 'Штраф за потери', 'Job fee': 'Штраф за задание', 'Viewer tax': 'Налог зрителей',
+  Diner: 'Закусочная', 'Ore mined': 'Добыто руды', Followers: 'Подписчики', 'Casualty fine': 'Штраф за потери', 'Job fee': 'Штраф за задание', 'Viewer tax': 'Налог зрителей',
   'Job not started: -▮{n} fee': 'Задание не начато: -▮{n} штраф', 'Job not started: -▮{n} fee. Press E again to leave anyway': 'Задание не начато: -▮{n} штраф. Нажми E ещё раз, чтобы всё равно взлететь',
   'ORE {a}/{b} today': 'РУДА {a}/{b} сегодня', 'The diner made ▮{n} while you were away': 'Закусочная заработала ▮{n}, пока вас не было',
   '+{n} % VALUE': '+{n} % СТОИМОСТИ', 'CURSED ×{n}': 'ПРОКЛЯТО ×{n}',
@@ -46,6 +48,15 @@ export function installRewardviz(game) {
   let disposed = false, style = null, boundNet = null, armed = 0;
   const L = C.freshLedger();
   const pocket = new Set();
+  // [followers] +N followers gained today = every positive profile.addCoins of the day (all sources); viewers today = the LIVE peak (algo1 'tfg:viewers')
+  let gained = 0, peakV = 0;
+  const pr = game.progress;
+  if (pr && typeof pr.addCoins === 'function') {
+    const orig = pr.addCoins;
+    pr.addCoins = function (c, why) { const b = Number(this.p?.coins) || 0; const r = orig.call(this, c, why); gained += Math.max(0, (Number(this.p?.coins) || 0) - b); return r; };
+    offs.push(() => { if (pr.addCoins !== orig) pr.addCoins = orig; });
+  }
+  offs.push(mods.on('tfg:viewers', (d, g) => { if (g && g !== game) return; peakV = Math.max(peakV, Math.round(+d?.viewers || 0)); }));
   const run = () => game.run;
   const me = () => game.selfId;
   const toast = (m, k) => { try { game.ui?.toast?.(m, k); } catch { /* ui optional */ } };
@@ -94,6 +105,7 @@ export function installRewardviz(game) {
     if (g !== game || !d) return;
     try {
       L.pocket = Math.max(L.pocket, pocketValue());
+      L.clout = Math.max(L.clout, Math.round(gained));   // [followers] the ledger row is the day's whole follower gain, whatever the source
       let rows = C.rowsOf(L, d, mapVal());
       // feedcams already prints a VIEWER TAX line in the summary: do not show the tax twice
       if (game.run?.fc?.tx > 0) rows = rows.filter((r) => r[0] !== 'tax');
@@ -101,7 +113,13 @@ export function installRewardviz(game) {
         extra.push(`<div class="rv-sum"><div class="rv-h">${escapeHtml(t('INCOME BY SOURCE'))}</div>${rows.map(([k, gl, n, sg], i) => `<div class="rv-row${sg === '-' ? ' cost' : ''}" data-i="${i}"><i>${gl}</i><span>${escapeHtml(t(LABEL[k]))}${k === 'crate' ? ' ×' + n : ''}</span>${k === 'crate' ? '' : `<b class="rv-n" data-v="${n}" data-pre="${sg}${k === 'clout' ? '◈' : '▮'}">${sg}${k === 'clout' ? '◈' : '▮'}0</b>`}</div>`).join('')}</div>`);
         timers.push(setTimeout(countUp, 120));
       }
+      // [followers] viewers today (LIVE, per day) -> followers gained (the channel, forever) + the total
+      if (!d.company) {
+        const v = Math.max(peakV, Math.round(game.algo1?.viewers?.() || 0)), g2 = Math.round(gained);
+        extra.push(`<div class="rv-sum rv-fol"><div class="rv-row"><i>◈</i><span>${escapeHtml(v > 0 ? tf('Viewers today: {v} -> +{n} followers', { v: fmtMoney(v).replace('▮', ''), n: g2 }) : tf('+{n} followers', { n: g2 }))}</span></div><div class="rv-row"><i>◈</i><span>${escapeHtml(tf('Channel: {n} followers', { n: followersOf(game) }))}</span></div></div>`);
+      }
     } catch (e) { console.warn('[rewardviz] summary', e); }
+    gained = 0; peakV = 0;
     for (const k of Object.keys(L)) L[k] = 0;
     pocket.clear();
   }));

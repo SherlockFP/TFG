@@ -91,7 +91,7 @@ export function createDailyService({ profile, game = null, ui = null, audio = nu
         coin += out.coin; if (out.crate) crates++;
       }
       svc.save();
-      svc.toast(tf('Last season ended: {n} unclaimed tiers were collected for you (+{coin} Clout, {crates} crates).', { n: r.rolled.tiers.length, coin, crates }), 'good');
+      svc.toast(tf('Last season ended: {n} unclaimed tiers were collected for you (+{coin} Followers, {crates} crates).', { n: r.rolled.tiers.length, coin, crates }), 'good');
       svc.changed();
       return r.rolled;
     },
@@ -147,7 +147,7 @@ export function createDailyService({ profile, game = null, ui = null, audio = nu
       const td = TIERS[res.tier] || TIERS.common;
       if (res.kind === 'cosmetic') return { title: t(res.name), sub: `${t(SLOT_NAME[res.slot] || res.slot)} · ${t(td.name)}`, tier: res.tier, color: td.color, isNew: true, kicker: t('NEW COSMETIC') };
       if (res.kind === 'items') return { title: res.items.map(([id, n]) => `${t(itemName(id))} x${n}`).join(', '), sub: `${t('Delivered to your ship')} · ${t(td.name)}`, tier: res.tier, color: td.color, kicker: t('PARTS') };
-      return { title: `◈ ${res.coin} ${t('Clout')}`, sub: res.dupe ? t('Duplicate protection: you own everything, so it turned into Clout') : t(td.name), tier: res.tier, color: td.color, kicker: res.dupe ? t('DUPLICATE') : t('CLOUT') };
+      return { title: `◈ ${res.coin} ${t('Followers')}`, sub: res.dupe ? t('Duplicate protection: you own everything, so it turned into Followers') : t(td.name), tier: res.tier, color: td.color, kicker: res.dupe ? t('DUPLICATE') : t('FOLLOWERS') };
     },
     /** Filler cards for the reel: [{ tier, title, sub }] (seeded so a reveal looks the same on every replay). */
     reelCards(crate, count, winner) {
@@ -160,7 +160,7 @@ export function createDailyService({ profile, game = null, ui = null, audio = nu
         const r = rng.next();
         if (r < 0.5 && cat.length) { const e = cat[rng.int(0, cat.length - 1)]; out.push({ tier: e.tier || 'common', title: t(e.name), sub: t(SLOT_NAME[e.slot] || e.slot) }); }
         else if (r < 0.8 && items.length) { const id = items[rng.int(0, items.length - 1)]; const tiers = Object.keys(TIERS); out.push({ tier: tiers[Math.min(tiers.length - 1, rng.int(0, 3))], title: t(itemName(id)), sub: t('Parts') }); }
-        else out.push({ tier: ['common', 'common', 'uncommon', 'rare'][rng.int(0, 3)], title: `◈ ${rng.int(3, 90) * 10}`, sub: t('Clout') });
+        else out.push({ tier: ['common', 'common', 'uncommon', 'rare'][rng.int(0, 3)], title: `◈ ${rng.int(3, 90) * 10}`, sub: t('Followers') });
       }
       void def; void winner;
       return out;

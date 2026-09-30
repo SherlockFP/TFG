@@ -17,7 +17,7 @@ export const RULES = Object.freeze({
   startDist: 4.6,       // m: the host allows a request when the players are this close (client checks 4)
   keepDist: 6.5,        // m: a trade in progress is cancelled beyond this
   idleTtl: 300,         // s without any change before an open trade times out
-  maxClout: 1000000,    // Clout per side (the client's own balance is the real cap)
+  maxClout: 0,          // [followers] Followers are never spent or traded: every offer's Clout clamps to 0 (protocol fields kept for old peers)
   debitTtl: 3,          // s the host waits for the giver's client to confirm a Clout debit
 });
 
@@ -33,7 +33,7 @@ export const CANCEL_TEXT = Object.freeze({
   phase: 'Trade cancelled: the ship is moving.',
   invalid: 'Trade cancelled: an offered item is gone.',
   noroom: 'Trade cancelled: not enough room in {name}\'s inventory.',
-  noclout: 'Trade cancelled: {name} does not have that much Clout.',
+  noclout: 'Trade cancelled: {name} does not have that much Followers.',
   timeout: 'The trade timed out.',
   error: 'Trade cancelled.',
 });

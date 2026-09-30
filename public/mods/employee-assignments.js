@@ -14,7 +14,7 @@ KefalAPI.defineMod({
   scope: 'host',
   category: 'content',
   enabledByDefault: true,
-  description: 'Every landing each employee gets a personal assignment (haul, hunt, deep dive, heavy lift, cat rescue...). Finish it for a crew Credits bonus plus XP and Clout. Die and it fails.',
+  description: 'Every landing each employee gets a personal assignment (haul, hunt, deep dive, heavy lift, cat rescue...). Finish it for a crew Credits bonus plus XP and Followers. Die and it fails.',
   config: {
     payMul: { type: 'number', default: 1, min: 0, max: 5, step: 0.25, label: 'Payout multiplier' },
     showCrew: { type: 'boolean', default: true, label: 'Show crewmates\' assignments on the card' },

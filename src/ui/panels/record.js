@@ -293,15 +293,15 @@ export function createServiceRecord({ game = null, profile = game?.profile, tab,
     for (let i = 0; i < shown; i++) { const sp = mk('span', i < s ? '' : 'dim', '★'); stars.appendChild(sp); }
     body.appendChild(stars);
     const cur = prestigeBonus(s), next = prestigeBonus(s + 1);
-    body.appendChild(mk('div', 'rec-d', `Current: +${Math.round(cur.xpPct * 100)}% XP · +${Math.round(cur.coinPct * 100)}% Clout · +${cur.maxHp} max HP · +${Math.round(cur.staminaPct * 100)}% stamina`));
-    if (s < STAR_BONUS_CAP) body.appendChild(mk('div', 'rec-good', `Next star: +${Math.round(next.xpPct * 100)}% XP · +${Math.round(next.coinPct * 100)}% Clout · +${next.maxHp} max HP`));
+    body.appendChild(mk('div', 'rec-d', `Current: +${Math.round(cur.xpPct * 100)}% XP · +${Math.round(cur.coinPct * 100)}% Followers · +${cur.maxHp} max HP · +${Math.round(cur.staminaPct * 100)}% stamina`));
+    if (s < STAR_BONUS_CAP) body.appendChild(mk('div', 'rec-good', `Next star: +${Math.round(next.xpPct * 100)}% XP · +${Math.round(next.coinPct * 100)}% Followers · +${next.maxHp} max HP`));
     body.appendChild(mk('div', 'rec-h', _t('STAR REWARDS')));
     const grid = mk('div', 'rec-grid');
     for (const r of STAR_REWARDS) grid.appendChild(card(s >= r.stars, '★', `★${r.stars}`, s >= r.stars ? L('Unlocked') : '', [['rec-d', rewardLine(r)]]));
     body.appendChild(grid);
     body.appendChild(mk('div', 'rec-h', L('REBIRTH')));
     const pv = rebirthPreview(p);
-    body.appendChild(mk('div', 'rec-d', `Requires Lv.${REBIRTH_LEVEL} (you: Lv.${p.level}/${MAX_LEVEL}). You go back to level 1; base skills reset (${pv.spent} spent → ${pv.keep} refunded + ${pv.extra} bonus points; unspent points kept). KEPT: Mastery, gear, Clout, cosmetics, titles, achievements, Codex.`));
+    body.appendChild(mk('div', 'rec-d', `Requires Lv.${REBIRTH_LEVEL} (you: Lv.${p.level}/${MAX_LEVEL}). You go back to level 1; base skills reset (${pv.spent} spent → ${pv.keep} refunded + ${pv.extra} bonus points; unspent points kept). KEPT: Mastery, gear, Followers, cosmetics, titles, achievements, Codex.`));
     let armed = false;
     const b = btn(L('Rebirth now') + ` → ★${pv.stars}`, () => {
       if (!canRebirth(p)) return;

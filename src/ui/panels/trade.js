@@ -128,7 +128,7 @@ export function createTradePanel(game, T) {
       <div class="trd-col trd-mid">
         <div class="trd-sec">${escapeHtml(t('Your offer'))}</div>
         <div class="trd-box trd-mine"><div class="trd-slots" data-side="mine"></div>
-          <div class="trd-clout"><span>◈ ${escapeHtml(t('Clout'))}</span><input class="trd-cin" type="number" min="0" step="1" value="0"><small class="trd-cbal"></small></div>
+          <div class="trd-clout" hidden><span>◈ ${escapeHtml(t('Followers'))}</span><input class="trd-cin" type="number" min="0" step="1" value="0"><small class="trd-cbal"></small></div>
           <div class="trd-tot trd-tot-mine"></div></div>
         <div class="trd-state"></div>
         <div class="trd-btns"><button class="btn trd-lock"></button><button class="btn primary trd-acc"></button><button class="btn trd-cancel">${escapeHtml(t('CANCEL'))}</button></div>
@@ -137,7 +137,7 @@ export function createTradePanel(game, T) {
       <div class="trd-col trd-their">
         <div class="trd-sec"><span class="trd-tname"></span></div>
         <div class="trd-box trd-theirs"><div class="trd-slots" data-side="their"></div>
-          <div class="trd-clout"><span>◈ ${escapeHtml(t('Clout'))}</span><b class="trd-tclout">0</b></div>
+          <div class="trd-clout" hidden><span>◈ ${escapeHtml(t('Followers'))}</span><b class="trd-tclout">0</b></div>
           <div class="trd-tot trd-tot-their"></div></div>
         <div class="trd-lamps"></div>
         <div class="trd-sec">${escapeHtml(t('Summary'))}</div>
@@ -239,7 +239,7 @@ export function createTradePanel(game, T) {
     else if (my.l && th.l) txt = escapeHtml(t('Both locked. Press ACCEPT to confirm.'));
     else if (my.l) txt = escapeHtml(tf('Your offer is locked. Waiting for {name} to lock.', { name: T.nameOf(other) }));
     else if (th.l) txt = escapeHtml(tf('{name} locked their offer. Check it, then LOCK yours.', { name: T.nameOf(other) }));
-    else txt = escapeHtml(t('Drag items in, set Clout, then LOCK. Any change resets the locks.'));
+    else txt = escapeHtml(t('Drag items in, then LOCK. Any change resets the locks.'));
     stateEl.classList.toggle('go', go);
     stateEl.innerHTML = txt;
   }

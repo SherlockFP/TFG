@@ -72,7 +72,7 @@ export const PT = {
   roof: P({ cat: 'str', size: [1, 1], layer: 'r', max: 220, cost: { cr: 4, parts: 0 }, pw: 0, mk: 0, solid: 0, desc: 'Roof tile.' }),
   crate: P({ cat: 'str', size: [1, 1], layer: 'g', max: 8, cost: { cr: 30, parts: 1 }, pw: 0, mk: 0, solid: 1, needFloor: 1, desc: 'Storage crate. In a closed room: storage +20 %.' }),
   bench: P({ cat: 'str', size: [2, 1], layer: 'g', max: 4, cost: { cr: 60, parts: 2 }, pw: 0, mk: 0, solid: 1, needFloor: 1, desc: 'Workbench. In a closed room: every machine +6 % speed.' }),
-  bed: P({ cat: 'str', size: [2, 1], layer: 'g', max: 4, cost: { cr: 50, parts: 2 }, pw: 0, mk: 0, solid: 1, needFloor: 1, desc: 'Bed. In a closed, roofed room: slow passive Clout.' }),
+  bed: P({ cat: 'str', size: [2, 1], layer: 'g', max: 4, cost: { cr: 50, parts: 2 }, pw: 0, mk: 0, solid: 1, needFloor: 1, desc: 'Bed. In a closed, roofed room: slow passive Followers.' }),
   planter: P({ cat: 'str', size: [2, 1], layer: 'g', max: 4, cost: { cr: 40, parts: 1 }, pw: 0, mk: 0, solid: 1, needFloor: 1, desc: 'Planter. A closed, roofed room with one is a greenhouse: trees grow twice as fast.' }),
   tree: P({ cat: 'nat', size: [2, 2], layer: 'g', max: 24, cost: { cr: 45, parts: 0 }, pw: 0, mk: 0, solid: 1, desc: 'Sapling. Grows in real time, bears fruit, can be felled for wood.' }),
 };

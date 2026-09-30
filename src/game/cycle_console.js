@@ -218,7 +218,7 @@ export function createHostConsole(d) {
       if (r.cosmetic) { p.cycle2.endlessCosmetics = p.cycle2.endlessCosmetics || []; if (!p.cycle2.endlessCosmetics.includes(r.cosmetic)) p.cycle2.endlessCosmetics.push(r.cosmetic); }
       p.cycle2.board = CORE.insertLeaderboard(p.cycle2.board || [], m.entry || { score: 0, depth: 0 }).list;
       game.progress?.save?.();
-      hud?.bigText(m.fired ? t('DEPLATFORMED FROM THE DEEP FEED') : t('CASHED OUT'), tf('{c} Clout, {x} XP{s}', { c: r.clout || 0, x: r.xp || 0, s: r.stars ? `, +${r.stars} ` + t('prestige star') : '' }));
+      hud?.bigText(m.fired ? t('DEPLATFORMED FROM THE DEEP FEED') : t('CASHED OUT'), tf('{c} Followers, {x} XP{s}', { c: r.clout || 0, x: r.xp || 0, s: r.stars ? `, +${r.stars} ` + t('prestige star') : '' }));
     }
   }
 

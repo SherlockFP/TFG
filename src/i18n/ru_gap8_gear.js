@@ -39,7 +39,7 @@ fillGaps([
   ["Try on", null, "Примерить"],
   ["Symbiote Sample", null, "Образец симбиота"],
   ["Bare visor.", null, "Голый визор."],
-  ["Not enough Clout", null, "Не хватает клаута"],
+  ["Not enough Followers", null, "Не хватает подписчиков"],
   ["Standard tank.", null, "Обычный баллон."],
   ["Zombie Account", null, "Аккаунт-зомби"],
   ["Gunner", null, "Стрелок"],

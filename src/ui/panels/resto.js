@@ -58,7 +58,7 @@ export function createRestoPanel(ui, game, api) {
     const c = s.ct;
     h += `<div class="tfg-card"><div class="row"><b>${escapeHtml(t('Algorithm Food Festival'))}</b><span class="tfg-tag">${escapeHtml(tf('done {n}x', { n: s.ctDone }))}</span></div>`;
     if (!c) h += `<div class="sub">${escapeHtml(st >= 3 ? t('No contract right now. The Algorithm offers one roughly every week of game days.') : t('Reach 3 stars: the Algorithm will offer a weekly festival contract.'))}</div>`;
-    else h += `<div class="sub">${escapeHtml(tf('Serve {n} cooked or better dishes by day {d}. Reward {r} credits and Clout for everyone.', { n: c.need, d: c.by, r: c.reward }))}</div>${c.on ? bar(c.got / c.need) + `<div class="sub ok">${c.got} / ${c.need}</div>` : '<div data-slot="ct"></div>'}`;
+    else h += `<div class="sub">${escapeHtml(tf('Serve {n} cooked or better dishes by day {d}. Reward {r} credits and Followers for everyone.', { n: c.need, d: c.by, r: c.reward }))}</div>${c.on ? bar(c.got / c.need) + `<div class="sub ok">${c.got} / ${c.need}</div>` : '<div data-slot="ct"></div>'}`;
     h += `</div></div>`;
     const pan = Object.entries(s.pantry).sort((a, b) => b[1] - a[1]);
     h += `<div class="tfg-card"><div class="row"><b>${escapeHtml(t('Fridge'))}</b><span>${C.pantryTotal(s.pantry)} / ${C.MAX_PANTRY}</span></div>`;
@@ -91,7 +91,7 @@ export function createRestoPanel(ui, game, api) {
     let h = `<div class="sub">${escapeHtml(t('Guests only fly in when the unlocked menu has something they eat. Unhappy guests leave and cost reputation.'))}</div><div class="rs-grid">`;
     for (const sp of Object.values(C.SPECIES)) {
       const on = sp.id === 'inspector' || sp.id === 'critic' ? sp.id === 'critic' ? C.has(s, 'booth') && st >= 3 : C.has(s, 'floor') : C.speciesAvailable(sp.id, st, s.b, menuIds);
-      h += `<div class="tfg-card${on ? '' : ' dim'}"><div class="row"><b>${escapeHtml(t(sp.name))}</b><span class="${on ? 'ok' : 'warn'}">${escapeHtml(on ? t('VISITS') : sp.star > st ? `${sp.star}*` : t('LOCKED'))}</span></div><div class="sub">${escapeHtml(t(sp.taste))}</div><div class="sub">${escapeHtml(t(sp.pay === 'scrap' ? 'Pays: rare scrap' : sp.pay === 'clout' ? 'Pays: credits + Clout tip' : 'Pays: credits'))}</div></div>`;
+      h += `<div class="tfg-card${on ? '' : ' dim'}"><div class="row"><b>${escapeHtml(t(sp.name))}</b><span class="${on ? 'ok' : 'warn'}">${escapeHtml(on ? t('VISITS') : sp.star > st ? `${sp.star}*` : t('LOCKED'))}</span></div><div class="sub">${escapeHtml(t(sp.taste))}</div><div class="sub">${escapeHtml(t(sp.pay === 'scrap' ? 'Pays: rare scrap' : sp.pay === 'clout' ? 'Pays: credits + Followers tip' : 'Pays: credits'))}</div></div>`;
     }
     return h + '</div>';
   }

@@ -222,7 +222,7 @@ export function installTrade(game) {
     if (disposed || !d || typeof d.tid !== 'string') return;
     const n = Math.max(0, Math.floor(Number(d.n) || 0));
     const mineTrade = S.snap && S.snap.tid === d.tid;
-    const ok = !!mineTrade && n > 0 && !!game.progress?.spendCoins?.(n);
+    const ok = false;   // [followers] Followers are never spent or traded: the host no longer asks (RULES.maxClout = 0); an old host's debit is declined
     req('trca', { tid: d.tid, ok });
   }
 
@@ -240,7 +240,7 @@ export function installTrade(game) {
     countdown: () => (S.snap?.st === 'countdown' ? Math.max(0, S.snap.cd - (performance.now() - S.recvAt) / 1000) : 0),
     addOffer(id) { if (!S.snap || S.mine.items.includes(id) || S.mine.items.length >= RULES.maxItems) return; S.mine.items = [...S.mine.items, id]; game.sfx?.('inventory_switch', 0.4); sendOffer(); },
     removeOffer(id) { if (!S.snap || !S.mine.items.includes(id)) return; S.mine.items = S.mine.items.filter((x) => x !== id); game.sfx?.('inventory_switch', 0.3, 0.8); sendOffer(); },
-    setClout(n) { if (!S.snap) return; S.mine.clout = Math.max(0, Math.min(balance(), Math.floor(n) || 0)); sendOffer(); },
+    setClout() { /* [followers] no Clout in trades */ },
     lock(on) { if (S.snap) req('trlock', { tid: S.snap.tid, on: !!on }); },
     accept() { if (S.snap) req('trok', { tid: S.snap.tid }); },
     cancel() { if (S.snap) { const tid = S.snap.tid; req('trcx', { tid }); } else closePanel(); },

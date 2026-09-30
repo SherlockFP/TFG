@@ -7,7 +7,7 @@ import { addTranslations, t, tf } from '../core/i18n.js';
 import { MOVES, RPS } from './arcade_rps.js';
 
 const TR = {
-  'ROCK-PAPER-SCISSORS': 'TAŞ-KAĞIT-MAKAS', 'Rock-Paper-Scissors with {name} [E]': '{name} ile Taş-Kağıt-Makas [E]', 'Best of 3. Wager: /rps <Clout> <name>': '3 turda 2. Bahis: /rps <Clout> <isim>',
+  'ROCK-PAPER-SCISSORS': 'TAŞ-KAĞIT-MAKAS', 'Rock-Paper-Scissors with {name} [E]': '{name} ile Taş-Kağıt-Makas [E]', 'Best of 3. Wager: /rps <Followers> <name>': '3 turda 2. Bahis: /rps <Takipçi> <isim>',
   'ROCK': 'TAŞ', 'PAPER': 'KAĞIT', 'SCISSORS': 'MAKAS', 'SHOOT!': 'AT!', 'vs': 'karşı', 'ROUND {n}': 'TUR {n}', 'YOU': 'SEN',
   '{name} challenges you to ROCK-PAPER-SCISSORS (best of 3, wager ◈{n}).': '{name} seni TAŞ-KAĞIT-MAKAS\'a çağırıyor (3 turda 2, bahis ◈{n}).',
   '{name} challenges you to ROCK-PAPER-SCISSORS (best of 3).': '{name} seni TAŞ-KAĞIT-MAKAS\'a çağırıyor (3 turda 2).',
@@ -17,13 +17,13 @@ const TR = {
   '(random pick)': '(rastgele seçim)', 'YOU WIN!': 'KAZANDIN!', '{name} WINS': '{name} KAZANDI', 'DRAW': 'BERABERE', 'Won ◈{n}.': '◈{n} kazandın.', 'Lost ◈{n}.': '◈{n} kaybettin.',
   '{a} vs {b}: {pa} - {pb}. {w}': '{a} - {b}: {pa} - {pb}. {w}', '{name} took the round.': 'Turu {name} aldı.', 'Draw.': 'Berabere.',
   '{name} declined.': '{name} reddetti.', 'The challenge expired.': 'Meydan okuma zaman aşımına uğradı.', 'Game cancelled: {name} left.': 'Oyun iptal: {name} ayrıldı.', 'Game cancelled.': 'Oyun iptal edildi.',
-  'Not enough Clout for that wager.': 'Bu bahis için yeterli Clout yok.', 'No crewmate close enough.': 'Yakında bir mürettebat arkadaşı yok.', 'Pick a crewmate.': 'Bir arkadaş seç.',
-  'Wagers go up to {n} Clout.': 'Bahis en fazla {n} Clout.', 'You are already in a game.': 'Zaten bir oyundasın.', 'They are busy.': 'Meşgul.', 'Nothing to answer.': 'Cevaplanacak bir şey yok.',
+  'Not enough Followers for that wager.': 'Bu bahis için yeterli Takipçi yok.', 'No crewmate close enough.': 'Yakında bir mürettebat arkadaşı yok.', 'Pick a crewmate.': 'Bir arkadaş seç.',
+  'Wagers go up to {n} Followers.': 'Bahis en fazla {n} Takipçi.', 'You are already in a game.': 'Zaten bir oyundasın.', 'They are busy.': 'Meşgul.', 'Nothing to answer.': 'Cevaplanacak bir şey yok.',
   'Not now.': 'Şimdi değil.', 'Bad pick.': 'Geçersiz seçim.', 'Already picked.': 'Zaten seçtin.', 'Get closer to them.': 'Ona biraz daha yaklaş.', 'They cannot play right now.': 'Şu an oynayamaz.',
   'Trade - Rock-Paper-Scissors': 'Ticaret - Taş-Kağıt-Makas',
 };
 const RU = {
-  'ROCK-PAPER-SCISSORS': 'КАМЕНЬ-НОЖНИЦЫ-БУМАГА', 'Rock-Paper-Scissors with {name} [E]': 'Камень-ножницы-бумага с {name} [E]', 'Best of 3. Wager: /rps <Clout> <name>': 'До 2 побед. Ставка: /rps <Clout> <имя>',
+  'ROCK-PAPER-SCISSORS': 'КАМЕНЬ-НОЖНИЦЫ-БУМАГА', 'Rock-Paper-Scissors with {name} [E]': 'Камень-ножницы-бумага с {name} [E]', 'Best of 3. Wager: /rps <Followers> <name>': 'До 2 побед. Ставка: /rps <подписчики> <имя>',
   'ROCK': 'КАМЕНЬ', 'PAPER': 'БУМАГА', 'SCISSORS': 'НОЖНИЦЫ', 'SHOOT!': 'РАЗ!', 'vs': 'против', 'ROUND {n}': 'РАУНД {n}', 'YOU': 'ВЫ',
   '{name} challenges you to ROCK-PAPER-SCISSORS (best of 3, wager ◈{n}).': '{name} вызывает вас на КАМЕНЬ-НОЖНИЦЫ-БУМАГА (до 2 побед, ставка ◈{n}).',
   '{name} challenges you to ROCK-PAPER-SCISSORS (best of 3).': '{name} вызывает вас на КАМЕНЬ-НОЖНИЦЫ-БУМАГА (до 2 побед).',
@@ -33,8 +33,8 @@ const RU = {
   '(random pick)': '(случайный выбор)', 'YOU WIN!': 'ВЫ ПОБЕДИЛИ!', '{name} WINS': '{name} ПОБЕЖДАЕТ', 'DRAW': 'НИЧЬЯ', 'Won ◈{n}.': 'Выиграно ◈{n}.', 'Lost ◈{n}.': 'Проиграно ◈{n}.',
   '{a} vs {b}: {pa} - {pb}. {w}': '{a} против {b}: {pa} - {pb}. {w}', '{name} took the round.': '{name} берёт раунд.', 'Draw.': 'Ничья.',
   '{name} declined.': '{name} отказался.', 'The challenge expired.': 'Вызов истёк.', 'Game cancelled: {name} left.': 'Игра отменена: {name} ушёл.', 'Game cancelled.': 'Игра отменена.',
-  'Not enough Clout for that wager.': 'Не хватает Clout для такой ставки.', 'No crewmate close enough.': 'Рядом нет напарника.', 'Pick a crewmate.': 'Выберите напарника.',
-  'Wagers go up to {n} Clout.': 'Ставки до {n} Clout.', 'You are already in a game.': 'Вы уже в игре.', 'They are busy.': 'Он занят.', 'Nothing to answer.': 'Отвечать не на что.',
+  'Not enough Followers for that wager.': 'Не хватает подписчики для такой ставки.', 'No crewmate close enough.': 'Рядом нет напарника.', 'Pick a crewmate.': 'Выберите напарника.',
+  'Wagers go up to {n} Followers.': 'Ставки до {n} подписчики.', 'You are already in a game.': 'Вы уже в игре.', 'They are busy.': 'Он занят.', 'Nothing to answer.': 'Отвечать не на что.',
   'Not now.': 'Сейчас нельзя.', 'Bad pick.': 'Неверный выбор.', 'Already picked.': 'Уже выбрано.', 'Get closer to them.': 'Подойдите ближе.', 'They cannot play right now.': 'Он сейчас не может играть.',
   'Trade - Rock-Paper-Scissors': 'Обмен - Камень-ножницы-бумага',
 };
@@ -93,7 +93,7 @@ export function createRpsClient({ game, request, isHost }) {
   const C = { ask: null, m: null, endShow: null };   // ask = incoming/outgoing challenge, m = the running match (local view), endShow = { txt, cls, until }
   const nameOf = (id) => game.playerName?.(id) || t('Employee');
   const me = () => game.selfId;
-  const coins = () => Math.max(0, Math.floor(game.profile?.coins || 0));
+  const coins = () => Infinity;   // [followers] a wager is a stake of followers to WIN, never a balance to cover
   const sfx = (n, v = 0.5, p) => { try { game.sfx?.(n, v, p); } catch { /* ignore */ } };
   const toast = (txt, kind = 'info') => game.ui?.toast?.(txt, kind);
   const moveName = (i) => t(MOVE_NAME[i]);
@@ -174,7 +174,7 @@ export function createRpsClient({ game, request, isHost }) {
         C.ask = { id: d.id, a: d.a, b: d.b, wager: d.wager | 0, until: clock + (d.sec || RPS.CHALLENGE_SEC) };
         if (d.b === self) {
           sfx('ui_notify', 0.6);
-          if (d.wager > coins()) { toast(t('Not enough Clout for that wager.'), 'bad'); request('no'); }
+          if (d.wager > coins()) { toast(t('Not enough Followers for that wager.'), 'bad'); request('no'); }
         }
         break;
       }
@@ -224,8 +224,7 @@ export function createRpsClient({ game, request, isHost }) {
           const won = d.winner === role, draw = d.winner === 'd';
           const sc = role === 'a' ? `${d.sc.a} : ${d.sc.b}` : `${d.sc.b} : ${d.sc.a}`;
           let sub = sc;
-          if (!draw && d.pay > 0) sub += ' · ' + (won ? tf('Won ◈{n}.', { n: d.pay }) : tf('Lost ◈{n}.', { n: d.pay }));
-          if (!won && !draw && d.pay > 0) { try { game.progress?.spendCoins(Math.min(d.pay, coins())); } catch { /* ignore */ } }
+          if (!draw && d.pay > 0 && won) sub += ' · ' + tf('Won ◈{n}.', { n: d.pay });   // [followers] the winner gains followers; the loser loses nothing (Followers are never spent)
           C.endShow = { txt: draw ? t('DRAW') : won ? t('YOU WIN!') : tf('{name} WINS', { name: nameOf(M?.opp || (role === 'a' ? d.b : d.a)) }), cls: draw ? '' : won ? 'win' : 'lose', sub, until: clock + 3.2 };
           sfx(draw ? 'ui_click' : won ? 'slot_win' : 'slot_lose', 0.6);
         }
@@ -244,7 +243,7 @@ export function createRpsClient({ game, request, isHost }) {
     const A = C.ask, M = C.m;
     if (A && A.b === me() && !M && (e.code === 'KeyY' || e.code === 'KeyN')) {
       e.stopImmediatePropagation(); e.preventDefault();
-      if (e.code === 'KeyY') { if (A.wager > coins()) toast(t('Not enough Clout for that wager.'), 'bad'); else request('ac'); }
+      if (e.code === 'KeyY') { if (A.wager > coins()) toast(t('Not enough Followers for that wager.'), 'bad'); else request('ac'); }
       else request('no');
       return;
     }
@@ -275,7 +274,7 @@ export function createRpsClient({ game, request, isHost }) {
   function challenge(id, wager = 0) {
     if (C.ask || C.m) { toast(t('You are already in a game.'), 'bad'); return false; }
     wager = Math.max(0, Math.min(RPS.WAGER_MAX, Math.floor(+wager) || 0));
-    if (wager > coins()) { toast(t('Not enough Clout for that wager.'), 'bad'); return false; }
+    if (wager > coins()) { toast(t('Not enough Followers for that wager.'), 'bad'); return false; }
     request('ch', { to: id, w: wager });
     return true;
   }
@@ -298,7 +297,7 @@ export function createRpsClient({ game, request, isHost }) {
     interactables(list) {
       if (disposed || C.ask || C.m || !game.player || game.player.dead) return;
       for (const { r } of remotesNear(4.5)) {
-        list.push({ pos: r.pos.clone().add(new THREE.Vector3(0, 1.2, 0)), r: 0.75, reach: 4.2, label: () => tf('Rock-Paper-Scissors with {name} [E]', { name: r.name || nameOf(r.id) }), sub: () => t('Best of 3. Wager: /rps <Clout> <name>'), action: () => challenge(r.id, 0) });
+        list.push({ pos: r.pos.clone().add(new THREE.Vector3(0, 1.2, 0)), r: 0.75, reach: 4.2, label: () => tf('Rock-Paper-Scissors with {name} [E]', { name: r.name || nameOf(r.id) }), sub: () => t('Best of 3. Wager: /rps <Followers> <name>'), action: () => challenge(r.id, 0) });
       }
     },
     update(dt) {

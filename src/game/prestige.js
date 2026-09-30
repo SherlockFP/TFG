@@ -92,7 +92,7 @@ export function installMeta(game) {
     const res = game.progress?.rebirth();
     if (!res) return null;
     const s = prestigeStars(p);
-    game.achievements?.banner?.({ tier: 'kefal', icon: '🌟', kicker: 'REBIRTH', name: `★${s} - Welcome back, Lv.1`, desc: 'Permanent bonuses applied. Mastery, gear and Clout were kept.', reward: `${p.skillPoints} skill points ready` });
+    game.achievements?.banner?.({ tier: 'kefal', icon: '🌟', kicker: 'REBIRTH', name: `★${s} - Welcome back, Lv.1`, desc: 'Permanent bonuses applied. Mastery, gear and Followers were kept.', reward: `${p.skillPoints} skill points ready` });
     grantStarRewards(game);
     game.net?.broadcast?.('chat', { text: `★ ${p.name} has been REBORN (★${s})!`, n: 'TFG' });
     game.engine?.flash?.(0xffe08a, 0.6);

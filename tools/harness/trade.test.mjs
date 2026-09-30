@@ -161,30 +161,25 @@ const countItems = (g) => g.items.size;
   ok(T.g.sent.some((m) => m.t === 'trs' && m.d.st === 'open'), 'snapshot sent when the trade opens');
   T.host.offer('A', { tid, items: ['a1', 'a2', 'a3'], clout: 100, q: 1, ...meta });
   T.host.offer('B', { tid, items: ['b1', 'b2'], clout: 40, q: 1, ...meta });
-  ok(T.host.sessionOf('A').offer.A.items.length === 3 && T.host.sessionOf('B').offer.B.clout === 40, 'offers recorded');
+  ok(T.host.sessionOf('A').offer.A.items.length === 3 && T.host.sessionOf('B').offer.B.clout === 0, 'offers recorded (a Clout offer is clamped to 0: Followers are never traded)');
   T.host.accept('A', { tid, ...meta });
   ok(!T.host.sessionOf('A').accepted.A, 'accept before both locked is refused');
   lockBoth(T, tid);
-  T.host.offer('B', { tid, items: ['b1', 'b2'], clout: 45, q: 2, ...meta });
+  T.host.offer('B', { tid, items: ['b1'], clout: 0, q: 2, ...meta }); T.host.offer('B', { tid, items: ['b1', 'b2'], clout: 0, q: 3, ...meta });
   ok(!T.host.sessionOf('A').locked.A && !T.host.sessionOf('A').locked.B, 'changing an offer resets both locks');
   lockBoth(T, tid); acceptBoth(T, tid);
   ok(T.host.sessionOf('A').state === 'countdown', 'both accepted -> countdown');
   T.adv(1.5);
   ok(holders(T.g).a1 === 'A' && T.g.sent.filter((m) => m.t === 'trc').length === 0, 'nothing moves during the countdown');
   T.adv(1.6);
-  const debits = T.g.sent.filter((m) => m.t === 'trc');
-  ok(debits.length === 2 && debits.find((m) => m.peer === 'A').d.n === 100 && debits.find((m) => m.peer === 'B').d.n === 45, 'after the countdown the host asks both givers to debit their Clout');
-  ok(holders(T.g).a1 === 'A', 'items still untouched while the debits are pending');
-  T.host.ack('A', { tid, ok: true });
-  ok(holders(T.g).a1 === 'A', 'still waiting for the second debit');
-  T.host.ack('B', { tid, ok: true });
+  ok(T.g.sent.filter((m) => m.t === 'trc').length === 0, 'no Clout debit is ever requested [followers]');
   const h = holders(T.g);
   ok(h.a1 === 'B' && h.a2 === 'B' && h.a3 === 'B' && h.b1 === 'A' && h.b2 === 'A', 'swap executed: every offered item changed hands');
   ok(countItems(T.g) === 5 && new Set(Object.keys(h)).size === 5, 'no item duplicated or lost');
   const credit = T.g.xp.map((x) => `${x.to}:${x.coin}:${x.reason}`).sort();
-  ok(credit.length === 2 && credit[0] === 'A:45:Trade: Clout' && credit[1] === 'B:100:Trade: Clout', 'Clout is paid through the reward path with the flat "Trade" reason');
+  ok(credit.length === 0, 'no Followers move through a trade');
   const done = T.g.msgs('A', 'done')[0];
-  ok(done && done.d.gave.length === 3 && done.d.got.length === 2 && done.d.cg === 100 && done.d.cr === 45, 'TRADE COMPLETE summary carries both lists + Clout');
+  ok(done && done.d.gave.length === 3 && done.d.got.length === 2 && done.d.cg === 0 && done.d.cr === 0, 'TRADE COMPLETE summary carries both lists, no Clout');
   ok(!T.host.sessionOf('A') && !T.host.sessionOf('B'), 'session cleaned up');
   ok(T.g.items.get('a3').inv === null || T.g.items.get('a3').inv.k === 'bag', 'the received armour lands in the bag / hotbar, never auto-equipped');
 }
@@ -250,18 +245,7 @@ const countItems = (g) => g.items.size;
   const T = setup(); const tid = openTrade(T);
   T.host.offer('A', { tid, items: ['a1'], clout: 50, q: 1, ...meta }); T.host.offer('B', { tid, items: ['b2'], clout: 70, q: 1, ...meta });
   lockBoth(T, tid); acceptBoth(T, tid); T.adv(3.2);
-  T.host.ack('A', { tid, ok: true });
-  T.host.ack('B', { tid, ok: false });
-  ok(T.g.msgs('A', 'cancel')[0]?.d.why === 'noclout' && T.g.msgs('A', 'cancel')[0].d.by === 'B', 'a refused Clout debit cancels the trade');
-  ok(holders(T.g).a1 === 'A' && holders(T.g).b2 === 'B', 'no item moved');
-  ok(T.g.xp.length === 1 && T.g.xp[0].to === 'A' && T.g.xp[0].coin === 50, 'the confirmed debit is refunded');
-}
-{
-  const T = setup(); const tid = openTrade(T);
-  T.host.offer('A', { tid, items: ['a1'], clout: 50, q: 1, ...meta });
-  lockBoth(T, tid); acceptBoth(T, tid); T.adv(3.2);
-  T.adv(3.5); T.adv(0.3);
-  ok(T.g.msgs('A', 'cancel')[0]?.d.why === 'noclout' && holders(T.g).a1 === 'A', 'a debit that never gets confirmed times out and cancels');
+  ok(holders(T.g).a1 === 'B' && holders(T.g).b2 === 'A' && T.g.xp.length === 0 && !T.g.msgs('A', 'cancel').length, '[followers] Clout offers are ignored: the item swap completes, nothing is debited or refunded');
 }
 {
   const T = setup(); const tid = openTrade(T);

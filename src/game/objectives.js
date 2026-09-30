@@ -92,7 +92,7 @@ export class Objectives {
       case 'company': {
         if (shipValue > 0) add(tf('Put scrap on the COUNTER, ring the BELL (▮{v} on board)', { v: shipValue }), 'main');
         add(tf('Quota: ▮{a} / ▮{b} · buying at {r}%', { a: run.sold || 0, b: run.quota || 0, r: Math.round((run.buyRate || 0) * 100) }), 'sub', (run.sold || 0) >= (run.quota || 0)).cat = 'other';
-        add(tf('Spend your ◈{c} clout at Phish Dayı', { c: g.profile.coins }), 'hint');
+        add(tf('Claim what your ◈{c} followers unlocked at Phish Dayı', { c: g.profile.coins }), 'hint');
         break;
       }
       case 'fired': add(t('You have been deplatformed.'), 'warn'); break;

@@ -134,7 +134,7 @@ const mkProfile = (over = {}) => ({ id: 't' + Math.random(), level: 20, xp: 0, c
   const leafId = prof.rpg.nodes.at(-1);
   const info = c.refundInfo(leafId);
   ok(info.ok, 'leaf refund allowed');
-  if (info.ok) { c.refund(leafId); eq(prof.coins, coins - info.cost, 'refund charges the quoted Clout'); }
+  if (info.ok) { c.refund(leafId); eq(prof.coins, coins, 'refund is free: Followers are never spent'); }
   const all = c.respecAll();
   ok(all.ok || prof.rpg.nodes.length === 0, 'respec ok');
   eq(prof.rpg.nodes.length, 0, 'respec clears nodes');
@@ -149,18 +149,18 @@ const mkProfile = (over = {}) => ({ id: 't' + Math.random(), level: 20, xp: 0, c
   ok(!c.refund('scout_s1').ok, 'refund gate blocks');
 }
 {
-  // role switch with orphans needs Clout
+  // [followers] role switch with orphans is free (Followers are never spent)
   const prof = mkProfile({ coins: 5, skillPoints: 20 });
   const c = createRpgController(prof, { changed: () => {} });
   c.setRole('scout'); c.allocate('scout_n1'); c.allocate('scout_nl');
   const n = prof.rpg.nodes.length;
   ok(n >= 4, `scout tree has ${n} nodes`);
   const r = c.setRole('enforcer');
-  ok(!r.ok && prof.rpg.role === 'scout', 'role switch refused without Clout');
+  ok(r.ok && prof.coins === 5, 'role switch is free even with 5 followers');
   prof.coins = 5000;
   const spentBefore = T.treeSpent(prof.rpg);
   const r2 = c.setRole('enforcer');
-  ok(r2.ok && prof.rpg.role === 'enforcer', 'role switch with Clout');
+  ok(r2.ok, 'second role switch ok');
   eq(prof.skillPoints, 20 - spentBefore + spentBefore, 'role switch refunds all orphan points');
   ok(prof.rpg.nodes.every((id) => T.reachableFrom('start_enforcer', new Set(['start_enforcer', ...prof.rpg.nodes])).has(id)), 'no orphan after switch');
 }

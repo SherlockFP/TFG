@@ -102,7 +102,7 @@ export const ACHIEVEMENTS = [
   A('quota_1', '📈', 'bronze', 'Quota Is Love', 'Meet your first quota.', ['Kota Aşktır', 'İlk kotanı doldur.'], counter((p) => n(st(p).quotasMet), 1)),
   A('quota_5', '📊', 'silver', 'Team Player', 'Meet 5 quotas.', ['Takım Oyuncusu', '5 kota doldur.'], counter((p) => n(st(p).quotasMet), 5), { title: 'Team Player' }),
   A('quota_10', '🏅', 'gold', 'Employee of the Month', 'Meet 10 quotas.', ['Ayın Çalışanı', '10 kota doldur.'], counter((p) => n(st(p).quotasMet), 10), { title: 'Employee of the Month' }),
-  A('tycoon', '🪙', 'gold', 'Clout Chaser', 'Earn ◈10,000 Clout in total.', ['Clout Avcısı', 'Toplam ◈10.000 Clout kazan.'], counter((p) => n(st(p).coinsEarned), 10000), { title: 'Clout Chaser' }),
+  A('tycoon', '🪙', 'gold', 'Follower Chaser', 'Earn ◈10,000 Followers in total.', ['Followers Avcısı', 'Toplam ◈10.000 Takipçi kazan.'], counter((p) => n(st(p).coinsEarned), 10000), { title: 'Follower Chaser' }),
   A('arsenal', '🔫', 'silver', 'Arsenal', 'Own 3 Black Market weapons.', ['Cephanelik', 'Karaborsadan 3 silah sahibi ol.'], counter(weaponsOwned, 3)),
   // --- survival & death
   A('untouchable', '😇', 'silver', 'Untouchable', 'Go inside a facility and survive the whole day without taking any damage.', ['Dokunulmaz', 'Tesise gir ve bütün günü hiç hasar almadan atlat.'], counter((p) => n(st(p).flawlessDays), 1), { title: 'Untouchable', cosmetic: 'hat:halo' }),

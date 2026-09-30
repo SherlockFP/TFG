@@ -88,7 +88,7 @@ export function createHomeworldPanel(ui, game, hw, opts = {}) {
     sub.innerHTML = `<b>${escapeHtml(walletRowOf(game))}</b> · ${st.b.length} ${t('buildings')}`;   // [unify] the one wallet row
     for (const k of H.RES_KEYS) {
       const cap = H.capOf(st, k), v = st.s[k], full = v >= cap - 1e-9;
-      const label = k === 's1' ? t('Scrap Shard') : k === 's2' ? t('Circuit Core') : k === 's3' ? t('Data Crystal') : k === 's4' ? t('Ecto Core') : k === 'meals' ? t('Meals') : k === 'parts' ? t('Components') : k === 'clout' ? 'Clout' : t('Credits');
+      const label = k === 's1' ? t('Scrap Shard') : k === 's2' ? t('Circuit Core') : k === 's3' ? t('Data Crystal') : k === 's4' ? t('Ecto Core') : k === 'meals' ? t('Meals') : k === 'parts' ? t('Components') : k === 'clout' ? 'Followers' : t('Credits');
       const isMat = classify(k) === 'material';   // [unify] shards / components / meals are materials, not money
       resEl.appendChild(el('div', { class: 'hw-chip' + (full ? ' full' : '') + (isMat ? ' mat' : ''), title: isMat ? t('Materials: crafting only, not money') : '', html: glyphify(`${H.RES_ICON[k].length === 1 ? H.RES_ICON[k] : ''} ${f0(v)}/${f0(cap)}<br><small>${escapeHtml(label)}</small><i><b style="width:${Math.min(100, (v / cap) * 100)}%"></b></i>`) }));
     }

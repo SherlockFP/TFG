@@ -36,7 +36,7 @@ export default {
   "SPONSORED DROP": "СПОНСОРСКИЙ СБРОС",
   "A sponsor is air-dropping content near the ship every ~90 s. Grab it before it rots.": "Спонсор сбрасывает контент рядом с кораблём примерно каждые 90 с. Хватай, пока не сгнил.",
   "TOXIC COMMENTS": "ТОКСИЧНЫЕ КОММЕНТАРИИ",
-  "Elite creatures are far more common. Clout rewards +25%, scrap +10%.": "Элитные существа встречаются гораздо чаще. Награды клаутом +25%, хлам +10%.",
+  "Elite creatures are far more common. Followers rewards +25%, scrap +10%.": "Элитные существа встречаются гораздо чаще. Награды подписчики +25%, хлам +10%.",
   "SATELLITE UPLINK": "СПУТНИКОВАЯ СВЯЗЬ",
   "A clean signal: scanner range +60% and batteries last 30% longer.": "Чистый сигнал: дальность сканера +60%, батареи держат на 30% дольше.",
   "A grenade that kills machines: turrets, mines, bots.": "Граната, убивающая технику: турели, мины, ботов.",

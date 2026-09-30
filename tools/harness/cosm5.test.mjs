@@ -167,12 +167,12 @@ const P = () => ({ level: 20, coins: 5000, stats: { sold: 0, quotasMet: 0, creat
   const q = P(), day = 20123, rot = C.offersFor(q, day);
   ok(rot.offers.length === 8 && rot.featured, 'offers');
   const o = rot.offers[0];
-  const before = q.coins;
+  q.coins = 1e6; const before = q.coins;
   const r = C.buyOffer(q, o.key, { day });
-  ok(r.ok && q.coins === before - o.price && C.owns5(q, D.C5_BY_KEY[o.key]), 'buy ok');
+  ok(r.ok && q.coins === before && C.owns5(q, D.C5_BY_KEY[o.key]), 'claim ok: followers are never spent');
   ok(!C.buyOffer(q, o.key, { day }).ok, 'no double buy');
   ok(!C.buyOffer(q, 'suit:eoty', { day }).ok, 'not in rotation');
-  const poor = P(); poor.coins = 1; ok(C.buyOffer(poor, rot.offers[1].key, { day }).why === 'Not enough Clout', 'poor');
+  const poor = P(); poor.coins = 1; ok(/^Unlocks at \d+ followers$/.test(C.buyOffer(poor, rot.offers[1].key, { day }).why), 'below the follower milestone');
   const low = P(); low.level = 1; const lv = rot.offers.find((x) => x.minLevel > 1); if (lv) ok(/Requires level/.test(C.buyOffer(low, lv.key, { day }).why), 'level gate');
   const rich = P(); rich.stats = { sold: 25000, quotasMet: 20, creatureKills: 400 }; rich.level = 45; rich.cosm5 = { flags: { glitch: true, quoted: 9, appraised: 45, raved: 6 } };
   for (const [k, r0] of Object.entries(C.RULES)) { ok(r0.test(rich), 'rule met ' + k); if (k !== 'emote:undo') ok(!r0.test(P()), 'rule not met at start ' + k); }

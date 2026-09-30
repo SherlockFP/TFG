@@ -98,11 +98,11 @@ ok('stable / active / ko / skins / shop', () => {
   assert.equal(C.skinAccess(ctx, 'h', 'crown').ok, false);
   assert.equal(C.skinAccess(ctx, 's', 'halloween').why, 'buy');             // October
   assert.equal(C.skinAccess(ctx, 's', 'winter').why, 'season');
-  assert.ok(C.buySkin(ctx, 'h', 'party').ok); assert.equal(profile.coins, 900);
+  assert.ok(C.buySkin(ctx, 'h', 'party').ok); assert.equal(profile.coins, 1000);   // [followers] never spent
   assert.ok(C.equipSkin(ctx, id, 'h', 'party').ok); assert.equal(C.findPet(s, id).sk.h, 'party');
   assert.equal(C.equipSkin(ctx, id, 'h', 'crown').ok, false);
   assert.ok(C.releasePet(s, id));
-  const s2 = C.newPetsState(); const r = C.buyPet({ state: s2, profile }, 'cat'); assert.ok(r.ok); assert.equal(profile.coins, 650);
+  const s2 = C.newPetsState(); const r = C.buyPet({ state: s2, profile }, 'cat'); assert.ok(r.ok); assert.equal(profile.coins, 1000);
   assert.equal(C.buyPet({ state: s2, profile }, 'owl').ok, false);          // egg only
   const prof = { pets: { stable: [{ sp: 'nope' }, { sp: 'fox', xp: 999999, nm: 'x'.repeat(50), sk: { h: 'evil' } }] } };
   const e = C.ensurePets(prof); assert.equal(e.stable.length, 1); assert.equal(e.stable[0].nm.length, C.NAME_MAX); assert.equal(e.stable[0].sk.h, 'none'); assert.equal(C.levelOf(e.stable[0]), 30);

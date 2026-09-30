@@ -16,7 +16,7 @@ export const AFFIXES = [
   { id: 'infested', kind: 'prefix', name: 'Infested', desc: 'More creatures live in the facility (+20% spawns).', minQ: 1, w: 10, rew: [8, 12], fx: { dangerMul: 1.2 } },
   { id: 'overclocked', kind: 'prefix', name: 'Overclocked', desc: 'Creatures move 15% faster (never past the early-sector speed cap).', minQ: 2, w: 7, rew: [0, 20], flag: { spd: 1.15 } },
   { id: 'volatile', kind: 'prefix', name: 'Volatile', desc: 'Dropped scrap may blow up a moment later (beeps first, 22 damage max).', minQ: 1, w: 6, rew: [5, 15], flag: { boom: 0.15 } },
-  { id: 'watched', kind: 'prefix', name: 'Watched', desc: 'The Algorithm streams this floor: +2 cameras, Clout +40%, the crowd wants blood (+6% danger).', minQ: 0, w: 9, rew: [0, 8], fx: { coinMul: 1.4, dangerMul: 1.06 } },
+  { id: 'watched', kind: 'prefix', name: 'Watched', desc: 'The Algorithm streams this floor: +2 cameras, Followers +40%, the crowd wants blood (+6% danger).', minQ: 0, w: 9, rew: [0, 8], fx: { coinMul: 1.4, dangerMul: 1.06 } },
   { id: 'ruthless', kind: 'prefix', name: 'Ruthless', desc: 'Elite creatures are 12% more common.', minQ: 3, w: 5, rew: [0, 18], fx: { eliteAdd: 0.12 } },
   { id: 'swarming', kind: 'prefix', name: 'Swarming', desc: 'Two extra bot packs are released indoors.', minQ: 1, w: 7, rew: [6, 8], fx: { swarm: 2 } },
   { id: 'hoarder', kind: 'prefix', name: 'Hoarder', desc: 'One more loot room worth of scrap, and the floor is a little busier (+10% danger).', minQ: 0, w: 8, rew: [25, 0], fx: { dangerMul: 1.1 } },

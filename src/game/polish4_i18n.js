@@ -40,7 +40,7 @@ export const TR_P4 = {
   'No crewmate to teleport.': 'Işınlanacak ekip arkadaşı yok.', 'The teleporter only works while landed.': 'Işınlayıcı sadece inişteyken çalışır.', 'Target lost.': 'Hedef kayboldu.', 'The Loud Horn is recharging.': 'Yüksek Korna şarj oluyor.',
   'They are busy trading.': 'Onlar takasla meşgul.', 'It is resting.': 'Dinleniyor.', 'Out of season.': 'Sezon dışı.', 'PET panel: N': 'EVCİL paneli: N',
   'Sector core cleared': 'Sektör çekirdeği temizlendi', 'Keystone completed': 'Keystone tamamlandı', 'Raid cleared': 'Baskın temizlendi', 'Gate cleared': 'Kapı temizlendi', 'Endless cash out': 'Sonsuz mod tahsilatı',
-  'Homeworld raid': 'Ana dünya baskını', 'Trade: Clout': 'Takas: Clout', 'Trade: Clout refund': 'Takas: Clout iadesi',
+  'Homeworld raid': 'Ana dünya baskını', 'Trade: Followers': 'Takas: Takipçi', 'Trade: Followers refund': 'Takas: Takipçi iadesi',
   Summon: 'Çağır', Feed: 'Besle', 'You need a Pet Treat.': 'Bir Evcil Ödülü gerekir.',
 };
 
@@ -180,6 +180,6 @@ export const RU_P4 = {
   'No crewmate to teleport.': 'Некого телепортировать.', 'The teleporter only works while landed.': 'Телепорт работает только после посадки.', 'Target lost.': 'Цель потеряна.', 'The Loud Horn is recharging.': 'Громкий гудок перезаряжается.',
   'They are busy trading.': 'Они заняты обменом.', 'It is resting.': 'Отдыхает.', 'Out of season.': 'Не сезон.', 'PET panel: N': 'Панель питомцев: N',
   'Sector core cleared': 'Ядро сектора зачищено', 'Keystone completed': 'Ключ-камень пройден', 'Raid cleared': 'Рейд пройден', 'Gate cleared': 'Врата пройдены', 'Endless cash out': 'Вывод наград бесконечного режима',
-  'Homeworld raid': 'Налёт на родной мир', 'Trade: Clout': 'Обмен: Клаут', 'Trade: Clout refund': 'Обмен: возврат Клаута',
+  'Homeworld raid': 'Налёт на родной мир', 'Trade: Followers': 'Обмен: Подписчики', 'Trade: Followers refund': 'Обмен: возврат Подписчиков',
   Summon: 'Призвать', Feed: 'Покормить', 'You need a Pet Treat.': 'Нужно лакомство для питомца.',
 };

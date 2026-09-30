@@ -18,7 +18,7 @@ KefalAPI.defineMod({
   config: {
     maxCats: { type: 'number', default: 2, min: 0, max: 6, label: 'Max cats per moon' },
     rescueXp: { type: 'number', default: 70, min: 0, max: 1000, label: 'Rescue XP' },
-    rescueClout: { type: 'number', default: 15, min: 0, max: 500, label: 'Rescue Clout' },
+    rescueClout: { type: 'number', default: 15, min: 0, max: 500, label: 'Rescue Followers' },
     meowNoise: { type: 'boolean', default: true, label: 'Meows attract creatures' },
   },
   init(api, cfg) {

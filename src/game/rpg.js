@@ -62,7 +62,6 @@ export function installRpg(game) {
   const toast = (t, kind = 'info') => { try { game.ui?.toast?.(t, kind); } catch { /* ignore */ } };
 
   const ctl = createRpgController(p, {
-    spendCoins: (c) => game.progress.spendCoins(c),
     changed: (kind, detail) => onChanged(kind, detail),
     canRespec: () => phaseOk(false),
     canChangeRole: () => phaseOk(true),
@@ -378,7 +377,7 @@ export function installRpg(game) {
       if (rest[0] !== 'confirm') { term.print(tf('RESPEC refunds every passive node ({treeSpent} points) for ◈{cost}. Type RESPEC CONFIRM.', { treeSpent: treeSpent(g.profile.rpg), cost })); return; }
       const res = R.respecAll();
       term.print(res.msg, res.ok ? '' : 'err');
-    }, 'RESPEC [CONFIRM]  refund the whole passive tree (Clout)');
+    }, 'RESPEC [CONFIRM]  refund the whole passive tree (Followers)');
   }
 
   // old saves: announce the skill refund once

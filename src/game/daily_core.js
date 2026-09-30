@@ -362,7 +362,7 @@ export function capOnce(p, name, wallMs = Date.now()) {
 
 // ---------------------------------------------------------------------------------------------- 3. crates
 export const CRATES = {
-  supply: { name: 'Supply Crate', minTier: 'common', maxTier: 'epic', luck: 0, cosmeticP: 0.22, tag: 'Parts, Clout and the odd cosmetic' },
+  supply: { name: 'Supply Crate', minTier: 'common', maxTier: 'epic', luck: 0, cosmeticP: 0.22, tag: 'Parts, Followers and the odd cosmetic' },
   cosmetic: { name: 'Cosmetic Crate', minTier: 'uncommon', maxTier: 'legendary', luck: 0.25, cosmeticP: 1, tag: 'One cosmetic, guaranteed' },
   weekly: { name: 'Weekly Crate', minTier: 'rare', maxTier: 'legendary', luck: 0.3, cosmeticP: 1, tag: 'A rare-or-better cosmetic' },
   season: { name: 'Season Crate', minTier: 'common', maxTier: 'legendary', luck: 0, cosmeticP: 1, tag: 'A cosmetic of the tier shown' },

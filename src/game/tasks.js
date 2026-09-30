@@ -324,7 +324,7 @@ export function installTasks(game) {
         refreshVisuals();
         break;
       }
-      case 'sab': T.sab = { need: d.need, done: d.done, complete: !!d.complete }; if (!d.done && !d.complete) game.ui?.toast?.('🤡 SECRET SIDE TASK: prank 2 stations (hold E). Do not get caught.', 'info'); else if (d.complete) game.ui?.toast?.('🤡 Sabotage complete! +Clout at day end.', 'good'); break;
+      case 'sab': T.sab = { need: d.need, done: d.done, complete: !!d.complete }; if (!d.done && !d.complete) game.ui?.toast?.('🤡 SECRET SIDE TASK: prank 2 stations (hold E). Do not get caught.', 'info'); else if (d.complete) game.ui?.toast?.('🤡 Sabotage complete! +Followers at day end.', 'good'); break;
       case 'result': T.result = d; if (d.complete && game.profile) { const p = ensureWardrobeProfile(game.profile); p.fun.bonuses += 1; game.progress?.save?.(); } break;
       case 'clear': clearStations(); break;
       default: break;

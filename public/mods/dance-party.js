@@ -11,7 +11,7 @@ KefalAPI.defineMod({
   scope: 'host',
   category: 'social',
   enabledByDefault: true,
-  description: 'Two or more crewmates dancing close together earn a small XP + Clout bonus every 20 s (max 6 per day each). Mandatory fun. Five parties unlock the Server Room Rave emote.',
+  description: 'Two or more crewmates dancing close together earn a small XP + Followers bonus every 20 s (max 6 per day each). Mandatory fun. Five parties unlock the Server Room Rave emote.',
   config: {
     radius: { type: 'number', default: 9, min: 3, max: 25, label: 'Party radius (m)' },
     seconds: { type: 'number', default: 20, min: 8, max: 120, label: 'Seconds of dancing per payout' },
@@ -57,7 +57,7 @@ KefalAPI.defineMod({
       const game = api.game;
       if (!game || d?.k !== 'lcm-party' || !Array.isArray(d.ids)) return;
       if (!d.ids.includes(game.selfId)) return;
-      game.ui.toast(tf('OFFICE PARTY! {n} employees are having mandatory fun. +8 XP, +5 Clout', { n: Math.max(2, d.n | 0) }), 'good');
+      game.ui.toast(tf('OFFICE PARTY! {n} employees are having mandatory fun. +8 XP, +5 Followers', { n: Math.max(2, d.n | 0) }), 'good');
       game.cosm5?.bump?.('raved');
     });
   },

@@ -4,7 +4,7 @@ import { fillGaps } from '../i18n/fill.js';
 fillGaps([
   // ---- home base buildings (homeworld_core)
   ['Posts content all day. Passive credits per day.', 'Gün boyu içerik paylaşır. Günlük pasif kredi.', 'Целый день постит контент. Пассивные кредиты каждый день.'],
-  ['Turns Engagement into Clout. Runs hot: needs cooling.', "Etkileşimi Clout'a çevirir. Isınır: soğutma ister.", 'Превращает вовлечённость в клаут. Греется: нужно охлаждение.'],
+  ['Turns Engagement into Followers. Runs hot: needs cooling.', "Etkileşimi Takipçi'ye çevirir. Isınır: soğutma ister.", 'Превращает вовлечённость в подписчики. Греется: нужно охлаждение.'],
   ['Burns anything. Lots of power, some heat.', 'Her şeyi yakar. Bol güç, biraz ısı.', 'Жжёт всё подряд. Много энергии, немного тепла.'],
   ['Clean power. No heat, fragile, costs more per watt.', 'Temiz güç. Isı yok, kırılgan, watt başına daha pahalı.', 'Чистая энергия. Без тепла, хрупкая, дороже за ватт.'],
   ['Removes heat so hot buildings can be built.', 'Isıyı alır, böylece sıcak yapılar kurulabilir.', 'Отводит тепло, чтобы можно было строить горячие здания.'],
@@ -12,8 +12,8 @@ fillGaps([
   ['Slowly distils forge shards. Higher tiers, better shards.', 'Dökümhane parçalarını yavaşça damıtır. Üst seviye, daha iyi parça.', 'Медленно перегоняет осколки кузни. Ранг выше - осколки лучше.'],
   ['Meals for the crew (collected as medkits).', 'Ekibe yemek (ilk yardım çantası olarak toplanır).', 'Еда для команды (собирается в виде аптечек).'],
   ['Hired hands. Every producer works faster.', 'Tutulmuş işçiler. Her üretici daha hızlı çalışır.', 'Наёмные руки. Каждое производство работает быстрее.'],
-  ['Bestiary trophies draw visitors: passive Clout.', 'Bestiary kupaları ziyaretçi çeker: pasif Clout.', 'Трофеи бестиария привлекают посетителей: пассивный клаут.'],
-  ['Games, jam, friends. +Clout from every source.', 'Oyunlar, jam, dostlar. Her kaynaktan +Clout.', 'Игры, джемы, друзья. +клаут из любого источника.'],
+  ['Bestiary trophies draw visitors: passive Followers.', 'Bestiary kupaları ziyaretçi çeker: pasif Takipçi.', 'Трофеи бестиария привлекают посетителей: пассивный подписчики.'],
+  ['Games, jam, friends. +Followers from every source.', 'Oyunlar, jam, dostlar. Her kaynaktan +Takipçi.', 'Игры, джемы, друзья. +подписчики из любого источника.'],
   ['Raises every storage cap.', 'Her depolama sınırını yükseltir.', 'Поднимает все лимиты хранения.'],
   ['Reliable single-target fire.', 'Güvenilir tek hedef atışı.', 'Надёжный огонь по одной цели.'],
   ['Arcs chain between raiders. Great vs swarms.', 'Yıldırım baskıncılar arasında zincirlenir. Sürülere karşı harika.', 'Дуги перескакивают между налётчиками. Отлично против роёв.'],

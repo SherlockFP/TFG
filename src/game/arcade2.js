@@ -19,7 +19,7 @@ const TR = {
   'Stack scrap shapes, make quota rows.': 'Hurda şekillerini diz, kota sıraları yap.', 'Shoot the hate-comments.': 'Nefret yorumlarını vur.',
   'TARGET BEATEN': 'HEDEF AŞILDI', 'NEW BEST': 'YENİ REKOR', 'GAME OVER': 'OYUN BİTTİ', '[ENTER] again   [ESC] menu': '[ENTER] tekrar   [ESC] menü',
   'Play ARCADE [E]': 'Salonda oyna [E]', 'Flappy Fish': 'Flappy Balık', 'Cable Runner': 'Kablo Koşucusu', 'Quota Stack': 'Kota İstifi', 'Viewer Invaders': 'İzleyici İstilası',
-  'Arcade prize: +{n} Clout ({game})': 'Salon ödülü: +{n} Clout ({game})', 'Arcade daily prize cap reached ({n} Clout).': 'Günlük salon ödül sınırına ulaşıldı ({n} Clout).',
+  'Arcade prize: +{n} Followers ({game})': 'Salon ödülü: +{n} Takipçi ({game})', 'Arcade daily prize cap reached ({n} Followers).': 'Günlük salon ödül sınırına ulaşıldı ({n} Takipçi).',
   'ARCADE CHAMPION: hat unlocked (beat {target} in {game})': 'SALON ŞAMPİYONU: şapka açıldı ({game} oyununda {target} puanı geçtin)', 'Rank #{r} on today\'s {game} board': 'Bugünün {game} tablosunda #{r}. sıra',
   'ARCADE: FLAPPY | CABLE | STACK | INVADERS | TOP | CLASSIC': 'SALON: FLAPPY | CABLE | STACK | INVADERS | TOP | CLASSIC', 'Today\'s crew high scores': 'Bugünün ekip skorları', 'no scores yet': 'henüz skor yok',
   'Arcade Champion': 'Salon Şampiyonu', 'A joystick on a cap. Worn by whoever beat the cabinet.': 'Şapkanın üstünde bir joystick. Makineyi yenen takar.', 'Beat a target score on the ship arcade': 'Gemi salonunda bir hedef skoru geç',
@@ -36,7 +36,7 @@ const RU = {
   'Stack scrap shapes, make quota rows.': 'Складывай фигуры из хлама, собирай ряды квоты.', 'Shoot the hate-comments.': 'Сбивай хейт-комментарии.',
   'TARGET BEATEN': 'ЦЕЛЬ ПРЕВЗОЙДЕНА', 'NEW BEST': 'НОВЫЙ РЕКОРД', 'GAME OVER': 'ИГРА ОКОНЧЕНА', '[ENTER] again   [ESC] menu': '[ENTER] ещё раз   [ESC] меню',
   'Play ARCADE [E]': 'Играть в автомат [E]', 'Flappy Fish': 'Флэппи-рыба', 'Cable Runner': 'Кабельный бегун', 'Quota Stack': 'Квотный стек', 'Viewer Invaders': 'Вторжение зрителей',
-  'Arcade prize: +{n} Clout ({game})': 'Приз аркады: +{n} Clout ({game})', 'Arcade daily prize cap reached ({n} Clout).': 'Дневной лимит призов аркады достигнут ({n} Clout).',
+  'Arcade prize: +{n} Followers ({game})': 'Приз аркады: +{n} подписчики ({game})', 'Arcade daily prize cap reached ({n} Followers).': 'Дневной лимит призов аркады достигнут ({n} подписчики).',
   'ARCADE CHAMPION: hat unlocked (beat {target} in {game})': 'ЧЕМПИОН АРКАДЫ: шапка открыта ({target} очков в игре {game})', 'Rank #{r} on today\'s {game} board': 'Место #{r} в сегодняшней таблице {game}',
   'ARCADE: FLAPPY | CABLE | STACK | INVADERS | TOP | CLASSIC': 'АРКАДА: FLAPPY | CABLE | STACK | INVADERS | TOP | CLASSIC', 'Today\'s crew high scores': 'Рекорды экипажа за сегодня', 'no scores yet': 'очков пока нет',
   'Arcade Champion': 'Чемпион аркады', 'A joystick on a cap. Worn by whoever beat the cabinet.': 'Джойстик на кепке. Носит тот, кто победил автомат.', 'Beat a target score on the ship arcade': 'Побей целевой счёт на корабельном автомате',
@@ -99,8 +99,8 @@ export function installArcade2(game) {
     let coins = Math.max(0, Math.min(m.coins | 0, K.PRIZE_CAP));
     const room = K.ledgerRoom(p);   // profile-side cap: even a lying host cannot pay more than PRIZE_CAP a day
     const pay = Math.min(coins, room);
-    if (pay > 0) { p.arcade2.paid = (p.arcade2.paid | 0) + pay; game.progress?.addCoins?.(pay, 'Daily arcade'); game.ui.toast(tf('Arcade prize: +{n} Clout ({game})', { n: pay, game: name }), 'good'); }
-    else if (coins > 0 || room <= 0) game.ui.toast(tf('Arcade daily prize cap reached ({n} Clout).', { n: K.PRIZE_CAP }));
+    if (pay > 0) { p.arcade2.paid = (p.arcade2.paid | 0) + pay; game.progress?.addCoins?.(pay, 'Daily arcade'); game.ui.toast(tf('Arcade prize: +{n} Followers ({game})', { n: pay, game: name }), 'good'); }
+    else if (coins > 0 || room <= 0) game.ui.toast(tf('Arcade daily prize cap reached ({n} Followers).', { n: K.PRIZE_CAP }));
     if (m.rank > 0 && m.rank <= 3 && m.best) game.ui.toast(tf('Rank #{r} on today\'s {game} board', { r: m.rank, game: name }), 'good');
     if (m.champ && !p.arcade2.champ && (m.score | 0) >= K.TARGETS[m.game]) {
       p.arcade2.champ = 1;

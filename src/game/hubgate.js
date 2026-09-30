@@ -106,7 +106,7 @@ export function installHubgate(game) {
   /** the host's ladder for a joiner (run.hub); null on the host / when the host has not published one */
   const remoteHub = () => (game.isHost ? null : game.run?.hub || null);
   /** shop.js hook: rare+ stock (and ship upgrades) wait for quota 1 -> a lock reason or '' */
-  function shopLock(e) { return locked('shop') && (tierIndex(e.tier) >= 2 || e.currency === 'clout') ? tx('hg.lock', { n: 1, name: sysName('shop') }) : ''; }
+  function shopLock(e) { return locked('shop') && (tierIndex(e.tier) >= 2 || e.currency === 'clout' || e.followersAt) ? tx('hg.lock', { n: 1, name: sysName('shop') }) : ''; }
   function publishHub() {
     if (!game.isHost || !game.run || !ob()) return;
     const u = ob().unlocks?.();

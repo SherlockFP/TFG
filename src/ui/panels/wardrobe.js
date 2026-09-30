@@ -3,7 +3,8 @@
 // Works in-game (game given: equips via game.cosmetics, syncs to the crew) and from the main menu (game null: edits
 // the saved profile only). Clicking a tile TRIES it on in the preview; EQUIP / BUY act on the selection.
 import { el } from '../../core/util.js';
-import { t } from '../../core/i18n.js';
+import { t, tf } from '../../core/i18n.js';
+import { unlockAt, claimable } from '../../game/wallet.js';
 import { glyphEl } from '../glyphs.js';
 import { saveProfile } from '../../core/save.js';
 import { getCharPreview } from '../charpreview.js';
@@ -87,8 +88,8 @@ export function openWardrobe({ game = null, profile, ui, from = null } = {}) {
     if (cos) return cos.buy(e.key);
     if (!e.price || owns(profile, e.slot, e.id)) return { ok: false };
     if (profile.level < (e.minLevel || 1)) return { ok: false, why: `Requires level ${e.minLevel}` };
-    if (profile.coins < e.price) return { ok: false, why: 'Not enough Clout' };
-    profile.coins -= e.price; grant(profile, e.slot, e.id); saveProfile(profile);
+    if (!claimable(profile.coins, e.price)) return { ok: false, why: tf('Unlocks at {n} followers', { n: unlockAt(e.price) }) };   // [followers] milestone, nothing is spent
+    grant(profile, e.slot, e.id); saveProfile(profile);
     return { ok: true };
   };
 
@@ -119,7 +120,9 @@ export function openWardrobe({ game = null, profile, ui, from = null } = {}) {
         : el('div', { class: 'wd-how' }, glyphEl('lock'), ` ${t('Unlock')}: ${t(cur.how || '?')}`),
       prog ? el('div', { class: 'wd-bar' }, el('i', { style: { width: Math.round(Math.min(1, prog[0] / prog[1]) * 100) + '%' } })) : null,
       prog ? el('div', { class: 'wd-note' }, `${Math.min(prog[0], prog[1])} / ${prog[1]}`) : null,
-      !owned && price ? el('div', { class: 'wd-how' }, `◈ ${price}${cur.minLevel > 1 ? ` · Lv.${cur.minLevel}+` : ''}`) : null,
+      !owned && price ? el('div', { class: 'wd-how' }, `◈ ${tf('Unlocks at {n} followers', { n: unlockAt(price) })}${cur.minLevel > 1 ? ` · Lv.${cur.minLevel}+` : ''}`) : null,   // [followers] milestone, never spent
+      !owned && price ? el('div', { class: 'wd-bar' }, el('i', { style: { width: Math.round(Math.min(1, (profile.coins || 0) / Math.max(1, unlockAt(price))) * 100) + '%' } })) : null,
+      !owned && price ? el('div', { class: 'wd-note' }, tf('{n} / {m} followers', { n: Math.min(Math.floor(profile.coins || 0), unlockAt(price)), m: unlockAt(price) })) : null,
     );
     const actions = el('div', { class: 'wd-actions' });
     const equipBtn = el('button', { class: 'btn primary' + (owned && (!isEq || X?.alwaysEquippable) ? '' : ' disabled'), type: 'button', 'data-nav': 'wd:equip' }, X?.equipLabel ? X.equipLabel(cur) : t('Equip'));
@@ -129,10 +132,10 @@ export function openWardrobe({ game = null, profile, ui, from = null } = {}) {
     });
     actions.appendChild(equipBtn);
     if (!owned && price) {
-      const buyBtn = el('button', { class: 'btn', type: 'button', 'data-nav': 'wd:buy' }, `${t('Buy')} ◈${price}`);
+      const buyBtn = el('button', { class: 'btn' + (claimable(profile.coins, price) ? ' primary' : ' disabled'), type: 'button', 'data-nav': 'wd:buy' }, claimable(profile.coins, price) ? t('Claim') : `◈ ${unlockAt(price)}`);
       buyBtn.addEventListener('click', () => {
         const r = X ? (X.buy ? X.buy(ctx, cur) : { ok: false }) : doBuy(cur);
-        if (r.ok) { ui.sfx?.('ui_buy', 0.7); render(); } else { ui.sfx?.('ui_error', 0.5); ui.toast?.(t(r.why || 'Not enough Clout'), 'bad'); }
+        if (r.ok) { ui.sfx?.('ui_buy', 0.7); render(); } else { ui.sfx?.('ui_error', 0.5); ui.toast?.(t(r.why || 'Locked'), 'bad'); }
       });
       actions.appendChild(buyBtn);
     }
@@ -154,7 +157,7 @@ export function openWardrobe({ game = null, profile, ui, from = null } = {}) {
       const tp = X && X.price ? X.price(e) : 0;
       const tile = el('div', { class: 'wd-tile' + (sel.id === e.id ? ' sel' : '') + (own ? '' : ' locked'), style: { '--tc': tierColor(e.tier || 'common') }, tabindex: 0, 'data-nav': `wd:${slot}:${e.id}`, title: e.desc || '' },
         el('div', { class: 'n' }, t(e.name)),
-        el('div', { class: 's' }, ...(own ? [eq ? t('Equipped') : t('Owned')] : p2 ? [glyphEl('lock'), ` ${Math.min(p2[0], p2[1])}/${p2[1]}`] : tp ? [`◈ ${tp}`] : [glyphEl('lock'), ' ' + t('Locked')])),
+        el('div', { class: 's' }, ...(own ? [eq ? t('Equipped') : t('Owned')] : p2 ? [glyphEl('lock'), ` ${Math.min(p2[0], p2[1])}/${p2[1]}`] : tp ? [`◈ ${unlockAt(tp)}`] : [glyphEl('lock'), ' ' + t('Locked')])),
         e.color ? el('div', { class: 'sw', style: { background: e.color } }) : null,
         eq ? el('div', { class: 'ck' }, glyphEl('check')) : null);
       const pick = () => { sel = { slot, id: e.id }; if (X) X.select?.(ctx, e); else { tryOn[slot] = e.id; applyTry(); } ui.sfx?.('ui_hover', 0.3); render(); };

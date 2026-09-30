@@ -6,7 +6,7 @@ fillGaps([
   // ---- achievement / milestone titles (shown on the name tag)
   ['Pest Control', 'İlaçlama Ekibi', 'Дезинсектор'], ['The Reaper', 'Azrail', 'Жнец'], ['Monster Hunter', 'Canavar Avcısı', 'Охотник на монстров'], ['Giant Slayer', 'Dev Avcısı', 'Убийца великанов'],
   ['Zoologist', 'Zoolog', 'Зоолог'], ['Packrat', 'İstifçi', 'Барахольщик'], ['Tycoon', 'Patron', 'Магнат'], ['Team Player', 'Takım Oyuncusu', 'Командный игрок'],
-  ['Employee of the Month', 'Ayın Çalışanı', 'Сотрудник месяца'], ['Clout Chaser', 'Clout Avcısı', 'Охотник за клаутом'], ['Untouchable', 'Dokunulmaz', 'Неприкасаемый'],
+  ['Employee of the Month', 'Ayın Çalışanı', 'Сотрудник месяца'], ['Follower Chaser', 'Takipçi Avcısı', 'Охотник за подписчики'], ['Untouchable', 'Dokunulmaz', 'Неприкасаемый'],
   ['Lucky Fish', 'Şanslı Balık', 'Везучая рыба'], ['Veteran', 'Kıdemli', 'Ветеран'], ['Revenant', 'Hortlak', 'Ревенант'], ['Snack', 'Atıştırmalık', 'Закуска'],
   ['Forgotten', 'Unutulan', 'Забытый'], ['Unemployed', 'İşsiz', 'Безработный'], ['Angler', 'Olta Ustası', 'Рыболов'], ['Shiny Hunter', 'Parlak Avcısı', 'Охотник за блестяшками'],
   ['High Roller', 'Büyük Oyuncu', 'Крупный игрок'], ['Safecracker', 'Kasa Kırıcı', 'Медвежатник'], ['Electrician', 'Elektrikçi', 'Электрик'], ['Gamer', 'Oyuncu', 'Геймер'],
