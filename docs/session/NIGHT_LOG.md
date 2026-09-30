@@ -1,3 +1,21 @@
+# SABAH ÖZETİ (Türkçe) — gece ne değişti, önce neyi dene
+
+**Kısaca:** Gece ~30 iş main'e girdi, hepsi node testleri + build'den geçti. Tarayıcıda iki QA turu yapıldı (puan 4.5 → **5.5/10**). Direktör incelemesi: `docs/REVIEW_W8_NIGHT.md`. Sorular: `docs/session/QUESTIONS.md` (cevaplayana kadar önerilen varsayılanlarla ilerledim).
+
+**Önce bunları dene (5 dk):**
+1. Yeni oyun aç → **canlı yayın açılışı** (12 sn, Boşluk ile geç) → terminalde **3 rota kartı** (56K-Dialup / 88-Chatroom metro / E9-Estate konak).
+2. İniş → gemi-giriş yolu artık 42-75 m; yolda **kamera dronu** ve kör rota. Kırmızı ışıkta kalırsan **CANLI/İŞARETLİ** olursun (vergi + yaratık).
+3. Ekran: tek hedef satırı; **TAB basılı** = tam durum kartı. İç mekanlar loş ama okunur (fener yine satın alınıyor; ilk inişte ödünç fener).
+4. Canın bitince **yere düşersin**; arkadaşın E ile kaldırır. Tek başınaysan E'yi 6 sn basılı tut.
+5. Büyük eşyaları (otomat, sunucu kabini) **iki kişi taşıyın**; kırılganları arkadaşına at, yakalasın.
+6. Gün sonu: **gelir dökümü** + **"ÖNE ÇIKANI İZLE" [L]** (Algoritma'nın tekrar klibi).
+
+**Gece eklenen/iyileşen başlıklar:** iniş donması (kuyruk + ön-derleme, 404 ayı 6.2 sn→1.7 sn), ekonomi dengesi, kamera mekaniği derinleşti (Opus), ödül görünürlüğü, 3 macera ayı (Mavna/Kum/Çatı), hedef tek satır, yaratık havuzları (her ay 3-4 yaratık), yaratık gözleri/animasyonları, taşıma komedisi, highlight klibi, 64 yeni ses, haritalar %46 küçüldü, eldiven/fener görünüşü, çok oyunculu 10+ hata, host değişimi.
+
+**Bilinen açıklar:** macera ayları headless tarayıcıda çöktü (düzeltme ajanı çalışıyor); 2 kişilik gerçek WebRTC oturumu hâlâ yapılmadı; birçok görsel sadece node testinde doğrulandı.
+
+---
+
 # Night loop log (autonomous development while the owner sleeps)
 
 Owner (2026-09-29 night): "develop continuously like a gauntlet loop, fix bugs, make it fun, playtest, keep it short; don't ask me questions" → questions are collected in `docs/session/QUESTIONS.md` for the morning instead.
