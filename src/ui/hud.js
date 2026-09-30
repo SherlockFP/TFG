@@ -16,6 +16,7 @@ import { xpForLevel, rankOf } from '../game/progression.js';
 import { MOONS, WEATHER } from '../game/moons.js';
 import * as DailyEvents from '../game/dailyEvents.js';
 import { t, getLang, tf } from '../core/i18n.js';
+import { LABEL as HL_LABEL } from '../game/headline_core.js';
 import { walletRow } from '../game/wallet.js';   // [unify] one wallet row: credits + clout
 import { INTERIOR_NAMES as REG_INTERIOR_NAMES } from '../world/interiors/index.js';
 
@@ -66,6 +67,7 @@ export function todaysEvent(run) {
   if (!run || !['landing', 'moon', 'takeoff'].includes(run.phase)) return null;
   if (MOONS[run.moon]?.company) return null;
   if (run.dailyEvent) return run.dailyEvent;
+  if (run.hl) return null;   // [trim] headline.js decided this landing: no daily event today (the fallback roll below is only for runs from an older host)
   try { return DailyEvents.dailyEventFor?.(run.seed, run.day, run.moon) || null; } catch { return null; }
 }
 
@@ -464,8 +466,10 @@ export class HUD {
          <div><span>${t('DANGER')}</span><b class="br-danger d${danger}"><span class="br-pips">${pips}</span>${dangerName(danger)}</b></div>
          <div><span>${t('LOOT')}</span><b>×${lootMul.toFixed(2)}</b></div>`;
     const fx = eventEffects(ev);
-    const evHtml = ev ? `<div class="br-event ${eventMood(ev)}"><div class="br-ek">${t('DAILY EVENT')}</div><div class="br-en">${glyph('bolt')} ${escapeHtml(eventName(ev))}</div>
-      <div class="br-ed">${escapeHtml(eventDesc(ev))}</div>${fx.length ? `<div class="br-fx">${fx.map((x) => `<i>${escapeHtml(x)}</i>`).join('')}</div>` : ''}</div>` : '';
+    const hl = !ev && run.hl && run.hl.n ? run.hl : null;   // [trim] role day / trend / warp headline (the affix set and the daily event come through `ev`)
+    const hlHtml = hl ? `<div class="br-event mixed"><div class="br-ek">${t(HL_LABEL[hl.k] || 'HEADLINE')}</div><div class="br-en">${glyph('bolt')} ${escapeHtml(t(hl.n))}</div><div class="br-ed">${escapeHtml(t(hl.d || ''))}</div></div>` : '';
+    const evHtml = hlHtml || (ev ? `<div class="br-event ${eventMood(ev)}"><div class="br-ek">${t(run.hl?.k === 'mapmods' ? 'SECTOR MAP' : 'DAILY EVENT')}</div><div class="br-en">${glyph('bolt')} ${escapeHtml(eventName(ev))}</div>
+      <div class="br-ed">${escapeHtml(eventDesc(ev))}</div>${fx.length ? `<div class="br-fx">${fx.map((x) => `<i>${escapeHtml(x)}</i>`).join('')}</div>` : ''}</div>` : '');
     this.briefTip = randomTip(this.briefTip);
     this.$.brief.innerHTML = `<div class="br-bar top"></div><div class="br-bar bot"><span class="br-tip"><b>${t('TIP')}</b> ${escapeHtml(t(this.briefTip))}</span></div>
       <div class="br-card">

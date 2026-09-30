@@ -71,3 +71,36 @@ export function algoOk(o) {
   if (pri) return true;
   return !(lastMs > 0) || nowMs - lastMs >= ALGO_GAP * 1000;
 }
+
+// ------------------------------------------------------------------------------------------ Algorithm ticker classes (wave 8 trim, docs/wave8/trim.md)
+// EVERY voice (algo1 / algo2 / lore / story / soul PA / crdirector captions / feedcams tips / guide) ends in algorithm.show. It ranks them:
+// teaching > danger > flavour. Teaching (d.pri) passes the 45 s gap; danger (d.cls = 'danger': stream / director warnings) has its own 8 s gap and is
+// NOT muted by a chase or a peak (it is the reason for it); flavour is the paced, chase-quiet commentary above. A higher class cuts a flavour line short.
+export const CLS = Object.freeze({ teach: 0, danger: 1, flavour: 2 });
+export const DANGER_GAP = 8;
+const rk = (x) => CLS[x && x.cls] ?? 2;
+export function classOf(d) { return d && CLS[d.cls] !== undefined ? d.cls : d && d.pri ? 'teach' : 'flavour'; }
+/** danger gate: lastMs of the previous danger line (ms), chatty = off switch */
+export function dangerOk(nowMs, lastMs, chatty = false) { return chatty || !(lastMs > 0) || nowMs - lastMs >= DANGER_GAP * 1000; }
+/** queue insert: ranked (stable), at most `max` kept: the OLDEST line of the lowest class is dropped. Returns a new array. */
+export function enqueue(q, item, max = 3) {
+  const out = [...q, item].map((x, i) => [x, i]).sort((a, b) => rk(a[0]) - rk(b[0]) || a[1] - b[1]).map((x) => x[0]);
+  while (out.length > max) {
+    const worst = Math.max(...out.map(rk));
+    out.splice(out.findIndex((x) => rk(x) === worst), 1);
+  }
+  return out;
+}
+/** words of a line, digits folded to '#', punctuation dropped (same text in a different number / case = the same line) */
+export function lineWords(text) { return String(text || '').toLowerCase().replace(/\d+/g, '#').split(/[^\p{L}#]+/u).filter(Boolean); }
+/** is `text` (near-)identical to one of the `seen` word lists (Jaccard >= 0.8)? */
+export function nearDup(text, seen) {
+  const a = new Set(lineWords(text)); if (!a.size) return false;
+  for (const o of seen || []) {
+    const b = new Set(o);
+    let inter = 0; for (const x of a) if (b.has(x)) inter++;
+    const uni = a.size + b.size - inter;
+    if (uni && inter / uni >= 0.8) return true;
+  }
+  return false;
+}

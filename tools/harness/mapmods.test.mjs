@@ -64,7 +64,7 @@ game.hostSetPhase('landing', {});   // wrapped
 const cur = game.run.mm.cur;
 if (nxt.a.length) {
   ok(JSON.stringify(cur) === JSON.stringify(nxt) && game.run.mm.nxt === null, 'landing moves nxt -> cur');
-  ok(game.run.dailyEvent.name === 'QUIET FEED' && game.run.dailyEvent.mm.length === nxt.a.length && phases[0][1].dailyEvent === game.run.dailyEvent, 'affix numbers merged into the day event, name kept, phase message carries it');
+  ok(game.run.dailyEvent.name === 'SECTOR MAP' && game.run.dailyEvent.desc !== 'x' && game.run.dailyEvent.mm.length === nxt.a.length && phases[0][1].dailyEvent === game.run.dailyEvent, 'affix numbers merged into the day event, name SECTOR MAP (trim: the affix set replaces the daily event), phase message carries it');
 } else ok(cur.a.length === 0, 'normal map lands clean');
 game.run.phase = 'orbit'; game.run.dailyEvent = null;
 handlers.phase.forEach((f) => f('orbit', game));

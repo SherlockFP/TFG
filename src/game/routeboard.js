@@ -153,7 +153,7 @@ export function installRouteboard(game) {
     const r = run(), out = [];
     if (r.dailyEvent && fr()?.allow?.('dailyEvent') !== false) out.push(`<span><b>${escapeHtml(x('today'))}</b>${escapeHtml(t(r.dailyEvent.name || ''))}</span>`);
     const a = r.mm?.nxt?.a;
-    if (Array.isArray(a) && a.length && fr()?.allow?.('mapmods') !== false) out.push(`<span><b>${escapeHtml(x('nextmap'))}</b>${a.map((id) => escapeHtml(t(AFFIX_BY_ID[id]?.name || id))).join(' · ')}</span>`);
+    if (Array.isArray(a) && a.length && fr()?.allow?.('mapmods') !== false && game.mapmods?.allowed?.() !== false) out.push(`<span><b>${escapeHtml(x('nextmap'))}</b>${a.map((id) => escapeHtml(t(AFFIX_BY_ID[id]?.name || id))).join(' · ')}</span>`);
     return out.length ? `<div class="rb-strip">${out.join('')}</div>` : '';
   }
   function cardHtml(c, i, orbit) {

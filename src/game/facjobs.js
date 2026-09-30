@@ -17,6 +17,7 @@ import { ITEMS, registerItem } from './items.js';
 import { MOONS } from './moons.js';
 import { LAB_IDS } from './labyrinths_core.js';   // [labyrinths]
 import { insideShip } from '../world/ship.js';
+import { affixCalm } from './headline_core.js';
 import { fallbackChestLoot } from './chests.js';
 import * as C from './facjobs_core.js';
 import './facjobs_i18n.js';
@@ -49,6 +50,8 @@ const ITEM_DEFS = [
 ];
 
 export function installFacjobs(game) {
+  /** [trim] side jobs wait until quota 2 for a fresh staged crew (run.hub is the host's ladder, synced, so every peer rolls the same); veterans / unlock-everything / Quick Shift keep them */
+  const rollOf = (r) => { const x = C.rollJobs(r.runId ?? 'x', r.day ?? 1, r.moon, r.quotaIndex | 0); return x.side && affixCalm({ mode: r.hub?.mode, q: r.quotaIndex | 0, quick: !!r.quick }) ? { ...x, side: null } : x; };
   const mods = game.mods;
   const offs = [];
   let disposed = false, tickT = 0, droneT = 0;
@@ -103,7 +106,7 @@ export function installFacjobs(game) {
     mem.drone = null; mem.ids = {};
     const moon = MOONS[r.moon], F = fac();
     if (!C.jobMoon(moon) || !F || game.onboard?.fr?.calm?.('facjobs')) { if (r.fj) { r.fj = null; bcast(); } return; }   // [firstrun] the first landing has ONE goal: no facility job / fee before the first sale
-    const roll = C.rollJobs(r.runId ?? 'x', r.day ?? 1, r.moon, r.quotaIndex | 0);
+    const roll = rollOf(r);
     const rng = new RNG((r.seed ^ 0xfa11) >>> 0);
     const floor = (F.scrapSpots || []).filter((s) => !s.elevated && !s.sealed && s.room >= 0);
     const bigs = (F.bigSpots || []).length >= 2 ? F.bigSpots : floor;
@@ -431,7 +434,7 @@ export function installFacjobs(game) {
     if (phase === 'orbit') {
       const moon = MOONS[r.moon];
       if (!C.jobMoon(moon)) return;
-      const roll = C.rollJobs(r.runId ?? 'x', r.day ?? 1, r.moon, r.quotaIndex | 0);
+      const roll = rollOf(r);
       add(tf('Job: {job}', { job: title(roll.main) }), 'hint');
       add(t("Terminal: JOBS shows today's facility jobs"), 'hint');
       return;
@@ -455,7 +458,7 @@ export function installFacjobs(game) {
     const grid = document.querySelector('.br-card .br-grid');
     if (!grid || grid.querySelector('.fj-row')) return;
     if (!C.jobMoon(MOONS[r.moon]) || game.onboard?.fr?.calm?.('facjobs')) return;
-    const roll = C.rollJobs(r.runId ?? 'x', r.day ?? 1, r.moon, r.quotaIndex | 0);
+    const roll = rollOf(r);
     const row = (k, v) => { const d = document.createElement('div'); d.className = 'fj-row'; const a = document.createElement('span'); a.textContent = k; const b = document.createElement('b'); b.textContent = v; d.append(a, b); grid.appendChild(d); };
     row(t('JOB'), title(roll.main));
     if (roll.side) row(t('SIDE'), title(roll.side));
@@ -521,7 +524,7 @@ export function installFacjobs(game) {
   function printJobs(term) {
     const r = run(), moon = MOONS[r?.moon];
     if (!C.jobMoon(moon)) { term.print(t('No jobs on this moon.')); return; }
-    const roll = C.rollJobs(r.runId ?? 'x', r.day ?? 1, r.moon, r.quotaIndex | 0);
+    const roll = rollOf(r);
     const lines = [tf("TODAY'S JOBS - {moon}", { moon: moon.name || r.moon }), ''];
     for (const [sl, id] of [['m', roll.main], ['s', roll.side]]) {
       if (!id) continue;
@@ -535,7 +538,7 @@ export function installFacjobs(game) {
   return {
     /** layoutOpts for game.js loadMap: the day's archetype (null = classic) */
     layoutOpts: (moon, r) => C.layoutOptsFor(moon, r),
-    roll: () => { const r = run(); return r ? C.rollJobs(r.runId ?? 'x', r.day ?? 1, r.moon, r.quotaIndex | 0) : null; },
+    roll: () => { const r = run(); return r ? rollOf(r) : null; },
     hostSetup, hostRebuild, hostReq, hostTick, droneTick, _mem: mem,
     dispose() {
       disposed = true;

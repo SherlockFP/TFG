@@ -39,6 +39,7 @@ import { x as obx } from '../game/onboard_text.js';   // [onboard] Settings: unl
 import { soundPackSection } from './soundpack_ui.js';   // [sfx] Settings > Audio > Sound pack
 import { hudDensitySelect } from './hudcalm_ui.js';   // [hudcalm] Settings > HUD > density
 import { syncArtdir } from './artdir.js';   // [artdir] html.tfg-artdir / ad-calm from settings
+import { cloutOpenOf } from '../game/wallet.js';   // [trim] Clout is spendable after the store unlock
 
 // [profile] tiny avatar icon (16x16 thumbnail) for chat / lists
 const avIcon = (av, px = 16) => { const c = avatarCanvas(av, px, { thumb: true }); c.style.marginRight = '4px'; return c; };
@@ -1103,6 +1104,7 @@ export class UI {
   }
 
   openMarket(game) {
+    if (!cloutOpenOf(game)) { game.onboard?.deny?.('shop'); return; }   // [trim] Clout prices (Black Market) open with the store's quota-1 unlock
     const p = game.profile;
     let tab = this.marketTab || 'Weapons';
     const wrap = this.panel('wide market');

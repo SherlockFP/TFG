@@ -9,6 +9,7 @@ import { iconHTML } from '../icons.js';
 import { glyph } from '../glyphs.js';
 import { tierColor, TIERS } from '../../game/tiers.js';
 import { categoryList, statsOf } from '../../game/shop.js';
+import { cloutOpenOf } from '../../game/wallet.js';
 
 const CSS = `
 .overlay .menu-frame.shop{width:min(1180px,96vw);height:min(88vh,720px)}
@@ -72,7 +73,9 @@ export function createShopPanel(ui, game, opts = {}) {
   const g = game, shop = g.shop;
   let cat = opts.category && categoryList().some((c) => c.id === String(opts.category).toLowerCase()) ? String(opts.category).toLowerCase() : (ui.shopTab || 'weapons');
   const cart = new Map();   // id -> { n, trade }
-  let stock = shop.stock();
+  const cloutOpen = () => cloutOpenOf(g);   // [trim] Clout is a wallet only after the store's quota-1 unlock: credits are the only money of the first hour
+  const vis = (l) => (cloutOpen() ? l : l.filter((e) => e.currency !== 'clout'));
+  let stock = vis(shop.stock());
   const byId = (id) => stock.find((e) => e.id === id);
   const wrap = ui.panel('wide shop');
   const head = ui.panelHead(t('COMPANY STORE'), ' ');
@@ -85,7 +88,7 @@ export function createShopPanel(ui, game, opts = {}) {
   body.appendChild(el('div', { class: 'sh-wrap' }, main, sideEl));
   wrap.append(head, body, ui.panelFoot([['LB/RB', t('TAB')], ['E', t('ADD')]]));
 
-  const balance = () => `<b>▮${fmt(g.run?.credits || 0)}</b> · <b style="color:#ff7ad9">◈${fmt(g.profile?.coins || 0)}</b>`;
+  const balance = () => `<b>▮${fmt(g.run?.credits || 0)}</b>${cloutOpen() ? ` · <b style="color:#ff7ad9">◈${fmt(g.profile?.coins || 0)}</b>` : ''}`;
   const cartTotal = () => { let s = 0; for (const [id, l] of cart) { const e = byId(id); if (e && e.currency === 'credits') s += (l.trade && e.def?.upgradePrice ? e.def.upgradePrice : e.price) * l.n; } return s; };
   const hasBat = (e) => !!e.def?.upgradeFrom && [...g.items.all()].some((it) => it.holder === g.selfId && it.type === e.def.upgradeFrom && !it.affix);
 
@@ -198,7 +201,7 @@ export function createShopPanel(ui, game, opts = {}) {
     sideEl.scrollTop = keepScroll;
   }
   function renderHead() { sub.innerHTML = balance(); }
-  const full = () => { stock = shop.stock(); renderHead(); renderTabs(); renderGrid(); renderSide(); };
+  const full = () => { stock = vis(shop.stock()); renderHead(); renderTabs(); renderGrid(); renderSide(); };
 
   // live balance / stock (a crewmate may buy the last one while the panel is open)
   let lastKey = '';
@@ -208,14 +211,14 @@ export function createShopPanel(ui, game, opts = {}) {
     if (key === lastKey) return;
     lastKey = key;
     const focusId = document.activeElement?.dataset?.id;
-    stock = shop.stock(); renderHead(); renderGrid(); renderSide();
+    stock = vis(shop.stock()); renderHead(); renderGrid(); renderSide();
     if (focusId) gridEl.querySelector(`.sh-card[data-id="${focusId}"]`)?.focus({ preventScroll: true });
   }, 600);
 
   full();
   return {
     el: wrap,
-    onResult(d) { if (d.ok) cart.clear(); stock = shop.stock(); renderHead(); renderGrid(); renderSide(); },
+    onResult(d) { if (d.ok) cart.clear(); stock = vis(shop.stock()); renderHead(); renderGrid(); renderSide(); },
     dispose() { clearInterval(poll); },
   };
 }

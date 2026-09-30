@@ -349,10 +349,12 @@ export function installCrdirector(game) {
     for (const k of ['f', 'b', 'l', 'r']) { const i = document.createElement('i'); i.className = k; edgeEl.appendChild(i); edgeKids[k] = i; }
     root.appendChild(edgeEl);
   }
-  function caption(text, late) {
+  function caption(text, late, cls = 'danger') {
     ensureUi(); if (!capEl) return;
-    if (!late) { const d = game.onboard?.fr?.slot?.(CAPTION_S) || 0; if (d > 80) { clearTimeout(S.capWait); S.capWait = setTimeout(() => { if (capEl) caption(text, true); }, d); return; } }   // [qa] arrival cards queue
+    if (!late) { const d = game.onboard?.fr?.slot?.(CAPTION_S) || 0; if (d > 80) { clearTimeout(S.capWait); S.capWait = setTimeout(() => { if (capEl) caption(text, true, cls); }, d); return; } }   // [qa] arrival cards queue
     if (game.onboard?.fr?.lease?.('caption', CAPTION_S, 1) === false) return;   // [firstrun] never on top of the touchdown card
+    // [trim] the director's captions are Algorithm voices too: one ticker (algorithm.show), class danger (phase warnings) / teach (first-encounter rule line); the DOM caption below is the fallback
+    try { if (game.lore?.say) { game.lore.say(text.replace(' \u2014 ', ': '), { cls, mood: 'ecstatic' }); S.capT = 0; S.capCool = CAPTION_S + 2; return; } } catch { /* lore optional */ }
     const i = text.indexOf(' — ');
     capEl.textContent = '';
     if (i > 0) { const b = document.createElement('b'); b.textContent = text.slice(0, i); capEl.appendChild(b); capEl.appendChild(document.createTextNode(text.slice(i))); }
@@ -504,7 +506,7 @@ export function installCrdirector(game) {
         else if (tell.fx === 'dust') { try { game.particles?.burst(new THREE.Vector3(cam.x + (v.pos.x - cam.x) * 0.15, cam.y + 1.6, cam.z + (v.pos.z - cam.z) * 0.15), 'dust', null, 1.2); } catch { /* particles optional */ } }
       }
       if (d < CAPTION_R && S.capCool <= 0 && !S.seen[v.type] && !(game.profile?.bestiary?.[v.type]?.kills > 0)) {
-        S.seen[v.type] = 1; saveSeen(); caption(ruleLine(v.type, v));
+        S.seen[v.type] = 1; saveSeen(); caption(ruleLine(v.type, v), false, 'teach');
       } else if (d < CAPTION_R && !S.seen[v.type] && game.profile?.bestiary?.[v.type]?.kills > 0) { S.seen[v.type] = 1; saveSeen(); }
     }
     if (dimmerNear && S.flick.endT - nowMs() < 400) dipLights(0.7, 8);

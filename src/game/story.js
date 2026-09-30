@@ -18,6 +18,7 @@ import { addTranslations, t, tf, tIn, tfIn, sysMsg } from '../core/i18n.js';
 import { HOST_ONLY } from '../net/session.js';
 import { saveProfile } from '../core/save.js';
 import * as C from './story_core.js';
+import { trendActive } from './headline_core.js';
 import { TR, RU } from './story_i18n.js';
 import { createDock, createFinale, registerCase, unregisterCase, COL } from './story_ui.js';
 
@@ -99,6 +100,8 @@ export function installStory(game) {
     pushSt();
   }
   const trend = () => { const s = run()?.st; return s?.trend && CREATURES[s.trend.type] ? s.trend : null; };
+  /** [trim] the trend only acts on a landing whose headline it is (headline.js sets run.hl); in orbit it is just the upcoming/current weekly trend */
+  const trendOn = () => { const tr = trend(), r = run(); return tr && (!['landing', 'moon'].includes(r?.phase) || trendActive(r?.hl)) ? tr : null; };
   const trendName = () => { const tr = trend(); return tr ? t(CREATURES[tr.type].name) : ''; };
 
   // ------------------------------------------------------------------------------------------ allegiance moves
@@ -341,7 +344,7 @@ export function installStory(game) {
       return enabled() && isFoe(c) && kinRule(c.type) === 'hunt' ? s * C.huntMul(effA()).speed : s;
     });
     wrap(cm, 'hostSpawn', (orig) => function (type, pos, opts = {}) {
-      const tr = enabled() && host() ? trend() : null;
+      const tr = enabled() && host() ? trendOn() : null;
       const def = CREATURES[type];
       if (!tr || opts.id || tr.type !== type || !def || def.boss || def.hazard || !def.hp || opts.data?.trendClone) return orig.call(this, type, pos, opts);
       const o2 = { ...opts, level: (opts.level || 1) + C.TREND.levelBonus, data: { ...(opts.data || {}), trend: 1 } };
@@ -406,7 +409,7 @@ export function installStory(game) {
       const mo = MOONS[run().moon];
       if (s.job?.state === 'active' && !mo?.company && !mo?.home) { s.job = { ...s.job, state: 'running' }; pushSt(); }
       refreshTrend();
-      const tr = trend();
+      const tr = trendOn();
       if (tr && H.trendKey !== `${runKey()}:${run().day}`) { H.trendKey = `${runKey()}:${run().day}`; later(() => intercom('TRENDING: {@c} {h}. More of them, one level higher, better loot. The viewers love a hashtag.', { c: CREATURES[tr.type].name, h: '#' + tr.type }), 9000); }
       const line = C.toneLine(effA(), 'land', `${runKey()}:${run().day}`);
       if (line) later(() => intercom(line), 4500);
@@ -528,7 +531,7 @@ export function installStory(game) {
   function paint() {
     const r = run(), s = r && view();
     if (!r || !['orbit', 'landing', 'moon', 'company'].includes(r.phase)) { dockUi.update({ show: false }); return; }
-    const j = s.job, tr = trend();
+    const j = s.job, tr = trendOn();
     const show = Math.abs(s.a) >= 1 || !!j || s.act >= 2 || !!tr;
     const jobLine = j ? `${t(patronName(j.patron))}: ${t(C.JOBS[j.id]?.title || '')}${j.state === 'active' ? ' · ' + t('starts on landing') : ''}` : '';
     dockUi.update({ show, a: s.a, head: `${t('PATRON')} · ${t(actName(s.act))}${s.ending ? ' · ' + t(C.ENDINGS[s.ending].title) : ''}`, l: t('COMPANY'), r: t('ALGORITHM'), jobLine, trendLine: tr ? `${t('TRENDING')}: ${trendName()} #${tr.type}` : '' });
@@ -542,7 +545,7 @@ export function installStory(game) {
       if (j) add(`${t('Patron job')}: ${jobText(j).title} (${t(patronName(j.patron))}) - ${t('land to start')}`, 'sub');
       else if (s.offers?.some((o) => !o.taken)) add(t('Patron jobs: terminal JOBS'), 'hint');
       if (s.act >= 3 && !s.ending) add(t('ACT III: choose your ending: terminal CHOOSE'), 'main');
-      const tr = trend(); if (tr) add(`${t('TRENDING')}: ${trendName()}`, 'hint');
+      const tr = trendOn(); if (tr) add(`${t('TRENDING')}: ${trendName()}`, 'hint');
     } else if (phase === 'moon' && j?.state === 'running') add(`${t(patronName(j.patron))}: ${jobText(j).brief}`, 'sub');
   });
   function statusText() {
@@ -602,7 +605,7 @@ export function installStory(game) {
     /** rows for the ship contract board panel (client side): the day's patron jobs */
     jobRows() { const v = view(); return { active: v.job ? { ...jobText(v.job), patron: v.job.patron } : null, rows: (v.offers || []).map((o, i) => ({ i, ...jobText(o), patron: o.patron, credits: o.pay?.credits | 0, xp: o.pay?.xp | 0, shift: o.shift, taken: !!o.taken })) }; },
     takeJob: (i) => askHost('job', { i: i | 0 }),
-    core: C, state: st, effA, trend, items: ITEM_DEFS.map((d) => d.id), genOffers, hostJob, hostQuit, hostChoose, checkAct, dayEnd, statusText, jobsText, refreshTrend,
+    core: C, state: st, effA, trend, trendOn, trendName, items: ITEM_DEFS.map((d) => d.id), genOffers, hostJob, hostQuit, hostChoose, checkAct, dayEnd, statusText, jobsText, refreshTrend,
     dispose() {
       disposed = true;
       for (const o of offs.splice(0)) { try { o?.(); } catch { /* ignore */ } }

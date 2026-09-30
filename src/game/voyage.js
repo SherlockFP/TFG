@@ -28,6 +28,7 @@ import { NO_LOOK } from '../render/tierlooks.js';
 import * as V from './voyage_core.js';
 import { createArtModel } from '../models/artpass.js';
 import { TR, RU } from './voyage_i18n.js';
+import { warpMayRoll } from './headline_core.js';
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const flat = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
@@ -225,7 +226,7 @@ export function installVoyage(game) {
     const st = warpState();
     const job = s.mission && (s.mission.st === 'accepted' || s.mission.st === 'active') && s.mission.moon === r.moon;
     let w = null;
-    if (!job) w = V.rollWarp(new RNG((Math.random() * 4294967296) >>> 0), st);
+    if (!job && warpMayRoll(game.mapmods?.plan?.(), !!game.roledays?.state?.cur)) w = V.rollWarp(new RNG((Math.random() * 4294967296) >>> 0), st);
     if (!w) return orig.call(this, from);
     const proceed = () => { if (!disposed) orig.call(this, from); };
     if (w.kind === 'glitch') { S.pendingWarp = { kind: 'glitch' }; startWarp(w, proceed); return; }

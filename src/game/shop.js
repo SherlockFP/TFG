@@ -22,6 +22,7 @@ import { CRUISER } from '../entities/cruiser.js';
 import { createWeaponContext, installWeapons } from './weapons.js';
 import { installDeck } from './deck.js';
 import { dropPoint, SPOTS } from '../world/shiplayout.js';
+import { cloutOpenOf } from './wallet.js';
 
 export const CATEGORIES = [
   { id: 'weapons', name: 'Weapons' }, { id: 'tools', name: 'Tools' }, { id: 'bags', name: 'Bags' }, { id: 'consumables', name: 'Consumables' },
@@ -253,7 +254,7 @@ export function installShop(game) {
       if (eom) out.push(`EMPLOYEE OF THE MONTH: ${eom.name} (-${Math.round(eom.off * 100)}%)`);
       if (deals.length || eom) out.push('');
       for (const c of categoryList()) {
-        const list = st.filter((e) => e.cat === c.id && !e.owned);
+        const list = st.filter((e) => e.cat === c.id && !e.owned && (e.currency !== 'clout' || cloutOpenOf(g)));   // [trim] no Clout prices before the store's quota-1 unlock
         if (!list.length) continue;
         out.push(c.name.toUpperCase() + ':');
         for (const e of list) {
@@ -262,7 +263,7 @@ export function installShop(game) {
         }
         out.push('');
       }
-      out.push('Personal gear, armor and cosmetics: visit Phish Dayı at 0-Algorithm HQ.');
+      if (cloutOpenOf(g)) out.push('Personal gear, armor and cosmetics: visit Phish Dayı at 0-Algorithm HQ.');
       return out;
     },
   });

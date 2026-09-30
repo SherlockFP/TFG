@@ -106,7 +106,7 @@ export function installHubgate(game) {
   /** the host's ladder for a joiner (run.hub); null on the host / when the host has not published one */
   const remoteHub = () => (game.isHost ? null : game.run?.hub || null);
   /** shop.js hook: rare+ stock (and ship upgrades) wait for quota 1 -> a lock reason or '' */
-  function shopLock(e) { return locked('shop') && tierIndex(e.tier) >= 2 ? tx('hg.lock', { n: 1, name: sysName('shop') }) : ''; }
+  function shopLock(e) { return locked('shop') && (tierIndex(e.tier) >= 2 || e.currency === 'clout') ? tx('hg.lock', { n: 1, name: sysName('shop') }) : ''; }
   function publishHub() {
     if (!game.isHost || !game.run || !ob()) return;
     const u = ob().unlocks?.();
@@ -218,8 +218,11 @@ export function installHubgate(game) {
     ensureStyle();
     const wrap = ui.panel('hg-hub');
     const list = el('div', { class: 'hg-hub' });
+    const reqKey = (id) => { const r = requirement(id); return r?.boss ? 'boss' : r?.q; };
+    const nextKey = reqKey(HUB_ORDER.find((id) => locked(id)));   // [trim] the panel lists what is open + only the NEXT unlock step (no advert for the whole roadmap)
     for (const id of HUB_ORDER) {
       const open = !locked(id);
+      if (!open && reqKey(id) !== nextKey) continue;
       const row = el('div', { class: 'hg-row' + (open ? '' : ' lk') }, el('span', { class: 'hg-n' }, sysName(id)), el('span', { class: 'hg-d' }, open ? hintOf(id) : needText(id)));
       if (open && GO[id]) row.appendChild(ui.button(tx('hg.go'), () => { ui.closePanel(); try { GO[id](game); } catch (e) { warn('go ' + id, e); } }, 'small'));
       else row.appendChild(el('span', { class: 'dim' }, open ? tx('hg.open') : ''));

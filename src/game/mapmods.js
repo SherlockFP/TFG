@@ -16,6 +16,7 @@ import { insideShip } from '../world/ship.js';
 import { t, tf } from '../core/i18n.js';
 import { RNG, hashString } from '../core/rng.js';
 import { AFFIX_BY_ID, MAX_AFFIX, RARITY_NAME, rollMap, addAffix, effectsOf, flagsOf, rewardOf, mapTitle, cleanMap } from './mapmods_core.js';
+import { affixCalm } from './headline_core.js';
 import './mapmods_i18n.js';
 import { HOST_ONLY } from '../net/session.js';
 HOST_ONLY.add('mm');   // host -> client text (terminal / chat): a peer must not be able to print into other players' terminals
@@ -96,16 +97,29 @@ export function installMapmods(game) {
     const r = run(); if (r?.phase === 'orbit' && !mmOf()?.nxt) hostRollNext();
   }));
   /** at the lever: nxt becomes cur and its numbers are merged into the day event (before the phase message, so every peer gets both) */
+  /** [trim] would a landing on this run get an affix set? (the fresh-profile calm gates + a weekly challenge, which is its own headline) */
+  function mmGate(r) {
+    if (game.onboard?.fr?.calm?.('mapmods')) return false;
+    const u = game.profile?.unlocks;
+    return !affixCalm({ mode: u?.mode, q: Math.max(u?.q | 0, r?.quotaIndex | 0), quick: !!r?.quick, unlockAll: !!game.settings?.unlockAll });
+  }
+  const mmAllowed = (r) => realMoon(r.moon) && !r.dailyEvent?.weekly && mmGate(r);
+  /** [trim] headline.js: how many affixes the coming landing will carry (rolls the map now if orbit had none; applyLanding reuses it) */
+  function plan() {
+    const r = run(), m = mmOf(); if (!r || !m || !mmAllowed(r)) return 0;
+    if (!m.nxt) { m.nxt = rollMap(seed(m), q()); m.n++; }
+    return m.nxt.a.length;
+  }
   function applyLanding(extra) {
     const r = run(), m = mmOf(); if (!r || !m) return extra;
-    if (!realMoon(r.moon) || game.onboard?.fr?.calm?.('mapmods')) { m.cur = null; return { ...extra, mm: m }; }   // [firstrun] no sector-map affixes / card before quota 1
+    if (!mmAllowed(r)) { m.cur = null; return { ...extra, mm: m }; }   // [firstrun] no sector-map affixes / card before quota 1 (fresh staged profiles: quota 2)
     if (!m.nxt) { m.nxt = rollMap(seed(m), q()); m.n++; }
     m.cur = m.nxt; m.nxt = null;
     const fx = effectsOf(m.cur.a);
     if (!Object.keys(fx).length) return { ...extra, mm: m };
-    const base = r.dailyEvent;
+    const base = r.dailyEvent?.weekly ? r.dailyEvent : null;   // [trim] the affix set IS the day's headline: the daily event was already dropped (headline.js), only a weekly challenge stays merged
     const ev = combineEvents(base, [{ ...fx, name: 'Sector Map' }], 'MAP');
-    ev.name = base?.name || 'NORMAL FEED'; ev.desc = base?.desc || ''; if (base?.weekly) ev.weekly = true; else delete ev.weekly;
+    ev.name = base?.name || 'SECTOR MAP'; ev.desc = base?.desc || m.cur.a.map((id) => AFFIX_BY_ID[id]?.name || id).join(', '); if (base?.weekly) ev.weekly = true; else delete ev.weekly;
     ev.mm = m.cur.a.slice();
     r.dailyEvent = ev;
     return { ...extra, dailyEvent: ev, mm: m };
@@ -224,7 +238,7 @@ export function installMapmods(game) {
       const nested = inExec; inExec = true;
       let r; try { r = orig.call(this, cmd, ...a); } finally { inExec = nested; }
       const w0 = String(cmd || '').trim().toLowerCase().split(/\s+/)[0];
-      if (!nested && (w0 === 'moon' || w0 === 'moons') && run()?.phase === 'orbit' && mmOf()?.nxt) this.print('\n' + readout());
+      if (!nested && (w0 === 'moon' || w0 === 'moons') && run()?.phase === 'orbit' && mmOf()?.nxt && mmGate(run())) this.print('\n' + readout());
       return r;
     }));
   }
@@ -293,7 +307,7 @@ export function installMapmods(game) {
   }
 
   return {
-    ensure: mmOf, readout, rollNext: hostRollNext, hostUse, apply: applyLanding, flags: liveFlags,
+    ensure: mmOf, plan, allowed: () => mmGate(run()), readout, rollNext: hostRollNext, hostUse, apply: applyLanding, flags: liveFlags,
     state: () => run()?.mm || null,
     dispose() {
       if (S.disposed) return;

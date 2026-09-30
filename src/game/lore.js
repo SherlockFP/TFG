@@ -553,10 +553,10 @@ export function installLore(game) {
 
   // ---------------------------------------------------------------- public API (game.lore)
   return {
-    /** show a line in the intercom (local); opts.all (host) = everyone; opts.voice = faction id */
+    /** show a line in the intercom (local); opts.all (host) = everyone; opts.voice = faction id; opts.cls = 'danger' | 'teach' */
     say(text, opts = {}) {
-      if (opts.all && game.isHost) core.broadcast('say', { text: String(text), voice: opts.voice || null });
-      else algo.show({ text: String(text), voice: opts.voice || null, mood: opts.mood, pri: !!opts.pri });
+      if (opts.all && game.isHost) core.broadcast('say', { text: String(text), voice: opts.voice || null, cls: opts.cls, pri: !!opts.pri });
+      else algo.show({ text: String(text), voice: opts.voice || null, mood: opts.mood, pri: !!opts.pri, cls: opts.cls });   // [trim] opts.cls = 'danger' | 'teach' (default: flavour, or teach when pri)
     },
     factionRep: (id) => factions.rep(id),
     factions: () => FACTION_IDS.map((id) => ({ id, name: FACTIONS[id].name, color: FACTIONS[id].color, rival: FACTIONS[id].rival, rep: factions.rep(id), war: factions.war(id), discount: factions.discount(id) })),

@@ -253,6 +253,7 @@ import { installCosm5 } from './cosm5.js';   // wave 4: cosmetics drop (suits/ha
 // [import:ui2]
 import { installNvgear } from './nvgear.js';   // [import:nvgear] wave 8: buyable night-vision goggles + timed ship charger
 import { installMapmods } from './mapmods.js';
+import { installHeadline } from './headline.js';
 import { installWorlds3 } from './worlds3.js';   // wave 8: wrong door + alternate Backrooms worlds + facility size/dressing (docs/wave8/worlds3.md)
 import { installCrdirector } from './crdirector.js';
 import { installFacjobs } from './facjobs.js';
@@ -551,6 +552,7 @@ export class Game extends Emitter {
     // [slot:ui2]
     this.useModule('nvgear', installNvgear);   // [slot:nvgear]
     this.useModule('mapmods', installMapmods);
+    this.useModule('headline', installHeadline);   // [trim] ONE headline modifier per landing (installed after mapmods: wraps hostSetPhase outside it)
     this.useModule('worlds3', installWorlds3);
     this.useModule('crdirector', installCrdirector);
     this.useModule('facjobs', installFacjobs);

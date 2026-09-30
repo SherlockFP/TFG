@@ -13,6 +13,7 @@ import { LINES, FACTIONS, pickLang } from './loredata.js';
 import { isSellable } from './items.js';
 import { getLang, t, speechLang } from '../core/i18n.js';
 import { saveSettings } from '../core/save.js';
+import * as OG from './onegoal_core.js';
 
 export const FOCI = ['noise', 'light', 'greed', 'split', 'doors', 'coward'];
 export const FOCUS_NAME = {
@@ -138,7 +139,7 @@ const GLYPHS = '#%&@$*+=?/\\|<>01';   // ASCII only: block glyphs (▯ ░) rend
 export function installAlgorithm(core) {
   const { game } = core;
   const st = {
-    t: 0, lastSay: -99, keyAt: {}, bags: {},
+    t: 0, lastSay: -99, keyAt: {}, bags: {}, seen: [], seenDay: '', dangerAt: 0,
     // client intercom
     q: [], cur: null, el: null, face: null, faceCtx: null, speakingT: 0, faceT: 0,
     // host
@@ -209,14 +210,24 @@ export function installAlgorithm(core) {
     if (v.cause !== undefined) v.cause = T ? 'öldü.' : (game.deathText?.(v.cause) || 'died.');
     return fill(pickLang(pair, T), v);
   }
-  /** local: queue a line (d = {text} | {key,i,v} | {fv,fk}); voice = faction id or null */
+  /** local: queue a line (d = {text} | {key,i,v} | {fv,fk}); voice = faction id or null.
+   *  [trim] the ONE gate for every Algorithm voice: class teach (d.pri) > danger (d.cls) > flavour (default), near-identical lines are dropped for the rest of the day. */
   function show(d) {
     const text = textOf(d);
     if (!text) return;
-    // [firstrun] a brand-new player hears at most one Algorithm line per 45 s; teaching lines (d.pri) and deaths always pass
-    if (d.key !== 'death' && game.onboard?.fr?.algoOk?.(!!d.pri) === false) return;
-    if (st.q.length >= 3) st.q.shift();
-    st.q.push({ text, pri: !!d.pri, voice: d.voice || null, mood: d.mood || game.run?.algo?.mood });
+    const cls = OG.classOf(d), rank = OG.CLS[cls], death = d.key === 'death';
+    const day = `${game.run?.runId ?? ''}:${game.run?.day ?? ''}`;
+    if (st.seenDay !== day) { st.seenDay = day; st.seen = []; }
+    if (!death && OG.nearDup(text, st.seen)) return;   // [trim] the same line (numbers / case aside) once per day
+    if (!death) {
+      const nowMs = typeof performance !== 'undefined' ? performance.now() : Date.now();
+      if (cls === 'danger') { if (!OG.dangerOk(nowMs, st.dangerAt, !!game.settings?.chattyAlgo)) return; st.dangerAt = nowMs; }
+      // [firstrun] a brand-new player hears at most one Algorithm line per 45 s; teaching lines and deaths always pass (past the budget: onegoal, same pacing for everyone)
+      else if (game.onboard?.fr?.algoOk?.(cls === 'teach') === false) return;
+    }
+    st.seen.push(OG.lineWords(text)); if (st.seen.length > 40) st.seen.shift();
+    st.q = OG.enqueue(st.q, { text, pri: rank < 2, cls, voice: d.voice || null, mood: d.mood || game.run?.algo?.mood });
+    if (rank < 2 && st.cur && OG.CLS[st.cur.cls] === 2) st.cur.dur = Math.min(st.cur.dur, st.cur.t + 0.6);   // a warning / lesson cuts a flavour line short
   }
   function startNext() {
     const n = st.q.shift();

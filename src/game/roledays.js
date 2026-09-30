@@ -9,6 +9,7 @@ import { t, tf } from '../core/i18n.js';
 import { hudDock } from '../ui/dock.js';
 import { MOONS } from './moons.js';
 import * as K from './roledays_core.js';
+import { roleMayRoll } from './headline_core.js';
 import './roledays_i18n.js';
 
 const CSS = `.rd-card{pointer-events:none;width:260px;padding:8px 10px;background:rgba(18,19,13,.88);border:2px solid #f2c230;color:#e8e6d0;font:600 12px/1.3 'Bahnschrift','Arial Narrow',Arial,sans-serif;box-shadow:0 0 0 2px #12130d}
@@ -199,7 +200,7 @@ export function installRoledays(game) {
     const rng = new RNG(((r.seed | 0) ^ 0x40d5 ^ ((r.day | 0) * 7919)) >>> 0);
     const players = crew();
     const ctx = { quotaIndex: r.quotaIndex | 0, difficulty: game.config?.difficulty, company: !!MOONS[r.moon]?.company, lastDay: st.lastDay, day: r.day, roll: rng.next() };
-    if (!enabled() || !K.dayEligible(ctx)) { S.cur = null; bcast(); return; }
+    if (!enabled() || !K.dayEligible(ctx) || !roleMayRoll(game.mapmods?.plan?.())) { S.cur = null; bcast(); return; }   // [trim] a sector-map affix set is the day's headline: no role day on top
     const id = K.pickCard(players.length, () => rng.next(), st.lastCard);
     const a = id ? K.assign(id, players, r.day) : null;
     S.cur = a; S.paid = false; S.said = false;

@@ -53,3 +53,7 @@ export function countMaterials(itemTypes = [], store = null) {
   if (store) { c.stash += Math.floor(store.parts || 0); c.meals += Math.floor(store.meals || 0); for (const k of ['s1', 's2', 's3', 's4']) c.shards += Math.floor(store[k] || 0); }
   return c;
 }
+
+/** [trim] is Clout a wallet the player can SPEND yet? Credits are the only money of the first hour: a fresh staged profile meets Clout prices (Company Store,
+ *  terminal store list, Black Market) at the same unlock as the store's rare stock (hubgate 'shop', quota 1). Veterans / unlock-everything / no onboard: always. */
+export const cloutOpenOf = (game) => { try { return !game?.onboard?.locked?.('shop'); } catch { return true; } };

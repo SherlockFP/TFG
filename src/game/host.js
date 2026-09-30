@@ -353,6 +353,7 @@ export const hostMethods = {
     } else {
       this.hostSetPhase('moon');
       const ev = this.run.dailyEvent;
+      if (!ev && ['mapmods', 'role', 'warp', 'trend'].includes(this.run.hl?.k)) { /* [trim] the headline announces itself (sector map / role day / warp / trend) */ } else
       this.net.broadcast('sys', sysMsg('DAILY EVENT: {@n} - {@n2}', { n: ev?.name || 'NORMAL FEED', n2: ev?.desc || '' }, ev?.dangerMul > 1.15 ? 'warn' : 'info'));
       this.hostData.pressureStage = 0;
       this.hostData.moonT = 0;
