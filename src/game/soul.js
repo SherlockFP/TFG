@@ -23,7 +23,7 @@ const SOUNDS = {
   sl_tick: (sr) => synth(sr, 0.07, (tt) => sin(1900, tt) * ex(tt, 55) * 0.3),
   sl_pop: (sr) => synth(sr, 0.16, (tt) => sin(480 + 900 * (1 - Math.exp(-tt * 38)), tt) * ex(tt, 20) * 0.32),
 };
-const CSS = `.sl-card{position:fixed;left:0;right:0;top:30%;text-align:center;pointer-events:none;z-index:45;font-family:var(--cond,'Barlow Condensed','Arial Narrow',sans-serif);color:#ece4cf;opacity:0;transition:opacity .55s;text-shadow:0 2px 10px #000}
+const CSS = `.sl-card{position:fixed;left:0;right:0;top:22%;text-align:center;pointer-events:none;z-index:45;font-family:var(--cond,'Barlow Condensed','Arial Narrow',sans-serif);color:#ece4cf;opacity:0;transition:opacity .55s;text-shadow:0 2px 10px #000}
 .sl-card.on{opacity:1}.sl-card .k{font-size:15px;letter-spacing:.42em;color:#f2c230;text-transform:uppercase}.sl-card .n{font-size:54px;letter-spacing:.06em;margin:4px 0 8px;text-transform:uppercase}
 .sl-card .l{font-size:19px;font-style:italic;max-width:640px;margin:0 auto;color:#ffb86a}.sl-card .s{font-size:12px;letter-spacing:.2em;color:#8a8474;margin-top:16px}
 .sl-pop{position:fixed;left:50%;top:60%;transform:translateX(-50%);pointer-events:none;z-index:44;font-family:var(--cond,'Barlow Condensed','Arial Narrow',sans-serif);font-size:24px;color:#f2c230;text-shadow:0 2px 6px #000;opacity:0}
@@ -408,8 +408,12 @@ export function installSoul(game) {
   // ================================================================== 5. moments
   function showCard(moonId, late) {
     if (typeof document === 'undefined') return;
-    if (game.onboard?.fr?.lease?.('card', 4.4, 2) === false) return;   // [firstrun] one card at a time
-    if (!late) { const d = game.onboard?.fr?.slot?.(4.4) || 0; if (d > 80) { later(() => showCard(moonId, true), d); return; } }   // [qa] arrival cards queue behind each other
+    const cc = game.ui?.centerCards;   // [centercards] the moon title takes the one centre-card slot (priority over level up / achievements)
+    if (cc) cc.request('moon', (done) => buildCard(moonId, late, done)); else buildCard(moonId, late, () => {});
+  }
+  function buildCard(moonId, late, done) {
+    if (game.onboard?.fr?.lease?.('card', 4.4, 2) === false) { done(); return; }   // [firstrun] one card at a time
+    if (!late) { const d = game.onboard?.fr?.slot?.(4.4) || 0; if (d > 80) { done(); later(() => showCard(moonId, true), d); return; } }   // [qa] arrival cards queue behind each other
     S.card?.remove?.();
     const moon = MOONS[moonId], line = C.TX['land_' + moonId] ? tx('land_' + moonId) : tx('land_any');
     const el = document.createElement('div'); el.className = 'sl-card';
@@ -420,7 +424,7 @@ export function installSoul(game) {
     el.querySelector('.s').textContent = t(C.TX.skip[0][0]);
     (document.getElementById('ui') || document.body).appendChild(el);
     S.card = el;
-    const kill = () => { el.classList.remove('on'); later(() => el.remove(), 700); off(); };
+    const kill = () => { el.classList.remove('on'); later(() => el.remove(), 700); off(); done(); };
     const onKey = () => kill();
     const off = () => { window.removeEventListener('keydown', onKey, true); window.removeEventListener('mousedown', onKey, true); };
     window.addEventListener('keydown', onKey, true); window.addEventListener('mousedown', onKey, true);

@@ -357,6 +357,7 @@ input[type=range] { accent-color: var(--amber); width: 220px; }
 .hud-coins { color: #ffd23f; }
 .hud-quota { position: absolute; top: 64px; left: 50%; transform: translateX(-50%); font-size: 22px; background: rgba(0,0,0,0.35); padding: 0 12px; border: 1px solid var(--amber-dim); white-space: nowrap; }
 .hud-cross { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -58%); font-size: 30px; color: #fff; opacity: 0.8; }
+#ui.cc-on .hud-prompt .p-sub { opacity: 0; }   /* [centercards] a centre card is up: the prompt keeps only its main line */
 .hud-prompt { position: absolute; left: 50%; top: calc(50% + 46px); transform: translateX(-50%); text-align: center; transition: opacity 0.1s; opacity: 0; }
 .p-main { font-size: 26px; color: #fff; }
 .p-sub { font-size: 21px; color: var(--amber); }
@@ -675,7 +676,7 @@ i.sale-ico.none { display: inline-block; }
 
 /* while a full-screen report plays, anything that still pops up (e.g. mod banners) moves below it */
 #ui.cine-open .kach-banner-host { top: auto; bottom: 150px; }
-#ui.cine-open .hud-dead, #ui.cine-open .hud-spec, #ui.cine-open .hud-big { opacity: 0; }
+#ui.cine-open .hud-dead, #ui.cine-open .hud-spec, #ui.cine-open .hud-big, #ui.cine-open .kach-banner-host { opacity: 0; }
 
 /* ---------------- UI pass 2: character preview, menu transitions, settings, HUD readability ---------------- */
 /* live 3D character preview (src/ui/charpreview.js): a little CRT "scanner booth" */

@@ -428,6 +428,15 @@ class BannerQueue {
     this.showing = true;
     if (this.blocked()) { this.later(() => this.next(), 500); return; }
     const item = this.q.shift();
+    const cc = this.game.ui?.centerCards;   // [centercards] one centre card at a time, compact toast when 2+ are waiting
+    if (cc) { cc.request('ach', (done, o) => this.show(item, { compact: o.compact || o.waiting + this.q.length >= 2 }, () => { done(); this.next(); })); return; }
+    this.show(item, {}, () => this.next());
+  }
+  show(item, o, end) {
+    if (o.compact) {
+      try { this.game.ui?.toast?.(`${item.icon || '\u{1F3C6}'} ${item.name}${item.reward ? ' \u00B7 ' + item.reward : ''}`, 'good', 3500); this.game.audio?.ui?.('ui_levelup', 0.5); } catch { /* ui optional */ }
+      this.later(end, 600); return;
+    }
     ensureStyle();
     if (!this.host) {
       this.host = mk('div', 'kach-banner-host');
@@ -444,7 +453,7 @@ class BannerQueue {
     this.host.appendChild(node);
     try { this.game.audio?.ui?.('ui_levelup', 0.75); } catch { /* audio optional */ }
     this.later(() => node.classList.add('kach-out'), BANNER_MS - 400);
-    this.later(() => { node.remove(); this.next(); }, BANNER_MS);
+    this.later(() => { node.remove(); end(); }, BANNER_MS);
   }
   dispose() {
     this.disposed = true;

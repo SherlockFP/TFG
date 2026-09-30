@@ -7,6 +7,7 @@ import { el, escapeHtml, clamp, fmtMoney } from '../core/util.js';
 import { t, setLang, getLang, LANGS, tf } from '../core/i18n.js';
 import { tNum } from '../i18n/tnum.js';   // [i18n8] toasts: exact key, then numbers as {}
 import { HUD, randomTip } from './hud.js';
+import { createCenterCards } from './centercards.js';
 import { iconHTML, typeFromName } from './icons.js';
 import { chooseQuality, resolveLevel } from '../render/quality.js';   // [perf2]
 import '../render/quality_i18n.js';
@@ -111,6 +112,7 @@ export class UI {
     this.padActive = false;
     // HUD toasts / big banners wait while a full-screen report is up (see HUD.toast)
     this.hud.gate = () => this.fullscreenOpen();
+    this.centerCards = this.hud.cc = createCenterCards({ onChange: (k) => this.root.classList.toggle('cc-on', !!k) });   // [centercards] ONE centre card at a time
     this.chatIn.addEventListener('keydown', (e) => {
       e.stopPropagation();
       if (e.key === 'Enter') { const v = this.chatIn.value; this.chatIn.value = ''; this.closeChat(); if (v.trim()) this.app.game?.sendChat(v); }
@@ -1254,7 +1256,8 @@ export class UI {
   clearCinematics() {
     if (!this.cineActive && !this.cineQ.length) return;
     this.cineQ.length = 0;
-    this.cineGen = (this.cineGen || 0) + 1;       // stale done() callbacks of the old cinematic are ignored
+    if (this.cineActive) this.centerCards?.end();
+    this.cineGen = (this.cineGen || 0) + 1;      // stale done() callbacks of the old cinematic are ignored
     clearTimeout(this.cineGuard);
     this.cineActive = null;
     this.root.classList.remove('cine-open');
@@ -1262,8 +1265,10 @@ export class UI {
   }
   nextCinematic() {
     clearTimeout(this.cineGuard);
-    if (!this.app.game) { this.cineQ.length = 0; this.cineActive = null; this.root.classList.remove('cine-open'); return; }
+    if (!this.app.game) { this.cineQ.length = 0; if (this.cineActive) this.centerCards?.end(); this.cineActive = null; this.root.classList.remove('cine-open'); return; }
     const c = this.cineQ.shift();
+    if (this.cineActive && !c) this.centerCards?.end();   // [centercards] last cinematic gone
+    else if (!this.cineActive && c) this.centerCards?.begin('cine');
     this.cineActive = c ? c.kind : null;
     this.root.classList.toggle('cine-open', !!c);
     if (!c) return;
