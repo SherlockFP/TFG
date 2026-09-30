@@ -317,7 +317,7 @@ export function installFeedcams(game) {
       emit({ k: 'tax', item: id, type: it.type, name: it.def?.name || it.type, v: v0, cut: r.cut, by });
     }
     if (cut > 0) { F.tx += cut; F.tn += n; run().fcTax = (run().fcTax | 0) + cut; game.broadcastRun?.(['fc', 'fcTax']); fx({ k: 'tax', cut, n }); }
-    for (const p of players) { const m = S.mt.get(p.id); if (m?.tag && p.inShip && !(m.air > now)) { m.tag = ''; } }   // home: the tag is paid off
+    for (const p of players) { const m = S.mt.get(p.id); if (m?.tag && p.inShip) { m.tag = ''; m.air = 0; } }   // home: the tag is paid off
   }
   // noise bait: a loud sound turns nearby cameras toward it for a few seconds
   function onNoise(pos, loud) {
