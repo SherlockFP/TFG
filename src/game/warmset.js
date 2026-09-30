@@ -11,7 +11,7 @@ import { CREATURES, spawnTable } from './creatures.js';
 import { scrapTableFor, bigTableFor } from './items.js';
 import { createCreatureModel } from '../models/creatures.js';
 import { createItemModel, hasItemModel } from '../models/items.js';
-import { warmPlan } from './warmset_core.js';
+import { warmPlan, makeFrameRing, pushFrame, frameStats } from './warmset_core.js';
 import { errLog } from '../core/events.js';   // [errbudget]
 
 const TEX_KEYS = ['map', 'emissiveMap', 'alphaMap', 'lightMap', 'aoMap', 'normalMap', 'bumpMap'];
@@ -41,6 +41,8 @@ export function vfxObjects(canvasTex) {
 }
 
 export function installWarmSet(game) {
+  const ring = makeFrameRing();   // [fastmenu] last 600 frame times
+  const offFrame = game.mods?.on?.('update', (dt, g) => { if (g === game && !(typeof document !== 'undefined' && document.hidden)) pushFrame(ring, performance.now()); });
   const S = { group: null, tex: new Set(), built: [], ms: 0, plan: null, programsBefore: null, programsAfter: null };
   const rend = () => game.engine?.renderer || null;
   const progCount = () => rend()?.info?.programs?.length ?? 0;
@@ -120,10 +122,11 @@ export function installWarmSet(game) {
     for (const p of i?.programs || []) names[p.name] = (names[p.name] || 0) + 1;
     return {
       programs: i?.programs?.length ?? null, programNames: names, geometries: i?.memory?.geometries ?? null, textures: i?.memory?.textures ?? null,
+      frameMs: frameStats(ring),   // [fastmenu] p50/p95/p99 frame ms + 1%-low fps over the last 600 frames
       calls: i?.render?.calls ?? null, triangles: i?.render?.triangles ?? null,
       errors: { total: errLog.total, last: errLog.ring.map((k) => ({ k, n: errLog.counts.get(k) || 0 })) },   // [errbudget]
       warm: { built: S.built.length, models: S.built.slice(0, 80), ms: Math.round(S.ms * 10) / 10, programsBefore: S.programsBefore, programsAfter: S.programsAfter, plan: S.plan },
     };
   };
-  return { queue, cleanup, plan: () => S.plan, hold, dispose() { cleanup(); delete game.perfInfo; } };
+  return { queue, cleanup, plan: () => S.plan, hold, dispose() { cleanup(); try { offFrame?.(); } catch { /* ignore */ } delete game.perfInfo; } };
 }

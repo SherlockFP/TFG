@@ -35,3 +35,24 @@ export function warmPlan(run, moon, theme, deps) {
   }
   return { creatures: cs, items: [...items] };
 }
+
+// [fastmenu] rolling frame-time window: a Float32Array ring (allocation-free per frame). frameStats() is called only from perfInfo().
+export const FRAME_WIN = 600;
+export function makeFrameRing(n = FRAME_WIN) { return { buf: new Float32Array(n), i: 0, n: 0, last: 0 }; }
+/** push the frame that ended at `now` (ms); gaps > 1 s (hidden tab / debugger) are not frames */
+export function pushFrame(r, now) {
+  if (r.last) { const d = now - r.last; if (d > 0 && d < 1000) { r.buf[r.i] = d; r.i = (r.i + 1) % r.buf.length; if (r.n < r.buf.length) r.n++; } }
+  r.last = now;
+}
+/** p50 / p95 / p99 frame ms + 1%-low fps (1000 / mean of the worst 1 % of frames) */
+export function frameStats(r) {
+  const n = r.n;
+  if (!n) return { frames: 0, p50: null, p95: null, p99: null, low1pctFps: null, avgFps: null };
+  const a = Array.from(r.buf.subarray(0, n)).sort((x, y) => x - y);
+  const pct = (p) => a[Math.min(n - 1, Math.floor(p * n))];
+  const k = Math.max(1, Math.ceil(n * 0.01));
+  let worst = 0; for (let j = n - k; j < n; j++) worst += a[j];
+  let sum = 0; for (const v of a) sum += v;
+  const r1 = (v) => Math.round(v * 100) / 100;
+  return { frames: n, p50: r1(pct(0.5)), p95: r1(pct(0.95)), p99: r1(pct(0.99)), low1pctFps: r1(1000 / (worst / k)), avgFps: r1(1000 / (sum / n)) };
+}
