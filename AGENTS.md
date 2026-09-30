@@ -859,3 +859,5 @@ Three internet-horror creatures, one rule each: **Buffering** (moves only while 
 ### Wave 10 - outlife10
 `src/game/outlife10{,_core,_art}.js`: outdoor life for every moon (boulders / tufts / snags, 5 Company-debris POIs with sound + one line, fog pools, ONE pooled particle field per biome, a second paler skyline ring with beacons + the Algorithm's watcher tower). Seeded, ~10 draw calls, built as landing jobs after mapart + soul, colliders for <= 12 big boulders only.
 Test: `node tools/harness/outlife10.test.mjs`. Docs: `docs/wave10/outlife10.md`. Not seen in a browser yet (lead verifies).
+### Wave 10 - landing10
+Landing sequencer: `src/game/landing10.js` (+ `landing10_core.js`) routes landing `sys` lines into ONE compact CREW BRIEFING panel after the moon title card (max 5 lines, self-dismissing, rest stays in the chat log); toasts / big text / Algorithm box wait while it runs. Fixed the case card (`.lcase-cine`) surviving `clearCinematics` and the floating cobweb "grey shards" (facility.js). Hooks: ui.js (systemMessage / fullscreenOpen / clearCinematics), docklayout TOP_BANNERS. Docs: docs/wave10/landing10.md.

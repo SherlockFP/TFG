@@ -226,7 +226,8 @@ import { installLabyr10 } from './labyr10.js';   // [import:labyr10] wave 10: De
 import { installMoons10 } from './moons10.js';
 // [import:moons10]
 import { installOutlife10 } from './outlife10.js';
-// [import:landing10]
+import { installLanding10 } from './landing10.js';
+// [import:outlife10]
 // [import:mystery10]
 import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
 
@@ -616,7 +617,8 @@ export class Game extends Emitter {
     this.useModule('moons10', installMoons10);
     // [slot:moons10]
     this.useModule('outlife10', installOutlife10);
-    // [slot:landing10]
+    this.useModule('landing10', installLanding10);
+    // [slot:outlife10]
     // [slot:mystery10]
 
     this.useModule('onboard', installOnboard);   // [slot:onboard] wave 5: Hiring Day + staged unlocks (installed last: wraps hostLever / terminalCommand / objectives.compute)
