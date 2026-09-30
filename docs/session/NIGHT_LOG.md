@@ -36,3 +36,4 @@ Loop rule: 2-3 Sonnet agents at a time (1 browser/QA agent max) → merge with t
 | 15 | shotfix | merged 44a2250: Algorithm typewriter scramble used glyphs the font lacks (now ASCII), task waypoints: only the current goal's label floats, others edge icons, algo2 pink glitch octahedron → dead CRT monitor on a crate (phosphor colours), chunkier torch held further forward. |
 | 16 | QA night 2 (browser at gamma 1.0: everything merged after night 1 + scripted 2-player session) | running |
 | 16 | glove (first-person glove/sleeve smaller & darker, items held naturally) | running |
+| 17 | herocontent | merged 36c6764: own scrap tables for metro/greenhouse/prison/tower (12 new modelled items), themed sector bosses via BOSS_TABLE aliases, route-board payouts use them; economy unchanged (median 7). |
