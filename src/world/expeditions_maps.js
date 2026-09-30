@@ -116,7 +116,7 @@ export function buildBarge(seed, moon, { physics, lightPool, biome }) {
   for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + 0.3, x = Math.cos(a) * 12.6, z = Math.sin(a) * 12.6; k.box(x, K.SHIP_Y, z, 0.35, 2.2, 0.35, 0x3a3f44, { solid: true, data: { kind: 'prop', id: 'ex_post' } }); k.box(x, K.SHIP_Y + 2.2, z, 0.5, 0.25, 0.5, 0xffb060, { glow: true }); }
   emitters.push({ pos: new V3(9, K.SHIP_Y + 3, 9), color: 0xffb060, intensity: 1.1, distance: 18, group: 'outdoor' }, { pos: new V3(-9, K.SHIP_Y + 3, -9), color: 0xffb060, intensity: 1.1, distance: 18, group: 'outdoor' });
   // hull, decks, cabins, containers (colour by kind)
-  const COL = { hull: 0x5b4738, bulk: 0x4a4038, deck: 0x4b535a, pillar: 0x353b40, cabin: 0x3f4a52, roof: 0x2f373c, rack: 0x252a30, console: 0x2b3238, container: 0x6a3a2c };
+  const COL = { hull: 0x86705a, bulk: 0x5e5044, deck: 0x5f6a72, pillar: 0x353b40, cabin: 0x3f4a52, roof: 0x2f373c, rack: 0x252a30, console: 0x2b3238, container: 0x6a3a2c };
   const CONT = [0x7a3b2e, 0x2e5a6a, 0x6a6a3a, 0x4a4f5a, 0x5a3a5a];
   let ci = 0;
   for (const s of P.solids) boxOf(k, s, s.k === 'container' ? CONT[(ci++) % CONT.length] : COL[s.k] || 0x4a4038, { data: { kind: 'wall' } });
@@ -153,6 +153,18 @@ export function buildBarge(seed, moon, { physics, lightPool, biome }) {
       else { const cy = K.BARGE.water + WR.float(0.6, 2.2); k.box(x, y, z, 2.6, cy - y, 2.6, 0x3b3c40, { solid: true, data: { kind: 'prop', id: 'ex_wreck' } }); k.box(x, cy, z, 6.4, 2.5, 2.5, CONT[n % CONT.length], { ry: WR.float(0, 3.1), rz: WR.float(-0.25, 0.25) }); }
       n++;
     }
+  }
+  // [expedfix2] barge readable from the dock: deck lights along the rails, lit portholes, a crane silhouette with a red lamp (emissive/merged only)
+  {
+    const H = P.hull, sz = P.sz, wz = sz > 0 ? H.z0 : H.z1, out = -sz * 0.45, topY = sb - 0.3 + K.BARGE.wallH;
+    for (let x = H.x0 + 3; x < H.x1 - 2; x += 4) {
+      k.box(x, topY + 0.02, wz + out, 0.5, 0.35, 0.3, 0xffe2a0, { glow: true });                 // rail lamp on the near wall top
+      if (((x - H.x0) / 4 | 0) % 2 === 0) k.box(x + 1.4, K.BARGE.water + 1.1, wz + out * 0.6, 0.7, 0.7, 0.16, 0xffc36a, { glow: true });   // porthole above the waterline
+    }
+    for (const zz of [H.z0 + 0.3, H.z1 - 0.3]) for (let x = H.x0 + 2; x < H.x1 - 1; x += 6) k.box(x, topY + 0.05, zz, 0.3, 0.3, 0.3, 0x7fe6ff, { glow: true });
+    const cxp = H.x0 + 0.55 * (H.x1 - H.x0), cz0 = (H.z0 + H.z1) / 2;
+    k.box(cxp, topY, cz0, 1.2, 15, 1.2, 0x3a4048); k.box(cxp + 6, topY + 15, cz0, 16, 0.8, 0.8, 0x3a4048); k.box(cxp + 14, topY + 10, cz0, 0.2, 5, 0.2, 0x2c3238);
+    k.box(cxp - 1.4, topY + 15.9, cz0, 0.7, 0.7, 0.7, 0xff2a1a, { glow: true }); k.box(cxp + 14, topY + 15.4, cz0, 0.5, 0.5, 0.5, 0xff2a1a, { glow: true });
   }
   k.finish();
   // water sheet + bubbles + core beacons (dynamic)
@@ -208,11 +220,13 @@ export function buildDune(seed, moon, { physics, lightPool, biome }) {
     B.addBox(r.x, y + r.h * 0.4, r.z, r.r * 1.5, r.h * 0.8, r.r * 1.5, 0, { kind: 'prop', id: 'ex_rock' });
   }
   // relay pylons at C1..C3: a mast + a top lamp (dynamic: red -> green when the crawler gets there)
-  const lampGeo = new THREE.SphereGeometry(0.42, 8, 6), lamps = [];
+  const lampGeo = new THREE.SphereGeometry(0.42, 8, 6), lamps = [], beamGeo = new THREE.CylinderGeometry(0.35, 0.35, 60, 6, 1, true); env.own(beamGeo);
   for (let i = 1; i <= 3; i++) {
     const p = P.route[i], y = terrain.heightAt(p.x, p.z), ox = 5, oz = 0;
     k.box(p.x + ox, y, p.z + oz, 0.7, 9, 0.7, 0x4a4f55, { solid: true, data: { kind: 'prop', id: 'ex_pylon' } }); k.box(p.x + ox, y + 9, p.z + oz, 1.6, 0.4, 1.6, 0x2a2e33);
-    const m = new THREE.MeshBasicMaterial({ color: 0xff3a24, fog: true }), mesh = new THREE.Mesh(lampGeo, m); mesh.position.set(p.x + ox, y + 9.6, p.z + oz); env.add(mesh); env.mat(m); lamps.push(mesh);
+    const m = new THREE.MeshBasicMaterial({ color: 0xff3a24, fog: true }), mesh = new THREE.Mesh(lampGeo, m); mesh.position.set(p.x + ox, y + 9.6, p.z + oz); mesh.scale.setScalar(1.8); env.add(mesh); env.mat(m); lamps.push(mesh);
+    const bm = new THREE.MeshBasicMaterial({ color: 0xff3a24, transparent: true, opacity: 0.4, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }), beam = new THREE.Mesh(beamGeo, bm);   // [expedfix2] tall checkpoint beam
+    beam.position.set(p.x + ox, y + 10, p.z + oz); env.add(beam); env.mat(bm); mesh.userData.beam = beam;
   }
   env.own(lampGeo);
   // start pad marker at S0 (the crawler parks here)
@@ -239,6 +253,9 @@ export function buildDune(seed, moon, { physics, lightPool, biome }) {
   const dGeo = new THREE.BufferGeometry(); dGeo.setAttribute('position', new THREE.BufferAttribute(dp.slice(), 3));
   const dMat = new THREE.PointsMaterial({ color: 0xd9a86c, size: 0.34, transparent: true, opacity: 0, depthWrite: false, fog: true });
   const dust = new THREE.Points(dGeo, dMat); dust.frustumCulled = false; env.add(dust); env.own(dGeo); env.mat(dMat);
+  // [expedfix2] hard low sun: a bright disc + halo (unfogged, additive), billboarded toward the camera
+  const sunG = new THREE.CircleGeometry(1, 24), sunM = new THREE.MeshBasicMaterial({ color: 0xfff2c0, fog: false, depthWrite: false, transparent: true }), haloM = new THREE.MeshBasicMaterial({ color: 0xffa84a, fog: false, depthWrite: false, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending });
+  const sun = new THREE.Group(), sd = new THREE.Mesh(sunG, sunM), sh = new THREE.Mesh(sunG, haloM); sd.scale.setScalar(16); sh.scale.setScalar(70); sh.position.z = -0.5; sun.add(sh, sd); sun.position.set(-150, 85, -150); env.add(sun); env.own(sunG); env.mat(sunM); env.mat(haloM);
   const ex = { kind: 'dune', plan: P, crawler: cw, cwLamps, cwEm, pylons: lamps, storm: 0, cwCollider: null, dust, dMat, placed: -1 };
   let t = 0;
   const cwSet = (s, mode) => {
@@ -251,7 +268,7 @@ export function buildDune(seed, moon, { physics, lightPool, biome }) {
   ex.setCrawler = (s, mode, rep, cp) => {
     cwSet(s, mode);
     for (let i = 0; i < 3; i++) cwLamps[i].material.color.setHex(i < cp ? 0x40ff70 : (i === cp && mode === 'park' ? (Math.sin(t * 6) > 0 ? 0xffb020 : 0x552200) : 0xff3a24));
-    for (let i = 0; i < 3; i++) lamps[i].material.color.setHex(i < cp ? 0x40ff70 : 0xff3a24);
+    for (let i = 0; i < 3; i++) { lamps[i].material.color.setHex(i < cp ? 0x40ff70 : 0xff3a24); lamps[i].userData.beam.material.color.setHex(i < cp ? 0x40ff70 : 0xff3a24); }
     void rep;
   };
   ex.setCollider = (on, physics2) => {   // the chassis is solid only while parked
@@ -261,6 +278,7 @@ export function buildDune(seed, moon, { physics, lightPool, biome }) {
   const update = (dt, game) => {
     t += dt;
     const cam = game?.camera?.position;
+    if (game?.camera) sun.lookAt(game.camera.position);
     if (cam) {
       const a = dGeo.attributes.position.array, k2 = ex.storm, wind = 6 + 16 * k2;
       for (let i = 0; i < ND; i++) {
@@ -297,7 +315,7 @@ export function buildRoof(seed, moon, { physics, lightPool, biome }) {
   const B = makeBase({ seed, moon, physics, lightPool, plan, kind: 'roof', TerrainCls: ExTerrain });
   const { env, terrain, emitters } = B;
   const k = new Kit(env, 0, 0, 0, 0), R = new RNG((seed ^ 0x40017) >>> 0);
-  const CB = [0x2b2f3a, 0x33303d, 0x2a3540, 0x352e38];
+  const CB = [0x454b5e, 0x4a4660, 0x3f4f62, 0x504658];   // [expedfix2] lighter roof slabs so the surfaces read at night
   // buildings + parapets with gaps at the stair tops / plank ends
   for (const b of P.b) {
     boxOf(k, { x0: b.x0, x1: b.x1, y0: K.SHIP_Y - 0.4, y1: b.y, z0: b.z0, z1: b.z1 }, CB[b.k % 4], { data: { kind: 'wall' } });
@@ -312,6 +330,10 @@ export function buildRoof(seed, moon, { physics, lightPool, biome }) {
     // a dim violet edge line along the roof rim: the blackout city still reads as walkable roofs from the plaza and from the next roof over
     { const ey = b.y + K.ROOFC.parapet + 0.02, w = b.x1 - b.x0, d = b.z1 - b.z0;
       for (const [cx, cz, sx, sz] of [[(b.x0 + b.x1) / 2, b.z0 + 0.25, w, 0.1], [(b.x0 + b.x1) / 2, b.z1 - 0.25, w, 0.1], [b.x0 + 0.25, (b.z0 + b.z1) / 2, 0.1, d], [b.x1 - 0.25, (b.z0 + b.z1) / 2, 0.1, d]]) k.box(cx, ey, cz, sx, 0.05, sz, 0x4a52c8, { glow: true }); }
+    // [expedfix2] rooftop practicals: an access door with a warm lamp, wet puddles that catch the sky
+    { const dz = b.gz < 0 ? b.z1 - 0.62 : b.z0 + 0.62;
+      k.box(b.cx + R.float(-5, 5), b.y, dz, 1.6, 2.2, 0.2, 0x1c2028); k.box(b.cx + 0.0, b.y + 2.35, dz, 0.5, 0.2, 0.2, 0xffb45a, { glow: true });
+      for (let j = 0; j < 2; j++) k.box(b.cx + R.float(-b.w / 3, b.w / 3), b.y + 0.03, b.cz + R.float(-b.w / 3, b.w / 3), R.float(2.5, 4.5), 0.03, R.float(1.6, 3), 0x3c4a86, { glow: true }); }
     // window strips on the four faces (glow), about a third lit
     for (let row = 0; row < 3; row++) {
       const yy = K.SHIP_Y + 1.6 + row * (b.h - 3) / 3;
@@ -338,7 +360,7 @@ export function buildRoof(seed, moon, { physics, lightPool, biome }) {
     k.box(p.x, p.y, p.z, p.sx, p.sy, p.sz, PC[p.id] || 0x555555, { solid: true, data: { kind: 'prop', id: 'ex_' + p.id } });
     if (p.id === 'skylight') k.box(p.x, p.y + p.sy, p.z, p.sx - 0.4, 0.05, p.sz - 0.4, 0x7fd8ff, { glow: true });
     if (p.id === 'mast') k.box(p.x, p.y + p.sy, p.z, 0.3, 0.3, 0.3, 0xff3a24, { glow: true });
-    if (p.id === 'ac') k.box(p.x, p.y + p.sy - 0.05, p.z + p.sz / 2 + 0.02, p.sx * 0.5, 0.12, 0.05, 0x40e8ff, { glow: true });
+    if (p.id === 'ac') { k.box(p.x, p.y + p.sy - 0.05, p.z + p.sz / 2 + 0.02, p.sx * 0.5, 0.12, 0.05, 0x40e8ff, { glow: true }); for (let j = 0; j < 3; j++) k.box(p.x - p.sx * 0.35 + j * 0.3, p.y + p.sy * 0.5, p.z + p.sz / 2 + 0.03, 0.14, 0.14, 0.05, [0x40ff70, 0xffb020, 0xff3a24][j], { glow: true }); }
   }
   // generator (charging station) + billboards (dynamic panels) + kiosks
   const g0 = P.gen; k.box(g0.x, g0.y + 1.5, g0.z, 1.4, 0.16, 0.5, 0xffd060, { glow: true }); k.box(g0.x - 1.2, g0.y + 1.6, g0.z - 0.72, 0.16, 0.16, 0.06, 0x40ff70, { glow: true });
@@ -365,7 +387,7 @@ export function buildRoof(seed, moon, { physics, lightPool, biome }) {
     for (let i = 0; i < 18; i++) {
       const a = i / 18 * Math.PI * 2, x = Math.max(-half, Math.min(half, Math.cos(a) * 140)), z = Math.max(-half, Math.min(half, Math.sin(a) * 140)), h = R.float(24, 52), w = R.float(12, 20);
       if (Math.abs(x) < terrain.playHalf + 6 && Math.abs(z) < terrain.playHalf + 6) continue;
-      sk.box(x, K.SHIP_Y - 0.5, z, w, h, w, 0x14161f);
+      sk.box(x, K.SHIP_Y - 0.5, z, w, h, w, 0x1c1f2c); sk.box(x, K.SHIP_Y + 1, z, w + 0.2, 4, w + 0.2, i % 2 ? 0x5a2f6a : 0x6a4a2a, { glow: true });   // [expedfix2] faint city glow at the tower feet lights the fog
       for (let r = 0; r < 4; r++) if (R.chance(0.6)) sk.box(x, K.SHIP_Y + 4 + r * (h - 8) / 4, z + w / 2 + 0.03, w * 0.5, 0.6, 0.05, R.pick([0xffc070, 0x7fd8ff]), { glow: true });
     }
     sk.finish();

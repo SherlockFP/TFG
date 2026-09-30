@@ -24,8 +24,8 @@ const V3 = THREE.Vector3;
 // ------------------------------------------------------------------------------------------------ registration (every peer, at import)
 const BIOME_BASE = {
   ex_barge: { name: 'Flooded Server Barge', ground: 'mud', ground2: 'metal_plate', rock: 'metal_dark', tint: 0x5f8088, pathTint: 0x6a8a90, rockTint: 0x40525a, sky: 0x0c2a3a, fog: 0x0a4a62, fogDensity: 0.0085, night: 0x041420, sun: 0x9fe0ff, height: 0, rough: 0, trees: null, noBushes: true, step: 'metal', planet: 0x2a8ab0, hemiW: 0.4 },
-  ex_dune: { name: 'Dune Relay Route', ground: 'red_sand', ground2: 'sand', rock: 'rock', tint: 0xf2cf9a, pathTint: 0xe8c48a, rockTint: 0xb08a66, sky: 0xd59462, fog: 0xc89060, fogDensity: 0.009, night: 0x140a08, sun: 0xffe0b0, height: 6, rough: 0.35, dunes: 9, trees: null, noBushes: true, step: 'gravel', planet: 0xd0904a },
-  ex_roof: { name: 'Blackout City', ground: 'asphalt', ground2: 'concrete_dark', rock: 'concrete_dark', tint: 0x7a7f92, pathTint: 0x6a6f80, rockTint: 0x505468, sky: 0x140a2a, fog: 0x1c1234, fogDensity: 0.011, night: 0x05030f, sun: 0x8a90ff, minNight: 0.94, height: 0, rough: 0, trees: null, noBushes: true, step: 'concrete', planet: 0x6a3ad0, fx: 'ash', hemiW: 0.25, hemiG: 0x0c0818 },
+  ex_dune: { name: 'Dune Relay Route', ground: 'red_sand', ground2: 'sand', rock: 'rock', tint: 0xf2cf9a, pathTint: 0xe8c48a, rockTint: 0xb08a66, sky: 0xd59462, fog: 0xdca060, fogDensity: 0.0105, night: 0x140a08, sun: 0xfff0c8, height: 6, rough: 0.35, dunes: 9, trees: null, noBushes: true, step: 'gravel', planet: 0xd0904a },
+  ex_roof: { name: 'Blackout City', ground: 'asphalt', ground2: 'concrete_dark', rock: 'concrete_dark', tint: 0x7a7f92, pathTint: 0x6a6f80, rockTint: 0x505468, sky: 0x140a2a, fog: 0x2a1a4a, fogDensity: 0.011, night: 0x05030f, sun: 0x8a90ff, minNight: 0.94, height: 0, rough: 0, trees: null, noBushes: true, step: 'concrete', planet: 0x6a3ad0, fx: 'ash', hemiW: 0.25, hemiG: 0x0c0818 },
 };
 for (const [id, b] of Object.entries(BIOME_BASE)) if (!BIOMES[id]) BIOMES[id] = { ...b };
 const moonDef = (kind, o) => ({
