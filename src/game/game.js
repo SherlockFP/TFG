@@ -234,6 +234,13 @@ import { installLoop11 } from './loop11.js';
 import { installShift11 } from './shift11.js';
 import { installEvents11 } from './events11.js';
 import { installGear11 } from './gear11.js';
+// wave 12 placeholders
+// [import:creatures12]
+// [import:labyr12]
+// [import:moons12]
+// [import:atmos12]
+// [import:coop12]
+// [import:balance12]
 import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
 
 
@@ -629,6 +636,12 @@ export class Game extends Emitter {
     this.useModule('shift11', installShift11);
     this.useModule('events11', installEvents11);
     this.useModule('gear11', installGear11);
+    // [slot:creatures12]
+    // [slot:labyr12]
+    // [slot:moons12]
+    // [slot:atmos12]
+    // [slot:coop12]
+    // [slot:balance12]
 
     this.useModule('onboard', installOnboard);   // [slot:onboard] wave 5: Hiring Day + staged unlocks (installed last: wraps hostLever / terminalCommand / objectives.compute)
     this.useModule('score', installScore);   // wave 7: adaptive procedural music + the Algorithm's jingle (docs/wave7/score.md)
