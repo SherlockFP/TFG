@@ -172,7 +172,7 @@ const LIST = [
   ['sound2', 'sound2', 'installSound2'], ['expeditions', 'expeditions', 'installExpeditions'], ['labyrinths', 'labyrinths', 'installLabyrinths'], ['routeboard', 'routeboard', 'installRouteboard'],
   ['hudcalm', 'hudcalm', 'installHudCalm'], ['creatureRead', 'creature_read', 'installCreatureRead'], ['lcmonsters', 'lcmonsters', 'installLcmonsters'], ['loaner', 'loaner', 'installLoaner'],
   ['downed', 'downed', 'installDowned'], ['hubgate', 'hubgate', 'installHubgate'], ['mapmods', 'mapmods', 'installMapmods'], ['worlds3', 'worlds3', 'installWorlds3'], ['facjobs', 'facjobs', 'installFacjobs'],
-  ['mining', 'mining', 'installMining'], ['atmos', 'atmos', 'installAtmos'], ['soul', 'soul', 'installSoul'], ['repomaps', 'repomaps', 'installRepomaps'], ['resto', 'resto', 'installResto'],
+  ['mining', 'mining', 'installMining'], ['atmos', 'atmos', 'installAtmos'], ['soul', 'soul', 'installSoul'], ['repomaps', 'repomaps', 'installRepomaps'], ['resto', 'resto', 'installResto'], ['homestead', 'homestead', 'installHomestead'],
   ['arcade2', 'arcade2', 'installArcade2'], ['herocontent', 'herocontent', 'installHerocontent'], ['nvgear', 'nvgear', 'installNvgear'], ['balRules', 'balance_rules', 'installBalanceRules'],
   ['gpusweep', 'gpusweep', 'installGpuSweep'],
 ];

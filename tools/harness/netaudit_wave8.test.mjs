@@ -39,11 +39,11 @@ for (const f of files) {
 // wave-8 modules: type -> [module file, how a client is protected from a forged copy]
 const W8 = {
   fcfx: ['feedcams.js', 'HOST_ONLY'], fc2fx: ['feedcams2.js', 'HOST_ONLY'], dn: ['downed.js', 'from-check'], hg: ['hubgate.js', 'HOST_ONLY'],
-  rsx: ['resto.js', 'HOST_ONLY'], rsmsg: ['resto.js', 'HOST_ONLY'], labfx: ['labyrinths.js', 'HOST_ONLY'], w3fx: ['worlds3.js', 'from-check'],
+  rsx: ['resto.js', 'HOST_ONLY'], rsmsg: ['resto.js', 'HOST_ONLY'], hsx: ['homestead.js', 'HOST_ONLY'], hsmsg: ['homestead.js', 'HOST_ONLY'], labfx: ['labyrinths.js', 'HOST_ONLY'], w3fx: ['worlds3.js', 'from-check'],
   rmap: ['repomaps.js', 'HOST_ONLY'], lm: ['lcmonsters.js', 'HOST_ONLY'], cd: ['crdirector.js', 'from-check'], mm: ['mapmods.js', 'HOST_ONLY'],
   fjfx: ['facjobs.js', 'HOST_ONLY'], fjd: ['facjobs.js', 'HOST_ONLY'], mnd: ['mining.js', 'HOST_ONLY'], ac2s: ['arcade2.js', 'from-check'], rvpk: ['rewardviz.js', 'HOST_ONLY'],
 };
-const W8REQ = { fcreq: 'feedcams.js', fc2req: 'feedcams2.js', dnreq: 'downed.js', rsreq: 'resto.js', labreq: 'labyrinths.js', lmq: 'lcmonsters.js', mmq: 'mapmods.js', fjreq: 'facjobs.js',
+const W8REQ = { fcreq: 'feedcams.js', fc2req: 'feedcams2.js', dnreq: 'downed.js', rsreq: 'resto.js', hsreq: 'homestead.js', labreq: 'labyrinths.js', lmq: 'lcmonsters.js', mmq: 'mapmods.js', fjreq: 'facjobs.js',
   mnhit: 'mining.js', mnput: 'mining.js', mnsync: 'mining.js', ac2req: 'arcade2.js', arreq: 'arcade.js' };
 const rows = [];
 for (const [type, [file, how]] of Object.entries(W8)) {
@@ -63,7 +63,7 @@ for (const [type, v] of Object.entries(T)) if (v.on.length && v.msg.length) ok(f
 // hub gate: the host store validation must pass the lock (a client can forge the terminal BUY / cart request)
 ok(/stockFor\(run, lore\(\), g\.hubgate\?\.shopLock\)\.find/.test(rd('game/shop.js')) && /new Map\(stockFor\(run, lore\(\), g\.hubgate\?\.shopLock\)/.test(rd('game/shop.js')), 'shop host paths enforce the hub lock');
 // every run field the wave-8 modules write is broadcast right there
-for (const [f, keys] of [['feedcams.js', ["'fc'", "'fcTax'"]], ['feedcams2.js', ["'fc2'"]], ['hubgate.js', ["'hub'"]], ['resto.js', ["'rs'"]], ['facjobs.js', ['bcast']], ['mapmods.js', ["'mm'"]]]) {
+for (const [f, keys] of [['feedcams.js', ["'fc'", "'fcTax'"]], ['feedcams2.js', ["'fc2'"]], ['hubgate.js', ["'hub'"]], ['resto.js', ["'rs'"]], ['homestead.js', ["'hs'"]], ['facjobs.js', ['bcast']], ['mapmods.js', ["'mm'"]]]) {
   const src = rd('game/' + f);
   for (const k of keys) ok(new RegExp('broadcastRun\\??\\.?\\(\\[[^\\]]*' + k.replace(/[$()*+.?[\\\]^{|}]/g, '\\$&')).test(src) || (k === 'bcast' && /bcast = /.test(src)), `${f}: run field ${k} is broadcast`);
 }
