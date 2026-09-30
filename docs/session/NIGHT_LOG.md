@@ -12,7 +12,7 @@
 
 **Gece eklenen/iyileşen başlıklar:** iniş donması (kuyruk + ön-derleme, 404 ayı 6.2 sn→1.7 sn), ekonomi dengesi, kamera mekaniği derinleşti (Opus), ödül görünürlüğü, 3 macera ayı (Mavna/Kum/Çatı), hedef tek satır, yaratık havuzları (her ay 3-4 yaratık), yaratık gözleri/animasyonları, taşıma komedisi, highlight klibi, 64 yeni ses, haritalar %46 küçüldü, eldiven/fener görünüşü, çok oyunculu 10+ hata, host değişimi.
 
-**Bilinen açıklar:** macera ayları headless tarayıcıda çöktü (düzeltme ajanı çalışıyor); 2 kişilik gerçek WebRTC oturumu hâlâ yapılmadı; birçok görsel sadece node testinde doğrulandı.
+**Bilinen açıklar:** macera ayları artık iniyor ve görünüyor (yeşil ekran düzeldi), ama gerçek ekran kartında hiç denenmedi; 2 kişilik gerçek WebRTC oturumu hâlâ yapılmadı; birçok görsel sadece node testinde doğrulandı.
 
 ---
 
@@ -58,5 +58,5 @@ Loop rule: 2-3 Sonnet agents at a time (1 browser/QA agent max) → merge with t
 | 18 | perf5 | merged f60343c: steady-state profiler (105 modules on a stub facility day); tonight's modules were already cheap; fixed per-frame DOM writes (221→41 text/s, 441→81 style/s via domdiff), shipyard/pets/feedcams/combat_kit garbage. Felt stutter is most likely the landing/first-use hitches (perf3/4). |
 | 19 | perf6 warmset | merged e79aa11: landing builds hidden copies of the moon's pool creatures (≤12), top scrap/big items and common VFX so shaders compile + textures upload before first sight; `kefal.game.perfInfo()` for QA. Material dedupe: nothing needed (three shares programs by params). |
 | 20 | feelfix2 | merged 0954a7f: face the terminal after the stream, locked prompts only within 1.5 m, tarp hides lids, round soft drone/camera cones, bulky carry ≤25 % of view + 60 % opacity, carryMul 0.92 fixed, metro/influencer brighter practicals + floors, report hides the quota banner. |
-| 20 | expedfix | running |
+| 20 | expedfix | merged 9debb9f: green wash = the pacing fog cap clamping the barge dive fog (skipped on expeditions) + spore particles removed; darker sea + 9 wreck silhouettes; roof billboards share 4 POT textures (were leaking per-billboard canvases), lamps merged. All 3 expedition moons land and read in a fresh tab (shots ex_*.jpg). 7 GB crash not reproduced (maps are 2-3 MB geometry). |
 | 21 | mpfix | merged e19abaa: two-tab MP script 17/17, 0 pageerrors. All 4 failures were harness bugs (takeoff was the designed pre-flight fault checklist). Verified: host migration mid-landing, TAGGED cleared at the ship, carry strap visible on both, revive UI on both. Lead: TAGGED now clears the moment you're inside the ship (was up to 10 s later). |
