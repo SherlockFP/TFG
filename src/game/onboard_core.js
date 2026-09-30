@@ -145,16 +145,19 @@ export const UNLOCKS = [
   { id: 'voyage', q: 4 }, { id: 'season', q: 4 },
   { id: 'gates', boss: true },
 ];
-/** ONE wardrobe piece handed over with each unlock (cosmetics.js slot:id; cosmetics.entry() must know it; the wardrobe never needed the shop for these) */
+/** ONE wardrobe piece handed over with each unlock: an ordered candidate list [slot:id, ...] (cosmetics.js; entry() must know each). The first one the profile does
+ *  not own yet is granted. Primary picks avoid pieces whose own earn rule fires around the same moment (plushie = quota 1, beanie = level 2, ...). */
+const G = (...keys) => keys.map((k) => { const [slot, id] = k.split(':'); return { slot, id }; });
 export const GIFTS = {
-  shop: { slot: 'hat', id: 'beanie' }, tree: { slot: 'hat', id: 'wizard' },
-  arcade: { slot: 'face', id: 'shades' }, pets: { slot: 'back', id: 'plushie' },
-  homeworld: { slot: 'suit', id: 'construction' }, farming: { slot: 'hat', id: 'bucket' }, restaurant: { slot: 'face', id: 'moustache' },
-  forge: { slot: 'hat', id: 'headlamp' }, zones: { slot: 'suit', id: 'soviet' },
-  voyage: { slot: 'back', id: 'antenna' }, season: { slot: 'suit', id: 'tracksuit' },
-  gates: { slot: 'face', id: 'gasmask' },
+  shop: G('hat:hardhat', 'hat:cone', 'hat:beanie'), tree: G('hat:wizard', 'hat:propeller', 'hat:tophat'),
+  arcade: G('face:shades', 'face:visor', 'face:led'), pets: G('back:plushfrog', 'back:balloons', 'back:lunchbox'),
+  homeworld: G('suit:soviet', 'suit:construction'), farming: G('hat:cowboy', 'hat:bucket'), restaurant: G('hat:chef', 'face:moustache'),
+  forge: G('hat:cablecoil', 'hat:headlamp'), zones: G('suit:tracksuit', 'suit:viking'),
+  voyage: G('back:fieldradio', 'back:parachute', 'back:antenna'), season: G('suit:viking', 'suit:modarmor', 'suit:knight'),
+  gates: G('face:visor', 'face:gasmask'),
 };
-export const giftOf = (id) => GIFTS[id] || null;
+export const giftsOf = (id) => GIFTS[id] || [];
+export const giftOf = (id) => GIFTS[id]?.[0] || null;
 export const UNLOCK_IDS = UNLOCKS.map((u) => u.id);
 
 export function ensureUnlocks(p) {

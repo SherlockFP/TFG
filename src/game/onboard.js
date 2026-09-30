@@ -120,15 +120,18 @@ export function installOnboard(game) {
   }));
   /** hand over the unlock's ONE wardrobe piece (own profile; each peer's gift lands in their own wardrobe) -> its translated name or '' */
   function giveGift(id) {
-    const g = K.giftOf(id);
-    if (!g || !game.profile) return '';
+    const list = K.giftsOf(id);
+    if (!list.length || !game.profile) return '';
     try {
       ensureWardrobeProfile(game.profile);
-      const e = cosmeticEntry(g.slot, g.id);
-      if (!e) return '';
-      grantCosmetic(game.profile, g.slot, g.id);
-      game.cosmetics?.refresh?.();
-      return t(e.name);
+      for (const g of list) {
+        const e = cosmeticEntry(g.slot, g.id);
+        if (!e) continue;
+        if (!grantCosmetic(game.profile, g.slot, g.id)) continue;   // already owned (earned / bought earlier): try the next candidate
+        game.cosmetics?.refresh?.();
+        return t(e.name);
+      }
+      return '';
     } catch { return ''; }
   }
   function announceGift(id) {
@@ -651,7 +654,7 @@ export function installOnboard(game) {
     controlsPinned: () => !!S.pinned || game.profile?.onboard?.s === 'done',
     stage, step, flow: () => S.flow, fr,
     locked, deny, routeBlocked, lockedText,
-    unlocks: () => { const u = U(); return u ? { mode: u.mode, q: u.q, boss: u.boss, given: { ...u.given }, open: K.UNLOCK_IDS.filter((id) => !locked(id)) } : null; },
+    unlocks: () => { const u = U(); return u ? { mode: u.mode, q: u.q, boss: u.boss, sale: !!(u.sale || prog()?.sale), given: { ...u.given }, open: K.UNLOCK_IDS.filter((id) => !locked(id)) } : null; },
     skip, begin, decide,
     force: (id) => { if (!flowActive()) return false; const ok = K.forceTo(S.flow, id); if (S.wing && K.stageOf(S.flow) !== 'wing') toShip(); if (S.stream && K.stageOf(S.flow) !== 'wing') endStream(true); return ok; },
     note,

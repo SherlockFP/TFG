@@ -176,7 +176,8 @@ const eq = (a, b, m) => ok(JSON.stringify(a) === JSON.stringify(b), `${m}: got $
   eq(K.requirementText('forge'), { q: 3 }, 'requirement forge'); eq(K.requirementText('shop'), { sale: true }, 'requirement shop'); eq(K.requirementText('gates'), { boss: true }, 'requirement gates');
   // the design table
   eq(K.UNLOCKS.map((x) => [x.id, x.q ?? (x.sale ? 'sale' : 'boss')]), [['shop', 'sale'], ['tree', 'sale'], ['arcade', 1], ['pets', 1], ['homeworld', 2], ['farming', 2], ['restaurant', 2], ['forge', 3], ['zones', 3], ['voyage', 4], ['season', 4], ['gates', 'boss']], 'the wave 9 ladder (store at the first sale)');
-  for (const id of K.UNLOCK_IDS) ok(K.giftOf(id) && CO.entry(K.giftOf(id).slot, K.giftOf(id).id), 'a real wardrobe gift for ' + id);
+  for (const id of K.UNLOCK_IDS) ok(K.giftsOf(id).length >= 2 && K.giftsOf(id).every((g) => CO.entry(g.slot, g.id)), 'real wardrobe gift candidates (with fallbacks) for ' + id);
+  ok(K.giftOf('pets').id !== 'plushie' && !K.giftsOf('pets').slice(0, 2).some((g) => g.id === 'plushie'), 'pets gift is not the quota-1 plushie (earned anyway)');
 }
 
 // ================================================================================================ 5. text table (EN / TR / RU)
@@ -272,15 +273,20 @@ const eq = (a, b, m) => ok(JSON.stringify(a) === JSON.stringify(b), `${m}: got $
   ok(api.routeBlocked({ id: 'hamsi' }) === null, 'other moons not blocked');
   // quota progress opens things and the Algorithm gifts them one by one
   ok(api.locked('shop') && /first sale/.test(TX.xf('locked_term_sale', { name: 'STORE' })), 'store: locked before the first sale, sale text');
+  CO.grant(profile, 'hat', 'wizard');   // already owned: the tree gift must fall through to the next candidate
   game.run.sold = 40; tick(0.6);
   ok(!api.locked('shop') && !api.locked('tree') && api.locked('pets'), 'the FIRST SALE (run.sold > 0, quota 0) opens store tiers + skill tree');
-  ok(profile.cosmetics?.hats?.includes('beanie'), 'the store unlock handed over its wardrobe gift (hat:beanie)');
+  ok(profile.cosmetics?.hats?.includes('hardhat'), 'the store unlock handed over its wardrobe gift (hat:hardhat)');
+  { const H = await import('../../src/game/hubgate_core.js'); const hb = H.hubOf(api.unlocks(), null);   // the host publishes the sale rung to joiners
+    ok(hb.sale === true && H.hubOpen('shop', hb) && H.hubOpen('tree', hb) && !H.hubOpen('pets', hb), 'api.unlocks() -> hubOf() carries the sale rung (joiners see the store open)');
+    game.run.sold = 0; ok(H.hubOf(api.unlocks(), null).sale === true, 'a new run (sold 0) on a profile that already sold still publishes sale:true'); game.run.sold = 40; }
   ok(said.some((s) => /better stock/.test(s)) && toasts.some((x) => /NEW TOY/.test(x[0])), 'the store tiers are gifted by the Algorithm (line + toast)');
   game.run.quotaIndex = 1; tick(0.6);
   ok(!api.locked('pets') && !api.locked('arcade') && api.locked('homeworld'), 'quota 1 opens arcade + pets');
   const n1 = said.length; tick(0.6, 3); ok(said.length === n1, 'gifts are spaced (one per 9 s)');
   tick(10, 1); tick(0.6);
   ok(said.filter((s) => /gift/i.test(s)).length >= 2, 'the next gift follows later');
+  ok(profile.cosmetics?.hats?.includes('propeller') && !profile.cosmetics?.hats?.includes('tophat'), 'tree gift: the wizard hat was already owned, so the next candidate (propeller) was granted');
   game.settings.unlockAll = true; ok(!api.locked('gates') && !api.locked('homeworld'), 'Settings: unlock everything opens all'); game.settings.unlockAll = false;
   game.run.cycle = { firstKills: { core1: 1 } }; ok(!api.locked('gates'), 'first boss opens the gates');
   game.run.quotaIndex = 0; game.run.cycle = undefined;
