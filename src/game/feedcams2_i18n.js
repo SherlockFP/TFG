@@ -13,6 +13,8 @@ export const HL_TEXT = {
   juke: "The Algorithm's pick: {name} slipping a camera lock at {v}%. Chat says it was edited.",
   streak: "The Algorithm's pick: {name} live for {v} seconds straight. A natural.",
   live: "The Algorithm's pick: {name} wandering into frame. Low bar, but it is what we have.",
+  crack: "The Algorithm's pick: {name} breaking the {x} (▮{v} gone) on camera. Nobody was surprised.",
+  catch: "The Algorithm's pick: {name} tossing the {x} across the room and somebody actually catching it. A first.",
 };
 
 const ROWS = [
@@ -49,6 +51,8 @@ const ROWS = [
   [HL_TEXT.juke, 'Algoritmanın seçimi: {name} kamera kilidinden %{v} seviyesinde sıyrılıyor. Sohbet montaj diyor.', 'Выбор Алгоритма: {name} уходит от захвата камеры на {v}%. Чат говорит, что это монтаж.'],
   [HL_TEXT.streak, 'Algoritmanın seçimi: {name} tam {v} saniye kesintisiz yayında. Doğuştan yetenek.', 'Выбор Алгоритма: {name} в эфире {v} секунд подряд. Прирождённый талант.'],
   [HL_TEXT.live, 'Algoritmanın seçimi: {name} kadraja dalıyor. Çıta düşük ama elimizdeki bu.', 'Выбор Алгоритма: {name} забредает в кадр. Планка низкая, но что есть.'],
+  [HL_TEXT.crack, 'Algoritmanın seçimi: {name}, {x} eşyasını (▮{v} gitti) kamera önünde kırıyor. Kimse şaşırmadı.', 'Выбор Алгоритма: {name} разбивает {x} (▮{v} потеряно) в кадре. Никто не удивился.'],
+  [HL_TEXT.catch, 'Algoritmanın seçimi: {name}, {x} eşyasını odanın öbür ucuna fırlatıyor ve biri gerçekten yakalıyor. İlk kez oluyor.', 'Выбор Алгоритма: {name} бросает {x} через всю комнату, и кто-то правда ловит. Впервые.'],
 ];
 const TR = {}, RU = {};
 for (const [en, tr, ru] of ROWS) { TR[en] = tr; RU[en] = ru; }
