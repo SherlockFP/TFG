@@ -89,6 +89,7 @@ export function installMapmods(game) {
   // a resumed / late run may sit in orbit without a map: roll one (cheap poll, host only)
   offs.push(mods.on('update', (dt, g) => {
     if (g && g !== game) return;
+    if (S.wait > 0 && (S.wait -= dt) <= 0) buildCard();
     if (S.card && (S.cardT -= dt) <= 0) hideCard();
     if (!host() || (S.chkT -= dt) > 0) return;
     S.chkT = 2;
@@ -240,8 +241,8 @@ export function installMapmods(game) {
       background:rgba(12,9,6,.94);border:1px solid var(--t-line-hi,rgba(255,150,70,.58));box-shadow:0 0 0 1px #000;color:var(--t-paper,#ffd9b8);font-family:var(--font2,sans-serif);text-transform:uppercase;letter-spacing:.06em;transition:opacity .6s}
       .mm-card.out{opacity:0}
       .mm-card .mm-h{display:flex;gap:8px;align-items:center;margin-bottom:5px;font-size:13px}
-      .mm-card .mm-t{font-size:17px;line-height:1.15;margin:2px 0 6px;color:var(--t-amber-hi,#ffb266)}
-      .mm-card .mm-r{display:flex;justify-content:space-between;gap:10px;font-size:13px;line-height:1.35;border-top:1px solid var(--t-line,rgba(255,150,70,.26));padding-top:2px}
+      .mm-card .mm-t{font-size:17px;line-height:1.15;margin:2px 0 6px;text-wrap:balance;overflow-wrap:anywhere;color:var(--t-amber-hi,#ffb266)}
+      .mm-card .mm-r{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:13px;line-height:1.35;overflow-wrap:anywhere;border-top:1px solid var(--t-line,rgba(255,150,70,.26));padding-top:2px}
       .mm-card .mm-r b{font-weight:700;color:var(--t-paper,#ffd9b8)}.mm-card .mm-r i{font-style:normal;color:var(--t-good,#7dff7d);white-space:nowrap}
       .mm-card .mm-f{margin-top:6px;font-size:12px;color:var(--t-clout,#ffd23f)}
       .mm-card.rare .mm-t{color:var(--t-warn,#ffc233)}`;
@@ -252,6 +253,14 @@ export function installMapmods(game) {
     const r = run(), cur = r?.mm?.cur;
     hideCard();
     if (!cur?.a?.length || !realMoon(r.moon)) return;
+    S.wait = (game.onboard?.fr?.slot?.(6) || 0) / 1000;   // [qa] arrival cards queue (firstrun slot): wait for the ones that came first
+    if (S.wait > 0.08) return;
+    S.wait = 0; buildCard();
+  }
+  function buildCard() {
+    const r = run(), cur = r?.mm?.cur;
+    S.wait = 0;
+    if (!cur?.a?.length || !realMoon(r?.moon)) return;
     ensureCss();
     const el = document.createElement('div');
     el.className = 'mm-card tfg-card' + (cur.r >= 2 ? ' rare' : '');
@@ -259,11 +268,11 @@ export function installMapmods(game) {
     const plate = document.createElement('span'); plate.className = 'tfg-plate'; plate.textContent = t('SECTOR MAP');
     const tag = document.createElement('span'); tag.className = 'tfg-tag'; tag.textContent = t(RARITY_NAME[cur.r]);
     head.append(plate, tag);
-    const title = document.createElement('div'); title.className = 'mm-t'; title.textContent = mapTitle(MOONS[r.moon]?.name || '', cur.a, t);
+    const title = document.createElement('div'); title.className = 'mm-t'; title.textContent = mapTitle(MOONS[r.moon]?.short || MOONS[r.moon]?.name || '', cur.a, t);
     el.append(head, title);
     for (const id of cur.a) {
       const row = document.createElement('div'); row.className = 'mm-r';
-      const b = document.createElement('span'); const bn = document.createElement('b'); bn.textContent = nameOf(id); b.append(bn, ' ' + t(AFFIX_BY_ID[id].desc));
+      const b = document.createElement('span'); const bn = document.createElement('b'); bn.textContent = nameOf(id) + ':'; b.append(bn, ' ' + t(AFFIX_BY_ID[id].desc));
       const rw = document.createElement('i'); rw.textContent = perAffix(id);
       row.append(b, rw); el.append(row);
     }
@@ -271,9 +280,10 @@ export function installMapmods(game) {
     const strip = document.createElement('div'); strip.className = 'tfg-hazard'; strip.style.marginTop = '6px';
     el.append(foot, strip);
     document.body.appendChild(el);
-    S.card = el; S.cardT = 9;
+    S.card = el; S.cardT = 6;
   }
   function hideCard() {
+    S.wait = 0;
     const el = S.card; S.card = null;
     if (!el) return;
     el.classList.add('out');

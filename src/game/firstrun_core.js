@@ -54,6 +54,12 @@ export function lease(st, kind, nowMs, secs = CARD_LEASE, pri = 1) {
   return true;
 }
 
+/** arrival card queue (every stage): reserves the next `secs` on the shared card timeline and returns how many ms to wait before showing (0 = free now).
+ *  st = { until }. Cards of the landing (soul card, sector map, wave chip, captions) call it so they show one after another instead of stacking. */
+export function slot(st, nowMs, secs = CARD_LEASE) { const at = Math.max(nowMs, st.until || 0); st.until = at + secs * 1000; return Math.round(at - nowMs); }
+/** ms until the card timeline is free */
+export const busyMs = (st, nowMs) => Math.max(0, (st.until || 0) - nowMs);
+
 /**
  * ONE objective at a time. lines = [{ text, kind: 'main'|'sub'|'hint'|'warn'|'bounty', done, pin, first }] in their original order.
  * Keeps: the first `warn` (midnight, deadline) + one goal = the `first` line (facility entrance) or the first `main`, else the first non-hint line.

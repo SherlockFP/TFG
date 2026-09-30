@@ -488,6 +488,7 @@ export function installOnboard(game) {
     return FR.stageOf({ mode: u?.mode, q: Math.max(u?.q | 0, prog().q | 0), unlockAll: unlockAll(), quick: !!game.run?.quick, flow: S.flow?.s === 'run' ? 'run' : ob?.s || null, sold: !!ob?.f?.frSold });
   }
   const frLease = { kind: '', until: 0, pri: 0 };
+  const frQ = { until: 0 };   // arrival card timeline (all stages): FR.slot
   let frAlgoAt = 0;
   const fr = {
     stage: frStage,
@@ -498,6 +499,10 @@ export function installOnboard(game) {
     algoOk(pri = false) { const now = performance.now(); if (!FR.algoOk(frStage(), now, frAlgoAt, pri)) return false; if (frStage() !== 'free') frAlgoAt = now; return true; },
     /** one card / caption on screen at a time while budgeted; true = you may show yours */
     lease(kind, secs, pri = 1) { return frStage() === 'free' || FR.lease(frLease, kind, performance.now(), secs, pri); },
+    /** arrival cards queue instead of stacking: returns ms to wait before showing a card of `secs` (0 = now), and reserves that time. Every stage. */
+    slot: (secs) => FR.slot(frQ, performance.now(), secs),
+    /** ms until the arrival card timeline is free (the Algorithm box waits for it) */
+    busy: () => FR.busyMs(frQ, performance.now()),
     /** ONE objective at a time while budgeted (the same list when free) */
     only: (lines) => (frStage() === 'free' ? lines : FR.only(lines)),
     /** after Hiring Day, with scrap aboard and nothing sold yet, the orbit objective becomes "sell it" (the first sale beat) */

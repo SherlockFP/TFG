@@ -315,8 +315,9 @@ export function installHorde(game) {
     S.styleEl = document.getElementById(STYLE_ID);
     if (!S.styleEl) { S.styleEl = document.createElement('style'); S.styleEl.id = STYLE_ID; S.styleEl.textContent = CSS; document.head.appendChild(S.styleEl); }
   }
-  function banner(title, sub, color) {
+  function banner(title, sub, color, late) {
     if (typeof document === 'undefined') return;
+    if (!late) { const d = game.onboard?.fr?.slot?.(3) || 0; if (d > 80) { clearTimeout(S.bannerWait); S.bannerWait = setTimeout(() => banner(title, sub, color, true), d); return; } }   // [qa] arrival cards queue
     ensureStyle();
     if (!S.banner) {
       S.banner = document.createElement('div');

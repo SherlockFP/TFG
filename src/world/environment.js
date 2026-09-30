@@ -2,7 +2,8 @@
 // space backdrop for orbit (stars + planet).
 import * as THREE from 'three';
 import { clamp, lerp } from '../core/util.js';
-import { QUALITY } from '../render/quality.js';   // [perf2]
+import { QUALITY } from '../render/quality.js';
+const _white = new THREE.Color(0xffffff);   // [perf2]
 
 function skyDome() {
   const geo = new THREE.SphereGeometry(380, 16, 10);
@@ -248,12 +249,18 @@ export class Environment {
     const duskF = clamp(1 - Math.abs(t - 0.62) / 0.12, 0, 1);
     let night = 1 - dayF;
     if (this.eclipse) night = Math.max(night, 0.75);
-    const skyC = new THREE.Color(b.sky ?? 0x6f8a99);
+    // [qa] soul palettes follow the clock: morning is mostly neutral daylight (45 % palette), the palette is strongest at dusk (t = 0.62), and the night never
+    // goes fully black (darkness capped, night colour lifted) so e.g. 404 stays readable
+    const pal = b.palBlend ? 1 : 0, pw = pal ? 0.45 + 0.55 * clamp(t / 0.62, 0, 1) : 1;
+    const blendC = (c, neutral) => (pal ? new THREE.Color(neutral).lerp(new THREE.Color(c), pw) : new THREE.Color(c));
+    if (pal && !this.eclipse) night = Math.min(night, 0.82);
+    const skyC = blendC(b.sky ?? 0x6f8a99, 0x8fa4ae);
     const nightC = new THREE.Color(this.eclipse ? 0x1a0707 : (b.night ?? 0x05070c));
+    if (pal && !this.eclipse) nightC.lerp(new THREE.Color(0x1a1620), 0.4);
     const duskC = new THREE.Color(b.dusk ?? 0x8a4a30);   // [soul] per-moon dusk colour
-    const horizon = skyC.clone().lerp(duskC, duskF * 0.6).lerp(nightC, night);
+    const horizon = skyC.clone().lerp(duskC, duskF * (pal ? 0.75 : 0.6)).lerp(nightC, night);
     const top = horizon.clone().multiplyScalar(0.7);
-    let fogC = new THREE.Color(b.fog ?? 0x7d8f95).lerp(duskC, duskF * 0.4).lerp(nightC, night * 0.95);
+    let fogC = blendC(b.fog ?? 0x7d8f95, 0x9aa8ac).lerp(duskC, duskF * 0.4).lerp(nightC, night * 0.95);
     let fogD = Math.min(b.fogDensity ?? 0.015, this.fogCap ?? 1) * (this.weather === 'foggy' ? 2.6 : this.weather === 'rainy' ? 1.4 : this.weather === 'stormy' ? 1.6 : 1);
     fogD *= 1 + night * 0.4;
     // corrupted biomes: short sky/fog glitch flashes (visual only)
@@ -298,15 +305,21 @@ export class Environment {
     const lf = this.lightningFlash;
     L.sun.position.copy(this.sunDir).multiplyScalar(100).add(camPos);
     L.sun.target.position.copy(camPos);
-    const sunCol = new THREE.Color(b.sun ?? 0xfff1d6).lerp(new THREE.Color(0xff8a50), duskF * 0.6);
+    const sunCol = blendC(b.sun ?? 0xfff1d6, 0xfff1d6).lerp(new THREE.Color(0xff8a50), duskF * 0.6);
     if (this.eclipse) sunCol.set(0xff4a3a);
     L.sun.color.copy(sunCol);
     const overcast = this.weather === 'clear' ? 1 : this.weather === 'foggy' ? 0.6 : 0.55;
     L.sun.intensity = this.indoor ? 0 : (dayF * 1.7 * overcast + night * 0.06 + lf * 3);
-    L.hemi.intensity = this.indoor ? 0.02 : (0.15 + dayF * 0.7 * overcast + lf * 1.5) * (this.eclipse ? 0.5 : 1);
-    L.hemi.color.copy(horizon).lerp(new THREE.Color(0xffffff), b.hemiW ?? 0.35);   // [soul] per-moon hemisphere tint
-    L.hemi.groundColor.set(b.hemiG ?? 0x1c1712);
-    L.ambient.intensity = this.indoor ? 0.012 : 0.03;
+    L.hemi.intensity = this.indoor ? 0.02 : (Math.max(0.15 + dayF * 0.7 * overcast + lf * 1.5, pal ? 0.24 : 0)) * (this.eclipse ? 0.5 : 1);
+    if (this.indoor) {   // [qa] readable-dim interiors: a low neutral baseline (tinted by the theme haze) so room shapes read without a torch; the fog still eats the far corners
+      const af = this.interiorFog;
+      L.hemi.color.set(af?.fog ?? 0x000000).lerp(_white, 0.62); L.hemi.groundColor.set(af?.fog ?? 0x000000).lerp(_white, 0.18);
+      L.hemi.intensity = af?.hemi ?? 0.16; L.ambient.intensity = af?.ambient ?? 0.045;
+    } else {
+      L.hemi.color.copy(horizon).lerp(new THREE.Color(0xffffff), b.hemiW ?? 0.35);   // [soul] per-moon hemisphere tint
+      L.hemi.groundColor.set(b.hemiG ?? 0x1c1712);
+      L.ambient.intensity = 0.03;
+    }
     this.night = night;
   }
 }

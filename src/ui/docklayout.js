@@ -6,7 +6,7 @@
 //   top banners  (vote, PA, siege banner, horde banner, id card, big text) stack under the clock / compass / quota block
 // When a dock has less room than its items need, the items with the HIGHEST `order` (least important) get `.hud-clip`.
 // window.__hcLayout = false switches the pass off (before/after screenshots).
-const BOTTOM_BANNERS = ['.zn-bar', '#p4-hint', '.ob-skip'];
+const BOTTOM_BANNERS = ['.zn-bar', '#p4-hint', '.ob-skip', '.cd-cap'];   // [qa1] .cd-cap (director caption) sat 10 px into the downed bar
 const TOP_BANNERS = [['.a1-vote', 0], ['.algo-sub', 0], ['.ob-pa', 0], ['.sg-banner', 0], ['.hban', 0.5], ['.g2-card', 0], ['.hud-big', 0]];
 let timer = 0;
 

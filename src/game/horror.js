@@ -59,7 +59,7 @@ export function installHorror(game) {
 
   const S = {
     active: false, L: null, plan: null, group: null, closets: [], pockets: [], traps: [], store: new ChalkStore(), chalk: null, host: null,
-    time: 0, portalCd: 0, herbsTaken: new Set(), boxN: new Map(), tellT: 0, lastChalk: 0, headT: 0, hintShown: false, disposed: false, portals: 0,
+    gen: 0, time: 0, portalCd: 0, herbsTaken: new Set(), boxN: new Map(), tellT: 0, lastChalk: 0, headT: 0, hintShown: false, disposed: false, portals: 0,
   };
   const X = {
     g, S,
@@ -74,6 +74,7 @@ export function installHorror(game) {
 
   // ================================================================================ build / teardown (every peer, from the finished facility)
   function teardown() {
+    S.gen++;
     S.host?.dispose?.(); S.host = null;
     for (const T of S.traps) T.view.dispose();
     for (const c of S.closets) c.view.dispose();
@@ -107,45 +108,56 @@ export function installHorror(game) {
     S.L = L; S.plan = plan; S.active = true;
     S.group = new THREE.Group(); S.group.name = 'horror'; g.scene.add(S.group);
     S.chalk = new ChalkView(g.scene);
+    // [wave8 QA] the rest is split into small landQ jobs (one per closet / pocket / trap), same order as before, so no single 0.2-3.5 s slice
+    const gen = S.gen;
+    const job = (name, fn) => {
+      const run = () => { if (gen !== S.gen || S.disposed) return; try { fn(); } catch (e) { console.warn('[horror] ' + name, e); } };
+      if (g.landQ?.addNext) g.landQ.addNext('horror:' + name, run); else run();
+    };
     // ---- closets + pockets
     plan.closets.forEach((pc, i) => {
-      try {
+      let entry = null;
+      job('closet' + i, () => {
         const frame = closetFrame(L, pc.cell);
         const style = pc.kind === 'outbreak' ? 'quarantine' : pc.kind === 'mansion' ? 'mansion' : 'plain';
         const view = buildCloset(frame, { style, physics: g.physics, wide: pc.kind === 'mansion' });
         S.group.add(view.group);
         blockNav(fac, frame, view.W);
+        entry = { id: i, kind: pc.kind, frame, view, pocket: null, locked: pc.kind === 'outbreak', unlocked: false, fake: false, tellT: 0 };
+        S.closets.push(entry);
+      });
+      job('pocket' + i, () => {
+        if (!entry) return;
         const { ox, oz } = pocketOrigin(i);
         const pocket = buildPocket(POCKET_SPECS[pc.kind], { physics: g.physics, lightPool: g.lights, ox, oz, y: L.y, seed: (L.seed ^ (i * 7919)) >>> 0 });
         pocket.index = i; g.scene.add(pocket.group);
-        S.pockets[i] = pocket;
-        S.closets.push({ id: i, kind: pc.kind, frame, view, pocket, locked: pc.kind === 'outbreak', unlocked: false, fake: false, tellT: 0 });
+        S.pockets[i] = pocket; entry.pocket = pocket;
         // pocket traps (the outbreak wing's crusher corridor)
         (pocket.spec.traps || []).forEach((tp, k) => addPocketTrap(pocket, tp, 50 + i * 10 + k));
-      } catch (e) { console.warn('[horror] closet', pc.kind, e); }
+      });
     });
     if (plan.fake) {
-      try {
+      job('fake', () => {
         const frame = closetFrame(L, plan.fake.cell);
         const view = buildCloset(frame, { style: 'plain', physics: g.physics, fake: true });
         S.group.add(view.group); blockNav(fac, frame, view.W);
         S.closets.push({ id: plan.fake.id, kind: 'fake', frame, view, pocket: null, locked: false, unlocked: false, fake: true, tellT: 2 });
-      } catch (e) { console.warn('[horror] fake closet', e); }
+      });
     }
     // ---- traps in the corridors
     const lasers = fac.hazards?.lasers || [];
-    for (const pt of plan.traps) {
-      try {
-        const zone = trapZoneOf(L, pt);
-        if (lasers.some((h) => Math.hypot((h.cx ?? h.x) - zone.cx, (h.cz ?? h.z) - zone.cz) < 8)) continue;   // never stack on the built-in laser grids
-        const ceil = L.heightOf[L.idx(pt.cells[0][0], pt.cells[0][1])] || L.corridorH || 3.3;
-        const view = new TrapView(pt, zone, ceil, panelFor(L, pt), L.seed);
-        S.group.add(view.group);
-        S.traps.push({ uid: pt.id, desc: pt, view, zone, panel: view.panelPos || { x: zone.cx, y: zone.y + 1.3, z: zone.cz }, st: newTrap(pt.type) });
-      } catch (e) { console.warn('[horror] trap', pt.type, e); }
-    }
-    S.host = g.isHost ? installHost(X) : null;
-    if (!g.isHost) g.net?.request?.('hrReq', { op: 'sync' });
+    plan.traps.forEach((pt, ti) => job('trap' + ti, () => {
+      const zone = trapZoneOf(L, pt);
+      if (lasers.some((h) => Math.hypot((h.cx ?? h.x) - zone.cx, (h.cz ?? h.z) - zone.cz) < 8)) return;   // never stack on the built-in laser grids
+      const ceil = L.heightOf[L.idx(pt.cells[0][0], pt.cells[0][1])] || L.corridorH || 3.3;
+      const view = new TrapView(pt, zone, ceil, panelFor(L, pt), L.seed);
+      S.group.add(view.group);
+      S.traps.push({ uid: pt.id, desc: pt, view, zone, panel: view.panelPos || { x: zone.cx, y: zone.y + 1.3, z: zone.cz }, st: newTrap(pt.type) });
+    }));
+    job('host', () => {
+      S.host = g.isHost ? installHost(X) : null;
+      if (!g.isHost) g.net?.request?.('hrReq', { op: 'sync' });
+    });
   }
   function addPocketTrap(pocket, tp, uid) {
     const [bx, bz, bw, bh] = tp.box;

@@ -11,14 +11,18 @@
 export class LandingQueue {
   constructor({ budgetMs = 8, startDelay = 0.35, now = () => (typeof performance !== 'undefined' ? performance.now() : Date.now()) } = {}) {
     this.budgetMs = budgetMs; this.startDelay = startDelay; this.now = now;
-    this.enabled = true; this.jobs = []; this.wait = 0; this.last = []; this.running = false; this.flushing = false;
+    this.enabled = true; this.jobs = []; this.wait = 0; this.last = []; this.running = false; this.flushing = false; this._inJob = false; this._ins = 0;
   }
   get pending() { return this.jobs.length; }
   /** queue one job; the first one of a batch arms the start delay (title card + thrusters get a frame first) */
   add(name, fn) { if (!this.jobs.length && !this.running && !this.flushing) { this.wait = this.startDelay; this.last = []; } this.jobs.push({ name, fn }); }
+  /** a handler that is itself running as a job splits its work: the parts run NEXT, in the order added (before the jobs queued behind it, so later
+   *  handlers + prewarm still see the finished result). Outside a job (instant load) it just runs fn now. */
+  addNext(name, fn) { if (!this._inJob) { fn(); return; } this.jobs.splice(this._ins++, 0, { name, fn }); }
   _run(job) {
-    const t = this.now();
-    try { job.fn(); } catch (e) { console.warn('[landingq] ' + job.name, e); }
+    const t = this.now(), pj = this._inJob, pi = this._ins;
+    this._inJob = true; this._ins = 0;
+    try { job.fn(); } catch (e) { console.warn('[landingq] ' + job.name, e); } finally { this._inJob = pj; this._ins = pi; }
     this.last.push({ name: job.name, ms: Math.round((this.now() - t) * 10) / 10 });
   }
   /** per-frame pump: at least one job, then more while this frame's budget lasts */

@@ -58,6 +58,7 @@ export function installSoul(game) {
     const b = BIOMES[pal.biome];
     if (!b) continue;
     for (const k of C.GRADE_KEYS) if (pal[k] !== undefined) { backup.push([b, k, b[k]]); b[k] = pal[k]; }
+    backup.push([b, 'palBlend', b.palBlend]); b.palBlend = 1;   // [qa] environment.js blends the palette with the time of day
   }
   let curSat = 1;
   function setSat(v) {
@@ -71,7 +72,7 @@ export function installSoul(game) {
     let pal = palOf(world.moonId);
     if (!pal && game.env?.biome) {   // generated sector / other map: seeded shift of its own biome so no two look alike
       pal = C.paletteFor(world.moonId, game.env.biome, world.seed);
-      if (pal) game.env.biome = { ...game.env.biome, ...pal };
+      if (pal) game.env.biome = { ...game.env.biome, ...pal, palBlend: 1 };
     }
     setSat(pal?.sat ?? 1);
   }
@@ -405,9 +406,10 @@ export function installSoul(game) {
   const pickLine = (key) => C.pickIdx(C.TX[key].length, (game.run?.seed | 0) + (game.run?.day | 0) * 7 + S.lines * 3);
 
   // ================================================================== 5. moments
-  function showCard(moonId) {
+  function showCard(moonId, late) {
     if (typeof document === 'undefined') return;
     if (game.onboard?.fr?.lease?.('card', 4.4, 2) === false) return;   // [firstrun] one card at a time
+    if (!late) { const d = game.onboard?.fr?.slot?.(4.4) || 0; if (d > 80) { later(() => showCard(moonId, true), d); return; } }   // [qa] arrival cards queue behind each other
     S.card?.remove?.();
     const moon = MOONS[moonId], line = C.TX['land_' + moonId] ? tx('land_' + moonId) : tx('land_any');
     const el = document.createElement('div'); el.className = 'sl-card';
