@@ -73,7 +73,7 @@ export const hostMethods = {
 
   hostAnnounce() {
     const info = {
-      code: this.net.code, name: this.opts.lobbyName || (this.profile.name + "'s crew"), host: this.profile.name,
+      code: this.net.code, strategy: this.net.strategy, name: this.opts.lobbyName || (this.profile.name + "'s crew"), host: this.profile.name,
       players: this.net.playerCount(), max: this.config.maxPlayers, phase: this.run.phase, moon: MOONS[this.run.moon]?.short,
       quota: this.run.quota, day: this.run.day, locked: !!this.opts.password, mods: this.mods?.enabledIds() || [],
       diff: this.config.difficulty || undefined,   // [hardmode] shown in the lobby browser
@@ -110,12 +110,13 @@ export const hostMethods = {
   },
 
   hostOnPlayerJoin(id, info, resume = false) {
-    if (!resume && this.mods?.gateJoin && !this.mods.gateJoin(id, info, this)) return;   // (a resume was already admitted)   // Late Join switch + missing content mods: reject before any world data is sent
-    this.ensureRemote(id, info);
+    if (!resume && this.mods?.gateJoin && !this.mods.gateJoin(id, info, this)) { this.net.players.delete(id); return; }   // (a resume was already admitted)   // Late Join switch + missing content mods: reject before any world data is sent
+    this.ensureRemote(id, info)?.setInfo(info);
     const players = [];
     players.push({ id: this.selfId, ...this.helloData(), dead: this.player.dead, st: this.lastPs });
     for (const r of this.remotes.values()) players.push({ id: r.id, name: r.name, level: r.level, suit: r.suit, hat: r.hat, title: r.title || '', dead: r.dead, st: r.lastState });
     const doors = (this.world.facility?.doors || []).map((d) => ({ id: d.id, open: d.open, locked: d.locked, silent: true }));
+    this.net.broadcast('pjoin', { id, ...info }, false);
     this.net.sendTo(id, 'welcome', {
       resume: resume || undefined, run: this.run, config: this.config, players,
       items: this.items.serialize(), creatures: this.creatures.serializeFor(), doors, shipDoor: this.ship.door.open,

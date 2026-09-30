@@ -257,11 +257,18 @@ class App {
     } else this.stopLobbyBrowser();
   }
   async joinGame(opts) {
+    if (this._startingGame || this.game) return false;
     this.stopLobbyBrowser();
-    await this.startGame({ ...opts, host: false });
+    return this.startGame({ ...opts, host: false });
   }
 
   async startGame(opts) {
+    if (this._startingGame || this.game) return false;
+    this._startingGame = true;
+    try { return await this._startGame(opts); } finally { this._startingGame = false; }
+  }
+
+  async _startGame(opts) {
     this.ui.showLoading(opts.host ? t('Preparing the ship...') : tf('Connecting to {code}...', { code: opts.code }));
     if (!this.assetsDone && this.assetsReady) {   // [fastmenu] PLAY / host / join / join link all pass here: wait for the background load (no delay when already done)
       this.assetsWaiting = true;
@@ -287,6 +294,7 @@ class App {
       await this.game.startSession(opts);
     } catch (e) {
       console.error(e);
+      if (!this.game) return false;   // fatal already displayed the error and cleaned up
       alert(tf('Could not start the session: {message}', { message: e.message }));
       this.leaveGame();
       return false;

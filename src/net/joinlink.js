@@ -4,13 +4,13 @@ import { t, tf, addTranslations } from '../core/i18n.js';
 export const NET_MODES = ['nostr', 'mqtt', 'torrent', 'local'];
 
 addTranslations({
-  'ADVANCED': 'GELİŞMİŞ', 'PLAY': 'OYNA',
+  'ADVANCED': 'GELİŞMİŞ', 'PLAY': 'OYNA', 'Campaign': 'Kampanya', 'Game mode': 'Oyun modu', 'HOST GAME': 'HOST AÇ', 'Lobby browser': 'Sunucu listesi',
   'Copy join link': 'Katılma bağlantısını kopyala', 'Join link copied': 'Katılma bağlantısı kopyalandı', 'Copy failed: {link}': 'Kopyalanamadı: {link}',
   'LOBBY {code}': 'LOBİ {code}', 'You are the host. Lobby code: {code}. ESC > Copy join link': 'Sen hostsun. Lobi kodu: {code}. ESC > Katılma bağlantısını kopyala',
   'Join with code {code} or ESC > Copy join link': '{code} koduyla katıl ya da ESC > Katılma bağlantısını kopyala',
 }, 'tr');
 addTranslations({
-  'ADVANCED': 'ДОПОЛНИТЕЛЬНО', 'PLAY': 'ИГРА',
+  'ADVANCED': 'ДОПОЛНИТЕЛЬНО', 'PLAY': 'ИГРА', 'Campaign': 'Кампания', 'Game mode': 'Режим игры', 'HOST GAME': 'СОЗДАТЬ ЛОББИ', 'Lobby browser': 'Список серверов',
   'Copy join link': 'Скопировать ссылку', 'Join link copied': 'Ссылка скопирована', 'Copy failed: {link}': 'Не удалось скопировать: {link}',
   'LOBBY {code}': 'ЛОББИ {code}', 'You are the host. Lobby code: {code}. ESC > Copy join link': 'Ты хост. Код лобби: {code}. ESC > Скопировать ссылку',
   'Join with code {code} or ESC > Copy join link': 'Входи по коду {code} или ESC > Скопировать ссылку',

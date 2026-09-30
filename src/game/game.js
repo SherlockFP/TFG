@@ -639,13 +639,18 @@ export class Game extends Emitter {
     this.installNetHandlers();
     this.director = installDirector(this);
     this.pings = installPings(this);
-    await this.net.start(this.helloData());
-    if (opts.host) {
-      this.hostInit(opts.runData, opts.slot);
-    } else {
-      this.ui.toast(tf('Connecting to lobby {code}...', { code: opts.code }));
-      this.joinTimeout = setTimeout(() => { if (!this.net.connected) this.emit('fatal', 'Could not reach the host. Check the lobby code / network mode.'); }, 25000);
-    }
+    let offReady, offFatal;
+    const ready = opts.host ? null : new Promise((resolve, reject) => {
+      offReady = this.net.once('ready', resolve);
+      offFatal = this.on('fatal', (msg) => reject(new Error(msg)));
+      this.joinTimeout = setTimeout(() => this.emit('fatal', t('Could not reach the host. Check the lobby code / network mode.')), 45000);
+    });
+    ready?.catch(() => {});   // a fatal can arrive while transport.start is still awaiting signaling
+    try {
+      await this.net.start(this.helloData());
+      if (opts.host) this.hostInit(opts.runData, opts.slot);
+      else await ready;   // keep the loading screen until the world snapshot has actually been applied
+    } finally { offReady?.(); offFatal?.(); clearTimeout(this.joinTimeout); }
     this.setupVoice();
     return this;
   }
@@ -708,6 +713,7 @@ export class Game extends Emitter {
     net.on('binary', (buf, from, meta) => this.voice.onBinary(buf, from, meta));
 
     net.on_('welcome', (d) => this.onWelcome(d));
+    net.on_('pjoin', (d) => { if (d?.id) this.ensureRemote(d.id, d)?.setInfo(d); });
     net.on_('gs', (d) => this.applyRunState(d));
     net.on_('phase', (d) => this.onPhase(d));
     net.on_('it', (d) => this.items.onEvent(d));
@@ -762,7 +768,7 @@ export class Game extends Emitter {
   }
 
   onWelcome(d) {
-    clearTimeout(this.joinTimeout);
+    if (!d?.run || !Array.isArray(d.players)) throw new Error('Incomplete host snapshot');
     clearTimeout(this._pwErrTimer);
     const resume = !!d.resume && !!this.run;   // reconnect after a dropped link: resync the world, keep our position and inventory
     if (!resume) this.ui.toast(t('Connected. Welcome aboard.'));
@@ -1377,7 +1383,7 @@ export class Game extends Emitter {
 
   // ------------------------------------------------------------------ networking (send)
   netSend(dt) {
-    if (!this.net) return;
+    if (!this.net || !this.run || (!this.isHost && !this.net.connected)) return;
     this.psTimer = (this.psTimer || 0) - dt;
     if (this.psTimer <= 0) {
       this.psTimer = 1 / 15;

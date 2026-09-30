@@ -439,6 +439,7 @@ export class UI {
   // ---------------------------------------------------------------- menu screens
   showMenu(screen = 'title', opts = {}) {
     this.cancelRebind?.();
+    if (screen !== 'browser' && !this.app.game) this.app.stopLobbyBrowser();
     this.hud.show(false);
     this.menuEl.classList.remove('hidden');
     // CRT switch-off of the old screen (a ghost copy collapses while the new screen powers on)
@@ -455,7 +456,7 @@ export class UI {
     this.menuEl.innerHTML = '';
     this.currentScreen = screen;
     this.menuOpts = opts;
-    const labels = { host: t('HOST GAME'), browser: t('JOIN GAME'), daily: t('DAILY'), profile: t('PROFILE'), hub: t('SOCIAL HUB'), character: t('CHARACTER'), mods: t('MODS'), settings: t('SETTINGS'), howto: t('HOW TO PLAY') };
+    const labels = { host: t('HOST GAME'), browser: t('Lobby browser'), daily: t('DAILY'), profile: t('PROFILE'), hub: t('SOCIAL HUB'), character: t('CHARACTER'), mods: t('MODS'), settings: t('SETTINGS'), howto: t('HOW TO PLAY') };
     this.app.menu?.setMode?.(screen === 'title' ? 'title' : 'sub', labels[screen] || '');
     this.menuEl.classList.toggle('over-crt', screen !== 'title');
     const fn = this['screen_' + screen];
@@ -484,7 +485,7 @@ export class UI {
     const maxAllowed = this.app.mods?.maxPlayersAllowed?.() || 4;
     const form = el('div', { class: 'form' });
     const name = el('input', { value: `${p.name}'s crew`, maxlength: 32 });
-    const pub = el('input', { type: 'checkbox', checked: false });   // [joinplay] private by default (PLAY and QUICK SHIFT are private too)
+    const pub = el('input', { type: 'checkbox', checked: true });   // Public hosts appear in the server browser by default
     const pw = el('input', { type: 'text', maxlength: 24, placeholder: '—' });
     const max = el('select', {}, ...Array.from({ length: maxAllowed - 1 }, (_, i) => el('option', { value: i + 2, selected: i + 2 === Math.min(4, maxAllowed) }, String(i + 2))));
     const net = this.netSelect();
@@ -492,16 +493,17 @@ export class UI {
     const diffNote = el('div', { class: 'cp-note', style: 'opacity:.7;font-size:12px;margin:-2px 0 6px' }, t(DIFF_SUMMARY[diff.value]));
     diff.addEventListener('change', () => { diffNote.textContent = t(DIFF_SUMMARY[diff.value]); });
     const adv = el('details', { class: 'host-adv' }, el('summary', { class: 'cp-sec' }, t('ADVANCED')),   // [joinplay] the crew fields fold away; PLAY / START use saved settings
-      row(t('Lobby name'), name), row(t('Public (listed in lobby browser)'), pub), row(t('Password (optional)'), pw),
+      row(t('Password (optional)'), pw),
       row(t('Max players'), max), row(t('Network'), net),
       row(t('Difficulty'), diff), diffNote,   // [hardmode]
     );
-    form.append(adv);
+    const mode = el('select', {}, el('option', { value: 'campaign' }, t('Campaign')), el('option', { value: 'quick' }, t('QUICK SHIFT')));
+    form.append(row(t('Game mode'), mode), row(t('Lobby name'), name), row(t('Public (listed in lobby browser)'), pub), adv);
     const slots = el('div', { class: 'slots' });
     let chosen = { slot: this.menuOpts?.slot || listRuns().filter((r) => r.data).sort((a, b) => (b.data.savedAt || 0) - (a.data.savedAt || 0))[0]?.slot || 1, data: null };
     const start = () => {
       s.netStrategy = net.value; s.difficulty = diff.value; saveSettings(s);
-      this.app.hostGame({ lobbyName: name.value.trim() || 'Crew', isPublic: pub.checked, password: pw.value.trim(), maxPlayers: +max.value, difficulty: diff.value, strategy: net.value, slot: chosen.slot, runData: loadRun(chosen.slot) });
+      this.app.hostGame({ lobbyName: name.value.trim() || 'Crew', isPublic: pub.checked, password: pw.value.trim(), maxPlayers: +max.value, difficulty: diff.value, strategy: net.value, slot: mode.value === 'quick' ? 0 : chosen.slot, runData: mode.value === 'quick' ? null : loadRun(chosen.slot), quick: mode.value === 'quick' });
     };
     const renderSlots = () => {
       const focused = document.activeElement?.dataset?.slot;
@@ -549,16 +551,20 @@ export class UI {
   }
 
   async joinLobby(l, strategy) {
-    let pass = '';
-    if (l.locked) {
-      pass = await this.dialog({ title: t('Lobby password'), text: t('This lobby is locked. Enter the password:'), input: { type: 'password', max: 24, placeholder: t('password') }, buttons: [{ label: t('CANCEL'), value: null }, { label: t('Join'), value: '$input', primary: true }] });
-      if (pass === null) return;
-    }
-    await this.app.assetsReady;   // [fastmenu] mods finish loading in the background: enabledIds() is empty before that
-    const mine = this.app.mods.enabledIds();
-    const missing = (l.mods || []).filter((m) => !mine.includes(m));
-    if (missing.length && !(await this.confirmBox(t('Missing mods'), `${t('The host uses mods you do not have enabled:')}\n${missing.join('\n')}\n\n${t('Join anyway?')}`, t('Join')))) return;
-    this.app.joinGame({ code: l.code, password: pass, strategy });
+    if (this._joiningLobby || this.app._startingGame || l.incompatible || l.players >= l.max) return;
+    this._joiningLobby = true;
+    try {
+      let pass = '';
+      if (l.locked) {
+        pass = await this.dialog({ title: t('Lobby password'), text: t('This lobby is locked. Enter the password:'), input: { type: 'password', max: 24, placeholder: t('password') }, buttons: [{ label: t('CANCEL'), value: null }, { label: t('Join'), value: '$input', primary: true }] });
+        if (pass === null) return;
+      }
+      await this.app.assetsReady;   // [fastmenu] mods finish loading in the background: enabledIds() is empty before that
+      const mine = this.app.mods.enabledIds();
+      const missing = (l.mods || []).filter((m) => !mine.includes(m));
+      if (missing.length && !(await this.confirmBox(t('Missing mods'), `${t('The host uses mods you do not have enabled:')}\n${missing.join('\n')}\n\n${t('Join anyway?')}`, t('Join')))) return;
+      return await this.app.joinGame({ code: l.code, password: pass, strategy: l.strategy || strategy });
+    } finally { this._joiningLobby = false; }
   }
 
   screen_browser() {
@@ -590,7 +596,7 @@ export class UI {
           el('div', { class: 'l-mods' }, (l.mods || []).length ? `${l.mods.length}` : '—'),
           this.button(full ? t('Full') : t('Join'), () => this.joinLobby(l, net.value), blocked ? 'small disabled' : 'small primary'),
         );
-        if (!blocked) row_.addEventListener('click', () => this.joinLobby(l, net.value));
+        if (!blocked) row_.addEventListener('click', (e) => { if (!e.target.closest('button')) this.joinLobby(l, net.value); });
         list.appendChild(row_);
       }
       if (focusedCode) list.querySelector(`[data-code="${focusedCode}"]`)?.focus({ preventScroll: true });
@@ -603,7 +609,7 @@ export class UI {
       this.app.joinGame({ code: c, password: pw.value.trim(), strategy: net.value });
     };
     this.frame(t('Lobby browser'),
-      el('div', { class: 'menu-row lb-top' }, el('span', { class: 'lbl' }, t('Network')), net, status, this.button('⟳ ' + t('Refresh'), render, 'small')),
+      el('div', { class: 'menu-row lb-top' }, el('span', { class: 'lbl' }, t('Network')), net, status, this.button('⟳ ' + t('Refresh'), () => { this.app.lobbyDir?.refresh(); render(); }, 'small'), this.button(t('HOST GAME'), () => this.showMenu('host'), 'primary')),
       list,
       el('div', { class: 'menu-row code-row' }, el('span', { class: 'lbl' }, t('Join by code')), code, pw, this.button(t('Join') + ' ▶', joinCode, 'primary')),
       el('div', { class: 'menu-row' }, this.backButton(() => { this.app.stopLobbyBrowser(); this.showMenu('title'); })),

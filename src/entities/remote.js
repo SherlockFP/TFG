@@ -125,6 +125,8 @@ export class RemotePlayer {
     if (first || this.target.distanceTo(this.pos) > 8) this.pos.copy(this.target);
     this.targetYaw = s.y; this.pitch = s.pt || 0;
     this.flags = s.f || 0;
+    // Periodic state heals a missed death/revive event (otherwise the avatar stays invisible).
+    if (!!(this.flags & 32) !== this.dead) this.setDead(!!(this.flags & 32));
     this.flashOn = !!s.fl;
     this.noise = s.n || 0;
     this.swing = s.sw || 0;

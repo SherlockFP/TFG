@@ -7,9 +7,9 @@ import { Emitter } from '../core/events.js';
 // Message types only the host may send. A client drops them from anybody else (a rogue or buggy peer
 // cannot rewrite the run, spawn items or hand out XP), and the host drops them from everybody.
 export const HOST_ONLY = new Set(['welcome', 'gs', 'phase', 'it', 'cev', 'cs', 'xp', 'power', 'summary', 'fired', 'quotamet',
-  'tp', 'pickfail', 'sell', 'door', 'latch', 'stun', 'slow', 'hold', 'pleft']);
-// Client-originated broadcast types the host forwards to crewmates that have no direct WebRTC link to the sender
-// (full mesh without TURN: a failed client<->client link would otherwise desync those two silently).
+  'tp', 'pickfail', 'sell', 'door', 'latch', 'stun', 'slow', 'hold', 'pleft', 'pjoin']);
+// Client-originated gameplay types routed through the host. A missing client<->client
+// WebRTC link never prevents movement / inventory / chat from reaching crewmates.
 // Feature modules may add their own types: game.net.relayTypes.add('myType').
 const RELAY_TYPES = ['ps', 'pst', 'pinfo', 'itst', 'is', 'chat', 'fx', 'modmsg', 'ping'];
 
@@ -89,15 +89,11 @@ export class Session extends Emitter {
     }, 400);
   }
 
-  // host: forward a client's broadcast to accepted players that reported no direct link to that client
+  // Host forwards client gameplay to every admitted crewmate, independent of direct mesh links.
   relay(t, d, from) {
     if (!this.isHost || !this.relayTypes.has(t) || !this.players.has(from)) return;
-    const fromLinks = this.peerLinks.get(from);
     for (const q of this.players.keys()) {
       if (q === from || q === this.selfId) continue;
-      const ql = this.peerLinks.get(q);
-      const missing = (ql && !ql.has(from)) || (fromLinks && !fromLinks.has(q));
-      if (!missing) continue;
       this.stats.relayed++;
       this._out({ t: 'relay', d: { from, m: { t, d } } }, q);
     }
@@ -122,6 +118,7 @@ export class Session extends Emitter {
     this._startWatch();
     await t.join('game-' + this.code, this.password);
     this.selfId = t.selfId;
+    this._startedAt = performance.now();
     if (this.isHost) {
       this.hostId = this.selfId;
       this.connected = true;
@@ -137,6 +134,7 @@ export class Session extends Emitter {
   // the old hard leave (peerLeave: items dropped, avatar removed, slot freed / 'hostLeft').
   peerGone(id, deliberate) {
     this.byes.delete(id);
+    if (!this.isHost && id !== this.hostId && !deliberate) { this.reportLinks(); return; }
     const known = this.players.has(id) || id === this.hostId;
     if (deliberate || !known || this.leaving) { this.finalizeLeave(id); return; }
     if (this.lost.has(id)) return;
@@ -191,6 +189,7 @@ export class Session extends Emitter {
         else if (id === this.hostId) { this.peerGone(id, false); this._rejoin(); }
       }
     }
+    if (!this.isHost && !this.connected && !this.hostId && now - (this._startedAt ?? now) > NET.REJOIN_AFTER_MS) this._rejoin();
     // joiner that never got its welcome (snapshot chunks can be dropped after a 10 s datachannel stall): ask again, the host re-welcomes
     if (!this.isHost && !this.connected && this.hostId && t.peers.has(this.hostId) && (this._hellos || 0) < 4) {
       this._helloT ??= now;
@@ -260,8 +259,9 @@ export class Session extends Emitter {
     }
     if (HOST_ONLY.has(t)) {
       if (this.isHost) return;                                     // the host never takes world state from a client
-      if (t === 'welcome' ? (this.hostId && from !== this.hostId && this.connected) : (this.hostId && from !== this.hostId)) return;
+      if (t === 'welcome' ? (this.hostId && from !== this.hostId) : from !== this.hostId) return;
     }
+    if (this.isHost && this.relayTypes.has(t) && !this.players.has(from)) return;
     if (t === 'req') {
       if (!this.isHost || !d || typeof d.a !== 'string') return;
       if (d.a === '_links') { if (Array.isArray(d.ids)) this.peerLinks.set(from, new Set(d.ids.map(String))); return; }
@@ -270,11 +270,16 @@ export class Session extends Emitter {
       if (fn) { try { fn(d, from); } catch (e) { console.error('req', d.a, e); } }
       return;
     }
-    if (t === 'welcome' && !this.isHost) { this.hostId = from; this.connected = true; this.reportLinks(); }
+    if (t === 'welcome' && !this.isHost) {
+      this.hostId = from;
+      for (const p of d?.players || []) if (p?.id) this.players.set(p.id, { ...p, host: p.id === from });
+    }
+    if (t === 'pjoin' && !this.isHost && d?.id) this.players.set(d.id, d);
     if (this.isHost) this.relay(t, d, from);
     const h = this.msgHandlers.get(t);
-    if (h) { try { h(d, from); } catch (e) { console.error('msg', t, e); } }
+    if (h) { try { h(d, from); } catch (e) { console.error('msg', t, e); return; } }
     else this.emit('msg:' + t, d, from);
+    if (t === 'welcome' && !this.isHost) { this.connected = true; this.reportLinks(); this.emit('ready'); }
   }
 
   on_(type, fn) { this.msgHandlers.set(type, fn); }
@@ -293,7 +298,7 @@ export class Session extends Emitter {
 
   // host -> everyone (including local handler when includeSelf)
   broadcast(t, d, includeSelf = true) {
-    this._out({ t, d });
+    this.send(t, d);
     if (includeSelf) this.receiveLocal(t, d);
   }
   sendTo(peerId, t, d) {
@@ -301,7 +306,14 @@ export class Session extends Emitter {
     this._out({ t, d }, peerId);
   }
   // peer -> all others (no self)
-  send(t, d) { this._out({ t, d }); }
+  send(t, d) {
+    // Gameplay travels through the host: clients never need a client-to-client ICE link.
+    if (!this.isHost && this.relayTypes.has(t)) {
+      if (this.hostId && this.connected) this._out({ t, d }, this.hostId);
+      return;
+    }
+    this._out({ t, d });
+  }
 
   // Delta-compressed row snapshots (creature / item state tables: rows are arrays whose [0] is a stable id).
   // Only rows that changed since the last send go out; every `keyframe` seconds all rows are re-sent so late
@@ -346,7 +358,7 @@ export class Session extends Emitter {
     this._outq = [];
     const tr = this.transport;
     const sizes = new Map();
-    const sizeOf = (m) => { let n = sizes.get(m); if (n === undefined) { try { n = JSON.stringify(m).length; } catch { n = 0; } sizes.set(m, n); } return n; };
+    const sizeOf = (m) => { let n = sizes.get(m); if (n === undefined) { try { n = new TextEncoder().encode(JSON.stringify(m)).byteLength; } catch { n = 0; } sizes.set(m, n); } return n; };
     // split a per-peer message list into packets of <= PACKET_CAP (one oversized message goes alone)
     const packs = (list) => {
       if (list.length === 1) return [list[0]];
@@ -362,23 +374,69 @@ export class Session extends Emitter {
     };
     const put = (m, to) => {
       this.stats.packetsOut++;
-      if (this.measureBytes) { try { this.stats.bytesOut += JSON.stringify(m).length * (to ? 1 : Math.max(1, tr.peers.size)); } catch { /* ignore */ } }
+      if (this.measureBytes) this.stats.bytesOut += sizeOf(m) * (to ? 1 : Math.max(1, tr.peers.size));
       tr.send(m, to || undefined);
     };
     const peers = [...tr.peers];
-    const slow = peers.some((p) => tr.congested?.(p));
-    if (!slow && q.every((e) => !e.to)) { for (const pk of packs(q.map((e) => e.m))) put(pk); return; }
     // per-peer lists (broadcasts go to everyone, directed ones to their peer); a backed-up peer is not fed latest-wins state
     const per = new Map();
     for (const e of q) {
       const targets = e.to ? [e.to] : peers;
       for (const p of targets) {
         if (!tr.peers.has(p)) { this.stats.dropped++; continue; }          // lost / gone: nothing to send to
-        if (DROPPABLE.has(e.m.t) && tr.congested?.(p)) { this.stats.dropped++; continue; }
+        if (DROPPABLE.has(e.m.t === 'relay' ? e.m.d?.m?.t : e.m.t) && tr.congested?.(p)) { this.stats.dropped++; continue; }
         let a = per.get(p); if (!a) per.set(p, a = []); a.push(e.m);
       }
     }
-    for (const [p, list] of per) for (const pk of packs(list)) put(pk, p);
+    for (const [p, list] of per) {
+      const compacted = [];
+      const latestState = new Map();
+      const expandRows = (m) => {
+        const relay = m.t === 'relay' ? m.d : null;
+        const inner = relay?.m;
+        const t = inner?.t || m.t;
+        const rows = inner?.d ?? m.d;
+        if (!DROPPABLE.has(t) || !['cs', 'is', 'sgs'].includes(t) || !Array.isArray(rows) || rows.length < 2) return [m];
+        const build = (part) => inner ? { ...m, d: { ...relay, m: { ...inner, d: part } } } : { ...m, d: part };
+        const chunks = [];
+        let part = [];
+        for (const row of rows) {
+          const candidate = [...part, row];
+          if (part.length && sizeOf(build(candidate)) > NET.PACKET_CAP) { chunks.push(part); part = [row]; }
+          else part = candidate;
+        }
+        if (part.length) chunks.push(part);
+        return chunks.map(build);
+      };
+      for (const original of list) {
+        const expanded = expandRows(original);
+        for (let ci = 0; ci < expanded.length; ci++) {
+          const m = expanded[ci];
+          const t = m.t === 'relay' ? m.d?.m?.t : m.t;
+          if (!DROPPABLE.has(t)) { compacted.push(m); continue; }
+          // A player's pose is latest-wins per originating player; delta-row snapshots are
+          // latest-wins per stream and heal themselves on the next keyframe.
+          const owner = m.t === 'relay' ? m.d?.from : '';
+          const lane = t + ':' + String(owner || '');
+          const key = lane + (expanded.length > 1 ? ':' + ci : '');
+          if (latestState.has(key)) compacted[latestState.get(key)] = m;
+          else { latestState.set(key, compacted.length); compacted.push(m); }
+        }
+      }
+      // Keep event order. Check congestion before each packet, not once for the whole frame:
+      // Trystero waits at 64 KiB and gives up on a chunk after 10 s. Four 12-KiB packets
+      // leave room for framing while reliable events remain ordered and continue draining.
+      let cur = [], bytes = 0;
+      const flushCur = () => { if (cur.length) { for (const pk of packs(cur)) put(pk, p); cur = []; bytes = 0; } };
+      for (const m of compacted) {
+        const z = sizeOf(m);
+        if (cur.length && bytes + z > NET.PACKET_CAP) { this.stats.splits++; flushCur(); }
+        const t = m.t === 'relay' ? m.d?.m?.t : m.t;
+        if (DROPPABLE.has(t) && tr.congested?.(p)) { this.stats.dropped++; continue; }
+        cur.push(m); bytes += z;
+      }
+      flushCur();
+    }
   }
   receiveLocal(t, d) {
     const h = this.msgHandlers.get(t);

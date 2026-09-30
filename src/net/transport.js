@@ -28,7 +28,9 @@ function turnServers() {
   } catch { /* bad json */ }
   return out;
 }
-const CONGEST_AT = 30;   // unresolved sends to one peer (Trystero awaits the datachannel drain per chunk, 10 s timeout)
+// Keep the WebRTC data channel under Trystero's 64 KiB bufferedAmount low-water threshold.
+// Session packets are capped at 12 KiB, so four concurrent packets stay below that limit.
+export const CONGEST_AT = 4;
 
 export class TrysteroTransport extends BaseTransport {
   constructor(strategy = 'nostr') { super(); this.strategy = strategy; this.room = null; this.inflight = new Map(); this.rejoins = 0; }
@@ -40,12 +42,18 @@ export class TrysteroTransport extends BaseTransport {
     return this.mod;
   }
   async join(roomId, password) {
+    const generation = this._generation = (this._generation || 0) + 1;
     const mod = await this.load();
+    if (this._generation !== generation) return this;   // left while the strategy module was loading
     this.selfId = mod.selfId;
     this._joinArgs = [roomId, password];
     const cfg = { appId: APP_ID };
     if (password) cfg.password = password;
-    cfg.relayConfig = { warnOnRelayFailure: false };
+    // Keep the appId and strategy stable, but avoid depending on just five default relays.
+    // Discovery and game rooms use this same config so every player announces in the same places.
+    cfg.relayConfig = { warnOnRelayFailure: false, ...(this.strategy === 'nostr' ? { redundancy: 10 } : {}) };
+    const urls = this.strategy === 'nostr' && import.meta.env?.VITE_NOSTR_RELAY_URLS;
+    if (urls) cfg.relayConfig.urls = urls.split(',').map(s => s.trim()).filter(Boolean);
     const turn = turnServers();
     if (turn.length) cfg.turnConfig = turn;
     this.room = mod.joinRoom(cfg, roomId, {
@@ -92,18 +100,21 @@ export class TrysteroTransport extends BaseTransport {
       } catch (e) { /* peer gone */ }
     }
   }
-  congested(id) { return (this.inflight.get(id) || 0) > CONGEST_AT; }
+  congested(id) { return (this.inflight.get(id) || 0) >= CONGEST_AT; }
   // Re-enter the room (same selfId) to force a fresh signalling announce when links died and were not re-discovered.
   async rejoin() {
     if (!this._joinArgs || this._rejoining) return false;
     this._rejoining = true;
+    const generation = this._generation;
     try {
       const old = this.room; const stream = this.stream;
       this.room = null; this.inflight.clear();
       const gone = [...this.peers]; this.peers.clear();
       try { await old?.leave(); } catch { /* ignore */ }
+      if (this._generation !== generation) return false;
       for (const id of gone) { try { this.onPeerLeave?.(id); } catch (e) { console.error('peerLeave', e); } }
       await this.join(...this._joinArgs);
+      if (!this.room) return false;
       this.stream = stream;
       this.rejoins++;
       return true;
@@ -116,7 +127,7 @@ export class TrysteroTransport extends BaseTransport {
   addStream(stream) { this.stream = stream; try { this.room?.addStream(stream); } catch (e) { console.warn(e); } }
   removeStream(stream) { try { this.room?.removeStream(stream); } catch { /* ignore */ } this.stream = null; }
   async ping(id) { try { return await this.room.ping(id); } catch { return -1; } }
-  leave() { try { const p = this.room?.leave(); p?.catch?.(() => {}); } catch { /* ignore */ } this.room = null; this.peers.clear(); this.inflight.clear(); }
+  leave() { this._generation = (this._generation || 0) + 1; this._msg = null; this._bin = null; try { const p = this.room?.leave(); p?.catch?.(() => {}); } catch { /* ignore */ } this.room = null; this.peers.clear(); this.inflight.clear(); }
 }
 
 // Same-browser transport (multiple tabs). Peers discover each other via hello/heartbeat.

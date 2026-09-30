@@ -35,8 +35,8 @@ chk(/Copy join link/.test(H) && /'info', 9000/.test(H) && /9000/.test(HO), 'Quic
 const items = C.slice(C.indexOf('setItems()'), C.indexOf('refreshDailyBadge'));
 chk(/items = \[\{ id: 'play'/.test(items) && !/id: 'continue'/.test(items), 'PLAY is the first menu entry');
 chk(/if \(open\) items\.push\(\{ id: 'daily'/.test(items) && /if \(open\) items\.push\(\{ id: 'hub'/.test(items), 'DAILY + HUB only when unlocked');
-chk(/it\.id === 'play'[\s\S]{0,400}isPublic: false/.test(C), 'PLAY hosts a private lobby');
-chk(/checked: false/.test(P.slice(P.indexOf('screen_host'), P.indexOf('screen_host') + 900)) && /host-adv/.test(P), 'host form: Public off, fields under ADVANCED');
+chk(/it\.id === 'play'[\s\S]{0,100}showMenu\('browser'\)/.test(C) && !/id: '(host|quick|browser)'/.test(items), 'one PLAY entry opens the server browser');
+chk(/checked: true/.test(P.slice(P.indexOf('screen_host()'), P.indexOf('screen_host()') + 900)) && /host-adv/.test(P), 'host form: public by default, advanced options retained');
 
 // menu items for a fresh vs veteran profile (pure)
 const K = await import('../../src/game/onboard_core.js');
@@ -78,16 +78,14 @@ if (process.argv.includes('--browser')) {
   const term = await host.evaluate(() => { const g = kefal.game; g.terminal.open(); const s = g.terminal.codeEl?.textContent || ''; g.terminal.close(); return s; });
   chk(term.includes(CODE), 'terminal header shows the lobby code', term);
   }
-  // PLAY: main menu -> stream
+  // PLAY is the single gateway; host creation lives beside the browser.
   const pm = await mk('/', 'menu', false);
   await pm.evaluate(() => { kefal.settings.netStrategy = 'local'; });
   const first = await pm.evaluate(() => kefal.menu.items[0]?.id);
   chk(first === 'play', 'menu: first entry is PLAY', first);
   await pm.evaluate(() => kefal.menu.activate(0));
-  await pm.waitForFunction(() => kefal.game?.run, null, { timeout: 120000 }).catch(() => logs.push('PLAY never reached the run'));
-  await pm.waitForTimeout(3000);
-  const pl = await pm.evaluate(() => ({ host: !!kefal.game?.isHost, phase: kefal.game?.run?.phase, pub: !!kefal.game?.opts?.isPublic }));
-  chk(pl.host && !!pl.phase && !pl.pub, 'PLAY: hosted a private run', pl);
+  const pl = await pm.evaluate(() => ({ screen: kefal.ui.currentScreen, hasGame: !!kefal.game, hostButton: [...document.querySelectorAll('.lb-top button')].some((b) => b.textContent === 'HOST GAME') }));
+  chk(pl.screen === 'browser' && !pl.hasGame && pl.hostButton, 'PLAY opens server browser with host button', pl);
   if (shot) { await pm.evaluate(() => { kefal.tick(2, 1 / 30, true); try { kefal.game.engine.renderer.getContext().finish(); } catch { /* no gl */ } }); await pm.waitForTimeout(700); await pm.screenshot({ path: shot, type: 'jpeg', quality: 40, timeout: 150000 }); }
   console.log('LOGS', JSON.stringify(logs.filter((l) => !/nostr|WebSocket|wss:/i.test(l)).slice(0, 10)));
   chk(!logs.some((l) => /pageerror/.test(l)), 'no page errors');

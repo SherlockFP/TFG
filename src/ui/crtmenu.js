@@ -208,7 +208,7 @@ export class CRTMenu {
   setItems() {
     let open = true;   // [joinplay] veterans and anyone past quota 1 see everything; a fresh profile sees PLAY first and no DAILY / HUB
     try { const p = this.app.profile; if (p) { decideMode(p); open = isOpen('shop', p.unlocks, null); } } catch { open = true; }
-    const items = [{ id: 'play', label: t('PLAY') }, { id: 'host', label: t('HOST GAME') }, { id: 'quick', label: t('QUICK SHIFT') }, { id: 'browser', label: t('JOIN GAME') }];
+    const items = [{ id: 'play', label: t('PLAY') }];
     if (open) items.push({ id: 'daily', label: t('DAILY') });
     items.push({ id: 'profile', label: t('PROFILE') });
     if (open) items.push({ id: 'hub', label: t('HUB') });
@@ -421,17 +421,7 @@ export class CRTMenu {
     const it = this.items[i];
     if (!it) return;
     this.app.audio?.ui('ui_confirm', 0.6);
-    if (it.id === 'play') {   // [joinplay] PLAY: private lobby, saved settings, latest campaign slot (or a new run in slot 1) straight into the stream
-      const s = this.app.settings || {};
-      const slot = latestSlot() || 1;
-      this.app.hostGame({ lobbyName: `${this.app.profile?.name || 'Crew'}'s crew`, isPublic: false, password: '', maxPlayers: 4, difficulty: s.difficulty, strategy: s.netStrategy || 'nostr', slot, runData: loadRun(slot) });
-      return;
-    }
-    if (it.id === 'quick') {   // [hubgate] one day, one moon, straight from the menu (no slot, no save); friends join by the code in the toast
-      const s = this.app.settings || {};
-      this.app.hostGame({ lobbyName: `${this.app.profile?.name || 'Crew'}'s quick shift`, isPublic: false, password: '', maxPlayers: 4, difficulty: s.difficulty, strategy: s.netStrategy || 'nostr', slot: 0, runData: null, quick: true });
-      return;
-    }
+    if (it.id === 'play') { this.app.ui.showMenu('browser'); return; }
     this.app.ui.showMenu(it.id);
   }
   setMode(mode, label) {
