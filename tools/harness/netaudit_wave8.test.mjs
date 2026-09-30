@@ -61,7 +61,7 @@ for (const [type, file] of Object.entries(W8REQ)) ok(T[type]?.req.length && (T[t
 // a type registered with net.on_ AND listened to via msg: means the msg: listener never fires (this hid feedcams' viewer-tax line for 'sell')
 for (const [type, v] of Object.entries(T)) if (v.on.length && v.msg.length) ok(false, `SHADOW ${type}: on_ ${v.on[0]} replaces msg: listener ${v.msg[0]}`);
 // hub gate: the host store validation must pass the lock (a client can forge the terminal BUY / cart request)
-ok(/stockFor\(run, lore\(\), g\.hubgate\?\.shopLock\)\.find/.test(rd('game/shop.js')) && /new Map\(stockFor\(run, lore\(\), g\.hubgate\?\.shopLock\)/.test(rd('game/shop.js')), 'shop host paths enforce the hub lock');
+ok(/new Map\(stockFor\(run, lore\(\), g\.hubgate\?\.shopLock[,)]/.test(rd('game/shop.js')), 'shop host paths enforce the hub lock');   // [followers] the Clout coinbuy path is gone; the cart path carries the lock (+ follower gate)
 // every run field the wave-8 modules write is broadcast right there
 for (const [f, keys] of [['feedcams.js', ["'fc'", "'fcTax'"]], ['feedcams2.js', ["'fc2'"]], ['hubgate.js', ["'hub'"]], ['resto.js', ["'rs'"]], ['homestead.js', ["'hs'"]], ['facjobs.js', ['bcast']], ['mapmods.js', ["'mm'"]]]) {
   const src = rd('game/' + f);
