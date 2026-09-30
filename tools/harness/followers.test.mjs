@@ -1,4 +1,5 @@
 // node tools/harness/followers.test.mjs - wave 9 Clout -> FOLLOWERS: save migration + "no spend path" + milestone maths (no browser)
+import { fileURLToPath } from 'node:url';   // .pathname gives /D:/... on Windows
 import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
@@ -36,7 +37,7 @@ const prof = { coins: 5000, achievements: {} }, st = newPetsState();
 ok(buyPet({ state: st, profile: prof }, 'cat').ok && prof.coins === 5000, 'pet adoption leaves followers untouched');
 ok(buySkin({ state: st, profile: prof }, 'h', 'party').ok !== undefined && prof.coins === 5000, 'pet skin leaves followers untouched');
 const walk = (d, out = []) => { for (const f of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, f.name); if (f.isDirectory()) walk(p, out); else if (/\.(js|mjs)$/.test(f.name)) out.push(p); } return out; };
-const src = walk(new URL('../../src/', import.meta.url).pathname).concat(walk(new URL('../../public/mods/', import.meta.url).pathname));
+const src = walk(fileURLToPath(new URL('../../src/', import.meta.url))).concat(walk(fileURLToPath(new URL('../../public/mods/', import.meta.url))));
 for (const f of src) {
   const s = fs.readFileSync(f, 'utf8').replace(/\/\/.*$/gm, '');
   ok(!/spendCoins/.test(s), 'no spendCoins anywhere: ' + path.basename(f));

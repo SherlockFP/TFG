@@ -29,7 +29,7 @@ const pats = [['on', new RegExp(`\\bon_\\(\\s*${q}(\\w+)${q}`, 'g')], ['msg', ne
   ['to', new RegExp(`\\bsendTo\\([^,]+,\\s*${q}(\\w+)${q}`, 'g')], ['send', new RegExp(`\\bnet\\.send\\(\\s*${q}(\\w+)${q}`, 'g')],
   ['req', new RegExp(`\\brequest\\(\\s*${q}(\\w+)${q}`, 'g')], ['hostonly', new RegExp(`HOST_ONLY\\.add\\(\\s*${q}(\\w+)${q}`, 'g')]];
 for (const f of files) {
-  const rel = path.relative(root, f);
+  const rel = path.relative(root, f).split(path.sep).join('/');   // forward slashes on Windows too
   let src = fs.readFileSync(f, 'utf8');
   if (rel === 'game/hubgate.js') src = src.replace(/\bNET\b/g, "'hg'");          // named constants -> literal so the scan sees them
   if (rel === 'game/repomaps.js') src = src.replace(/\bMSG\b/g, "'rmap'");

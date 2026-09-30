@@ -47,7 +47,7 @@ chk(H.quickReward(res).xp > H.quickReward({ ok: false }).xp, 'meeting the quota 
 chk(K.progressOf({ quotaIndex: 4, quick: { v: 1 }, cycle: { sector: 2 } }).q === 0 && !K.progressOf({ quick: { v: 1 }, cycle: { sector: 2 } }).boss, 'the ladder does not advance in quick shift');
 chk(K.shouldRun({ profile: {}, isHost: true, quick: true }).why === 'quick', 'no Hiring Day in quick shift');
 // menu + slots
-chk(/id: 'quick'/.test(rd('src/ui/crtmenu.js')) && /'quick'/.test(rd('src/ui/artdir_menu.js')) && /quick: true/.test(rd('src/ui/crtmenu.js')), 'main menu has the QUICK SHIFT entry');
+chk(/quick: mode\.value === 'quick'/.test(rd('src/ui/ui.js')), 'host creation offers QUICK SHIFT (owner 2026-09-30: one PLAY button, Quick Shift is a host option)');
 chk(/useModule\('hubgate', installHubgate\)/.test(rd('src/game/game.js')), 'game.js slot');
 // i18n + install smoke (the module imports host.js / moons.js: skipped with a note when that chain needs a browser)
 let M = null;

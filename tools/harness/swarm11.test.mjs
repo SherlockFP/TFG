@@ -1,6 +1,7 @@
 // swarm11 (wave 11) rules + host logic test:  node tools/harness/swarm11.test.mjs
 // Pure rules, registration (pool / i18n / codex / spawn gate), Scraper + Nest, Streamer pull, AutoMod cleanup + flag state machines against a fake manager, models + sound recipes.
 // No browser, no physics, no rendering.
+import './seeded_random.mjs';   // deterministic rolls (the AI uses Math.random): no flaky timing asserts
 import { register } from 'node:module';
 register('data:text/javascript,export async function load(u,c,n){if(u.endsWith(".css"))return{format:"module",source:"export default {}",shortCircuit:true};return n(u,c);}');
 import assert from 'node:assert/strict';
@@ -157,7 +158,8 @@ await ok('scrapers: a hit bot drops its load and the colony rages after the 1.0 
   let carrier = null; for (let i = 0; i < 200 && !carrier; i++) { W.step([nest, b, b2], 0.05); carrier = [b, b2].find((x) => x.data.carry?.length) || null; }
   assert.ok(carrier, 'one bot is carrying the second item by now'); { const id = carrier.data.carry[0]; W.M.damage(carrier, 1, 'p1'); W.step([nest, b, b2], 0.1); assert.equal(carrier.data.carry.length, 0, 'load dropped'); assert.equal(W.items.get(id).holder, null); }
   assert.equal(nest.state, 'alarm', 'the nest rings first'); const t0 = W.g.time;
-  W.step([nest, b, b2], 0.8); assert.notEqual(b2.state, 'rage', 'still the siren'); W.step([nest, b, b2], 0.4); assert.ok(['rage', 'windup'].includes(b2.state), 'the swarm moves: ' + b2.state);
+  const other = carrier === b ? b2 : b;   // the HIT bot fights back at once; the rest of the colony waits for the siren
+  W.step([nest, b, b2], 0.8); assert.notEqual(other.state, 'rage', 'still the siren'); W.step([nest, b, b2], 0.4); assert.ok(['rage', 'windup'].includes(other.state), 'the swarm moves: ' + other.state);
   assert.ok(W.g.time - t0 >= T.scr.alarmT - 0.1);
   // lunge telegraph
   p.pos.set(b2.pos.x + 1, FY, b2.pos.z); b2.cooldown = 0; b2.data.rageT = 10; b2.data.tid = 'p1'; b2.setState('rage'); W.attacks.length = 0;

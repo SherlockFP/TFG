@@ -1,6 +1,7 @@
 // Art pass: every placeholder model was replaced by a Kit-merged company-equipment model (src/models/artpass.js); every id in the
 // store / crafting tables resolves to a real model builder (not the '?' box); everything builds without NaN, inside a triangle budget,
 // tools point along -Z with a tip anchor.   node tools/harness/artpass.test.mjs
+import { fileURLToPath } from 'node:url';   // .pathname gives /D:/... on Windows
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -89,7 +90,7 @@ ok('survival potions + sickle resolve through svItemModels', () => {
 });
 ok('every store / crafting-table item id has a real model builder', () => {
   const files = [];
-  (function walk(d) { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); if (e.isDirectory()) walk(p); else if (p.endsWith('.js')) files.push(p); } })(new URL('.', R).pathname);
+  (function walk(d) { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); if (e.isDirectory()) walk(p); else if (p.endsWith('.js')) files.push(p); } })(fileURLToPath(new URL('.', R)));
   const src = files.map((f) => fs.readFileSync(f, 'utf8')).filter((s) => /itemModels|createItemModel/.test(s));
   const svIds = Object.keys(SV.ALL_ITEMS || {}), svM = svItemModels(svIds);
   const registered = (id) => {

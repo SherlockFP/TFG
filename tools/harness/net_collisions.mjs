@@ -3,10 +3,11 @@
 // (the earlier module never hears the message). Also flags handlers that wrap net.handlers.get('x') (intentional chains)
 // and message types longer than Trystero's 32-byte action limit (only the envelope 'm'/'b' are actions, so just informational).
 // run: node tools/harness/net_collisions.mjs   (exit 1 when an unwrapped collision exists)
+import { fileURLToPath } from 'node:url';   // .pathname gives /D:/... on Windows
 import fs from 'node:fs';
 import path from 'node:path';
 
-const root = path.resolve(new URL('../../src', import.meta.url).pathname);
+const root = fileURLToPath(new URL('../../src', import.meta.url));
 const files = [];
 (function walk(d) { for (const f of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, f.name); if (f.isDirectory()) walk(p); else if (p.endsWith('.js')) files.push(p); } })(root);
 
