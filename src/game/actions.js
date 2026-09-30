@@ -193,15 +193,15 @@ export const actionMethods = {
           // a crewmate's body is carried in the hands (2-handed, heavy, ONE at a time) so it follows you through every door
           if (hit.distance < reach) {
             const has = this.carriedBody();
-            return { label: `Carry ${it.label ? it.label + "'s " : ''}body [E]`, sub: t(has ? 'You already carry a body' : 'Heavy - slows you down'), bodyItem: it, action: () => this.pickup(it) };
+            return { label: it.label ? tf("Carry {name}'s body [E]", { name: it.label }) : t('Carry body [E]'), sub: t(has ? 'You already carry a body' : 'Heavy - slows you down'), bodyItem: it, action: () => this.pickup(it) };
           }
         } else if (def.kind === 'big') {
           if (hit.distance < 3.6) {
-            return { label: `Grab ${def.name} [LMB]`, sub: `▮${it.value}`, bigItem: it, action: () => this.grab.start(it) };
+            return { label: tf('Grab {name} [LMB]', { name: def.name }), sub: `▮${it.value}`, bigItem: it, action: () => this.grab.start(it) };
           }
         } else if (hit.distance < reach) {
           const toBag = this.inventory?.pickTargetHint?.(it);
-          return { label: tf('Pick up {name} [E]', { name: affixDisplayName(def.name, it.affix, it) }), sub: [isSellable(def) && it.value ? `▮${it.value}` : '', tierTag(it), ...describeAffix(it.affix, { rarity: true }), toBag ? '→ BAG' : ''].filter(Boolean).join(' · '), color: it.affix ? affixColor(it.affix) : r, action: () => this.pickup(it) };
+          return { label: tf('Pick up {name} [E]', { name: affixDisplayName(def.name, it.affix, it) }), sub: [isSellable(def) && it.value ? `▮${it.value}` : '', tierTag(it), ...describeAffix(it.affix, { rarity: true }), toBag ? '→ ' + t('BAG') : ''].filter(Boolean).join(' · '), color: it.affix ? affixColor(it.affix) : r, action: () => this.pickup(it) };
         }
       }
     }

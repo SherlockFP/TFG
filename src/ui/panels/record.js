@@ -198,8 +198,8 @@ export function createServiceRecord({ game = null, profile = game?.profile, tab,
       for (const id of ids) {
         const d = CREATURES[id], e = p.bestiary[id];
         const on = !!e?.seen;
-        grid.appendChild(card(on, CREATURE_ICONS[id] || (d.boss ? '👹' : '👾'), on ? d.name : '???', d.hazard ? 'HAZARD' : (d.boss ? 'BOSS' : (on ? `${e.kills || 0} ${L('kills')}` : '')), on
-          ? [['rec-d', d.lore || ''], ['rec-note', FIELD_NOTES[id] ? '▸ ' + FIELD_NOTES[id] : '']]
+        grid.appendChild(card(on, CREATURE_ICONS[id] || (d.boss ? '👹' : '👾'), on ? d.name : '???', d.hazard ? _t('HAZARD') : (d.boss ? _t('BOSS') : (on ? `${e.kills || 0} ${L('kills')}` : '')), on
+          ? [['rec-d', _t(d.lore || '')], ['rec-note', FIELD_NOTES[id] ? '▸ ' + _t(FIELD_NOTES[id]) : '']]
           : [['rec-d', L('Not yet encountered')]]));
       }
     } else if (lastSub === 'scrap') {

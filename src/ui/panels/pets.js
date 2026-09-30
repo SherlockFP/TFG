@@ -104,7 +104,7 @@ export function createPetsPanel({ game, api, tab } = {}) {
     const m2 = mk('div', 'pt-meter'); m2.append(mk('span', '', t('Loyalty')), bar(p.ly / 100), mk('b', '', `${Math.round(p.ly)}/100`));
     info.append(m1, m2);
     const chips = mk('div', 'pt-chips');
-    chips.append(mk('span', 'pt-chip', `HP ${stt.maxHp}`), mk('span', 'pt-chip', `ATK ${stt.atk.toFixed(1)}`), mk('span', 'pt-chip', `SPD ${stt.spd.toFixed(1)}`));
+    chips.append(mk('span', 'pt-chip', tf('HP {n}', { n: stt.maxHp })), mk('span', 'pt-chip', tf('ATK {n}', { n: stt.atk.toFixed(1) })), mk('span', 'pt-chip', tf('SPD {n}', { n: stt.spd.toFixed(1) })));
     info.append(chips, mk('div', 'pt-sub', `${t('Trait')}: ${t(tr.name)} - ${t(tr.desc)}`));
     top.append(stage_, info);
     // actions

@@ -238,10 +238,10 @@ export function createTreePanel({ game = null, ctl = null, profile = game?.profi
       side.appendChild(mk('div', 'k', '◆ ' + KEYSTONES[k].name));
       for (const x of KEYSTONES[k].text || []) side.appendChild(mk('div', 'd', t(x)));
     }
-    h('INFO');
+    h(L('INFO'));
     side.appendChild(mk('div', 'd', L('DRAG pan · WHEEL zoom · CLICK allocate · RIGHT-CLICK refund')));
-    side.appendChild(mk('div', 'd', `${ctl.state().nodes.length} nodes · ${treeSpent(ctl.state())} points spent · ${NODES.length} nodes total`));
-    if (ctl.state().migrated?.skills) side.appendChild(mk('div', 'd', `${ctl.state().migrated.skills} old skill points were refunded into the tree.`));
+    side.appendChild(mk('div', 'd', tf('{n} nodes · {p} points spent · {t} nodes total', { n: ctl.state().nodes.length, p: treeSpent(ctl.state()), t: NODES.length })));
+    if (ctl.state().migrated?.skills) side.appendChild(mk('div', 'd', tf('{n} old skill points were refunded into the tree.', { n: ctl.state().migrated.skills })));
     prevPlan = null; prevSet = null;
     if (hover) updateHover(hover);
   }
@@ -575,7 +575,7 @@ export function createTreePanel({ game = null, ctl = null, profile = game?.profi
       const mine = ctl.role() === id;
       ctx.fillStyle = rgba(ROLES[id].color, mine ? 0.9 : 0.4);
       ctx.fillText(ROLES[id].name.toUpperCase(), Math.cos(a) * LABEL_R, Math.sin(a) * LABEL_R);
-      if (mine) { ctx.font = '22px VT323, monospace'; ctx.fillText('- YOUR ROLE -', Math.cos(a) * LABEL_R, Math.sin(a) * LABEL_R + 30); }
+      if (mine) { ctx.font = '22px VT323, monospace'; ctx.fillText(t('- YOUR ROLE -'), Math.cos(a) * LABEL_R, Math.sin(a) * LABEL_R + 30); }
     });
   }
   function draw(now) {

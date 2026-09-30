@@ -3,6 +3,7 @@
 // Shot, Faraday Suit). Everything is emissive / unlit so it never touches the light pool. Safe to import in node (no DOM at import).
 import * as THREE from 'three';
 import { SPOTS } from '../world/shiplayout.js';
+import { t } from '../core/i18n.js';
 
 const HAS_DOM = typeof document !== 'undefined';
 const TAU = Math.PI * 2;
@@ -198,8 +199,8 @@ export function createShrine() {
     c.fillStyle = '#12061f'; c.fillRect(0, 0, w, h);
     c.strokeStyle = '#ffd35a'; c.lineWidth = 3; c.strokeRect(2, 2, w - 4, h - 4);
     c.fillStyle = '#ff4fd0'; c.font = 'bold 30px monospace'; c.textAlign = 'center'; c.textBaseline = 'middle';
-    c.fillText('LOOT BOX', w / 2, 24);
-    c.fillStyle = '#7dfff0'; c.font = 'bold 16px monospace'; c.fillText('THE HOUSE ALWAYS WINS', w / 2, 47);
+    c.fillText(t('LOOT BOX'), w / 2, 24);
+    c.fillStyle = '#7dfff0'; c.font = 'bold 16px monospace'; c.fillText(t('THE HOUSE ALWAYS WINS'), w / 2, 47);
   });
   add(group, new THREE.PlaneGeometry(1.3, 0.34), signTex ? new THREE.MeshBasicMaterial({ map: signTex, fog: false, side: THREE.DoubleSide }) : bas(0xff4fd0), [0, 2.1, -0.5]);
   const d20 = createD20(0.3);
@@ -292,7 +293,7 @@ export function createDecon() {
   add(group, new THREE.CylinderGeometry(0.22, 0.22, 0.07, 10), metal, [0, DECON.h - 0.15, 0]);
   add(group, new THREE.CylinderGeometry(0.03, 0.03, 0.4, 6), metal, [0, DECON.h - 0.05, -DECON.d / 2 + 0.2]);
   const stripe = add(group, new THREE.BoxGeometry(0.7, 0.09, 0.02), bas(0x33ffaa), [0, DECON.h - 0.3, DECON.d / 2 + 0.03]);
-  const signTex = canvasTex(128, 32, (c, w, h) => { c.fillStyle = '#04150f'; c.fillRect(0, 0, w, h); c.fillStyle = '#33ffaa'; c.font = 'bold 22px monospace'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('DECON', w / 2, h / 2 + 1); });
+  const signTex = canvasTex(128, 32, (c, w, h) => { c.fillStyle = '#04150f'; c.fillRect(0, 0, w, h); c.fillStyle = '#33ffaa'; c.font = 'bold 22px monospace'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(t('DECON'), w / 2, h / 2 + 1); });
   const sign = add(group, new THREE.PlaneGeometry(0.62, 0.16), signTex ? new THREE.MeshBasicMaterial({ map: signTex, fog: false }) : bas(0x33ffaa), [0, DECON.h - 0.3, DECON.d / 2 + 0.045]);
   // spray: falling points inside the booth
   const N = 70;

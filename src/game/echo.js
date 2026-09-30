@@ -15,6 +15,7 @@ import { HOST_ONLY } from '../net/session.js';
 import { hudDock } from '../ui/dock.js';
 import { fx } from './funfx.js';
 import { ensureWardrobeProfile } from './cosmetics.js';
+import { sysMsg, tf } from '../core/i18n.js';   // [i18n8]
 
 HOST_ONLY.add('echo');
 
@@ -121,7 +122,7 @@ export function installEcho(game) {
     switch (ab.id) {
       case 'flicker': {
         game.net.broadcast('echo', { k: 'flicker', p: [r2(focus.pos.x), r2(focus.pos.y + 1), r2(focus.pos.z)], by: from });
-        game.net.broadcast('sys', { text: `👻 ${name} flickers the lights near ${game.playerName(focus.id)}.`, kind: 'info' });
+        game.net.broadcast('sys', sysMsg('👻 {name} flickers the lights near {who}.', { name, who: game.playerName(focus.id) }, 'info'));
         ok = true; break;
       }
       case 'knock':
@@ -143,7 +144,7 @@ export function installEcho(game) {
         }
         if (!best) { deny(from, 'No creature near your crew.'); return; }
         game.net.broadcast('echo', { k: 'reveal', cid: best.id, dur: REVEAL_DUR, by: from });
-        game.net.broadcast('sys', { text: `👻 ${name} points out something near ${game.playerName(focus.id)}...`, kind: 'warn' });
+        game.net.broadcast('sys', sysMsg('👻 {name} points out something near {who}...', { name, who: game.playerName(focus.id) }, 'warn'));
         ok = true; break;
       }
       case 'door': {
@@ -230,7 +231,7 @@ export function installEcho(game) {
   }
   function use(i) {
     const ab = ABILITIES[i];
-    if (E.cd[i] > 0) { game.ui?.toast?.(`${ab.name} is recharging.`, 'bad'); fx(game.audio, 'fun_bad', { volume: 0.3 }); return false; }
+    if (E.cd[i] > 0) { game.ui?.toast?.(tf('{@name} is recharging.', { name: ab.name }), 'bad'); fx(game.audio, 'fun_bad', { volume: 0.3 }); return false; }
     if (E.energy < ab.cost) { game.ui?.toast?.('Not enough echo energy.', 'bad'); fx(game.audio, 'fun_bad', { volume: 0.3 }); return false; }
     const req = { op: ab.id, tid: game.spectating || undefined };
     if (ab.id === 'knock' || ab.id === 'whisper') { const p = aimPoint(); req.p = [+p.x.toFixed(2), +p.y.toFixed(2), +p.z.toFixed(2)]; }

@@ -15,7 +15,7 @@ import { HOST_ONLY } from '../net/session.js';
 import { hudDock } from '../ui/dock.js';
 import { fx } from './funfx.js';
 import { ensureWardrobeProfile } from './cosmetics.js';
-import { t } from '../core/i18n.js';
+import { t, tf, sysMsg } from '../core/i18n.js';
 
 HOST_ONLY.add('ball');
 
@@ -338,7 +338,7 @@ export function installFootball(game) {
     fx(game.audio, 'fun_whistle', { volume: 0.8 });
     fx(game.audio, 'fun_cheer', { volume: 0.95 });
     game.ui?.hud?.bigText?.(t('GOAL!'), `${name} scores!  (crew goals: ${S.goals})`);
-    game.ui?.toast?.(`⚽ GOAL! ${name} - ${S.goals} total`, 'good');
+    game.ui?.toast?.(tf('⚽ GOAL! {name} - {n} total', { name, n: S.goals }), 'good');
     const conf = { count: 26, color: [0xff5a5a, 0xffd23f, 0x5adfff, 0x7dff8a, 0xffffff], speed: 4.2, up: 4, life: 1.1, size: 0.07, gravity: 7, drag: 1.2 };
     game.particles?.burst?.(p, conf);
     game.engine?.shake?.(0.05);
@@ -387,7 +387,7 @@ export function installFootball(game) {
         if (game.time - (S.resetT || -99) < 8) { game.net.sendTo(from, 'sys', { text: 'The ball was just reset.', kind: 'info' }); break; }
         S.resetT = game.time;
         hostRespawn(atHQ() ? 'pitch' : 'ship');
-        game.net.broadcast('sys', { text: `${game.playerName(from)} fetched the ball.`, kind: 'info' });
+        game.net.broadcast('sys', sysMsg('{name} fetched the ball.', { name: game.playerName(from) }, 'info'));
         break;
       }
       default: break;

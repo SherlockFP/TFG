@@ -10,6 +10,7 @@ import { GeoBuilder, levelMaterial } from '../world/geobuilder.js';
 import { createProp } from './props.js';
 import { SOCKETS, ROOM_H, DOOR_H, CHAIN_DOOR, CORE_GAPS } from '../world/hardpoints.js';
 import { MODULES, paintHex, themeTint, ROMAN } from '../game/shipyard_core.js';
+import { t } from '../core/i18n.js';
 
 const T = 0.25;                                    // wall / slab thickness
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -568,7 +569,7 @@ export function buildFrameConsole() {
   const body = new THREE.Mesh(new THREE.BoxGeometry(F.w, F.h, F.d), LM(0x4a4d52)); body.position.set(F.x, F.h / 2, F.z); g.add(body);
   const top = new THREE.Mesh(new THREE.BoxGeometry(F.w + 0.06, 0.06, F.d + 0.06), LM(0xd8b020)); top.position.set(F.x, F.h + 0.03, F.z); g.add(top);
   disp.push(body.geometry, body.material, top.geometry, top.material);
-  const scr = textPlane(0.8, 0.4, 160, 80, (c, w, h) => { c.fillStyle = '#0a0c08'; c.fillRect(0, 0, w, h); c.fillStyle = '#ffd23f'; c.font = 'bold 20px monospace'; c.fillText('FRAME CONSOLE', 8, 26); c.fillStyle = '#9aa08a'; c.font = '15px monospace'; c.fillText('SHIPYARD', 8, 48); c.fillText('feed ship parts', 8, 68); });
+  const scr = textPlane(0.8, 0.4, 160, 80, (c, w, h) => { c.fillStyle = '#0a0c08'; c.fillRect(0, 0, w, h); c.fillStyle = '#ffd23f'; c.font = 'bold 20px monospace'; c.fillText(t('FRAME CONSOLE'), 8, 26); c.fillStyle = '#9aa08a'; c.font = '15px monospace'; c.fillText('SHIPYARD', 8, 48); c.fillText('feed ship parts', 8, 68); });
   scr.mesh.position.set(F.x, F.h + 0.3, F.z - 0.05); scr.mesh.rotation.y = Math.PI;
   g.add(scr.mesh); disp.push(scr.mesh.geometry, scr.mesh.material, scr.tex);
   const hopper = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.05, 0.3), new THREE.MeshBasicMaterial({ color: 0xffb040 })); hopper.position.set(F.x, F.h + 0.075, F.z - 0.02); g.add(hopper); disp.push(hopper.geometry, hopper.material);

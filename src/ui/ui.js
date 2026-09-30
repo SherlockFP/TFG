@@ -5,6 +5,7 @@
 // Full-screen reports (day summary, quota met, deplatformed) play one at a time; toasts wait while one is up.
 import { el, escapeHtml, clamp, fmtMoney } from '../core/util.js';
 import { t, setLang, getLang, LANGS, tf } from '../core/i18n.js';
+import { tNum } from '../i18n/tnum.js';   // [i18n8] toasts: exact key, then numbers as {}
 import { HUD, randomTip } from './hud.js';
 import { iconHTML, typeFromName } from './icons.js';
 import { chooseQuality, resolveLevel } from '../render/quality.js';   // [perf2]
@@ -139,8 +140,8 @@ export class UI {
     b.dataset.back = '1';
     return b;
   }
-  toast(text, kind) { this.hud.toast(t(text), kind); }   // t(): safety net for static strings that were not wrapped at the call site
-  systemMessage(text, kind = 'info') { text = t(text); this.chatMessage(null, text, false, kind); this.hud.toast(text, kind === 'signal' ? 'info' : kind); }
+  toast(text, kind) { this.hud.toast(tNum(text), kind); }   // t(): safety net for static strings that were not wrapped at the call site
+  systemMessage(text, kind = 'info') { text = tNum(text); this.chatMessage(null, text, false, kind); this.hud.toast(text, kind === 'signal' ? 'info' : kind); }
   chatMessage(name, text, self, kind, avatar) {
     this.chatEl.classList.remove('hidden');
     const line = el('div', { class: 'chat-line ' + (kind || '') + (self ? ' self' : '') }, name && avatar ? avIcon(avatar, 14) : null, name ? el('span', { class: 'cn' }, name + ': ') : null, text);   // [profile] icon

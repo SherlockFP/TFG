@@ -69,4 +69,4 @@ Full item/moon/creature display names: `docs/THEME.md`. Internal ids never chang
 2. Is there a second copy of this sign/poster/name in the same room? Add a variant (see `poster_*` in `render/textures.js`).
 3. Does it leak an id, a debug word (TODO, placeholder, undefined, NaN), or a developer term (host, seed, RNG)?
 4. Does TR read like a person wrote it? Does RU keep the deadpan?
-5. `node tools/i18n_audit.mjs` must not grow the MISSING counts (baseline at wave 8: TR 373 / RU 370).
+5. `node tools/i18n_audit.mjs` must not grow the MISSING counts (wave 8 i18n8 baseline: TR 0 / RU 0) and `node tools/i18n_runtime_audit.mjs` must keep "without TR" at the 11 proper nouns and "TR but no RU" at 0 (docs/wave8/i18n8.md).

@@ -110,7 +110,7 @@ const IGNORE_CALLS = new Set(['warn', 'error', 'log', 'debug', 'trace', 'assert'
 const NAME_PROPS = new Set(['text', 'label', 'name', 'title', 'desc', 'description', 'msg', 'message', 'hint', 'tip', 'tooltip', 'placeholder', 'caption', 'flavor',
   'blurb', 'short', 'cause', 'reason', 'help', 'sub', 'subtitle', 'headline', 'lore', 'body', 'story', 'brief', 'goal', 'note', 'summary', 'tagline', 'prompt', 'say', 'line', 'quote']);
 const DOM_PROPS = new Set(['textContent', 'innerText', 'title', 'placeholder', 'alt', 'ariaLabel']);
-const WRAPPERS = new Set(['t', 'tf', 'tIn', 'tfIn', 'L', 'LA', 'sysMsg', 'sysText', 'hasTranslation', 'tl', 'tr_', 'T_', 'trKey', 'dn']);
+const WRAPPERS = new Set(['t', 'tf', 'tIn', 'tfIn', 'L', 'LA', 'sysMsg', 'sysText', 'hasTranslation', 'tl', 'tr_', 'T_', 'trKey', 'dn', '_t', '_tf', 'tt', 'tNum', 'tmg', 'xpReason']);   // + wave 8 i18n8 aliases
 
 function loadDictObject(obj, target, where, fileSrc, topConsts) {
   // obj: ObjectExpression (or Identifier resolved through topConsts). Returns count added.
@@ -378,6 +378,7 @@ const keysUsed = [...used.keys()];
       }
     } catch (e) { /* not importable in node */ }
   }
+  globalThis.__I18N_LIVE = I;   // the live dictionaries after every *_i18n import (fillGaps registers straight into them)
   for (const k of new Set([...keysUsed, ...TR.keys(), ...RU.keys()])) { if (!TR.has(k) && I.hasTranslation('tr', k)) TR.set(k, 'runtime'); if (!RU.has(k) && I.hasTranslation('ru', k)) RU.set(k, 'runtime'); }
 }
 const missTR = keysUsed.filter((k) => !TR.has(k) && !/^[^A-Za-z]*$/.test(k));
@@ -393,6 +394,7 @@ if (flag('gaps')) { console.log(JSON.stringify({ trNoRu: trNoRu.map((k) => [k, T
 
 // unwrapped findings that are actually covered by both dictionaries (data strings translated through t() elsewhere) -> "covered"
 const localEnAll = new Set(localTables.map((x) => x.text));
+for (const x of findings) { const I = globalThis.__I18N_LIVE; if (!I) break; if (!TR.has(x.text) && I.hasTranslation('tr', x.text)) TR.set(x.text, 'runtime'); if (!RU.has(x.text) && I.hasTranslation('ru', x.text)) RU.set(x.text, 'runtime'); }
 const unwrapped = findings.filter((x) => !((TR.has(x.text) || localEnAll.has(x.text)) && RU.has(x.text)));
 const covered = findings.length - unwrapped.length;
 

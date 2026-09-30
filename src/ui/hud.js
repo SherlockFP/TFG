@@ -16,6 +16,7 @@ import { xpForLevel, rankOf } from '../game/progression.js';
 import { MOONS, WEATHER } from '../game/moons.js';
 import * as DailyEvents from '../game/dailyEvents.js';
 import { t, getLang, tf } from '../core/i18n.js';
+import { tNum } from '../i18n/tnum.js';
 import { LABEL as HL_LABEL } from '../game/headline_core.js';
 import { walletRow } from '../game/wallet.js';   // [unify] one wallet row: credits + clout
 import { INTERIOR_NAMES as REG_INTERIOR_NAMES } from '../world/interiors/index.js';
@@ -195,7 +196,7 @@ export class HUD {
     // the landing briefing card already shows the moon name + weather
     if (this.run?.phase === 'landing' && main && main === MOONS[this.run.moon]?.name) return;
     if (this.gate?.()) { this.pendingBig = [main, sub]; return; }
-    this.$.bigMain.textContent = main; this.$.bigSub.textContent = sub || '';
+    this.$.bigMain.textContent = typeof main === 'string' ? t(main) : main; this.$.bigSub.textContent = typeof sub === 'string' ? t(sub) : (sub || '');   // t(): [i18n8] safety net for literal cinematic text
     this.$.big.classList.remove('hidden');
     this.$.big.classList.remove('anim'); void this.$.big.offsetWidth; this.$.big.classList.add('anim');
     // while the banner is up, the side columns (objectives, event chips, assignment) step back so nothing overlaps it
@@ -228,6 +229,8 @@ export class HUD {
   }
 
   setPrompt(text, sub) {
+    if (typeof text === 'string') text = t(text);   // [i18n8] safety net: fixed prompts that were not wrapped at the call site
+    if (typeof sub === 'string') sub = t(sub);
     if (text === this.promptText && sub === this.promptSub) return;
     this.promptText = text; this.promptSub = sub;
     this.$.prompt.style.opacity = text ? 1 : 0;
@@ -290,7 +293,7 @@ export class HUD {
     this.showToast(text, kind);
   }
   showToast(text, kind = 'info') {
-    const e = el('div', { class: 'toast ' + kind }, text);
+    const e = el('div', { class: 'toast ' + kind }, typeof text === 'string' ? t(text) : text);   // t(): [i18n8] safety net (ui.toast already translates)
     this.$.toasts.appendChild(e);
     setTimeout(() => e.classList.add('out'), 3800);
     setTimeout(() => e.remove(), 4400);
@@ -347,7 +350,7 @@ export class HUD {
   }
 
   floatText(pos, text, color = '#fff', big = false) {
-    const e = el('div', { class: 'float-text' + (big ? ' big' : ''), style: { color } }, text);
+    const e = el('div', { class: 'float-text' + (big ? ' big' : ''), style: { color } }, tNum(text));   // [i18n8] number-aware safety net
     this.$.float.appendChild(e);
     this.floats.push({ pos: pos.clone(), el: e, t: 0, off: (Math.random() - 0.5) * 30 });
     if (this.floats.length > 30) { const f = this.floats.shift(); f.el.remove(); }
@@ -443,7 +446,7 @@ export class HUD {
       else { ctx.moveTo(x, 23); ctx.lineTo(x + 5, 30); ctx.lineTo(x, 37); ctx.lineTo(x - 5, 30); }
       ctx.closePath(); ctx.fill();
       if (m.small) continue;
-      const txt = m.dist ? `${m.label} ${Math.round(d)}m` : m.label;
+      const txt = m.dist ? `${t(m.label)} ${Math.round(d)}m` : t(m.label);
       const tw = ctx.measureText(txt).width;
       const tx = clamp(x + (edge ? -Math.sign(rel) * (tw / 2 + 10) : 0), tw / 2 + 2, W - tw / 2 - 2);
       labels.push({ txt, tw, tx, col: m.col });

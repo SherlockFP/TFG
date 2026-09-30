@@ -73,7 +73,7 @@ function createMechanicBench() {
   const cv = document.createElement('canvas'); cv.width = 256; cv.height = 64;
   const c = cv.getContext('2d');
   c.fillStyle = '#1a0d04'; c.fillRect(0, 0, 256, 64); c.strokeStyle = '#ff8a3d'; c.lineWidth = 4; c.strokeRect(3, 3, 250, 58);
-  c.fillStyle = '#ffb060'; c.font = 'bold 34px monospace'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('REPAIRS', 128, 34);
+  c.fillStyle = '#ffb060'; c.font = 'bold 34px monospace'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(t('REPAIRS'), 128, 34);
   const tex = new THREE.CanvasTexture(cv); tex.magFilter = THREE.NearestFilter; tex.minFilter = THREE.NearestFilter;
   box(1.5, 0.375, 0.05, new THREE.MeshBasicMaterial({ map: tex }), 0, 2.85, -0.36);
   g.userData.colliders = [[0, 0.55, 0, 1.1, 0.55, 0.48]];
