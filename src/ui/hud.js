@@ -222,7 +222,7 @@ export class HUD {
     if (text === this.promptText && sub === this.promptSub) return;
     this.promptText = text; this.promptSub = sub;
     this.$.prompt.style.opacity = text ? 1 : 0;
-    this.$.pMain.textContent = text || '';
+    this.$.pMain.textContent = text ? String(text).replace(/\s*\[E\]\s*/g, ' ').trim() : '';   // [threatmerge] a11y.js prepends the key badge ('[E] ' via CSS): drop the '[E]' the label itself carries (was "[E] X [E]")
     this.$.pSub.textContent = sub || '';
   }
 

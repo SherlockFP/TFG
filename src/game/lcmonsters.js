@@ -16,6 +16,7 @@ import { RNG } from '../core/rng.js';
 import { CREATURES } from './creatures.js';
 import { ITEMS, itemDef, isSellable, scrapTableFor } from './items.js';
 import { MOONS } from './moons.js';
+import { poolFor, poolBlocks, LM_KIND_ID } from './threatpool.js';   // [threatmerge]
 import { G } from '../physics/physics.js';
 import * as C from './lcmonsters_core.js';
 import { registerLcContent, csnd, LC_TYPES } from './lcmonsters_ai.js';
@@ -48,7 +49,7 @@ export function installLcmonsters(game) {
   const run = () => g.run;
   const isMoon = () => run()?.phase === 'moon' && !MOONS[run()?.moon]?.company && !MOONS[run()?.moon]?.home;
   const fac = () => g.world?.facility;
-  const veto = (type, pos) => { try { return g.crdirector?.canSpawn?.(type, pos) === false; } catch { return false; } };
+  const veto = (type, pos) => { try { return g.crdirector?.canSpawn?.(type, pos, 'lcm') === false; } catch { return false; } };   // [threatmerge] crdirector = the gate
   const alive = (type) => { let n = 0; for (const c of g.creatures?.host?.values?.() || []) if (c.type === type && !c.dead) n++; return n; };
   const players = (zone) => g.aiPlayers().filter((p) => !p.dead && !p.inShip && (!zone || p.zone === zone));
   const bc = (d) => g.net.broadcast('lm', d);
@@ -140,7 +141,7 @@ export function installLcmonsters(game) {
     const r = run(); if (!r) return;
     const q = r.quotaIndex | 0, m = MOONS[r.moon];
     H.day = r.seed + ':' + r.day; H.tries.clear(); H.cursedN = 0; H.spawnN = 0; H.os = null; H.maskT.clear(); H.maskWarned.clear(); H.hit.clear(); H.marks.clear(); H.circles.clear(); H.exp.clear(); H.immune.clear();
-    H.plan = isMoon() ? C.planDay(r.seed, r.day, q, { indoor: !!fac(), outdoor: !m?.noOutdoor && !!g.world?.terrain }).map((e) => ({ ...e, done: false })) : [];
+    H.plan = isMoon() ? C.planDay(r.seed, r.day, q, { indoor: !!fac(), outdoor: !m?.noOutdoor && !!g.world?.terrain, block: (k) => poolBlocks(LM_KIND_ID[k], poolFor(r, m)) }).map((e) => ({ ...e, done: false })) : [];
     H.log.length = 0;
   }
   function planTick() {

@@ -61,6 +61,15 @@ export function sourceCaps(q) {
 /** [onegoal] swarm / horde waves and sieges only after quota 3 is met (quotaIndex >= 3) for every profile: a stealth / camera verb dies when a wave spawns on arrival */
 export const WAVE_MIN_Q = 3;
 export const wavesAllowed = (q) => (q | 0) >= WAVE_MIN_Q;
+/** [threatmerge] every scripted spawner asks the director. Set pieces (horde / siege / mirror waves) are gated at their START by wavesAllowed;
+ *  everything else (lcmonsters, backrooms residents, skeleton raids, crypt swarms) must fit the threat budget: share of the cap per phase (peak > build > relax > calm) */
+export const WAVE_KINDS = Object.freeze(['horde', 'siege', 'mirror']);
+export const GATE_SHARE = Object.freeze({ calm: 0.5, build: 1, peak: 1.3, relax: 0.7 });
+export function gateOk(kind, phase, o, active, cost) {
+  if (WAVE_KINDS.includes(kind)) return wavesAllowed(ctxOf(o).q);
+  const lim = capOf(o) * (GATE_SHARE[phase] ?? 1);
+  return active + cost <= lim + 1e-6 || (active <= 0.01 && cost <= lim + 1.5);
+}
 /** siege: wave power and wave count ceilings (siege starts at quota 2 at the earliest): 1.0 x 3 waves / 1.5 x 4 / vanilla */
 export const siegeCaps = (q) => (q >= 6 ? { power: 3.4, waves: 5 } : q >= 4 ? { power: 1.5, waves: 4 } : { power: 1.0, waves: 3 });
 export const SIEGE_TYPES = Object.freeze(['sg_swarmer', 'sg_runner', 'sg_brute']);

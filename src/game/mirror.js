@@ -92,6 +92,7 @@ export function installMirror(game) {
     if (!w?.terrain || !w.outdoor || w.company || !moon) return null;
     const rng = new RNG(((run.seed ^ 0x51ab1e) >>> 0) ^ hashString('mirror:' + run.moon));
     if (!hasPortal(run.quotaIndex || 0, moon, rng.next())) return null;
+    if (game.crdirector?.canSpawn?.('mirror', null, 'mirror') === false) return null;   // [threatmerge] mirror waves: quota 3+ (crdirector gate, same answer on every peer)
     const terr = w.terrain, out = w.outdoor, half = (terr.playHalf ?? 130) - 16;
     for (let i = 0; i < 120; i++) {
       const a = rng.float(0, Math.PI * 2), d = rng.float(40, Math.max(60, half * 0.85));

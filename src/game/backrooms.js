@@ -380,6 +380,7 @@ export function installBackrooms(game) {
       best = w;
     }
     if (!best) return null;
+    if (game.crdirector?.canSpawn?.(pick.id, null, 'backrooms') === false) return null;   // [threatmerge] director budget
     const c = game.creatures.hostSpawn(pick.id, new THREE.Vector3(best.x, pk.y, best.z), { zone: 'in', level: game.rollLevel?.() || 1, data: { brPocket: 1 } });
     if (c) S.host.spawned.add(c.id);
     return c;

@@ -2,6 +2,7 @@
 // hp: null = unkillable. power: spawn budget cost. xp/coin: kill rewards at level 1.
 import { localizeFields } from '../core/i18n.js';
 import { normalizeDef } from './balance_rules.js';
+import { poolFor, poolMul } from './threatpool.js';   // [threatmerge] curated 3-4 headline creatures per moon
 export const CREATURES = {
   scuttler: { name: 'Spam Bot', hp: 30, dmg: 8, walk: 2.2, run: 5.4, power: 0.5, pack: [2, 4], xp: 18, coin: 3, drop: ['drop_scuttler', 0.25], zone: 'in', radius: 0.5, height: 0.6,
     lore: 'Swarms of cheap spam bots. Crunchy. Easy XP for new janitors.' },
@@ -103,6 +104,10 @@ export function spawnTable(moon, zone = 'in', run = null) {
     if (e.zone !== zone || !CREATURES[id] || id in base) continue;
     const w = (e.w[tier - 1] || 0) * (e.interior?.[moon.interior] ?? 1) * late;
     if (w > 0) out[id] = Math.round(w * 10) / 10;
+  }
+  if (run) {   // [threatmerge] headline creatures outside this moon's pool are rare (Hard: less rare)
+    const pool = poolFor(run, moon);
+    if (pool) for (const id of Object.keys(out)) { const m = poolMul(id, pool); if (m < 1) out[id] = Math.max(0.1, Math.round(out[id] * m * 10) / 10); }
   }
   return out;
 }
