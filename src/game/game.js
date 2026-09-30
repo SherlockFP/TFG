@@ -235,7 +235,8 @@ import { installLoop11 } from './loop11.js';
 // [import:swarm11]
 import { installShift11 } from './shift11.js';
 // [import:loop11]
-// [import:events11]
+import { installEvents11 } from './events11.js';
+// [import:shift11]
 // [import:gear11]
 import { installHostMig } from './hostmig.js';   // wave 4: host migration (docs/wave4/hostmig.md)
 
@@ -633,7 +634,8 @@ export class Game extends Emitter {
     // [slot:swarm11]
     this.useModule('shift11', installShift11);
     // [slot:loop11]
-    // [slot:events11]
+    this.useModule('events11', installEvents11);
+    // [slot:shift11]
     // [slot:gear11]
 
     this.useModule('onboard', installOnboard);   // [slot:onboard] wave 5: Hiring Day + staged unlocks (installed last: wraps hostLever / terminalCommand / objectives.compute)
