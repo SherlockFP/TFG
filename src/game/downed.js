@@ -119,7 +119,7 @@ const CSS = `.dn-bar{background:#12130d;border:2px solid #ff4a3a;color:#ffe9d0;f
 .dn-mark{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;font:700 12px/1 var(--font2,'Arial Narrow',sans-serif);color:#ffe9d0;text-transform:uppercase;letter-spacing:.05em;text-shadow:0 0 4px #000}
 .dn-ring{width:46px;height:46px;border-radius:50%;background:conic-gradient(#7dff9b var(--p,0%),#3a1410 0);display:flex;align-items:center;justify-content:center}
 .dn-ring b{width:34px;height:34px;border-radius:50%;background:#12130d;display:flex;align-items:center;justify-content:center;font-size:15px;color:#ff8a7a}
-.dn-mid{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);display:none;flex-direction:column;align-items:center;gap:3px;font:700 13px/1 var(--font2,'Arial Narrow',sans-serif);color:#ffe9d0;letter-spacing:.06em;text-shadow:0 0 4px #000}
+.dn-mid{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);display:none;flex-direction:column;align-items:center;gap:3px;font:700 13px/1 var(--font2,'Arial Narrow',sans-serif);color:#ffe9d0;letter-spacing:.06em;text-shadow:0 0 4px #000}
 .dn-mid .dn-ring{width:74px;height:74px}.dn-mid .dn-ring b{width:60px;height:60px;color:#7dff9b;font-size:17px}`;
 
 const arr3 = (v) => [+v.x.toFixed(2), +v.y.toFixed(2), +v.z.toFixed(2)];

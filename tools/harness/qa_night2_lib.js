@@ -5,7 +5,10 @@ const V = (x, y, z) => new THREE.Vector3(x, y, z);
 const yaw2 = (x, z, tx, tz) => Math.atan2(-(tx - x), -(tz - z));
 const fac = () => g.world.facility;
 R.gamma = g.engine.postMat?.uniforms?.uGamma?.value;
-async function frames(n, render = true) { for (let i = 0; i < n; i++) { kefal.tick(1, 1 / 30, false); if (i % 4 === 3) await sleep(4); } if (render) kefal.tick(2, 1 / 30, true); await sleep(250); kefal.tick(1, 1 / 30, true); }
+// NOTE: every synchronous render queues GL commands for the software rasteriser; a burst of them (3 renders per call) piled up to 6-8 GB in the renderer and the OOM killer took the tab (5 runs).
+// finish() after each render makes the page wait for the GPU process, which keeps the queue bounded.
+const flush = () => { try { g.engine.renderer.getContext().finish(); } catch { /* no gl */ } };
+async function frames(n, render = true) { for (let i = 0; i < n; i++) { kefal.tick(1, 1 / 30, false); if (i % 4 === 3) await sleep(4); } if (render) { kefal.tick(2, 1 / 30, true); flush(); } await sleep(250); kefal.tick(1, 1 / 30, true); flush(); }
 async function step(name, fn) { const t = performance.now(); console.log('QA: start ' + name); try { const r = await fn(); R.steps[name] = r === undefined ? 'ok' : r; } catch (e) { R.steps[name] = 'ERR ' + String(e && e.stack || e).slice(0, 300); } R.steps[name + '_ms'] = Math.round(performance.now() - t); console.log('QA: done ' + name + ' ' + JSON.stringify(R.steps[name]).slice(0, 200) + ' ' + R.steps[name + '_ms'] + 'ms'); }
 function unpause() { try { if (document.querySelector('.pause-info')) { R.pausedSeen = (R.pausedSeen || 0) + 1; g.ui.closePanel(true); } if (g.ui.clickHint) g.ui.clickHint.style.display = 'none'; } catch (e) { R.unpauseErr = String(e); } }
 async function shot(name, keepPause) { if (!keepPause) unpause(); await frames(2, false); await sleep(500); if (!keepPause) unpause(); await window.__shot(name); }

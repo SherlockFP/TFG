@@ -29,7 +29,7 @@ const cli = await mk(`/?autojoin=${CODE}&net=local&name=Client`, 'client');
 await cli.waitForFunction(() => kefal.game?.net?.connected, null, { timeout: 60000 }).catch(() => logs.push('client never connected'));
 const tick = (p, n) => p.evaluate((n) => { for (let i = 0; i < n; i++) kefal.tick(1, 1 / 30, false); }, n);
 const both = async (rounds, n = 10) => { for (let i = 0; i < rounds; i++) { await tick(host, n); await tick(cli, n); await host.waitForTimeout(25); } };
-const shot = async (p, name) => { try { await p.evaluate(() => { kefal.tick(2, 1 / 30, true); }); await p.waitForTimeout(700); await p.screenshot({ path: `${shotDir}/${name}.jpg`, type: 'jpeg', quality: Q, timeout: 150000 }); } catch (e) { logs.push('shot ' + name + ' ' + String(e).slice(0, 100)); } };
+const shot = async (p, name) => { try { await p.evaluate(() => { kefal.tick(2, 1 / 30, true); try { kefal.game.engine.renderer.getContext().finish(); } catch { /* no gl */ } }); await p.waitForTimeout(700); await p.screenshot({ path: `${shotDir}/${name}.jpg`, type: 'jpeg', quality: Q, timeout: 150000 }); } catch (e) { logs.push('shot ' + name + ' ' + String(e).slice(0, 100)); } };
 const unpause = (p) => p.evaluate(() => { try { if (document.querySelector('.pause-info')) kefal.game.ui.closePanel(true); if (kefal.game.ui.clickHint) kefal.game.ui.clickHint.style.display = 'none'; } catch { /* ignore */ } });
 const IDS = { host: await host.evaluate(() => kefal.game.selfId), cli: await cli.evaluate(() => kefal.game.selfId) };
 out.ids = IDS;

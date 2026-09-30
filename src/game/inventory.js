@@ -559,12 +559,17 @@ export function installInventory(game) {
   // ------------------------------------------------------------------ world tier beams (rare+ rolled items; affixed weapons keep loot.js beams)
   function ensureBeamRes() {
     if (st.beamGeo) return;
-    st.beamGeo = new THREE.CylinderGeometry(0.035, 0.1, 2.2, 6, 1, true).translate(0, 1.1, 0);
+    st.beamGeo = new THREE.CylinderGeometry(0.03, 0.09, 1.6, 6, 1, true).translate(0, 0.8, 0);
+    {   // [qa2] the column fades to black (additive = transparent) toward the top: it used to read as a solid pillar through the ceiling / wall in a corridor
+      const pos = st.beamGeo.attributes.position, cols = new Float32Array(pos.count * 3);
+      for (let i = 0; i < pos.count; i++) { const k = 1 - Math.min(1, Math.max(0, pos.getY(i) / 1.6)); cols[i * 3] = cols[i * 3 + 1] = cols[i * 3 + 2] = k * k; }
+      st.beamGeo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+    }
     st.ringGeo = new THREE.RingGeometry(0.16, 0.34, 18).rotateX(-Math.PI / 2);
     st.beamGeo.userData.shared = true; st.ringGeo.userData.shared = true;
     for (const id of ['rare', 'epic', 'legendary', 'mythic']) {
-      const mk = () => new THREE.MeshBasicMaterial({ color: TIERS[id].hex, transparent: true, opacity: 0.2, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false });
-      st.beamMats[id] = { beam: mk(), ring: mk() };
+      const mk = (vc) => new THREE.MeshBasicMaterial({ color: TIERS[id].hex, transparent: true, opacity: 0.2, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false, vertexColors: !!vc });
+      st.beamMats[id] = { beam: mk(true), ring: mk(false) };
     }
   }
   const BEAM_ALPHA = { rare: 0.14, epic: 0.2, legendary: 0.28, mythic: 0.34 };
@@ -583,7 +588,8 @@ export function installInventory(game) {
         const beam = new THREE.Mesh(st.beamGeo, m.beam);
         const ring = new THREE.Mesh(st.ringGeo, m.ring);
         ring.position.y = 0.02;
-        if (it.tier === 'mythic' || it.tier === 'legendary') beam.scale.set(1.3, 1.35, 1.3);
+        if (it.tier === 'mythic' || it.tier === 'legendary') beam.scale.set(1.3, 1.2, 1.3);
+        beam.userData.bs = beam.scale.x;
         g.add(beam, ring);
         g.renderOrder = 2;
         game.scene.add(g);
@@ -596,6 +602,8 @@ export function installInventory(game) {
       g.position.copy(it.obj.position);
       g.position.y -= (it.size?.y || 0.3) * 0.5;
       g.children[1].rotation.y += dt * 0.8;
+      const cam = game.camera, bm = g.children[0];   // [qa2] up close the column thins out (it filled a third of the frame at 2 m); it is a far marker
+      if (cam && bm.userData.bs) { const k = Math.min(1, Math.max(0.3, (g.position.distanceTo(cam.position) - 1.5) / 5)) * bm.userData.bs; bm.scale.x = bm.scale.z = k; }
     }
     if (st.beamGeo) {
       for (const [id, m] of Object.entries(st.beamMats)) {

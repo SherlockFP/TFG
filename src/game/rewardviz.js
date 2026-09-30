@@ -111,7 +111,7 @@ export function installRewardviz(game) {
       const v = +b.dataset.v || 0, pre = b.dataset.pre || '';
       timers.push(setTimeout(() => {
         const t0 = performance.now(), dur = 600;
-        const step = (now) => { const k = Math.min(1, (now - t0) / dur); b.textContent = pre + Math.round(v * (1 - Math.pow(1 - k, 3))).toLocaleString('en-US'); if (k < 1 && b.isConnected) requestAnimationFrame(step); };
+        const step = (now) => { const k = Math.max(0, Math.min(1, (now - t0) / dur)); b.textContent = pre + Math.round(v * (1 - Math.pow(1 - k, 3))).toLocaleString('en-US'); if (k < 1 && b.isConnected) requestAnimationFrame(step); };
         requestAnimationFrame(step);
       }, 900 + i * 260));
     });

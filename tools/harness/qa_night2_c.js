@@ -1,8 +1,28 @@
 // QA night 2, run C: the 3 expedition moons (barge / dune / roof): landing view of the ship + an objective view, need bar, no page errors.
 //   bash run.sh c "/?autohost=local&code=T3&name=Tester"     (prepend qa_night2_lib.js)
 const dump = (k) => console.log('QA: R ' + k + ' ' + JSON.stringify(R).slice(0, 3500));
-// ---------------- part 0 (orbit, no landing = cheap): day summary with the income-by-source block + the highlight CRT replay from a synthetic clip
+// ---------------- part 0 (orbit, no landing = cheap): day summary with the income-by-source block + the highlight CRT replay (bisected: the first version killed the renderer, 6.5 GB)
+const mem = () => Math.round((performance.memory?.usedJSHeapSize || 0) / 1e6);
+const lg = (m) => console.log('QA: ' + m + ' heapMB=' + mem());
+setInterval(() => console.log('QA: heartbeat heapMB=' + mem()), 5000);
 await step('summary_crt', async () => {
+  const D = { moon: 'Estate of the Departed', company: false, collected: 312, shipValue: 312, deaths: [], fines: 30, allDead: false, kills: 2, day: 1, quota: 400, sold: 0, daysLeft: 2, leftValue: 40, credits: 480, players: [{ id: g.selfId, name: 'Tester', dead: false, collected: 312, loot: 312, kills: 2 }] };
+  lg('reward'); g.rewardviz.reward('job', 240); g.rewardviz.reward('till', 90); await sleep(300); lg('reward done');
+  g.ui.renderDaySummary(D, g, [], () => {}); await sleep(1500); lg('plain report in DOM');
+  kefal.tick(2, 1 / 30, true); lg('rendered a frame'); await sleep(2500);
+  await window.__shot('n2_day_summary_plain.jpg'); lg('plain shot');
+  document.querySelectorAll('.report').forEach((x) => x.remove());
+  const extra = []; g.mods.emit('daySummary', D, extra, g); lg('emitted lens=' + JSON.stringify(extra.map((x) => x.length)));
+  g.ui.renderDaySummary(D, g, extra, () => {}); await sleep(3500); lg('full report in DOM');
+  kefal.tick(2, 1 / 30, true); lg('rendered full');
+  R.sumText = document.querySelector('.report')?.innerText?.replace(/\s+/g, ' ').slice(0, 900);
+  R.hasRv = !!document.querySelector('.rv-sum'); const rp = document.querySelector('.report'); if (rp) { const r = rp.getBoundingClientRect(); R.reportRect = [r.left, r.top, r.width, r.height].map(Math.round); R.reportScroll = [rp.scrollHeight, rp.clientHeight]; }
+  dump('summary');
+  await window.__shot('n2_day_summary.jpg'); lg('full shot');
+  document.querySelectorAll('.report, .report *').forEach((e) => { if (e.scrollHeight > e.clientHeight + 20) e.scrollTop = 99999; });
+  await sleep(500); await window.__shot('n2_day_summary_b.jpg');
+  document.querySelectorAll('.report').forEach((x) => x.remove());
+  // highlight CRT from a synthetic clip (no landing needed)
   const HC = await import('/src/game/highlights_core.js'), F2C = await import('/src/game/feedcams2_core.js');
   const ring = new HC.Ring();
   for (let i = 0; i < 120; i++) {
@@ -10,26 +30,14 @@ await step('summary_crt', async () => {
     ring.setPlayer('me', 20 + Math.cos(a) * 6, 10 + Math.sin(a) * 6, a + 1.57); ring.setPlayer('p2', 22 + Math.cos(a + 2) * 4, 8 + Math.sin(a + 2) * 4, a);
     ring.setCreature('c1', 30 - i * 0.12, 16 - i * 0.05); ring.setCreature('c2', 8 + i * 0.05, 4 + i * 0.09);
   }
-  const m = F2C.hlMake('down', 'Tester', 0, '');
-  const clip = HC.buildClip(ring, 8.0, m, 'me', (id) => (id === 'me' ? 'Tester' : 'Crewmate'), [[8.0, 'down']]);
-  R.clipOk = !!clip; R.clipBytes = clip && HC.clipBytes(clip);
-  if (!clip) return 'no clip';
-  g.highlights.state.view = [{ clip, tracks: HC.unpackClip(clip) }]; g.highlights.state.idx = 0;
-  g.rewardviz.reward('job', 240); g.rewardviz.reward('till', 90);
-  g.ui.showDaySummary({ moon: 'Estate of the Departed', company: false, collected: 312, shipValue: 312, deaths: [], fines: 30, allDead: false, kills: 2, day: 1, quota: 400, sold: 0, daysLeft: 2, leftValue: 40, credits: 480, players: [{ id: g.selfId, name: 'Tester', dead: false, collected: 312 }] }, g);
-  await sleep(3500); await frames(3);
-  R.sumText = document.querySelector('.report')?.innerText?.replace(/\s+/g, ' ').slice(0, 900);
-  R.hasWatch = !!document.querySelector('.hc-watch'); R.hasRv = !!document.querySelector('.rv-sum');
-  const rp = document.querySelector('.report'); if (rp) { const r = rp.getBoundingClientRect(); R.reportRect = [r.left, r.top, r.width, r.height].map(Math.round); R.reportScroll = [rp.scrollHeight, rp.clientHeight]; }
-  dump('summary');
-  await shot('n2_day_summary.jpg', true);
-  document.querySelectorAll('.report, .report *').forEach((e) => { if (e.scrollHeight > e.clientHeight + 20) e.scrollTop = 99999; });
-  await frames(2); await shot('n2_day_summary_b.jpg', true);
-  const ok = g.highlights.watch(); R.watch = ok; await sleep(3800); await frames(2, false); await sleep(400);
-  R.crtText = document.querySelector('.hc-crt')?.innerText?.replace(/\s+/g, ' ').slice(0, 400);
-  dump('crt');
-  await shot('n2_highlight_crt.jpg', true);
-  try { document.querySelector('.hc-crt')?.remove(); g.highlights.state.playing?.stop?.(); document.querySelector('.report')?.remove(); g.ui.closePanel?.(true); } catch { /* ignore */ }
+  lg('ring built');
+  const clip = HC.buildClip(ring, 8.0, F2C.hlMake('down', 'Tester', 0, ''), 'me', (id) => (id === 'me' ? 'Tester' : 'Crewmate'), [[8.0, 'down']]);
+  R.clipOk = !!clip; if (!clip) return 'no clip'; lg('clip built bytes=' + HC.clipBytes(clip));
+  g.highlights.state.view = [{ clip, tracks: HC.unpackClip(clip) }]; g.highlights.state.idx = 0; lg('tracks unpacked');
+  R.watch = g.highlights.watch(); lg('watch() called'); await sleep(3800);
+  R.crtText = document.querySelector('.hc-crt')?.innerText?.replace(/\s+/g, ' ').slice(0, 400); lg('crt running');
+  await window.__shot('n2_highlight_crt.jpg'); lg('crt shot');
+  try { document.querySelector('.hc-crt')?.remove(); g.highlights.state.playing?.stop?.(); } catch { /* ignore */ }
 });
 // ---------------- part 1 (fresh profile): normal facility walk with the loaner torch (one goal line), Tab card, toast vs Algorithm ticker, eye tells
 await step('land_hamsi', () => land('hamsi', false));
