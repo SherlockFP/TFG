@@ -19,6 +19,7 @@ import { LAB_IDS } from './labyrinths_core.js';   // [labyrinths]
 import { insideShip } from '../world/ship.js';
 import { affixCalm } from './headline_core.js';
 import { fallbackChestLoot } from './chests.js';
+import { descentToken } from './descent21_state.js';
 import * as C from './facjobs_core.js';
 import './facjobs_i18n.js';
 
@@ -54,13 +55,17 @@ export function installFacjobs(game) {
   const rollOf = (r) => { const x = C.rollJobs(r.runId ?? 'x', r.day ?? 1, r.moon, r.quotaIndex | 0); return x.side && affixCalm({ mode: r.hub?.mode, q: r.quotaIndex | 0, quick: !!r.quick }) ? { ...x, side: null } : x; };
   const mods = game.mods;
   const offs = [];
-  let disposed = false, tickT = 0, droneT = 0;
+  let disposed = false, tickT = 0, droneT = 0, streaming = false, surfacePending = null;
   const S = { key: '', fac: null, meshes: [], clues: new Map(), ui: null, drone: null, dTarget: new V3(), briefKey: '' };
   const mem = { drone: null, ids: {} };   // host-only runtime (item ids, drone path)
   const run = () => game.run;
   const host = () => !!game.isHost;
   const fj = () => run()?.fj || null;
   const fac = () => game.world?.facility || null;
+  // Jobs belong to the landing's surface. Loose job items are checkpointed by
+  // Descent21, not destroyed when its single facility owner streams downstairs.
+  const deep = () => { const r = run(), d = r?.descent21; return !!d && d.depth > 0 && d.token === descentToken(r); };
+  const suspended = () => deep() || streaming || !!surfacePending;
   const toast = (text, kind = 'info') => { try { game.ui?.hud?.toast?.(text, kind); } catch { /* hud optional */ } };
   const bcast = () => { try { game.broadcastRun?.(['fj']); } catch { /* net closing */ } };
   const fx = (d) => { try { game.net.broadcast('fjfx', d); } catch { /* net closing */ } };
@@ -102,7 +107,7 @@ export function installFacjobs(game) {
 
   function hostSetup() {
     const r = run();
-    if (!host() || !r) return;
+    if (!host() || !r || suspended()) return;
     mem.drone = null; mem.ids = {};
     const moon = MOONS[r.moon], F = fac();
     if (!C.jobMoon(moon) || !F || game.onboard?.fr?.calm?.('facjobs')) { if (r.fj) { r.fj = null; bcast(); } return; }   // [firstrun] the first landing has ONE goal: no facility job / fee before the first sale
@@ -223,7 +228,7 @@ export function installFacjobs(game) {
   const near = (from, pos, d) => { const p = (game.aiPlayers?.() || []).find((q) => q.id === from); return !!p && !p.dead && Math.hypot(p.pos.x - pos[0], p.pos.z - pos[2]) <= d && Math.abs(p.pos.y - pos[1]) < 5; };
 
   function hostReq(d, from) {
-    if (!host() || !d || !fj() || run().phase !== 'moon') return;
+    if (!host() || !d || !fj() || run().phase !== 'moon' || suspended()) return;
     if (d.op === 'fuse') {
       const j = activeJobs().find((q) => q.id === 'power'); const it = j && game.items.items?.get?.(String(d.id));
       if (!j || !it || it.type !== 'fj_fuse' || it.holder !== from || !near(from, j.pos, 5)) return;
@@ -245,6 +250,7 @@ export function installFacjobs(game) {
   }
 
   function hostTick(dt) {
+    if (suspended()) return;
     const r = run(), list = activeJobs();
     if (!list.length) return;
     const players = (game.aiPlayers?.() || []).filter((p) => !p.dead && p.zone === 'in');
@@ -268,6 +274,7 @@ export function installFacjobs(game) {
   }
 
   function droneTick(dt) {
+    if (suspended()) return;
     const j = activeJobs().find((q) => q.id === 'drone'), D = mem.drone;
     if (!j || !D) return;
     const near = (game.aiPlayers?.() || []).some((p) => !p.dead && p.zone === 'in' && Math.hypot(p.pos.x - D.x, p.pos.z - D.z) <= C.DRONE_FOLLOW);
@@ -284,7 +291,7 @@ export function installFacjobs(game) {
     if (hit) { D.hp = Math.max(0, D.hp - 7 * dt); if (!D.warned || D.warned < game.time - 8) { D.warned = game.time; fx({ k: 'msg', m: 'The drone is under attack!', kind: 'warn' }); } }
     const p = Math.min(100, Math.round((D.done / Math.max(1, D.total)) * 100));
     D.sendT -= dt;
-    if (D.sendT <= 0) { D.sendT = 0.3; try { game.net.broadcast('fjd', { x: D.x, y: D.y, z: D.z, hp: Math.round(D.hp) }); } catch { /* ignore */ } }
+    if (D.sendT <= 0) { D.sendT = 0.3; try { game.net.broadcast('fjd', { token: descentToken(run()), x: D.x, y: D.y, z: D.z, hp: Math.round(D.hp) }); } catch { /* ignore */ } }
     if (p !== j.p) { j.p = p; bcast(); }
     if (D.hp <= 0) failJob(j, 'The drone is destroyed.');
     else if (D.k >= D.path.length) complete(j);
@@ -312,17 +319,34 @@ export function installFacjobs(game) {
     }
   }
   function onDrone(d) {
-    if (!d) return;
+    if (disposed || !d || suspended() || d.token !== descentToken(run())) return;
     S.dTarget.set(d.x, d.y, d.z); S.dHave = true;
     if (S.drone && !S.drone.visible) { S.drone.position.copy(S.dTarget); S.drone.visible = true; }
   }
 
   // ------------------------------------------------------------------------------------------ client: props (panels, notes, anomaly, drone)
   const G = { box: new THREE.BoxGeometry(1, 1, 1), oct: new THREE.OctahedronGeometry(0.22) };
+  for (const geometry of Object.values(G)) geometry.userData.shared = true;
+  // Parent maps may dispose before the next module update on ordinary travel.
+  // These resources belong to this module and are released by clearProps only.
+  const ownProp = (o) => {
+    o.traverse((child) => {
+      if (child.geometry) child.geometry.userData.shared = true;
+      if (child.material) for (const material of Array.isArray(child.material) ? child.material : [child.material]) material.userData.shared = true;
+    });
+    return o;
+  };
   function clearProps() {
-    for (const m of S.meshes) { m.parent?.remove(m); }
+    const release = (m) => {
+      m.removeFromParent();
+      m.traverse((o) => {
+        if (o.geometry && o.geometry !== G.box && o.geometry !== G.oct) o.geometry.dispose();
+        if (o.material) for (const material of Array.isArray(o.material) ? o.material : [o.material]) material.dispose();
+      });
+    };
+    for (const m of S.meshes) release(m);
     S.meshes = [];
-    if (S.drone) { S.drone.parent?.remove(S.drone); S.drone = null; }
+    if (S.drone) { release(S.drone); S.drone = null; }
   }
   function panelMesh(color, done) {
     const g = new THREE.Group();
@@ -333,12 +357,12 @@ export function installFacjobs(game) {
   }
   function buildProps() {
     const f = fj(), F = fac(), r = run();
-    const key = f && F && r?.phase === 'moon' ? `${r.seed}:${f.j.map((j) => j.id + j.st).join(',')}` : '';
+    const key = f && F && r?.phase === 'moon' && !suspended() ? `${r.seed}:${f.j.map((j) => j.id + j.st).join(',')}` : '';
     if (key === S.key && F === S.fac) return;
     clearProps();
     S.key = key; S.fac = F;
     if (!key) return;
-    const add = (o, p, ry = 0) => { o.position.set(p[0], p[1], p[2]); o.rotation.y = ry; F.group.add(o); S.meshes.push(o); };
+    const add = (o, p, ry = 0) => { ownProp(o); o.name = 'facjobs-prop'; o.position.set(p[0], p[1], p[2]); o.rotation.y = ry; F.group.add(o); S.meshes.push(o); };
     for (const j of f.j) {
       const color = C.JOBS[j.id].color, done = j.st === 1;
       if (j.id === 'power' || j.id === 'feed' || j.id === 'vault') add(panelMesh(color, done), j.pos, ((j.pos[0] * 7 + j.pos[2] * 3) % 4) * (Math.PI / 2));
@@ -353,10 +377,11 @@ export function installFacjobs(game) {
     const dj = f.j.find((j) => j.id === 'drone' && j.st === 0);
     if (dj) {   // the drone: a hovering body + fin; follows the host position message
       const g = new THREE.Group();
+      g.name = 'facjobs-drone';
       g.add(new THREE.Mesh(new THREE.SphereGeometry(0.32, 10, 8), mat(0xdfe6ea)));
       const ring = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.04, 6, 14), bas(C.JOBS.drone.color)); ring.rotation.x = Math.PI / 2; g.add(ring);
       g.position.copy(S.dTarget); g.visible = !!S.dHave;   // hidden until the first host position arrives
-      F.group.add(g); S.drone = g;
+      F.group.add(ownProp(g)); S.drone = g;
     }
   }
   function animateProps(dt) {
@@ -393,7 +418,7 @@ export function installFacjobs(game) {
   }
 
   // ------------------------------------------------------------------------------------------ hooks
-  const inFac = () => { const p = game.player; return !!p && !p.dead && run()?.phase === 'moon' && !!fac() && !!p.indoor; };
+  const inFac = () => { const p = game.player; return !suspended() && !!p && !p.dead && run()?.phase === 'moon' && !!fac() && !!p.indoor; };
   offs.push(mods.on('interactables', (out, g) => {
     if (g !== game || disposed || !fj() || !inFac()) return;
     const pp = game.player.pos, req = (d) => { try { game.net.request('fjreq', d); } catch { /* net closing */ } };
@@ -429,7 +454,7 @@ export function installFacjobs(game) {
   }));
 
   offs.push(mods.on('objectives', (add, g, phase) => {
-    if (g !== game || disposed) return;
+    if (g !== game || disposed || suspended()) return;
     const r = run();
     if (phase === 'orbit') {
       const moon = MOONS[r.moon];
@@ -467,9 +492,20 @@ export function installFacjobs(game) {
 
   offs.push(mods.on('update', (dt, g) => {
     if (g !== game || disposed) return;
+    if (surfacePending) {
+      const pending = surfacePending, r = run(), d = r?.descent21;
+      if (pending.token !== descentToken(r) || pending.fac !== fac() || r?.phase !== 'moon') surfacePending = null;
+      else if (!deep() && !streaming && ++pending.frames >= 2 &&
+        !(d?.token === pending.token && (d.surface?.items || []).some((row) => !game.items.items?.has(row.id)))) {
+        // facilityChanged precedes native surface item broadcasts. Native Game
+        // updates step Rapier before this hook; do not rebuild against that gap.
+        surfacePending = null;
+        if (host()) { try { hostRebuild(); } catch (e) { console.warn('[facjobs] resume', e); } }
+      }
+    }
     briefRows();
     try { buildProps(); animateProps(dt); } catch (e) { console.warn('[facjobs] props', e); clearProps(); S.key = 'err'; }
-    if (!host() || run()?.phase !== 'moon' || !fj()) return;
+    if (!host() || run()?.phase !== 'moon' || !fj() || suspended()) return;
     tickT += dt; droneT += dt;
     if (droneT >= 0.1) { const d = droneT; droneT = 0; try { droneTick(d); } catch (e) { console.warn('[facjobs] drone', e); } }
     if (tickT >= 0.5) { const d = tickT; tickT = 0; try { hostTick(d); } catch (e) { console.warn('[facjobs] tick', e); } }
@@ -483,16 +519,26 @@ export function installFacjobs(game) {
   offs.push(mods.on('netReady', (n, g) => { if (g === game) bindNet(n); }));
   if (game.net) bindNet(game.net);
   offs.push(mods.on('moonPopulated', (g) => { if (g === game) { try { hostSetup(); } catch (e) { console.warn('[facjobs] setup', e); } } }));
+  offs.push(mods.on('facilityWillChange', (world, g) => {
+    if (g !== game) return;
+    streaming = true; surfacePending = null; tickT = 0; droneT = 0;
+    closeCode(); clearProps(); S.key = ''; S.fac = null; S.dHave = false;
+  }));
+  offs.push(mods.on('facilityChanged', (world, g, depth) => {
+    if (g !== game) return;
+    streaming = false;
+    if (depth === 0) surfacePending = { token: descentToken(run()), fac: fac(), frames: 0 };
+  }));
   // host migration: item ids + the drone are host-only runtime; rebuild them from the synced run.fj (job progress) and the items every peer holds
   function hostRebuild() {
     const f = fj(), F = fac();
-    if (!host() || !f || run()?.phase !== 'moon') return;
+    if (!host() || !f || run()?.phase !== 'moon' || suspended()) return;
     mem.ids = {};
     for (const j of f.j || []) {
       if (j.st !== 0) continue;
       const type = { power: 'fj_fuse', core: 'fj_core', rescue: 'fj_contractor', sample: 'fj_sample' }[j.id];
       if (!type) continue;
-      const ids = game.items.all().filter((it) => it.type === type).map((it) => it.id);
+      const ids = [...game.items.all()].filter((it) => it.type === type).map((it) => it.id);
       if (ids.length) mem.ids[j.sl] = j.id === 'core' || j.id === 'rescue' ? ids[0] : ids;
       else if (j.id === 'core' || j.id === 'rescue') failJob(j, 'Job failed: {job}', { job: title(j.id) });   // the item is gone: same outcome as the host-side check
     }
@@ -515,6 +561,7 @@ export function installFacjobs(game) {
   offs.push(mods.on('hostMigrated', (g, info) => { if (g === game && info?.self) { try { hostRebuild(); } catch (e) { console.warn('[facjobs] migrate', e); } } }));
   offs.push(mods.on('phase', (ph, g) => {
     if (g && g !== game) return;
+    if (ph !== 'moon') { streaming = false; surfacePending = null; tickT = 0; droneT = 0; }
     if (ph === 'takeoff' && host()) { try { hostTakeoff(); } catch (e) { console.warn('[facjobs] takeoff', e); } }
     if (ph !== 'moon' && ph !== 'landing') { S.clues.clear(); closeCode(); mem.drone = null; S.dHave = false; }
     if (ph === 'orbit' && host() && run()?.fj) { run().fj = null; bcast(); }
@@ -542,10 +589,12 @@ export function installFacjobs(game) {
     hostSetup, hostRebuild, hostReq, hostTick, droneTick, _mem: mem,
     get codeOpen() { return !!S.ui; }, closeCode,
     dispose() {
+      if (disposed) return;
       disposed = true;
       for (const off of offs) { try { off(); } catch { /* ignore */ } }
       try { boundNet?.off?.('msg:fjfx', onFx); boundNet?.off?.('msg:fjd', onDrone); } catch { /* ignore */ }
       closeCode(); clearProps();
+      G.box.dispose(); G.oct.dispose();
       try { window.__kefalMods?.commands?.delete?.('jobs'); } catch { /* ignore */ }
     },
   };

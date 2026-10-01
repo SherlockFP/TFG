@@ -1,0 +1,204 @@
+{
+  "method": "Artifact index; raw files own the results. No single uninterrupted all-goals browser pass.",
+  "jsFreeze": "6d2cab553cb78e870b102bd7a888abaa5182d59abd5ba35cca412d41723c28af",
+  "coreAllSourceFreeze": "01dba2b0a9064ac1a6a65e6b263b2f13a34cb1dd0c2361988c5ac50620972e99",
+  "finalCssAllSourceFreeze": "44b2091ad59b1205e84ae0b6f5ae68220c00a2b107429c1bbb85c4d2f326c652",
+  "sessions": [
+    {
+      "file": "first-selector-failure.json",
+      "method": "Wave27 GUIDED_INPUT / TWO_PEER / LOCAL: native landing, safe body visitation/approach and initial item/velocity fixtures explicitly labelled; actual keyboard/mouse/E for descent, cabinet, braking and held drum. No hostReq/noLos/AI/HP/stage outcomes. Controlled Game.update/Input.endFrame through unchanged native kefal.tick; SwiftShader is not hardware FPS.",
+      "status": "PARTIAL_STOP",
+      "durationMs": 31482,
+      "stopReason": "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'SETTINGS', exact: true })\u001b[22m\n",
+      "pageErrors": 0,
+      "caughtNativeErrors": [
+        {
+          "total": 0,
+          "ring": [],
+          "counts": []
+        },
+        {
+          "total": 0,
+          "ring": [],
+          "counts": []
+        }
+      ],
+      "feedbackWarnings": 0,
+      "browserClosed": true,
+      "sha256": "0c8805f0f37d0769eab026b4e29a0182e708be2f2d7075c0f7c45c7bdbdb9402"
+    },
+    {
+      "file": "second-selector-failure.json",
+      "method": "Wave27 GUIDED_INPUT / TWO_PEER / LOCAL: native landing, safe body visitation/approach and initial item/velocity fixtures explicitly labelled; actual keyboard/mouse/E for descent, cabinet, braking and held drum. No hostReq/noLos/AI/HP/stage outcomes. Controlled Game.update/Input.endFrame through unchanged native kefal.tick; SwiftShader is not hardware FPS.",
+      "status": "PARTIAL_STOP",
+      "durationMs": 38762,
+      "stopReason": "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Resume', exact: true })\u001b[22m\n",
+      "pageErrors": 0,
+      "caughtNativeErrors": [
+        {
+          "total": 0,
+          "ring": [],
+          "counts": []
+        },
+        {
+          "total": 0,
+          "ring": [],
+          "counts": []
+        }
+      ],
+      "feedbackWarnings": 0,
+      "browserClosed": true,
+      "sha256": "4321004a0a0a1a37c96aad468c97b7cffd6f30baa15908701ac2850d3d0674ca"
+    },
+    {
+      "file": "core-cabinet-partial.json",
+      "method": "Wave27 GUIDED_INPUT / TWO_PEER / LOCAL: native landing, safe body visitation/approach and initial item/velocity fixtures explicitly labelled; actual keyboard/mouse/E for descent, cabinet, braking and held drum. No hostReq/noLos/AI/HP/stage outcomes. Controlled Game.update/Input.endFrame through unchanged native kefal.tick; SwiftShader is not hardware FPS.",
+      "status": "PARTIAL_STOP",
+      "durationMs": 163717,
+      "stopReason": "Error: Wrong E target {\"typing\":false,\"enabled\":true,\"locked\":true,\"domLock\":true,\"want\":true,\"down\":[],\"pressed\":[],\"focus\":{\"tag\":\"BODY\",\"cls\":\"\"},\"panel\":false,\"term\":false,\"phase\":\"moon\",\"target\":\"Vaporwave Bust: Grab [LMB] \u00b7 Push [E]\",\"sub\":\"\u25ae155\",\"clock\":497.02222222223577,\"token\":\"hamsi:17:1\",\"p\":[-4,-299.9800015979639,52]}",
+      "pageErrors": 0,
+      "caughtNativeErrors": [
+        {
+          "total": 0,
+          "ring": [],
+          "counts": []
+        },
+        {
+          "total": 0,
+          "ring": [],
+          "counts": []
+        }
+      ],
+      "feedbackWarnings": 0,
+      "browserClosed": true,
+      "sha256": "237965cbc128ce4eb9c7d43992bfa49ef00d70b2af68dc0cb7dbf46dc0a877b8"
+    },
+    {
+      "file": "focused-salvage-partial.json",
+      "method": "Wave27 FOCUSED GUIDED_INPUT / TWO_PEER / LOCAL + RECORDED_FLOOR_REPLAY_SETUP: earned depth2 admission is from the separately retained original run; this fresh scenario tests actual brake/drum/return only. native landing, safe body visitation/approach and initial item/velocity fixtures explicitly labelled; actual keyboard/mouse/E for descent, cabinet, braking and held drum. No hostReq/noLos/AI/HP/stage outcomes. Controlled Game.update/Input.endFrame through unchanged native kefal.tick; SwiftShader is not hardware FPS.",
+      "status": "PARTIAL_STOP",
+      "durationMs": 46380,
+      "stopReason": "Error: Native helper prompt not selected",
+      "pageErrors": 0,
+      "caughtNativeErrors": [
+        {
+          "total": 0,
+          "ring": [],
+          "counts": []
+        },
+        {
+          "total": 0,
+          "ring": [],
+          "counts": []
+        }
+      ],
+      "feedbackWarnings": 0,
+      "browserClosed": true,
+      "sha256": "1d98f9fd4e14f02267752bd35c02aba7b610cab085dc7f47617478038c026d01"
+    },
+    {
+      "file": "return-evidence.json",
+      "method": "Wave27 FOCUSED GUIDED_INPUT / TWO_PEER / LOCAL + RECORDED_FLOOR_REPLAY_SETUP: earned depth2 admission is from the separately retained original run; this fresh scenario tests actual drum pickup, certified cabin boarding and E return only; separate retained scenarios own cabinet, braking and noise evidence. native landing, safe body visitation/approach and initial item/velocity fixtures explicitly labelled; actual keyboard/mouse/E for descent, cabinet, braking and held drum. No hostReq/noLos/AI/HP/stage outcomes. Controlled Game.update/Input.endFrame through unchanged native kefal.tick; SwiftShader is not hardware FPS.",
+      "status": "FOCUSED_E_DRUM_PICKUP_TWO_PEER_SURFACE_RETURN_PASS_FROM_RECORDED_FLOOR_SETUP",
+      "durationMs": 83531,
+      "stopReason": null,
+      "pageErrors": 0,
+      "caughtNativeErrors": [
+        {
+          "total": 0,
+          "ring": [],
+          "counts": []
+        },
+        {
+          "total": 0,
+          "ring": [],
+          "counts": []
+        }
+      ],
+      "feedbackWarnings": 0,
+      "browserClosed": true,
+      "sha256": "56c9ee456b54b85d1f420824c83d92ad7deae43f7f939879108c2cac786cba3c"
+    },
+    {
+      "file": "visual-base-evidence.json",
+      "method": "VISUAL_REPLAY: fresh solo native Pause/Settings/Network UI at final CSS freeze, real keyboard/clicks and rendered frames. No re-earned core/cargo/mechanic, Internet or hardware claim.",
+      "status": "FRESH_FINAL_CSS_NETWORK_VISUAL_PASS",
+      "durationMs": 5397,
+      "stopReason": null,
+      "pageErrors": 0,
+      "caughtNativeErrors": null,
+      "feedbackWarnings": 0,
+      "browserClosed": true,
+      "sha256": "9562ca6be0ffac30c4393483e2dd8a6ea7e9d3433b6f8d33ef42b8f8ad9bda8a"
+    },
+    {
+      "file": "visual-evidence.json",
+      "method": "VISUAL_REPLAY: fresh solo native Pause/Settings/Network UI at final CSS freeze, real keyboard/clicks and rendered frames. No re-earned core/cargo/mechanic, Internet or hardware claim.",
+      "status": "FRESH_FINAL_CSS_NETWORK_VISUAL_PASS",
+      "durationMs": 5389,
+      "stopReason": null,
+      "pageErrors": 0,
+      "caughtNativeErrors": null,
+      "feedbackWarnings": 0,
+      "browserClosed": true,
+      "sha256": "7dc5305838d3db62f554a134af50b2fb088ceba3410f9c575ed2427494c7180d"
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "qa_shots/final-network-1280.png",
+      "bytes": 349734,
+      "sha256": "bbee060eb42c0b59af6fc9f2bcbf7e776e0b27792175c25071f579b463f6c69d"
+    },
+    {
+      "file": "qa_shots/final-network-960.png",
+      "bytes": 223691,
+      "sha256": "c0912c3a9417178aa2bf881cfa2d5ead558d8f743ab46fb2d4567bee2e94002f"
+    },
+    {
+      "file": "qa_shots/initial-network-form-960.png",
+      "bytes": 182931,
+      "sha256": "2ba96059bf183faca066607e318205e038e7626a36514533e4db31c967062a72"
+    },
+    {
+      "file": "qa_shots/native-cargo-brake-960.png",
+      "bytes": 628074,
+      "sha256": "1dde965719f8bb375d32681f715a5aa3bc9226c1cad88d237e3522d352c3b878"
+    },
+    {
+      "file": "qa_shots/native-depth2-cabinet-open-960.png",
+      "bytes": 566431,
+      "sha256": "e282625560437b5bb54d69bafb3eb69d47cfcc67febc419b3170594f8e3adf8b"
+    },
+    {
+      "file": "qa_shots/native-depth2-cabinet-rule-960.png",
+      "bytes": 554333,
+      "sha256": "b6251ab3f6666b2a6f8890719439c25c27641484c7443826f42399db6024f4f3"
+    },
+    {
+      "file": "qa_shots/native-held-drum-helper-partial-960.png",
+      "bytes": 622007,
+      "sha256": "5400e7bb2c651844982f79d36dd29ece848595d0406fc46a45a8dd7b3ce818b3"
+    },
+    {
+      "file": "qa_shots/native-salvage-surface-return-960.png",
+      "bytes": 509923,
+      "sha256": "045188650562b0679f02e156a4881bbd8d8ca46cf54497f76d58ae9994f9c05c"
+    },
+    {
+      "file": "qa_shots/native-skill-focused-960.png",
+      "bytes": 386203,
+      "sha256": "8d69ee3b5d0edf414b28c59b9cc2b0d0cc8621462c29724e380a45e602f9ed4f"
+    },
+    {
+      "file": "qa_shots/selector-failure-pause-960.png",
+      "bytes": 277168,
+      "sha256": "d3645f4dfeb2f309d178bb0effe0c4006b2293a0dc0f7e6d0849009932b7a9f2"
+    }
+  ],
+  "limits": [
+    "Genuine initial 0\u21921\u21922 and cabinet release are distinct from recorded-floor focused retries.",
+    "Helper browser prompt was not selected; only native integration owns positive helper acceptance.",
+    "No blind human fun, Internet transport or representative hardware performance proof."
+  ]
+}

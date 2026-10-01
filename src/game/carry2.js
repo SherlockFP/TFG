@@ -12,6 +12,7 @@ import { SCRAP_TABLE, ITEMS, registerItem } from './items.js';
 import { MOONS } from './moons.js';
 import * as C from './carry2_core.js';
 import { createArtModel } from '../models/artpass.js';
+import { G } from '../physics/physics.js';
 
 HOST_ONLY.add('cy2fx');
 
@@ -88,6 +89,36 @@ export function installCarry2(game) {
   const fx = (d) => { try { game.net.broadcast('cy2fx', d); } catch { /* net closing */ } };
   const nameOf = (id) => { try { return game.playerName?.(id) || '?'; } catch { return '?'; } };
   const posOf = (id) => (id === game.selfId ? game.player?.pos : game.remotes?.get(id)?.pos) || null;
+  const actorOf = id => id === game.selfId ? game.player : game.remotes?.get(id);
+  const alive = id => !!actorOf(id) && !actorOf(id).dead && !game.downed?.isDowned?.(id);
+  const scope = () => `${run()?.moon}:${run()?.seed}:${run()?.day}:${game.world?.descent21Depth||0}:${game.world?.facility?.layout?.seed||0}:${game.net?.hostEpoch||0}`;
+  const gripA = new V3(), gripB = new V3();
+  const activeHeld = (id,it) => {
+    if (!it || it.holder !== id || it.inv || it.state !== 'held') return false;
+    if (id === game.selfId) return game.player?.heldItem?.() === it;
+    const type = actorOf(id)?.heldType;
+    if (!type || type !== it.type) return false;
+    // Native remote packets name a type, not an item ID. Ambiguous same-type
+    // inventory must not grant benefits to an unseen second item.
+    return [...game.items.all()].filter(x => x.holder === id && !x.inv && x.type === type).length === 1;
+  };
+  function validGrip(it,by,limit=C.CO.leash) {
+    if (!onMoon() || !alive(it?.holder) || !alive(by) || !activeHeld(it.holder,it) ||
+        String(it.holder).startsWith('c:') || !C.canGrip(it.def,it.holder,by,posOf(it.holder),posOf(by),limit)) return false;
+    const actor=actorOf(by), held=by===game.selfId?actor.heldItem?.():ITEMS[actor.heldType];
+    if (held && ((held.def||held).hands===2 || (held.def||held).kind==='body')) return false;
+    if (by===game.selfId && game.grab?.item) return false;
+    for (const x of game.items.all()) if (x.owner===by) return false;
+    for (const [id,e] of S.coHost) if (id!==it.id && e.by===by && (game.time||0)-e.t<C.CO.ttl) return false;
+    const a=posOf(by),b=posOf(it.holder);
+    gripA.set(a.x,a.y+1.1,a.z);gripB.set(b.x,b.y+1.1,b.z);
+    return !!game.physics?.lineOfSight?.(gripA,gripB,G.STATIC|G.DOOR);
+  }
+  function helperFor(id) {
+    if (!host() || disposed) return null;
+    const e=S.coHost.get(id),it=game.items?.get?.(id);
+    return e && (game.time||0)-e.t<C.CO.ttl && validGrip(it,e.by) ? e.by : null;
+  }
   const snd = (name, pos, vol = 0.6) => { try { if (game.audio?.has && !game.audio.has(name)) return; game.audio?.at?.(name, pos, vol, { refDistance: 3, maxDistance: 40 }); } catch { /* audio optional */ } };
   const onCam = (id, pos) => { try { const m = game.feedcams?.meter?.(id); return !!m && (m.live || m.m > 0.2 || !!m.tag || (!!pos && !!game.feedcams?.sees?.(pos))); } catch { return false; } };
 
@@ -136,13 +167,13 @@ export function installCarry2(game) {
   function hostGrip(it, from, on) {
     const cur = S.coHost.get(it.id);
     if (!on) { if (cur?.by === from) { S.coHost.delete(it.id); coSync(); } return; }
-    if (!it.holder || it.holder.startsWith?.('c:') || !C.canGrip(it.def, it.holder, from, posOf(it.holder), posOf(from))) return;
+    if (!validGrip(it,from,cur?.by===from?C.CO.leash:C.CO.reach)) return;
     const now = game.time || 0;
     if (cur && cur.by !== from && now - cur.t < C.CO.ttl) return;   // one helper per item
     S.coHost.set(it.id, { by: from, t: now });
     if (!cur || cur.by !== from) { S.stats.grips++; coSync(); }
   }
-  function coSync() { fx({ k: 'co', l: [...S.coHost].map(([id, e]) => [id, e.by]) }); S.syncT = 0; }
+  function coSync() { fx({ k: 'co', token:scope(), l: [...S.coHost].map(([id, e]) => [id, e.by]) }); S.syncT = 0; }
 
   function hostTick(dt) {
     const now = game.time || 0;
@@ -150,7 +181,7 @@ export function installCarry2(game) {
     let changed = false;
     for (const [id, e] of [...S.coHost]) {
       const it = game.items?.get?.(id);
-      if (!it || !it.holder || now - e.t > C.CO.ttl || !C.canGrip(it.def, it.holder, e.by, posOf(it.holder), posOf(e.by), C.CO.leash + 0.8)) { S.coHost.delete(id); changed = true; }
+      if (!it || now - e.t > C.CO.ttl || !validGrip(it,e.by)) { S.coHost.delete(id); changed = true; }
     }
     S.syncT += dt;
     if (changed || (S.coHost.size && S.syncT > 3)) coSync();
@@ -188,6 +219,7 @@ export function installCarry2(game) {
     if (!d || disposed) return;
     try {
       if (d.k === 'co') {
+        if (d.token!==scope()) return;
         const prev = S.co;
         S.co = new Map(Array.isArray(d.l) ? d.l.filter((e) => Array.isArray(e)) : []);
         for (const [id, by] of S.co) {
@@ -251,7 +283,7 @@ export function installCarry2(game) {
     if (!g) return;
     const it = game.items?.get?.(g.id), hp = it?.holder ? posOf(it.holder) : null;
     const down = !!game.input?.isDown?.('interact');
-    if (!it || it.holder !== g.holder || !hp || P.dead || !down || Math.hypot(hp.x - P.pos.x, hp.z - P.pos.z) > C.CO.leash) { req({ op: 'grip', id: g.id, on: 0 }); S.grip = null; return; }
+    if (!it || it.holder !== g.holder || !hp || !down || !validGrip(it,game.selfId)) { req({ op: 'grip', id: g.id, on: 0 }); S.grip = null; return; }
     g.ping -= dt;
     if (g.ping <= 0) { g.ping = C.CO.ping; req({ op: 'grip', id: g.id, on: 1 }); }
   }
@@ -278,9 +310,9 @@ export function installCarry2(game) {
     if (!busy && !S.grip) {
       for (const it of S.bulky) {
         const hp = posOf(it.holder);
-        if (!hp || it.holder === game.selfId || Math.hypot(hp.x - P.pos.x, hp.z - P.pos.z) > C.CO.reach + 0.6) continue;
+        if (!hp || it.holder === game.selfId || !validGrip(it,game.selfId,C.CO.reach)) continue;
         out.push({
-          pos: new V3(hp.x, hp.y + 1.1, hp.z), r: 1.3, reach: C.CO.reach, noLos: true,
+          pos: new V3(hp.x, hp.y + 1.1, hp.z), r: 1.3, reach: C.CO.reach,
           label: () => tf('Help carry the {name} [hold E]', { name: t(it.def.name) }), sub: () => t('Two people carry it at near-normal speed.'),
           action: () => { if (!S.grip) { S.grip = { id: it.id, holder: it.holder, ping: 0 }; } },
         });
@@ -353,9 +385,13 @@ export function installCarry2(game) {
     if (g && g !== game) return;
     if (ph !== 'moon') { S.co.clear(); S.coHost.clear(); S.fly.clear(); S.throws.clear(); S.grip = null; }
   }));
+  const clearGrips=()=>{S.co.clear();S.coHost.clear();S.grip=null;S.fly.clear();S.throws.clear();S.bulky=[];if(host())coSync();};
+  offs.push(mods.on('facilityWillChange',(w,g)=>{if(!g||g===game)clearGrips();}));
+  offs.push(mods.on('mapLoaded',(w,g)=>{if(!g||g===game)clearGrips();}));
+  offs.push(mods.on('hostMigrated',(g)=>{if(!g||g===game)clearGrips();}));
 
   return {
-    state: S, items: C.ITEM_DEFS.map((d) => d.id), core: C,
+    state: S, items: C.ITEM_DEFS.map((d) => d.id), core: C, helperFor,
     /** debug / tests: local carry multipliers right now */
     feel: () => ({ speed: game.player?.carryMul ?? 1, turn: game.player?.carryTurn ?? 1 }),
     dispose() {

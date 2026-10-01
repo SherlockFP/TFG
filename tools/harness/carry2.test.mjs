@@ -9,6 +9,11 @@ import { HL, hlMake } from '../../src/game/feedcams2_core.js';
 import { HL_TEXT } from '../../src/game/feedcams2_i18n.js';
 import { tIn } from '../../src/core/i18n.js';
 import { MOONS } from '../../src/game/moons.js';
+import * as THREE from 'three';
+import { Physics,initPhysics,G } from '../../src/physics/physics.js';
+import { WorldItem } from '../../src/entities/items.js';
+import { Emitter,errLog } from '../../src/core/events.js';
+import { Session } from '../../src/net/session.js';
 const MOON = Object.keys(MOONS).find((k) => !MOONS[k].company && !MOONS[k].home);
 
 const fails = [];
@@ -35,12 +40,12 @@ ok(C.isBreak(100, 20) && !C.isBreak(100, 6) && !C.isBreak(400, 20), 'breakage th
   const handlers = new Map(), H = new Map(), sent = [], recs = [], said = [], dmg = [];
   const mods = { on(ev, fn) { (handlers.get(ev) || handlers.set(ev, []).get(ev)).push(fn); return () => {}; }, emit(ev, ...a) { for (const f of handlers.get(ev) || []) f(...a); } };
   const items = new Map();
-  const mk = (id, holder, def) => ({ id, holder, def, value: 200, baseValue: 200, state: holder ? 'held' : 'world', lastHolder: holder, obj: { position: { x: 0, y: 1, z: 0 } }, body: { linvel: () => ({ x: 0, y: 0, z: 0 }) } });
+  const mk = (id, holder, def) => ({ id, type:def.id, holder, def, value: 200, baseValue: 200, state: holder ? 'held' : 'world', lastHolder: holder, obj: { position: { x: 0, y: 1, z: 0 } }, body: { linvel: () => ({ x: 0, y: 0, z: 0 }) } });
   const game = {
     mods, isHost: true, selfId: 'h', time: 100, run: { phase: 'moon', moon: MOON },
     net: { broadcast: (k, d) => sent.push([k, d]), request: (k, d) => H.get(k)?.(d, 'a'), on_() {}, on() {}, off() {} },
     items: { get: (id) => items.get(id), all: () => items.values() },
-    player: { pos: { x: 0, y: 0, z: 0 }, heldItem: () => null }, remotes: new Map([['a', { pos: { x: 0, y: 0, z: 0 } }], ['b', { pos: { x: 2, y: 0, z: 0 } }]]),
+    player: { pos: { x: 0, y: 0, z: 0 }, heldItem: () => null }, remotes: new Map([['a', { pos: { x: 0, y: 0, z: 0 },heldType:'cy_rack' }], ['b', { pos: { x: 2, y: 0, z: 0 } }]]),physics:{lineOfSight:()=>true},
     playerName: (id) => id, hostDamageItem: (id, n) => { dmg.push([id, n]); const it = items.get(id); it.value -= n; },
     feedcams: { meter: () => ({ live: true }), sees: () => true }, feedcams2: { record: (...a) => recs.push(a) }, lore: { say: (s) => said.push(s) },
     dropItem() {}, engine: {}, ui: {}, audio: {},
@@ -78,6 +83,55 @@ ok(C.isBreak(100, 20) && !C.isBreak(100, 6) && !C.isBreak(400, 20), 'breakage th
   cup2.holder = 'b'; cup2.state = 'held'; const n1 = dmg.length; mods.emit('update', 0.5, game);
   ok(dmg.length === n1 && fxs('catch').length === 1 && recs.some((r) => r[0] === 'catch'), 'caught throw keeps its value + catch fx + highlight');
   api.dispose();
+}
+
+// Actual native custody, Rapier wall/door queries and synchronous Session co delivery.
+{
+  globalThis.window=globalThis;await initPhysics();
+  const physics=new Physics(),scene=new THREE.Scene(),mods=new Emitter();
+  physics.addStaticBox(0,-.1,0,8,.1,8);
+  const a={id:'a',pos:new THREE.Vector3(-1,0,0),dead:false,heldType:'cy_rack'};
+  const b={id:'b',pos:new THREE.Vector3(1,0,0),dead:false,heldType:null};
+  const net=new Session({strategy:'local',isHost:true,code:'CARRY27',profile:{}});net.selfId=net.hostId='h';
+  const broadcast=net.broadcast;let lastCo;
+  net.broadcast=function(k,d,...args){if(k==='cy2fx'&&d.k==='co')lastCo=structuredClone(d);return broadcast.call(this,k,d,...args);};
+  const map=new Map(),player={pos:new THREE.Vector3(6,0,0),dead:false,heldItem:()=>null};
+  let down=null;
+  const game={mods,scene,physics,net,isHost:true,selfId:'h',time:10,run:{phase:'moon',moon:MOON,seed:17,day:1},
+    world:{facility:{layout:{seed:17}}},player,remotes:new Map([['a',a],['b',b]]),
+    downed:{isDowned:id=>id===down},ui:{},audio:{},engine:{},dropItem(){},
+    items:{get:id=>map.get(id),all:()=>map.values()},playerName:id=>id};
+  const mgr={game,physics,scene,fxPickup(){}},it=new WorldItem(mgr,{id:'rack27',ty:'cy_rack',v:240,h:'a'});map.set(it.id,it);
+  const initialErrors=errLog.total,api=installCarry2(game);game.carry2=api;
+  mods.emit('registerHandlers',(k,fn)=>net.handle(k,fn),game);
+  const grip=()=>net.handlers.get('cy2q')({op:'grip',id:it.id,on:true},'b');
+  const wall=physics.addStaticBox(0,1,0,.12,1,2);physics.step(1/30);
+  grip();ok(!api.state.coHost.has(it.id),'actual wall blocks helper, not only client selector');
+  physics.removeCollider(wall);physics.step(1/30);
+  grip();ok(api.state.coHost.get(it.id)?.by==='b'&&api.state.co.get(it.id)==='b','clear native pair accepts and Session self-delivers co state');
+  net.handlers.get('cy2q')({op:'grip',id:it.id,on:false},'b');
+  const reject=(change,restore,label)=>{change();grip();ok(!api.state.coHost.has(it.id),label);restore();net.handlers.get('cy2q')({op:'grip',id:it.id,on:false},'b');};
+  reject(()=>b.dead=true,()=>b.dead=false,'dead helper rejected');
+  reject(()=>a.dead=true,()=>a.dead=false,'dead carrier rejected');
+  reject(()=>down='b',()=>down=null,'downed helper rejected');
+  reject(()=>it.inv={k:'bag',x:0,y:0},()=>it.inv=null,'bagged cargo cannot gain a helper');
+  reject(()=>b.pos.x=4.5,()=>b.pos.x=1,'initial grip uses the real start reach, not continuing leash');
+  reject(()=>b.heldType='cy_vending',()=>b.heldType=null,'two-handed helper occupied');
+  map.set('beam27',{id:'beam27',owner:'b',holder:null,def:{hands:0}});grip();ok(!api.state.coHost.has(it.id),'beam owner cannot also grip');map.delete('beam27');
+  const door=physics.addStaticBox(0,1,0,.12,1,2,0,G.DOOR);physics.step(1/30);
+  grip();ok(!api.state.coHost.has(it.id),'closed actual door blocks grip');physics.removeCollider(door);physics.step(1/30);
+  grip();ok(api.helperFor(it.id)==='b','authoritative helper API returns a genuine live pair');
+  b.dead=true;ok(api.helperFor(it.id)===null,'sound counterplay cannot use a stale dead helper');game.time+=.1;mods.emit('update',.1,game);
+  ok(!api.state.coHost.has(it.id)&&!api.state.co.has(it.id),'death ends active helper and replicated benefit');b.dead=false;
+  grip();const oldCo=structuredClone(lastCo);mods.emit('facilityWillChange',game);
+  ok(!api.state.coHost.size&&!api.state.co.size,'streaming releases native grip bookkeeping');
+  game.world.facility.layout.seed=42;net.receiveLocal('cy2fx',oldCo);
+  ok(!api.state.co.size,'delayed old-floor helper packet cannot restore a benefit');
+  grip();game.time+=C.CO.ttl+.01;
+  ok(api.helperFor(it.id)===null,'helper API expires an unrenewed actual grip');
+  mods.emit('hostMigrated',game,{self:true});ok(!api.state.coHost.size&&!api.state.co.size,'migration discards old transient grip');
+  ok(errLog.total===initialErrors,'native event callbacks had no caught errors');
+  api.dispose();it.dispose();physics.world.free();mods.clear();
 }
 
 // 3. items + strings

@@ -313,6 +313,8 @@ import { installDescent21 } from './descent21.js';
 import { installFirstDepth21 } from './firstdepth21.js';
 import { installDescent21Threats } from './descent21_threats.js';
 import { installLiminal26 } from './liminal26.js';
+import { installSalvage27 } from './salvage27.js';
+import { installRecovery27 } from './recovery27.js';
 import './lab20_moons.js';
 import { installDowned } from './downed.js';   // [import:downed] wave 8: 0 HP = downed, crew revives (docs/wave8/downed.md)
 import { installHubgate } from './hubgate.js';   // [import:hubgate]
@@ -693,6 +695,8 @@ export class Game extends Emitter {
     this.useModule('descent21', installDescent21);
     this.useModule('descentThreat21', installDescent21Threats);
     this.useModule('liminal26', installLiminal26);
+    this.useModule('salvage27', installSalvage27);
+    this.useModule('recovery27', installRecovery27);
     this.useModule('firstdepth21', installFirstDepth21);
     this.useModule('deadletter24', installDeadletter24);
 

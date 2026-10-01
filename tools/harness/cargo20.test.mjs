@@ -1,9 +1,13 @@
 import assert from 'node:assert/strict';
+import {register} from 'node:module';
+register('data:text/javascript,export async function load(u,c,n){if(u.endsWith(".css"))return{format:"module",source:"export default {}",shortCircuit:true};return n(u,c);}');
 import * as THREE from 'three';
 import {Physics,initPhysics,G} from '../../src/physics/physics.js';
 import {WorldItem,ItemManager} from '../../src/entities/items.js';
 import {installCargo20} from '../../src/game/cargo20.js';
-import {cargoToken,impulseCargo} from '../../src/game/cargo20_core.js';
+import {cargoToken,impulseCargo,approachingCargo,brakeCargo} from '../../src/game/cargo20_core.js';
+import {nudgeLabel} from '../../src/game/cargo20_text.js';
+import {setLang} from '../../src/core/i18n.js';
 globalThis.window=globalThis;await initPhysics();
 const physics=new Physics();physics.addStaticBox(0,-.1,0,10,.1,10);physics.addStaticBox(0,1,2,.8,1,.1);
 const scene=new THREE.Scene(),handlers=new Map(),listeners=new Map(),items=new Map();
@@ -33,6 +37,7 @@ const wall=physics.addStaticBox(0,1,.5,.5,1,.1);physics.step(1/30);assert.equal(
 assert.equal(req({token:'previous map'}),false);assert.equal(handlers.get('cg20n')({id:it.id,token:cargoToken(game.run),n:++n},'forged'),false);
 it.body.setLinvel({x:0,y:0,z:3},true);assert.equal(impulseCargo(it,player.look),false,'speed cap refuses runaway stacking');
 assert.equal(impulseCargo(peer,player.look),false,'replica cannot apply authoritative force');
+assert.equal(brakeCargo(peer),false,'replica cannot apply authoritative braking force');
 // Cancel a real active burst at the next physics boundary when custody, aim, map or hands change.
 let impulses=0;const originalImpulse=it.body.applyImpulse.bind(it.body);it.body.applyImpulse=(...args)=>{impulses++;return originalImpulse(...args);};
 function stops(change,restore){
@@ -55,3 +60,90 @@ const heavyMoved=server.body.translation().z-serverStart;assert.equal(server.bod
 console.log(`native server mass55/carryweight150 moved ${heavyMoved.toFixed(4)}m over.5s, maxspeed ${maximum.toFixed(3)}`);server.dispose();
 api.dispose();assert.equal(game.findInteraction,original);it.dispose();peer.dispose();physics.world.free();peerPhysics.world.free();
 console.log(`cargo20: actual installed E, native ground movement ${moved.toFixed(4)}m/wall, custody/forgery/replay/caps and native peer snapshots pass`);
+
+// NATIVE_INTEGRATION: fresh authoritative Rapier worlds, same labelled rolling setup,
+// actual contextual action/handler and native impact/value callbacks. No body transform
+// is written by the feature; the initial velocity and selector are test fixtures.
+const {actionMethods}=await import('../../src/game/actions.js');
+const {hostMethods}=await import('../../src/game/host.js');
+function braceFixture(type='vase'){
+ const ph=new Physics();ph.addStaticBox(0,-.1,0,10,.1,10);
+ const ls=new Map(),hs=new Map(),is=new Map(),messages=[],hits=[];
+ const crew={id:'H',pos:new THREE.Vector3(0,0,0),eye:new THREE.Vector3(0,1.4,0),look:new THREE.Vector3(0,0,1),dead:false};
+ const g={isHost:true,selfId:'H',time:1,run:{runId:'brace',phase:'moon',moon:'hamsi',seed:27,day:1},world:{moonId:'hamsi'},physics:ph,engine:{scene:new THREE.Scene()},player:crew,input:{enabled:true},ui:{},settings:{keys:{interact:'KeyF'}},audio:{at(){}},onItemValueLost(){},downed:{isDowned:()=>false},mods:{on(ev,fn){const a=ls.get(ev)||[];a.push(fn);ls.set(ev,a);return()=>{a.splice(a.indexOf(fn),1);};}},aiPlayerById:id=>id==='H'?crew:null};
+ const manager=Object.assign(Object.create(ItemManager.prototype),{game:g,physics:ph,scene:g.engine.scene,items:is});g.items=manager;
+ g.net={hostId:'H',selfId:'H',request(op,d){messages.push(['request:'+op,d]);return hs.get(op)?.(d,'H');},broadcast(op,d){messages.push([op,d]);if(op==='it')manager.onEvent(d);}};
+ g.hostDamageItem=hostMethods.hostDamageItem.bind(g);
+ g.onItemImpact=(item,dv)=>{hits.push([item.id,dv]);actionMethods.onItemImpact.call(g,item,dv);};
+ const load=new WorldItem(manager,{id:'rolling',ty:type,v:200,p:[0,2,1.8]});is.set(load.id,load);
+ for(let i=0;i<120;i++){ph.step(1/60);manager.update(1/60);}hits.length=0;messages.length=0;
+ g.findInteraction=()=>({label:'Native big-item fixture',bigItem:load,action(){}});
+ const runtime=installCargo20(g);for(const fn of ls.get('registerHandlers')||[])fn((k,f)=>hs.set(k,f),g);
+ const request=(d={},from='H')=>hs.get('cg20n')({id:load.id,token:cargoToken(g.run),n:100,...d},from);
+ const tick=(n=1)=>{for(let i=0;i<n;i++){g.time+=1/60;ph.step(1/60);manager.update(1/60);}};
+ return {g,crew,ph,load,manager,messages,hits,request,tick,runtime,dispose(){runtime.dispose();load.dispose();ph.world.free();}};
+}
+function rollingTrial(type,brace){
+ const f=braceFixture(type);try{
+  f.load.body.setLinvel({x:0,y:0,z:-3.5},true);f.manager.update(1/60);
+  const start=f.load.body.translation(),before=f.load.body.linvel(),beforeValue=f.load.value;
+  assert.equal(approachingCargo(f.load,f.crew.pos),true);
+  if(brace){
+   assert.match(f.g.findInteraction().label,/Brace \[F\]/);f.g.findInteraction().action();
+   const after=f.load.body.linvel();assert.equal(after.y,before.y,'native opposing horizontal impulse leaves gravity velocity untouched');
+   assert.ok(Math.abs(after.z)<Math.abs(before.z));
+   assert.equal(f.load.body.isDynamic(),true);assert.equal(f.load.state,'world');assert.equal(f.load.holder,null);assert.equal(f.load.owner,null);
+  }
+  f.tick(30);const travel=start.z-f.load.body.translation().z;
+  assert.equal(f.load.value,beforeValue,'benign native shove/brace causes no fragile price damage');
+  assert.equal(f.hits.length,0,'bounded deceleration does not trigger native >4.2 impact detector');
+  assert.equal(f.messages.filter(([op,d])=>op==='it'&&['val','held','own','drop'].includes(d.e)).length,0);
+  if(brace){
+   const remotePhysics=new Physics(),remoteGame={net:{hostId:'H',selfId:'P'}},remoteMgr={game:remoteGame,physics:remotePhysics,scene:new THREE.Scene(),items:new Map()};
+   const remote=new WorldItem(remoteMgr,{id:f.load.id,ty:type,v:beforeValue,p:[0,2,1.8]});remoteMgr.items.set(remote.id,remote);remoteMgr.get=id=>remoteMgr.items.get(id);
+   try{ItemManager.prototype.applySnapshot.call(remoteMgr,f.manager.collectSnapshot('H'));ItemManager.prototype.update.call(remoteMgr,1);assert.ok(remote.obj.position.distanceTo(f.load.obj.position)<.002,'native braked body snapshot reaches replica');assert.equal(remote.value,beforeValue);assert.equal(remote.owner,null);assert.equal(remote.holder,null);}finally{remote.dispose();remotePhysics.world.free();}
+  }
+  return {travel,mass:f.load.body.mass()};
+ }finally{f.dispose();}
+}
+for(const type of ['vase','server']){
+ const control=rollingTrial(type,false),braced=rollingTrial(type,true);
+ assert.equal(control.mass,type==='server'?55:8);assert.equal(braced.mass,control.mass);
+ assert.ok(control.travel>.1);assert.ok(braced.travel>=0&&braced.travel<control.travel*.6,`${type}: useful native stopping reduction ${control.travel} -> ${braced.travel}`);
+ console.log(`native ${type} mass${control.mass} rolling travel over.5s ${control.travel.toFixed(4)} -> ${braced.travel.toFixed(4)}m`);
+}
+const bf=braceFixture();try{
+ const reset=()=>{bf.load.body.setLinvel({x:0,y:0,z:-3.5},true);bf.g.time+=1;};
+ reset();assert.equal(bf.request({op:'brake',n:1}),true);assert.equal(bf.request({op:'brake',n:1}),false,'brake replay rejected');
+ reset();assert.equal(bf.request({op:'brake',n:1}),false,'old nonce cannot replay after cooldown');
+ let serial=1;
+ const rejectedBrake=(change,restore)=>{reset();change();assert.equal(bf.request({op:'brake',n:++serial}),false);restore();};
+ rejectedBrake(()=>bf.load.holder='c:cargo13',()=>bf.load.holder=null);
+ rejectedBrake(()=>bf.load.owner='P',()=>bf.load.owner=null);
+ rejectedBrake(()=>bf.load.inv={k:'bag'},()=>bf.load.inv=null);
+ rejectedBrake(()=>bf.load.selling=true,()=>bf.load.selling=false);
+ rejectedBrake(()=>bf.crew.dead=true,()=>bf.crew.dead=false);
+ rejectedBrake(()=>bf.g.downed.isDowned=()=>true,()=>bf.g.downed.isDowned=()=>false);
+ rejectedBrake(()=>bf.crew.pos.x=20,()=>bf.crew.pos.x=0);
+ rejectedBrake(()=>bf.crew.look.set(0,0,-1),()=>bf.crew.look.set(0,0,1));
+ rejectedBrake(()=>bf.g.items.items.set('held',{holder:'H',def:{hands:2}}),()=>bf.g.items.items.delete('held'));
+ rejectedBrake(()=>bf.load.body.setLinvel({x:0,y:0,z:3.5},true),()=>{});
+ rejectedBrake(()=>bf.load.body.setLinvel({x:3.5,y:0,z:0},true),()=>{});
+ rejectedBrake(()=>bf.load.body.setLinvel({x:0,y:0,z:-.6},true),()=>{});
+ rejectedBrake(()=>bf.load.body.setBodyType(1,true),()=>bf.load.body.setBodyType(0,true));
+ const wall=bf.ph.addStaticBox(0,1,.7,1,1,.1);bf.ph.step(1/30);reset();assert.equal(bf.request({op:'brake',n:++serial}),false,'real wall denies brake LOS');bf.ph.removeCollider(wall);
+ reset();assert.equal(bf.request({op:'brake',n:++serial,token:'old map'}),false);assert.equal(bf.request({op:'brake',n:++serial},'forged'),false);assert.equal(bf.request({op:'invalid',n:++serial}),false);
+ // A successful stop erases a previously queued native shove; no later prestep reverses it.
+ bf.load.body.setLinvel({x:0,y:0,z:0},true);bf.g.time+=1;assert.equal(bf.request({op:'push',n:++serial}),true);
+ bf.load.body.setLinvel({x:0,y:0,z:-3.5},true);bf.g.time+=1;assert.equal(bf.request({op:'brake',n:++serial}),true);
+ let extra=0;const old=bf.load.body.applyImpulse.bind(bf.load.body);bf.load.body.applyImpulse=(...a)=>{extra++;return old(...a);};bf.tick();assert.equal(extra,0,'old shove burst cannot reapply force after brace');
+ // Vertical danger stays native: bracing a setup-labelled fast fall leaves its
+ // downward velocity intact and the real impact/economy path still charges damage.
+ const beforeFall=bf.load.value;bf.g.time+=1;bf.load.body.setLinvel({x:0,y:-8,z:-3.5},true);assert.equal(bf.request({op:'brake',n:++serial}),true);
+ assert.equal(bf.load.body.linvel().y,-8);bf.manager.update(1/60);
+ assert.ok(bf.hits.some(([,dv])=>dv>4.2));assert.ok(bf.load.value<beforeFall,'brace grants no immunity to native violent impact/value path');
+ bf.load.body.setLinvel({x:0,y:-8,z:-10},true);const fast=bf.load.body.linvel();assert.equal(brakeCargo(bf.load,{deltaSpeed:100,maxImpulse:Infinity}),true);
+ const bounded=bf.load.body.linvel();assert.ok(Math.abs(bounded.z-fast.z)>0&&Math.abs(bounded.z-fast.z)<4.2,'even oversized options cannot create a benign >4.2 impact');assert.equal(bounded.y,fast.y);
+}finally{bf.dispose();}
+for(const [lang,word]of [['en','Brace'],['tr','Frenle'],['ru','затормозить']]){setLang(lang);assert.ok(nudgeLabel('Load','F',true).includes(`${word} [F]`));}setLang('en');
+console.log('cargo20 brace: native mass8/55 stopping, contextual input, gravity/impact/value, replay/custody/LOS/crew states and burst cleanup pass');

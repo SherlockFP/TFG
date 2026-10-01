@@ -163,6 +163,15 @@ body { font-family: var(--font); color: var(--text); user-select: none; }
 .menu-frame .form-row:focus-within > label { color: var(--ph-hi); opacity: 1; }
 input, select { font-family: var(--font); font-size: 22px; background: #140a04; color: var(--text); border: 1px solid var(--amber-dim); padding: 2px 8px; outline: none; }
 input:focus, select:focus { border-color: var(--amber); }
+/* Browser-local relay editor follows the same terminal fields as its credentials. */
+#ui .menu-frame.settings textarea[data-nav="set:turnurl"] {
+  box-sizing: border-box; width: 230px; max-width: 100%; min-width: 0; resize: vertical;
+  font-family: var(--font); font-size: 22px; padding: 2px 10px;
+  color: var(--ph-hi); caret-color: var(--ph-hi); background: rgba(0,0,0,0.45);
+  border: 1px solid var(--ph-line); border-bottom: 2px solid var(--ph-dim); border-radius: 0;
+}
+#ui .menu-frame.settings textarea[data-nav="set:turnurl"]::placeholder { color: var(--ph-dim); opacity: 0.6; }
+#ui .menu-frame.settings textarea[data-nav="set:turnurl"]:focus { outline: 1px solid var(--ph); border-color: var(--ph); }
 input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--amber); }
 input[type=range] { accent-color: var(--amber); width: 220px; }
 .menu-frame input:not([type=checkbox]):not([type=range]):not([type=file]), .menu-frame select {

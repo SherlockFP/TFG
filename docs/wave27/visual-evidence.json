@@ -1,0 +1,171 @@
+{
+  "method": "VISUAL_REPLAY: fresh solo native Pause/Settings/Network UI at final CSS freeze, real keyboard/clicks and rendered frames. No re-earned core/cargo/mechanic, Internet or hardware claim.",
+  "freeze": "6d2cab553cb78e870b102bd7a888abaa5182d59abd5ba35cca412d41723c28af",
+  "allSourceFreeze": "44b2091ad59b1205e84ae0b6f5ae68220c00a2b107429c1bbb85c4d2f326c652",
+  "errors": [],
+  "runtime": [
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    }
+  ],
+  "warnings": [],
+  "checks": [
+    {
+      "name": "Final native Network textarea themed and accessible at960",
+      "style": {
+        "focused": true,
+        "focusVisible": true,
+        "background": "rgba(0, 0, 0, 0.45)",
+        "color": "rgb(255, 243, 230)",
+        "font": "\"TFG Credit\", VT323, \"TFG Cyr VT\", ui-monospace, monospace",
+        "fontSize": "22px",
+        "border": "rgb(255, 217, 184)",
+        "borderRadius": "0px",
+        "rect": {
+          "x": 667.1875,
+          "y": 414.53125,
+          "width": 230,
+          "height": 51
+        },
+        "overflow": false
+      }
+    }
+  ],
+  "startedAt": "2026-10-01T14:09:23.792Z",
+  "pauseDom": {
+    "lang": "en",
+    "expected": "SETTINGS",
+    "pause": true,
+    "buttons": [
+      "Resume",
+      "Copy join link",
+      "Copy invite code",
+      "CHARACTER",
+      "SETTINGS",
+      "Leave game"
+    ]
+  },
+  "style960": {
+    "focused": true,
+    "focusVisible": true,
+    "background": "rgba(0, 0, 0, 0.45)",
+    "color": "rgb(255, 243, 230)",
+    "font": "\"TFG Credit\", VT323, \"TFG Cyr VT\", ui-monospace, monospace",
+    "fontSize": "22px",
+    "border": "rgb(255, 217, 184)",
+    "borderRadius": "0px",
+    "rect": {
+      "x": 667.1875,
+      "y": 414.53125,
+      "width": 230,
+      "height": 51
+    },
+    "overflow": false
+  },
+  "style1280": {
+    "background": "rgba(0, 0, 0, 0.45)",
+    "color": "rgb(255, 243, 230)",
+    "border": "rgb(255, 217, 184)",
+    "rect": {
+      "x": 926,
+      "y": 403.4375,
+      "width": 230,
+      "height": 51
+    }
+  },
+  "durationMs": 5389,
+  "status": "FRESH_FINAL_CSS_NETWORK_VISUAL_PASS",
+  "cleanup": {
+    "update": true,
+    "tick": true,
+    "endFrame": true
+  },
+  "browserClosed": true
+}

@@ -1,4 +1,31 @@
-# Current quality — Wave26
+# Current quality — Wave27
+
+The qualified independent score stays **8.0/10**. The latest improvement gives a
+second crew member concrete work during hauling: brace rolling cargo, support a
+rattling Reply Drum or choose quiet recovery versus immediate noise at a Dead
+Link cabinet. Three original matte archive objects extend native item/value/
+fragility rules. Existing cart and physics systems remain the foundation. No new
+required currency or mandatory progression task was added.
+
+Observed source/native defects were addressed: grips through walls or with dead/
+occupied helpers, surface jobs continuing at obsolete downstairs coordinates,
+job reconstruction treating ItemManager's iterator as an array, and popup Escape
+routing changing with input focus. Connection settings now expose shared mode,
+TURN validation/cleanup and guarded isolated retry. The quick fix is separately
+published as `1191082`; it does not establish Internet connectivity across strict NAT.
+
+[Wave27](wave27/README.md), [review](wave27/REVIEW.md) and
+[playtest](wave27/PLAYTEST.md) own frozen-source verification and its limits.
+Final combined regression 253/253 and production build pass; local guided two-peer native descent/cabinet, separate brake/drum and exact
+surface-return checks pass. The browser helper-grip target remained partial,
+while its native integration passes. These distinct fixtures are not one full shift.
+A naturally navigated complete crew shift, unassisted discovery, human reaction
+and replay desire still need direct observation. Representative hardware stutter
+and Internet co-op remain unmeasured. Cabinet planning now shares a bounded
+reachable field; local fixture timings establish implementation cost, not FPS.
+More catalogue volume alone does not justify 8.5.
+
+# Prior quality — Wave26
 
 The qualified score remains **8.0/10** pending independent human play. Wave26
 connects the existing Backrooms facilities to normal depth travel and adds original

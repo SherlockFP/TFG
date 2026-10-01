@@ -1,0 +1,598 @@
+{
+  "method": "Wave27 GUIDED_INPUT / TWO_PEER / LOCAL: native landing, safe body visitation/approach and initial item/velocity fixtures explicitly labelled; actual keyboard/mouse/E for descent, cabinet, braking and held drum. No hostReq/noLos/AI/HP/stage outcomes. Controlled Game.update/Input.endFrame through unchanged native kefal.tick; SwiftShader is not hardware FPS.",
+  "checks": [
+    {
+      "name": "actual 960 Network form and focused Escape routing",
+      "error": "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Resume', exact: true })\u001b[22m\n"
+    }
+  ],
+  "errors": [],
+  "runtime": [
+    {
+      "who": "host",
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "host",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "host",
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "host",
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "host",
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "host",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "host",
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "host",
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "peer",
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "peer",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "peer",
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "host",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "host",
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "peer",
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "peer",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "peer",
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "host",
+      "stage": "actual 960 Network form and focused Escape routing",
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "peer",
+      "stage": "actual 960 Network form and focused Escape routing",
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "peer",
+      "stage": "actual 960 Network form and focused Escape routing",
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "peer",
+      "stage": "actual 960 Network form and focused Escape routing",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "peer",
+      "stage": "actual 960 Network form and focused Escape routing",
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "host",
+      "stage": "actual 960 Network form and focused Escape routing",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "host",
+      "stage": "actual 960 Network form and focused Escape routing",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "peer",
+      "stage": "actual 960 Network form and focused Escape routing",
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "peer",
+      "stage": "actual 960 Network form and focused Escape routing",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "host",
+      "stage": "actual 960 Network form and focused Escape routing",
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "host",
+      "stage": "actual 960 Network form and focused Escape routing",
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "peer",
+      "stage": "actual 960 Network form and focused Escape routing",
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "peer",
+      "stage": "actual 960 Network form and focused Escape routing",
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "peer",
+      "stage": "actual 960 Network form and focused Escape routing",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    },
+    {
+      "who": "host",
+      "stage": "actual 960 Network form and focused Escape routing",
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      },
+      "expectedBootstrap": true
+    }
+  ],
+  "warnings": [
+    "peer:Failed to execute 'requestFullscreen' on 'Element': API can only be initiated by a user gesture.",
+    "peer:join error {error: could not connect to peer 3tIeh566xSQzCtaI0uJB aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: 3tIeh566xSQzCtaI0uJB, roomId: tfg-hub-v1}",
+    "join error {error: could not connect to peer RtOFUgHUyCRuRhhjfkJX aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: RtOFUgHUyCRuRhhjfkJX, roomId: tfg-hub-v1}"
+  ],
+  "allWarningEvents": [
+    {
+      "who": "peer",
+      "time": 1790862274076,
+      "text": "Failed to execute 'requestFullscreen' on 'Element': API can only be initiated by a user gesture.",
+      "location": {
+        "url": "http://127.0.0.1:5174/?autojoin=QA27L&net=local&name=QA27Peer",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      }
+    },
+    {
+      "who": "peer",
+      "stage": "actual 960 Network form and focused Escape routing",
+      "time": 1790862293470,
+      "text": "join error {error: could not connect to peer 3tIeh566xSQzCtaI0uJB aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: 3tIeh566xSQzCtaI0uJB, roomId: tfg-hub-v1}",
+      "location": {
+        "url": "http://127.0.0.1:5174/@vite/client",
+        "line": 298,
+        "column": 3,
+        "lineNumber": 298,
+        "columnNumber": 3
+      }
+    },
+    {
+      "who": "host",
+      "stage": "actual 960 Network form and focused Escape routing",
+      "time": 1790862294029,
+      "text": "join error {error: could not connect to peer RtOFUgHUyCRuRhhjfkJX aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: RtOFUgHUyCRuRhhjfkJX, roomId: tfg-hub-v1}",
+      "location": {
+        "url": "http://127.0.0.1:5174/@vite/client",
+        "line": 298,
+        "column": 3,
+        "lineNumber": 298,
+        "columnNumber": 3
+      }
+    }
+  ],
+  "freeze": "6d2cab553cb78e870b102bd7a888abaa5182d59abd5ba35cca412d41723c28af",
+  "allSourceFreeze": "01dba2b0a9064ac1a6a65e6b263b2f13a34cb1dd0c2361988c5ac50620972e99",
+  "startedAt": "2026-10-01T13:44:36.023Z",
+  "nativeFloors": [],
+  "setups": [],
+  "appErrorsStart": [
+    {
+      "total": 0,
+      "ring": []
+    },
+    {
+      "total": 0,
+      "ring": []
+    }
+  ],
+  "stage": "actual 960 Network form and focused Escape routing",
+  "pauseDom27": {
+    "lang": "en",
+    "expectedSettings": "SETTINGS",
+    "connected": true,
+    "buttons": [
+      {
+        "text": "Resume",
+        "aria": null,
+        "visible": true
+      },
+      {
+        "text": "Copy join link",
+        "aria": null,
+        "visible": true
+      },
+      {
+        "text": "Copy invite code",
+        "aria": null,
+        "visible": true
+      },
+      {
+        "text": "CHARACTER",
+        "aria": null,
+        "visible": true
+      },
+      {
+        "text": "SETTINGS",
+        "aria": null,
+        "visible": true
+      },
+      {
+        "text": "Leave game",
+        "aria": null,
+        "visible": true
+      }
+    ],
+    "text": "TFG OS //PAUSED█FORM TFG-43-CON BREAKLobby code: QA27LYou are the host · Players 2ResumeCopy join linkCopy invite codeCHARACTERSETTINGSLeave game↑↓ SELECTENTER CONFIRMESC BACK"
+  },
+  "status": "PARTIAL_STOP",
+  "stopReason": "TimeoutError: locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Resume', exact: true })\u001b[22m\n",
+  "failedDom27": {
+    "panel": "menu-frame crt-panel pause",
+    "text": "TFG OS //PAUSED█FORM TFG-43-CON BREAKLobby code: QA27LYou are the host · Players 2ResumeCopy join linkCopy invite codeCHARACTERSETTINGSLeave game↑↓ SELECTENTER CONFIRMESC BACK",
+    "overlay": "overlay",
+    "focus": "BUTTON",
+    "buttons": [
+      {
+        "text": "Resume",
+        "aria": null
+      },
+      {
+        "text": "Copy join link",
+        "aria": null
+      },
+      {
+        "text": "Copy invite code",
+        "aria": null
+      },
+      {
+        "text": "CHARACTER",
+        "aria": null
+      },
+      {
+        "text": "SETTINGS",
+        "aria": null
+      },
+      {
+        "text": "Leave game",
+        "aria": null
+      }
+    ]
+  },
+  "durationMs": 38762,
+  "appErrorsFinal": [
+    {
+      "total": 0,
+      "ring": [],
+      "counts": []
+    },
+    {
+      "total": 0,
+      "ring": [],
+      "counts": []
+    }
+  ],
+  "clockFinal": [
+    {
+      "outsideUpdates": 143,
+      "manualUpdates": 22,
+      "steps": 22
+    },
+    {
+      "outsideUpdates": 91,
+      "manualUpdates": 0,
+      "steps": 0
+    }
+  ],
+  "finalInput": [
+    {
+      "p": [
+        2.4000000953674316,
+        -1.2300504063299742,
+        23
+      ],
+      "phase": "orbit",
+      "hp": 100,
+      "dead": false
+    },
+    {
+      "p": [
+        2.4000000953674316,
+        -1.23009698396927,
+        23
+      ],
+      "phase": "orbit",
+      "hp": 100,
+      "dead": false
+    }
+  ],
+  "cleanupPages": [
+    {
+      "noise": null,
+      "clock": {
+        "update": true,
+        "tick": true,
+        "endFrame": true
+      }
+    },
+    {
+      "noise": null,
+      "clock": {
+        "update": true,
+        "tick": true,
+        "endFrame": true
+      }
+    }
+  ],
+  "browserClosed": true
+}

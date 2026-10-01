@@ -29,6 +29,18 @@ an echo, then walk quietly. The same maintenance lift always offers surface retu
 These are finite authored themes with generated layouts, not infinitely many
 new environments or borrowed franchise lore. See [Wave26](wave26/README.md).
 
+## Crew salvage direction — Wave27
+
+Three original matte salvage silhouettes extend the maintenance fiction: a Reply
+Drum with loose recorded messages, an Indexed Glass tower and a robust Archive
+Sorter. Dirty ivory, charcoal, oxidized steel and small ochre labels distinguish
+weight and handling without glossy toy bodies or broad green emission. The drum
+rewards quiet walking, a real partner grip or the existing trolley; it adds no
+new required meter. A shallow Dead Link cabinet reuses existing floor cargo and
+offers four seconds of quiet recovery versus an immediate noisy release. These
+are TFG objects and choices, not imported R.E.P.O. assets or franchise monsters.
+See [Wave27](wave27/README.md).
+
 ## Names
 | Old | New |
 |---|---|

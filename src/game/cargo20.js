@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { G } from '../physics/physics.js';
 import { wrapMethod } from './dailyEvents.js';
-import { looseCargo, impulseCargo, cargoToken } from './cargo20_core.js';
+import { looseCargo, impulseCargo, approachingCargo, brakeCargo, cargoToken } from './cargo20_core.js';
 import { nudgeLabel } from './cargo20_text.js';
 export function installCargo20(game) {
  const offs=[],seen=new Map(),peerAt=new Map(),bodyAt=new Map(),bursts=new Map();let disposed=false,nonce=0;
@@ -20,10 +20,16 @@ export function installCargo20(game) {
  }
  function hostNudge(d,from){
   if(!game.isHost||!active()||!d||d.token!==cargoToken(game.run)||!Number.isSafeInteger(d.n)||d.n<1||d.n>1e9)return false;
+  const brake=d.op==='brake';if(d.op!==undefined&&d.op!=='push'&&!brake)return false;
   const it=game.items?.get?.(d.id),time=game.time||0,p=reachable(from,it);
-  if(!p||bursts.has(it.id)||d.n<=(seen.get(from)||0)||time-(peerAt.get(from)??-10)<.75||time-(bodyAt.get(it.id)??-10)<.5)return false;
-  if(!impulseCargo(it,p.look,{deltaSpeed:1.6,maxImpulse:55,maxSpeed:2.5}))return false;
-  bursts.set(it.id,{from,token:d.token,left:.3,look:p.look.clone()});
+  if(!p||(!brake&&bursts.has(it.id))||d.n<=(seen.get(from)||0)||time-(peerAt.get(from)??-10)<.75||time-(bodyAt.get(it.id)??-10)<.5)return false;
+  if(brake){
+   if(!approachingCargo(it,p.pos)||!brakeCargo(it))return false;
+   bursts.delete(it.id);
+  }else{
+   if(!impulseCargo(it,p.look,{deltaSpeed:1.6,maxImpulse:55,maxSpeed:2.5}))return false;
+   bursts.set(it.id,{from,token:d.token,left:.3,look:p.look.clone()});
+  }
   seen.set(from,d.n);peerAt.set(from,time);bodyAt.set(it.id,time);return true;
  }
  const step=dt=>{
@@ -42,7 +48,8 @@ export function installCargo20(game) {
   const target=old.apply(this,args),it=target?.bigItem;
   if(!active()||!eligible(it)||!freeHands(game.selfId)||game.grab?.item||!game.player?.pos||game.player.pos.distanceTo(it.obj.position)>2.8)return target;
   const key=String(game.settings?.keys?.interact||'KeyE').replace(/^Key/,'').replace(/^Digit/,'');
-  return {...target,label:nudgeLabel(it.def.name,key),action:()=>{if(game.input?.enabled===false||game.ui?.panelOpen||game.terminal?.active||game.minigame)return;game.net.request('cg20n',{id:it.id,token:cargoToken(game.run),n:++nonce});}};
+  const brake=approachingCargo(it,game.player.pos);
+  return {...target,label:nudgeLabel(it.def.name,key,brake),action:()=>{if(game.input?.enabled===false||game.ui?.panelOpen||game.terminal?.active||game.minigame)return;game.net.request('cg20n',{id:it.id,op:brake?'brake':'push',token:cargoToken(game.run),n:++nonce});}};
  }));
  const on=(ev,fn)=>{const off=game.mods?.on?.(ev,fn);if(off)offs.push(off);};
  on('registerHandlers',(H,g)=>{if(!g||g===game)H('cg20n',hostNudge);});

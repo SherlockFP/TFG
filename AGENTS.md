@@ -1,13 +1,13 @@
 # TFG — current agent map
 
-Updated 2026-10-01, Wave26. This is the current entry point; historical Windows,
+Updated 2026-10-01, Wave27. This is the current entry point; historical Windows,
 Claude branch/model, no-test and automatic merge/push instructions are retired.
 Their full prior text is preserved in [the historical snapshot](docs/history/AGENTS-pre-wave25.md).
 Current user/session instructions take precedence. Inspect Git for the publication SHA.
 
 ## Start here
 
-1. Read [current work and evidence](docs/wave26/README.md), then
+1. Read [current work and evidence](docs/wave27/README.md), then
    [Gauntlet procedure](docs/GAUNTLET.md) and [current critique](docs/CRITIQUE.md).
 2. Read [identity/art direction](docs/THEME.md) and the relevant module report.
    [Research](docs/wave25/RESEARCH.md) connects genre design and current agent engineering.
