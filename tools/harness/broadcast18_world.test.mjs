@@ -14,7 +14,7 @@ for(const seed of [17,1235,1234,777,42,387276917,1161830751,3576916120,333756572
  const p=ward.plan;assert.ok(Object.isFrozen(p)&&Object.isFrozen(p.shortcutDoor),'immutable plan');
  assert.ok(p.buildings.length>=3&&p.buildings.length<=5,'distinct facade budget');
  assert.equal(ward.group.children.some(c=>c.isLight),false,'no new renderer lights');
- let meshes=0;ward.group.traverse(o=>{if(o.isMesh)meshes++;});assert.ok(meshes<=10,'bounded merged geometry');
+ let meshes=0;ward.group.traverse(o=>{if(o.isMesh)meshes++;});assert.ok(meshes<=11,'bounded merged geometry plus one replay status strip');
  // Whole actual seeded outdoor map: every ordinary path segment remains free of this lane's solid geometry.
  const main=p.mainReturn;
  for(let j=3;j<main.length-2;j++)for(const offset of [-.4,0,.4]){
@@ -43,6 +43,19 @@ for(const seed of [17,1235,1234,777,42,387276917,1161830751,3576916120,333756572
  for(let k=0;k<45;k++)move();actorPos=actor.body.translation();assert.ok((actorPos.x-start.x)*dir.x+(actorPos.z-start.z)*dir.z>3,'open optional passage crosses with actual player capsule');
  ph.world.removeCharacterController(cc);ph.removeBody(actor.body);
  const eye=p.console.clone().add(new THREE.Vector3(-axis.nx*1.8,.3,-axis.nz*1.8));assert.ok(ph.lineOfSight(eye,p.console),'physical console ray reachable');
+ assert.ok(p.replayControl,'physical transmitter replay control available');
+ const replayEye=p.replayApproach.clone();
+ replayEye.y=out.terrain.heightAt(replayEye.x,replayEye.z)+1.6;
+ assert.ok(ph.lineOfSight(replayEye,p.replayControl),'physical replay control has a clear approach ray');
+ if(seed===17){
+  const approach=p.replayApproach,body=ph.createKinematicCapsule(new THREE.Vector3(approach.x,out.terrain.heightAt(approach.x,approach.z)+.9,approach.z),.5,.35,G.PLAYER,G.STATIC),controller=ph.world.createCharacterController(.015);
+  controller.enableAutostep(.3,.3,true);controller.setMaxSlopeClimbAngle(.8);ph.world.step();
+  const toward=p.replayControl.clone().sub(approach);toward.y=0;toward.normalize();const before=body.body.translation();
+  controller.computeColliderMovement(body.col,{x:toward.x*.4,y:-.03,z:toward.z*.4},undefined,groups(G.PLAYER,G.STATIC));
+  const movement=controller.computedMovement();assert.ok(movement.x*toward.x+movement.z*toward.z>.3,'actual player capsule can approach replay E control');
+  assert.ok(Math.hypot(before.x-p.replayControl.x,before.z-p.replayControl.z)<2.4,'native reachable interaction radius');
+  ph.world.removeCharacterController(controller);ph.removeBody(body.body);
+ }
  out.dispose(ph);assert.equal(ward.group.parent,null,'owned ward removed');ph.world.free();
 }
 const ph=new Physics(),out=buildMoonOutdoor(17,MOONS.lufer,{physics:ph,lightPool:{add:e=>e,remove(){}}});assert.equal(out.broadcast18,null,'other moons unchanged');out.dispose(ph);ph.world.free();

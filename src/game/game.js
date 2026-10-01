@@ -301,6 +301,11 @@ import { installArcade2 } from './arcade2.js';
 import { installFeedcams } from './feedcams.js';   // [import:feedcams]
 import { installFeedcams2 } from './feedcams2.js';   // [import:feedcams2] wave 8 pass 2: showcase, drones, jammer, highlights
 import { installBroadcast18 } from './broadcast18.js';
+import { installReplay19 } from './replay19.js';
+import { installCreatures20 } from './creatures20.js';
+import { installDarkCollapse20 } from './darkcollapse20.js';
+import { installCargo20 } from './cargo20.js';
+import './lab20_moons.js';
 import { installDowned } from './downed.js';   // [import:downed] wave 8: 0 HP = downed, crew revives (docs/wave8/downed.md)
 import { installHubgate } from './hubgate.js';   // [import:hubgate]
 import { installRouteboard } from './routeboard.js';   // wave 8: route board (3 route cards) + campaign route ladder (docs/wave8/routeboard.md)
@@ -604,6 +609,7 @@ export class Game extends Emitter {
     this.useModule('feedcams', installFeedcams);   // [slot:feedcams]
     this.useModule('feedcams2', installFeedcams2);   // [slot:feedcams2]
     this.useModule('broadcast18', installBroadcast18);
+    this.useModule('replay19', installReplay19);
     this.useModule('downed', installDowned);   // [slot:downed]
     this.useModule('hubgate', installHubgate);   // [slot:hubgate] wave 8: Hub door, unlock cards, Quick Shift
     this.useModule('routeboard', installRouteboard);   // wave 8: route board + 3 hero moons at the campaign start
@@ -657,6 +663,7 @@ export class Game extends Emitter {
     this.useModule('company13', installCompany13);
     this.useModule('casino13', installCasino13);
     this.useModule('threats13', installThreats13);
+    this.useModule('creatures20', installCreatures20);
     this.useModule('districts13', installDistricts13);
 
     this.useModule('onboard', installOnboard);   // [slot:onboard] wave 5: Hiring Day + staged unlocks (installed last: wraps hostLever / terminalCommand / objectives.compute)
@@ -673,6 +680,8 @@ export class Game extends Emitter {
     this.useModule('missions14', installMissions14);
     this.useModule('cargo13', installCargo13);
     this.useModule('life13', installLife13);
+    this.useModule('darkcollapse20', installDarkCollapse20);
+    this.useModule('cargo20', installCargo20);
 
 
   }

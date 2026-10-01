@@ -1,0 +1,9 @@
+# Public source research and adaptation limits
+
+Successful public GitHub API reads identified [HoldScanButton](https://github.com/milleroski/HoldScanButton) and [ShipLoot](https://github.com/tinyhoot/ShipLoot), including their MIT license metadata. Search also identified [GeneralImprovements](https://github.com/Shaosil/LethalCompanyMods-GeneralImprovements) and [QuickSwitch](https://github.com/andr515i/QuickSwitch). These are concept/source-discovery references, not evidence of having tested their Unity implementations.
+
+TFG already has native ship-loot-tracker, general-improvements, quick-change, reserved slots, helmet cameras and other adaptations. This round adds only the missing held-scan convenience, rewritten as local browser JavaScript using the existing scan API. No Unity assemblies, C# code or commercial models/assets are imported. The shipped implementation retains scan cooldown, noise, line of sight and normal input/menu safety. Its actual shipped-script regression exercises release, stalls and blocked input.
+
+The commercial game comparisons and small qualitative review sample are documented in [Wave19 research](../wave19/RESEARCH.md), with successfully read primary Steam links for Lethal Company, R.E.P.O., Content Warning and Deep Rock Galactic. R.E.P.O.'s physical cargo tension motivates manual native pushing and a loose-prop enemy interaction. Tracking Pixel and Buffer Brute express TFG's dead-internet setting with distinct counterplay, original neutral faceted models and bounded attacks; no exact enemy reproduction is claimed.
+
+Thunderstore pages returned403 and were not read. An attempted Valve presentation URL returned404 and is not cited as research. Neither limited review samples nor feature counts establish human retention, hardware FPS or an objective game score.

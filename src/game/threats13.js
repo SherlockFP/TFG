@@ -10,13 +10,13 @@ import { ensureThreat13Sounds } from './threats13_sfx.js';
 import { TR, RU } from './threats13_text.js';
 export const HINTS = {
   [IDS.printer]: 'Amber lane = printing in 1.4 seconds. Step sideways or use a wall; its aim locks before it fires.',
-  [IDS.checksum]: 'It investigates noise. Stop moving and talking during its green scan to cancel the strike, or retreat beyond its reach.'
+  [IDS.checksum]: 'It investigates noise. Stop moving and talking while its scanner lamp pulses to cancel the strike, or retreat beyond its reach.'
 };
 const DEFS = {
   [IDS.printer]: { name: 'Line Printer', hp: 110, dmg: 26, walk: 0, run: 0, power: 2, xp: 130, coin: 24, zone: 'in', radius: 0.6, height: 1.6, maxAlive: 1, lore: HINTS[IDS.printer] },
   [IDS.checksum]: { name: 'Checksum', hp: 85, dmg: 22, walk: 2, run: 2.7, power: 1.5, xp: 110, coin: 20, zone: 'in', radius: 0.55, height: 1.6, maxAlive: 1, lore: HINTS[IDS.checksum] }
 };
-const players = (c, M) => M.playersFor(c).filter(p => !p.dead && !p.inShip && !M.nearSafeZone(p));
+const players = (c, M) => M.playersFor(c).filter(p => !p.dead && !p.downed && !M.game.downed?.isDowned?.(p.id) && !p.inShip && !M.nearSafeZone(p));
 function printer(c, dt, M) {
   if (!c.data.init) { c.data.init = true; c.setState('idle'); }
   if (c.state === 'stunned') return;

@@ -29,7 +29,7 @@ assert.notDeepEqual(effects(fleetLayout('survey')),effects(fleetLayout('courier'
 function makeGame(){
  const handlers={},events={},sent=[];
  const game={isHost:true,selfId:'host',profile:{shipyard:{}},player:{pos:new Vector3(0,.2,30),dead:false,inShip:false,teleport(p){this.pos.copy(p);}},world:{moonId:'__relay13'},env:{setMoon(){},setSpace(){}},ship:{door:{setOpen(){}},spawns:[new Vector3(0,0,0),new Vector3(2,0,0),new Vector3(4,0,0),new Vector3(6,0,0)]},remotes:new Map([['crew',{pos:new Vector3(0,.2,30)}]]),ui:{toast(){}},mods:{on(k,fn){events[k]=fn;return ()=>{};}},net:{sendTo(id,k,d){sent.push({id,k,d});}},objectives:{compute(){return[];}},broadcastRun(){},hostSave(){},applyRunState(d){this.run={...d};},spawnInShip(){this.player.teleport(this.ship.spawns[fleetSpawnIndex13(this.selfId,this.ship.spawns.length)]);},loadMapFor(){this.world.moonId=null;},hostLever(){return'launched';},hostInit(data){this.applyRunState({phase:'orbit',credits:1000,...data});events.registerHandlers?.((k,fn)=>handlers[k]=fn,this);this.spawnInShip();}};
- const api=installFleet13(game);return {game,api,handlers,sent};
+ const api=installFleet13(game);return {game,api,handlers,sent,events};
 }
 let {game,api,handlers,sent}=makeGame();game.hostInit(null,1);assert(api.docked());assert.equal(game.player.pos.z,23);
 assert.match(game.objectives.compute()[0].text,/free ship/);
@@ -90,3 +90,18 @@ hostMethods.hostInit.call(rg,runSave,3);const loaded=[...rg.items.all()].find(it
 assert.equal(loaded.collected,true,'native save/reload retains prior extraction credit instead of booking old cargo again');
 api.dispose();peerApi.dispose();
 console.log('fleet13: purchase, distinct capabilities, host authority, dock entry, crew dispatch and save lifecycle passed');
+
+// Actual installed DOM marker: Company peer, known selected hull, danger pauses visible budget.
+const {PerspectiveCamera}=await import('three');const elements=[];globalThis.innerWidth=800;globalThis.innerHeight=600;
+globalThis.document={getElementById:()=>null,body:{appendChild(el){elements.push(el);}},createElement(){return{style:{},innerHTML:'',removed:false,remove(){this.removed=true;}}}};
+for(const phase of ['company','moon']){
+ const f=makeGame();f.game.isHost=false;f.game.run={phase,moon:phase==='company'?'company':'hamsi',day:1,fleet13:{selected:'hauler',docked:false}};f.game.world={moonId:f.game.run.moon,seed:55};f.game.player.pos.set(2.6,-1.2,8);f.game.camera=new PerspectiveCamera();f.game.camera.updateMatrixWorld();let danger=false;f.game.onegoal={hot:()=>danger};
+ const count=elements.length;f.events.update(1,f.game);assert.equal(elements.length,count+1);assert.equal(elements.at(-1).innerHTML,'SHIP ENTRY');
+ danger=true;f.events.update(30,f.game);assert.ok(elements.at(-1).removed,'danger hides real DOM marker');assert.equal(elements.length,count+1);
+ f.game.player.indoor=true;danger=false;f.events.update(30,f.game);assert.equal(elements.length,count+1,'facility never projects an outdoor ship cue');
+ f.game.player.indoor=false;f.game.player.pos.y=-300;f.events.update(30,f.game);assert.equal(elements.length,count+1,'vertical separation excludes underground cue even before indoor flag updates');
+ f.game.player.pos.y=-1.2;f.events.update(1,f.game);assert.equal(elements.length,count+2,'safe outdoor return resumes remaining visible budget');assert.equal(elements.at(-1).style.opacity,'1');
+ f.events.update(13,f.game);assert.ok(elements.at(-1).removed);for(let i=0;i<20;i++)f.events.update(1,f.game);assert.equal(elements.length,count+2,'expired hint never recreates');
+ f.api.dispose();
+}
+console.log('fleet13 installed Company/moon peer entry markers: danger pause/resume and finite expiry pass');

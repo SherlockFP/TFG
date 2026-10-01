@@ -29,6 +29,7 @@ const tierTag = (it) => (it?.tier && it.tier !== 'common' && !it.affix ? TIERS[i
 
 const tmp = new THREE.Vector3();
 const UP = new THREE.Vector3(0, 1, 0);
+const PROMPT_TEXT = /\S/;
 
 class GrabBeam {
   constructor(game) {
@@ -211,7 +212,7 @@ export const actionMethods = {
     }
     // 2) point interactables
     const pts = this.interactablesNow();
-    let best = null, bestScore = 1e9;
+    let best = null, bestLabel = '', bestScore = 1e9;
     for (const ip of pts) {
       tmp.copy(ip.pos).sub(eye);
       const along = tmp.dot(fwd);
@@ -222,12 +223,15 @@ export const actionMethods = {
       const score = along + perp * 2;
       // Do not let the generous interaction radius punch through a 30 cm wall.
       // noLos is reserved for deliberately screen/position based interactions.
-      if (score < bestScore && (!hit || hit.distance > along - 0.15 || ip.noLos)) { best = ip; bestScore = score; }
+      if (score < bestScore && (!hit || hit.distance > along - 0.15 || ip.noLos)) {
+        const label = typeof ip.label === 'function' ? ip.label() : ip.label;
+        // A deliberately hidden point cannot eclipse the next usable station. Resolve only eligible contenders.
+        if (typeof label !== 'string' || !PROMPT_TEXT.test(label)) continue;
+        best = ip; bestLabel = label; bestScore = score;
+      }
     }
     if (best) {
-      const lbl = typeof best.label === 'function' ? best.label() : best.label;
-      if (!lbl) return null;
-      return { label: lbl, sub: best.sub ? (typeof best.sub === 'function' ? best.sub() : best.sub) : '', action: best.action };
+      return { label: bestLabel, sub: best.sub ? (typeof best.sub === 'function' ? best.sub() : best.sub) : '', action: best.action };
     }
     return null;
   },

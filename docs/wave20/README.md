@@ -1,0 +1,21 @@
+# Wave20 — original facilities and bounded physical threats
+
+The owner requested new labyrinths, darkness-driven collapse, Lethal Company mod adaptations and R.E.P.O.-inspired creatures/physics, followed by test and main publication. This round also publishes the preceding Wave19 quality work; read its research and independent review for that history.
+
+Two explicit route destinations preserve every existing moon definition and generated save layout: **17-Thread Archive** is free, tier1, size1.1; **27-Buffer Foundry** costs95, tier2, size1.2. Both use native terrain, salvage custody, quota and creature budgets. Thread Archive has branching reply rooms and return loops; Buffer Foundry has processing lanes and a separate service bypass. Their original PSX geometry adds no lights. See [labyrinths.md](labyrinths.md).
+
+Occupied darkness can close at most two redundant optional passages after45 seconds plus a six-second warning. Native flashlight/light recovery, exit connectivity and player/cargo clearance gate the result; no main exit, required gate, damage or reward is added. See [darkcollapse.md](darkcollapse.md).
+
+Tracking Pixel hunts visible hand-carried salvage; dropping or bagging it and breaking sight cancels its warned attack. Buffer Brute follows loud noise and can gently shove nearby loose props. These are original theme-specific models/behaviors, not copied commercial creatures. The shared director admits at most one of this family after quota2 and excludes special encounters. Explicit low native spawn weights let Pixel appear in Thread Archive and Brute in Buffer Foundry after that gate; the existing generic extra-spawn weights remain restricted to higher-tier moons. See [creatures.md](creatures.md).
+
+Heavy loose salvage offers Grab[LMB] and Push[E]. A bounded0.3-second native physics burst respects custody, aim, distance, wall collision and speed limits, with existing item snapshots carrying the result. See [physics.md](physics.md).
+
+The built-in **Hold Scan** is an original browser implementation of the HoldScanButton convenience: hold RMB for normal interval-limited scans, release to stop. Typing, menus, death and disabled controls stop it and require a fresh press. Existing adapted camera/ship-loot/quality mods remain intact; they are not counted again as new ports. See [RESEARCH.md](RESEARCH.md).
+
+Root installs creatures20 after threats13 and darkcollapse20/cargo20 after expedition/interaction wrappers. The replay19 audio boundary now uses the native sfx bus; a real AudioManager regression covers it. Verification: the full227-group run completed in349s with226 passing and one atmos12 failure exposing missing explicit atmosphere profiles for the new themes. Root added warm-neutral archive paper/cable and foundry rubble/cable profiles without new lights. The unchanged full atmosphere/art-budget test then passed, alongside creatures20 and actual moon registration (3/3 in12s). Final actual lab spawn/held scan/replay audio checks passed4/4 in3s. The final production build and browser outcomes are recorded below; these focused corrections do not pretend that the initial full run was green.
+
+Browser gallery exposed the new outdoor fleet cue being projected underground because its range used only horizontal coordinates. Root now requires outdoor state and nearby vertical position; installed DOM tests prove facility/vertical suppression preserves the finite remaining outdoor hint budget. Native all-hull boarding and fleet regressions passed2/2 in4s after this correction.
+
+Final production build passed in3.75s. Browser input and setup boundaries, remaining misses and independent score are documented in [PLAYTEST.md](PLAYTEST.md) and [REVIEW.md](REVIEW.md). This is local two-peer software WebGL evidence, not hardware FPS or human retention measurement.
+
+Independent final assessment: **7.9/10**. Fresh browser checks passed both native entry/return portals, held scanner release/menu safety, exact-ID native cargo push/grab/peer snapshots and shared darkness warning with no runtime/page/framebuffer feedback errors. Charged-light recovery and camera-cut targeting did not pass their browser setups; full interior traversal and creature combat remain native regression evidence. The serialized browser was closed cleanly before publication.

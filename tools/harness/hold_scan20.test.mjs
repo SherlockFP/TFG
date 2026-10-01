@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import vm from 'node:vm';
+let definition;
+vm.runInNewContext(readFileSync(new URL('../../public/mods/hold-scan.js', import.meta.url), 'utf8'), { KefalAPI: { defineMod: d => definition = d } });
+assert.equal(definition.builtin, true); assert.equal(definition.enabledByDefault, true);
+assert.ok(JSON.parse(readFileSync(new URL('../../public/mods/index.json', import.meta.url), 'utf8')).mods.includes('hold-scan.js'));
+const events = new Map(); let down = false, calls = 0, enabled = true;
+const game = { input: { enabled: true, mouseDown: key => key === 2 && down, isTyping: () => false }, player: {}, ui: {}, scan() { calls++; } };
+definition.init({ enabled: () => enabled, on: (key, fn) => events.set(key, fn) }, { interval: 1.8 });
+const tick = dt => events.get('update')(dt, game);
+down = true; tick(.1); assert.equal(calls, 0, 'first click remains exclusively native');
+tick(1); tick(.7); assert.equal(calls, 0); tick(.2); assert.equal(calls, 1);
+tick(10); assert.equal(calls, 2, 'a stalled update never bursts queued scans');
+down = false; tick(10); assert.equal(calls, 2, 'release stops repeats');
+for (const block of ['panel', 'terminal', 'minigame', 'dead', 'downed', 'input', 'feature']) {
+  down = true; tick(.1);
+  if(block === 'panel') game.ui.panelOpen = {};
+  if(block === 'terminal') game.terminal = { active: true };
+  if(block === 'minigame') game.minigame = {};
+  if(block === 'dead' || block === 'downed') game.player[block] = true;
+  if(block === 'input') game.input.enabled = false;
+  if(block === 'feature') enabled = false;
+  const before = calls; tick(10); assert.equal(calls, before, `${block} blocks repeating input`);
+  game.ui.panelOpen = null; game.terminal = null; game.minigame = null; game.player = {}; game.input.enabled = true; enabled = true;
+  tick(10); assert.equal(calls, before, 'closing a panel does not reuse its held mouse button');
+  down = false; tick(.1); down = true; tick(.1); tick(1.9); assert.equal(calls, before + 1, 'fresh hold resumes native repeats');
+  down = false; tick(.1);
+}
+down = true; tick(.1); events.get('sessionEnd')(); tick(.1); const before = calls; tick(.5); assert.equal(calls, before, 'session reset clears accumulated hold time');
+console.log('hold_scan20: PASS (shipped built-in mod, native call boundary, cooldown pacing and menu/release safety)');

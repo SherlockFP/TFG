@@ -4,7 +4,7 @@ import { parts18 } from './life18_shapes.js';
 // Native item owner disposes private geometry; render cache owns these materials.
 export function createParcel17(){
  const root=new THREE.Group(),p=parts18(root,{
-  body:getMaterial(null,0x7a7567,{flat:true}),trim:getMaterial(null,0x303439,{flat:true}),seal:getMaterial(null,0xc9bc98,{flat:true}),tag:getMaterial(null,0xbcb59d,{flat:true}),
+  body:getMaterial(null,0x979184,{flat:true}),trim:getMaterial(null,0x36383c,{flat:true}),seal:getMaterial(null,0xcbbb9b,{flat:true}),tag:getMaterial(null,0xd4cdbd,{flat:true}),
  });
  p.box('body',.46,.28,.32);p.box('trim',.465,.055,.325,0,.07,0);
  p.box('seal',.075,.29,.33);p.box('seal',.47,.035,.33,0,-.065,0);
@@ -14,7 +14,7 @@ export function createParcel17(){
 }
 export function courierMarker17(recipient=false){
  const root=new THREE.Group();root.name=recipient?'courier-recipient-placard':'courier-dispatch-placard';
- const materials={edge:new THREE.MeshLambertMaterial({color:0x303439}),face:new THREE.MeshLambertMaterial({color:recipient?0xb89a68:0xc0b9a5,emissive:recipient?0x70582c:0x6c6553,emissiveIntensity:.045}),ink:new THREE.MeshLambertMaterial({color:0x343536})};
+ const materials={edge:new THREE.MeshLambertMaterial({color:0x36383c}),face:new THREE.MeshLambertMaterial({color:recipient?0xb89a68:0xc0b9a5,emissive:recipient?0x70582c:0x6c6553,emissiveIntensity:.045}),ink:new THREE.MeshLambertMaterial({color:0x343536})};
  for(const material of Object.values(materials))material.flatShading=true;
  const p=parts18(root,materials);
  // Envelope/receipt icon is readable from front and back, and replaces the floating toy crystal.

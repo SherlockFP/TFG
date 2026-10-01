@@ -1,4 +1,12 @@
+> **Final Wave20 QA:** independent7.9/10. Fresh two-peer native portals, HoldScan release/menu, exact-ID cargo E/LMB/replication and shared darkness warning passed; runtime/page/feedback errors0. Charged-light recovery, camera-cut aiming, full interior walk and creature combat are not browser passes; native regressions cover the relevant mechanics. Final build3.75s; browser closed/lock released. See wave20 PLAYTEST/REVIEW before claiming broader results.
+
+> **Wave20 validation:** full227 groups:226 passed/one missing-profile failure in349s; corrected explicit new-theme atmos profiles pass the unchanged all-theme atmos12 test plus actual moon/creature checks (3/3). Final spawn/scan/replay boundary checks4/4; underground fleet cue and native boarding2/2. Read current wave20 docs for final build/browser result and honest scope limits.
+
+> **Wave20 continuation (2026-10-01):** owner additionally requested new labyrinths, darkness collapse, LC-style mod convenience and REPO-inspired original creatures/physics, then test/commit/push main. Read `docs/wave20/README.md`, `PLAYTEST.md` and `REVIEW.md` for final evidence. Explicit archive20/foundry20 destinations preserve old moon definitions/save generation. Root owns Git; no separate economy/physics ledger or copied commercial assets.
+
 # TFG — HANDOFF FOR THE NEXT AI / DEVELOPER (read this first)
+
+> **Latest cloud state — wave19, 2026-10-01 owner timezone:** main baseline `33fe646` includes wave18 and immediate system access. The owner requests autonomous research and quality work with continuing multi-agent/main publication authorization. Start at the newest `AGENTS.md` notes and `docs/wave19/README.md`, `RESEARCH.md`, `PLAYTEST.md`, `REVIEW.md`; check Git history/remote for the final publication SHA. Use `/workspace/TFG` / `/workspace/.tfg-tools/activate.sh`; `npm test` exists and runs native regressions. Historical Windows/model/branch directions below are superseded by the current cloud continuation.
 
 > **Latest cloud state — wave 17, 2026-09-30.** Wave 16 is published on main as `0aad5fa`. The owner requested content and quality work toward 8–8.5, with the earlier multi-agent/main-push authorization still active. Read [wave17/README.md](wave17/README.md), [PLAYTEST.md](wave17/PLAYTEST.md), [REVIEW.md](wave17/REVIEW.md) and current critique. Use `/workspace/TFG` with `/workspace/.tfg-tools/activate.sh`. Root owns final Git publication; check history/remote for the exact SHA. Historical Windows/model/branch directions below remain historical.
 

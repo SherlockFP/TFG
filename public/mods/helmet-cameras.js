@@ -124,7 +124,7 @@ KefalAPI.defineMod({
       cam.updateMatrixWorld(true);
       const L = game.lights, fog = scene.fog;
       const indoor = r.pos.y < api.FACILITY_Y + 40;
-      const prev = { rt: renderer.getRenderTarget(), ai: L.ambient.intensity, hi: L.hemi.intensity, fd: fog ? fog.density : 0, camVis: game.camera.visible, rootVis: r.root.visible };
+      const prev = { rt: renderer.getRenderTarget(), ai: L.ambient.intensity, hi: L.hemi.intensity, fd: fog ? fog.density : 0, camVis: game.camera.visible, rootVis: r.root.visible, screenVis: mon.screen.visible };
       saved.ac.copy(L.ambient.color); if (fog) saved.fc.copy(fog.color);
       try {
         if (cfg.nightVision) {
@@ -134,6 +134,7 @@ KefalAPI.defineMod({
         }
         game.camera.visible = false;       // hides our own view model / held item (children of the main camera)
         r.root.visible = false;            // don't film the inside of their helmet
+        mon.screen.visible = false;        // this pass writes its map; exclude that sampler from the feed scene
         renderer.setRenderTarget(mon.rt);
         renderer.clear();
         renderer.render(scene, cam);
@@ -145,6 +146,7 @@ KefalAPI.defineMod({
         if (fog) { fog.density = prev.fd; fog.color.copy(saved.fc); }
         game.camera.visible = prev.camVis;
         r.root.visible = prev.rootVis;
+        mon.screen.visible = prev.screenVis;
       }
     }
 

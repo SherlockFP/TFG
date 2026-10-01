@@ -1,0 +1,36 @@
+# Wave19 independent gauntlet
+
+Baseline independent7.7/10. QA owns this file/REVIEW and private helpers only; root owns production integration/Git. Priorities are genuine observed player friction: street return around a thin legacy post then ambiguous ship-side approach, dark worker/world contrast, contextual E targets competing with crew/loose items, and recurring peer framebuffer feedback/startup stalls. No fresh overall score before changed-source evidence.
+
+Read CLAUDE.md, AGENTS/HANDOFF latest notes and wave18 review/render evidence. Preserve PSX low-poly matte industrial art, original districts and one finite custody/wallet/quota/camera ledger. New unlock access is immediate while earned progress and fresh teaching/hazard budget remain separate.
+
+Renderer coordination with controls comes first: one serialized Chromium context under /tmp/tfg-browser.lock, fresh host+peer join/native fleet Board repro, real GL draw instrumentation before loading rather than only two settled frames after warning. Need first bad draw, actual program samplers/bound textures versus actual framebuffer attachments and renderer target, with strict identity matches. Instrumentation is bounded, restored, private and stalls GL; no hardware FPS conclusions or warning suppression. Previous host/company and fresh peer probes returned no errors despite130 warnings in another run; producer remains unknown.
+
+Later frozen-source probes cover contrast/wayfinding/counterplay/optional activity only where changed. Setup-labelled positions/items remain explicit, with real keys/E/physical collision and native outcomes. No forced AI/LOS/score/ledger or new broad campaign claims.
+
+## Renderer first-bad-draw evidence
+
+Serialized native fresh host+peer access/Board reproduction `/tmp/tfg-qa19/results.json`, startup hooks armed before navigation with controls' bounded armRender19Probe. Raw feedback recurred during native fleet Board and incubator stages. Startup peer drawStages[1] captured real1282, main-scene MeshBasic material396c9d4a/objectb937..., active sampler map/unit0 binding current.color:a758..., which strictly equals actual color0 framebuffer attachment; renderer target was that same160×120 texture. This is direct self-sampling evidence, unlike later untextured sky-sphere errors without samplers.
+
+Live scene lookup confirmed failing object PlaneGeometry0.92×0.69, path Mesh→tiltGroup→Group→ship→Scene, JS map isRenderTargetTexture160×120 with sameuuid. Full-repository source search identifies public/mods/helmet-cameras.js: its screen uses that size/RT, while renderFeed renders the entire scene into mon.rt without hiding its own screen/group. It only hides the local view model and remote head. Controls/root received raw evidence for a narrow hide/restore-in-finally fix. No Engine/post/sampler suppression or visual-quality downgrade is justified. The earlier source-only-src audit missed built-in public mods; no warning fix is claimed before actual after reproduction.
+
+Temporary prototype and renderer hooks were restored; current context remains available for fresh source reload once root freezes the integration. getError consumes and stalls GL, so these captures are producer diagnostics, never frame-rate evidence.
+
+## Frozen-source after checks (2026-10-01)
+
+One serialized Chromium host+local peer context, headless SwiftShader at 960×540, under `/tmp/tfg-browser.lock`. Fresh pages loaded the fixed helmet-camera mod. Position/phase/seed/quota fixtures are labelled; interactions use real mouse, E/W and native host handlers. This is bounded integration QA, not an unassisted campaign or a hardware performance measurement. Raw evidence: `/tmp/tfg-qa19/results.json` and `run.log`.
+
+| Probe | Actual result |
+| --- | --- |
+| Helmet-camera feedback | Native free Courier broker selection and Board E. Real 160×120 feed targets rendered 24 host / 14 peer times. Monitor screen and parent visible after rendering. Armed real GL draws 4,089 / 2,883 yielded zero errors; hooks restored, then 3.5 seconds of native unwrapped updates yielded zero feedback warnings. Before source had an exact sampler/attachment alias. This verifies the narrow fix without reducing quality/cadence. |
+| Worker contrast | Native moving actors sampled with player-only initial eye-height stances. Valid full-body frames: `09-worker-0.png`, `09-worker-2.png`, `18-reader-fullbody.png`. Geometry/route behaviour remains native; washed clothing, gloves and shells separate better. `09-worker-1.png`, `15-worker-1-clear-company.png`, `17-reader-unobstructed.png` are occluded/misaimed harness frames and excluded from visual approval. |
+| Company stairs | Correct native open-door E. Tiny W tap/brake waypoint follower initially stalled at the lowest tread near `[2.6,-1.23,6.01]`. A normal continuous W retry from labelled exterior stance `[2.6,-1.25,6.2]` crossed all treads and reached `[2.60022,0.01987,-3.13990]`, grounded and insideShip=true. No teleport during this traversal. `16-continuous-stair-attempt.png`. Normal entry passes; very short burst sensitivity remains a harness/geometry observation. Closed-door negative browser check was not completed; actual Rapier all-hull regression covers that boundary. |
+| Dead-Air Replay | Native physical E on Hamsi seed17/quota1. Warning→live pulse0/1/2→spent; both peers token `hamsi:17:1`, rev5, used=true, pulse2. Native loud2 noise at the exact control position at elapsed 8.0 / 12.08 / 16.08 seconds, matching the 8-second warning and three broadcast pulses. Repeat E left the spent ledger unchanged. `11-replay-warning.png`, `12-replay-spent.png`. Creature attraction was not independently observed in this browser run; native Hound tests are separate evidence. |
+
+The new replay exposed a real audio integration error: `bus:'world'` passed an undefined bus to native `AudioNode.connect`, producing host/peer page errors and update/interactables errors. Root changed it to the existing `sfx` bus and added an actual AudioManager graph boundary regression which fails before/passes after. That final bus correction is **Node-verified, not yet browser-rerun**; include a live pulse/zero-error check in the next frozen gauntlet.
+
+The second replay token's attempted physical camera cut showed the correct E label/pressed input but retained powered=true/rev0. The generic +z stance was not the authored approach; host LOS/occupied-gate safety can legitimately refuse it. Therefore cancellation is **not a browser pass or a proven defect**. Next run must use `plan.waypoints.console`, confirm clear shutter occupancy, and inspect the native receipt before claiming cancellation.
+
+Bodycam images `07/08/13/14` are wall/edge views, not visual proof of a readable live screen. Actual feed target passes plus restored visibility establish the technical result; a correctly front-facing monitor image is still useful. Prototype/renderer instrumentation was restored. Replay's original errors remain in the raw record rather than being hidden by the later source fix.
+
+Root reports broad frozen-source regression **221/221 passed in344s**, build **3.95s**, before the final audio-bus correction. The focused actual-audio regression passed after that correction; the upcoming broader round must incorporate it. No fresh tree/pet/arcade/access campaign was repeated.

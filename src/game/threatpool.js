@@ -23,6 +23,7 @@ export const HEADLINE = Object.freeze([
   { id: 'c11_captcha', zone: 'in', minQ: C11.TUNE.minQuota.c11_captcha }, { id: 'c11_shadowban', zone: 'in', minQ: C11.TUNE.minQuota.c11_shadowban }, { id: 'c11_recommender', zone: 'in', minQ: C11.TUNE.minQuota.c11_recommender },   // wave 11 creatures11 (docs/wave11/creatures11.md)
   { id: 'sw_scraper', zone: 'in' }, { id: 'sw_streamer', zone: 'in', minQ: S11.TUNE.minQuota.sw_streamer }, { id: 'sw_automod', zone: 'in', minQ: S11.TUNE.minQuota.sw_automod },   // wave 11 swarm11 (docs/wave11/swarm11.md)
   { id: 'c13_printer', zone: 'in', minQ: 2 }, { id: 'c13_checksum', zone: 'in', minQ: 2 },
+  { id: 'c20_pixel', zone: 'in', minQ: 2, family: 'cargo20' }, { id: 'c20_brute', zone: 'in', minQ: 2, family: 'cargo20' },
   { id: 'zombie', zone: 'out', minQ: 3 },   // Zombie Accounts: horde waves (crdirector gates them to quota 3+ anyway)
 ]);
 export const HEAD_IDS = new Set(HEADLINE.map((h) => h.id));
@@ -32,7 +33,7 @@ export const LM_KIND_ID = Object.freeze({ witch: 'lm_witch', keeper: 'lm_keeper'
 const BASELINE = new Set(['scuttler', 'yoinker', 'crawler', 'lurker', 'mannequin', 'sludge', 'spider', 'leech', 'jester', 'screamer', 'mimic', 'turret', 'mine', 'hound', 'giant', 'listener']);
 export const POOL_SIZE = 3;
 /** [balance12] wave 10 / 11 headliners ("new rules"): a pool holds at most newCap(q) of them - 1 before quota 2 (one lesson per landing), 2 at quota 2-3, then unlimited (the late game combines them) */
-export const NEW_IDS = new Set(['c12_404', 'c12_cookie', 'c12_echo', 'c12_lag', 'c13_printer', 'c13_checksum', 'c10_buffering', 'c10_doomscroller', 'c10_ratio', 'c11_captcha', 'c11_shadowban', 'c11_recommender', 'sw_scraper', 'sw_streamer', 'sw_automod']);
+export const NEW_IDS = new Set(['c12_404', 'c12_cookie', 'c12_echo', 'c12_lag', 'c13_printer', 'c13_checksum', 'c20_pixel', 'c20_brute', 'c10_buffering', 'c10_doomscroller', 'c10_ratio', 'c11_captcha', 'c11_shadowban', 'c11_recommender', 'sw_scraper', 'sw_streamer', 'sw_automod']);
 export const newCap = (q) => ((q | 0) < 2 ? 1 : (q | 0) < 4 ? 2 : 9);
 /** [balance12] pool size: 3 residents until quota 4, then 4 (more rules meet on one moon) */
 export const poolSize = (q) => ((q | 0) >= 4 ? POOL_SIZE + 1 : POOL_SIZE);
@@ -58,6 +59,7 @@ export function poolFor(run, moon) {
   let fresh = 0;
   for (let n = 0; n < poolSize(q) && cand.length; n++) {
     const h = cand.splice(rng.int(0, cand.length - 1), 1)[0];
+    if (h.family && ids.some(id => HEADLINE.find(e => e.id === id)?.family === h.family)) { n--; continue; }
     if (NEW_IDS.has(h.id) && fresh >= newCap(q)) { n--; continue; }   // over the cap: draw again (the skipped one stays out)
     if (NEW_IDS.has(h.id)) fresh++;
     ids.push(h.id);

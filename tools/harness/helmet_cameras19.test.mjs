@@ -1,0 +1,32 @@
+// Install the shipped built-in mod and drive its real netReady/update render pass.
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import * as THREE from 'three';
+let definition;const warnings=[];
+const ctx=new Proxy({createImageData:(w,h)=>({data:new Uint8ClampedArray(w*h*4)}),createRadialGradient:()=>({addColorStop(){}})},{get:(o,k)=>o[k]||(()=>{})});
+vm.runInNewContext(fs.readFileSync(new URL('../../public/mods/helmet-cameras.js',import.meta.url),'utf8'),{KefalAPI:{defineMod:d=>definition=d},document:{createElement:()=>({getContext:()=>ctx})},console:{warn:(...args)=>warnings.push(args)}});
+const handlers=new Map();
+const api={THREE,FACILITY_Y:-800,SHIP:{h:3.4},enabled:()=>true,on:(e,fn)=>handlers.set(e,fn)};
+definition.init(api,{fps:6,resolution:'160x120',nightVision:true});
+const scene=new THREE.Scene(),ship=new THREE.Group();scene.add(ship);
+const camera=new THREE.PerspectiveCamera();camera.position.set(-5.6,2.75,-2.55);scene.add(camera);
+const root=new THREE.Group();scene.add(root);
+const remote={id:'peer',name:'Peer',pos:new THREE.Vector3(0,-850,0),root,pitch:0,yaw:0,hp:100,headPos:p=>p.copy(remote.pos)};
+const ambient=new THREE.AmbientLight(0x332211,.2),hemi=new THREE.HemisphereLight(0xffffff,0,.3);
+scene.fog=new THREE.FogExp2(0x778899,.01);
+const originalTarget={sentinel:true};let target=originalTarget,calls=0,throwRender=false,alias=false;
+const renderer={getRenderTarget:()=>target,setRenderTarget:t=>{target=t;},clear(){},render(s){calls++;s.traverseVisible(o=>{if(o.material?.map===target?.texture)alias=true;});assert.equal(alias,false,'feed draw must not sample its own color attachment');if(throwRender)throw Error('deliberate render failure');}};
+const game={scene,camera,ship:{group:ship},engine:{renderer},lights:{ambient,hemi},remotes:new Map([['peer',remote]]),player:{inShip:true,dead:false},run:{phase:'orbit',time:480}};
+handlers.get('netReady')(null,game);
+let screen;ship.traverse(o=>{if(o.material?.map?.isRenderTargetTexture)screen=o;});assert.ok(screen,'real monitor owns its native target texture');
+const color=ambient.color.clone(),fogColor=scene.fog.color.clone();
+const tick=()=>handlers.get('update')(.2,game);
+tick();
+assert.equal(alias,false);assert.equal(calls,1);assert.equal(screen.visible,true,'monitor visible for ordinary scene after feed');assert.equal(screen.parent.visible,true,'casing and overlay are not hidden');
+assert.equal(target,originalTarget);assert.equal(camera.visible,true);assert.equal(root.visible,true);assert.equal(ambient.intensity,.2);assert.ok(ambient.color.equals(color));assert.equal(scene.fog.density,.01);assert.ok(scene.fog.color.equals(fogColor));
+// A pre-hidden screen, camera and avatar must remain hidden, including the failure path.
+screen.visible=false;camera.visible=false;root.visible=false;throwRender=true;tick();
+assert.equal(warnings.length,1);assert.match(String(warnings[0][1]),/deliberate render failure/);assert.equal(calls,2);assert.equal(target,originalTarget);assert.equal(screen.visible,false);assert.equal(camera.visible,false);assert.equal(root.visible,false);assert.equal(ambient.intensity,.2);assert.ok(ambient.color.equals(color));assert.equal(scene.fog.density,.01);assert.ok(scene.fog.color.equals(fogColor));
+handlers.get('sessionEnd')();assert.equal(ship.children.length,0);
+console.log('helmet_cameras19: real built-in feed excludes own attachment and restores success/failure visibility, target and scene state');

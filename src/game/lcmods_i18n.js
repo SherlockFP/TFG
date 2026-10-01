@@ -2,6 +2,9 @@
 // dance-party,ship-radio,shift-awards}.js). Mods reach t()/tf() through KefalAPI.t / KefalAPI.tf; the MODS screen translates names,
 // descriptions and setting labels. installLcModsI18n(addTranslations) is idempotent and is called from src/mods/modapi.js.
 const TR = {
+  "Hold Scan": "Basılı Tutarak Tara",
+  "Hold the scan button to repeat normal scans. Release to stop; menus pause scanning.": "Normal taramaları tekrarlamak için tarama tuşunu basılı tut. Bırakınca durur; menüler taramayı duraklatır.",
+  "Seconds between scans": "Taramalar arası saniye",
   "The Algorithm Quotes You": "Algoritma Seni Alıntılıyor",
   "Opt-in. The Algorithm reads your own chat lines back on the intercom, with a snide caption. Host memory only, peers only, nothing is saved. Being quoted 8 times unlocks a secret suit.": "İsteğe bağlı. Algoritma kendi sohbet satırlarını telsizden alaycı bir altyazıyla geri okur. Sadece ev sahibinin belleğinde, sadece ekip arasında, hiçbir şey kaydedilmez. 8 kez alıntılanmak gizli bir kıyafetin kilidini açar.",
   "Avg seconds between quotes": "Alıntılar arası ort. saniye",
@@ -55,6 +58,9 @@ const TR = {
   "lines": "satır",
 };
 const RU = {
+  "Hold Scan": "Удержание сканирования",
+  "Hold the scan button to repeat normal scans. Release to stop; menus pause scanning.": "Удерживайте кнопку сканирования для повторения обычных сканирований. Отпустите для остановки; меню приостанавливают сканирование.",
+  "Seconds between scans": "Секунд между сканированиями",
   "The Algorithm Quotes You": "Алгоритм цитирует тебя",
   "Opt-in. The Algorithm reads your own chat lines back on the intercom, with a snide caption. Host memory only, peers only, nothing is saved. Being quoted 8 times unlocks a secret suit.": "По желанию. Алгоритм зачитывает твои же строки из чата по интеркому с ехидной подписью. Только в памяти хоста, только для команды, ничего не сохраняется. 8 цитат открывают секретный костюм.",
   "Avg seconds between quotes": "Среднее число секунд между цитатами",

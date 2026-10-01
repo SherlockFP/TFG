@@ -1,3 +1,9 @@
+# Latest quality direction — waves19–20
+
+The independent Wave19 slice is **7.8/10**, up from7.7, with [review](wave19/REVIEW.md) and browser boundaries in [playtest](wave19/PLAYTEST.md). Real GPU framebuffer feedback came from the built-in helmet-camera monitor sampling its own render target; hiding only that screen during its feed render fixes the actual reproduced error. This is not a universal hardware stutter claim. Native ship stairs, worker contrast, downed-target safety and station selection also improved.
+
+Wave20 adds two authored destinations, warned optional darkness collapse, original rare creatures, physical manual cargo pushing and held scanning. Content earns its place through routes and counterplay rather than catalogue size. The final independent Wave20 slice is **7.9/10**; its evidence and limits belong to [Wave20 review](wave20/REVIEW.md). Remaining priorities are dark-surface separation, station/nearby-target competition, inherited nav corner clearance and simplifying dense optional prompts. Human retention and broad hardware performance remain unmeasured.
+
 # Honest critique log (updated every development round)
 
 ## Wave 18 snapshot (2026-09-30)

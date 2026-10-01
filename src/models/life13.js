@@ -4,28 +4,31 @@ import { parts18 } from './life18_shapes.js';
 export function createCitizen13(kind=0){
  const root=new THREE.Group();root.name='alien-citizen13';
  const style=kind%3,materials={
-  cloth:new THREE.MeshLambertMaterial({color:[0x8c795d,0x777774,0x4b535e][style]}),
-  dark:new THREE.MeshLambertMaterial({color:0x282c30}),
-  shell:new THREE.MeshLambertMaterial({color:[0xaaa18d,0x8b8a82,0x777d83][style]}),
-  glove:new THREE.MeshLambertMaterial({color:0xaaa596}),
+  cloth:new THREE.MeshLambertMaterial({color:[0xaa9371,0xaaa79a,0x747d8b][style]}),
+  dark:new THREE.MeshLambertMaterial({color:0x34363a}),
+  shell:new THREE.MeshLambertMaterial({color:[0xc4bba6,0xb0aea4,0xa1a7ad][style]}),
+  glove:new THREE.MeshLambertMaterial({color:0xd0c6b0}),
   screen:new THREE.MeshLambertMaterial({color:0x111519,emissive:0x211b10,emissiveIntensity:.035}),
   pixel:new THREE.MeshLambertMaterial({color:0xc9ba91,emissive:0xad8044,emissiveIntensity:.06}),
  };
- materials.cloth.userData.wear18=true;
+ // Separate jacket/trouser/pocket values survive ordinary exposure without adding mesh batches.
+ materials.trouser=new THREE.MeshLambertMaterial({color:[0x929386,0x7b8289,0xa2a097][style]});
+ materials.pocket=new THREE.MeshLambertMaterial({color:materials.cloth.color.clone().multiplyScalar(.84)});
+ for(const key of ['cloth','trouser','pocket','shell'])materials[key].userData.wear18=true;
  materials.vertex=new THREE.MeshLambertMaterial({color:0xffffff,vertexColors:true});
  for(const material of Object.values(materials))material.flatShading=true;
  const rig=new THREE.Group();root.add(rig);
  const pivot=(name,x,y,z=0)=>{const g=new THREE.Group();g.name=name;g.position.set(x,y,z);rig.add(g);return g;};
  const torso=pivot('worker-jacket',0,.94),body=parts18(torso,materials);
  body.box('cloth',.58,.62,.37,0,.13,0);
- body.box('cloth',.47,.3,.32,0,-.26,0);
+ body.box('trouser',.47,.3,.32,0,-.26,0);
  body.box('dark',.6,.075,.39,0,-.1,.005); // utility belt
  body.box('shell',.09,.07,.035,0,-.1,.219);
  // Jacket placket, chest pockets, shoulders and overall suspenders.
  body.box('dark',.027,.43,.015,0,.2,.197);
  for(const x of [-.18,.18]){
   body.box('shell',.055,.43,.025,x,.19,.193);
-  body.box('cloth',.15,.14,.04,x,.16,.219);
+  body.box('pocket',.15,.14,.04,x,.16,.219);
   body.box('glove',.075,.025,.015,x,.23,.247);
  }
  body.box('dark',.32,.43,.18,0,.13,-.265); // small battery/survey pack
@@ -68,7 +71,7 @@ export function createCitizen13(kind=0){
  const legs=[],arms=[];
  for(const sign of [-1,1]){
   const leg=pivot(sign<0?'left-leg':'right-leg',sign*.15,.65),p=parts18(leg,materials);
-  p.box('cloth',.225,.43,.245,0,-.19,0);
+  p.box('trouser',.225,.43,.245,0,-.19,0);
   p.box('dark',.24,.13,.25,0,-.34,.0); // articulated knee/boot gaiter
   p.box('dark',.26,.17,.37,0,-.545,.06);
   p.box('shell',.23,.055,.12,0,-.53,.205); // reinforced toe

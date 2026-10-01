@@ -7,6 +7,8 @@ import { sanitize, aboardVolumes } from './shipyard_core.js';
 import { SHIP } from '../world/ship.js';
 import { BIOMES } from './moons.js';
 import { WorldMarker } from '../render/br_fx.js';
+import { insideShip } from '../world/ship.js';
+import { attentionHot } from '../ui/hud_attention.js';
 const words = {
  'No vessel selected':['Gemi seçilmedi', 'Корабль не выбран'],
  'Selected vessel: {name}':['Seçilen gemi: {name}', 'Выбранный корабль: {name}'],
@@ -31,6 +33,7 @@ const words = {
  'Claim a free ship at the fleet office ({n} m)':['Gemi ofisinden ücretsiz bir gemi al ({n} m)', 'Забери бесплатный корабль в доковом офисе ({n} м)'],
  'Waiting for the host to dispatch the selected vessel.':['Hostun seçilen gemiyi yola çıkarması bekleniyor.', 'Ожидаем отправления выбранного корабля ведущим.'],
  'Waiting for the host to choose a vessel.':['Hostun gemi seçmesi bekleniyor.', 'Ожидаем выбора корабля ведущим.'],
+ 'SHIP ENTRY':['GEMİ GİRİŞİ', 'ВХОД НА КОРАБЛЬ'],
  'DEPARTURE':['KALKIŞ', 'ОТПРАВЛЕНИЕ'],
  'FLEET OFFICE':['GEMİ OFİSİ', 'ДОКОВЫЙ ОФИС'],
  'Board {name}':['{name} gemisine bin', 'Подняться на {name}'],
@@ -54,7 +57,7 @@ const words = {
 addTranslations(Object.fromEntries(Object.entries(words).map(([k,v])=>[k,v[0]])));
 addTranslations(Object.fromEntries(Object.entries(words).map(([k,v])=>[k,v[1]])), 'ru');
 export function installFleet13(game) {
- const offs=[], restores=[]; let disposed=false, marker=null, markerKey='';
+ const offs=[], restores=[]; let disposed=false, marker=null, markerKey=''; const entryBudget=new Map();
  const docked=()=>game.run?.phase==='orbit' && game.run?.fleet13?.docked===true;
  const wrap=(obj,key,fn)=>{const old=obj[key]; if(typeof old!=='function')return; const next=fn(old);obj[key]=next;restores.push(()=>{if(obj[key]===next)obj[key]=old;});};
  const near=(from,at,r)=>{const p=from===game.selfId?game.player?.pos:game.remotes.get(from)?.pos;return p && Math.hypot(p.x-at[0],p.y-at[1],p.z-at[2])<r;};
@@ -148,11 +151,15 @@ export function installFleet13(game) {
  });
  offs.push(game.mods.on('update',(dt,g)=>{
   if(g!==game)return;
-  if(!docked()||!game.isHost||game.player.dead||game.player.downed){marker?.dispose();marker=null;markerKey='';return;}
-  const key=game.run.fleet13.selected?'board':'broker';
-  const target=new THREE.Vector3(...(key==='board'?HUB13_BOARD:HUB13_BROKER));
-  if(key!==markerKey){marker?.dispose();marker=null;markerKey=key;if(typeof document!=='undefined')marker=new WorldMarker('', '#72e3d6', 14);}
-  if(marker){const label=t(key==='board'?'DEPARTURE':'FLEET OFFICE');if(!marker.update(dt,game.camera,target,label))marker=null;}
+  const entry=!docked()&&!!game.world?.moonId&&['moon','company'].includes(game.run?.phase)&&!insideShip(game.player.pos);
+  const nearby=entry&&!game.player.indoor&&Math.abs(game.player.pos.y)<12&&Math.hypot(game.player.pos.x-SHIP.door.x,game.player.pos.z-SHIP.z1)<24;
+  if(game.player.dead||game.player.downed||attentionHot(game)||(!docked()&&!nearby)||(docked()&&!game.isHost)){marker?.dispose();marker=null;markerKey='';return;}
+  const landing=`entry:${game.run.moon}:${game.world?.seed}:${game.run.day}:${game.run.fleet13?.selected||'courier'}`;
+  const key=entry?landing:(game.run.fleet13.selected?'board':'broker');
+  const target=entry?new THREE.Vector3(SHIP.door.x,.6,SHIP.z1+.3):new THREE.Vector3(...(key==='board'?HUB13_BOARD:HUB13_BROKER));
+  if(entry&&entryBudget.get(key)<=0)return;
+  if(key!==markerKey){marker?.dispose();marker=null;markerKey=key;if(typeof document!=='undefined')marker=new WorldMarker('', entry?'#d9c8a0':'#72e3d6', entry?(entryBudget.get(key)??14):14);if(entry){if(!entryBudget.has(key))entryBudget.set(key,14);if(entryBudget.size>32)entryBudget.delete(entryBudget.keys().next().value);}}
+  if(marker){const label=t(entry?'SHIP ENTRY':key==='board'?'DEPARTURE':'FLEET OFFICE');const visible=marker.update(dt,game.camera,target,label);if(entry)entryBudget.set(key,Math.max(0,marker.life));if(!visible)marker=null;}
  }));
  offs.push(game.mods.on('phase',(ph,g)=>{if(g!==game||ph!=='orbit'||!game.isHost||game.run.fleet13)return;game.run.fleet13=sanitizeFleet13({...game.profile.fleet13,docked:true});persist();arrive();for(const id of game.remotes.keys())game.net.sendTo(id,'tp',{p:HUB13_SPAWN,yaw:Math.PI});}));
  offs.push(game.mods.on('registerHandlers',(H,g)=>{if(g!==game)return;H('f13act',(d,from)=>{

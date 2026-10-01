@@ -116,3 +116,9 @@ interaction anchors, attack warnings and bounded merged draw batches when replac
 Original authored assets retain a reproducible source. `tools/blender/dockmaster18.py` generates the
 fleet service GLB; boot preloads it before entering a session. Map instances own their cloned geometry
 and materials so travel cannot invalidate the reusable asset template.
+
+## Wave20 authored facilities
+
+Thread Archive turns threaded conversations into a central reading trunk, branching reply chambers and returning loops. Buffer Foundry turns upload buffering into twin processing lanes, sorting hall and outer service bypass. Materials remain matte, muted industrial PSX surfaces with small amber indicators; landmarks add no lights. Darkness collapse is failing neglected infrastructure: a warned optional ceiling passage with another exit, rather than arbitrary lethal room destruction.
+
+Tracking Pixel is a faceted surveillance scavenger drawn to visibly carried content; Buffer Brute is a heavy processing worker drawn to noise. Clothing, terminal silhouettes, short mechanical tells and original audio belong to the dead-internet setting. Native loose-cargo pushing adds physical cooperation without copying REPO creatures or its assets.

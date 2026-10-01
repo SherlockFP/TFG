@@ -70,8 +70,14 @@ export function planBroadcast18({moon,terrain,plan}) {
   const console={x:gate.x-nx*3.2-tx*1.8,z:gate.z-nz*3.2-tz*1.8};console.y=height(console.x,console.z)+1.3;
   const shortcutDoor=Object.freeze({pos:freezePoint({x:gate.x,y:baseY+gateH/2,z:gate.z}),size:Object.freeze([.28,gateH,4.4]),rotY,baseY});
   const groundPoint=p=>freezePoint({x:p.x,y:height(p.x,p.z)+.1,z:p.z});
+  let replayAnchor=null,replayApproach=null;
+  replaySearch:for(const b of buildings.filter(b=>b.type==='transmitter'||b.type==='reel-house').sort((a,b)=>(a.type==='transmitter'?-1:1)-(b.type==='transmitter'?-1:1)))for(const along of [0,-b.w*.25,b.w*.25,-b.w*.38,b.w*.38])for(const setback of [1.7,2.5,3.3,4.5,5.5]){
+    const across=-b.side*(b.d/2+setback),p={x:b.x+b.tx*along+b.nx*across,z:b.z+b.tz*along+b.nz*across},a={x:p.x-b.nx*b.side*1.8,z:p.z-b.nz*b.side*1.8};
+    if(safe(p.x,p.z,1.5)&&safe(a.x,a.z,.5)&&routeClear(p,a,.55)&&Math.abs(height(p.x,p.z)-height(a.x,a.z))<1){replayAnchor=p;replayApproach=groundPoint(a);break replaySearch;}
+  }
+  const replayControl=replayAnchor?freezePoint({...replayAnchor,y:height(replayAnchor.x,replayAnchor.z)+1.25}):null;
   const mainReturn=Object.freeze(path.map(groundPoint));
-  const result={name:'Relay Ward',console:freezePoint(console),shortcutDoor,
+  const result={name:'Relay Ward',console:freezePoint(console),shortcutDoor,replayControl,replayApproach,
     serviceEntry:groundPoint(entry),serviceExit:groundPoint(exit),serviceRoute:Object.freeze([groundPoint(a),groundPoint(entry),groundPoint(gate),groundPoint(exit),groundPoint(b)]),
     waypoints:Object.freeze({approach:groundPoint(at(.15)),street:groundPoint(at(.4)),relay:groundPoint(at(.6)),entrance:groundPoint(path.at(-1)),console:freezePoint(console)}),
     mainReturn,mainEntry:groundPoint(a),mainExit:groundPoint(b),basepoints:Object.freeze(buildings.map(p=>groundPoint(p))),buildings:Object.freeze(buildings),axis:Object.freeze({tx,tz,nx,nz}),entry:Object.freeze(entry),exit:Object.freeze(exit)};
@@ -80,6 +86,7 @@ export function planBroadcast18({moon,terrain,plan}) {
 /** Reserve only authored foundations and passage, so ordinary seeded scatter cannot spawn rocks inside them. */
 export function broadcast18Reserved(plan,x,z,m=0) {
   if(!plan)return false;
+  if(plan.replayControl&&Math.hypot(x-plan.replayControl.x,z-plan.replayControl.z)<3+m)return true;
   if(plan.buildings.some(b=>Math.hypot(x-b.x,z-b.z)<Math.hypot(b.w,b.d)/2+1.5+m))return true;
   return segmentDistance(x,z,plan.entry,plan.exit)<4.5+m || segmentDistance(x,z,plan.mainEntry,plan.entry)<2.5+m || segmentDistance(x,z,plan.exit,plan.mainExit)<2.5+m;
 }
@@ -137,9 +144,20 @@ export function buildBroadcast18({plan,terrain,group:parent,physics}) {
   const c=plan.console;solid('m:metal_dark',c.x,c.y-.72,c.z,.48,1.05,.45,gate.rotY);
   B.rbox('m:metal_plate',c.x,c.y,c.z,.75,.42,.18,gate.rotY);
   B.rbox('g:647e68',c.x,c.y,c.z,.55,.17,.2,gate.rotY);
+  const rc=plan.replayControl;
+  if(rc){solid('m:metal_dark',rc.x,rc.y-.65,rc.z,.5,.95,.5);B.rbox('m:metal_plate',rc.x,rc.y,rc.z,.8,.4,.45,0);B.rbox('m:metal_dark',rc.x,rc.y+.27,rc.z,.5,.12,.35,0);}
+  // Twin exposed tape reels belong to the physical transmitter control, not a floating screen.
+  if(rc)for(const side of [-1,1]){
+    const center=new V(rc.x+side*.19,rc.y+.34,rc.z);
+    for(let k=0;k<8;k++){const a=k*Math.PI/4,b=(k+1)*Math.PI/4,p=center.clone().add(new V(Math.cos(a)*.16,0,Math.sin(a)*.16)),q=center.clone().add(new V(Math.cos(b)*.16,0,Math.sin(b)*.16));B.gb.quad('m:metal_plate',center,q,p,center,[[0,0],[1,0],[1,1],[0,0]]);}
+    B.rbox('m:metal_dark',center.x,center.y+.015,center.z,.055,.035,.055,0);
+  }
   const staticMeshes=B.build('relay-ward18-static');staticMeshes.traverse(o=>{if(o.material){o.material=o.material.clone();materials.add(o.material);}});
   const gateMesh=new THREE.Mesh(new THREE.BoxGeometry(...gate.size),new THREE.MeshLambertMaterial({color:0x566770}));gateMesh.position.copy(gate.pos);gateMesh.rotation.y=gate.rotY;group.add(gateMesh);materials.add(gateMesh.material);
   const gateIndicator=new THREE.Mesh(new THREE.BoxGeometry(.06,.18,3.8),new THREE.MeshBasicMaterial({color:0x66886f}));gateIndicator.rotation.y=gate.rotY;gateIndicator.position.copy(gate.pos);gateIndicator.position.y=gate.baseY+gate.size[1]-.3;group.add(gateIndicator);materials.add(gateIndicator.material);
+  let replayIndicator=null;
+  if(rc){replayIndicator=new THREE.Mesh(new THREE.BoxGeometry(.84,.06,.49),new THREE.MeshBasicMaterial({color:0x687a80}));replayIndicator.position.copy(rc);replayIndicator.position.y+=.23;group.add(replayIndicator);materials.add(replayIndicator.material);}
+  const setReplay=stage=>{if(!disposed&&replayIndicator)replayIndicator.material.color.setHex(({warning:0xb38a48,live:0xd1a15a,spent:0x493e3a,idle:0x687a80})[stage]||0x687a80);};
   function setPowered(on) {
     if(disposed)return;powered=!!on;
     if(powered) {if(gateCollider){physics.removeCollider(gateCollider);gateCollider=null;}gateMesh.position.y=gate.pos.y+gate.size[1]+.25;gateIndicator.material.color.setHex(0x66886f);}
@@ -150,5 +168,5 @@ export function buildBroadcast18({plan,terrain,group:parent,physics}) {
     return !(Math.abs(x)<gate.size[0]/2+radius+.15&&Math.abs(z)<gate.size[2]/2+radius+.15&&pos.y<gate.pos.y+gate.size[1]/2+.1&&pos.y+height>gate.baseY-.1);
   }
   setPowered(true);
-  return {plan,group,setPowered,canClose,get gateCollider(){return gateCollider;},get powered(){return powered;},dispose(){if(disposed)return;disposed=true;if(gateCollider)physics.removeCollider(gateCollider);gateCollider=null;for(const col of colliders)physics.removeCollider(col);colliders.length=0;group.removeFromParent();group.traverse(o=>o.geometry?.dispose());for(const material of materials)material.dispose();}};
+  return {plan,group,setPowered,setReplay,canClose,get gateCollider(){return gateCollider;},get powered(){return powered;},dispose(){if(disposed)return;disposed=true;if(gateCollider)physics.removeCollider(gateCollider);gateCollider=null;for(const col of colliders)physics.removeCollider(col);colliders.length=0;group.removeFromParent();group.traverse(o=>o.geometry?.dispose());for(const material of materials)material.dispose();}};
 }

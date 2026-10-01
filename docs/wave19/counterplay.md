@@ -1,0 +1,11 @@
+# Wave19 counterplay audit
+
+Line Printer and Checksum previously selected incapacitated players. Their custom windups call the native late attack path, so a player becoming downed during an already visible warning could still receive another strike. The two machine behaviors now exclude both the replicated downed flag and the authoritative downed registry. Dead, ship and safe-zone exclusions remain. Revival restores ordinary targeting; this does not grant invulnerability to living crew or change attack damage, timing, range, spawn budgets or rewards.
+
+The new counterplay19 harness builds the real seed1235 factory and Rapier world, waits four actual physics steps for geometry queries, and uses the native CreatureManager/HostCreature dispatch. A living noisy player naturally starts each warning, becomes incapacitated during it, and later revives. Before the fix the printer assertion failed with one hit against the incapacitated target. After the fix both machines skip that hit and later strike the living noisy player normally. The Checksum case also stops player noise during a genuine scan, observes safe recovery, then observes natural reacquisition. No AI state, LOS, hit or path result is forced; generated test placement and player-state changes are labelled setup, not browser input proof.
+
+Checksum's EN/TR/RU lore now describes the pulsing scanner lamp instead of a green scan, matching the neutral art palette and retaining a color-independent internet-horror rule: stop generating noise while the machine checks you. The existing scan/clear sounds and pulse remain, with no new lights or audio overhaul.
+
+Validation: counterplay19, threats13, escape14 and escape17 harnesses pass. Existing escape17 coverage includes actual character-controller navigation and native pursuit/search/retirement over five generated factory cases. No new browser combat or headphone feedback claim is made. Warden challenge timing, one attempt, genuine initial sight, continuous unseen search and single physical recording remain unchanged.
+
+Ownership: threats13 behavior/lore and counterplay19 regression only. The other lane's proposed physical transmitter distraction should use ordinary native noise; Checksum currently responds to player noise/voice directly, so it must not be advertised as guaranteed distraction for every species.

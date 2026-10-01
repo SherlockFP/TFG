@@ -105,10 +105,13 @@ export function buildShip({ physics, lightPool, scene }) {
   }
   // door frame outside + steps
   gb.box('hazard_stripes', S.door.x, S.door.height + 0.12, S.z1 + 0.28, S.door.width + 0.4, 0.24, 0.1, 0.6);
-  const steps = [[0.0, S.z1 + 0.7], [-0.4, S.z1 + 1.1], [-0.8, S.z1 + 1.5]];
+  // First outdoor rise must stay below the native .42m autostep (dock ground: -1.25).
+  const steps = [[0.0, S.z1 + 0.7], [-0.3, S.z1 + 1.1], [-0.6, S.z1 + 1.5], [-0.9, S.z1 + 1.9]];
   for (const [sy, sz] of steps) {
     gb.box('metal_grate', S.door.x, sy - 0.1, sz, S.door.width + 0.4, 0.2, 0.5, 0.6);
     box(S.door.x, sy - 0.1, sz, S.door.width + 0.4, 0.2, 0.5);
+    // Painted leading edges make the real usable threshold readable without extra lights.
+    gb.box('metal_light', S.door.x, sy + .008, sz + .21, S.door.width + .25, .012, .045, .85);
   }
   // antenna + light on roof
   gb.box('metal_dark', S.x0 + 0.15, eh + 0.9, S.z0 + 0.1, 0.08, 1.8, 0.08, 0.5);   // [shipdeck] moved to the nose corner (the tail roof holds the mounts)
