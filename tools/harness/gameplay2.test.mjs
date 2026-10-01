@@ -127,5 +127,14 @@ ok(Object.values(cnt).every((n) => n <= 2) && Object.keys(cnt).length === 8, 'te
 ok(A.pickRerollRole('scout', ['medic', 'hauler', null], () => 0) !== 'scout' && !['medic', 'hauler'].includes(A.pickRerollRole('scout', ['medic', 'hauler'], () => 0.9)), 'reroll: new role, not held by the crew');
 ok(A.pickRerollRole('scout', all.filter((r) => r !== 'scout'), () => 0) !== 'scout', 'reroll falls back when every role is held');
 
+// Actual registered isolated-mode actors cannot enter permanent identification through any native path.
+const {installIdentify}=await import('../../src/game/identify.js'),{registerDeadletter24Actors,DL24_TYPES}=await import('../../src/game/deadletter24_combat.js'),{Emitter}=await import('../../src/core/events.js'),THREE=await import('three');
+const nativeMsgs=[],nativeRequests=[];let nativeXp=0,nativeSaves=0;
+const identGame={selfId:'self',profile:{bestiary:{}},mods:new Emitter(),creatures:{host:new Map(),views:new Map()},aiPlayerById:()=>({pos:new THREE.Vector3()}),net:{broadcast:(...m)=>nativeMsgs.push(m),request:(...m)=>nativeRequests.push(m)},progress:{addXp:n=>nativeXp+=n,save:()=>nativeSaves++}};
+const undoActors=registerDeadletter24Actors(identGame),nativeIdent=installIdentify(identGame),profileBefore=JSON.stringify(identGame.profile);
+for(const type of DL24_TYPES){const actor={id:type,type,def:CREATURES[type],pos:new THREE.Vector3(),dead:false};identGame.creatures.host.set(type,actor);ok(!gated(actor),'mode actor has no misleading scan label '+type);ok(nativeIdent.request(actor,'photo')===false,'native photo request rejects permanent mode identify');nativeIdent.hostIdent({ty:type,cid:type,via:'photo'},'self');ok(nativeIdent.mark(type,'self',true)===false,'direct native mark rejects mode actor');nativeIdent.onMsg({k:'ident',ty:type,by:'self'});nativeIdent.onMsg({k:'known',list:[type]});}
+ok(nativeMsgs.length===0&&nativeRequests.length===0,'forged/direct photo produces no identify network side effects');ok(JSON.stringify(identGame.profile)===profileBefore&&nativeXp===0&&nativeSaves===0,'delayed native identify packets cannot persist mode bestiary or XP');
+ok(nativeIdent.mark('hound','self',true)===true&&nativeXp>0&&identGame.profile.bestiary.hound.id,'ordinary campaign identification remains functional');nativeIdent.dispose();undoActors();
+
 console.log(`gameplay2 test: ${checks - fails}/${checks} checks passed`);
 process.exit(fails ? 1 : 0);

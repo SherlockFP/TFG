@@ -1,8 +1,12 @@
-# Lead tools (multi-agent merge workflow)
+# TFG lead workflow — current cloud checkout
 
-- `merge_agent.sh <branch> <module> [test files...]` — merge a finished agent worktree branch, auto-resolve `.md` conflicts (union) and `src/game/game.js` slot conflicts, drop leftover placeholders, `node --check` changed files, run the given `tools/harness/<test>` files, `npm run build`, then push to the work branch AND `main`. Stops (exit 1) on any real code conflict or failure — resolve by hand, `git add`, then re-run with an empty branch: `merge_agent.sh "" <module> tests...`.
-  - NOTE: pushes to `main` (the owner's rule: everything goes to main; Render deploys main). The commit trailer inside is this session's; update it for a new session.
-- `union_md.py <file>` — resolve git conflict markers in a Markdown file by keeping both sides.
-- `resolve_gamejs.py` — resolve `game.js` conflicts: keep HEAD, put the agent's `import { installX }` / `this.useModule('X', ...)` lines into their `// [import:X]` / `// [slot:X]` placeholders.
-- `agent_rules.txt` + `agent_test_rules.txt` — the shared rules given to every Sonnet sub-agent (module pattern, net prefixes, i18n, UI, budget, docs, commit-don't-push; short batched browser tests). Point each agent at them in its prompt.
-See `docs/HANDOFF.md` §6 for the whole workflow.
+The authoritative process is [docs/GAUNTLET.md](../../docs/GAUNTLET.md), updated2026-10-01. Start with the current cloud preface in AGENTS.md/CLAUDE.md, not historical Windows or Claude worktree instructions.
+
+Agents share /workspace/TFG. Assign file/function ownership before editing. One independent browser owner uses /tmp/tfg-browser.lock; root owns combined review, commit and the already-authorized main push. Scope work by player behavior and explicit acceptance, not by module count or a requested score.
+
+- agent_rules.txt: current shared implementation boundaries.
+- agent_test_rules.txt: current evidence, targeted checks and browser constraints.
+- merge_agent.sh: retired fail-fast entry point. It performs no Git/build/test/network mutation. The old hardcoded branch/session auto-push is no longer valid.
+- union_md.py / resolve_gamejs.py: retained historical helpers, not automatic conflict-resolution policy. Review real code and contradictory documentation manually.
+
+Node22: source /workspace/.tfg-tools/activate.sh. Run relevant npm test -- -j 4 <filters> and npm run build; HMR is off, so browser checks use fresh pages. See the Gauntlet document for source freeze, evidence labels, short justified bug reruns, full-first-floor acceptance and publication verification.

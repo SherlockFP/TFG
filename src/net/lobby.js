@@ -2,7 +2,7 @@
 // joins a shared discovery room; hosts announce their lobby info periodically.
 import { makeTransport } from './transport.js';
 
-export const GAME_VERSION = '0.12.0';   // isolated combat phase + private casino hands; reload older clients
+export const GAME_VERSION = '0.12.1';   // authoritative combat throw receipts; all peers reload together
 const DISCOVERY_ROOM = 'kefal-lobbies-v1';
 
 export class LobbyDirectory {

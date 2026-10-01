@@ -236,8 +236,13 @@ export function installAlgorithm(core) {
     st.q = OG.enqueue(st.q, { text, pri: rank < 2, cls, voice: d.voice || null, mood: d.mood || game.run?.algo?.mood, ctx, exp: st.t + OG.ttlOf(d) });
     if (rank < 2 && st.cur && OG.CLS[st.cur.cls] === 2) st.cur.dur = Math.min(st.cur.dur, st.cur.t + 0.6);   // a warning / lesson cuts a flavour line short
   }
+  const separateMode = () => game.deadletter24?.active?.() === true;
+  function pruneQueue() {
+    // Campaign speech keeps its context during the isolated mode; urgent lines retain native expiry/context checks.
+    st.q = separateMode() ? st.q.filter(line => line.cls !== 'danger' || OG.prune([line], st.t, tagsNow()).length) : OG.prune(st.q, st.t, tagsNow());
+  }
   function startNext(dangerOnly = false) {
-    st.q = OG.prune(st.q, st.t, tagsNow());
+    pruneQueue();
     const idx = dangerOnly ? st.q.findIndex(line => line.cls === 'danger') : 0;
     const n = idx < 0 ? null : st.q.splice(idx, 1)[0];
     if (!n) return;
@@ -274,13 +279,14 @@ export function installAlgorithm(core) {
   }
   function clientUpdate(dt) {
     const busy = game.ui?.fullscreenOpen?.();
-    const danger = routineAttentionBusy(game);
+    const danger = routineAttentionBusy(game) || separateMode();
     if (danger && st.cur && st.cur.cls !== 'danger') {
       st.q = OG.enqueue(st.q, st.cur);
+      if(separateMode()){const index=st.q.findIndex(line=>line.text===st.cur.text);if(index>=0){const [held]=st.q.splice(index,1);const firstRoutine=st.q.findIndex(line=>line.cls!=='danger');st.q.splice(firstRoutine<0?st.q.length:firstRoutine,0,held);}}
       st.el?.classList.remove('on'); st.cur = null;
       try { if (game.settings?.algoVoice) window.speechSynthesis?.cancel(); } catch { /* optional voice */ }
     }
-    if (st.q.length) st.q = OG.prune(st.q, st.t, tagsNow());   // [algoctx] stale / wrong-context lines never wait for their turn
+    if (st.q.length) pruneQueue();   // [algoctx] stale / wrong-context lines never wait for their turn
     if (!st.cur && st.q.length && !busy && (!danger || st.q.some(line => line.cls === 'danger')) && (st.q[0].pri || !(game.onboard?.fr?.busy?.() > 0))) startNext(danger);   // [qa] the Algorithm box waits for the arrival cards (soul / sector map / wave)
     const c = st.cur;
     if (c && st.el) {
@@ -463,6 +469,7 @@ export function installAlgorithm(core) {
 
   function update(dt) {
     st.t += dt;
+    if(separateMode()){for(const line of st.q)if(line.cls!=='danger'&&line.exp>0)line.exp+=dt;if(st.cur&&st.cur.cls!=='danger'&&st.cur.exp>0)st.cur.exp+=dt;}
     clientUpdate(dt);
     if (!game.isHost || !game.run) return;
     st.tickT -= dt;

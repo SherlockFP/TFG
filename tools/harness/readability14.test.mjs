@@ -59,6 +59,7 @@ events.get('itemState')({id:'remote-lamp',type:'flashlight',on:true});
 events.get('itemState')({id:'floor-lamp',type:'proflash',on:true});
 assert.equal(guide.tutorial().done,beforeLamp);assert.equal(guide.used('flashlight'),false);
 events.get('itemState')({id:'local-lamp',type:'flashlight',on:false});assert.equal(guide.tutorial().done,beforeLamp);
+let separateExpedition=true;guideGame.deadletter24={active:()=>separateExpedition};const beforeModeGuide=JSON.stringify(guide.tutorial());let modeGuideRows=[];events.get('objectives')((...args)=>modeGuideRows.push(args),guideGame,'deadletter');assert.equal(modeGuideRows.length,0);events.get('update')(120,guideGame);events.get('itemState')({id:'local-lamp',type:'flashlight',on:true});assert.equal(JSON.stringify(guide.tutorial()),beforeModeGuide,'mode event/poll cannot advance campaign tutorial');separateExpedition=false;delete guideGame.deadletter24;
 events.get('itemState')({id:'local-lamp',type:'flashlight',on:true});assert.equal(guide.tutorial().done,beforeLamp+1);assert.equal(guide.used('flashlight'),true);
 guide.dispose();
 
@@ -110,7 +111,12 @@ try {
  arrivalIntercom.show({text:'Optional salvage route.',cls:'teach'});arrivalIntercom.update(.1);assert.equal(arrivalIntercom.speaking,false,'actual installed intercom retains routine queue at lift arrival');
  arrivalIntercom.show({text:'Crew needs rescue.',cls:'danger'});arrivalIntercom.update(.1);assert.equal(arrivalIntercom.state.cur.cls,'danger','urgent intercom can pass deferred teaching');arrivalIntercom.update(10);
  cabinQuiet=false;arrivalIntercom.update(.1);assert.equal(arrivalIntercom.state.cur.text,'Optional salvage route.','same unread routine line resumes after leaving');delete wardGame.descent21;
- arrivalIntercom.dispose();
+ arrivalIntercom.dispose();wardGame.run.phase='company';let isolated=false;wardGame.deadletter24={active:()=>isolated};const modeIntercom=installAlgorithm({game:wardGame});
+ modeIntercom.show({text:'Welcome employee. Walk to the field broker.',cls:'teach',ctx:'company',ttl:2});modeIntercom.update(.1);assert(modeIntercom.speaking);
+ modeIntercom.show({text:'Choose a useful field tool.',cls:'teach',ctx:'company',ttl:2});isolated=true;wardGame.run.phase='deadletter';modeIntercom.update(100);assert.equal(modeIntercom.speaking,false);assert.equal(modeIntercom.state.q.length,2,'preexisting speech+queued campaign teaching survive mode context and original TTL');
+ modeIntercom.show({text:'Immediate rescue required.',cls:'danger',ctx:'any',ttl:2});modeIntercom.update(.1);assert.equal(modeIntercom.state.cur.cls,'danger');modeIntercom.update(10);assert.equal(modeIntercom.speaking,false,'danger duration still advances normally');assert.equal(modeIntercom.state.q.length,2);
+ isolated=false;wardGame.run.phase='company';modeIntercom.update(.1);const resumedText=modeIntercom.state.cur.text;assert.equal(resumedText,'Welcome employee. Walk to the field broker.','the actual already-speaking campaign tutorial resumes');modeIntercom.update(10);modeIntercom.update(.1);assert.notEqual(modeIntercom.state.cur?.text,resumedText,'suspended campaign line resumes only once');modeIntercom.dispose();isolated=false;wardGame.onboard={fr:{busy:()=>0}};const queuedDangerIntercom=installAlgorithm({game:wardGame});queuedDangerIntercom.show({text:'Archive clerks forgot your paperwork.',cls:'flavour',ctx:'company',ttl:20});queuedDangerIntercom.update(.1);assert(queuedDangerIntercom.speaking);queuedDangerIntercom.show({text:'Move away from immediate danger.',cls:'danger',ctx:'any',ttl:20});isolated=true;wardGame.run.phase='deadletter';wardGame.onboard.fr.busy=()=>10;queuedDangerIntercom.update(.1);assert.equal(queuedDangerIntercom.state.cur.cls,'danger','already queued urgent line leads held flavor even during arrival budget');assert(queuedDangerIntercom.state.q.some(line=>line.text==='Archive clerks forgot your paperwork.'));queuedDangerIntercom.dispose();delete wardGame.onboard;delete wardGame.deadletter24;
+
 } finally {if(oldDoc===undefined)delete globalThis.document;else globalThis.document=oldDoc;}
 
 // Installed HUD: unchanged frames must not replace status text nodes or stable bars repeatedly.
@@ -144,3 +150,20 @@ h.toast('Recover downed crew','warn');assert.equal(shown.at(-1)[0],'Recover down
 assert.deepEqual(arrivalObjectives(h.game,rows).map(r=>r.text),['Evacuate','Emergency hint']);
 h.$.toasts.children=[];liftArrival=false;h.flushPending();assert.equal(shown.at(-1)[0],'Depth 2 / Tier 1. Quiet archive');assert.equal(h.pendingToasts.length,1);
 console.log('readability23: local presentation defers native routine queue, preserves urgent warning, releases unread cue');
+
+// Temporary mode must not record permanent Codex discoveries; prior native notifications retain queue pacing.
+const {installCollection}=await import('../../src/game/collection.js');
+const collectionHooks=new Map();let modeIntro=true;const collectionGame={profile:{},player:{indoor:true,dead:false},world:{seed:1,facility:{layout:{theme:'deadletter24'}}},run:{phase:'deadletter',moon:'deadletter24'},deadletter24:{presentationQuiet:()=>modeIntro},mods:{on(k,f){collectionHooks.set(k,f);return()=>collectionHooks.delete(k);}},ui:{toast:(...a)=>h.toast(...a)},progress:{save(){}}};
+h.game=collectionGame;h.pendingToasts=[];h.toastQ=[];h.$.toasts.children=[];h.nextFlush=0;const nativeCodex=installCollection(collectionGame);collectionHooks.get('update')(.1,collectionGame);assert.equal(h.pendingToasts.length,0,'temporary mode cannot emit a permanent Codex discovery');assert.equal(collectionGame.profile.codex.interiors.deadletter24,undefined);
+h.toast('Prior campaign notice','info');assert.equal(h.pendingToasts.length,1);h.toast('Recover crew','warn');assert.equal(shown.at(-1)[0],'Recover crew');h.$.toasts.children=[];modeIntro=false;collectionGame.run.phase='company';h.flushPending();assert.equal(h.pendingToasts.length,0);assert.equal(shown.at(-1)[0],'Prior campaign notice','same unread campaign notice resumes after mode');
+collectionGame.run.phase='moon';collectionGame.world.facility.layout.theme='office';collectionHooks.get('update')(.1,collectionGame);assert(collectionGame.profile.codex.interiors.office,'native campaign discovery resumes outside temporary mode');assert.match(shown.at(-1)[0],/Codex|Kodeks|Кодекс|interior/);nativeCodex.dispose();
+
+const modeGoalGame={player:{},deadletter24:{active:()=>true,presentationQuiet:()=>true}};const modeGoalRows=[...rows,{src:'deadletter24',kind:'main',text:'Dead Letter /1'},{src:'deadletter24',kind:'sub',text:'LMB: throw cards. R: change special.'}];assert.deepEqual(arrivalObjectives(modeGoalGame,modeGoalRows).map(r=>r.text),['Evacuate','Emergency hint','Dead Letter /1','LMB: throw cards. R: change special.'],'intro keeps its own2modecues while ordinarycampaign rowswait');
+
+// Objective collection→installed OneGoal display policy, not just producer row count.
+const {Emitter}=await import('../../src/core/events.js'),{installOneGoal}=await import('../../src/game/onegoal.js'),{Objectives}=await import('../../src/game/objectives.js');
+const policyMods=new Emitter();let modeActive=true,needRescue=false;const policyGame={mods:policyMods,profile:{},settings:{},player:{dead:false},run:{phase:'deadletter',moon:'deadletter24'},items:{inShipItems:()=>[]},deadletter24:{active:()=>modeActive,presentationQuiet:()=>false}};
+const modeObjectiveProducer=(add)=>{add('Dead Letter /1 /Archive entry','main');add(needRescue?'Recover crew [E]':'LMB: throw cards. R: change special.',needRescue?'warn':'sub');};modeObjectiveProducer._src='deadletter24';policyMods.on('objectives',modeObjectiveProducer);policyGame.onegoal=installOneGoal(policyGame);const objectiveTracker=Object.create(Objectives.prototype);objectiveTracker.game=policyGame;
+for(const density of ['standard','full'])assert.deepEqual(policyGame.onegoal.shown(objectiveTracker.compute(),density).map(l=>l.text),['Dead Letter /1 /Archive entry','LMB: throw cards. R: change special.']);
+assert.equal(policyGame.onegoal.shown(objectiveTracker.compute(),'minimal').length,1);needRescue=true;for(const density of ['standard','full','minimal'])assert.equal(policyGame.onegoal.shown(objectiveTracker.compute(),density)[0].text,'Recover crew [E]');
+modeActive=false;assert.deepEqual(policyGame.onegoal.shown(rows,'standard').map(l=>l.text),['Evacuate','Get scrap back to ship']);policyGame.onegoal.dispose();

@@ -145,6 +145,7 @@ export function stepProgress(p, dt, aiming, dur) {
 /** XP for the first identification of a type (per profile). */
 export const identifyXp = (stars) => 15 + 10 * clamp(stars | 0, 1, 5);
 /** creatures the scan label / aim read-out must NOT relabel (hazards keep their codes; mimics keep their disguise). */
+const cannotIdentify = (type, def) => !!(def?.noIdentify || CREATURES[type]?.noIdentify);
 export function gated(view) {
   return !!view && !view.def?.hazard && !view.def?.noScan && view.type !== 'mimic' && view.hType !== 'doppel' && view.type !== 'doppel';
 }
@@ -210,7 +211,7 @@ export function installIdentify(game, ctx = {}) {
 
   // ---------------------------------------------------------------- marking (every peer: host broadcast 'g2' {k:'ident'})
   function mark(type, by, quiet) {
-    if (!CREATURES[type] && !IDENT[type]) return false;
+    if (cannotIdentify(type) || (!CREATURES[type] && !IDENT[type])) return false;
     const first = !known(type);
     const b = bestiary();
     if (!b[type]) b[type] = { seen: true, kills: 0, at: Date.now() };
@@ -230,7 +231,7 @@ export function installIdentify(game, ctx = {}) {
   }
   /** ask the host to identify a creature (aim scan / photo). Returns false when the request was not sent. */
   function request(view, via = 'scan') {
-    if (!view || known(view.type) || st.pending.has(view.type)) return false;
+    if (!view || cannotIdentify(view.type,view.def) || known(view.type) || st.pending.has(view.type)) return false;
     st.pending.add(view.type);
     setTimeout(() => st.pending.delete(view.type), 3000);
     game.net?.request('g2', { op: 'ident', ty: view.type, cid: view.id, via });
@@ -241,7 +242,7 @@ export function installIdentify(game, ctx = {}) {
     const ty = String(d.ty || '');
     const c = game.creatures?.host?.get(String(d.cid));
     const pl = game.aiPlayerById?.(from);
-    if (!c || c.dead || c.type !== ty || !pl || pl.pos.distanceTo(c.pos) > (d.via === 'photo' ? 46 : 36)) return;
+    if (!c || cannotIdentify(ty,c.def) || c.dead || c.type !== ty || !pl || pl.pos.distanceTo(c.pos) > (d.via === 'photo' ? 46 : 36)) return;
     game.net.broadcast('g2', { k: 'ident', ty, by: from });
   }
   function onMsg(d) {

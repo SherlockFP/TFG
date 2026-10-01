@@ -53,7 +53,17 @@ export function installOneGoal(game) {
   return {
     emit, carriedValues, preview: () => OG.carryPreview(carriedValues()),
     /** the lines the HUD shows for a density ('full' = the whole list in priority order, max 7) */
-    shown(lines, dens) { const visible = encounterObjectives(game, lines); return dens === 'full' && !attentionHot(game) ? OG.sortAll(visible).slice(0, 7) : OG.resolve(visible, dens === 'minimal' ? 1 : 2); },
+    shown(lines, dens) {
+      const visible = encounterObjectives(game, lines);
+      if (game.deadletter24?.active?.()) {
+        const ordered = OG.sortAll(visible), warning = ordered.find(l => l.kind === 'warn');
+        const mode = visible.filter(l => l.src === 'deadletter24');
+        const header = mode.find(l => l.kind === 'main'), cue = mode.find(l => l.kind === 'sub');
+        const out = warning ? [warning, header].filter(Boolean) : [header, cue].filter(Boolean);
+        return out.slice(0, dens === 'minimal' ? 1 : 2);
+      }
+      return dens === 'full' && !attentionHot(game) ? OG.sortAll(visible).slice(0, 7) : OG.resolve(visible, dens === 'minimal' ? 1 : 2);
+    },
     sortAll: OG.sortAll,
     resolve: OG.resolve,
     /** quiet right now (chase / director peak)? */

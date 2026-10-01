@@ -1,7 +1,13 @@
-UPDATE from lead: the owner now wants you to TEST your work in the real game too (budget rule relaxed a bit). After your node tests + build pass:
-- Start your own dev server from YOUR worktree on your port: `npx vite --port PORT --strictPort > /tmp/vite-PORT.log 2>&1 &` and remember its PID (kill only that PID later; never pkill by pattern).
-- Run 1-3 short headless checks: `flock /tmp/tfg-browser.lock node tools/harness/headless.mjs --port PORT --script <your_script.js> --shot <out.png> --wait 4000` (script = body of an async fn; window.kefal.game exists; see tools/harness/smoke_land.js / wave2_*.js for examples). Exercise your feature programmatically (spawn/trigger it, call your module API, check for pageerrors, return key numbers). Look at the screenshot with the Read tool to sanity-check visuals.
-- Also run tools/harness/smoke_land.js once to prove nothing else broke. Zero new pageerrors required.
-- Save the script as tools/harness/wave4_<module>.js, commit it. Keep runs short; don't loop endlessly.
-- OWNER UPDATE: keep playtests SHORT and FAST. Max 2 headless runs total, each under ~2 minutes, no long loops/waiting. Prefer node tests. The browser lock is shared by ~18 agents — hold it as briefly as possible (never hold it while thinking/editing).
-- OWNER RULE (wave 8, strict): at most ONE new node test file per task (a few focused checks, not dozens), run ONLY the tests of the modules you touched, and at most ONE short headless run. Do not add test harness scripts for every feature. Quota matters more than coverage.
+CURRENT TFG TEST RULES — 2026-10-01
+The single authoritative procedure is docs/GAUNTLET.md. These rules replace the contradictory wave4/wave8 browser and test-count instructions.
+
+- Run focused tests for touched modules and real adjacent boundaries, then production build when source is stable. Extend meaningful existing coverage; default at most one new focused test file per task. Reversible visual edits do not require tests mirroring their implementation.
+- Native integration needs relevant real installers, Session local delivery, phases/unload, Rapier stepped geometry and resource cleanup. Inert mocks cannot prove reentrant installed callbacks or physical interaction selection.
+- Root runs final broad regression for shared Game/host/Session/lifecycle contracts; do not repeatedly run all tests while unchanged. Pin jobs to budget (normally -j4 here); never profile a browser concurrently with the broad CPU suite.
+- One assigned independent QA owner holds /tmp/tfg-browser.lock. Prepare helpers and assertions BEFORE opening the browser; fresh room/page after source freeze (HMRoff). Other agents do not run browsers.
+- Normal budget is one or two short bounded sessions. Declare a larger full-loop budget if needed. A reproduced bug authorizes an appropriate focused fresh retry after its fix; budget rules do not turn unverified work into a pass.
+- Label NATIVE_INTEGRATION / GUIDED_INPUT / VISUAL_REPLAY / BLIND_HUMAN / HARDWARE_PROFILE. Disclose setup positions, accelerated clocks/kills, source-guided routes and saved-profile fixtures. Never equate accelerated native kills with real browser combat or software WebGL with hardware FPS.
+- Use actual keyboard/mouse/E, selected prompt, native LOS/range and authoritative outcome. Alive/downed/pose/input/panel guards precede movement. No HP/XP/stage/deck/reward/AI writes to force a gameplay pass. Stop and report PARTIAL at death/obstruction/time/error.
+- Inspect rendered screenshots and computed CSS/layout. Capture pageerrors AND caught console/application/mod/runtime/WebGL errors. Do not silence warnings or change rendering solely to hide failures.
+- Every operation releases held input; finally closes only owned contexts/processes and releases the browser lock. Do not retain the lock while thinking, editing or waiting on agents.
+- Save bounded raw results in current PLAYTEST, distinguish fixed bugs/operator gaps/current limits, and give an independent qualified review. A score is not computed from feature/test count. Root owns combined verification and publication.

@@ -150,6 +150,11 @@ export function installCollection(game) {
   const st = { disposed: false, evalT: 2, landingKey: '', interiorKey: '', seenItems: new Set() };
   const offs = [];
   const save = () => game.progress?.save?.();
+  // Temporary expedition interiors must never become campaign discoveries, including
+  // transition frames where phase and facility replacement arrive separately.
+  const temporary = () => game.deadletter24?.active?.() || game.run?.phase === 'deadletter'
+    || !!game.world?.facility?.dl24Token;
+
 
   const payout = (m) => {
     const r = m.reward || {};
@@ -163,6 +168,7 @@ export function installCollection(game) {
 
   function evaluate() {
     const k = codexCounts(p);
+    if (temporary()) return k;
     p.codex.pct = k.pct;
     let changed = false;
     for (const m of MILESTONES) {
@@ -178,6 +184,7 @@ export function installCollection(game) {
 
   // ---- recorders
   const recordMoon = () => {
+    if (temporary()) return;
     const run = game.run;
     if (!run?.moon) return;
     const key = run.moon + ':' + run.seed + ':' + run.day;
@@ -193,6 +200,7 @@ export function installCollection(game) {
     save();
   };
   const recordInterior = () => {
+    if (temporary()) return;
     const fac = game.world?.facility;
     const theme = fac?.layout?.theme;
     if (!theme || !game.player?.indoor || game.player.dead) return;
@@ -206,6 +214,7 @@ export function installCollection(game) {
     save();
   };
   const recordScrap = (it) => {
+    if (temporary() || it?.type === 'dl24_cards' || String(it?.label || '').startsWith('dl24:')) return;
     if (!it?.def || !it.type || it.type === 'body' || it.soulbound || !isSellable(it.def)) return;
     if (st.seenItems.has(it.id)) return;
     st.seenItems.add(it.id);
@@ -231,7 +240,7 @@ export function installCollection(game) {
       if (ph === 'moon' || ph === 'company') recordMoon();
     }));
     offs.push(mods.on('update', (dt, g) => {
-      if ((g && g !== game) || st.disposed) return;
+      if ((g && g !== game) || st.disposed || temporary()) return;
       recordInterior();
       st.evalT -= dt;
       if (st.evalT <= 0 && !game.minigame) { st.evalT = 3; evaluate(); }

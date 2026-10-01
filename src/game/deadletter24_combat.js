@@ -9,7 +9,17 @@ const BASES=['scuttler','screamer','crawler','moderator'];
 const alive=M=>M.game.aiPlayers().filter(p=>!p.dead&&!p.downed&&!M.game.downed?.isDowned?.(p.id)&&p.zone==='in');
 function step(c,p,dt,M){const old=c.pos.clone();M.moveToward(c,p.pos,Math.min(.06,dt),c.def.run);const v=c.pos.clone().sub(old);if(v.lengthSq()<1e-8)return;
  c.data.shape ||=new RAPIER.Capsule(Math.max(.01,c.def.height/2-c.def.radius),c.def.radius);
- if(M.game.physics.world.castShape({x:old.x,y:old.y+c.def.height/2+.02,z:old.z},{x:0,y:0,z:0,w:1},{x:v.x,y:0,z:v.z},c.data.shape,.005,1,true,undefined,groups(0xffff,G.STATIC|G.DOOR))){c.pos.copy(old);c.path=null;c.repath=.6;}}
+ const physics=M.game.physics,origin={x:old.x,y:old.y+c.def.height/2+.02,z:old.z},rotation={x:0,y:0,z:0,w:1},filter=groups(0xffff,G.STATIC|G.DOOR);
+ const hit=physics.world.castShape(origin,rotation,{x:v.x,y:0,z:v.z},c.data.shape,.005,1,true,undefined,filter);if(hit){
+  c.pos.copy(old);
+  // Grid-smoothed paths can skim a divider. Retain only fully swept tangential
+  // movement, with at most two additional casts and the complete native body.
+  const axes=Math.abs(v.x)>Math.abs(v.z)?[{x:v.x,z:0},{x:0,z:v.z}]:[{x:0,z:v.z},{x:v.x,z:0}];
+  for(const a of axes){if(Math.hypot(a.x,a.z)<1e-7)continue;const n=hit.normal1,norm=Math.hypot(n?.x||0,n?.z||0);if(norm>1e-6){a.x+=n.x/norm*.002;a.z+=n.z/norm*.002;const length=Math.hypot(a.x,a.z),budget=Math.hypot(v.x,v.z);if(length>budget){a.x*=budget/length;a.z*=budget/length;}}if(physics.world.castShape(origin,rotation,{x:a.x,y:0,z:a.z},c.data.shape,.005,1,true,undefined,filter))continue;
+   const q=old.clone().add(new THREE.Vector3(a.x,0,a.z)),floor=physics.raycast(q.clone().add(new THREE.Vector3(0,1,0)),new THREE.Vector3(0,-1,0),1.2,G.STATIC|G.DOOR);
+   if(!floor||floor.normal.y<.7||Math.abs(floor.point.y-old.y)>.08)continue;if(physics.world.intersectionWithShape({x:q.x,y:q.y+c.def.height/2+.02,z:q.z},rotation,c.data.shape,undefined,filter))continue;c.pos.copy(q);return;}
+  c.path=null;c.repath=.6;
+ }}
 function actorAI(c,dt,M){if(!M.game.deadletter24?.active?.())return;const ps=alive(M),p=ps.find(p=>p.id===c.target)||ps.sort((a,b)=>a.pos.distanceToSquared(c.pos)-b.pos.distanceToSquared(c.pos))[0];
  if(!p){c.target=null;c.setState('idle');return;}c.target=p.id;
  if(c.state==='warning'){if(c.t>=1.3)c.setState('run');return;}
@@ -25,7 +35,7 @@ function actorAI(c,dt,M){if(!M.game.deadletter24?.active?.())return;const ps=ali
 let registered=false;
 export function registerDeadletter24Actors(game){if(!registered){registered=true;
  const defs=[['Unsent Clerk',36,9,3.0,.35,.7],['Null Sorter',65,13,2.7,.4,1.9],['Filing Auditor',95,18,2.5,.55,1.2],['Return Warden',420,24,2.1,.55,2.1]];
- defs.forEach(([name,hp,dmg,run,radius,height],i)=>registerCreature(DL24_TYPES[i],{name,hp,dmg,walk:run*.6,run,radius,height,zone:'in',power:1,xp:0,coin:0,noSpawn:true,boss:i===3,lore:'Raised arms and an amber circle warn before impact. Retreat around a sorting wall.'},actorAI));}
+ defs.forEach(([name,hp,dmg,run,radius,height],i)=>registerCreature(DL24_TYPES[i],{name,hp,dmg,walk:run*.6,run,radius,height,zone:'in',power:1,xp:0,coin:0,noSpawn:true,noScan:true,noIdentify:true,boss:i===3,lore:'Raised arms and an amber circle warn before impact. Retreat around a sorting wall.'},actorAI));}
  const registry=(typeof window!=='undefined'?window.__kefalMods?.creatureModels:null)||game.mods?.creatureModels;
  const ownership=[];DL24_TYPES.forEach((id,i)=>{const previous=registry?.get(id);const factory=(_THREE,opts)=>{const m=createCreatureModel(BASES[i],opts);const ring=new THREE.Mesh(new THREE.RingGeometry(.65,i===3?3.25:1.8,24),new THREE.MeshBasicMaterial({color:0xb88947,transparent:true,opacity:.32,side:THREE.DoubleSide,depthWrite:false}));ring.rotation.x=-Math.PI/2;ring.position.y=.045;ring.visible=false;m.root.add(ring);const update=m.update.bind(m),dispose=m.dispose.bind(m);let gone=false;m.update=(dt,a)=>{ring.visible=a.state==='windup';update(dt,{...a,state:a.state==='windup'?'attack':a.state==='warning'?'idle':a.state});};m.dispose=()=>{if(gone)return;gone=true;ring.geometry.dispose();ring.material.dispose();dispose();};return m;};registry?.set(id,factory);ownership.push({id,previous,factory});});return()=>{for(const {id,previous,factory}of ownership)if(registry?.get(id)===factory){if(previous)registry.set(id,previous);else registry.delete(id);}};
 }

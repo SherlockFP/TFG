@@ -1,19 +1,13 @@
-COMMON RULES (wave 4, repo TFG — browser co-op horror/RPG extraction game, Vite + three.js + Rapier + Trystero P2P):
-- First read CLAUDE.md, AGENTS.md §0 and §5.14 handoff, §7 Gotchas, and docs/MASTERPLAN.md sections relevant to you. Look at 2-3 existing wave-3 modules (e.g. src/game/cycle.js, src/game/worlds2.js, src/game/shipyard.js) and copy their idioms.
-- Module pattern: create src/game/<name>.js exporting install<Name>(game) returning an API object with dispose(). In src/game/game.js replace ONLY your own placeholders `// [import:<name>]` with `import { install<Name> } from './<name>.js';` and `// [slot:<name>]` with `this.useModule('<name>', install<Name>);`. Do not touch other slots/lines of game.js unless strictly needed.
-- Hook via game.mods.on(event, fn) (netReady, registerHandlers(H,g), phase, update, stats, interactables, useItem, objectives(add,g,phase), chat...). Networking is host-authoritative; game.net.on_(type, fn) keeps ONE handler per type → use unique message types prefixed with your module name. broadcast also delivers to sender. Deterministic RNG from src/core/rng.js for anything seeded; keep scene light count constant (use emissive materials / LightPool, never add THREE lights per object). Host timers via game.later.
-- All player-facing strings via t()/tf() from src/core/i18n.js with EN + TR + RU entries (see docs/wave2/i18n.md; tools/i18n_audit.mjs).
-- UI: avoid the generic "AI-looking" style — use the existing HUD/dock look (src/ui/dock.js hudDock, existing panel CSS), no emojis spam, no gradient-blob cards, no overlapping text; must work at 1280x720.
-- Budget: you are on a tight API budget. NO browser playtests / headless harness runs unless absolutely needed (at most one short run). Verify with: node --check on changed files, small node unit tests under tools/sim or a test file next to your module (run with node), and `npm run build`. NEVER rm -rf node_modules (it is shared; a symlink).
-- Keep scope tight, finish what you start; prefer fewer finished features over many half ones. Game goal: more fun, original (not a Lethal Company clone), fair early game.
-- When done: write docs/wave4/<name>.md (what, how to test, knobs, known gaps), add a short §5.16 entry in AGENTS.md and a line in docs/CRITIQUE.md, then `git add -A && git commit` on your worktree branch (message ends with the two trailer lines:
-Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_01AFt3mbxtTU1FfiT1N1A1YL). Do NOT push. Report back: commit hash, what was done, what is left, net message types you added.
+CURRENT TFG AGENT RULES — 2026-10-01 /workspace/TFG
+Authoritative workflow: docs/GAUNTLET.md. Read current AGENTS/CLAUDE prefaces, relevant module docs and docs/THEME.md. Historic Claude session, branch, trailers, model and worktree instructions are archived.
 
-LEAN MODE (token budget — mandatory, ponytail-style):
-- Before writing code ask: does this need to exist? Can an existing module/function/three.js feature do it? Reuse > extend > write new. Smallest diff that solves the task.
-- Read only what you need: Grep for symbols first, then Read with offset/limit around the hit. Never read whole large files (>400 lines) or generated/vendor files. Don't re-read files you already read.
-- Don't dump long command output: pipe tests/builds through `| tail -5`, grep for FAIL/error; never cat large logs or JSON.
-- No exploratory browser runs; at most the ONE allowed short run at the end.
-- Keep the final report SHORT (≤ 25 lines): commit hash, what was built (bullets), net types, tests run, what is NOT verified. No file-by-file prose.
-- If plain `git` is blocked in your worktree (rtk hook), call `/usr/bin/git` directly.
+- User-authorized agents share one checkout. Root assigns exact file or named-function ownership; coordinate shared APIs before edits. Do not overwrite another agent's work. Report conflicts instead of auto-unioning code/docs.
+- Root owns all Git staging, combined commit and authorized main push. No agent commits, pushes, deploys or invokes merge_agent.sh. Do not invent co-author/session trailers.
+- Prefer a small completed behavior change with a stated player hypothesis and acceptance. More content/tests do not establish a higher quality score. Avoid new compulsory meters or duplicate ledgers.
+- Preserve native host authority, exact item custody, wallets/quota/clock, legacy IDs/saves and phase/lifecycle cleanup. Session broadcast self-delivers synchronously; send does not. Tests must exercise relevant real installed callbacks.
+- Net callbacks use the existing one-handler-per-type rules; compose or use a unique prefix. Authenticate sender, phase, token/revision, sequence and bounded inputs. Do not accept client outcome/damage/reward claims.
+- Deterministic shared generation uses native RNG; game-owned timers use game.later. Resource ownership/dispose must be bounded and explicit.
+- PSX art: faceted matte workwear/CRT faces, charcoal/worn steel/dirty ivory/ochre and small authority accents. Preserve colliders/rigs/tells. No dynamic light-count changes or light.visible toggles; use existing pools and merged/cached geometry/atlases.
+- Player text is EN/TR/RU via native i18n. Use the existing panel/HUD style and contextual attention policy; urgent warnings and downed rescue remain higher priority. Verify small viewport readability.
+- Complete related native tests and write docs/wave<current>/<module>.md with exact behavior, evidence tags, knobs and limits. Root updates shared handoff/critique. Use agent_test_rules.txt for tests; only the assigned QA owner opens browsers.
+- Never remove shared node_modules or kill broad process patterns. Use the active Node runtime and only owned PID/context cleanup.

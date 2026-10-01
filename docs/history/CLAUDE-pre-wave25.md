@@ -1,0 +1,35 @@
+> **Wave24 continuation (2026-10-01):** implemented optional Dead Letter Run with personal three-card choices at every earned level, Common/Rare/Epic/Legendary tiers and rank1–5, three authored labyrinths plus normal exploration destinations, and native NPC blackjack/five-card poker in the staffed Card Archive. Start with `docs/wave24/README.md`, `mode.md`, `cards.md`, `labyrinths.md`, `casino.md`, `PLAYTEST.md` and `REVIEW.md`. Browser QA exposed recursive local run-state delivery during map unload; the mode now guards the whole build and tests real Cargo13/Fleet13 callbacks. Casino wallets now bind to native persistent profile PID for future reloads; unowned legacy wallets are preserved without guessing their owner. Game protocol is0.12.0; older clients must reload. Root owns the authorized combined main publication; confirm its final SHA from Git/remote. Preserve exact campaign custody, native wallets/authority, finite resources, optional mode access and honest test/score limits.
+
+> **Wave24 final verification:** frozen-source native regression245/245 in233s (-j4); production build2.62s; independent review8.0/10 from7.9. Actual two-peer casino actions, naturally earned personal card and exact15-item Company return passed. Final readable card image is a labelled replay of the earned offer. Boss/deep-floor combat and saved-hand browser reload remain outside browser proof. See current QA documents for fixtures and limits.
+
+> **Wave23 continuation (2026-10-01):** improve furnished depth-lift access, neutral PSX controls and calm arrival readability after the Wave22 7.9/10 review. Start with `docs/wave23/README.md`, `routes.md`, `readability.md`, `attention.md`, `PLAYTEST.md` and `REVIEW.md`. Fresh browser QA exposed stale Rapier queries during early state/interaction hooks; default lift placement now waits for the normal post-physics update, while certified streamed installation still makes no live queries or extra simulation step. Standing-body route certificates retain ordinary E-open door prerequisites and required locks. Urgent combat warnings stay separate from the short local transit/arrival presentation window. Full native regression after the placement timing fix: **238/238 in 370s**. A final malformed-certificate null guard then passed all21 native builder cases plus locked-ring coverage; publication build: **4.77s**. QA documents own the exact fresh two-peer result, fixture boundaries and independent score. Published starting baseline is `2380721`; root owns the authorized combined main publication, so confirm the final SHA from Git/remote. Preserve native custody/economy/host authority, finite assets, immediate system access and bounded resource ownership.
+
+> **Waves21–22 continuation (2026-10-01):** calmer first-surface admission, physical crew lifts through generated depth tiers, and a purchasable original PSX Echo Runner noise/explosive bot. Start with `docs/wave21/README.md`, `lifecycle.md`, `boundaries.md` and `docs/wave22/README.md`, `PLAYTEST.md`, `REVIEW.md`. Full native suite: 236/236 in 419s before final follow-ups; final source: 14/14 relevant files in 28s, including the new interaction-selector fixture; publication build: 3.38s. Final fixes cover delayed surface-item ghosts, shared cabin suppression of optional RPS/high-five/trade prompts, locked ordinary-door discovery and malformed runner charges. QA documents own exact fresh browser evidence and the independent score. Keep native custody/economy/host authority, finite themed assets and conservative surface chest/Horror no-reroll policy. Root owns authorized main publication; confirm SHA from Git/remote.
+
+> **Final Wave20 QA:** independent7.9/10. Fresh two-peer native portals, HoldScan release/menu, exact-ID cargo E/LMB/replication and shared darkness warning passed; runtime/page/feedback errors0. Charged-light recovery, camera-cut aiming, full interior walk and creature combat are not browser passes; native regressions cover the relevant mechanics. Final build3.75s; browser closed/lock released. See wave20 PLAYTEST/REVIEW before claiming broader results.
+
+> **Wave20 validation:** full227 groups:226 passed/one missing-profile failure in349s; corrected explicit new-theme atmos profiles pass the unchanged all-theme atmos12 test plus actual moon/creature checks (3/3). Final spawn/scan/replay boundary checks4/4; underground fleet cue and native boarding2/2. Read current wave20 docs for final build/browser result and honest scope limits.
+
+> **Wave20 continuation (2026-10-01):** owner additionally requested new labyrinths, darkness collapse, LC-style mod convenience and REPO-inspired original creatures/physics, then test/commit/push main. Read `docs/wave20/README.md`, `PLAYTEST.md` and `REVIEW.md` for final evidence. Explicit archive20/foundry20 destinations preserve old moon definitions/save generation. Root owns Git; no separate economy/physics ledger or copied commercial assets.
+
+# CLAUDE.md
+
+**Current cloud continuation (2026-10-01):** use `/workspace/TFG`; current authorization and workflow
+are at the top of `AGENTS.md`. Read `docs/wave19/README.md`, `RESEARCH.md` and `REVIEW.md` alongside
+`docs/THEME.md`. Node activation is `/workspace/.tfg-tools/activate.sh`; `npm test` runs the native
+regression suite. Historical Windows paths/model/session/branch instructions below are superseded
+by the current cloud handoff. Keep faceted, matte PSX industrial art and the Algorithm identity.
+
+**If the owner just types "devam" (continue): read `docs/session/CONTINUE.md` first** (decisions, progress, ordered next steps); the full owner conversation is in `docs/session/conversation_log.md`.
+
+Project folder: `D:\KefalCompany`. **Start with `docs/HANDOFF.md`** (what the game is, owner rules, reading order, architecture, testing, current state, next steps). Working notes live in **AGENTS.md**. Read it before doing anything,
+starting with **§0 START HERE**, which covers the reading order and a first-30-minutes checklist. It also contains:
+- §5.2 work that was in progress at handoff;
+- §5.3 what is missing or broken;
+- §6 the prioritised roadmap.
+
+Short version: TFG (TOTALLY FUCKED GAME) is a browser co-op Lethal Company / R.E.P.O.-style horror game with MMO
+progression (Vite + three.js + Rapier + Trystero P2P). The owner writes Turkish, wants fast iterations and a
+premium-feeling game.
+
+When you finish a chunk of work, update `AGENTS.md` (§5 / §6) and `docs/CRITIQUE.md`.

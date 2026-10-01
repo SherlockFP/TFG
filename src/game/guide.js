@@ -152,9 +152,10 @@ export function installGuide(game) {
   on('itemState', (it) => { if ((it?.type === 'flashlight' || it?.type === 'proflash') && it.on && game.player?.slots?.includes(it.id)) { use('flashlight'); tut('flash'); } });
 
   // ---------------------------------------------------------------- tutorial
+  const separateMode=()=>game.deadletter24?.active?.()===true;
   function tut(ev, data) {
     const g = G();
-    if (!g || disposed || !tutRunning(g)) return;
+    if (!g || disposed || separateMode() || !tutRunning(g)) return;
     const r = tutEvent(g, ev, data);
     if (!r.steps.length) return;
     save();
@@ -210,7 +211,7 @@ export function installGuide(game) {
   on('objectives', (add, g, phase) => {
     if (g && g !== game) return;
     const gs = G();
-    if (!gs || !tutRunning(gs) || game.player?.dead || game.onboard?.active?.()) return;   // [onboard] Hiring Day shows its own objectives
+    if (separateMode() || !gs || !tutRunning(gs) || game.player?.dead || game.onboard?.active?.()) return;   // [onboard] Hiring Day shows its own objectives
     const s = tutCurrent(gs);
     if (!s) return;
     const idx = TUT_STEPS.indexOf(s) + 1;
@@ -265,7 +266,7 @@ export function installGuide(game) {
     return !!(a && (a.speaking || (a.state?.q?.length || 0) > 0));
   };
   function canSpeak() {
-    if (routineAttentionBusy(game) || game.ui?.centerCards?.busy?.()) return false;
+    if (separateMode() || routineAttentionBusy(game) || game.ui?.centerCards?.busy?.()) return false;
     if (game.player?.dead || game.minigame || game.terminal?.active || game.ui?.panelOpen || game.ui?.chatOpen || game.ui?.fullscreenOpen?.()) return false;
     if ((game.chase?.tension?.() || 0) > 0.12 || threatNearNoise(game.player, game.creatures?.views?.values?.(), 10)) return false;
     if (!game.run || game.run.phase === 'fired') return false;
@@ -307,6 +308,7 @@ export function installGuide(game) {
     const g = G();
     const run = game.run, p = game.player;
     if (!g || !run || !p) return;
+    if(separateMode()){if(p.pos)S.lastPos={x:p.pos.x,z:p.pos.z};return;}
     // movement (horizontal, ignores teleports and the ship's takeoff / landing shake)
     const pos = p.pos;
     if (pos && S.lastPos && !p.dead && !p.frozen) {
@@ -337,6 +339,7 @@ export function installGuide(game) {
   // ---------------------------------------------------------------- update loop
   on('update', (dt, gm) => {
     if (gm && gm !== game) return;
+    if(separateMode()){const p=game.player?.pos;if(p)S.lastPos={x:p.x,z:p.z};return;}
     S.t += dt;
     if (S.quietT > 0) S.quietT -= dt;
     S.pollT -= dt;

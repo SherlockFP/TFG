@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import {GeoBuilder} from '../geobuilder.js';
 import {layoutKit,navClear} from './common.js';
-import {addTranslations} from '../../core/i18n.js';
+import {addTranslations,getLang,onLangChange} from '../../core/i18n.js';
 export const LAB24_IDS=Object.freeze(['deadletter24','mutedswitch24','permissions24']);
 export function planLab24(ctx){
  const {arch,W,H,ent,cells,idx,addRoom,line,spines}=ctx;if(!LAB24_IDS.includes(arch)||W<30||H<30)return false;
@@ -52,12 +52,37 @@ function decorate(ctx,id){
    box('dark',sx,Y+h/2,sz,w,h,d);box('ivory',sx,Y+h+.035,sz,w+.04,.07,d+.04);addBox(sx,Y+h/2,sz,w,h,d,undefined,{kind:'lab24-cover',theme:id});nav.blockBox(sx-w/2,sz-d/2,sx+w/2,sz+d/2,.15);propBoxes.push([sx-w/2,sz-d/2,sx+w/2,sz+d/2]);cover.push(Object.freeze({x:sx,y:Y+h/2,z:sz,size:Object.freeze([w,h,d]),room:r.id}));
   }
  }
+ // One signature at the arena route convergence, facing the mode arrival/cabinet.
+ // Its lowest edge is above2.1m; it adds no floor footprint or collision.
+ const junction={x:K.wx(arenaRoom.cx)+K.C/2,y:Y,z:K.wz(arenaRoom.cz)+K.C/2},jx=junction.x,jz=junction.z;
+ box('steel',jx,Y+2.76,jz,3.15,.12,.2);
+ for(const dx of [-1.1,1.1])box('steel',jx+dx,Y+2.56,jz,.04,.45,.05);
+ if(id==='deadletter24'){
+  // A slotted returns rack with three retained envelopes and an ochre stamp.
+  box('dark',jx,Y+3.02,jz,1.75,.38,.35);
+  for(const dx of [-.55,0,.55]){box('ivory',jx+dx,Y+3.04,jz+.2,.43,.23,.04);box('ochre',jx+dx+.12,Y+3.10,jz+.225,.08,.065,.015);}
+ }else if(id==='mutedswitch24'){
+  // Disconnected switchboard sockets: a wide cassette, two vacant cable hooks.
+  box('dark',jx,Y+3.02,jz,2.15,.33,.28);
+  for(const dx of [-.75,-.25,.25,.75])box('ivory',jx+dx,Y+3.01,jz+.16,.15,.16,.04);
+  for(const dx of [-.9,.9]){box('ochre',jx+dx,Y+2.82,jz,.05,.27,.07);box('ochre',jx+dx+.1,Y+2.70,jz,.2,.05,.07);}
+ }else{
+  // Unequal permission tabs hang beneath a finite archive docket.
+  box('ivory',jx,Y+3.03,jz,1.2,.36,.26);
+  box('ochre',jx-.32,Y+2.9,jz+.155,.24,.38,.04);box('dark',jx+.27,Y+2.96,jz+.16,.35,.23,.04);
+ }
+ const canvas=typeof document!=='undefined'?document.createElement('canvas'):null;if(canvas){canvas.width=512;canvas.height=128;}const context=canvas?.getContext('2d'),texture=canvas?new THREE.CanvasTexture(canvas):null;if(texture){texture.colorSpace=THREE.SRGBColorSpace;texture.magFilter=texture.minFilter=THREE.NearestFilter;texture.generateMipmaps=false;texture.userData.keep=true;}
+ const signMaterial=new THREE.MeshBasicMaterial({map:texture,color:texture?0xffffff:0xbdb59e,toneMapped:false});signMaterial.userData.shared=true;mats.push(signMaterial);const sign=new THREE.Mesh(new THREE.PlaneGeometry(3.1,.52),signMaterial);sign.position.set(jx,Y+2.40,jz+.13);root.add(sign);
+ const words={en:{direct:'DIRECT',returns:'RETURN BAYS',ring:'BOOTH RING',service:'SERVICE',low:'CROUCH COVER',tall:'TALL COVER',exposed:'EXPOSED'},tr:{direct:'DOĞRUDAN',returns:'İADE BÖLMELERİ',ring:'BÖLME HALKASI',service:'SERVİS',low:'ÇÖMELEREK SİPER',tall:'YÜKSEK SİPER',exposed:'AÇIK HAT'},ru:{direct:'НАПРЯМУЮ',returns:'ВОЗВРАТНЫЕ ОТСЕКИ',ring:'КОЛЬЦО КАБИН',service:'СЛУЖЕБНЫЙ ПУТЬ',low:'УКРЫТИЕ СИДЯ',tall:'ВЫСОКОЕ УКРЫТИЕ',exposed:'ОТКРЫТЫЙ ПУТЬ'}};
+ let signDraws=0,lastLanguage='';const drawSign=()=>{if(!context||lastLanguage===getLang())return;lastLanguage=getLang();signDraws++;const w=words[lastLanguage]||words.en;context.fillStyle='#293035';context.fillRect(0,0,512,128);context.textAlign='center';context.fillStyle='#d0c7ad';context.font='bold 21px sans-serif';context.fillText('← '+(id==='deadletter24'?w.returns:id==='mutedswitch24'?w.ring:w.service),128,45,244);context.fillText((id==='permissions24'?'→ ':'↓ ')+w.direct,384,45,244);context.fillStyle='#b69761';context.font='bold 17px sans-serif';context.fillText(id==='deadletter24'?w.low:w.tall,128,93,244);context.fillText(w.exposed,384,93,244);texture.needsUpdate=true;};drawSign();const offSign=onLangChange(drawSign);
+ const landmark=Object.freeze({kind:id==='deadletter24'?'returns-rack':id==='mutedswitch24'?'disconnected-switchboard':'permission-docket',position:Object.freeze({x:jx,y:Y+2.4,z:jz+.13}),junction:Object.freeze(junction),directDirection:id==='permissions24'?'east':'south',coveredDirection:'west',lowCover:id==='deadletter24'});
  root.add(gb.build(key=>{const m=new THREE.MeshLambertMaterial({color:palette[key],vertexColors:true,flatShading:true});m.userData.shared=true;mats.push(m);return m;}));const geometries=[];let batches=0,triangles=0;root.traverse(o=>{if(o.geometry){o.geometry.userData.shared=true;geometries.push(o.geometry);batches++;triangles+=(o.geometry.index?.count||o.geometry.attributes.position.count)/3;}});
  const world=(r)=>({x:K.wx(r.cx)+K.C/2,y:Y,z:K.wz(r.cz)+K.C/2,room:r.id}),entry=world(L.entrance.room),arena=arenaRoom?Object.freeze({...world(arenaRoom),radius:Math.max(3.2,Math.min(arenaRoom.w,arenaRoom.h)*K.C/2-4),w:arenaRoom.w*K.C,h:arenaRoom.h*K.C}):null;
  const service=rooms.find(r=>r.lab24Role==='covered'),path=(a,b)=>routeWaypoints(nav,a,b,Y),target=arena||entry;
  const gallery=id==='permissions24'?rooms.find(r=>r.lab24Role==='exposed'):null,exposed=gallery?[...path(entry,world(gallery)),...path(world(gallery),target)]:path(entry,target),via=service?world(service):target,covered=[...path(entry,via),...path(via,target)];
+ const bossSpots=[];if(arena)for(let i=0;i<8;i++){const angle=i*Math.PI/4,p={x:arena.x+Math.cos(angle)*arena.radius,y:Y,z:arena.z+Math.sin(angle)*arena.radius,room:arena.room};if(navClear(nav,p.x-.65,p.z-.65,p.x+.65,p.z+.65,0))bossSpots.push(Object.freeze(p));}
  const spawnSpots=[];for(const r of rooms){const p=world(r);for(const [dx,dz]of [[0,0],[-1.8,0],[1.8,0],[0,-1.8],[0,1.8]])if(navClear(nav,p.x+dx-.5,p.z+dz-.5,p.x+dx+.5,p.z+dz+.5,0))spawnSpots.push(Object.freeze({...p,x:p.x+dx,z:p.z+dz}));}
- let disposed=false;return {lab:{id,arena,routes:Object.freeze({exposed:Object.freeze(exposed),covered:Object.freeze(covered)}),cover:Object.freeze(cover),spawnSpots:Object.freeze(spawnSpots),metrics:{batches,triangles,emitters:0,colliders:cover.length},dispose(){if(disposed)return;disposed=true;for(const geometry of geometries)geometry.dispose();for(const m of mats)m.dispose();root.removeFromParent();}}};
+ let disposed=false;return {lab:{id,arena,landmark,bossSpots:Object.freeze(bossSpots),routes:Object.freeze({exposed:Object.freeze(exposed),covered:Object.freeze(covered)}),cover:Object.freeze(cover),spawnSpots:Object.freeze(spawnSpots),metrics:{batches,triangles,emitters:0,colliders:cover.length,atlasPixels:canvas?canvas.width*canvas.height:0,get signDraws(){return signDraws;}},dispose(){if(disposed)return;disposed=true;offSign();texture?.dispose();for(const geometry of geometries)geometry.dispose();for(const m of mats)m.dispose();root.removeFromParent();}}};
 }
 
 // Cardinal native navigation waypoints preserve doorway centers. Smoothed A*
