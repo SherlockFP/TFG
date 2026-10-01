@@ -257,6 +257,7 @@ export const hostMethods = {
     H('term', (d, from) => this.terminal.hostExecute(d.cmd, from));
     H('bell', (d, from) => this.hostSell(from));
     H('hit', (d, from) => {
+      if (this.deadletter24?.active?.()) return;
       const c = this.creatures.host.get(d.cid);
       if (!c) return;
       if (c.type === 'leech' && c.state === 'ceiling') c.setState('fall');
@@ -513,7 +514,7 @@ export const hostMethods = {
   },
 
   hostSave() {
-    if (this.destroyed || this.hostData?.firedRun) return;
+    if (this.destroyed || this.hostData?.firedRun || this.deadletter24?.active?.()) return;
     const held = [...this.items.all()].filter((it) => it.holder && !String(it.holder).startsWith('c:') && !it.soulbound && it.type !== 'body' && (this.run.phase === 'orbit' || this.run.phase === 'company'));
     const shipItems = [...this.items.inShipItems(), ...held].filter((it) => !it.soulbound && it.type !== 'body').map((it, k) => ({
       ty: it.type, v: it.value, bv: it.baseValue, p: it.holder ? [3.5 + (k % 4) * 0.5, 1.0, -1.5 + Math.floor(k / 4) * 0.5] : it.obj.position.toArray(), q: it.holder ? [0, 0, 0, 1] : it.obj.quaternion.toArray(), col: it.collected ? 1 : undefined, af: it.affix || undefined, b: it.battery ?? undefined, c: it.charges ?? undefined, am: it.ammo ?? undefined,
@@ -754,7 +755,10 @@ export const hostMethods = {
     const run = this.run;
     if (!run) return;
     const hd = this.hostData;
-    if (run.phase === 'moon' && MOONS[run.moon]?.home) {   // [hw] homeworld: the clock never runs, nothing spawns
+    if (run.phase === 'deadletter') {
+      this.deadletter24?.hostTick?.(dt);
+      if (this.run?.phase === 'deadletter' && !this.deadletter24?.combatPaused?.()) this.creatures.hostUpdate(dt);
+    } else if (run.phase === 'moon' && MOONS[run.moon]?.home) {   // [hw] homeworld: the clock never runs, nothing spawns
       this.creatures.hostUpdate(dt);
     } else if (run.phase === 'moon') {
       hd.moonT = (hd.moonT || 0) + dt;
@@ -851,7 +855,8 @@ export const hostMethods = {
     if (!id) return;
     // Sector scale + early-game hit cap for EVERY creature / trap hit, whichever behaviour (built in or a module's) made
     // it: the source is a host creature id. Players, lightning, 'left behind' and the like are never scaled.
-    if (fromId && this.balance) { const src = this.creatures?.host?.get(fromId); if (src) dmg = this.balance.hitDamage(dmg, src); }
+    if (this.deadletter24?.active?.()) dmg = this.deadletter24.playerDamage?.(id, dmg) ?? dmg;
+    else if (fromId && this.balance) { const src = this.creatures?.host?.get(fromId); if (src) dmg = this.balance.hitDamage(dmg, src); }
     const p = fromPos ? [fromPos.x, fromPos.y, fromPos.z] : null;
     this.net.sendTo(id, 'hurt', { dmg, cause, from: fromId, p });
   },
@@ -968,6 +973,7 @@ export const hostMethods = {
   },
 
   hostOnPlayerDied(id, d) {
+    if (this.deadletter24?.active?.()) { this.deadletter24.onPlayerDied?.(id, d); return; }
     const pos = d.pos ? new THREE.Vector3().fromArray(d.pos) : (this.aiPlayerById(id)?.pos || new THREE.Vector3());
     const name = this.playerName(id);
     this.hostData.dayStats?.deaths.push({ id, name, cause: d.cause });

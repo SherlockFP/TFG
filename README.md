@@ -4,6 +4,9 @@ Co-op industrial horror and extraction for the browser. A company crew explores 
 inside the Algorithm's hostile broadcast, carries salvage home and invests in vessels, tools and workshops.
 PSX visuals, proximity voice chat, minigames and serverless P2P multiplayer.
 
+Current additions: [Dead Letter Run and Card Archive](docs/wave24/README.md) — optional co-op card combat,
+personal level upgrades, three authored labyrinths and NPC blackjack/five-card poker.
+
 > "Engagement is love." — The Algorithm
 
 ## Run it

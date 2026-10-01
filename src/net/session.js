@@ -352,6 +352,12 @@ export class Session extends Emitter {
   // queue one message; everything queued during the current task leaves as ONE packet per peer (microtask
   // flush), so a frame that emits 8 messages costs 1 WebRTC send instead of 8. Per-peer order is preserved.
   _out(m, to) {
+    // Wire-only feature views keep private host state out of remote packets.
+    // Local broadcast handlers still receive their original authoritative data.
+    if (typeof this.outboundView === 'function') {
+      const view = this.outboundView(m.t, m.d);
+      if (view !== m.d) m = { ...m, d: view };
+    }
     this.stats.sent++;
     const bt = this.stats.byType;
     bt[m.t] = (bt[m.t] || 0) + 1;

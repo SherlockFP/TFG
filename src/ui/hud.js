@@ -258,7 +258,7 @@ export class HUD {
       // tier frame: rolled / affix / def tiers and valued scrap; plain tools keep the neutral amber frame
       const tier = it && (it.tier || it.affix || d.tier || d.value) ? (it.rarity?.() || 'common') : null;
       const col = tier ? (TIERS[tier] || TIERS.common).color : '#cfc6b8';
-      const nm = it ? it.label || (it.plus || it.oc?.length ? forgeName(affixShortName(d.name, it.affix), it.plus || 0, it.oc) : affixShortName(d.name, it.affix)) : '';   // [forge] +N name
+      const nm = it ? (d.showLabel === false ? '' : it.label) || (it.plus || it.oc?.length ? forgeName(affixShortName(d.name, it.affix), it.plus || 0, it.oc) : affixShortName(d.name, it.affix)) : '';   // [forge] +N name
       const bar = it && d.battery ? `<div class="inv-bat"><div style="width:${clamp((Number(it.battery) / d.battery) * 100 || 0, 0, 100)}%"></div></div>` : '';
       const extra = it && d.ammo !== undefined ? `<div class="inv-ammo">${Number(it.ammo) || 0}/${Number(d.ammo) || 0}</div>` : it && it.charges !== undefined && it.charges !== null && d.charges ? `<div class="inv-ammo">${Number(it.charges) || 0}</div>` : '';
       const tcls = tier && tier !== 'common' ? ` tier tier-${tier}` : '';

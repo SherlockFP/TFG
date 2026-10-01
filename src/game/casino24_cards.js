@@ -1,0 +1,12 @@
+// Card identities remain server-owned; 0..51, rank 2..14, four suits.
+export const cardRank = c => c % 13 + 2;
+export const cardSuit = c => Math.floor(c / 13);
+export function cardLabel(c){return `${({11:'J',12:'Q',13:'K',14:'A'})[cardRank(c)]||cardRank(c)}${['♣','♦','♥','♠'][cardSuit(c)]}`;}
+export function shuffledDeck(rand=Math.random){const deck=Array.from({length:52},(_,i)=>i);for(let i=51;i>0;i--){const j=Math.floor(rand()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}return deck;}
+export function blackjackValue(cards){let value=0,aces=0;for(const c of cards){const r=cardRank(c);value+=r===14?11:Math.min(10,r);aces+=r===14?1:0;}while(value>21&&aces-->0)value-=10;return value;}
+export const POKER_RANKS=['High card','Pair','Two pairs','Three of a kind','Straight','Flush','Full house','Four of a kind','Straight flush'];
+export function pokerRank(cards){const ranks=cards.map(cardRank).sort((a,b)=>b-a),counts=new Map();for(const r of ranks)counts.set(r,(counts.get(r)||0)+1);const groups=[...counts].sort((a,b)=>b[1]-a[1]||b[0]-a[0]);const unique=[...counts.keys()].sort((a,b)=>b-a);const flush=cards.every(c=>cardSuit(c)===cardSuit(cards[0]));const straight=unique.length===5&&(unique[0]-unique[4]===4?unique[0]:unique.join(',')==='14,5,4,3,2'?5:0);
+ if(straight&&flush)return[8,straight];if(groups[0][1]===4)return[7,groups[0][0],groups[1][0]];if(groups[0][1]===3&&groups[1][1]===2)return[6,groups[0][0],groups[1][0]];if(flush)return[5,...ranks];if(straight)return[4,straight];if(groups[0][1]===3)return[3,groups[0][0],...groups.slice(1).map(g=>g[0])];if(groups[0][1]===2&&groups[1][1]===2)return[2,Math.max(groups[0][0],groups[1][0]),Math.min(groups[0][0],groups[1][0]),groups[2][0]];if(groups[0][1]===2)return[1,groups[0][0],...groups.slice(1).map(g=>g[0])];return[0,...ranks];}
+export function comparePoker(a,b){const x=pokerRank(a),y=pokerRank(b);for(let i=0;i<Math.max(x.length,y.length);i++)if(x[i]!==y[i])return x[i]>y[i]?1:-1;return 0;}
+export function dealerDiscards(cards){const rank=pokerRank(cards);if(rank[0]>=4)return[];const counts=new Map();for(const c of cards)counts.set(cardRank(c),(counts.get(cardRank(c))||0)+1);if(rank[0]>=1)return cards.flatMap((c,i)=>counts.get(cardRank(c))===1?[i]:[]).slice(0,3);const keep=cards.map((c,i)=>[cardRank(c),i]).sort((a,b)=>b[0]-a[0]).slice(0,2).map(p=>p[1]);return cards.flatMap((c,i)=>keep.includes(i)?[]:[i]);}
+export function validDiscards(value){return Array.isArray(value)&&value.length<=3&&value.every(i=>Number.isInteger(i)&&i>=0&&i<5)&&new Set(value).size===value.length;}

@@ -420,7 +420,7 @@ export class Terminal {
     switch (cmd.op) {
       case 'route': {
         const m = MOONS[cmd.moon];
-        if (!m || run.phase !== 'orbit') { reply('Cannot route now.', true); return; }
+        if (!m || m.deadletter24 || m.deadletter || run.phase !== 'orbit') { reply('Cannot route now.', true); return; }
         if (m.stale) { reply('That server went dark with the old sector. Type SECTOR.', true); return; }
         { const blocked = g.cycle?.routeBlocked?.(m); if (blocked) { reply(blocked, true); return; } }   // [cycle] the Sector Gate locks the autopilot
         { const lk = g.onboard?.routeBlocked?.(m); if (lk) { reply(lk.k, true, lk.v); return; } }   // [onboard] the homeworld is gifted at quota 3

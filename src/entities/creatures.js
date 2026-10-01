@@ -558,6 +558,13 @@ export class CreatureManager {
   hostSpawn(type, pos, opts = {}) {
     const def = CREATURES[type];
     if (!def) return null;
+    const mode = this.game.deadletter24;
+    const modeActive = !!mode?.active?.();
+    if (modeActive) {
+      const admitted = mode.spawnOptions?.(type, pos, opts);
+      if (admitted === false || admitted === null) return null;
+      opts = admitted || opts;
+    }
     const id = opts.id || ('c' + (this.nextId++));   // opts.id: host migration re-creates a creature under its old id
     // host rolls (Math.random is fine: creatures are host-authoritative, not world generation)
     if (opts.variant === undefined && !def.hazard && !def.boss && !def.custom) {
@@ -566,10 +573,11 @@ export class CreatureManager {
       if (list) { let r = Math.random() * 100; for (const e of list) { r -= e.w; if (r < 0) { v = e.id; break; } } }
       opts = { ...opts, variant: v };
     }
-    if (this.game.forge) opts = this.game.forge.creatureOpts(type, opts);   // [forge] tier + extra affixes
+    if (this.game.forge && !modeActive) opts = this.game.forge.creatureOpts(type, opts);   // [forge] tier + extra affixes
     if (opts.affix === undefined) opts = { ...opts, affix: rollAffix(type, opts.level || 1, !!opts.elite) };
     if (this.game.descentThreat21?.allowSpawn?.(type, opts) === false) return null;
     const c = new HostCreature(this, id, type, pos, opts);
+    if (modeActive) mode.afterSpawn?.(c, opts);
     this.game.descentThreat21?.limit?.(c, opts);   // bounded deep-floor stats before native replication
     c.fakeLv = opts.fakeLv; c.fakeTitle = opts.fakeTitle || '';   // disguise tag data, re-sent to late joiners by serializeFor
     this.host.set(id, c);
@@ -640,11 +648,16 @@ export class CreatureManager {
 
   kill(c, by, opts = {}) {
     if (c.dead) return;
+    const mode = this.game.deadletter24;
+    const modeOwned = !!mode?.ownsCreature?.(c);
+    const modeReward = modeOwned && !opts.silent;
+    if (modeOwned) opts = { ...opts, silent: true };
     c.dead = true;
     if (c.type === 'leech' && c.extra) { this.game.hostLatch(c, c.extra, false); c.extra = 0; }
     c.setState('dead');
     const fuse = !opts.silent && c.affix === 'hottake';
     this.game.net.broadcast('cev', { e: 'die', id: c.id, by: opts.silent ? null : by, xp: opts.silent ? 0 : c.xp, coin: opts.silent ? 0 : c.coin, ty: c.type, lv: c.level, el: c.elite, attackers: [...c.attackers.keys()], fuse: fuse || undefined });
+    if (modeReward) mode.onKill?.(c, by);
     if (!opts.silent) {
       this.game.hostOnCreatureKilled?.(c, by);
       // drop an item

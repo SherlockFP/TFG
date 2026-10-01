@@ -105,9 +105,14 @@ export function buildCompany({ physics, lightPool }) {
     gb.box('metal_dark',x,PY+3,z,sx,6,sz,.35); box(x,PY+3,z,sx,6,sz);
   }
   gb.box('metal_dark',-29,PY+6.2,-23,22, .4,22,.35); box(-29,PY+6.2,-23,22,.4,22);
+  // Worn archival club lining: low inset dado, clerestory slats and a recognizable open-mouth lintel.
+  for(const x of[-39.6,-18.4])for(const z of[-30,-24,-18])gb.box('wood_dark',x,PY+1.4,z,.12,2.2,4.6,.35);
+  for(const x of[-37,-33,-25,-21])gb.box('metal_rust',x,PY+3.3,-33.6,2.8,.12,.12,.3);
+  for(const x of[-32.3,-25.7])gb.box('wood_dark',x,PY+2,-11.63,.25,4,.12,.3);
+  gb.box('wood_dark',-29,PY+4.1,-11.63,6.9,.28,.12,.3);
   // casino machines
   const slots = [];
-  emitters.push(lightPool.add({ pos: new THREE.Vector3(-29, PY + 4.5, -23), color: 0xff4fd8, intensity: 1.2, distance: 9, group: 'company' }));
+  emitters.push(lightPool.add({ pos: new THREE.Vector3(-29, PY + 4.5, -23), color: 0xd0b183, intensity: 1.2, distance: 9, group: 'company' }));
 
   // bounty board near the entrance
   const board = put('quest_board', 27, PY, -6, 0);

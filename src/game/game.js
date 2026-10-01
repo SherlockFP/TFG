@@ -243,6 +243,10 @@ import { installAtmos12 } from './atmos12.js';
 import { installCoop12 } from './coop12.js';
 import { installCompany13 } from './company13.js';
 import { installCasino13 } from './casino13.js';
+import { installDeadletter24 } from './deadletter24.js';
+import { registerLab24Moons } from './lab24_moons.js';
+
+registerLab24Moons();
 import { installThreats13 } from './threats13.js';
 import { installDistricts13 } from './districts13.js';
 import { installIndustry13 } from './industry13.js';
@@ -688,6 +692,7 @@ export class Game extends Emitter {
     this.useModule('descent21', installDescent21);
     this.useModule('descentThreat21', installDescent21Threats);
     this.useModule('firstdepth21', installFirstDepth21);
+    this.useModule('deadletter24', installDeadletter24);
 
 
   }
@@ -697,7 +702,7 @@ export class Game extends Emitter {
       this._stats = derivedStats(this.profile);
       this.mods?.emit('stats', this._stats, this);
     }
-    return this._stats;
+    return this.deadletter24?.active?.() ? this.deadletter24.stats?.(this._stats) || this._stats : this._stats;
   }
   refreshStats() { this._stats = null; }
   hasPerk(id) { return hasPerk(this.profile, id); }
@@ -881,6 +886,7 @@ export class Game extends Emitter {
     if (resume) { this.ui.toast(t('Reconnected - world state resynced.'), 'good'); return; }
     this.spawnInShip();
     this.descent21?.placeLateJoin?.();
+    this.deadletter24?.placeLateJoin?.();
     if (d.run.phase === 'moon' || d.run.phase === 'company') this.requestLoadout();
     this.tutorialHint(d.run.phase);
     this.emit('joined');
@@ -897,10 +903,12 @@ export class Game extends Emitter {
     if (d.upgrades) this.refreshStats();
     this.ui.hud?.setRun(this.run);
     this.descent21?.onState?.(this.run);
+    this.deadletter24?.onState?.(this.run);
   }
 
   onItemEvent(d) {
     if (this.descent21?.acceptItemEvent?.(d) === false) return false;
+    if (this.deadletter24?.acceptItemEvent?.(d) === false) return false;
     this.items.onEvent(d);
     return true;
   }
@@ -908,6 +916,7 @@ export class Game extends Emitter {
   onPhase(d) {
     const prevPhase = this.run?.phase;
     this.applyRunState(d, true);
+    this.deadletter24?.onPhase?.(d);
     this.stateTimer = 0;
     const ph = d.phase;
     if (ph !== 'landing') this.landQ?.flush();   // [perf4] never leave a half-built map behind a later phase
@@ -969,6 +978,7 @@ export class Game extends Emitter {
   }
 
   loadMapFor(run, instant) {
+    if (this.deadletter24?.loadMapFor?.(run, instant)) return;
     const moonId = run.moon;
     const needMap = ['landing', 'moon', 'company', 'takeoff'].includes(run.phase);
     if (instant) this.landQ?.flush();

@@ -107,18 +107,21 @@ const beh = soundHunter(LISTENER_CFG);
   const p = player('p1', 5, 0, 0.02);
   M.players.push(p);
   const decoy = { pos: { x: -20, y: 0, z: 0 }, loud: 2.4, owner: null };
-  let phases = ['idle'], last = 'idle';
+  let phases = ['idle'], last = 'idle', inspectedDistance = Infinity;
   for (let i = 0; i < 20 * 40; i++) {
     M.noises = [noiseOf(p)];
     if (i < 20 * 9 && i % 25 === 0) M.noises.push({ ...decoy });    // a pulse every 1.25 s for 9 s (the Noisemaker)
     else if (i < 20 * 9) M.noises.push({ ...decoy });
     tick(M, c, beh);
+    if (c.state === 'inspect') inspectedDistance = Math.min(inspectedDistance, flat(c.pos, decoy.pos));
     if (c.state !== last) { phases.push(c.state); last = c.state; }
   }
   ok(phases.join('>').startsWith('idle>alert>hunt>inspect>search>idle'), `decoy state chain: ${phases.join('>')}`);
   ok(M.hits.length === 0, 'the quiet player was never touched');
   ok(M.game.stealth.inspected === 1, 'onInspect fired once (decoy investigated)');
-  ok(flat(c.pos, decoy.pos) < flat(c.pos, p.pos) + 4, 'it ended up near the decoy, away from the player');   // search wander after the decoy is random
+  // After forgetting the decoy it deliberately resumes random roaming. Its
+  // unrelated position at 40 s cannot prove whether it reached the decoy.
+  ok(inspectedDistance < 1.5, 'it physically reached the decoy before inspecting and forgetting it');
 }
 
 // 4. newer noise re-targets a running hunter

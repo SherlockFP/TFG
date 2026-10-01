@@ -117,6 +117,11 @@ export const actionMethods = {
       return;
     }
     if (input.pressed('interact') && target) { target.action(); }
+    if (this.deadletter24?.active?.()) {
+      if (input.mouseDown(0)) this.deadletter24.attack?.();
+      if (input.pressed('reload')) this.deadletter24.special?.();
+      return;
+    }
     // slot switching
     const wheel = input.consumeWheel();
     const held = p.heldItem();
@@ -213,7 +218,7 @@ export const actionMethods = {
     // 2) point interactables
     const pts = this.interactablesNow();
     let best = null, bestLabel = '', bestScore = 1e9;
-    const cabinControls = this.descent21?.controlsActive?.();
+    const cabinControls = this.descent21?.controlsActive?.() || this.deadletter24?.active?.();
     for (const ip of pts) {
       // Optional crew invitations yield to the physical lift. Rescue, cargo,
       // doors and NPC commerce retain their native interaction paths.
@@ -260,6 +265,7 @@ export const actionMethods = {
   interactablesNow() {
     const out = [];
     const ph = this.run?.phase;
+    const cardExpedition = this.deadletter24?.active?.();
     const sp = this.ship.points;
     const p = this.player;
     const held = p.heldItem();
@@ -279,11 +285,11 @@ export const actionMethods = {
     const fac = this.world.facility;
     if (fac && p.indoor) {
       for (const ip of fac.interactables) {
-        if (ip.type === 'fuse') add({ pos: ip.pos, r: 0.6, label: () => (this.run?.powerOn ? t('Fuse box: run diagnostics [E]') : t('Fuse box: restore power [E]')), action: () => this.startFuse(ip) });
+        if (!cardExpedition && ip.type === 'fuse') add({ pos: ip.pos, r: 0.6, label: () => (this.run?.powerOn ? t('Fuse box: run diagnostics [E]') : t('Fuse box: restore power [E]')), action: () => this.startFuse(ip) });
       }
       for (const d of fac.doors) {
         if (d.kind === 'vault' && d.locked && d.keypadPos) add({ pos: d.keypadPos, r: 0.6, label: t('Crack the vault keypad [E]'), action: () => this.startSafe(d) });
-        if (d.teleport) {
+        if (d.teleport && !cardExpedition) {
           // Put the target in front of its own solid portal panel. A centre target
           // was occluded at a downward angle by the panel's 15 cm half-depth.
           const point = d.pos.clone().add(new THREE.Vector3(0, 1.3, 0));
@@ -328,6 +334,7 @@ export const actionMethods = {
   },
 
   useExit(index, toInside) {
+    if (this.deadletter24?.active?.()) return;
     const w = this.world;
     let dest, yaw;
     if (toInside) {
@@ -947,6 +954,7 @@ export const actionMethods = {
   },
 
   noticeCreatures() {
+    if (this.deadletter24?.active?.()) return;
     const eye = this.camera.position;
     const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(this.camera.quaternion);
     for (const v of this.creatures.views.values()) {
@@ -975,7 +983,7 @@ export const actionMethods = {
     const p = this.player;
     if (p.dead || dmg <= 0) return;
     if (this.godMode) return;
-    if (p.hp - dmg <= 0 && this.hasPerk('secondwind') && !this.secondWindUsed && dmg < 999) {
+    if (!this.deadletter24?.active?.() && p.hp - dmg <= 0 && this.hasPerk('secondwind') && !this.secondWindUsed && dmg < 999) {
       this.secondWindUsed = true;
       p.hp = 1;
       this.ui.toast(t('SECOND WIND!'), 'good');
@@ -995,6 +1003,7 @@ export const actionMethods = {
   die(cause) {
     const p = this.player;
     if (p.dead) return;
+    const cardExpedition = !!this.deadletter24?.active?.();
     p.dead = true;
     p.hp = 0;
     this.grab?.stop();
@@ -1028,7 +1037,7 @@ export const actionMethods = {
     this.engine.flash(0x550000, 0.9);
     this.net.send('pst', { dead: true, cause, pos: p.pos.toArray() });
     if (this.isHost) this.hostOnPlayerDied(this.selfId, { cause, pos: p.pos.toArray() });
-    this.progress.onDeath(cause);
+    if (!cardExpedition) this.progress.onDeath(cause);
     const DEATH_TIPS = ['Crouch (C) to stay quiet - most things hunt by sound.', 'Scan (right click) before you walk into a room.',
       'Ping (P) threats so your crew knows.', 'Dead crewmates can still watch and ping. Stay on comms.', 'Bodies can be carried back to cut the fine.',
       'Close doors behind you. Some things cannot open them.', 'Do not stare at what blinks. Do not look away either.', 'Leave before midnight. The ship will not wait.'];

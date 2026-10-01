@@ -1,6 +1,6 @@
 # Company casino ve Dead Letter Run uygulama planı
 
-Tarih: 2026-10-01. İncelenen main: 7ceffb6. Durum: tasarım ve kaynak denetimi; aşağıdaki yeni içerik henüz uygulanmış özellik değildir. Casino, harita ve savaş ajanları ayrı okuma denetimleri yaptı. Bu plan için üretim kodu veya yeni oyun testleri değiştirilmedi.
+Tarih: 2026-10-01. İlk tasarımın kaynak başlangıcı: 7ceffb6. **Wave24 uygulaması:** ayrı Dead Letter Run, her levelda kişisel üç kart, rarity/rank gelişimi, üç özgün labirent ve normal keşif karşılıkları, NPC blackjack/poker, casino denge/gizlilik/rezerv düzeltmeleri uygulandı. Gerçek teslim kapsamı ve doğrulama `docs/wave24/` dosyalarında kayıtlıdır. Aşağıdaki tasarım havuzundaki Induction/Checksum, yeni boss aileleri, kat affixleri ve kalıcı blueprint ödülleri henüz uygulanmadı; mevcut sürüm bunları vaat etmez.
 
 ## 1. Yön ve mevcut zayıflıklar
 
@@ -87,7 +87,7 @@ Prototipte bir aktif silah ve sekiz seferlik güç yeterli. Örnek güçler: del
 
 Silah/skill dünyadan nadir düşer, fakat ilk silah başlangıçta kullanılabilir. Her uygun düşmana %1–2 vermek kalabalıkta çok fazla drop demektir; toplam sefer düşman sayısıyla beraber hesaplanacak. İlk aday: sadece belirlenmiş elitlerde %3 alternatif silah/skill şansı, kat başına en fazla bir nadir drop. 10 uygun elit varsa en az bir drop ihtimali yaklaşık %26.3; 30 varsa %59.9. Elite sayısı ve fırsat bütçesi bu yüzden sabitlenecek. Sayılar test öncesi adaydır.
 
-İlerlemenin temeli nadir droplar değil: güvenli dalga arasındaki bir ve kat bossu sonrasındaki bir kişisel üçlü güç seçimi garantidir. Zaten maksimuma çıkan güç seçeneklere konmaz; en az bir seçenek mevcut silahla işe yarar. Seçilmemiş güç güvenli sonraki araya taşınabilir. Kötü şans oyuncuyu ilk silahsız veya gelişimsiz bırakmaz.
+Kullanıcının uygulama yönlendirmesiyle ilerlemenin temeli **her kazanılan levelda üç kişisel karttan bir seçim** oldu. XP birden fazla level verirse seçimler sırayla korunur. Common/Rare/Epic/Legendary kart tierleri, tekrar seçince 1–5 rank gelişimi ve toplam on güç bulunur. Maksimum ranklı kart teklif edilmez; level41'e kadar her seçimde üç kullanılabilir seçenek garantidir. Kart seçimi sırasında düşmanlar güvenli, sınırlı bir arada durur; downed ekip kurtarılırken savaş bu şekilde durmaz. Nadir drop güçlenmenin zorunlu koşulu değildir.
 
 Nadir silahlar alternatif oynanış açar; çıkışta taşınacak kalıcı blueprint/kozmetik ödülleri ancak ayrı tamamlanma kuralları ve tek seferlik ödül kimlikleriyle uygulanır. Seferdeki silah, güç, XP ve affixler seferliktir; ana oyuna sınırsız Credit, chip, quota, bounty veya XP üretmez.
 

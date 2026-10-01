@@ -19,6 +19,9 @@ export const SIZES = {
 // shaft = { k: brightness, r: radius multiplier }; decals = per-cell weights; density = decals per floor cell; drips / vents = source counts
 const P = (tint, dust, shaft, density, decals, drips, vents, extra = {}) => ({ tint, dust, shaft, density, decals, drips, vents, spark: 0.5, ...extra });
 export const PROFILES = {
+  deadletter24: P([1.03, 1.00, 0.96], 0.75, { k: 0.85, r: 1 }, 0.10, { paper: 6, stain: 2, cable: 1 }, 0, 1, { spark: 0.1 }),
+  mutedswitch24: P([0.98, 1.00, 1.03], 0.55, { k: 0.85, r: 1 }, 0.10, { cable: 5, paper: 2, glass: 1 }, 0, 2, { spark: 0.15 }),
+  permissions24: P([1.04, 1.00, 0.94], 0.7, { k: 0.9, r: 1 }, 0.10, { paper: 4, stain: 2, grate: 1 }, 0, 1, { spark: 0.1 }),
   // Quiet archive motes, warm guest floors and scorched memory ceramics keep labyrinth identities distinct.
   darkweb: P([0.91, 0.93, 1.10], 0.6, { k: 0.75, r: 0.85 }, 0.14, { cable: 5, scorch: 3, glass: 2, stain: 1 }, 2, 5, { spark: 0.55 }),
   hotel: P([1.08, 1.01, 0.91], 1.2, { k: 1.1, r: 1.05 }, 0.14, { paper: 4, stain: 3, glass: 1, puddle: 1 }, 3, 2, { spark: 0.25 }),

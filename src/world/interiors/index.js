@@ -20,6 +20,7 @@
 //     lamps: { corridor: propId, every, color, flicker }, lampColor, posters, landmarks, doorProp,
 //     corridorPipes, corridorScrap, footstep: {floorTex: surface}, ambience, atmosphere, steamRooms, noFlood,
 //     decorate(ctx) }
+import { LAB24_THEMES } from './deadletter24.js';
 import { LAB20_THEMES } from './lab20_themes.js';
 import { LABYRINTH13_THEMES } from './labyrinth13.js';
 import { OFFICE } from './office.js';
@@ -55,6 +56,7 @@ export const INTERIORS = {
   ...LABYR12_THEMES,   // [labyr12]
   ...LABYRINTH13_THEMES,
   ...LAB20_THEMES,
+  ...LAB24_THEMES,
 };
 export const THEMES_BY_ID = INTERIORS;
 export const INTERIOR_THEMES = Object.freeze(Object.keys(INTERIORS));
