@@ -10,7 +10,7 @@
 // (it is also the only writer of the pre-existing stats.quotasMet / stats.sold / stats.scrapCollected).
 // Nothing here is shared state: every peer evaluates its own achievements (no net traffic besides the
 // title in 'pinfo', no RNG).
-import { attentionHot } from '../ui/hud_attention.js';
+import { routineAttentionBusy } from '../ui/hud_attention.js';
 import { CREATURES } from './creatures.js';
 import { MOONS } from './moons.js';
 import { MARKET, MAX_LEVEL, REBIRTH_LEVEL, prestigeStars, MASTERY, masteryRank } from './progression.js';
@@ -423,7 +423,7 @@ class BannerQueue {
   }
   later(fn, ms) { const id = setTimeout(() => { this.timers.delete(id); if (!this.disposed) fn(); }, ms); this.timers.add(id); }
   // never pop a banner over the loading screen (it would be hidden) or over an open minigame (slot reels, safe dial...)
-  blocked() { return attentionHot(this.game) || !!this.game?.ui?.panelOpen || isLoading() || !!this.game?.minigame || !!this.game?.ui?.fullscreenOpen?.(); }
+  blocked() { return routineAttentionBusy(this.game) || !!this.game?.ui?.panelOpen || isLoading() || !!this.game?.minigame || !!this.game?.ui?.fullscreenOpen?.(); }
   next() {
     if (!this.q.length) { this.showing = false; return; }
     this.showing = true;
@@ -434,7 +434,7 @@ class BannerQueue {
     this.show(item, {}, () => this.next());
   }
   show(item, o, end) {
-    if (attentionHot(this.game) || this.game?.ui?.panelOpen) { this.q.unshift(item); end(); return; }
+    if (routineAttentionBusy(this.game) || this.game?.ui?.panelOpen) { this.q.unshift(item); end(); return; }
     if (o.compact || ['bronze', 'silver'].includes(item.tier)) {
       try { this.game.ui?.toast?.(`${item.icon || '\u{1F3C6}'} ${item.name}${item.reward ? ' \u00B7 ' + item.reward : ''}`, 'good', 3500); this.game.audio?.ui?.('ui_levelup', 0.5); } catch { /* ui optional */ }
       this.later(end, 600); return;

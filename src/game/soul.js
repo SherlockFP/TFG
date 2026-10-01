@@ -5,7 +5,7 @@
 //   4. moments: touchdown title card, sale count-up + register + Algorithm reaction, quota PA line, pickup pop, low-HP audio muffle (the heartbeat lives in feel.js / downed.js)
 //   5. voice: Algorithm + Company PA lines, <= 1 per 45 s, silent while chased, all EN/TR/RU (soul_core.js TX)
 // Everything is local presentation (no net messages, no host state): the beats are seeded by (moon, seed) so every peer sees the same ones.
-import { attentionHot } from '../ui/hud_attention.js';
+import { routineAttentionBusy } from '../ui/hud_attention.js';
 import * as THREE from 'three';
 import { MOONS, BIOMES } from './moons.js';
 import { G } from '../physics/physics.js';
@@ -411,13 +411,13 @@ export function installSoul(game) {
   const deferCard = moonId => { S.pendingCard = { moonId, key: cardContext() }; };
   function showCard(moonId, late) {
     if (disposed || game.destroyed || typeof document === 'undefined') return;
-    if (attentionHot(game)) { deferCard(moonId); return; }
+    if (routineAttentionBusy(game)) { deferCard(moonId); return; }
     const cc = game.ui?.centerCards;   // [centercards] the moon title takes the one centre-card slot (priority over level up / achievements)
     if (cc) cc.request('moon', (done) => buildCard(moonId, late, done)); else buildCard(moonId, late, () => {});
   }
   function buildCard(moonId, late, done) {
     if (disposed || game.destroyed) { done(); return; }
-    if (attentionHot(game)) { deferCard(moonId); done(); return; }
+    if (routineAttentionBusy(game)) { deferCard(moonId); done(); return; }
     if (game.onboard?.fr?.lease?.('card', 4.4, 2) === false) { done(); return; }   // [firstrun] one card at a time
     if (!late) { const d = game.onboard?.fr?.slot?.(4.4) || 0; if (d > 80) { done(); later(() => showCard(moonId, true), d); return; } }   // [qa] arrival cards queue behind each other
     S.card?.remove?.();
@@ -531,9 +531,9 @@ export function installSoul(game) {
     const p = game.player, ph = game.run?.phase;
     if (!p) return;
     if (S.cardKill && (p.dead || !['moon','company'].includes(ph) || S.cardKey !== cardContext())) S.cardKill();
-    if (attentionHot(game) && S.cardKill) { deferCard(S.cardMoon); S.cardKill(); }
+    if (routineAttentionBusy(game) && S.cardKill) { deferCard(S.cardMoon); S.cardKill(); }
     if (S.pendingCard && (!['moon','company'].includes(ph) || p.dead || S.pendingCard.key !== cardContext())) S.pendingCard = null;
-    if (S.pendingCard && !attentionHot(game)) { const pending = S.pendingCard; S.pendingCard = null; showCard(pending.moonId, true); }
+    if (S.pendingCard && !routineAttentionBusy(game)) { const pending = S.pendingCard; S.pendingCard = null; showCard(pending.moonId, true); }
     // low-HP audio muffle (the heartbeat + red vignette are feel.js; the downed lowpass is downed.js): a soft high-shelf cut on the master tone stage
     const a = game.audio;
     if (a?.tone && a.ctx) {

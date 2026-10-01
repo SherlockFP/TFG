@@ -1,4 +1,16 @@
-# Latest quality direction — waves21–22
+# Latest quality direction — Wave23
+
+This round addresses the previous review's three concrete priorities: furnished lift access, dark control separation and calm-arrival message competition. Default placement now waits for the normal refreshed Rapier step. Fresh browser QA exposed the old early-hook route certificate entering a wall and shelf; post-fix read-only certification passes at a different physical location. Standing-body routes retain actual furniture, normal E-open doors and required locks, and native controller regressions walk the entrance, all four crew positions and reverse routes. This improves a real reliability boundary rather than adding another catalogue.
+
+The maintenance cabin has restrained dirty-ivory/ochre PSX markings, distinct CALL/DOWN/SURFACE icons and localized captions reflecting native availability. Direct surface return is clear even on an unexplored deep floor. The complete cabin remains nine batches/444 triangles, no extra lights and the same three physical walls. Cached atlases and once-owned disposal bound the additional rendering work; these counts do not establish hardware FPS.
+
+Ordinary teaching, rewards and narrative now wait briefly during calling/travel and the first four local seconds after a floor change, ending immediately on leaving the cabin. Actual danger stays independent: emergency prompts and warnings remain, and danger beginning inside that quiet window still preserves the native warning-density rule. Installed HUD, Algorithm and lifecycle regressions verify the queues resume without losing warnings or notices.
+
+The independent assessment remains **7.9/10**. The exact browser boundaries belong to [Wave23 review](wave23/REVIEW.md) and [playtest](wave23/PLAYTEST.md). Fresh same-generator real keyboard walking opened ordinary doors and progressed through the furnished route, but the follower drifted from the certified centerline into a shelf; read-only capsule sweeps distinguish that drift from the clear centerline. The host subsequently died in the native running game, ending the full-route/transit proof. Do not turn that incomplete attempt into an unassisted approach or shared arrival pass. Prior Wave22 native bot, cargo-ID and automatic-arrival/Return passes remain historical evidence.
+
+Full native regression after the timing correction passed238/238 in370s. A final null-point certificate guard then passed all21 actual builder/controller cases plus locked-ring coverage; publication build passed4.77s. Remaining priorities are eye-height dark navigation, natural crew decisions and encounters over a full shift, generated-room repetition and representative hardware measurements. The familiar extraction/quota structure still needs distinctive consequences and authored places; more compulsory meters would add fatigue instead of identity.
+
+# Earlier quality direction — waves21–22
 
 The current wave gives ordinary facilities a second decision: return with today's salvage or commit the whole crew to a deeper generated archive. Quieter first-surface admission, one short rule per floor and direct return reduce early pressure and mandatory friction. The lift has actual physical access proof, one active facility, native custody and bounded threat stats. Tower of God informs the layered trial structure through TFG's original dead-network art and rules.
 

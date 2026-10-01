@@ -9,7 +9,7 @@
 //        host (pool + index) and broadcast, so every peer shows the same line in its own language.
 // CLIENT the intercom: ONE react-only subtitle under the compass (wave 9: no face card, hidden while calm), typewriter reveal, optional robot voice
 //        (speechSynthesis, terminal ALGO VOICE ON, off by default), line queue, cinematic-aware.
-import { attentionHot } from '../ui/hud_attention.js';
+import { routineAttentionBusy } from '../ui/hud_attention.js';
 import { LINES, FACTIONS, pickLang } from './loredata.js';
 import { isSellable } from './items.js';
 import { getLang, t, speechLang, upperT } from '../core/i18n.js';
@@ -274,7 +274,7 @@ export function installAlgorithm(core) {
   }
   function clientUpdate(dt) {
     const busy = game.ui?.fullscreenOpen?.();
-    const danger = attentionHot(game);
+    const danger = routineAttentionBusy(game);
     if (danger && st.cur && st.cur.cls !== 'danger') {
       st.q = OG.enqueue(st.q, st.cur);
       st.el?.classList.remove('on'); st.cur = null;

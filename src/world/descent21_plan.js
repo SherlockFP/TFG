@@ -30,7 +30,7 @@ export function descentFingerprint21(fac){
  return Object.freeze({seed:L.seed,theme:L.theme,w:L.w,h:L.h,hash});
 }
 export function verifiedDescentPlan21(fac,verified){
- if(!verified?.fingerprint||!Number.isFinite(verified.x)||!Number.isFinite(verified.z)||!Number.isInteger(verified.roomId))return null;
+ if(!Array.isArray(verified?.entryPath)||!verified.entryPath.length||verified.entryPath.length>4096||verified.entryPath.some(p=>!p||![p.x,p.y,p.z].every(Number.isFinite))||verified?.routeProof?.version!==23||!verified?.fingerprint||!Number.isFinite(verified.x)||!Number.isFinite(verified.z)||!Number.isInteger(verified.roomId))return null;
  const actual=descentFingerprint21(fac);for(const key of ['seed','theme','w','h','hash'])if(actual[key]!==verified.fingerprint[key])return null;
  return planDescent21(fac,{clear:(x,z)=>x===verified.x&&z===verified.z&&fac.layout.rooms[verified.roomId]?.id===verified.roomId});
 }

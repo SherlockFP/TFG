@@ -9,7 +9,7 @@
 //   * terminal     GUIDE [name|ALL|MUTE|UNMUTE], TIPS, ALGO TIPS, TUTORIAL [STATUS|SKIP|RESTART], "did you mean" on unknown words
 //   * tutorial     7 objectives (move, light, scrap, inventory, scan, back to ship, sell) via the 'objectives' hook, never blocking
 // Profile: profile.guide (see guide_core.js). Setting: settings.guideTips (default on). Docs: docs/wave4/guide.md.
-import { attentionHot } from '../ui/hud_attention.js';
+import { routineAttentionBusy } from '../ui/hud_attention.js';
 import { getLang, t } from '../core/i18n.js';
 import { saveSettings } from '../core/save.js';
 import { wrapMethod } from './dailyEvents.js';
@@ -265,7 +265,7 @@ export function installGuide(game) {
     return !!(a && (a.speaking || (a.state?.q?.length || 0) > 0));
   };
   function canSpeak() {
-    if (attentionHot(game) || game.ui?.centerCards?.busy?.()) return false;
+    if (routineAttentionBusy(game) || game.ui?.centerCards?.busy?.()) return false;
     if (game.player?.dead || game.minigame || game.terminal?.active || game.ui?.panelOpen || game.ui?.chatOpen || game.ui?.fullscreenOpen?.()) return false;
     if ((game.chase?.tension?.() || 0) > 0.12 || threatNearNoise(game.player, game.creatures?.views?.values?.(), 10)) return false;
     if (!game.run || game.run.phase === 'fired') return false;

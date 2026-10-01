@@ -15,10 +15,17 @@ export function attentionHot(game) {
  try { return wardenPressure(game) || !!game.onegoal?.hot?.() || (+game.director?.chaseLevel?.() || 0) > CHASE_QUIET || !!game.crdirector?.peakNow?.() || (+game.chase?.tension?.() || 0) > 0.12; }
  catch { return false; }
 }
+/** Local lift presentation never contributes to combat pressure. */
+export function attentionArrival(game) {
+ if (!game || game.destroyed || game.player?.dead) return false;
+ try { return !!game.descent21?.presentationBusy?.(); } catch { return false; }
+}
+export const routineAttentionBusy = game => attentionHot(game) || attentionArrival(game);
 export const toastUrgent = kind => ['bad','warn','warning','danger'].includes(kind);
 
 /** Hide teaching-only steps during encounters; full status and tutorial progress retain the original rows. */
 export function encounterObjectives(game, lines) {
+ if (attentionArrival(game) && !attentionHot(game)) return lines.filter(line => line.kind === 'warn');
  if (!attentionHot(game)) return lines;
  return lines.filter(line => line.kind === 'warn' || (line.src !== 'guide' && line.cat !== 'teach'));
 }

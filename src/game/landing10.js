@@ -5,7 +5,7 @@
 // Hooks (small, in existing files): ui.js systemMessage -> ui.landHook.capture, ui.js fullscreenOpen -> ui.landHook.hold (toasts / big text / Algorithm box wait),
 // ui.js clearCinematics also removes the case card wrapper (.lcase-cine), docklayout TOP_BANNERS stacks .l10-brief.
 // Net: none. Every peer runs its own sequencer off the same `sys` broadcasts and the run phase (host and clients identical).
-import { attentionHot, toastUrgent } from '../ui/hud_attention.js';
+import { routineAttentionBusy, toastUrgent } from '../ui/hud_attention.js';
 import { t, tf, addTranslations } from '../core/i18n.js';
 import { LandingSeq } from './landing10_core.js';
 
@@ -62,13 +62,13 @@ export function installLanding10(game) {
 
   /** ui.systemMessage hook: true = merged into the briefing (the line goes to the chat history silently, no toast) */
   function capture(text, kind) {
-    if (disposed || game.player?.dead || (attentionHot(game) && toastUrgent(kind))) return false;
+    if (disposed || game.player?.dead || (routineAttentionBusy(game) && toastUrgent(kind))) return false;
     if (!seq.add(text, kind, now())) return false;
     const u = ui();
     try { u?.chatMessage?.(null, text, false, kind); u?.chatLog?.lastElementChild?.classList.add('old'); } catch { /* chat optional */ }   // nothing is lost: readable in the chat log
     return true;
   }
-  const hold = () => !disposed && !attentionHot(game) && seq.holding();
+  const hold = () => !disposed && !routineAttentionBusy(game) && seq.holding();
 
   /** is another centre card up (or reserved)? the panel waits for the title card, a report or the case card */
   function centerBusy() {
@@ -88,7 +88,7 @@ export function installLanding10(game) {
     if (phase === 'landing' && seq.key !== keyOf(run)) { if (seq.begin(keyOf(run), n)) { try { ui()?.clearCinematics?.(); } catch { /* ignore */ } } }
     else if (!LAND.has(phase) && seq.stage === 'done') { seq.stage = 'idle'; seq.key = null; }   // takeoff / orbit: the next landing starts fresh
     if (!seq.holding()) return;
-    const ev = seq.tick(n, { phase, centerBusy: seq.stage === 'wait' ? centerBusy() : false, dead: !!game.player?.dead, danger: attentionHot(game) });
+    const ev = seq.tick(n, { phase, centerBusy: seq.stage === 'wait' ? centerBusy() : false, dead: !!game.player?.dead, danger: routineAttentionBusy(game) });
     if (!ev) return;
     if (ev.type === 'show') {
       render(ev);

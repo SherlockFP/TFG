@@ -19,7 +19,7 @@ addTranslations({'Depth {n} / Tier {tier}':'Derinlik {n} / Kademe {tier}',[TEXT.
 addTranslations({'Depth {n} / Tier {tier}':'Глубина {n} / Уровень {tier}',[TEXT.choice]:'Переход 3 с. Груз в кабине едет с вами. В глубине часы стоят; покинутые этажи закрываются. На поверхности часы продолжатся.'},'ru');
 
 export function installDescent21(game){
- let disposed=false,fac=null,lift=null,key='',bound=null,swapping=false,lastVisit=-Infinity,lastLiftAttempt=-Infinity,liftAttempts=0,processed='',announced='',lateJoin=false,stageSincePublish=0;const offs=[];
+ let disposed=false,fac=null,lift=null,key='',bound=null,swapping=false,lastVisit=-Infinity,lastLiftAttempt=-Infinity,liftAttempts=0,processed='',announced='',lateJoin=false,stageSincePublish=0,arrivalUntil=0,arrivalKey='',depthNotice='';const offs=[];
  const state=()=>game.run?.descent21?.token===descentToken(game.run)?game.run.descent21:null;
  const eligible=run=>{const moon=MOONS[run?.moon];return !!moon&&!['company','home','customMap','expedition','goal','instance','core','raid','voyage','ghost'].some(k=>!!moon[k]);};
  const active=()=>!disposed&&!game.destroyed&&eligible(game.run)&&game.run?.phase==='moon'&&game.world?.moonId===game.run.moon&&game.world?.seed===game.run.seed&&!!game.world.facility;
@@ -27,17 +27,23 @@ export function installDescent21(game){
  const publish=()=>game.broadcastRun?.(['descent21']);
  const emit=(name,...args)=>game.mods?.emit?.(name,...args);
  const warn=text=>game.ui?.toast?.(t(text),'warn');
- function ensure(){
-  if(!active()){if(lift)lift.dispose();lift=null;fac=null;key='';return false;}
+ function ensure(allowPlacement=false){
+  if(!active()){arrivalUntil=0;arrivalKey='';if(lift)lift.dispose();lift=null;fac=null;key='';return false;}
   if(game.isHost&&!state()){game.run.descent21=newDescent(game.run);publish();}
   const changed=fac!==game.world.facility||key!==descentToken(game.run);
-  if(changed||(!lift&&liftAttempts<4&&game.time-lastLiftAttempt>.5)){
-   if(changed)liftAttempts=0;liftAttempts++;
-   lift?.dispose();fac=game.world.facility;key=descentToken(game.run);lastLiftAttempt=game.time;lift=buildDescent21({facility:fac,physics:game.physics,floor:state()?.depth||0});
+  if(changed){lift?.dispose();lift=null;fac=game.world.facility;key=descentToken(game.run);liftAttempts=0;lastLiftAttempt=-Infinity;}
+  // Initial placement queries need the native step's refreshed Rapier query tree.
+  // Read hooks and host requests may run before that step; verified swaps build separately.
+  if(!lift&&allowPlacement&&liftAttempts<4&&game.time-lastLiftAttempt>.5){
+   liftAttempts++;lastLiftAttempt=game.time;lift=buildDescent21({facility:fac,physics:game.physics,floor:state()?.depth||0});
   }
-  if(lift&&state())lift.setState({floor:state().depth,discovered:discovered(state(),lift.plan),available:true,busy:['calling','travelling'].includes(state().liftStage)});
+  if(!lift)return false;
+  if(lift&&state())lift.setState({floor:state().depth,discovered:discovered(state(),lift.plan),available:true,ready:state().liftStage==='ready',busy:['calling','travelling'].includes(state().liftStage)});
+  const localKey=`${key}:${state()?.depth||0}`;
+  if(localKey!==arrivalKey){if(arrivalKey)arrivalUntil=game.time+4;arrivalKey=localKey;
+   const hud=game.ui?.hud;if(depthNotice&&hud){hud.pendingToasts=hud.pendingToasts?.filter(p=>p[0]!==depthNotice)||[];hud.toastQ=hud.toastQ?.filter(p=>p[0]!==depthNotice)||[];}depthNotice='';}
   const floor=spec(game.run),notice=floor?.depth>0?`${key}:${floor.depth}`:'';
-  if(notice&&notice!==announced){announced=notice;game.ui?.toast?.(`${tf('Depth {n} / Tier {tier}',{n:floor.depth,tier:floor.tier})}. ${descentRuleText(floor.rule,getLang())}`,'info');}
+  if(notice&&notice!==announced){announced=notice;depthNotice=`${tf('Depth {n} / Tier {tier}',{n:floor.depth,tier:floor.tier})}. ${descentRuleText(floor.rule,getLang())}`;game.ui?.toast?.(depthNotice,'info');}
   return !!lift;
  }
  const crew=()=>game.aiPlayers?.().filter(p=>!p.dead)||[];
@@ -129,7 +135,7 @@ export function installDescent21(game){
  }
  const on=(name,fn)=>{const off=game.mods?.on?.(name,fn);if(off)offs.push(off);};
  on('registerHandlers',(H,g)=>{if(g===game)H('d21req',hostReq);});
- on('update',(dt,g)=>{if(g&&g!==game)return;if(!ensure()||!state())return;const st=state();
+ on('update',(dt,g)=>{if(g&&g!==game)return;if(!ensure(true)||!state())return;const st=state();
   if(lateJoin&&st.depth>0){lateJoin=false;const p=lift.plan.safeSpawns?.[0]||lift.plan.spawn;game.player.teleport(new THREE.Vector3(p.x,p.y+.05,p.z),0);game.psTimer=0;}
   if(!game.isHost)return;
   if(game.time-lastVisit>=.25){lastVisit=game.time;let changed=false;const L=fac.layout,valid=new Set(lift.plan.discoveryRooms);
@@ -158,5 +164,5 @@ export function installDescent21(game){
   // cargo or held/bag custody. It is bounded and replicated with native state.
   const st=state();return !(active()&&st?.depth>0&&d?.e==='sp'&&!d.h&&!d.iv&&
    d.p?.[1]<FACILITY_Y+40&&st.surface?.items?.some(row=>row.id===d.id));
- },controlsActive:()=>!!(active()&&lift&&fac===game.world.facility&&game.player?.indoor&&!game.player.dead&&inCabin(game.player.pos,lift.plan)),placeLateJoin(){lateJoin=true;},plan:()=>lift?.plan||null,clockRate:()=>active()&&(state()?.depth>0||state()?.liftStage==='travelling')?0:1,dispose(){if(disposed)return;disposed=true;lift?.dispose();lift=null;for(const off of offs)off();bound?.off?.('msg:ds21floor',applyFloor);}};
+ },presentationBusy:()=>!!(active()&&lift&&game.player?.indoor&&!game.player.dead&&inCabin(game.player.pos,lift.plan)&&(['calling','travelling'].includes(state()?.liftStage)||game.time<arrivalUntil)),controlsActive:()=>!!(active()&&lift&&fac===game.world.facility&&game.player?.indoor&&!game.player.dead&&inCabin(game.player.pos,lift.plan)),placeLateJoin(){lateJoin=true;},plan:()=>lift?.plan||null,clockRate:()=>active()&&(state()?.depth>0||state()?.liftStage==='travelling')?0:1,dispose(){if(disposed)return;disposed=true;lift?.dispose();lift=null;for(const off of offs)off();bound?.off?.('msg:ds21floor',applyFloor);}};
 }

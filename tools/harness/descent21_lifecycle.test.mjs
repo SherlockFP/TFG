@@ -6,11 +6,12 @@ globalThis.window=globalThis;globalThis.document={createElement:canvas,documentE
 const THREE=await import('three'),{generateLayout,buildFacility}=await import('../../src/world/facility.js'),{MOONS}=await import('../../src/game/moons.js'),{initPhysics,Physics}=await import('../../src/physics/physics.js');await initPhysics();
 const {ItemManager}=await import('../../src/entities/items.js'),{Game}=await import('../../src/game/game.js'),{installDescent21}=await import('../../src/game/descent21.js');
 const {chooseSafeFloor}=await import('../../src/game/descent21_state.js'),{buildDescent21}=await import('../../src/world/descent21.js');
+const {attentionHot,routineAttentionBusy}=await import('../../src/ui/hud_attention.js');
 const {createRpsClient}=await import('../../src/game/arcade_rps_ui.js');
 const {installCoop12}=await import('../../src/game/coop12.js');
-function fixture(host=true,generation={}){
+function fixture(host=true,generation={},deferBootstrap=false){
  const ph=new Physics(),scene=new THREE.Scene(),hooks=new Map(),handlers=new Map(),messages=new Map(),events=[],sent=[];
- const run={phase:'moon',moon:'hamsi',seed:17,day:0,quotaIndex:0,time:123},moon=MOONS.hamsi,F=buildFacility(generateLayout(run.seed,moon.interior,generation.size??moon.size,generation.layoutOpts),{physics:ph,lightPool:{add:e=>e,remove(){}}});scene.add(F.group);ph.world.step();
+ const run={phase:'moon',moon:'hamsi',seed:17,day:0,quotaIndex:0,time:123},moon=MOONS.hamsi,F=buildFacility(generateLayout(run.seed,moon.interior,generation.size??moon.size,generation.layoutOpts),{physics:ph,lightPool:{add:e=>e,remove(){}}});scene.add(F.group);if(!deferBootstrap)ph.world.step();
  const player={pos:new THREE.Vector3(0,0,0),dead:false,indoor:false,teleport(p){this.pos.copy(p);this.indoor=p.y<0;}},remote={id:'b',pos:new THREE.Vector3(0,0,0),zone:'out',dead:false};
  const g={isHost:host,selfId:host?'a':'b',run,time:0,world:{moonId:'hamsi',seed:run.seed,facility:F,descent21Depth:0,outdoor:{identity:1}},physics:ph,scene,engine:{scene},env:{},player,lights:{add:e=>e,remove(){}},hostData:{powerUsed:2,powerBoost:1,spawnT:4,outPowerUsed:9,outdoorSpawnT:10,collected:new Set(['paid']),dayStats:{sold:4}},
  mods:{on:(k,fn)=>{const a=hooks.get(k)||[];a.push(fn);hooks.set(k,a);return()=>{hooks.set(k,a.filter(v=>v!==fn));};},emit:(k,...args)=>{events.push([k,...args]);for(const fn of hooks.get(k)||[])fn(...args);}},audio:{play(){},at(){}},ui:{toast(){}},onItemHeld(){},onItemDropped(){},
@@ -18,7 +19,7 @@ function fixture(host=true,generation={}){
  aiPlayers:()=>[{id:g.selfId,pos:player.pos,eye:player.pos.clone().add(new THREE.Vector3(0,1.6,0)),zone:player.indoor?'in':'out',dead:player.dead},...(host?[remote]:[])],aiPlayerById:id=>g.aiPlayers().find(p=>p.id===id),
  doorById:id=>g.world.facility.doors.find(d=>d.id===id),onDoor:Game.prototype.onDoor,broadcastRun(){},creatures:{host:new Map([['outside',{id:'outside',zone:'out',pos:new THREE.Vector3()}],['inside',{id:'inside',zone:'in',pos:new THREE.Vector3(0,-300,0)}]]),views:new Map(),noises:[],hostRemove(id){this.host.delete(id);},onEvent(){}},
  };
- g.items=new ItemManager(g);g.descent21=installDescent21(g);g.descent21.onState();
+ g.items=new ItemManager(g);g.descent21=installDescent21(g);g.descent21.onState();if(!deferBootstrap){ph.world.step();(hooks.get('update')||[]).at(-1)?.(1/60,g);}
  const tick=seconds=>{for(let i=0;i<Math.round(seconds*60);i++){g.time+=1/60;ph.world.step();(hooks.get('update')||[]).at(-1)?.(1/60,g);}};
  const visit=()=>{const L=g.world.facility.layout;for(const id of g.descent21.plan().discoveryRooms){const r=L.rooms[id];player.pos.set(L.ox+(r.cx+.5)*L.cell,L.y+.03,L.oz+(r.cz+.5)*L.cell);player.indoor=true;tick(.3);}};
  const aboard=()=>{const p=g.descent21.plan().spawn;player.teleport(new THREE.Vector3(p.x,p.y+.05,p.z));remote.pos.set(p.x+.55,p.y+.05,p.z);remote.zone='in';};
@@ -26,6 +27,16 @@ function fixture(host=true,generation={}){
  const dispose=()=>{g.descent21.dispose();g.items.clearAll();g.world.facility.dispose(ph);ph.world.free();};
  return {g,hooks,messages,events,sent,player,remote,tick,visit,aboard,request,dispose};
 }
+// Unstepped bootstrap read paths must not place a lift against stale Rapier queries.
+const Fresh=fixture(true,{},true);let initialQueries=0;
+const initialRay=Fresh.g.physics.raycast,initialOverlap=Fresh.g.physics.overlapSphere,initialShapes=Fresh.g.physics.world.intersectionsWithShape;
+Fresh.g.physics.raycast=Fresh.g.physics.overlapSphere=Fresh.g.physics.world.intersectionsWithShape=()=>{initialQueries++;throw Error('pre-step placement query');};
+Fresh.g.descent21.onState();Fresh.player.indoor=true;Fresh.g.mods.emit('interactables',[],Fresh.g);
+assert.equal(initialQueries,0);assert.equal(Fresh.g.descent21.plan(),null,'no pre-step cabin certificate');assert.equal(Fresh.request('call'),false);
+Fresh.g.physics.raycast=initialRay;Fresh.g.physics.overlapSphere=initialOverlap;Fresh.g.physics.world.intersectionsWithShape=initialShapes;
+Fresh.tick(1/60);assert(Fresh.g.descent21.plan(),'normal native step/update installs checked cabin');
+const freshPlan=structuredClone(Fresh.g.descent21.plan()),FreshPeer=fixture(false);assert.deepEqual(FreshPeer.g.descent21.plan(),freshPlan,'same stepped native geometry yields synchronized host/peer certificate');FreshPeer.dispose();Fresh.g.descent21.onState();assert.deepEqual(Fresh.g.descent21.plan(),freshPlan,'read hooks retain checked plan');Fresh.dispose();
+
 // Actual native ordinary lock is not an empty-discovery permanent lift lockout.
 const Ring=fixture(true,{size:.68,layoutOpts:{arch:'ring',roomMul:1.05}});Ring.aboard();
 assert(Ring.g.descent21.plan().discoveryRooms.length>0);assert.equal(Ring.request('call'),false,'native host rejects structurally eligible but unvisited ring');
@@ -57,7 +68,7 @@ assert(W.request('call'));W.tick(3.1);assert.equal(W.g.descent21.state().liftSta
 const jammed=W.g.world.facility.doors.find(d=>d.kind==='door'&&!d.locked);assert(jammed);jammed.locked=true;jammed.jam=10;
 W.remote.pos.x+=20;assert.equal(W.request('descend'),false,'no forced travel while friend elsewhere');W.aboard();
 const cabin=W.g.descent21.plan().spawn;W.g.items.onEvent({e:'sp',id:'corpse',ty:'body',v:5,p:[cabin.x,cabin.y+.5,cabin.z],lb:'Crew'});
-assert(W.request('descend'));W.tick(3.1);assert.equal(W.g.descent21.state().depth,1,'surface to real first deep floor');
+assert(W.request('descend'));assert.equal(W.g.descent21.presentationBusy(),true);assert.equal(attentionHot(W.g),false,'lift transit is never fake combat');W.tick(3.1);assert.equal(W.g.descent21.presentationBusy(),true,'native committed floor arrival reserves short local attention');assert.equal(routineAttentionBusy(W.g),true);const atArrival=W.player.pos.clone();W.player.pos.x+=20;assert.equal(W.g.descent21.presentationBusy(),false,'leaving cabin releases routine cues immediately');W.player.pos.copy(atArrival);W.tick(4.1);assert.equal(W.g.descent21.presentationBusy(),false,'safe automatic arrival cannot silence the whole floor');assert.equal(W.g.descent21.state().depth,1,'surface to real first deep floor');
 assert.equal(W.g.world.outdoor,baseOutdoor);assert.equal(W.g.run.time,baseClock);assert.equal(W.g.hostData.outPowerUsed,9);assert.equal(W.g.hostData.powerUsed,0);assert.equal(W.g.descent21.clockRate(),0);
 assert(W.g.items.get('corpse'));assert(W.g.items.get('held'));assert(W.g.items.get('bag'));assert(W.g.items.get('outside'));assert(!W.g.items.get('surface'));assert(!W.g.creatures.host.has('inside'));assert(W.g.creatures.host.has('outside'));
 assert.equal(W.g.items.get('bag').inv.k,'bag','native bag custody kept');assert.equal(W.g.descent21.state().surface.items[0].id,'surface');

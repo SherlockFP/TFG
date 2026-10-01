@@ -1,6 +1,6 @@
 // Exercises the existing HUD queues without creating a parallel HUD or pretending to test rendered CSS.
 import assert from 'node:assert/strict';
-import { attentionHot, toastUrgent, encounterObjectives } from '../../src/ui/hud_attention.js';
+import { attentionHot, routineAttentionBusy, encounterObjectives as arrivalObjectives, toastUrgent, encounterObjectives } from '../../src/ui/hud_attention.js';
 import { HUD } from '../../src/ui/hud.js';
 assert.equal(attentionHot({player:{},director:{chaseLevel:()=>.2}}),false);
 assert.equal(attentionHot({player:{},settings:{chattyAlgo:true},director:{chaseLevel:()=>.8}}),true);
@@ -106,14 +106,18 @@ try {
  intercom.show({text:'Threat approaching your position.',cls:'danger'});intercom.update(.1);assert.equal(intercom.state.cur.cls,'danger');
  intercom.update(10);assert.equal(intercom.speaking,false);assert.equal(intercom.state.q.length,1);
  wardGame.run.escape14.result='escaped';intercom.update(.1);assert.equal(intercom.state.cur.cls,'teach');assert.equal(intercom.state.cur.text,'Inspect the service counter.');
- intercom.dispose();
+ intercom.dispose();const arrivalIntercom=installAlgorithm({game:wardGame});let cabinQuiet=true;wardGame.descent21={presentationBusy:()=>cabinQuiet};
+ arrivalIntercom.show({text:'Optional salvage route.',cls:'teach'});arrivalIntercom.update(.1);assert.equal(arrivalIntercom.speaking,false,'actual installed intercom retains routine queue at lift arrival');
+ arrivalIntercom.show({text:'Crew needs rescue.',cls:'danger'});arrivalIntercom.update(.1);assert.equal(arrivalIntercom.state.cur.cls,'danger','urgent intercom can pass deferred teaching');arrivalIntercom.update(10);
+ cabinQuiet=false;arrivalIntercom.update(.1);assert.equal(arrivalIntercom.state.cur.text,'Optional salvage route.','same unread routine line resumes after leaving');delete wardGame.descent21;
+ arrivalIntercom.dispose();
 } finally {if(oldDoc===undefined)delete globalThis.document;else globalThis.document=oldDoc;}
 
 // Installed HUD: unchanged frames must not replace status text nodes or stable bars repeatedly.
 const prevDocument=globalThis.document,prevWindow=globalThis.window;
 let textWrites=0,styleWrites=0;
-const domNode=()=>{const classes=new Set(),cache=new Map();let text='';return {children:[],offsetHeight:0,childElementCount:0,classList:classList(classes),style:new Proxy({},{set(o,k,v){styleWrites++;o[k]=v;return true;}}),setAttribute(){},appendChild(n){this.children.push(n);},querySelector(s){if(!cache.has(s))cache.set(s,domNode());return cache.get(s);},querySelectorAll(){return [];},getContext(){return {};},getBoundingClientRect(){return {bottom:this.rectBottom||0,height:0};},getClientRects(){return [];},get textContent(){return text;},set textContent(v){textWrites++;text=String(v);}};};
-globalThis.document={documentElement:{dataset:{hud:'standard'}},createElement:domNode,head:domNode(),getElementById:()=>null};globalThis.window={innerWidth:960,innerHeight:540};
+const domNode=()=>{const classes=new Set(),cache=new Map();let text='';return {children:[],offsetHeight:0,childElementCount:0,classList:classList(classes),style:new Proxy({},{set(o,k,v){styleWrites++;o[k]=v;return true;}}),setAttribute(){},appendChild(n){n.parent=this;this.children.push(n);},remove(){if(this.parent)this.parent.children=this.parent.children.filter(n=>n!==this);},querySelector(s){if(!cache.has(s))cache.set(s,domNode());return cache.get(s);},querySelectorAll(){return [];},getContext(){return {};},getBoundingClientRect(){return {bottom:this.rectBottom||0,height:0};},getClientRects(){return [];},get textContent(){return text;},set textContent(v){textWrites++;text=String(v);}};};
+globalThis.document={documentElement:{dataset:{hud:'standard'}},createElement:domNode,createTextNode:text=>({textContent:text}),head:domNode(),getElementById:()=>null};globalThis.window={innerWidth:960,innerHeight:540};
 try {
  const mounted=new HUD(domNode());
  const stable={player:{hp:100,maxHp:100,stamina:100,maxStamina:100,carryWeight:()=>4,inShip:true,slots:[]},run:{phase:'moon',moon:'hamsi',time:480,seed:1,credits:0},profile:{level:1,xp:0,coins:0,skillPoints:0},stats:{carryRelief:0},world:{},voice:{transmitting:false,localLevel:0},settings:{}};
@@ -124,5 +128,19 @@ try {
  assert.equal(styleWrites,0,'stable health/bars/crosshair must not rewrite styles every frame');
  stable.player.hp=10;stable.player.stamina=50;stable.profile.level=2;stable.profile.skillPoints=1;stable.profile.xp=20;stable.run.time=600;
  mounted.update(1/60,stable);assert.ok(textWrites>0);assert.ok(styleWrites>0);assert.equal(mounted.$.lvl.textContent,'Lv.2');assert.match(mounted.$.rank.textContent,/\(\+1\)/);assert.notEqual(mounted.$.clockTime.textContent,'8:00 AM');assert.equal(mounted.$.stam.style.width,'50%');
+ let localArrival=true,realChase=false;stable.descent21={presentationBusy:()=>localArrival};stable.director={chaseLevel:()=>realChase?.8:0};
+ mounted.update(1/60,stable);mounted.toast('Lift safety warning','warn');mounted.toast('Crew needs rescue','bad');assert.equal(mounted.$.toasts.children.length,2);
+ realChase=true;mounted.update(1/60,stable);assert.equal(mounted.$.toasts.children.length,1,'real danger entry inside existing safe-arrival quiet trims visible warnings');assert.ok(mounted.toastQ.some(p=>p[0]==='Crew needs rescue'),'second unread warning is retained');
+ realChase=false;mounted.update(1/60,stable);assert.equal(mounted.toastLimit(),2);assert.equal(mounted.$.toasts.children.length,2,'native safe capacity restores deferred warning without loss');
+ for(const warning of [...mounted.$.toasts.children]){clearTimeout(warning._t1);clearTimeout(warning._t2);warning.remove();}localArrival=false;
  globalThis.window.innerHeight=720;mounted.el.querySelector('.hud-tr').rectBottom=140;for(let n=0;n<8;n++)mounted.update(1/60,stable);assert.equal(mounted.$.xpfeed.style.top,'148px','status cache does not bypass existing resize/layout measurement');
 } finally {if(prevDocument===undefined)delete globalThis.document;else globalThis.document=prevDocument;if(prevWindow===undefined)delete globalThis.window;else globalThis.window=prevWindow;}
+
+// Presentation pacing uses the actual HUD queue; urgent messages still pass without combat.
+let liftArrival=true;h.game={player:{},descent21:{presentationBusy:()=>liftArrival}};busy=false;h.pendingToasts=[];h.toastQ=[];h.pendingBig=null;h.$.toasts.children=[];h.nextFlush=0;
+assert.equal(attentionHot(h.game),false);assert.equal(routineAttentionBusy(h.game),true);
+h.toast('Depth 2 / Tier 1. Quiet archive','info');h.toast('Optional job reward','good');assert.equal(h.pendingToasts.length,2);
+h.toast('Recover downed crew','warn');assert.equal(shown.at(-1)[0],'Recover downed crew');assert.equal(h.toastLimit(),2,'arrival retains ordinary warning capacity');
+assert.deepEqual(arrivalObjectives(h.game,rows).map(r=>r.text),['Evacuate','Emergency hint']);
+h.$.toasts.children=[];liftArrival=false;h.flushPending();assert.equal(shown.at(-1)[0],'Depth 2 / Tier 1. Quiet archive');assert.equal(h.pendingToasts.length,1);
+console.log('readability23: local presentation defers native routine queue, preserves urgent warning, releases unread cue');
