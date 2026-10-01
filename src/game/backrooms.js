@@ -24,6 +24,7 @@
 import * as THREE from 'three';
 import { buildPocket, POCKET } from '../world/backrooms_pocket.js';
 import { pocketKey } from '../world/backrooms_plan.js';
+import { descentToken } from './descent21_state.js';
 import { RNG, hashString } from '../core/rng.js';
 import { CREATURES } from './creatures.js';
 import { ITEMS, SCRAP_TABLE, itemDef } from './items.js';
@@ -70,6 +71,7 @@ export function installBackrooms(game) {
     host: { t0: 0, nextSpawn: 0, warned: false, spawned: new Set(), outT: new Map(), emptyT: 0, cleanT: 0, sealTimer: null, loot: 0 },
   };
   const run = () => game.run;
+  const deepFloor = () => { const r = run(), d = r?.descent21; return d?.token === descentToken(r) && Number(d.depth) > 0; };
   const br = () => { const r = game.run; return r?.br && r.br.d === r.day ? r.br : null; };
   const members = () => (br()?.k ? br().m || [] : []);
   const posInPocket = (pos) => !!(S.pocket && pos && S.pocket.contains(pos));
@@ -82,6 +84,9 @@ export function installBackrooms(game) {
 
   // ---------------------------------------------------------------- pocket lifecycle (every peer)
   function ensurePocket(key) {
+    // A lift destination is the facility itself, never another nested noclip map.
+    // Delayed old pocket packets cannot recreate a second map below the lift.
+    if (key && deepFloor()) return null;
     key = (key || 0) >>> 0;
     if (key === S.builtKey) return S.pocket;
     if (S.pocket) {
@@ -104,7 +109,7 @@ export function installBackrooms(game) {
   function computeSpot() {
     disposeSpot();
     const fac = game.world.facility, r = run();
-    if (!fac || !r || game.world.company) return;
+    if (!fac || !r || game.world.company || deepFloor()) return;
     const rng = new RNG(((r.seed >>> 0) ^ 0xb4c7f00d ^ Math.imul((r.day | 0) + 1, 0x9e3779b1)) >>> 0);
     const chance = game.w3?.spotChance ? game.w3.spotChance(r, MOONS[r.moon]?.brGlitch) : (MOONS[r.moon]?.brGlitch ?? SPOT_CHANCE);   // [worlds3] 100 % day 1 / every 3rd day
     S.spotRoll = rng.next();
@@ -149,7 +154,7 @@ export function installBackrooms(game) {
   // ---------------------------------------------------------------- noclip cinematic (local)
   function startNoclip(reason) {
     const p = game.player, r = run();
-    if (S.cine || p.dead || !r || r.phase !== 'moon' || !game.net) return false;
+    if (S.cine || p.dead || !r || r.phase !== 'moon' || !game.net || deepFloor()) return false;
     if (reason === 'spot' && (!S.spot || spotState() === 'sealed')) return false;
     if (posInPocket(p.pos)) return false;
     S.go = null;
@@ -261,7 +266,7 @@ export function installBackrooms(game) {
   function hostEnter(from, reason, claimed) {
     const r = run();
     const deny = (why) => game.net.sendTo(from, 'brgo', { ok: false, why });
-    if (!r || r.phase !== 'moon' || !game.world.facility || game.world.company) return deny('phase');
+    if (!r || r.phase !== 'moon' || !game.world.facility || game.world.company || deepFloor()) return deny('phase');
     const ap = game.aiPlayerById(from);
     if (!ap || ap.dead) return deny('dead');
     // each peer owns its own position: trust the position sent with the request when it is close to what we last saw
@@ -621,6 +626,14 @@ export function installBackrooms(game) {
     const b = br();
     if (b?.k) ensurePocket(b.k);       // late joiner: build before the welcome's items are created
   });
+  on('facilityWillChange', () => {
+    disposeSpot();
+    clearTimeout(S.host.sealTimer);
+    if (S.cine) { game.player.frozen = false; S.cine = null; S.go = null; S.overlay?.show(false); }
+    if (game.isHost && (S.pocket || br()?.k)) hostUnload();
+    else ensurePocket(0);
+  });
+  on('facilityChanged', () => computeSpot());
   on('phase', (ph) => {
     if (ph === 'orbit' || ph === 'fired') {
       if (game.isHost && run()?.br) { run().br = null; game.broadcastRun(['br']); }

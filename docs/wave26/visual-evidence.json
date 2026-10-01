@@ -1,0 +1,285 @@
+{
+  "method": "VISUAL_REPLAY / SOLO: recorded genuine depth3/7 state through native onState rebuild; safe standing/camera fixtures only, not another E/cargo/AI outcome proof",
+  "javascriptFreeze": "da409e4e35b20cb2b39f220491f7f7b5b1f534f8b46129d05fd94530136919a1",
+  "allSourceFreeze": "92381f362de85873237ede8b6b7b9a0a20c317d46deb67f062e31ab92e57bddb",
+  "checks": [
+    {
+      "pose": {
+        "depth": 3,
+        "theme": "backrooms",
+        "seed": 1179496989,
+        "size": 0.77,
+        "p": [
+          -32,
+          -299.9800005665005,
+          -64
+        ],
+        "grounded": true,
+        "standingClear": true,
+        "target": {
+          "x": -32,
+          "y": -298.45,
+          "z": -59
+        },
+        "caption": "l0",
+        "oldStage": "idle"
+      },
+      "viewport": {
+        "width": 960,
+        "height": 540
+      },
+      "rectangles": {
+        "caption": {
+          "x": 716,
+          "y": 298,
+          "width": 230,
+          "height": 61.09375,
+          "visible": true,
+          "text": "● REC   SP   04:57:40 AMLEVEL 0 - THE LOBBYMono-yell"
+        },
+        "hotbar": {
+          "x": 362,
+          "y": 444,
+          "width": 568,
+          "height": 70,
+          "visible": true,
+          "text": "IPOCKETS0/81Chalk2Lead Pipe34LIGHT5"
+        },
+        "play": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "visible": false,
+          "text": "▶ PLAY 00:00:01SP · LEVEL 0 · CH 03"
+        },
+        "date": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "visible": false,
+          "text": "JUN 17 1993  08:42 PM"
+        },
+        "errors": {
+          "total": 0,
+          "last": []
+        }
+      },
+      "filename": "replay-depth3-960.png"
+    },
+    {
+      "pose": {
+        "depth": 3,
+        "theme": "backrooms",
+        "seed": 1179496989,
+        "size": 0.77,
+        "p": [
+          -32,
+          -299.9800005665005,
+          -64
+        ],
+        "grounded": true,
+        "standingClear": true,
+        "target": {
+          "x": -32,
+          "y": -298.45,
+          "z": -59
+        },
+        "caption": "l0",
+        "oldStage": "idle"
+      },
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "rectangles": {
+        "caption": {
+          "x": 1036,
+          "y": 208,
+          "width": 230,
+          "height": 61.09375,
+          "visible": true,
+          "text": "● REC   SP   04:59:40 AMLEVEL 0 - THE LOBBYMono-yell"
+        },
+        "hotbar": {
+          "x": 682,
+          "y": 624,
+          "width": 568,
+          "height": 70,
+          "visible": true,
+          "text": "IPOCKETS0/81Chalk2Lead Pipe34LIGHT5"
+        },
+        "play": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "visible": false,
+          "text": "▶ PLAY 00:00:01SP · LEVEL 0 · CH 03"
+        },
+        "date": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "visible": false,
+          "text": "JUN 17 1993  08:42 PM"
+        },
+        "errors": {
+          "total": 0,
+          "last": []
+        }
+      },
+      "filename": "replay-depth3-1280.png"
+    },
+    {
+      "pose": {
+        "depth": 7,
+        "theme": "nullreception",
+        "seed": 3171011355,
+        "size": 0.815,
+        "p": [
+          -2.809999942779541,
+          -299.9800015899867,
+          52
+        ],
+        "grounded": true,
+        "standingClear": true,
+        "target": {
+          "x": -5.81,
+          "y": -298.15,
+          "z": 52,
+          "yaw": 1.5707963267948966,
+          "room": 0
+        },
+        "caption": null,
+        "oldStage": "idle"
+      },
+      "viewport": {
+        "width": 960,
+        "height": 540
+      },
+      "rectangles": {
+        "caption": {
+          "x": 716,
+          "y": 306,
+          "width": 230,
+          "height": 61.09375,
+          "visible": false,
+          "text": "● REC   SP   04:59:40 AMLEVEL 0 - THE LOBBYMono-yell"
+        },
+        "hotbar": {
+          "x": 362,
+          "y": 444,
+          "width": 568,
+          "height": 70,
+          "visible": true,
+          "text": "IPOCKETS0/81Chalk2Lead Pipe34LIGHT5"
+        },
+        "play": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "visible": false,
+          "text": "▶ PLAY 00:00:01SP · LEVEL 0 · CH 03"
+        },
+        "date": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "visible": false,
+          "text": "JUN 17 1993  08:42 PM"
+        },
+        "errors": {
+          "total": 0,
+          "last": []
+        }
+      },
+      "filename": "replay-depth7-960.png"
+    },
+    {
+      "pose": {
+        "depth": 7,
+        "theme": "nullreception",
+        "seed": 3171011355,
+        "size": 0.815,
+        "p": [
+          -2.809999942779541,
+          -299.9800015899867,
+          52
+        ],
+        "grounded": true,
+        "standingClear": true,
+        "target": {
+          "x": -5.81,
+          "y": -298.15,
+          "z": 52,
+          "yaw": 1.5707963267948966,
+          "room": 0
+        },
+        "caption": null,
+        "oldStage": "idle"
+      },
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "rectangles": {
+        "caption": {
+          "x": 1036,
+          "y": 291,
+          "width": 230,
+          "height": 61.09375,
+          "visible": false,
+          "text": "● REC   SP   04:59:40 AMLEVEL 0 - THE LOBBYMono-yell"
+        },
+        "hotbar": {
+          "x": 682,
+          "y": 624,
+          "width": 568,
+          "height": 70,
+          "visible": true,
+          "text": "IPOCKETS0/81Chalk2Lead Pipe34LIGHT5"
+        },
+        "play": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "visible": false,
+          "text": "▶ PLAY 00:00:01SP · LEVEL 0 · CH 03"
+        },
+        "date": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "visible": false,
+          "text": "JUN 17 1993  08:42 PM"
+        },
+        "errors": {
+          "total": 0,
+          "last": []
+        }
+      },
+      "filename": "replay-depth7-1280.png"
+    }
+  ],
+  "errors": [],
+  "consoleErrors": [
+    "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+    "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+    "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+    "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+    "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+    "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+    "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+    "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+    "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+    "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed."
+  ],
+  "status": "FRESH_VISUAL_REPLAY_PASS"
+}

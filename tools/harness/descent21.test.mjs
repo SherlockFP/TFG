@@ -5,6 +5,8 @@ import {generateLayout,buildFacility} from '../../src/world/facility.js';
 import {NavGrid} from '../../src/world/nav.js';
 import {initPhysics,Physics,G,groups,RAPIER} from '../../src/physics/physics.js';
 import {newDescent,discovered,stageRequest} from '../../src/game/descent21_state.js';
+import {floorSpec} from '../../src/game/descent21_core.js';
+import {MOONS} from '../../src/game/moons.js';
 import {certifyCabinRoutes23} from '../../src/world/descent23_routes.js';
 import {buildDescent21} from '../../src/world/descent21.js';
 await initPhysics();
@@ -20,7 +22,7 @@ function physicalPath(ph,source,start,spot){
  assert.ok(seen.has(goal),'native nav plus actual body-clearance graph reaches optional room');const ids=[];for(let a=goal;a!==-1;a=seen.get(a))ids.push(a);return ids.reverse().map(i=>nav.toWorld(i%nav.w,Math.floor(i/nav.w)));
 }
 
-const cases=[{theme:'factory',seed:17,size:.68,opts:{arch:'atrium',roomMul:1.05}},...['threadarchive','bufferfoundry','office','serverfarm','factory'].flatMap(theme=>[17,42].map(seed=>({theme,seed,size:1.1}))),...[1,2,3,4,5,6,7,17,42,77].map(seed=>({theme:'factory',seed,size:.8}))];
+const cases=[{theme:'factory',seed:17,size:.68,opts:{arch:'atrium',roomMul:1.05}},...['threadarchive','bufferfoundry','office','serverfarm','factory'].flatMap(theme=>[17,42].map(seed=>({theme,seed,size:1.1}))),...['backrooms','nullreception'].flatMap(theme=>[1,17,42].map(seed=>({theme,seed,size:.9}))),...[3,7].map(depth=>{const {theme,seed,size}=floorSpec(MOONS.hamsi,17,depth);return {theme,seed,size};}),...[1,2,3,4,5,6,7,17,42,77].map(seed=>({theme:'factory',seed,size:.8}))];
 for(const {theme,seed,size,opts} of cases){
  const L=generateLayout(seed,theme,size,opts),ph=new Physics(),fac=buildFacility(L,{physics:ph,lightPool:{add:e=>e,remove(){}}});ph.world.step();if(opts?.arch==='atrium'){assert.equal(certifyCabinRoutes23(ph,{x:34.6,z:37.4,y:L.y,yaw:Math.PI,approach:{x:34.6,y:L.y,z:35.1}}),null,'old furnished approach rejected before any lift is placed');}const lobby=buildDescent21({facility:fac,physics:ph,floor:3});assert.ok(lobby,`${theme}/${seed}: safe lobby missing`);ph.world.step();
  assert.equal(lobby.metrics.colliders,3);assert.equal(lobby.metrics.emitters,0);assert.ok(lobby.metrics.batches<=9);assert.equal(lobby.plan.requiredRooms,15);assert.ok(lobby.plan.discoveryRooms.length>0);

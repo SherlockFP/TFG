@@ -1004,7 +1004,7 @@ export function buildFacility(layout, { physics, lightPool }) {
     const rcx = (x0 + x1) / 2, rcz = (z0 + z1) / 2;
     // Deep rooms get a readable landmark so navigation is not just an endless sequence of boxes.
     // Keep it visual-only: the gameplay collision belongs to the room itself, not the landmark.
-    if (r.type !== 'entrance' && r.type !== 'core' && !r.hub && L.distOf[L.idx(r.cx, r.cz)] >= 5 && r.w * r.h >= 8 && rng.chance(0.38)) {
+    if (def.landmarks?.length !== 0 && r.type !== 'entrance' && r.type !== 'core' && !r.hub && L.distOf[L.idx(r.cx, r.cz)] >= 5 && r.w * r.h >= 8 && rng.chance(0.38)) {
       const marks = def.landmarks || ['server_rack_prop', 'generator', 'shelf_metal'];
       const landmark = marks[rng.int(0, marks.length - 1)];
       const obj = placeProp(landmark, rcx, Y, rcz, rng.int(0, 3) * Math.PI / 2, { visualOnly: true });

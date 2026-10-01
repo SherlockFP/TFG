@@ -1,0 +1,7286 @@
+{
+  "method": "Wave26 GUIDED_INPUT: two-peer normal descent, setup-labelled landing only; actual keyboard/mouse/E, no hostReq/noLos/AI/HP/stage outcomes. Controlled Game.update/Input.endFrame clock via unchanged kefal.tick; SwiftShader is not hardware FPS.",
+  "freeze": "6bcce081ffcc949e2496101b37cc8261c0c6acce4e33f1fe6d099d6d13d6751e",
+  "startedAt": "2026-10-01T07:23:32.269Z",
+  "status": "TWO_PEER_NATIVE_E_BACKROOMS_AND_NULL_RECEPTION_RETURN_PASS",
+  "durationMs": 315876,
+  "cargoBaseline26": [
+    {
+      "id": "i1qc",
+      "type": "bolt",
+      "value": 19,
+      "state": "world",
+      "holder": null,
+      "inv": null,
+      "p": [
+        -56.71674346923828,
+        -299.8251037597656,
+        -58.61182403564453
+      ]
+    },
+    {
+      "id": "i1rw",
+      "type": "airhorn",
+      "value": 49,
+      "state": "held",
+      "holder": "L2eniu6pyc",
+      "inv": null,
+      "p": [
+        0.059008664682468445,
+        0.049118570012930185,
+        -0.025004015627281523
+      ]
+    }
+  ],
+  "echoInput26": {
+    "before": {
+      "time": 121.56666666666105,
+      "p": [
+        -59.95000076293945,
+        -299.9800008859323,
+        -29.149999618530273
+      ],
+      "eye": [
+        -59.95000076293945,
+        -298.3600008859323,
+        -29.149999618530273
+      ],
+      "active": true,
+      "stats": {
+        "pending": 0,
+        "cooldowns": 0
+      },
+      "held": "airhorn"
+    },
+    "captured": {
+      "time": 121.59999999999438,
+      "stats": {
+        "pending": 1,
+        "cooldowns": 1
+      }
+    },
+    "walking": [
+      {
+        "target": [
+          -59.949999999999996,
+          -299.97,
+          -29.150000000000002
+        ],
+        "start": [
+          -59.95000076293945,
+          -299.9800008859323,
+          -29.149999618530273
+        ],
+        "end": [
+          -59.95000076293945,
+          -299.9800008859323,
+          -29.149999618530273
+        ],
+        "done": true
+      },
+      {
+        "target": [
+          -59.4,
+          -299.97,
+          -28.6
+        ],
+        "start": [
+          -59.95000076293945,
+          -299.9800008859323,
+          -29.149999618530273
+        ],
+        "end": [
+          -59.56695521972142,
+          -299.98000060277843,
+          -28.767652141861618
+        ],
+        "done": true
+      },
+      {
+        "target": [
+          -59.4,
+          -300,
+          -30.900000000000002
+        ],
+        "start": [
+          -59.56695521972142,
+          -299.98000060277843,
+          -28.767652141861618
+        ],
+        "end": [
+          -59.40820045606233,
+          -299.9800008605083,
+          -30.780098632443696
+        ],
+        "done": true
+      }
+    ],
+    "replay": {
+      "time": 124.59999999999421,
+      "player": [
+        -59.449244861454645,
+        -299.9800005642113,
+        -30.237840816145763
+      ],
+      "stats": {
+        "pending": 0,
+        "cooldowns": 1
+      },
+      "rows": [
+        {
+          "p": [
+            -59.95000076293945,
+            -298.3600008859323,
+            -29.149999618530273
+          ],
+          "loud": 1.1,
+          "t": 0
+        }
+      ]
+    },
+    "obsoleteDistance": 1.1975620836104344
+  },
+  "clockFinal": [
+    {
+      "outsideUpdates": 1009,
+      "manualUpdates": 8002,
+      "steps": 8002
+    },
+    {
+      "outsideUpdates": 721,
+      "manualUpdates": 5696,
+      "steps": 5696
+    }
+  ],
+  "finalInput": [
+    {
+      "p": [
+        -57.95000076293945,
+        -299.9800002160795,
+        -59.150001525878906
+      ],
+      "phase": "moon",
+      "depth": 0,
+      "hp": 100,
+      "dead": false
+    },
+    {
+      "p": [
+        -56.849998474121094,
+        -299.9800002718788,
+        -59.150001525878906
+      ],
+      "phase": "moon",
+      "depth": 0,
+      "hp": 100,
+      "dead": false
+    }
+  ],
+  "selected26": [
+    {
+      "op": "call",
+      "before": {
+        "typing": false,
+        "enabled": true,
+        "locked": true,
+        "domLock": true,
+        "want": true,
+        "down": [],
+        "pressed": [],
+        "focus": {
+          "tag": "BODY",
+          "cls": ""
+        },
+        "panel": false,
+        "term": false,
+        "phase": "moon",
+        "target": "Call depth lift [E]",
+        "sub": "10/10 ",
+        "clock": 493.44444444445514,
+        "token": "hamsi:17:1",
+        "p": [
+          -57.86429977416992,
+          -299.9800003090344,
+          -59.096378326416016
+        ]
+      }
+    },
+    {
+      "op": "descend",
+      "before": {
+        "typing": false,
+        "enabled": true,
+        "locked": true,
+        "domLock": true,
+        "want": true,
+        "down": [],
+        "pressed": [],
+        "focus": {
+          "tag": "BODY",
+          "cls": ""
+        },
+        "panel": false,
+        "term": false,
+        "phase": "moon",
+        "target": "Descend together [E]",
+        "sub": "Next: depth 1 · ordinary archive. Cabin cargo travels. Direct surface return stays available.",
+        "clock": 498.0000000000143,
+        "token": "hamsi:17:1",
+        "p": [
+          -57.86429977416992,
+          -299.9800003090344,
+          -59.096378326416016
+        ]
+      }
+    },
+    {
+      "op": "call",
+      "before": {
+        "typing": false,
+        "enabled": true,
+        "locked": true,
+        "domLock": true,
+        "want": true,
+        "down": [],
+        "pressed": [],
+        "focus": {
+          "tag": "BODY",
+          "cls": ""
+        },
+        "panel": false,
+        "term": false,
+        "phase": "moon",
+        "target": "Call depth lift [E]",
+        "sub": "13/13 ",
+        "clock": 498.0888888889033,
+        "token": "hamsi:17:1",
+        "p": [
+          -23.877685546875,
+          -299.9800000429153,
+          -59.849609375
+        ]
+      }
+    },
+    {
+      "op": "descend",
+      "before": {
+        "typing": false,
+        "enabled": true,
+        "locked": true,
+        "domLock": true,
+        "want": true,
+        "down": [],
+        "pressed": [],
+        "focus": {
+          "tag": "BODY",
+          "cls": ""
+        },
+        "panel": false,
+        "term": false,
+        "phase": "moon",
+        "target": "Descend together [E]",
+        "sub": "Next: depth 2 · ordinary archive. Cabin cargo travels. Direct surface return stays available.",
+        "clock": 498.0888888889033,
+        "token": "hamsi:17:1",
+        "p": [
+          -23.877685546875,
+          -299.9800000429153,
+          -59.849609375
+        ]
+      }
+    },
+    {
+      "op": "call",
+      "before": {
+        "typing": false,
+        "enabled": true,
+        "locked": true,
+        "domLock": true,
+        "want": true,
+        "down": [],
+        "pressed": [],
+        "focus": {
+          "tag": "BODY",
+          "cls": ""
+        },
+        "panel": false,
+        "term": false,
+        "phase": "moon",
+        "target": "Call depth lift [E]",
+        "sub": "13/13 ",
+        "clock": 498.0888888889033,
+        "token": "hamsi:17:1",
+        "p": [
+          32.162532806396484,
+          -299.9800170898437,
+          -63.799625396728516
+        ]
+      }
+    },
+    {
+      "op": "descend",
+      "before": {
+        "typing": false,
+        "enabled": true,
+        "locked": true,
+        "domLock": true,
+        "want": true,
+        "down": [],
+        "pressed": [],
+        "focus": {
+          "tag": "BODY",
+          "cls": ""
+        },
+        "panel": false,
+        "term": false,
+        "phase": "moon",
+        "target": "Descend together [E]",
+        "sub": "Next: depth 3 · Backrooms — unindexed route. Cabin cargo travels. Direct surface return stays available.",
+        "clock": 498.0888888889033,
+        "token": "hamsi:17:1",
+        "p": [
+          32.162532806396484,
+          -299.9800170898437,
+          -63.799625396728516
+        ]
+      }
+    },
+    {
+      "op": "return",
+      "before": {
+        "typing": false,
+        "enabled": true,
+        "locked": true,
+        "domLock": true,
+        "want": true,
+        "down": [],
+        "pressed": [],
+        "focus": {
+          "tag": "BODY",
+          "cls": ""
+        },
+        "panel": false,
+        "term": false,
+        "phase": "moon",
+        "target": "Return to surface together [E]",
+        "sub": "3s transit. Cabin cargo travels. Deep clock held; abandoned floors seal. Surface clock resumes on return.",
+        "clock": 498.0888888889033,
+        "token": "hamsi:17:1",
+        "p": [
+          20.049999237060547,
+          -299.9800013035132,
+          -23.950000762939453
+        ]
+      }
+    },
+    {
+      "op": "call",
+      "before": {
+        "typing": false,
+        "enabled": true,
+        "locked": true,
+        "domLock": true,
+        "want": true,
+        "down": [],
+        "pressed": [],
+        "focus": {
+          "tag": "BODY",
+          "cls": ""
+        },
+        "panel": false,
+        "term": false,
+        "phase": "moon",
+        "target": "Call depth lift [E]",
+        "sub": "10/10 ",
+        "clock": 509.2222222222455,
+        "token": "hamsi:17:1",
+        "p": [
+          -57.74993896484375,
+          -299.9800001729849,
+          -59.02826690673828
+        ]
+      }
+    },
+    {
+      "op": "descend",
+      "before": {
+        "typing": false,
+        "enabled": true,
+        "locked": true,
+        "domLock": true,
+        "want": true,
+        "down": [],
+        "pressed": [],
+        "focus": {
+          "tag": "BODY",
+          "cls": ""
+        },
+        "panel": false,
+        "term": false,
+        "phase": "moon",
+        "target": "Descend together [E]",
+        "sub": "Next: depth 4 · ordinary archive. Cabin cargo travels. Direct surface return stays available.",
+        "clock": 513.7777777778047,
+        "token": "hamsi:17:1",
+        "p": [
+          -57.74993896484375,
+          -299.9800001729849,
+          -59.02826690673828
+        ]
+      }
+    },
+    {
+      "op": "call",
+      "before": {
+        "typing": false,
+        "enabled": true,
+        "locked": true,
+        "domLock": true,
+        "want": true,
+        "down": [],
+        "pressed": [],
+        "focus": {
+          "tag": "BODY",
+          "cls": ""
+        },
+        "panel": false,
+        "term": false,
+        "phase": "moon",
+        "target": "Call depth lift [E]",
+        "sub": "13/13 ",
+        "clock": 513.8666666666936,
+        "token": "hamsi:17:1",
+        "p": [
+          -21.076852798461914,
+          -299.9800017817828,
+          -59.84982681274414
+        ]
+      }
+    },
+    {
+      "op": "descend",
+      "before": {
+        "typing": false,
+        "enabled": true,
+        "locked": true,
+        "domLock": true,
+        "want": true,
+        "down": [],
+        "pressed": [],
+        "focus": {
+          "tag": "BODY",
+          "cls": ""
+        },
+        "panel": false,
+        "term": false,
+        "phase": "moon",
+        "target": "Descend together [E]",
+        "sub": "Next: depth 5 · ordinary archive. Cabin cargo travels. Direct surface return stays available.",
+        "clock": 513.8666666666936,
+        "token": "hamsi:17:1",
+        "p": [
+          -21.076852798461914,
+          -299.9800017817828,
+          -59.84982681274414
+        ]
+      }
+    },
+    {
+      "op": "call",
+      "before": {
+        "typing": false,
+        "enabled": true,
+        "locked": true,
+        "domLock": true,
+        "want": true,
+        "down": [],
+        "pressed": [],
+        "focus": {
+          "tag": "BODY",
+          "cls": ""
+        },
+        "panel": false,
+        "term": false,
+        "phase": "moon",
+        "target": "Call depth lift [E]",
+        "sub": "11/11 ",
+        "clock": 513.8666666666936,
+        "token": "hamsi:17:1",
+        "p": [
+          -33.07720947265625,
+          -299.9800170898437,
+          20.152006149291992
+        ]
+      }
+    },
+    {
+      "op": "descend",
+      "before": {
+        "typing": false,
+        "enabled": true,
+        "locked": true,
+        "domLock": true,
+        "want": true,
+        "down": [],
+        "pressed": [],
+        "focus": {
+          "tag": "BODY",
+          "cls": ""
+        },
+        "panel": false,
+        "term": false,
+        "phase": "moon",
+        "target": "Descend together [E]",
+        "sub": "Next: depth 6 · ordinary archive. Cabin cargo travels. Direct surface return stays available.",
+        "clock": 513.8666666666936,
+        "token": "hamsi:17:1",
+        "p": [
+          -33.07720947265625,
+          -299.9800170898437,
+          20.152006149291992
+        ]
+      }
+    },
+    {
+      "op": "call",
+      "before": {
+        "typing": false,
+        "enabled": true,
+        "locked": true,
+        "domLock": true,
+        "want": true,
+        "down": [],
+        "pressed": [],
+        "focus": {
+          "tag": "BODY",
+          "cls": ""
+        },
+        "panel": false,
+        "term": false,
+        "phase": "moon",
+        "target": "Call depth lift [E]",
+        "sub": "9/9 ",
+        "clock": 513.8666666666936,
+        "token": "hamsi:17:1",
+        "p": [
+          -55.750728607177734,
+          -299.98000021675887,
+          -61.028263092041016
+        ]
+      }
+    },
+    {
+      "op": "descend",
+      "before": {
+        "typing": false,
+        "enabled": true,
+        "locked": true,
+        "domLock": true,
+        "want": true,
+        "down": [],
+        "pressed": [],
+        "focus": {
+          "tag": "BODY",
+          "cls": ""
+        },
+        "panel": false,
+        "term": false,
+        "phase": "moon",
+        "target": "Descend together [E]",
+        "sub": "Next: depth 7 · Null Reception — undelivered messages. Cabin cargo travels. Direct surface return stays available.",
+        "clock": 513.8666666666936,
+        "token": "hamsi:17:1",
+        "p": [
+          -55.750728607177734,
+          -299.98000021675887,
+          -61.028263092041016
+        ]
+      }
+    },
+    {
+      "op": "return",
+      "before": {
+        "typing": false,
+        "enabled": true,
+        "locked": true,
+        "domLock": true,
+        "want": true,
+        "down": [],
+        "pressed": [],
+        "focus": {
+          "tag": "BODY",
+          "cls": ""
+        },
+        "panel": false,
+        "term": false,
+        "phase": "moon",
+        "target": "Return to surface together [E]",
+        "sub": "3s transit. Cabin cargo travels. Deep clock held; abandoned floors seal. Surface clock resumes on return.",
+        "clock": 513.8666666666936,
+        "token": "hamsi:17:1",
+        "p": [
+          -59.843685150146484,
+          -299.9800007751604,
+          -29.074111938476562
+        ]
+      }
+    }
+  ],
+  "walkProgress": [
+    {
+      "target": [
+        -57.4,
+        -300,
+        -60.9
+      ],
+      "start": [
+        -57.400001525878906,
+        -299.9800002250025,
+        -60.900001525878906
+      ],
+      "end": [
+        -57.400001525878906,
+        -299.9800002250025,
+        -60.900001525878906
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -57.4,
+        -299.97,
+        -58.6
+      ],
+      "start": [
+        -57.400001525878906,
+        -299.9800002250025,
+        -60.900001525878906
+      ],
+      "end": [
+        -57.39884246911606,
+        -299.98000036455085,
+        -58.812519180355594
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -57.949999999999996,
+        -299.97,
+        -59.15
+      ],
+      "start": [
+        -57.39884246911606,
+        -299.98000036455085,
+        -58.812519180355594
+      ],
+      "end": [
+        -57.859669455792755,
+        -299.98000018839264,
+        -59.0934870284982
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -57.4,
+        -300,
+        -60.9
+      ],
+      "start": [
+        -57.400001525878906,
+        -299.9800002250025,
+        -60.900001525878906
+      ],
+      "end": [
+        -57.400001525878906,
+        -299.9800002250025,
+        -60.900001525878906
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -57.4,
+        -299.97,
+        -58.6
+      ],
+      "start": [
+        -57.400001525878906,
+        -299.9800002250025,
+        -60.900001525878906
+      ],
+      "end": [
+        -57.39856679212244,
+        -299.97979600928954,
+        -58.787364423740655
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -56.85,
+        -299.97,
+        -59.15
+      ],
+      "start": [
+        -57.39856679212244,
+        -299.97979600928954,
+        -58.787364423740655
+      ],
+      "end": [
+        -56.94230267475359,
+        -299.97975090545367,
+        -59.08852082910016
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -23.4,
+        -300,
+        -57.1
+      ],
+      "start": [
+        -23.399999618530273,
+        -299.98000091545725,
+        -57.099998474121094
+      ],
+      "end": [
+        -23.399999618530273,
+        -299.98000091545725,
+        -57.099998474121094
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -23.4,
+        -299.97,
+        -59.4
+      ],
+      "start": [
+        -23.399999618530273,
+        -299.98000091545725,
+        -57.099998474121094
+      ],
+      "end": [
+        -23.39848949612133,
+        -299.9800017702149,
+        -59.17856058292091
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -23.95,
+        -299.97,
+        -59.949999999999996
+      ],
+      "start": [
+        -23.39848949612133,
+        -299.9800017702149,
+        -59.17856058292091
+      ],
+      "end": [
+        -23.874505318235606,
+        -299.97977743531226,
+        -59.845211235573515
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -23.4,
+        -300,
+        -57.1
+      ],
+      "start": [
+        -23.399999618530273,
+        -299.98000091545725,
+        -57.099998474121094
+      ],
+      "end": [
+        -23.399999618530273,
+        -299.98000091545725,
+        -57.099998474121094
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -23.4,
+        -299.97,
+        -59.4
+      ],
+      "start": [
+        -23.399999618530273,
+        -299.98000091545725,
+        -57.099998474121094
+      ],
+      "end": [
+        -23.399410247802734,
+        -299.98000065037047,
+        -59.21103327232413
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -22.849999999999998,
+        -299.97,
+        -59.949999999999996
+      ],
+      "start": [
+        -23.399410247802734,
+        -299.98000065037047,
+        -59.21103327232413
+      ],
+      "end": [
+        -22.987509034574032,
+        -299.97981817342804,
+        -59.76802338170819
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        32.6,
+        -300,
+        -61.1
+      ],
+      "start": [
+        32.599998474121094,
+        -299.98000147553137,
+        -61.099998474121094
+      ],
+      "end": [
+        32.599998474121094,
+        -299.98000147553137,
+        -61.099998474121094
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        32.6,
+        -299.97,
+        -63.4
+      ],
+      "start": [
+        32.599998474121094,
+        -299.98000147553137,
+        -61.099998474121094
+      ],
+      "end": [
+        32.599830627441406,
+        -299.9800170898437,
+        -63.20212085777894
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        32.050000000000004,
+        -299.97,
+        -63.949999999999996
+      ],
+      "start": [
+        32.599830627441406,
+        -299.9800170898437,
+        -63.20212085777894
+      ],
+      "end": [
+        32.16446751484182,
+        -299.98000111054023,
+        -63.79700980556663
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        32.6,
+        -300,
+        -61.1
+      ],
+      "start": [
+        32.599998474121094,
+        -299.98000147553137,
+        -61.099998474121094
+      ],
+      "end": [
+        32.599998474121094,
+        -299.98000147553137,
+        -61.099998474121094
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        32.6,
+        -299.97,
+        -63.4
+      ],
+      "start": [
+        32.599998474121094,
+        -299.98000147553137,
+        -61.099998474121094
+      ],
+      "end": [
+        32.59947967529297,
+        -299.9799170466998,
+        -63.23476433882024
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        33.15,
+        -299.97,
+        -63.949999999999996
+      ],
+      "start": [
+        32.59947967529297,
+        -299.9799170466998,
+        -63.23476433882024
+      ],
+      "end": [
+        33.00367130478844,
+        -299.97978069040107,
+        -63.76314112066757
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -57.4,
+        -300,
+        -60.9
+      ],
+      "start": [
+        -57.400001525878906,
+        -299.9800002250025,
+        -60.900001525878906
+      ],
+      "end": [
+        -57.400001525878906,
+        -299.9800002250025,
+        -60.900001525878906
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -57.4,
+        -299.97,
+        -58.6
+      ],
+      "start": [
+        -57.400001525878906,
+        -299.9800002250025,
+        -60.900001525878906
+      ],
+      "end": [
+        -57.39986058240356,
+        -299.979756598192,
+        -58.82050741626881
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -57.949999999999996,
+        -299.97,
+        -59.15
+      ],
+      "start": [
+        -57.39986058240356,
+        -299.979756598192,
+        -58.82050741626881
+      ],
+      "end": [
+        -57.74529730598442,
+        -299.9800001990428,
+        -59.02541210874915
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -57.4,
+        -300,
+        -60.9
+      ],
+      "start": [
+        -57.400001525878906,
+        -299.9800002250025,
+        -60.900001525878906
+      ],
+      "end": [
+        -57.400001525878906,
+        -299.9800002250025,
+        -60.900001525878906
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -57.4,
+        -299.97,
+        -58.6
+      ],
+      "start": [
+        -57.400001525878906,
+        -299.9800002250025,
+        -60.900001525878906
+      ],
+      "end": [
+        -57.40052034684923,
+        -299.97967953660407,
+        -58.78771257936023
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -56.85,
+        -299.97,
+        -59.15
+      ],
+      "start": [
+        -57.40052034684923,
+        -299.97967953660407,
+        -58.78771257936023
+      ],
+      "end": [
+        -56.94316594093107,
+        -299.9798865208853,
+        -59.08717468008399
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -20.6,
+        -300,
+        -57.1
+      ],
+      "start": [
+        -20.600000381469727,
+        -299.9800006708923,
+        -57.099998474121094
+      ],
+      "end": [
+        -20.600000381469727,
+        -299.9800006708923,
+        -57.099998474121094
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -20.6,
+        -299.97,
+        -59.4
+      ],
+      "start": [
+        -20.600000381469727,
+        -299.9800006708923,
+        -57.099998474121094
+      ],
+      "end": [
+        -20.60008430480957,
+        -299.98000067667033,
+        -59.178645899519324
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -21.150000000000002,
+        -299.97,
+        -59.949999999999996
+      ],
+      "start": [
+        -20.60008430480957,
+        -299.98000067667033,
+        -59.178645899519324
+      ],
+      "end": [
+        -21.073718786006793,
+        -299.98000072593857,
+        -59.84542456571944
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -20.6,
+        -300,
+        -57.1
+      ],
+      "start": [
+        -20.600000381469727,
+        -299.9800006708923,
+        -57.099998474121094
+      ],
+      "end": [
+        -20.600000381469727,
+        -299.9800006708923,
+        -57.099998474121094
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -20.6,
+        -299.97,
+        -59.4
+      ],
+      "start": [
+        -20.600000381469727,
+        -299.9800006708923,
+        -57.099998474121094
+      ],
+      "end": [
+        -20.600221633911133,
+        -299.9800007333164,
+        -59.21030085044913
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -20.05,
+        -299.97,
+        -59.949999999999996
+      ],
+      "start": [
+        -20.600221633911133,
+        -299.9800007333164,
+        -59.21030085044913
+      ],
+      "end": [
+        -20.189235565718263,
+        -299.98000071387503,
+        -59.766717788763344
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -32.6,
+        -300,
+        22.900000000000002
+      ],
+      "start": [
+        -32.599998474121094,
+        -299.98000139962494,
+        22.899999618530273
+      ],
+      "end": [
+        -32.599998474121094,
+        -299.98000139962494,
+        22.899999618530273
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -32.6,
+        -299.97,
+        20.6
+      ],
+      "start": [
+        -32.599998474121094,
+        -299.98000139962494,
+        22.899999618530273
+      ],
+      "end": [
+        -32.60092333578359,
+        -299.97955610245697,
+        20.822981473756954
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -33.15,
+        -299.97,
+        20.05
+      ],
+      "start": [
+        -32.60092333578359,
+        -299.97955610245697,
+        20.822981473756954
+      ],
+      "end": [
+        -33.07403053715825,
+        -299.97954445225184,
+        20.156397364567965
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -32.6,
+        -300,
+        22.900000000000002
+      ],
+      "start": [
+        -32.599998474121094,
+        -299.98000139962494,
+        22.899999618530273
+      ],
+      "end": [
+        -32.599998474121094,
+        -299.98000139962494,
+        22.899999618530273
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -32.6,
+        -299.97,
+        20.6
+      ],
+      "start": [
+        -32.599998474121094,
+        -299.98000139962494,
+        22.899999618530273
+      ],
+      "end": [
+        -32.60033111860457,
+        -299.9798870993603,
+        20.78976133093238
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -32.050000000000004,
+        -299.97,
+        20.05
+      ],
+      "start": [
+        -32.60033111860457,
+        -299.9798870993603,
+        20.78976133093238
+      ],
+      "end": [
+        -32.18739029788412,
+        -299.9800170898437,
+        20.233634707517922
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -55.4,
+        -300,
+        -62.9
+      ],
+      "start": [
+        -55.400001525878906,
+        -299.9800008993956,
+        -62.900001525878906
+      ],
+      "end": [
+        -55.400001525878906,
+        -299.9800008993956,
+        -62.900001525878906
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -55.4,
+        -299.97,
+        -60.6
+      ],
+      "start": [
+        -55.400001525878906,
+        -299.9800008993956,
+        -62.900001525878906
+      ],
+      "end": [
+        -55.401054404125766,
+        -299.98000025574436,
+        -60.82085056044161
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -55.949999999999996,
+        -299.97,
+        -61.15
+      ],
+      "start": [
+        -55.401054404125766,
+        -299.98000025574436,
+        -60.82085056044161
+      ],
+      "end": [
+        -55.74607963603921,
+        -299.9796440897684,
+        -61.02541454194579
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -55.4,
+        -300,
+        -62.9
+      ],
+      "start": [
+        -55.400001525878906,
+        -299.9800008993956,
+        -62.900001525878906
+      ],
+      "end": [
+        -55.400001525878906,
+        -299.9800008993956,
+        -62.900001525878906
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -55.4,
+        -299.97,
+        -60.6
+      ],
+      "start": [
+        -55.400001525878906,
+        -299.9800008993956,
+        -62.900001525878906
+      ],
+      "end": [
+        -55.40016939470079,
+        -299.98000020205507,
+        -60.78805120033212
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -54.85,
+        -299.97,
+        -61.15
+      ],
+      "start": [
+        -55.40016939470079,
+        -299.98000020205507,
+        -60.78805120033212
+      ],
+      "end": [
+        -54.942628065589815,
+        -299.9800002178057,
+        -61.08757903659716
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -59.949999999999996,
+        -299.97,
+        -29.150000000000002
+      ],
+      "start": [
+        -59.95000076293945,
+        -299.9800008859323,
+        -29.149999618530273
+      ],
+      "end": [
+        -59.95000076293945,
+        -299.9800008859323,
+        -29.149999618530273
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -59.4,
+        -299.97,
+        -28.6
+      ],
+      "start": [
+        -59.95000076293945,
+        -299.9800008859323,
+        -29.149999618530273
+      ],
+      "end": [
+        -59.56695521972142,
+        -299.98000060277843,
+        -28.767652141861618
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -59.4,
+        -300,
+        -30.900000000000002
+      ],
+      "start": [
+        -59.56695521972142,
+        -299.98000060277843,
+        -28.767652141861618
+      ],
+      "end": [
+        -59.40820045606233,
+        -299.9800008605083,
+        -30.780098632443696
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -59.4,
+        -300,
+        -30.900000000000002
+      ],
+      "start": [
+        -59.40820045606233,
+        -299.9800008605083,
+        -30.780098632443696
+      ],
+      "end": [
+        -59.40820045606233,
+        -299.9800008605083,
+        -30.780098632443696
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -59.4,
+        -299.97,
+        -28.6
+      ],
+      "start": [
+        -59.40820045606233,
+        -299.9800008605083,
+        -30.780098632443696
+      ],
+      "end": [
+        -59.39895089242964,
+        -299.9797952851717,
+        -28.763438385911286
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -59.949999999999996,
+        -299.97,
+        -29.150000000000002
+      ],
+      "start": [
+        -59.39895089242964,
+        -299.9797952851717,
+        -28.763438385911286
+      ],
+      "end": [
+        -59.83926152763888,
+        -299.9797836981219,
+        -29.070994478766806
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -59.4,
+        -300,
+        -30.900000000000002
+      ],
+      "start": [
+        -58.849998474121094,
+        -299.98000081758926,
+        -29.149999618530273
+      ],
+      "end": [
+        -59.340470153896604,
+        -299.9800005470519,
+        -30.706729779718444
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -59.4,
+        -299.97,
+        -28.6
+      ],
+      "start": [
+        -59.340470153896604,
+        -299.9800005470519,
+        -30.706729779718444
+      ],
+      "end": [
+        -59.395689516168204,
+        -299.98000047988023,
+        -28.799331293208525
+      ],
+      "done": true
+    },
+    {
+      "target": [
+        -58.85,
+        -299.97,
+        -29.150000000000002
+      ],
+      "start": [
+        -59.395689516168204,
+        -299.98000047988023,
+        -28.799331293208525
+      ],
+      "end": [
+        -58.93472864269279,
+        -299.9800007598491,
+        -29.09387046226766
+      ],
+      "done": true
+    }
+  ],
+  "visual26": {
+    "status": "PARTIAL",
+    "error": "Error: Insufficient original eight-minute budget for separate visual",
+    "remainingMs": 17172
+  },
+  "evidenceLabel": "GUIDED_INPUT",
+  "rawSource": "/tmp/tfg-qa26/results.json",
+  "rawBytes": 2568955,
+  "errors": {
+    "page": [],
+    "console": [
+      {
+        "who": "host",
+        "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "host",
+        "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "host",
+        "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "host",
+        "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "host",
+        "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "host",
+        "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "host",
+        "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "peer",
+        "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "peer",
+        "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "host",
+        "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "host",
+        "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "peer",
+        "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "peer",
+        "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "peer",
+        "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "host",
+        "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "peer",
+        "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "host",
+        "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "host",
+        "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "peer",
+        "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "host",
+        "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "peer",
+        "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "host",
+        "stage": "native hamsi17 landing setup",
+        "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "peer",
+        "stage": "native hamsi17 landing setup",
+        "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "host",
+        "stage": "native hamsi17 landing setup",
+        "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "peer",
+        "stage": "native hamsi17 landing setup",
+        "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "peer",
+        "stage": "native hamsi17 landing setup",
+        "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "host",
+        "stage": "native hamsi17 landing setup",
+        "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "peer",
+        "stage": "native hamsi17 landing setup",
+        "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "peer",
+        "stage": "native hamsi17 landing setup",
+        "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "peer",
+        "stage": "native hamsi17 landing setup",
+        "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "peer",
+        "stage": "native visitation and physical first cabin setup",
+        "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "host",
+        "stage": "native visitation and physical first cabin setup",
+        "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "peer",
+        "stage": "native visitation and physical first cabin setup",
+        "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "peer",
+        "stage": "native visitation and physical first cabin setup",
+        "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "host",
+        "stage": "native visitation and physical first cabin setup",
+        "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+        "expectedBootstrap": true
+      },
+      {
+        "who": "peer",
+        "stage": "native E depth2",
+        "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+        "expectedBootstrap": true
+      }
+    ],
+    "warnings": [
+      "peer:Failed to execute 'requestFullscreen' on 'Element': API can only be initiated by a user gesture.",
+      "THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported.",
+      "peer:THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported.",
+      "join error {error: could not connect to peer B67sh1BGbLrx3rqFLzfS aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: B67sh1BGbLrx3rqFLzfS, roomId: tfg-hub-v1}",
+      "peer:join error {error: could not connect to peer pnwm8qHpLJS64bdXdGHN aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: pnwm8qHpLJS64bdXdGHN, roomId: tfg-hub-v1}",
+      "join error {error: could not connect to peer B67sh1BGbLrx3rqFLzfS aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: B67sh1BGbLrx3rqFLzfS, roomId: tfg-hub-v1}",
+      "peer:join error {error: could not connect to peer pnwm8qHpLJS64bdXdGHN aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: pnwm8qHpLJS64bdXdGHN, roomId: tfg-hub-v1}",
+      "join error {error: could not connect to peer B67sh1BGbLrx3rqFLzfS aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: B67sh1BGbLrx3rqFLzfS, roomId: tfg-hub-v1}",
+      "peer:join error {error: could not connect to peer pnwm8qHpLJS64bdXdGHN aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: pnwm8qHpLJS64bdXdGHN, roomId: tfg-hub-v1}",
+      "join error {error: could not connect to peer B67sh1BGbLrx3rqFLzfS aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: B67sh1BGbLrx3rqFLzfS, roomId: tfg-hub-v1}",
+      "peer:join error {error: could not connect to peer pnwm8qHpLJS64bdXdGHN aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: pnwm8qHpLJS64bdXdGHN, roomId: tfg-hub-v1}",
+      "join error {error: could not connect to peer B67sh1BGbLrx3rqFLzfS aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: B67sh1BGbLrx3rqFLzfS, roomId: tfg-hub-v1}",
+      "peer:join error {error: could not connect to peer pnwm8qHpLJS64bdXdGHN aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: pnwm8qHpLJS64bdXdGHN, roomId: tfg-hub-v1}",
+      "join error {error: could not connect to peer B67sh1BGbLrx3rqFLzfS aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: B67sh1BGbLrx3rqFLzfS, roomId: tfg-hub-v1}",
+      "peer:join error {error: could not connect to peer pnwm8qHpLJS64bdXdGHN aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: pnwm8qHpLJS64bdXdGHN, roomId: tfg-hub-v1}",
+      "join error {error: could not connect to peer B67sh1BGbLrx3rqFLzfS aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: B67sh1BGbLrx3rqFLzfS, roomId: tfg-hub-v1}",
+      "peer:join error {error: could not connect to peer pnwm8qHpLJS64bdXdGHN aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: pnwm8qHpLJS64bdXdGHN, roomId: tfg-hub-v1}",
+      "join error {error: could not connect to peer B67sh1BGbLrx3rqFLzfS aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: B67sh1BGbLrx3rqFLzfS, roomId: tfg-hub-v1}",
+      "peer:join error {error: could not connect to peer pnwm8qHpLJS64bdXdGHN aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: pnwm8qHpLJS64bdXdGHN, roomId: tfg-hub-v1}",
+      "join error {error: could not connect to peer B67sh1BGbLrx3rqFLzfS aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: B67sh1BGbLrx3rqFLzfS, roomId: tfg-hub-v1}",
+      "peer:join error {error: could not connect to peer pnwm8qHpLJS64bdXdGHN aft…N servers with turnConfig or rtcConfig.iceServers, appId: kefal-company-v1, peerId: pnwm8qHpLJS64bdXdGHN, roomId: tfg-hub-v1}"
+    ],
+    "feedback": []
+  },
+  "checks": [
+    {
+      "name": "native hamsi17 landing setup",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "native visitation and physical first cabin setup",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "native E depth1",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "native E depth2",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "native E depth3 Backrooms",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "native E Backrooms return surface",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "native E depth4",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "native E depth5",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "native E depth6",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "native E depth7 Null Reception",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "actual airhorn LMB and stale-position receipt",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "physical boarding after original mechanic",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "native E original-floor return and cleared echo owner",
+      "status": "PASS",
+      "error": null
+    }
+  ],
+  "floors": [
+    {
+      "label": "surface before native descent",
+      "pair": [
+        {
+          "phase": "moon",
+          "moon": "hamsi",
+          "baseSeed": 17,
+          "worldSeed": 17,
+          "depth": 0,
+          "clock": 493.00000000001035,
+          "moonT": 9.750000000000064,
+          "theme": "factory",
+          "layoutSeed": 17,
+          "group": "cc900304-584c-42d4-9a6a-4b6e87a464ca",
+          "liveFacilityGroups": 1,
+          "player": {
+            "p": [
+              -57.86429977416992,
+              -299.9800003090344,
+              -59.096378326416016
+            ],
+            "indoor": true,
+            "inShip": false,
+            "slots": [
+              "i1g4",
+              "i1mn",
+              "i1ns",
+              "i1rw",
+              null
+            ]
+          },
+          "creatures": [
+            {
+              "id": "c1",
+              "type": "turret",
+              "zone": "in",
+              "state": "off",
+              "dead": false,
+              "hazard": true,
+              "boss": false,
+              "hp": null,
+              "maxHp": null,
+              "damage": 12
+            },
+            {
+              "id": "c2",
+              "type": "mine",
+              "zone": "in",
+              "state": "armed",
+              "dead": false,
+              "hazard": true,
+              "boss": false,
+              "hp": null,
+              "maxHp": null,
+              "damage": 110
+            },
+            {
+              "id": "c3",
+              "type": "sw_nest",
+              "zone": "in",
+              "state": "idle",
+              "dead": false,
+              "hazard": false,
+              "boss": false,
+              "hp": 96,
+              "maxHp": 96,
+              "damage": 0,
+              "walk": 2,
+              "run": 5
+            }
+          ],
+          "limits": null,
+          "brStats": {
+            "bake": null,
+            "level": null,
+            "fog": {
+              "fog": 11838558,
+              "density": 0.032
+            },
+            "amb": 0.012
+          },
+          "echo": {
+            "active": false,
+            "stats": {
+              "pending": 0,
+              "cooldowns": 0
+            },
+            "rows": []
+          },
+          "state": {
+            "token": "hamsi:17:1",
+            "baseSeed": 17,
+            "routeVersion": 26,
+            "depth": 0,
+            "reached": 0,
+            "rev": 10,
+            "nonce": 0,
+            "liftStage": "idle",
+            "visited": [
+              16,
+              11,
+              15,
+              10,
+              13,
+              8,
+              9,
+              12,
+              14,
+              5
+            ],
+            "currentChoice": null
+          },
+          "cargo": [
+            {
+              "id": "i1qc",
+              "type": "bolt",
+              "state": "world",
+              "holder": null,
+              "owner": null,
+              "value": 19,
+              "inv": null,
+              "p": [
+                -56.71674346923828,
+                -299.8251037597656,
+                -58.61182403564453
+              ]
+            },
+            {
+              "id": "i1rw",
+              "type": "airhorn",
+              "state": "held",
+              "holder": "L2eniu6pyc",
+              "owner": null,
+              "value": 49,
+              "inv": null,
+              "p": [
+                0.059008664682468445,
+                0.049118570012930185,
+                -0.025004015627281523
+              ]
+            }
+          ],
+          "nativePlan": {
+            "roomId": 11,
+            "x": -57.4,
+            "z": -58.6,
+            "y": -300,
+            "yaw": 3.141592653589793,
+            "approach": {
+              "x": -57.4,
+              "y": -300,
+              "z": -60.9
+            },
+            "spawn": {
+              "x": -57.4,
+              "y": -299.97,
+              "z": -58.6
+            },
+            "fingerprint": {
+              "seed": 17,
+              "theme": "factory",
+              "w": 34,
+              "h": 34,
+              "hash": 4145788662
+            },
+            "requiredRooms": 15
+          }
+        },
+        {
+          "phase": "moon",
+          "moon": "hamsi",
+          "baseSeed": 17,
+          "worldSeed": 17,
+          "depth": 0,
+          "clock": 492.0888888888985,
+          "moonT": null,
+          "theme": "factory",
+          "layoutSeed": 17,
+          "group": "943097db-abeb-43ab-94e5-cd9d7e9e645b",
+          "liveFacilityGroups": 1,
+          "player": {
+            "p": [
+              -56.93770980834961,
+              -299.98000023275233,
+              -59.09162521362305
+            ],
+            "indoor": true,
+            "inShip": false,
+            "slots": [
+              "i1he",
+              "i1or",
+              "i1pz",
+              null,
+              null
+            ]
+          },
+          "creatures": [],
+          "limits": null,
+          "brStats": {
+            "bake": null,
+            "level": null,
+            "fog": {
+              "fog": 11838558,
+              "density": 0.032
+            },
+            "amb": 0.012
+          },
+          "echo": {
+            "active": false,
+            "stats": {
+              "pending": 0,
+              "cooldowns": 0
+            },
+            "rows": []
+          },
+          "state": {
+            "token": "hamsi:17:1",
+            "baseSeed": 17,
+            "routeVersion": 26,
+            "depth": 0,
+            "reached": 0,
+            "rev": 10,
+            "nonce": 0,
+            "liftStage": "idle",
+            "visited": [
+              16,
+              11,
+              15,
+              10,
+              13,
+              8,
+              9,
+              12,
+              14,
+              5
+            ],
+            "currentChoice": null
+          },
+          "cargo": [
+            {
+              "id": "i1qc",
+              "type": "bolt",
+              "state": "world",
+              "holder": null,
+              "owner": null,
+              "value": 19,
+              "inv": null,
+              "p": [
+                -56.714970908779485,
+                -299.8083759955358,
+                -58.61056770031494
+              ]
+            },
+            {
+              "id": "i1rw",
+              "type": "airhorn",
+              "state": "held",
+              "holder": "L2eniu6pyc",
+              "owner": null,
+              "value": 49,
+              "inv": null,
+              "p": [
+                0,
+                0.02,
+                -0.10249999977648258
+              ]
+            }
+          ],
+          "nativePlan": {
+            "roomId": 11,
+            "x": -57.4,
+            "z": -58.6,
+            "y": -300,
+            "yaw": 3.141592653589793,
+            "approach": {
+              "x": -57.4,
+              "y": -300,
+              "z": -60.9
+            },
+            "spawn": {
+              "x": -57.4,
+              "y": -299.97,
+              "z": -58.6
+            },
+            "fingerprint": {
+              "seed": 17,
+              "theme": "factory",
+              "w": 34,
+              "h": 34,
+              "hash": 4145788662
+            },
+            "requiredRooms": 15
+          }
+        }
+      ],
+      "nativeStandingFloor": [
+        {
+          "pos": [
+            -57.86429977416992,
+            -299.9800003090344,
+            -59.096378326416016
+          ],
+          "dead": false,
+          "grounded": true,
+          "hit": {
+            "point": -299.99998932270626,
+            "normal": 1
+          },
+          "echo": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        },
+        {
+          "pos": [
+            -56.93770980834961,
+            -299.98000023275233,
+            -59.09162521362305
+          ],
+          "dead": false,
+          "grounded": true,
+          "hit": {
+            "point": -299.9999892464242,
+            "normal": 1
+          },
+          "echo": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        }
+      ]
+    },
+    {
+      "label": "native E depth1",
+      "pair": [
+        {
+          "phase": "moon",
+          "moon": "hamsi",
+          "baseSeed": 17,
+          "worldSeed": 17,
+          "depth": 1,
+          "clock": 498.0888888889033,
+          "moonT": 16.783333333333662,
+          "theme": "factory",
+          "layoutSeed": 3782706551,
+          "group": "dd844dd5-e9b9-4dee-8e94-4806a388384b",
+          "liveFacilityGroups": 1,
+          "player": {
+            "p": [
+              -23.950000762939453,
+              -299.9800009918748,
+              -59.95000076293945
+            ],
+            "indoor": true,
+            "inShip": false,
+            "slots": [
+              "i1g4",
+              "i1mn",
+              "i1ns",
+              "i1rw",
+              null
+            ]
+          },
+          "creatures": [],
+          "limits": {
+            "powerMul": 0.82,
+            "hpMul": 0.96,
+            "damageMul": 0.895,
+            "speedMul": 0.925,
+            "maxAlive": 2,
+            "speedCap": 6.8,
+            "damageCap": 40,
+            "newRuleSlots": 0,
+            "newIds": [],
+            "minQuota": 0
+          },
+          "brStats": {
+            "bake": null,
+            "level": null,
+            "fog": {
+              "fog": 11838558,
+              "density": 0.032
+            },
+            "amb": 0.012
+          },
+          "echo": {
+            "active": false,
+            "stats": {
+              "pending": 0,
+              "cooldowns": 0
+            },
+            "rows": []
+          },
+          "state": {
+            "token": "hamsi:17:1",
+            "baseSeed": 17,
+            "routeVersion": 26,
+            "depth": 1,
+            "reached": 1,
+            "rev": 14,
+            "nonce": 3,
+            "liftStage": "idle",
+            "visited": [],
+            "currentChoice": {
+              "seed": 3782706551,
+              "theme": "factory",
+              "size": 0.75
+            }
+          },
+          "cargo": [
+            {
+              "id": "i1qc",
+              "type": "bolt",
+              "state": "world",
+              "holder": null,
+              "owner": null,
+              "value": 19,
+              "inv": null,
+              "p": [
+                -24.083335876464844,
+                -299.82501220703125,
+                -59.38823699951172
+              ]
+            },
+            {
+              "id": "i1rw",
+              "type": "airhorn",
+              "state": "held",
+              "holder": "L2eniu6pyc",
+              "owner": null,
+              "value": 49,
+              "inv": null,
+              "p": [
+                0.059008664682468445,
+                0.049118570012930185,
+                -0.025004015627281523
+              ]
+            }
+          ],
+          "nativePlan": {
+            "roomId": 4,
+            "x": -23.4,
+            "z": -59.4,
+            "y": -300,
+            "yaw": 0,
+            "approach": {
+              "x": -23.4,
+              "y": -300,
+              "z": -57.1
+            },
+            "spawn": {
+              "x": -23.4,
+              "y": -299.97,
+              "z": -59.4
+            },
+            "fingerprint": {
+              "seed": 3782706551,
+              "theme": "factory",
+              "w": 35,
+              "h": 35,
+              "hash": 748142784
+            },
+            "requiredRooms": 15
+          }
+        },
+        {
+          "phase": "moon",
+          "moon": "hamsi",
+          "baseSeed": 17,
+          "worldSeed": 17,
+          "depth": 1,
+          "clock": 498.0888888889033,
+          "moonT": null,
+          "theme": "factory",
+          "layoutSeed": 3782706551,
+          "group": "711dc519-06e7-404e-a396-49dcee541e13",
+          "liveFacilityGroups": 1,
+          "player": {
+            "p": [
+              -23.950000762939453,
+              -299.9800009918748,
+              -59.95000076293945
+            ],
+            "indoor": true,
+            "inShip": false,
+            "slots": [
+              "i1he",
+              "i1or",
+              "i1pz",
+              null,
+              null
+            ]
+          },
+          "creatures": [],
+          "limits": {
+            "powerMul": 0.82,
+            "hpMul": 0.96,
+            "damageMul": 0.895,
+            "speedMul": 0.925,
+            "maxAlive": 2,
+            "speedCap": 6.8,
+            "damageCap": 40,
+            "newRuleSlots": 0,
+            "newIds": [],
+            "minQuota": 0
+          },
+          "brStats": {
+            "bake": null,
+            "level": null,
+            "fog": {
+              "fog": 11838558,
+              "density": 0.032
+            },
+            "amb": 0.012
+          },
+          "echo": {
+            "active": false,
+            "stats": {
+              "pending": 0,
+              "cooldowns": 0
+            },
+            "rows": []
+          },
+          "state": {
+            "token": "hamsi:17:1",
+            "baseSeed": 17,
+            "routeVersion": 26,
+            "depth": 1,
+            "reached": 1,
+            "rev": 14,
+            "nonce": 3,
+            "liftStage": "idle",
+            "visited": [],
+            "currentChoice": {
+              "seed": 3782706551,
+              "theme": "factory",
+              "size": 0.75
+            }
+          },
+          "cargo": [
+            {
+              "id": "i1rw",
+              "type": "airhorn",
+              "state": "held",
+              "holder": "L2eniu6pyc",
+              "owner": null,
+              "value": 49,
+              "inv": null,
+              "p": [
+                0,
+                0.02,
+                -0.10249999977648258
+              ]
+            },
+            {
+              "id": "i1qc",
+              "type": "bolt",
+              "state": "world",
+              "holder": null,
+              "owner": null,
+              "value": 19,
+              "inv": null,
+              "p": [
+                -24.083256530761716,
+                -299.8251037597656,
+                -59.38817596435547
+              ]
+            }
+          ],
+          "nativePlan": {
+            "roomId": 4,
+            "x": -23.4,
+            "z": -59.4,
+            "y": -300,
+            "yaw": 0,
+            "approach": {
+              "x": -23.4,
+              "y": -300,
+              "z": -57.1
+            },
+            "spawn": {
+              "x": -23.4,
+              "y": -299.97,
+              "z": -59.4
+            },
+            "fingerprint": {
+              "seed": 3782706551,
+              "theme": "factory",
+              "w": 35,
+              "h": 35,
+              "hash": 748142784
+            },
+            "requiredRooms": 15
+          }
+        }
+      ],
+      "nativeStandingFloor": [
+        {
+          "pos": [
+            -23.950000762939453,
+            -299.9800009918748,
+            -59.95000076293945
+          ],
+          "dead": false,
+          "grounded": true,
+          "hit": {
+            "point": -299.9999900055467,
+            "normal": 1
+          },
+          "echo": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        },
+        {
+          "pos": [
+            -23.950000762939453,
+            -299.9800009918748,
+            -59.95000076293945
+          ],
+          "dead": false,
+          "grounded": true,
+          "hit": {
+            "point": -299.9999900055467,
+            "normal": 1
+          },
+          "echo": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        }
+      ]
+    },
+    {
+      "label": "native E depth2",
+      "pair": [
+        {
+          "phase": "moon",
+          "moon": "hamsi",
+          "baseSeed": 17,
+          "worldSeed": 17,
+          "depth": 2,
+          "clock": 498.0888888889033,
+          "moonT": 33.016666666666076,
+          "theme": "serverfarm",
+          "layoutSeed": 598252011,
+          "group": "376c7bdf-03d9-4196-9a3a-40928f42347e",
+          "liveFacilityGroups": 1,
+          "player": {
+            "p": [
+              32.04999923706055,
+              -299.98000168645774,
+              -63.95000076293945
+            ],
+            "indoor": true,
+            "inShip": false,
+            "slots": [
+              "i1g4",
+              "i1mn",
+              "i1ns",
+              "i1rw",
+              null
+            ]
+          },
+          "creatures": [],
+          "limits": {
+            "powerMul": 0.949,
+            "hpMul": 0.995,
+            "damageMul": 0.921,
+            "speedMul": 0.94,
+            "maxAlive": 2,
+            "speedCap": 6.8,
+            "damageCap": 40,
+            "newRuleSlots": 0,
+            "newIds": [],
+            "minQuota": 0
+          },
+          "brStats": {
+            "bake": null,
+            "level": null,
+            "fog": {
+              "fog": 11838558,
+              "density": 0.032
+            },
+            "amb": 0.012
+          },
+          "echo": {
+            "active": false,
+            "stats": {
+              "pending": 0,
+              "cooldowns": 0
+            },
+            "rows": []
+          },
+          "state": {
+            "token": "hamsi:17:1",
+            "baseSeed": 17,
+            "routeVersion": 26,
+            "depth": 2,
+            "reached": 2,
+            "rev": 30,
+            "nonce": 6,
+            "liftStage": "idle",
+            "visited": [],
+            "currentChoice": {
+              "seed": 598252011,
+              "theme": "serverfarm",
+              "size": 0.751
+            }
+          },
+          "cargo": [
+            {
+              "id": "i1qc",
+              "type": "bolt",
+              "state": "world",
+              "holder": null,
+              "owner": null,
+              "value": 19,
+              "inv": null,
+              "p": [
+                31.916744232177734,
+                -299.82501220703125,
+                -63.38825225830078
+              ]
+            },
+            {
+              "id": "i1rw",
+              "type": "airhorn",
+              "state": "held",
+              "holder": "L2eniu6pyc",
+              "owner": null,
+              "value": 49,
+              "inv": null,
+              "p": [
+                0.059008664682468445,
+                0.049118570012930185,
+                -0.025004015627281523
+              ]
+            }
+          ],
+          "nativePlan": {
+            "roomId": 11,
+            "x": 32.6,
+            "z": -63.4,
+            "y": -300,
+            "yaw": 0,
+            "approach": {
+              "x": 32.6,
+              "y": -300,
+              "z": -61.1
+            },
+            "spawn": {
+              "x": 32.6,
+              "y": -299.97,
+              "z": -63.4
+            },
+            "fingerprint": {
+              "seed": 598252011,
+              "theme": "serverfarm",
+              "w": 35,
+              "h": 35,
+              "hash": 1420081559
+            },
+            "requiredRooms": 15
+          }
+        },
+        {
+          "phase": "moon",
+          "moon": "hamsi",
+          "baseSeed": 17,
+          "worldSeed": 17,
+          "depth": 2,
+          "clock": 498.0888888889033,
+          "moonT": null,
+          "theme": "serverfarm",
+          "layoutSeed": 598252011,
+          "group": "bdbacf28-1a3f-4ed2-bd04-b1089d1d77a2",
+          "liveFacilityGroups": 1,
+          "player": {
+            "p": [
+              33.150001525878906,
+              -299.9800008177757,
+              -63.95000076293945
+            ],
+            "indoor": true,
+            "inShip": false,
+            "slots": [
+              "i1he",
+              "i1or",
+              "i1pz",
+              null,
+              null
+            ]
+          },
+          "creatures": [],
+          "limits": {
+            "powerMul": 0.949,
+            "hpMul": 0.995,
+            "damageMul": 0.921,
+            "speedMul": 0.94,
+            "maxAlive": 2,
+            "speedCap": 6.8,
+            "damageCap": 40,
+            "newRuleSlots": 0,
+            "newIds": [],
+            "minQuota": 0
+          },
+          "brStats": {
+            "bake": null,
+            "level": null,
+            "fog": {
+              "fog": 11838558,
+              "density": 0.032
+            },
+            "amb": 0.012
+          },
+          "echo": {
+            "active": false,
+            "stats": {
+              "pending": 0,
+              "cooldowns": 0
+            },
+            "rows": []
+          },
+          "state": {
+            "token": "hamsi:17:1",
+            "baseSeed": 17,
+            "routeVersion": 26,
+            "depth": 2,
+            "reached": 2,
+            "rev": 30,
+            "nonce": 6,
+            "liftStage": "idle",
+            "visited": [],
+            "currentChoice": {
+              "seed": 598252011,
+              "theme": "serverfarm",
+              "size": 0.751
+            }
+          },
+          "cargo": [
+            {
+              "id": "i1rw",
+              "type": "airhorn",
+              "state": "held",
+              "holder": "L2eniu6pyc",
+              "owner": null,
+              "value": 49,
+              "inv": null,
+              "p": [
+                0,
+                0.02,
+                -0.10249999977648258
+              ]
+            },
+            {
+              "id": "i1qc",
+              "type": "bolt",
+              "state": "world",
+              "holder": null,
+              "owner": null,
+              "value": 19,
+              "inv": null,
+              "p": [
+                31.916999879998244,
+                -299.8250000071712,
+                -63.388000139229646
+              ]
+            }
+          ],
+          "nativePlan": {
+            "roomId": 11,
+            "x": 32.6,
+            "z": -63.4,
+            "y": -300,
+            "yaw": 0,
+            "approach": {
+              "x": 32.6,
+              "y": -300,
+              "z": -61.1
+            },
+            "spawn": {
+              "x": 32.6,
+              "y": -299.97,
+              "z": -63.4
+            },
+            "fingerprint": {
+              "seed": 598252011,
+              "theme": "serverfarm",
+              "w": 35,
+              "h": 35,
+              "hash": 1420081559
+            },
+            "requiredRooms": 15
+          }
+        }
+      ],
+      "nativeStandingFloor": [
+        {
+          "pos": [
+            32.04999923706055,
+            -299.98000168645774,
+            -63.95000076293945
+          ],
+          "dead": false,
+          "grounded": true,
+          "hit": {
+            "point": -299.9999907001296,
+            "normal": 1
+          },
+          "echo": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        },
+        {
+          "pos": [
+            33.150001525878906,
+            -299.9800008177757,
+            -63.95000076293945
+          ],
+          "dead": false,
+          "grounded": true,
+          "hit": {
+            "point": -299.9999898314476,
+            "normal": 1
+          },
+          "echo": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        }
+      ]
+    },
+    {
+      "label": "native E depth3",
+      "pair": [
+        {
+          "phase": "moon",
+          "moon": "hamsi",
+          "baseSeed": 17,
+          "worldSeed": 17,
+          "depth": 3,
+          "clock": 498.0888888889033,
+          "moonT": 52.18333333333165,
+          "theme": "backrooms",
+          "layoutSeed": 1179496989,
+          "group": "5d29e927-8434-471b-a43b-95c2bf6057e9",
+          "liveFacilityGroups": 1,
+          "player": {
+            "p": [
+              20.049999237060547,
+              -299.9800013035132,
+              -23.950000762939453
+            ],
+            "indoor": true,
+            "inShip": false,
+            "slots": [
+              "i1g4",
+              "i1mn",
+              "i1ns",
+              "i1rw",
+              null
+            ]
+          },
+          "creatures": [],
+          "limits": {
+            "powerMul": 1.04,
+            "hpMul": 1.02,
+            "damageMul": 0.94,
+            "speedMul": 0.95,
+            "maxAlive": 2,
+            "speedCap": 6.8,
+            "damageCap": 40,
+            "newRuleSlots": 0,
+            "newIds": [],
+            "minQuota": 0
+          },
+          "brStats": {
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 93,
+              "dark": 1,
+              "runs": 1
+            },
+            "level": "l1",
+            "fog": {
+              "fog": 11050087,
+              "density": 0.033722266210121615
+            },
+            "amb": 0.036548468685550194
+          },
+          "echo": {
+            "active": false,
+            "stats": {
+              "pending": 0,
+              "cooldowns": 0
+            },
+            "rows": []
+          },
+          "state": {
+            "token": "hamsi:17:1",
+            "baseSeed": 17,
+            "routeVersion": 26,
+            "depth": 3,
+            "reached": 3,
+            "rev": 47,
+            "nonce": 9,
+            "liftStage": "idle",
+            "visited": [
+              9
+            ],
+            "currentChoice": {
+              "seed": 1179496989,
+              "theme": "backrooms",
+              "size": 0.77
+            }
+          },
+          "cargo": [
+            {
+              "id": "i1qc",
+              "type": "bolt",
+              "state": "world",
+              "holder": null,
+              "owner": null,
+              "value": 19,
+              "inv": null,
+              "p": [
+                19.916858673095703,
+                -299.82501220703125,
+                -23.388296127319336
+              ]
+            },
+            {
+              "id": "i1rw",
+              "type": "airhorn",
+              "state": "held",
+              "holder": "L2eniu6pyc",
+              "owner": null,
+              "value": 49,
+              "inv": null,
+              "p": [
+                0.059008664682468445,
+                0.049118570012930185,
+                -0.025004015627281523
+              ]
+            }
+          ],
+          "nativePlan": {
+            "roomId": 9,
+            "x": 20.6,
+            "z": -23.4,
+            "y": -300,
+            "yaw": 0,
+            "approach": {
+              "x": 20.6,
+              "y": -300,
+              "z": -21.099999999999998
+            },
+            "spawn": {
+              "x": 20.6,
+              "y": -299.97,
+              "z": -23.4
+            },
+            "fingerprint": {
+              "seed": 1179496989,
+              "theme": "backrooms",
+              "w": 35,
+              "h": 35,
+              "hash": 2712049520
+            },
+            "requiredRooms": 15
+          }
+        },
+        {
+          "phase": "moon",
+          "moon": "hamsi",
+          "baseSeed": 17,
+          "worldSeed": 17,
+          "depth": 3,
+          "clock": 498.0888888889033,
+          "moonT": null,
+          "theme": "backrooms",
+          "layoutSeed": 1179496989,
+          "group": "f434915c-9ec5-4639-9ca3-6a676b4793de",
+          "liveFacilityGroups": 1,
+          "player": {
+            "p": [
+              21.149999618530273,
+              -299.9800010842331,
+              -23.950000762939453
+            ],
+            "indoor": true,
+            "inShip": false,
+            "slots": [
+              "i1he",
+              "i1or",
+              "i1pz",
+              null,
+              null
+            ]
+          },
+          "creatures": [],
+          "limits": {
+            "powerMul": 1.04,
+            "hpMul": 1.02,
+            "damageMul": 0.94,
+            "speedMul": 0.95,
+            "maxAlive": 2,
+            "speedCap": 6.8,
+            "damageCap": 40,
+            "newRuleSlots": 0,
+            "newIds": [],
+            "minQuota": 0
+          },
+          "brStats": {
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 110,
+              "dark": 1,
+              "runs": 1
+            },
+            "level": "l1",
+            "fog": {
+              "fog": 10195822,
+              "density": 0.03545619059239954
+            },
+            "amb": 0.06306599219331628
+          },
+          "echo": {
+            "active": false,
+            "stats": {
+              "pending": 0,
+              "cooldowns": 0
+            },
+            "rows": []
+          },
+          "state": {
+            "token": "hamsi:17:1",
+            "baseSeed": 17,
+            "routeVersion": 26,
+            "depth": 3,
+            "reached": 3,
+            "rev": 47,
+            "nonce": 9,
+            "liftStage": "idle",
+            "visited": [
+              9
+            ],
+            "currentChoice": {
+              "seed": 1179496989,
+              "theme": "backrooms",
+              "size": 0.77
+            }
+          },
+          "cargo": [
+            {
+              "id": "i1rw",
+              "type": "airhorn",
+              "state": "held",
+              "holder": "L2eniu6pyc",
+              "owner": null,
+              "value": 49,
+              "inv": null,
+              "p": [
+                0,
+                0.02,
+                -0.10249999977648258
+              ]
+            },
+            {
+              "id": "i1qc",
+              "type": "bolt",
+              "state": "world",
+              "holder": null,
+              "owner": null,
+              "value": 19,
+              "inv": null,
+              "p": [
+                19.9168643951416,
+                -299.82501220703125,
+                -23.38825225830078
+              ]
+            }
+          ],
+          "nativePlan": {
+            "roomId": 9,
+            "x": 20.6,
+            "z": -23.4,
+            "y": -300,
+            "yaw": 0,
+            "approach": {
+              "x": 20.6,
+              "y": -300,
+              "z": -21.099999999999998
+            },
+            "spawn": {
+              "x": 20.6,
+              "y": -299.97,
+              "z": -23.4
+            },
+            "fingerprint": {
+              "seed": 1179496989,
+              "theme": "backrooms",
+              "w": 35,
+              "h": 35,
+              "hash": 2712049520
+            },
+            "requiredRooms": 15
+          }
+        }
+      ],
+      "nativeStandingFloor": [
+        {
+          "pos": [
+            20.049999237060547,
+            -299.9800013035132,
+            -23.950000762939453
+          ],
+          "dead": false,
+          "grounded": true,
+          "hit": {
+            "point": -299.99999031718505,
+            "normal": 1
+          },
+          "echo": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        },
+        {
+          "pos": [
+            21.149999618530273,
+            -299.9800010842331,
+            -23.950000762939453
+          ],
+          "dead": false,
+          "grounded": true,
+          "hit": {
+            "point": -299.99999009790497,
+            "normal": 1
+          },
+          "echo": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        }
+      ]
+    },
+    {
+      "label": "native E first surface return",
+      "pair": [
+        {
+          "phase": "moon",
+          "moon": "hamsi",
+          "baseSeed": 17,
+          "worldSeed": 17,
+          "depth": 0,
+          "clock": 498.35555555557016,
+          "moonT": 57.816666666664666,
+          "theme": "factory",
+          "layoutSeed": 17,
+          "group": "6f77abee-d586-4ef4-a8ff-e63db7e8de56",
+          "liveFacilityGroups": 1,
+          "player": {
+            "p": [
+              -57.95000076293945,
+              -299.9800002160795,
+              -59.150001525878906
+            ],
+            "indoor": true,
+            "inShip": false,
+            "slots": [
+              "i1g4",
+              "i1mn",
+              "i1ns",
+              "i1rw",
+              null
+            ]
+          },
+          "creatures": [],
+          "limits": null,
+          "brStats": {
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 93,
+              "dark": 1,
+              "runs": 1
+            },
+            "level": null,
+            "fog": {
+              "fog": 7370624,
+              "density": 0.03999134028556081
+            },
+            "amb": 0.1591052378104659
+          },
+          "echo": {
+            "active": false,
+            "stats": {
+              "pending": 0,
+              "cooldowns": 0
+            },
+            "rows": []
+          },
+          "state": {
+            "token": "hamsi:17:1",
+            "baseSeed": 17,
+            "routeVersion": 26,
+            "depth": 0,
+            "reached": 3,
+            "rev": 49,
+            "nonce": 11,
+            "liftStage": "idle",
+            "visited": [
+              16,
+              11,
+              15,
+              10,
+              13,
+              8,
+              9,
+              12,
+              14,
+              5
+            ],
+            "currentChoice": null
+          },
+          "cargo": [
+            {
+              "id": "i1qc",
+              "type": "bolt",
+              "state": "world",
+              "holder": null,
+              "owner": null,
+              "value": 19,
+              "inv": null,
+              "p": [
+                -56.717201232910156,
+                -299.8250732421875,
+                -58.61183547973633
+              ]
+            },
+            {
+              "id": "i1rw",
+              "type": "airhorn",
+              "state": "held",
+              "holder": "L2eniu6pyc",
+              "owner": null,
+              "value": 49,
+              "inv": null,
+              "p": [
+                0.059008664682468445,
+                0.049118570012930185,
+                -0.025004015627281523
+              ]
+            }
+          ],
+          "nativePlan": {
+            "roomId": 11,
+            "x": -57.4,
+            "z": -58.6,
+            "y": -300,
+            "yaw": 3.141592653589793,
+            "approach": {
+              "x": -57.4,
+              "y": -300,
+              "z": -60.9
+            },
+            "spawn": {
+              "x": -57.4,
+              "y": -299.97,
+              "z": -58.6
+            },
+            "fingerprint": {
+              "seed": 17,
+              "theme": "factory",
+              "w": 34,
+              "h": 34,
+              "hash": 1293129356
+            },
+            "requiredRooms": 15
+          }
+        },
+        {
+          "phase": "moon",
+          "moon": "hamsi",
+          "baseSeed": 17,
+          "worldSeed": 17,
+          "depth": 0,
+          "clock": 498.0888888889033,
+          "moonT": null,
+          "theme": "factory",
+          "layoutSeed": 17,
+          "group": "1e0f6ab9-bdf7-4c53-b7b5-dd290ec9b6b4",
+          "liveFacilityGroups": 1,
+          "player": {
+            "p": [
+              -56.849998474121094,
+              -299.9800002718788,
+              -59.150001525878906
+            ],
+            "indoor": true,
+            "inShip": false,
+            "slots": [
+              "i1he",
+              "i1or",
+              "i1pz",
+              null,
+              null
+            ]
+          },
+          "creatures": [],
+          "limits": null,
+          "brStats": {
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 110,
+              "dark": 1,
+              "runs": 1
+            },
+            "level": null,
+            "fog": {
+              "fog": 7370624,
+              "density": 0.039984124723421964
+            },
+            "amb": 0.15859194146747235
+          },
+          "echo": {
+            "active": false,
+            "stats": {
+              "pending": 0,
+              "cooldowns": 0
+            },
+            "rows": []
+          },
+          "state": {
+            "token": "hamsi:17:1",
+            "baseSeed": 17,
+            "routeVersion": 26,
+            "depth": 0,
+            "reached": 3,
+            "rev": 49,
+            "nonce": 11,
+            "liftStage": "idle",
+            "visited": [
+              16,
+              11,
+              15,
+              10,
+              13,
+              8,
+              9,
+              12,
+              14,
+              5
+            ],
+            "currentChoice": null
+          },
+          "cargo": [
+            {
+              "id": "i1rw",
+              "type": "airhorn",
+              "state": "held",
+              "holder": "L2eniu6pyc",
+              "owner": null,
+              "value": 49,
+              "inv": null,
+              "p": [
+                0,
+                0.02,
+                -0.10249999977648258
+              ]
+            },
+            {
+              "id": "i1qc",
+              "type": "bolt",
+              "state": "world",
+              "holder": null,
+              "owner": null,
+              "value": 19,
+              "inv": null,
+              "p": [
+                -56.71699999204888,
+                -299.8250000071712,
+                -58.61199985852934
+              ]
+            }
+          ],
+          "nativePlan": {
+            "roomId": 11,
+            "x": -57.4,
+            "z": -58.6,
+            "y": -300,
+            "yaw": 3.141592653589793,
+            "approach": {
+              "x": -57.4,
+              "y": -300,
+              "z": -60.9
+            },
+            "spawn": {
+              "x": -57.4,
+              "y": -299.97,
+              "z": -58.6
+            },
+            "fingerprint": {
+              "seed": 17,
+              "theme": "factory",
+              "w": 34,
+              "h": 34,
+              "hash": 1293129356
+            },
+            "requiredRooms": 15
+          }
+        }
+      ],
+      "nativeStandingFloor": [
+        {
+          "pos": [
+            -57.95000076293945,
+            -299.9800002160795,
+            -59.150001525878906
+          ],
+          "dead": false,
+          "grounded": true,
+          "hit": {
+            "point": -299.99998922975135,
+            "normal": 1
+          },
+          "echo": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        },
+        {
+          "pos": [
+            -56.849998474121094,
+            -299.9800002718788,
+            -59.150001525878906
+          ],
+          "dead": false,
+          "grounded": true,
+          "hit": {
+            "point": -299.99998928555067,
+            "normal": 1
+          },
+          "echo": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        }
+      ]
+    },
+    {
+      "label": "native E depth4",
+      "pair": [
+        {
+          "phase": "moon",
+          "moon": "hamsi",
+          "baseSeed": 17,
+          "worldSeed": 17,
+          "depth": 4,
+          "clock": 513.8666666666936,
+          "moonT": 72.66666666666383,
+          "theme": "hospital",
+          "layoutSeed": 3655156048,
+          "group": "145c7d00-80ac-4d6c-8fde-2788b4c48cda",
+          "liveFacilityGroups": 1,
+          "player": {
+            "p": [
+              -21.149999618530273,
+              -299.9800170898437,
+              -59.95000076293945
+            ],
+            "indoor": true,
+            "inShip": false,
+            "slots": [
+              "i1g4",
+              "i1mn",
+              "i1ns",
+              "i1rw",
+              null
+            ]
+          },
+          "creatures": [],
+          "limits": {
+            "powerMul": 1.111,
+            "hpMul": 1.039,
+            "damageMul": 0.954,
+            "speedMul": 0.958,
+            "maxAlive": 3,
+            "speedCap": 6.8,
+            "damageCap": 40,
+            "newRuleSlots": 1,
+            "newIds": [
+              "c20_pixel"
+            ],
+            "minQuota": 0
+          },
+          "brStats": {
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 93,
+              "dark": 1,
+              "runs": 1
+            },
+            "level": null,
+            "fog": {
+              "fog": 7370624,
+              "density": 0.03999134028556081
+            },
+            "amb": 0.1591052378104659
+          },
+          "echo": {
+            "active": false,
+            "stats": {
+              "pending": 0,
+              "cooldowns": 0
+            },
+            "rows": []
+          },
+          "state": {
+            "token": "hamsi:17:1",
+            "baseSeed": 17,
+            "routeVersion": 26,
+            "depth": 4,
+            "reached": 4,
+            "rev": 54,
+            "nonce": 14,
+            "liftStage": "idle",
+            "visited": [
+              11
+            ],
+            "currentChoice": {
+              "seed": 3655156048,
+              "theme": "hospital",
+              "size": 0.784
+            }
+          },
+          "cargo": [
+            {
+              "id": "i1qc",
+              "type": "bolt",
+              "state": "world",
+              "holder": null,
+              "owner": null,
+              "value": 19,
+              "inv": null,
+              "p": [
+                -21.2827091217041,
+                -299.82501220703125,
+                -59.38823699951172
+              ]
+            },
+            {
+              "id": "i1rw",
+              "type": "airhorn",
+              "state": "held",
+              "holder": "L2eniu6pyc",
+              "owner": null,
+              "value": 49,
+              "inv": null,
+              "p": [
+                0.059008664682468445,
+                0.049118570012930185,
+                -0.025004015627281523
+              ]
+            }
+          ],
+          "nativePlan": {
+            "roomId": 11,
+            "x": -20.6,
+            "z": -59.4,
+            "y": -300,
+            "yaw": 0,
+            "approach": {
+              "x": -20.6,
+              "y": -300,
+              "z": -57.1
+            },
+            "spawn": {
+              "x": -20.6,
+              "y": -299.97,
+              "z": -59.4
+            },
+            "fingerprint": {
+              "seed": 3655156048,
+              "theme": "hospital",
+              "w": 35,
+              "h": 35,
+              "hash": 1878522510
+            },
+            "requiredRooms": 15
+          }
+        },
+        {
+          "phase": "moon",
+          "moon": "hamsi",
+          "baseSeed": 17,
+          "worldSeed": 17,
+          "depth": 4,
+          "clock": 513.8666666666936,
+          "moonT": null,
+          "theme": "hospital",
+          "layoutSeed": 3655156048,
+          "group": "c52434f0-eef9-4a7a-9658-f6f1803ab77b",
+          "liveFacilityGroups": 1,
+          "player": {
+            "p": [
+              -20.049999237060547,
+              -299.9800009750919,
+              -59.95000076293945
+            ],
+            "indoor": true,
+            "inShip": false,
+            "slots": [
+              "i1he",
+              "i1or",
+              "i1pz",
+              null,
+              null
+            ]
+          },
+          "creatures": [],
+          "limits": {
+            "powerMul": 1.111,
+            "hpMul": 1.039,
+            "damageMul": 0.954,
+            "speedMul": 0.958,
+            "maxAlive": 3,
+            "speedCap": 6.8,
+            "damageCap": 40,
+            "newRuleSlots": 1,
+            "newIds": [
+              "c20_pixel"
+            ],
+            "minQuota": 0
+          },
+          "brStats": {
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 110,
+              "dark": 1,
+              "runs": 1
+            },
+            "level": null,
+            "fog": {
+              "fog": 7370624,
+              "density": 0.039984124723421964
+            },
+            "amb": 0.15859194146747235
+          },
+          "echo": {
+            "active": false,
+            "stats": {
+              "pending": 0,
+              "cooldowns": 0
+            },
+            "rows": []
+          },
+          "state": {
+            "token": "hamsi:17:1",
+            "baseSeed": 17,
+            "routeVersion": 26,
+            "depth": 4,
+            "reached": 4,
+            "rev": 54,
+            "nonce": 14,
+            "liftStage": "idle",
+            "visited": [
+              11
+            ],
+            "currentChoice": {
+              "seed": 3655156048,
+              "theme": "hospital",
+              "size": 0.784
+            }
+          },
+          "cargo": [
+            {
+              "id": "i1rw",
+              "type": "airhorn",
+              "state": "held",
+              "holder": "L2eniu6pyc",
+              "owner": null,
+              "value": 49,
+              "inv": null,
+              "p": [
+                0,
+                0.02,
+                -0.10249999977648258
+              ]
+            },
+            {
+              "id": "i1qc",
+              "type": "bolt",
+              "state": "world",
+              "holder": null,
+              "owner": null,
+              "value": 19,
+              "inv": null,
+              "p": [
+                -21.28299982799778,
+                -299.82500004302744,
+                -59.3880000966504
+              ]
+            }
+          ],
+          "nativePlan": {
+            "roomId": 11,
+            "x": -20.6,
+            "z": -59.4,
+            "y": -300,
+            "yaw": 0,
+            "approach": {
+              "x": -20.6,
+              "y": -300,
+              "z": -57.1
+            },
+            "spawn": {
+              "x": -20.6,
+              "y": -299.97,
+              "z": -59.4
+            },
+            "fingerprint": {
+              "seed": 3655156048,
+              "theme": "hospital",
+              "w": 35,
+              "h": 35,
+              "hash": 1878522510
+            },
+            "requiredRooms": 15
+          }
+        }
+      ],
+      "nativeStandingFloor": [
+        {
+          "pos": [
+            -21.149999618530273,
+            -299.9800170898437,
+            -59.95000076293945
+          ],
+          "dead": false,
+          "grounded": true,
+          "hit": {
+            "point": -300.0000061035156,
+            "normal": 1
+          },
+          "echo": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        },
+        {
+          "pos": [
+            -20.049999237060547,
+            -299.9800009750919,
+            -59.95000076293945
+          ],
+          "dead": false,
+          "grounded": true,
+          "hit": {
+            "point": -299.9999899887638,
+            "normal": 1
+          },
+          "echo": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        }
+      ]
+    },
+    {
+      "label": "native E depth5",
+      "pair": [
+        {
+          "phase": "moon",
+          "moon": "hamsi",
+          "baseSeed": 17,
+          "worldSeed": 17,
+          "depth": 5,
+          "clock": 513.8666666666936,
+          "moonT": 88.86666666666291,
+          "theme": "mansion",
+          "layoutSeed": 757416681,
+          "group": "7406bfee-1721-4e47-9f1b-ae8bc98567a0",
+          "liveFacilityGroups": 1,
+          "player": {
+            "p": [
+              -33.150001525878906,
+              -299.9800170898437,
+              20.049999237060547
+            ],
+            "indoor": true,
+            "inShip": false,
+            "slots": [
+              "i1g4",
+              "i1mn",
+              "i1ns",
+              "i1rw",
+              null
+            ]
+          },
+          "creatures": [],
+          "limits": {
+            "powerMul": 1.169,
+            "hpMul": 1.055,
+            "damageMul": 0.966,
+            "speedMul": 0.965,
+            "maxAlive": 3,
+            "speedCap": 6.8,
+            "damageCap": 40,
+            "newRuleSlots": 1,
+            "newIds": [
+              "c20_pixel"
+            ],
+            "minQuota": 0
+          },
+          "brStats": {
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 93,
+              "dark": 1,
+              "runs": 1
+            },
+            "level": null,
+            "fog": {
+              "fog": 7370624,
+              "density": 0.03999134028556081
+            },
+            "amb": 0.1591052378104659
+          },
+          "echo": {
+            "active": false,
+            "stats": {
+              "pending": 0,
+              "cooldowns": 0
+            },
+            "rows": []
+          },
+          "state": {
+            "token": "hamsi:17:1",
+            "baseSeed": 17,
+            "routeVersion": 26,
+            "depth": 5,
+            "reached": 5,
+            "rev": 71,
+            "nonce": 17,
+            "liftStage": "idle",
+            "visited": [
+              5
+            ],
+            "currentChoice": {
+              "seed": 757416681,
+              "theme": "mansion",
+              "size": 0.796
+            }
+          },
+          "cargo": [
+            {
+              "id": "i1qc",
+              "type": "bolt",
+              "state": "world",
+              "holder": null,
+              "owner": null,
+              "value": 19,
+              "inv": null,
+              "p": [
+                -33.2825813293457,
+                -299.82501220703125,
+                20.611719131469727
+              ]
+            },
+            {
+              "id": "i1rw",
+              "type": "airhorn",
+              "state": "held",
+              "holder": "L2eniu6pyc",
+              "owner": null,
+              "value": 49,
+              "inv": null,
+              "p": [
+                0.059008664682468445,
+                0.049118570012930185,
+                -0.025004015627281523
+              ]
+            }
+          ],
+          "nativePlan": {
+            "roomId": 5,
+            "x": -32.6,
+            "z": 20.6,
+            "y": -300,
+            "yaw": 0,
+            "approach": {
+              "x": -32.6,
+              "y": -300,
+              "z": 22.900000000000002
+            },
+            "spawn": {
+              "x": -32.6,
+              "y": -299.97,
+              "z": 20.6
+            },
+            "fingerprint": {
+              "seed": 757416681,
+              "theme": "mansion",
+              "w": 35,
+              "h": 35,
+              "hash": 1915806142
+            },
+            "requiredRooms": 15
+          }
+        },
+        {
+          "phase": "moon",
+          "moon": "hamsi",
+          "baseSeed": 17,
+          "worldSeed": 17,
+          "depth": 5,
+          "clock": 513.8666666666936,
+          "moonT": null,
+          "theme": "mansion",
+          "layoutSeed": 757416681,
+          "group": "e7781d03-cdc1-4cdb-a75a-7eac10cc9577",
+          "liveFacilityGroups": 1,
+          "player": {
+            "p": [
+              -32.04999923706055,
+              -299.98000135776,
+              20.049999237060547
+            ],
+            "indoor": true,
+            "inShip": false,
+            "slots": [
+              "i1he",
+              "i1or",
+              "i1pz",
+              null,
+              null
+            ]
+          },
+          "creatures": [],
+          "limits": {
+            "powerMul": 1.169,
+            "hpMul": 1.055,
+            "damageMul": 0.966,
+            "speedMul": 0.965,
+            "maxAlive": 3,
+            "speedCap": 6.8,
+            "damageCap": 40,
+            "newRuleSlots": 1,
+            "newIds": [
+              "c20_pixel"
+            ],
+            "minQuota": 0
+          },
+          "brStats": {
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 110,
+              "dark": 1,
+              "runs": 1
+            },
+            "level": null,
+            "fog": {
+              "fog": 7370624,
+              "density": 0.039984124723421964
+            },
+            "amb": 0.15859194146747235
+          },
+          "echo": {
+            "active": false,
+            "stats": {
+              "pending": 0,
+              "cooldowns": 0
+            },
+            "rows": []
+          },
+          "state": {
+            "token": "hamsi:17:1",
+            "baseSeed": 17,
+            "routeVersion": 26,
+            "depth": 5,
+            "reached": 5,
+            "rev": 71,
+            "nonce": 17,
+            "liftStage": "idle",
+            "visited": [
+              5
+            ],
+            "currentChoice": {
+              "seed": 757416681,
+              "theme": "mansion",
+              "size": 0.796
+            }
+          },
+          "cargo": [
+            {
+              "id": "i1rw",
+              "type": "airhorn",
+              "state": "held",
+              "holder": "L2eniu6pyc",
+              "owner": null,
+              "value": 49,
+              "inv": null,
+              "p": [
+                0,
+                0.02,
+                -0.10249999977648258
+              ]
+            },
+            {
+              "id": "i1qc",
+              "type": "bolt",
+              "state": "world",
+              "holder": null,
+              "owner": null,
+              "value": 19,
+              "inv": null,
+              "p": [
+                -33.28299975180334,
+                -299.8250000071712,
+                20.61199986077035
+              ]
+            }
+          ],
+          "nativePlan": {
+            "roomId": 5,
+            "x": -32.6,
+            "z": 20.6,
+            "y": -300,
+            "yaw": 0,
+            "approach": {
+              "x": -32.6,
+              "y": -300,
+              "z": 22.900000000000002
+            },
+            "spawn": {
+              "x": -32.6,
+              "y": -299.97,
+              "z": 20.6
+            },
+            "fingerprint": {
+              "seed": 757416681,
+              "theme": "mansion",
+              "w": 35,
+              "h": 35,
+              "hash": 1915806142
+            },
+            "requiredRooms": 15
+          }
+        }
+      ],
+      "nativeStandingFloor": [
+        {
+          "pos": [
+            -33.150001525878906,
+            -299.9800170898437,
+            20.049999237060547
+          ],
+          "dead": false,
+          "grounded": true,
+          "hit": {
+            "point": -300.0000061035156,
+            "normal": 1
+          },
+          "echo": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        },
+        {
+          "pos": [
+            -32.04999923706055,
+            -299.98000135776,
+            20.049999237060547
+          ],
+          "dead": false,
+          "grounded": true,
+          "hit": {
+            "point": -299.99999037143186,
+            "normal": 1
+          },
+          "echo": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        }
+      ]
+    },
+    {
+      "label": "native E depth6",
+      "pair": [
+        {
+          "phase": "moon",
+          "moon": "hamsi",
+          "baseSeed": 17,
+          "worldSeed": 17,
+          "depth": 6,
+          "clock": 513.8666666666936,
+          "moonT": 104.3333333333287,
+          "theme": "mineshaft",
+          "layoutSeed": 422184192,
+          "group": "742f61e2-fb4f-411a-844b-c3718e8f745d",
+          "liveFacilityGroups": 1,
+          "player": {
+            "p": [
+              -55.95000076293945,
+              -299.9800003355525,
+              -61.150001525878906
+            ],
+            "indoor": true,
+            "inShip": false,
+            "slots": [
+              "i1g4",
+              "i1mn",
+              "i1ns",
+              "i1rw",
+              null
+            ]
+          },
+          "creatures": [],
+          "limits": {
+            "powerMul": 1.218,
+            "hpMul": 1.068,
+            "damageMul": 0.976,
+            "speedMul": 0.97,
+            "maxAlive": 4,
+            "speedCap": 6.8,
+            "damageCap": 40,
+            "newRuleSlots": 2,
+            "newIds": [
+              "c20_brute"
+            ],
+            "minQuota": 0
+          },
+          "brStats": {
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 93,
+              "dark": 1,
+              "runs": 1
+            },
+            "level": null,
+            "fog": {
+              "fog": 7370624,
+              "density": 0.03999134028556081
+            },
+            "amb": 0.1591052378104659
+          },
+          "echo": {
+            "active": false,
+            "stats": {
+              "pending": 0,
+              "cooldowns": 0
+            },
+            "rows": []
+          },
+          "state": {
+            "token": "hamsi:17:1",
+            "baseSeed": 17,
+            "routeVersion": 26,
+            "depth": 6,
+            "reached": 6,
+            "rev": 86,
+            "nonce": 20,
+            "liftStage": "idle",
+            "visited": [
+              13
+            ],
+            "currentChoice": {
+              "seed": 422184192,
+              "theme": "mineshaft",
+              "size": 0.806
+            }
+          },
+          "cargo": [
+            {
+              "id": "i1qc",
+              "type": "bolt",
+              "state": "world",
+              "holder": null,
+              "owner": null,
+              "value": 19,
+              "inv": null,
+              "p": [
+                -54.7177619934082,
+                -299.8250732421875,
+                -60.61185073852539
+              ]
+            },
+            {
+              "id": "i1rw",
+              "type": "airhorn",
+              "state": "held",
+              "holder": "L2eniu6pyc",
+              "owner": null,
+              "value": 49,
+              "inv": null,
+              "p": [
+                0.059008664682468445,
+                0.049118570012930185,
+                -0.025004015627281523
+              ]
+            }
+          ],
+          "nativePlan": {
+            "roomId": 13,
+            "x": -55.4,
+            "z": -60.6,
+            "y": -300,
+            "yaw": 3.141592653589793,
+            "approach": {
+              "x": -55.4,
+              "y": -300,
+              "z": -62.9
+            },
+            "spawn": {
+              "x": -55.4,
+              "y": -299.97,
+              "z": -60.6
+            },
+            "fingerprint": {
+              "seed": 422184192,
+              "theme": "mineshaft",
+              "w": 35,
+              "h": 35,
+              "hash": 927312191
+            },
+            "requiredRooms": 15
+          }
+        },
+        {
+          "phase": "moon",
+          "moon": "hamsi",
+          "baseSeed": 17,
+          "worldSeed": 17,
+          "depth": 6,
+          "clock": 513.8666666666936,
+          "moonT": null,
+          "theme": "mineshaft",
+          "layoutSeed": 422184192,
+          "group": "07ece8ff-8338-4e18-addf-d21c293f07be",
+          "liveFacilityGroups": 1,
+          "player": {
+            "p": [
+              -54.849998474121094,
+              -299.9800007053949,
+              -61.150001525878906
+            ],
+            "indoor": true,
+            "inShip": false,
+            "slots": [
+              "i1he",
+              "i1or",
+              "i1pz",
+              null,
+              null
+            ]
+          },
+          "creatures": [],
+          "limits": {
+            "powerMul": 1.218,
+            "hpMul": 1.068,
+            "damageMul": 0.976,
+            "speedMul": 0.97,
+            "maxAlive": 4,
+            "speedCap": 6.8,
+            "damageCap": 40,
+            "newRuleSlots": 2,
+            "newIds": [
+              "c20_brute"
+            ],
+            "minQuota": 0
+          },
+          "brStats": {
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 110,
+              "dark": 1,
+              "runs": 1
+            },
+            "level": null,
+            "fog": {
+              "fog": 7370624,
+              "density": 0.039984124723421964
+            },
+            "amb": 0.15859194146747235
+          },
+          "echo": {
+            "active": false,
+            "stats": {
+              "pending": 0,
+              "cooldowns": 0
+            },
+            "rows": []
+          },
+          "state": {
+            "token": "hamsi:17:1",
+            "baseSeed": 17,
+            "routeVersion": 26,
+            "depth": 6,
+            "reached": 6,
+            "rev": 86,
+            "nonce": 20,
+            "liftStage": "idle",
+            "visited": [
+              13
+            ],
+            "currentChoice": {
+              "seed": 422184192,
+              "theme": "mineshaft",
+              "size": 0.806
+            }
+          },
+          "cargo": [
+            {
+              "id": "i1rw",
+              "type": "airhorn",
+              "state": "held",
+              "holder": "L2eniu6pyc",
+              "owner": null,
+              "value": 49,
+              "inv": null,
+              "p": [
+                0,
+                0.02,
+                -0.10249999977648258
+              ]
+            },
+            {
+              "id": "i1qc",
+              "type": "bolt",
+              "state": "world",
+              "holder": null,
+              "owner": null,
+              "value": 19,
+              "inv": null,
+              "p": [
+                -54.717999734682,
+                -299.8250000071712,
+                -60.61199986749339
+              ]
+            }
+          ],
+          "nativePlan": {
+            "roomId": 13,
+            "x": -55.4,
+            "z": -60.6,
+            "y": -300,
+            "yaw": 3.141592653589793,
+            "approach": {
+              "x": -55.4,
+              "y": -300,
+              "z": -62.9
+            },
+            "spawn": {
+              "x": -55.4,
+              "y": -299.97,
+              "z": -60.6
+            },
+            "fingerprint": {
+              "seed": 422184192,
+              "theme": "mineshaft",
+              "w": 35,
+              "h": 35,
+              "hash": 927312191
+            },
+            "requiredRooms": 15
+          }
+        }
+      ],
+      "nativeStandingFloor": [
+        {
+          "pos": [
+            -55.95000076293945,
+            -299.9800003355525,
+            -61.150001525878906
+          ],
+          "dead": false,
+          "grounded": true,
+          "hit": {
+            "point": -299.9999893492244,
+            "normal": 1
+          },
+          "echo": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        },
+        {
+          "pos": [
+            -54.849998474121094,
+            -299.9800007053949,
+            -61.150001525878906
+          ],
+          "dead": false,
+          "grounded": true,
+          "hit": {
+            "point": -299.9999897190668,
+            "normal": 1
+          },
+          "echo": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        }
+      ]
+    },
+    {
+      "label": "native E depth7",
+      "pair": [
+        {
+          "phase": "moon",
+          "moon": "hamsi",
+          "baseSeed": 17,
+          "worldSeed": 17,
+          "depth": 7,
+          "clock": 513.8666666666936,
+          "moonT": 118.78333333332787,
+          "theme": "nullreception",
+          "layoutSeed": 3171011355,
+          "group": "936b9914-3460-4364-afc3-431ef56501d3",
+          "liveFacilityGroups": 1,
+          "player": {
+            "p": [
+              -59.95000076293945,
+              -299.9800008859323,
+              -29.149999618530273
+            ],
+            "indoor": true,
+            "inShip": false,
+            "slots": [
+              "i1g4",
+              "i1mn",
+              "i1ns",
+              "i1rw",
+              null
+            ]
+          },
+          "creatures": [],
+          "limits": {
+            "powerMul": 1.26,
+            "hpMul": 1.08,
+            "damageMul": 0.985,
+            "speedMul": 0.975,
+            "maxAlive": 2,
+            "speedCap": 6.8,
+            "damageCap": 40,
+            "newRuleSlots": 0,
+            "newIds": [],
+            "minQuota": 0
+          },
+          "brStats": {
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 93,
+              "dark": 1,
+              "runs": 1
+            },
+            "level": null,
+            "fog": {
+              "fog": 7370624,
+              "density": 0.03999134028556081
+            },
+            "amb": 0.1591052378104659
+          },
+          "echo": {
+            "active": true,
+            "stats": {
+              "pending": 0,
+              "cooldowns": 0
+            },
+            "rows": []
+          },
+          "state": {
+            "token": "hamsi:17:1",
+            "baseSeed": 17,
+            "routeVersion": 26,
+            "depth": 7,
+            "reached": 7,
+            "rev": 99,
+            "nonce": 23,
+            "liftStage": "idle",
+            "visited": [
+              3
+            ],
+            "currentChoice": {
+              "seed": 3171011355,
+              "theme": "nullreception",
+              "size": 0.815
+            }
+          },
+          "cargo": [
+            {
+              "id": "i1qc",
+              "type": "bolt",
+              "state": "world",
+              "holder": null,
+              "owner": null,
+              "value": 19,
+              "inv": null,
+              "p": [
+                -58.71788024902344,
+                -299.8250427246094,
+                -28.61191749572754
+              ]
+            },
+            {
+              "id": "i1rw",
+              "type": "airhorn",
+              "state": "held",
+              "holder": "L2eniu6pyc",
+              "owner": null,
+              "value": 49,
+              "inv": null,
+              "p": [
+                0.059008664682468445,
+                0.049118570012930185,
+                -0.025004015627281523
+              ]
+            }
+          ],
+          "nativePlan": {
+            "roomId": 3,
+            "x": -59.4,
+            "z": -28.6,
+            "y": -300,
+            "yaw": 3.141592653589793,
+            "approach": {
+              "x": -59.4,
+              "y": -300,
+              "z": -30.900000000000002
+            },
+            "spawn": {
+              "x": -59.4,
+              "y": -299.97,
+              "z": -28.6
+            },
+            "fingerprint": {
+              "seed": 3171011355,
+              "theme": "nullreception",
+              "w": 35,
+              "h": 35,
+              "hash": 3864262834
+            },
+            "requiredRooms": 15
+          }
+        },
+        {
+          "phase": "moon",
+          "moon": "hamsi",
+          "baseSeed": 17,
+          "worldSeed": 17,
+          "depth": 7,
+          "clock": 513.8666666666936,
+          "moonT": null,
+          "theme": "nullreception",
+          "layoutSeed": 3171011355,
+          "group": "4e2b6ef8-ddc3-4e91-bd10-efa09498293e",
+          "liveFacilityGroups": 1,
+          "player": {
+            "p": [
+              -58.849998474121094,
+              -299.98000081758926,
+              -29.149999618530273
+            ],
+            "indoor": true,
+            "inShip": false,
+            "slots": [
+              "i1he",
+              "i1or",
+              "i1pz",
+              null,
+              null
+            ]
+          },
+          "creatures": [],
+          "limits": {
+            "powerMul": 1.26,
+            "hpMul": 1.08,
+            "damageMul": 0.985,
+            "speedMul": 0.975,
+            "maxAlive": 2,
+            "speedCap": 6.8,
+            "damageCap": 40,
+            "newRuleSlots": 0,
+            "newIds": [],
+            "minQuota": 0
+          },
+          "brStats": {
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 110,
+              "dark": 1,
+              "runs": 1
+            },
+            "level": null,
+            "fog": {
+              "fog": 7370624,
+              "density": 0.039984124723421964
+            },
+            "amb": 0.15859194146747235
+          },
+          "echo": {
+            "active": false,
+            "stats": {
+              "pending": 0,
+              "cooldowns": 0
+            },
+            "rows": []
+          },
+          "state": {
+            "token": "hamsi:17:1",
+            "baseSeed": 17,
+            "routeVersion": 26,
+            "depth": 7,
+            "reached": 7,
+            "rev": 99,
+            "nonce": 23,
+            "liftStage": "idle",
+            "visited": [
+              3
+            ],
+            "currentChoice": {
+              "seed": 3171011355,
+              "theme": "nullreception",
+              "size": 0.815
+            }
+          },
+          "cargo": [
+            {
+              "id": "i1rw",
+              "type": "airhorn",
+              "state": "held",
+              "holder": "L2eniu6pyc",
+              "owner": null,
+              "value": 49,
+              "inv": null,
+              "p": [
+                0,
+                0.02,
+                -0.10249999977648258
+              ]
+            },
+            {
+              "id": "i1qc",
+              "type": "bolt",
+              "state": "world",
+              "holder": null,
+              "owner": null,
+              "value": 19,
+              "inv": null,
+              "p": [
+                -58.7177619934082,
+                -299.8250732421875,
+                -28.61185073852539
+              ]
+            }
+          ],
+          "nativePlan": {
+            "roomId": 3,
+            "x": -59.4,
+            "z": -28.6,
+            "y": -300,
+            "yaw": 3.141592653589793,
+            "approach": {
+              "x": -59.4,
+              "y": -300,
+              "z": -30.900000000000002
+            },
+            "spawn": {
+              "x": -59.4,
+              "y": -299.97,
+              "z": -28.6
+            },
+            "fingerprint": {
+              "seed": 3171011355,
+              "theme": "nullreception",
+              "w": 35,
+              "h": 35,
+              "hash": 3864262834
+            },
+            "requiredRooms": 15
+          }
+        }
+      ],
+      "nativeStandingFloor": [
+        {
+          "pos": [
+            -59.95000076293945,
+            -299.9800008859323,
+            -29.149999618530273
+          ],
+          "dead": false,
+          "grounded": true,
+          "hit": {
+            "point": -299.9999898996042,
+            "normal": 1
+          },
+          "echo": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        },
+        {
+          "pos": [
+            -58.849998474121094,
+            -299.98000081758926,
+            -29.149999618530273
+          ],
+          "dead": false,
+          "grounded": true,
+          "hit": {
+            "point": -299.99998983126113,
+            "normal": 1
+          },
+          "echo": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        }
+      ]
+    },
+    {
+      "label": "native E final surface return",
+      "pair": [
+        {
+          "phase": "moon",
+          "moon": "hamsi",
+          "baseSeed": 17,
+          "worldSeed": 17,
+          "depth": 0,
+          "clock": 514.1333333333605,
+          "moonT": 131.21666666666323,
+          "theme": "factory",
+          "layoutSeed": 17,
+          "group": "e365593c-3bb9-4350-a686-ae010a2cc20f",
+          "liveFacilityGroups": 1,
+          "player": {
+            "p": [
+              -57.95000076293945,
+              -299.9800002160795,
+              -59.150001525878906
+            ],
+            "indoor": true,
+            "inShip": false,
+            "slots": [
+              "i1g4",
+              "i1mn",
+              "i1ns",
+              "i1rw",
+              null
+            ]
+          },
+          "creatures": [],
+          "limits": null,
+          "brStats": {
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 93,
+              "dark": 1,
+              "runs": 1
+            },
+            "level": null,
+            "fog": {
+              "fog": 7370624,
+              "density": 0.03999134028556081
+            },
+            "amb": 0.1591052378104659
+          },
+          "echo": {
+            "active": false,
+            "stats": {
+              "pending": 0,
+              "cooldowns": 0
+            },
+            "rows": []
+          },
+          "state": {
+            "token": "hamsi:17:1",
+            "baseSeed": 17,
+            "routeVersion": 26,
+            "depth": 0,
+            "reached": 7,
+            "rev": 101,
+            "nonce": 25,
+            "liftStage": "idle",
+            "visited": [
+              16,
+              11,
+              15,
+              10,
+              13,
+              8,
+              9,
+              12,
+              14,
+              5
+            ],
+            "currentChoice": null
+          },
+          "cargo": [
+            {
+              "id": "i1qc",
+              "type": "bolt",
+              "state": "world",
+              "holder": null,
+              "owner": null,
+              "value": 19,
+              "inv": null,
+              "p": [
+                -56.71790313720703,
+                -299.8250427246094,
+                -58.61199188232422
+              ]
+            },
+            {
+              "id": "i1rw",
+              "type": "airhorn",
+              "state": "held",
+              "holder": "L2eniu6pyc",
+              "owner": null,
+              "value": 49,
+              "inv": null,
+              "p": [
+                0.059008664682468445,
+                0.049118570012930185,
+                -0.025004015627281523
+              ]
+            }
+          ],
+          "nativePlan": {
+            "roomId": 11,
+            "x": -57.4,
+            "z": -58.6,
+            "y": -300,
+            "yaw": 3.141592653589793,
+            "approach": {
+              "x": -57.4,
+              "y": -300,
+              "z": -60.9
+            },
+            "spawn": {
+              "x": -57.4,
+              "y": -299.97,
+              "z": -58.6
+            },
+            "fingerprint": {
+              "seed": 17,
+              "theme": "factory",
+              "w": 34,
+              "h": 34,
+              "hash": 1293129356
+            },
+            "requiredRooms": 15
+          }
+        },
+        {
+          "phase": "moon",
+          "moon": "hamsi",
+          "baseSeed": 17,
+          "worldSeed": 17,
+          "depth": 0,
+          "clock": 513.8666666666936,
+          "moonT": null,
+          "theme": "factory",
+          "layoutSeed": 17,
+          "group": "1006ad9e-5587-464f-835c-7bc94be00841",
+          "liveFacilityGroups": 1,
+          "player": {
+            "p": [
+              -56.849998474121094,
+              -299.9800002718788,
+              -59.150001525878906
+            ],
+            "indoor": true,
+            "inShip": false,
+            "slots": [
+              "i1he",
+              "i1or",
+              "i1pz",
+              null,
+              null
+            ]
+          },
+          "creatures": [],
+          "limits": null,
+          "brStats": {
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 110,
+              "dark": 1,
+              "runs": 1
+            },
+            "level": null,
+            "fog": {
+              "fog": 7370624,
+              "density": 0.039984124723421964
+            },
+            "amb": 0.15859194146747235
+          },
+          "echo": {
+            "active": false,
+            "stats": {
+              "pending": 0,
+              "cooldowns": 0
+            },
+            "rows": []
+          },
+          "state": {
+            "token": "hamsi:17:1",
+            "baseSeed": 17,
+            "routeVersion": 26,
+            "depth": 0,
+            "reached": 7,
+            "rev": 101,
+            "nonce": 25,
+            "liftStage": "idle",
+            "visited": [
+              16,
+              11,
+              15,
+              10,
+              13,
+              8,
+              9,
+              12,
+              14,
+              5
+            ],
+            "currentChoice": null
+          },
+          "cargo": [
+            {
+              "id": "i1rw",
+              "type": "airhorn",
+              "state": "held",
+              "holder": "L2eniu6pyc",
+              "owner": null,
+              "value": 49,
+              "inv": null,
+              "p": [
+                0,
+                0.02,
+                -0.10249999977648258
+              ]
+            },
+            {
+              "id": "i1qc",
+              "type": "bolt",
+              "state": "world",
+              "holder": null,
+              "owner": null,
+              "value": 19,
+              "inv": null,
+              "p": [
+                -56.71799988707088,
+                -299.8250000250993,
+                -58.61199993360327
+              ]
+            }
+          ],
+          "nativePlan": {
+            "roomId": 11,
+            "x": -57.4,
+            "z": -58.6,
+            "y": -300,
+            "yaw": 3.141592653589793,
+            "approach": {
+              "x": -57.4,
+              "y": -300,
+              "z": -60.9
+            },
+            "spawn": {
+              "x": -57.4,
+              "y": -299.97,
+              "z": -58.6
+            },
+            "fingerprint": {
+              "seed": 17,
+              "theme": "factory",
+              "w": 34,
+              "h": 34,
+              "hash": 1293129356
+            },
+            "requiredRooms": 15
+          }
+        }
+      ],
+      "nativeStandingFloor": [
+        {
+          "pos": [
+            -57.95000076293945,
+            -299.9800002160795,
+            -59.150001525878906
+          ],
+          "dead": false,
+          "grounded": true,
+          "hit": {
+            "point": -299.99998922975135,
+            "normal": 1
+          },
+          "echo": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        },
+        {
+          "pos": [
+            -56.849998474121094,
+            -299.9800002718788,
+            -59.150001525878906
+          ],
+          "dead": false,
+          "grounded": true,
+          "hit": {
+            "point": -299.99998928555067,
+            "normal": 1
+          },
+          "echo": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        }
+      ]
+    }
+  ],
+  "visualReplayFixtures": {
+    "3": {
+      "phase": "moon",
+      "moon": "hamsi",
+      "baseSeed": 17,
+      "worldSeed": 17,
+      "depth": 3,
+      "state": {
+        "token": "hamsi:17:1",
+        "baseSeed": 17,
+        "routeVersion": 26,
+        "rev": 47,
+        "depth": 3,
+        "reached": 3,
+        "visited": [
+          9
+        ],
+        "surfaceVisited": [
+          16,
+          11,
+          15,
+          10,
+          13,
+          8,
+          9,
+          12,
+          14,
+          5
+        ],
+        "liftStage": "idle",
+        "stageTime": 54.68333333333152,
+        "stageElapsed": 0,
+        "surface": {
+          "gen": {
+            "seed": 17,
+            "theme": "factory",
+            "size": 0.68,
+            "layoutOpts": {
+              "arch": "catacomb",
+              "loops": 0.04,
+              "deadMul": 6,
+              "labyrinth": 3,
+              "roomMul": 1.15
+            }
+          },
+          "items": [
+            {
+              "id": "idh",
+              "ty": "skull",
+              "v": 47,
+              "bv": 47,
+              "p": [
+                -32.94820022583008,
+                -299.9173583984375,
+                -16.954565048217773
+              ],
+              "q": [
+                1.6984407920972444e-05,
+                0.986085832118988,
+                0.00012532799155451357,
+                -0.16623686254024506
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "iet",
+              "ty": "skull",
+              "v": 29,
+              "bv": 29,
+              "p": [
+                15.052094459533691,
+                -299.9173583984375,
+                39.045684814453125
+              ],
+              "q": [
+                1.1398926289984956e-05,
+                0.9901121258735657,
+                0.00012779489043168724,
+                -0.14027822017669678
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "ifu",
+              "ty": "cryptocoin",
+              "v": 147,
+              "bv": 147,
+              "p": [
+                9.072454452514648,
+                -299.9500732421875,
+                -8.922396659851074
+              ],
+              "q": [
+                -9.183461224893108e-05,
+                0.8804174065589905,
+                0.00010992327588610351,
+                -0.47419944405555725
+              ],
+              "h": null,
+              "o": null,
+              "tr": "uncommon"
+            },
+            {
+              "id": "igz",
+              "ty": "robot",
+              "v": 60,
+              "bv": 60,
+              "p": [
+                6.664395809173584,
+                -299.83477783203125,
+                -13.722884178161621
+              ],
+              "q": [
+                -6.761346412531566e-06,
+                0.7893390655517578,
+                -4.973278464603936e-06,
+                -0.6139576435089111
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "ih6",
+              "ty": "mug",
+              "v": 57,
+              "bv": 57,
+              "p": [
+                17.711095809936523,
+                -299.9500732421875,
+                -56.31170654296875
+              ],
+              "q": [
+                -0.00014502742851618677,
+                0.16159306466579437,
+                0.00017316445882897824,
+                -0.986857533454895
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "iir",
+              "ty": "x_keyring",
+              "v": 14,
+              "bv": 14,
+              "p": [
+                21.922117233276367,
+                -299.9500732421875,
+                -54.484886169433594
+              ],
+              "q": [
+                2.1759511582786217e-05,
+                0.9756103157997131,
+                -0.00012632826110348105,
+                -0.219510018825531
+              ],
+              "h": null,
+              "o": null,
+              "tr": "rare"
+            },
+            {
+              "id": "ijk",
+              "ty": "simit",
+              "v": 12,
+              "bv": 12,
+              "p": [
+                -18.872468948364258,
+                -299.9500732421875,
+                -54.091827392578125
+              ],
+              "q": [
+                0.000205715507036075,
+                0.41563883423805237,
+                -3.5324497730471194e-05,
+                0.9095298051834106
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "ik3",
+              "ty": "mug",
+              "v": 50,
+              "bv": 50,
+              "p": [
+                17.16716194152832,
+                -299.9500427246094,
+                7.978572368621826
+              ],
+              "q": [
+                0.0002688114473130554,
+                0.5197035074234009,
+                2.7789351406681817e-06,
+                -0.8543466925621033
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "ilp",
+              "ty": "x_pickaxe",
+              "v": 34,
+              "bv": 34,
+              "p": [
+                -9.298089981079102,
+                -299.94976806640625,
+                -21.220237731933594
+              ],
+              "q": [
+                -4.2536677938187495e-05,
+                0.24518606066703796,
+                7.94217485236004e-05,
+                -0.969476044178009
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "im1",
+              "ty": "aquarium",
+              "v": 200,
+              "bv": 200,
+              "p": [
+                -17.110042572021484,
+                -299.7503356933594,
+                26.434181213378906
+              ],
+              "q": [
+                0.00011600396828725934,
+                0.43430623412132263,
+                1.6331536244251765e-05,
+                0.9007652997970581
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "inx",
+              "ty": "goldbar",
+              "v": 149,
+              "bv": 149,
+              "p": [
+                -16.41301727294922,
+                -299.9500732421875,
+                25.94532585144043
+              ],
+              "q": [
+                -0.00020820087229367346,
+                0.038806792348623276,
+                0.00013982313976157457,
+                -0.9992467761039734
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "ion",
+              "ty": "goldbar",
+              "v": 218,
+              "bv": 218,
+              "p": [
+                5.498701095581055,
+                -299.9500732421875,
+                -45.5015754699707
+              ],
+              "q": [
+                -0.00023272416729014367,
+                0.1360006034374237,
+                -0.00012381879787426442,
+                0.9907087683677673
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "ip6",
+              "ty": "register",
+              "v": 150,
+              "bv": 150,
+              "p": [
+                10.501446723937988,
+                -299.8203430175781,
+                -45.501529693603516
+              ],
+              "q": [
+                -1.655820415180642e-05,
+                0.8395370841026306,
+                9.113294072449207e-05,
+                0.5433024168014526
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "iqf",
+              "ty": "reactor",
+              "v": 185,
+              "bv": 185,
+              "p": [
+                20.00300407409668,
+                -299.76507568359375,
+                -55.99793243408203
+              ],
+              "q": [
+                -1.354619689664105e-05,
+                0.7033160328865051,
+                -3.68319742847234e-05,
+                -0.7108774185180664
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "irl",
+              "ty": "key",
+              "v": 3,
+              "bv": 3,
+              "p": [
+                8.882699966430664,
+                -299.95001220703125,
+                39.06653594970703
+              ],
+              "q": [
+                -4.366876964922994e-06,
+                0.9959613680839539,
+                2.7585458155954257e-05,
+                0.08978348970413208
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "isp",
+              "ty": "key",
+              "v": 3,
+              "bv": 3,
+              "p": [
+                5.508543491363525,
+                -299.9500732421875,
+                -44.92092514038086
+              ],
+              "q": [
+                -0.0001075057516572997,
+                0.947372317314148,
+                0.00011096467642346397,
+                -0.3201340138912201
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "ixe",
+              "ty": "cat_unit",
+              "v": 94,
+              "bv": 94,
+              "p": [
+                32.06496047973633,
+                -299.75274658203125,
+                -22.30705451965332
+              ],
+              "q": [
+                -8.302517017000355e-06,
+                -0.7139878869056702,
+                -1.2099804735044017e-05,
+                0.7001581192016602
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "iyq",
+              "ty": "trk_amulet",
+              "v": 47,
+              "bv": 47,
+              "p": [
+                22.269550323486328,
+                -299.9069519042969,
+                -58.461307525634766
+              ],
+              "q": [
+                -1.1437512512202375e-05,
+                0.9601448774337769,
+                -0.00013983302051201463,
+                0.27950283885002136
+              ],
+              "h": null,
+              "o": null,
+              "tr": "uncommon"
+            },
+            {
+              "id": "izt",
+              "ty": "comp_fuse",
+              "v": 7,
+              "bv": 7,
+              "p": [
+                -23.792461395263672,
+                -299.9500427246094,
+                -53.180030822753906
+              ],
+              "q": [
+                0.00016877661983016878,
+                0.6208549737930298,
+                -8.845128468237817e-05,
+                0.783925473690033
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i10h",
+              "ty": "comp_fuse",
+              "v": 6,
+              "bv": 6,
+              "p": [
+                -45.76871871948242,
+                -299.9500427246094,
+                -62.04837417602539
+              ],
+              "q": [
+                0.0001799593446776271,
+                0.5098248720169067,
+                6.516474240925163e-05,
+                -0.8602781891822815
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i119",
+              "ty": "key",
+              "v": 3,
+              "bv": 3,
+              "p": [
+                34.791526794433594,
+                -299.9500732421875,
+                -21.18107032775879
+              ],
+              "q": [
+                0.00014702171029057354,
+                0.6981756687164307,
+                5.009022788726725e-05,
+                0.7159265279769897
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i12s",
+              "ty": "fac_core",
+              "v": 314,
+              "bv": 314,
+              "p": [
+                6.001418590545654,
+                -299.0753173828125,
+                -37.99837112426758
+              ],
+              "q": [
+                -4.18016679759603e-05,
+                6.702117616441683e-08,
+                2.0789666450582445e-05,
+                1
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "i13o",
+              "ty": "nailbat",
+              "v": 0,
+              "bv": 0,
+              "p": [
+                33.901702880859375,
+                -299.94146728515625,
+                -37.94282531738281
+              ],
+              "q": [
+                0.00011186613846803084,
+                0.363007515668869,
+                8.123794395942241e-05,
+                0.931786298751831
+              ],
+              "h": null,
+              "o": null,
+              "af": {
+                "rarity": "rare",
+                "prefix": "Brutal",
+                "suffix": "of Storms",
+                "mods": {
+                  "dmgPct": 0.11,
+                  "critPct": 0.05,
+                  "speedPct": 0,
+                  "lifesteal": 0,
+                  "stunChance": 0,
+                  "shock": 9,
+                  "valuePct": 0
+                }
+              },
+              "tr": "rare"
+            },
+            {
+              "id": "i14d",
+              "ty": "comp_coolant",
+              "v": 12,
+              "bv": 12,
+              "p": [
+                -39.264713287353516,
+                -299.91583251953125,
+                -21.772125244140625
+              ],
+              "q": [
+                9.070547093870118e-06,
+                0.9252806901931763,
+                -5.217867965257028e-06,
+                0.3792831599712372
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i15i",
+              "ty": "comp_battery",
+              "v": 10,
+              "bv": 10,
+              "p": [
+                9.067768096923828,
+                -299.93157958984375,
+                -26.9080867767334
+              ],
+              "q": [
+                -5.613196481135674e-05,
+                0.9990516304969788,
+                -4.2194868001388386e-05,
+                0.0435420423746109
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i16e",
+              "ty": "comp_fuse",
+              "v": 6,
+              "bv": 6,
+              "p": [
+                42.66899108886719,
+                -299.9500732421875,
+                -38.581172943115234
+              ],
+              "q": [
+                -0.00020981607667636126,
+                0.16382546722888947,
+                -0.00017142726574093103,
+                0.9864893555641174
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i17k",
+              "ty": "comp_coolant",
+              "v": 10,
+              "bv": 10,
+              "p": [
+                34.38785934448242,
+                -299.91583251953125,
+                -30.768680572509766
+              ],
+              "q": [
+                6.629029059013192e-08,
+                0.5977639555931091,
+                1.1388720849936362e-05,
+                -0.8016722798347473
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i18e",
+              "ty": "comp_coolant",
+              "v": 10,
+              "bv": 10,
+              "p": [
+                18.263147354125977,
+                -299.91583251953125,
+                -46.333648681640625
+              ],
+              "q": [
+                -1.0883029972319491e-05,
+                0.7780042886734009,
+                8.345281457877718e-06,
+                0.628259003162384
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i194",
+              "ty": "comp_scrapmetal",
+              "v": 5,
+              "bv": 5,
+              "p": [
+                9.30692195892334,
+                -299.9501037597656,
+                13.554573059082031
+              ],
+              "q": [
+                8.621072629466653e-05,
+                0.5218590497970581,
+                3.9955270949576516e-06,
+                0.8530317544937134
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i1j4",
+              "ty": "rs_ember_pepper",
+              "v": 0,
+              "bv": 0,
+              "p": [
+                -9.461677551269531,
+                -299.8675537109375,
+                33.81071472167969
+              ],
+              "q": [
+                1.0691346687963232e-05,
+                0.9814876317977905,
+                9.206817776430398e-05,
+                0.1915254145860672
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i1k7",
+              "ty": "rs_ember_pepper",
+              "v": 0,
+              "bv": 0,
+              "p": [
+                -29.73539161682129,
+                -299.8675537109375,
+                29.879558563232422
+              ],
+              "q": [
+                -8.920457912608981e-05,
+                0.28975775837898254,
+                -1.2120240171498153e-06,
+                -0.9571000337600708
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i1lm",
+              "ty": "rs_glow_spore",
+              "v": 0,
+              "bv": 0,
+              "p": [
+                5.226842880249023,
+                -299.8870849609375,
+                58.95476150512695
+              ],
+              "q": [
+                -1.7310745533904992e-05,
+                0.46493348479270935,
+                1.458995757275261e-05,
+                0.8853456377983093
+              ],
+              "h": null,
+              "o": null
+            }
+          ],
+          "doors": [
+            {
+              "id": "d0",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d1",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d2",
+              "open": false,
+              "locked": true,
+              "silent": true
+            },
+            {
+              "id": "d3",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d4",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d5",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d6",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d7",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d8",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d9",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d10",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d11",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d12",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d13",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d14",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d15",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d16",
+              "open": false,
+              "locked": true,
+              "silent": true
+            },
+            {
+              "id": "d17",
+              "open": true,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d18",
+              "open": false,
+              "locked": true,
+              "silent": true
+            },
+            {
+              "id": "d19",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d20",
+              "open": false,
+              "locked": false,
+              "silent": true
+            }
+          ],
+          "budget": {
+            "powerUsed": 0,
+            "powerBoost": 0,
+            "spawnT": 3.4166666666665133
+          }
+        },
+        "nonce": 9,
+        "currentChoice": {
+          "seed": 1179496989,
+          "theme": "backrooms",
+          "size": 0.77
+        }
+      },
+      "spec": {
+        "depth": 3,
+        "floorNumber": 4,
+        "seed": 1179496989,
+        "theme": "backrooms",
+        "tier": 2,
+        "rule": "liminal",
+        "liminal": true,
+        "size": 0.77,
+        "discoveryRooms": 15,
+        "loot": {
+          "countMin": 13,
+          "countMax": 17,
+          "valueMul": 1.16
+        },
+        "threat": {
+          "powerMul": 1.04,
+          "hpMul": 1.02,
+          "damageMul": 0.94,
+          "speedMul": 0.95,
+          "maxAlive": 2,
+          "speedCap": 6.8,
+          "damageCap": 40,
+          "newRuleSlots": 0,
+          "newIds": [],
+          "minQuota": 0
+        },
+        "pattern": {
+          "lootSpread": "ordinary-rooms",
+          "noiseLesson": false,
+          "heavyProps": false,
+          "inspection": false
+        }
+      },
+      "theme": "backrooms",
+      "layoutSeed": 1179496989
+    },
+    "7": {
+      "phase": "moon",
+      "moon": "hamsi",
+      "baseSeed": 17,
+      "worldSeed": 17,
+      "depth": 7,
+      "state": {
+        "token": "hamsi:17:1",
+        "baseSeed": 17,
+        "routeVersion": 26,
+        "rev": 99,
+        "depth": 7,
+        "reached": 7,
+        "visited": [
+          3
+        ],
+        "surfaceVisited": [
+          16,
+          11,
+          15,
+          10,
+          13,
+          8,
+          9,
+          12,
+          14,
+          5
+        ],
+        "liftStage": "idle",
+        "stageTime": 121.28333333332773,
+        "stageElapsed": 0,
+        "surface": {
+          "gen": {
+            "seed": 17,
+            "theme": "factory",
+            "size": 0.68,
+            "layoutOpts": {
+              "arch": "catacomb",
+              "loops": 0.04,
+              "deadMul": 6,
+              "labyrinth": 3,
+              "roomMul": 1.15
+            }
+          },
+          "items": [
+            {
+              "id": "idh",
+              "ty": "skull",
+              "v": 47,
+              "bv": 47,
+              "p": [
+                -32.94819259643555,
+                -299.9173278808594,
+                -16.954715728759766
+              ],
+              "q": [
+                -1.6064534065662883e-05,
+                0.9860859513282776,
+                6.014017708366737e-05,
+                -0.16623689234256744
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "iet",
+              "ty": "skull",
+              "v": 29,
+              "bv": 29,
+              "p": [
+                15.052136421203613,
+                -299.9173278808594,
+                39.045677185058594
+              ],
+              "q": [
+                -2.0008752471767366e-05,
+                0.9901121258735657,
+                6.18245467194356e-05,
+                -0.14027823507785797
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "ifu",
+              "ty": "cryptocoin",
+              "v": 147,
+              "bv": 147,
+              "p": [
+                9.072449684143066,
+                -299.9500732421875,
+                -8.922507286071777
+              ],
+              "q": [
+                -6.427348125725985e-05,
+                0.88041752576828,
+                7.107812416506931e-05,
+                -0.4741995334625244
+              ],
+              "h": null,
+              "o": null,
+              "tr": "uncommon"
+            },
+            {
+              "id": "igz",
+              "ty": "robot",
+              "v": 60,
+              "bv": 60,
+              "p": [
+                6.664427757263184,
+                -299.83477783203125,
+                -13.722905158996582
+              ],
+              "q": [
+                -8.241618343163282e-05,
+                0.7893390655517578,
+                -0.00011574880045372993,
+                -0.6139576435089111
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "ih6",
+              "ty": "mug",
+              "v": 57,
+              "bv": 57,
+              "p": [
+                17.71109390258789,
+                -299.9501037597656,
+                -56.31170654296875
+              ],
+              "q": [
+                2.6637942937668413e-05,
+                0.16159307956695557,
+                -2.7165046049049124e-05,
+                -0.986857533454895
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "iir",
+              "ty": "x_keyring",
+              "v": 14,
+              "bv": 14,
+              "p": [
+                21.922117233276367,
+                -299.9500732421875,
+                -54.48487854003906
+              ],
+              "q": [
+                1.0519004717934877e-05,
+                0.9756102561950684,
+                -7.993799954419956e-05,
+                -0.2195100039243698
+              ],
+              "h": null,
+              "o": null,
+              "tr": "rare"
+            },
+            {
+              "id": "ijk",
+              "ty": "simit",
+              "v": 12,
+              "bv": 12,
+              "p": [
+                -18.872472763061523,
+                -299.9501647949219,
+                -54.091835021972656
+              ],
+              "q": [
+                5.5140106269391254e-05,
+                0.41563883423805237,
+                1.3846331057720818e-05,
+                0.9095297455787659
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "ik3",
+              "ty": "mug",
+              "v": 50,
+              "bv": 50,
+              "p": [
+                17.167160034179688,
+                -299.9500732421875,
+                7.978649139404297
+              ],
+              "q": [
+                -4.6080167521722615e-06,
+                0.5197035074234009,
+                -2.959128141810652e-05,
+                -0.8543466925621033
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "ilp",
+              "ty": "x_pickaxe",
+              "v": 34,
+              "bv": 34,
+              "p": [
+                -9.298093795776367,
+                -299.94989013671875,
+                -21.22024154663086
+              ],
+              "q": [
+                6.951853492864757e-07,
+                0.24518606066703796,
+                -5.760086878581205e-06,
+                -0.969476044178009
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "im1",
+              "ty": "aquarium",
+              "v": 200,
+              "bv": 200,
+              "p": [
+                -17.11007308959961,
+                -299.7503356933594,
+                26.433725357055664
+              ],
+              "q": [
+                8.408389840042219e-05,
+                0.43430623412132263,
+                2.9895605621277355e-05,
+                0.9007652997970581
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "inx",
+              "ty": "goldbar",
+              "v": 149,
+              "bv": 149,
+              "p": [
+                -16.41301727294922,
+                -299.95013427734375,
+                25.94532012939453
+              ],
+              "q": [
+                -0.00011613464448601007,
+                0.03880658373236656,
+                6.493007276731078e-06,
+                -0.9992467164993286
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "ion",
+              "ty": "goldbar",
+              "v": 218,
+              "bv": 218,
+              "p": [
+                5.49866247177124,
+                -299.95013427734375,
+                -45.5015754699707
+              ],
+              "q": [
+                -0.00012853647058364004,
+                0.13600043952465057,
+                -9.098926057049539e-08,
+                0.9907087683677673
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "ip6",
+              "ty": "register",
+              "v": 150,
+              "bv": 150,
+              "p": [
+                10.50157642364502,
+                -299.8203430175781,
+                -45.50154113769531
+              ],
+              "q": [
+                -2.3767031507304637e-06,
+                0.8395370841026306,
+                6.987167580518872e-05,
+                0.5433024168014526
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "iqf",
+              "ty": "reactor",
+              "v": 185,
+              "bv": 185,
+              "p": [
+                20.003149032592773,
+                -299.7650146484375,
+                -55.9979362487793
+              ],
+              "q": [
+                2.704228063521441e-05,
+                0.7033160328865051,
+                -3.676694177556783e-05,
+                -0.7108774185180664
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "irl",
+              "ty": "key",
+              "v": 3,
+              "bv": 3,
+              "p": [
+                8.882583618164062,
+                -299.9500427246094,
+                39.06653594970703
+              ],
+              "q": [
+                3.8934209442231804e-05,
+                0.9959613680839539,
+                8.82559543242678e-05,
+                0.08978349715471268
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "isp",
+              "ty": "key",
+              "v": 3,
+              "bv": 3,
+              "p": [
+                5.508540630340576,
+                -299.95013427734375,
+                -44.920921325683594
+              ],
+              "q": [
+                9.906608283927198e-06,
+                0.9473722577095032,
+                -3.081695467699319e-05,
+                -0.3201340436935425
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "ixe",
+              "ty": "cat_unit",
+              "v": 94,
+              "bv": 94,
+              "p": [
+                32.0649528503418,
+                -299.75274658203125,
+                -22.30705451965332
+              ],
+              "q": [
+                2.2333137167152017e-05,
+                -0.7139878869056702,
+                2.249552017019596e-05,
+                0.7001581192016602
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "iyq",
+              "ty": "trk_amulet",
+              "v": 47,
+              "bv": 47,
+              "p": [
+                22.269542694091797,
+                -299.90692138671875,
+                -58.46128845214844
+              ],
+              "q": [
+                1.934103602252435e-05,
+                0.9601449370384216,
+                7.316579285543412e-05,
+                0.2795027196407318
+              ],
+              "h": null,
+              "o": null,
+              "tr": "uncommon"
+            },
+            {
+              "id": "izt",
+              "ty": "comp_fuse",
+              "v": 7,
+              "bv": 7,
+              "p": [
+                -23.79248809814453,
+                -299.9500732421875,
+                -53.180030822753906
+              ],
+              "q": [
+                0.00011972958600381389,
+                0.6208549737930298,
+                9.118870366364717e-06,
+                0.7839255332946777
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i10h",
+              "ty": "comp_fuse",
+              "v": 6,
+              "bv": 6,
+              "p": [
+                -45.76871871948242,
+                -299.9500732421875,
+                -62.04837417602539
+              ],
+              "q": [
+                0.00011843061656691134,
+                0.5098249316215515,
+                -2.4884477170417085e-05,
+                -0.8602782487869263
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i119",
+              "ty": "key",
+              "v": 3,
+              "bv": 3,
+              "p": [
+                34.791526794433594,
+                -299.95013427734375,
+                -21.18107032775879
+              ],
+              "q": [
+                -3.1465981010114774e-05,
+                0.6981757879257202,
+                5.4433739933301695e-06,
+                0.7159263491630554
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i12s",
+              "ty": "fac_core",
+              "v": 314,
+              "bv": 314,
+              "p": [
+                6.0015692710876465,
+                -299.0752868652344,
+                -37.99838638305664
+              ],
+              "q": [
+                1.9541976143955253e-05,
+                6.083734405137875e-08,
+                2.5845711206784472e-05,
+                1
+              ],
+              "h": null,
+              "o": null,
+              "tr": "common"
+            },
+            {
+              "id": "i13o",
+              "ty": "nailbat",
+              "v": 0,
+              "bv": 0,
+              "p": [
+                33.90170669555664,
+                -299.9415588378906,
+                -37.94283676147461
+              ],
+              "q": [
+                5.3718795243185014e-05,
+                0.3630075454711914,
+                8.61449443618767e-05,
+                0.9317862391471863
+              ],
+              "h": null,
+              "o": null,
+              "af": {
+                "rarity": "rare",
+                "prefix": "Brutal",
+                "suffix": "of Storms",
+                "mods": {
+                  "dmgPct": 0.11,
+                  "critPct": 0.05,
+                  "speedPct": 0,
+                  "lifesteal": 0,
+                  "stunChance": 0,
+                  "shock": 9,
+                  "valuePct": 0
+                }
+              },
+              "tr": "rare"
+            },
+            {
+              "id": "i14d",
+              "ty": "comp_coolant",
+              "v": 12,
+              "bv": 12,
+              "p": [
+                -39.264732360839844,
+                -299.9158020019531,
+                -21.77211570739746
+              ],
+              "q": [
+                -8.22226211312227e-05,
+                0.9252806305885315,
+                9.4832998001948e-05,
+                0.3792831599712372
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i15i",
+              "ty": "comp_battery",
+              "v": 10,
+              "bv": 10,
+              "p": [
+                9.06777286529541,
+                -299.9315490722656,
+                -26.90811538696289
+              ],
+              "q": [
+                5.596469418378547e-05,
+                0.9990516901016235,
+                0.00013425479119177908,
+                0.043541859835386276
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i16e",
+              "ty": "comp_fuse",
+              "v": 6,
+              "bv": 6,
+              "p": [
+                42.66899108886719,
+                -299.9501037597656,
+                -38.581172943115234
+              ],
+              "q": [
+                -4.839042048843112e-06,
+                0.1638254076242447,
+                -0.00012099471496185288,
+                0.9864894151687622
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i17k",
+              "ty": "comp_coolant",
+              "v": 10,
+              "bv": 10,
+              "p": [
+                34.38785171508789,
+                -299.9158020019531,
+                -30.76861572265625
+              ],
+              "q": [
+                3.8741618482163176e-05,
+                0.5977639555931091,
+                -0.00011851890303660184,
+                -0.8016722798347473
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i18e",
+              "ty": "comp_coolant",
+              "v": 10,
+              "bv": 10,
+              "p": [
+                18.263151168823242,
+                -299.9158020019531,
+                -46.33367156982422
+              ],
+              "q": [
+                -0.0001393062702845782,
+                0.7780042290687561,
+                -3.5294047847855836e-05,
+                0.628259003162384
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i194",
+              "ty": "comp_scrapmetal",
+              "v": 5,
+              "bv": 5,
+              "p": [
+                9.306916236877441,
+                -299.9501647949219,
+                13.55456829071045
+              ],
+              "q": [
+                -1.7408763596904464e-05,
+                0.5218590497970581,
+                8.872837497619912e-06,
+                0.8530317544937134
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i1j4",
+              "ty": "rs_ember_pepper",
+              "v": 0,
+              "bv": 0,
+              "p": [
+                -9.461798667907715,
+                -299.8675537109375,
+                33.81072235107422
+              ],
+              "q": [
+                -0.00013161888637114316,
+                0.9814876317977905,
+                2.560323991929181e-05,
+                0.19152571260929108
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i1k7",
+              "ty": "rs_ember_pepper",
+              "v": 0,
+              "bv": 0,
+              "p": [
+                -29.73550796508789,
+                -299.8675537109375,
+                29.879535675048828
+              ],
+              "q": [
+                -8.579870154790115e-06,
+                0.2897581458091736,
+                -0.00013610663881991059,
+                -0.957099974155426
+              ],
+              "h": null,
+              "o": null
+            },
+            {
+              "id": "i1lm",
+              "ty": "rs_glow_spore",
+              "v": 0,
+              "bv": 0,
+              "p": [
+                5.226839542388916,
+                -299.8870849609375,
+                58.95475769042969
+              ],
+              "q": [
+                2.9959226594655775e-05,
+                0.46493348479270935,
+                -2.894334556913236e-06,
+                0.8853456377983093
+              ],
+              "h": null,
+              "o": null
+            }
+          ],
+          "doors": [
+            {
+              "id": "d0",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d1",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d2",
+              "open": false,
+              "locked": true,
+              "silent": true
+            },
+            {
+              "id": "d3",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d4",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d5",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d6",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d7",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d8",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d9",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d10",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d11",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d12",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d13",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d14",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d15",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d16",
+              "open": false,
+              "locked": true,
+              "silent": true
+            },
+            {
+              "id": "d17",
+              "open": true,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d18",
+              "open": false,
+              "locked": true,
+              "silent": true
+            },
+            {
+              "id": "d19",
+              "open": false,
+              "locked": false,
+              "silent": true
+            },
+            {
+              "id": "d20",
+              "open": false,
+              "locked": false,
+              "silent": true
+            }
+          ],
+          "budget": {
+            "powerUsed": 0,
+            "powerBoost": 0,
+            "spawnT": 53.37017127277258
+          }
+        },
+        "nonce": 23,
+        "currentChoice": {
+          "seed": 3171011355,
+          "theme": "nullreception",
+          "size": 0.815
+        }
+      },
+      "spec": {
+        "depth": 7,
+        "floorNumber": 8,
+        "seed": 3171011355,
+        "theme": "nullreception",
+        "tier": 2,
+        "rule": "receipt",
+        "liminal": true,
+        "size": 0.815,
+        "discoveryRooms": 15,
+        "loot": {
+          "countMin": 14,
+          "countMax": 18,
+          "valueMul": 1.24
+        },
+        "threat": {
+          "powerMul": 1.26,
+          "hpMul": 1.08,
+          "damageMul": 0.985,
+          "speedMul": 0.975,
+          "maxAlive": 2,
+          "speedCap": 6.8,
+          "damageCap": 40,
+          "newRuleSlots": 0,
+          "newIds": [],
+          "minQuota": 0
+        },
+        "pattern": {
+          "lootSpread": "ordinary-rooms",
+          "noiseLesson": false,
+          "heavyProps": false,
+          "inspection": false
+        }
+      },
+      "theme": "nullreception",
+      "layoutSeed": 3171011355
+    }
+  },
+  "backroomsPlan": [
+    {
+      "theme": "backrooms",
+      "seed": 1179496989,
+      "current": "l1",
+      "levelHash": "3c79d405",
+      "lightHash": "e4c442e5",
+      "counts": {
+        "l0": 342,
+        "l1": 54,
+        "l2": 16,
+        "pool": 16,
+        "fun": 0,
+        "run": 0,
+        "manila": 0
+      },
+      "bake": {
+        "meshes": 235,
+        "verts": 93409,
+        "ms": 93,
+        "dark": 1,
+        "runs": 1
+      },
+      "roomTypes": [
+        "entrance",
+        "poolrooms",
+        "yellow_room",
+        "l1_hall",
+        "yellow_room",
+        "l2_pipes",
+        "l1_hall",
+        "l1_hall",
+        "office_void",
+        "l1_store",
+        "vault",
+        "generator",
+        "core"
+      ]
+    },
+    {
+      "theme": "backrooms",
+      "seed": 1179496989,
+      "current": "l1",
+      "levelHash": "3c79d405",
+      "lightHash": "e4c442e5",
+      "counts": {
+        "l0": 342,
+        "l1": 54,
+        "l2": 16,
+        "pool": 16,
+        "fun": 0,
+        "run": 0,
+        "manila": 0
+      },
+      "bake": {
+        "meshes": 235,
+        "verts": 93409,
+        "ms": 110,
+        "dark": 1,
+        "runs": 1
+      },
+      "roomTypes": [
+        "entrance",
+        "poolrooms",
+        "yellow_room",
+        "l1_hall",
+        "yellow_room",
+        "l2_pipes",
+        "l1_hall",
+        "l1_hall",
+        "office_void",
+        "l1_store",
+        "vault",
+        "generator",
+        "core"
+      ]
+    }
+  ],
+  "lifecycle": [
+    {
+      "name": "native E depth1",
+      "life": [
+        {
+          "oldAttached": false,
+          "sameFacility": false,
+          "oldHostPresent": [],
+          "oldViewsPresent": [],
+          "clock": {
+            "outsideUpdates": 246,
+            "manualUpdates": 1015,
+            "steps": 1015
+          },
+          "br": {
+            "current": null,
+            "bake": null
+          },
+          "liminal": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        },
+        {
+          "oldAttached": false,
+          "sameFacility": false,
+          "oldHostPresent": [],
+          "oldViewsPresent": [],
+          "clock": {
+            "outsideUpdates": 219,
+            "manualUpdates": 717,
+            "steps": 717
+          },
+          "br": {
+            "current": null,
+            "bake": null
+          },
+          "liminal": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "native E depth2",
+      "life": [
+        {
+          "oldAttached": false,
+          "sameFacility": false,
+          "oldHostPresent": [],
+          "oldViewsPresent": [],
+          "clock": {
+            "outsideUpdates": 422,
+            "manualUpdates": 1989,
+            "steps": 1989
+          },
+          "br": {
+            "current": null,
+            "bake": null
+          },
+          "liminal": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        },
+        {
+          "oldAttached": false,
+          "sameFacility": false,
+          "oldHostPresent": [],
+          "oldViewsPresent": [],
+          "clock": {
+            "outsideUpdates": 347,
+            "manualUpdates": 1356,
+            "steps": 1356
+          },
+          "br": {
+            "current": null,
+            "bake": null
+          },
+          "liminal": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "native E depth3 Backrooms",
+      "life": [
+        {
+          "oldAttached": false,
+          "sameFacility": false,
+          "oldHostPresent": [],
+          "oldViewsPresent": [],
+          "clock": {
+            "outsideUpdates": 558,
+            "manualUpdates": 3139,
+            "steps": 3139
+          },
+          "br": {
+            "current": "l1",
+            "counts": {
+              "l0": 342,
+              "l1": 54,
+              "l2": 16,
+              "pool": 16,
+              "fun": 0,
+              "run": 0,
+              "manila": 0
+            },
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 93,
+              "dark": 1,
+              "runs": 1
+            }
+          },
+          "liminal": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        },
+        {
+          "oldAttached": false,
+          "sameFacility": false,
+          "oldHostPresent": [],
+          "oldViewsPresent": [],
+          "clock": {
+            "outsideUpdates": 425,
+            "manualUpdates": 2171,
+            "steps": 2171
+          },
+          "br": {
+            "current": "l1",
+            "counts": {
+              "l0": 342,
+              "l1": 54,
+              "l2": 16,
+              "pool": 16,
+              "fun": 0,
+              "run": 0,
+              "manila": 0
+            },
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 110,
+              "dark": 1,
+              "runs": 1
+            }
+          },
+          "liminal": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "native E Backrooms return surface",
+      "life": [
+        {
+          "oldAttached": false,
+          "sameFacility": false,
+          "oldHostPresent": [],
+          "oldViewsPresent": [],
+          "clock": {
+            "outsideUpdates": 609,
+            "manualUpdates": 3478,
+            "steps": 3478
+          },
+          "br": {
+            "current": null,
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 93,
+              "dark": 1,
+              "runs": 1
+            }
+          },
+          "liminal": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        },
+        {
+          "oldAttached": false,
+          "sameFacility": false,
+          "oldHostPresent": [],
+          "oldViewsPresent": [],
+          "clock": {
+            "outsideUpdates": 442,
+            "manualUpdates": 2479,
+            "steps": 2479
+          },
+          "br": {
+            "current": null,
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 110,
+              "dark": 1,
+              "runs": 1
+            }
+          },
+          "liminal": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "native E depth4",
+      "life": [
+        {
+          "oldAttached": false,
+          "sameFacility": false,
+          "oldHostPresent": [],
+          "oldViewsPresent": [],
+          "clock": {
+            "outsideUpdates": 692,
+            "manualUpdates": 4368,
+            "steps": 4368
+          },
+          "br": {
+            "current": null,
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 93,
+              "dark": 1,
+              "runs": 1
+            }
+          },
+          "liminal": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        },
+        {
+          "oldAttached": false,
+          "sameFacility": false,
+          "oldHostPresent": [],
+          "oldViewsPresent": [],
+          "clock": {
+            "outsideUpdates": 501,
+            "manualUpdates": 3122,
+            "steps": 3122
+          },
+          "br": {
+            "current": null,
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 110,
+              "dark": 1,
+              "runs": 1
+            }
+          },
+          "liminal": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "native E depth5",
+      "life": [
+        {
+          "oldAttached": false,
+          "sameFacility": false,
+          "oldHostPresent": [],
+          "oldViewsPresent": [],
+          "clock": {
+            "outsideUpdates": 746,
+            "manualUpdates": 5340,
+            "steps": 5340
+          },
+          "br": {
+            "current": null,
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 93,
+              "dark": 1,
+              "runs": 1
+            }
+          },
+          "liminal": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        },
+        {
+          "oldAttached": false,
+          "sameFacility": false,
+          "oldHostPresent": [],
+          "oldViewsPresent": [],
+          "clock": {
+            "outsideUpdates": 542,
+            "manualUpdates": 3761,
+            "steps": 3761
+          },
+          "br": {
+            "current": null,
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 110,
+              "dark": 1,
+              "runs": 1
+            }
+          },
+          "liminal": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "native E depth6",
+      "life": [
+        {
+          "oldAttached": false,
+          "sameFacility": false,
+          "oldHostPresent": [],
+          "oldViewsPresent": [],
+          "clock": {
+            "outsideUpdates": 826,
+            "manualUpdates": 6268,
+            "steps": 6268
+          },
+          "br": {
+            "current": null,
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 93,
+              "dark": 1,
+              "runs": 1
+            }
+          },
+          "liminal": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        },
+        {
+          "oldAttached": false,
+          "sameFacility": false,
+          "oldHostPresent": [],
+          "oldViewsPresent": [],
+          "clock": {
+            "outsideUpdates": 586,
+            "manualUpdates": 4394,
+            "steps": 4394
+          },
+          "br": {
+            "current": null,
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 110,
+              "dark": 1,
+              "runs": 1
+            }
+          },
+          "liminal": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "native E depth7 Null Reception",
+      "life": [
+        {
+          "oldAttached": false,
+          "sameFacility": false,
+          "oldHostPresent": [],
+          "oldViewsPresent": [],
+          "clock": {
+            "outsideUpdates": 914,
+            "manualUpdates": 7135,
+            "steps": 7135
+          },
+          "br": {
+            "current": null,
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 93,
+              "dark": 1,
+              "runs": 1
+            }
+          },
+          "liminal": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        },
+        {
+          "oldAttached": false,
+          "sameFacility": false,
+          "oldHostPresent": [],
+          "oldViewsPresent": [],
+          "clock": {
+            "outsideUpdates": 662,
+            "manualUpdates": 5034,
+            "steps": 5034
+          },
+          "br": {
+            "current": null,
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 110,
+              "dark": 1,
+              "runs": 1
+            }
+          },
+          "liminal": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "native E original-floor return and cleared echo owner",
+      "life": [
+        {
+          "oldAttached": false,
+          "sameFacility": false,
+          "oldHostPresent": [],
+          "oldViewsPresent": [],
+          "clock": {
+            "outsideUpdates": 1009,
+            "manualUpdates": 8002,
+            "steps": 8002
+          },
+          "br": {
+            "current": null,
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 93,
+              "dark": 1,
+              "runs": 1
+            }
+          },
+          "liminal": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        },
+        {
+          "oldAttached": false,
+          "sameFacility": false,
+          "oldHostPresent": [],
+          "oldViewsPresent": [],
+          "clock": {
+            "outsideUpdates": 721,
+            "manualUpdates": 5696,
+            "steps": 5696
+          },
+          "br": {
+            "current": null,
+            "bake": {
+              "meshes": 235,
+              "verts": 93409,
+              "ms": 110,
+              "dark": 1,
+              "runs": 1
+            }
+          },
+          "liminal": {
+            "pending": 0,
+            "cooldowns": 0
+          }
+        }
+      ]
+    }
+  ]
+}

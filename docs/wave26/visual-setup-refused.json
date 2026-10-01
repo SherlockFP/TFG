@@ -1,0 +1,10 @@
+{
+  "method": "VISUAL_REPLAY / SOLO: recorded genuine depth3/7 state through native onState rebuild; safe standing/camera fixtures only, not another E/cargo/AI outcome proof",
+  "javascriptFreeze": "da409e4e35b20cb2b39f220491f7f7b5b1f534f8b46129d05fd94530136919a1",
+  "allSourceFreeze": "92381f362de85873237ede8b6b7b9a0a20c317d46deb67f062e31ab92e57bddb",
+  "checks": [],
+  "errors": [],
+  "consoleErrors": [],
+  "status": "FAILED",
+  "error": "page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:5174/?autohost=local&code=QA26VIS&name=QA26Visual\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:5174/?autohost=local&code=QA26VIS&name=QA26Visual\", waiting until \"load\"\u001b[22m\n\n    at /workspace/.tfg-tools/qa26-visual.cjs:7:12"
+}

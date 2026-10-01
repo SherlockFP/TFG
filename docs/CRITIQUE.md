@@ -1,4 +1,14 @@
-# Current quality — Wave25
+# Current quality — Wave26
+
+The qualified score remains **8.0/10** pending independent human play. Wave26
+connects the existing Backrooms facilities to normal depth travel and adds original
+Null Reception: an undelivered-message depot where delayed sound receipts let a
+quiet crew misdirect native hearing enemies. Occasional announced routes, gentle
+initial admission and immediate surface return support mystery without another
+mandatory task or economy. [Wave26](wave26/README.md) owns current validation;
+its guided/native evidence does not establish retention or hardware performance.
+
+The prior Wave25 snapshot below retains its research and remaining priorities.
 
 The independent score remains **8.0/10**. This round follows detailed genre and current agent-engineering research, then fixes observed control, navigation and campaign-boundary defects. Source/test counts do not produce a higher score. Read [Wave25 research](wave25/RESEARCH.md), [current review](wave25/REVIEW.md) and [playtest](wave25/PLAYTEST.md) for exact evidence and fixtures.
 

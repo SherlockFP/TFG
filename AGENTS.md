@@ -1,13 +1,13 @@
 # TFG — current agent map
 
-Updated 2026-10-01, Wave25. This is the current entry point; historical Windows,
+Updated 2026-10-01, Wave26. This is the current entry point; historical Windows,
 Claude branch/model, no-test and automatic merge/push instructions are retired.
 Their full prior text is preserved in [the historical snapshot](docs/history/AGENTS-pre-wave25.md).
 Current user/session instructions take precedence. Inspect Git for the publication SHA.
 
 ## Start here
 
-1. Read [current work and evidence](docs/wave25/README.md), then
+1. Read [current work and evidence](docs/wave26/README.md), then
    [Gauntlet procedure](docs/GAUNTLET.md) and [current critique](docs/CRITIQUE.md).
 2. Read [identity/art direction](docs/THEME.md) and the relevant module report.
    [Research](docs/wave25/RESEARCH.md) connects genre design and current agent engineering.
@@ -62,6 +62,7 @@ normal range/LOS input, failure capture and exact first-floor acceptance.
 | `src/world/facility.js`, `interiors/`, `nav.js` | Seeded layout, furniture, Rapier geometry and paths. |
 | `src/physics/physics.js`, `src/entities/` | Native bodies, controller, custody and creature simulation. |
 | `src/game/deadletter24*.js` | Optional temporary combat, cards, checkpoint and owned actors. |
+| `src/game/descent21*.js`, `brlevels.js`, `liminal26.js` | Normal certified depth travel, Backrooms lifecycle and bounded stale-sound receipts. |
 | `src/ui/`, `src/models/`, `src/audio/` | Presentation, faceted models and audio; follow actual callers. |
 | `src/core/save.js`, `rng.js`, `i18n.js` | Save compatibility, deterministic RNG and EN/TR/RU. |
 | `tools/harness/`, `tools/sim/` | Native behavior/boundary regressions and labelled simulations. |

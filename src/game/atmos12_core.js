@@ -33,6 +33,9 @@ export const PROFILES = {
   mansion: P([1.09, 0.98, 0.86], 1.5, { k: 1.15, r: 1.15 }, 0.15, { leaf: 5, paper: 3, stain: 2, puddle: 1, rubble: 1 }, 3, 1),
   mineshaft: P([1.07, 0.97, 0.84], 1.6, { k: 0.8, r: 0.9 }, 0.15, { rubble: 5, puddle: 4, stain: 1, cable: 1 }, 8, 0, { spark: 0.6 }),
   office: P([1.02, 1.07, 0.9], 1.0, { k: 1, r: 1 }, 0.17, { paper: 6, stain: 2, cable: 2, glass: 1, puddle: 0.5 }, 3, 6),
+  // Undelivered paper receipts in a dry, quiet depot; restrained neutral grading
+  // and fewer ambient sources leave the delayed acoustic receipt legible.
+  nullreception: P([1.03, 1.00, 0.96], 0.55, { k: 0.7, r: 0.85 }, 0.10, { paper: 6, stain: 2, cable: 1 }, 0, 1, { spark: 0.1 }),
   backrooms: P([1.14, 1.06, 0.72], 1.25, { k: 1.25, r: 1.3 }, 0.12, { stain: 5, puddle: 3, cable: 1 }, 3, 3, { spark: 0.3 }),
   serverfarm: P([0.86, 1.0, 1.14], 0.55, { k: 0.9, r: 0.9 }, 0.15, { cable: 8, scorch: 2, puddle: 1.5, stain: 1 }, 2, 9, { spark: 1 }),
   sewer: P([0.9, 1.06, 0.94], 0.4, { k: 0.8, r: 0.9 }, 0.2, { puddle: 6, moss: 5, grate: 3, stain: 2 }, 9, 2, { spark: 0.2 }),

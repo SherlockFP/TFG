@@ -1,0 +1,18 @@
+{
+  "method": "VISUAL_REPLAY / SOLO: recorded genuine depth3/7 state through native onState rebuild; safe standing/camera fixtures only, not another E/cargo/AI outcome proof",
+  "javascriptFreeze": "da409e4e35b20cb2b39f220491f7f7b5b1f534f8b46129d05fd94530136919a1",
+  "allSourceFreeze": "92381f362de85873237ede8b6b7b9a0a20c317d46deb67f062e31ab92e57bddb",
+  "checks": [],
+  "errors": [],
+  "consoleErrors": [
+    "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+    "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+    "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+    "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+    "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+    "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+    "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404"
+  ],
+  "status": "FAILED",
+  "error": "page.evaluate: Error: No actual safe yellow-room viewing pose\n    at eval (eval at evaluate (:311:30), <anonymous>:5:244)\n    at async <anonymous>:337:30\n    at /workspace/.tfg-tools/qa26-visual.cjs:12:23"
+}

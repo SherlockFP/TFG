@@ -9,7 +9,7 @@
 //   - baked flat light: after the facility is built, every static lit surface gets a per-vertex light colour from the
 //     plan (Level 0 flat yellow-white, Level ! red, Poolrooms cold white, dark zones black) - see backrooms_tex.js BAKE
 //   - per-level atmosphere: fog colour/density (yellow haze in Level 0, never black), ambient for dynamic objects
-//   - found-footage level captions (bottom-left under the chat log, typewriter + VHS), once per level per day
+//   - found-footage level captions (managed right HUD dock, typewriter), once per level per day
 //   - per-level sound: loud fluorescent hum, drips (L1), pipe groans + hiss (L2), water lapping (Poolrooms),
 //     a warped music box + party horns (Level Fun), a siren when entering Level !
 //   - animated bits: flickering troffers, pulsing red emergency beacons, rippling pool water
@@ -21,6 +21,8 @@ import { ITEMS } from './items.js';
 import { planBackroomsLevels, levelIdAt, LEVELS, LEVEL_BY_ID, LEVEL_IDS } from '../world/interiors/backrooms_levels.js';
 import { brMaterials, bakeMaterial, BAKE } from '../world/interiors/backrooms_tex.js';
 import { planDarkCorridors } from '../world/setpieces.js';
+import { descentToken } from './descent21_state.js';
+import { hudDock } from '../ui/dock.js';
 
 const SUBTITLE = {
   l0: 'Mono-yellow. Damp carpet. The hum never stops.',
@@ -73,10 +75,19 @@ export function installBackroomsLevels(game) {
   };
 
   // ------------------------------------------------------------------ plan / bake on every map load
-  function setup() {
+  function clearFacility() {
     teardownAudio();
-    const fac = game.world?.facility;
+    if (S.active) game.lights?.ambient?.color?.set?.(0xffffff);
     S.fac = null; S.L = null; S.plan = null; S.cur = null; S.runEmitters = [];
+    S.active = false; S.caption = null; S.breakers = []; S.off = new Set();
+    if (game.engine?.fx && game.engine.fx.noise === S.noiseSet) game.engine.fx.noise = 0;
+    S.noiseSet = 0;
+    S.noise = 0; S.bakeV = 1; BAKE.value = 1;
+    if (capEl) capEl.style.opacity = '0';
+  }
+  function setup() {
+    clearFacility();
+    const fac = game.world?.facility;
     if (!fac || fac.layout?.theme !== 'backrooms') return;
     const L = fac.layout;
     S.plan = L.brPlan || planBackroomsLevels(L, { dark: planDarkCorridors(L) });
@@ -215,22 +226,21 @@ export function installBackroomsLevels(game) {
     S.bakeStats = { ...(S.bakeStats || {}), meshes, verts };
   }
 
-  // ------------------------------------------------------------------ captions (VHS, bottom-left)
-  // The caption sits in the free strip under the chat log (the chat is anchored 90 px above the bottom), so it never
-  // covers system messages, objectives or the hotbar. Hidden together with the HUD (menus, death cam).
+  // ------------------------------------------------------------------ captions (managed right HUD dock)
+  // Decorative captions yield to actual status widgets when the native dock runs
+  // out of room. The legacy bottom strip is occupied by cargo controls and chat.
   let capEl = null;
   function ensureCaption() {
     if (capEl?.isConnected) return capEl;
     try {
-      capEl = document.createElement('div');
-      capEl.className = 'br-cap';
-      capEl.style.cssText = 'position:fixed;left:22px;bottom:10px;z-index:7;pointer-events:none;font-family:VT323,"Courier New",monospace;color:#f4f4ee;'
-        + 'opacity:0;transition:opacity .5s;padding:4px 14px 6px 10px;background:linear-gradient(90deg,rgba(0,0,0,.6),rgba(0,0,0,0));min-width:340px;overflow:hidden;';
+      capEl = hudDock('right', 'br-caption', 90);
+      capEl.classList.add('br-cap');
+      capEl.style.cssText = 'pointer-events:none;font-family:VT323,"Courier New",monospace;color:#f4f4ee;'
+        + 'opacity:0;transition:opacity .5s;padding:8px 10px;background:rgba(20,23,23,.78);width:230px;max-width:calc(100vw - 28px);box-sizing:border-box;overflow:hidden;';
       capEl.innerHTML = '<div class="br-rec" style="font-size:14px;letter-spacing:2px;color:#ff4a3a;text-shadow:0 0 6px #ff2010;line-height:1.1"></div>'
-        + '<div class="br-t" style="font-size:31px;letter-spacing:3px;line-height:1.05;text-shadow:2px 0 0 rgba(255,0,60,.75),-2px 0 0 rgba(0,220,255,.7),0 0 10px rgba(255,255,255,.35);white-space:nowrap"></div>'
-        + '<div class="br-s" style="font-size:17px;letter-spacing:1px;color:#d8d2b8;opacity:.9;white-space:nowrap;line-height:1.15"></div>'
+        + '<div class="br-t" style="font-size:22px;letter-spacing:1px;line-height:1.05;white-space:normal;overflow-wrap:break-word"></div>'
+        + '<div class="br-s" style="font-size:15px;letter-spacing:.3px;color:#d8d2b8;opacity:.9;white-space:normal;line-height:1.2;margin-top:4px"></div>'
         + '<div style="position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px)"></div>';
-      (document.getElementById('ui') || document.body).appendChild(capEl);
     } catch { capEl = null; }
     return capEl;
   }
@@ -241,7 +251,7 @@ export function installBackroomsLevels(game) {
     const el = ensureCaption();
     if (el) el.style.opacity = '1';
     // a burst of tape noise
-    S.noise = 0.34; S.noiseSet = 0;
+    S.noise = 0.34;
   }
   function updateCaption(dt) {
     const c = S.caption, el = capEl;
@@ -416,7 +426,8 @@ export function installBackroomsLevels(game) {
   function hostPrize() {
     const fac = game.world?.facility;
     const plan = fac?.layout?.brPlan;
-    if (!game.isHost || !plan?.manila) return;
+    const d = game.run?.descent21;
+    if (!game.isHost || !plan?.manila || (d?.token === descentToken(game.run) && Number(d.depth) > 0)) return;
     const key = `${fac.layout.seed}|${game.run?.daysLeft}|${game.run?.quotaIndex}`;
     if (S.lootDone === key) return;
     S.lootDone = key;
@@ -432,13 +443,18 @@ export function installBackroomsLevels(game) {
   }
 
   on('mapLoaded', () => setup());
+  on('facilityWillChange', () => clearFacility());
+  // Lift travel rebuilds only the facility; replaying mapLoaded would reroll outdoor jobs.
+  on('facilityChanged', () => setup());
   on('update', (dt) => update(dt));
+  // The deep-floor native loot population owns its cap. No second Manila prize is
+  // injected on facilityChanged, and surface return cannot pay a landing twice.
   on('moonPopulated', () => hostPrize());
   on('phase', (ph) => {
     if (ph !== 'orbit' && ph !== 'landing') return;
     S.seenDay.clear(); S.caption = null;
     if (capEl) capEl.style.opacity = '0';
-    if (ph === 'orbit') { teardownAudio(); S.plan = null; S.fac = null; S.L = null; S.cur = null; S.runEmitters = []; BAKE.value = 1; }
+    if (ph === 'orbit') clearFacility();
   });
   if (game.world?.facility) setup();
 

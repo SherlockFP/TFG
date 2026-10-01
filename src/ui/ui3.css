@@ -22,11 +22,12 @@ html.tfg-ui3 .mr-clock { font-size: 38px; text-shadow: 2px 2px 0 #000; }
 html.tfg-ui3 .mr-meter { top: 196px; }
 @media (max-height: 800px) { html.tfg-ui3 .mr-timer { top: 108px; } html.tfg-ui3 .mr-clock { font-size: 32px; } html.tfg-ui3 .mr-meter { top: 178px; } }
 
-/* Found-footage (VHS) captions: REC sat on the body icon, the battery on the level plate, the date on hotbar slots 3-5.
-   They move into the free strip under the clock and to the bottom-left (next to the PLAY line, under the chat log). */
+/* Found-footage keeps REC/battery below the clock. Decorative tape/date metadata
+   occupied live inventory controls; level captions now share the managed dock. */
 html.tfg-ui3 .liminal-vhs .lv-rec { left: 50% !important; right: auto !important; top: 104px !important; transform: translateX(-130%); }
 html.tfg-ui3 .liminal-vhs .lv-bat { left: 50% !important; right: auto !important; top: 104px !important; text-align: left !important; transform: translateX(30%); }
-html.tfg-ui3 .liminal-vhs .lv-stamp { left: 330px !important; right: auto !important; text-align: left !important; }
+html.tfg-ui3 .liminal-vhs :is(.lv-play, .lv-stamp) { display: none; }
+html.tfg-ui3 .br-cap .br-rec { display: none; }
 html.tfg-ui3 .br-vhs .br-vhs-rec { left: 28px; bottom: 26px; }
 
 /* Hotbar: the item name is one solid strip at the bottom of the slot (2 lines max above the icon used to collide with a label

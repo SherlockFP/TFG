@@ -19,6 +19,16 @@ The depth lift treats the dead network as layered storage rather than another nu
 
 Keep the lift faceted and matte: worn neutral steel, dirty ivory and restrained ochre signage, with no broad green body surfaces or new dynamic lights. A floor teaches one short rule and keeps the familiar exploration/carry/escape controls. It does not add a mandatory puzzle, new wallet or extra progression meter merely to label a tier.
 
+Wave26 makes liminal space a deliberate, announced depth route. Existing Backrooms
+rooms retain their own yellow/pool/pipe identity. **Null Reception** (TR **Boş
+Karşılama**, RU **Пустая приёмная**) is TFG's undelivered-message depot: the Algorithm
+kept every message but lost its recipient. Empty receipt windows, suspended queue
+rails and dry paper traces use dirty ivory, charcoal, worn steel and small ochre
+marks. Loud crew sounds return from their old position after three seconds; leave
+an echo, then walk quietly. The same maintenance lift always offers surface return.
+These are finite authored themes with generated layouts, not infinitely many
+new environments or borrowed franchise lore. See [Wave26](wave26/README.md).
+
 ## Names
 | Old | New |
 |---|---|

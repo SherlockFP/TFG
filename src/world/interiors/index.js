@@ -25,6 +25,7 @@ import { LAB20_THEMES } from './lab20_themes.js';
 import { LABYRINTH13_THEMES } from './labyrinth13.js';
 import { OFFICE } from './office.js';
 import { BACKROOMS } from './backrooms.js';
+import { NULL_RECEPTION26 } from './nullreception26.js';
 import { SERVERFARM } from './serverfarm.js';
 import { SEWER } from './sewer.js';
 import { HOSPITAL } from './hospital.js';
@@ -47,6 +48,7 @@ export const INTERIORS = {
   ...LEGACY,
   office: OFFICE,
   backrooms: BACKROOMS,
+  nullreception: NULL_RECEPTION26,
   serverfarm: SERVERFARM,
   sewer: SEWER,
   hospital: HOSPITAL,
@@ -65,6 +67,8 @@ export const INTERIOR_NAMES = Object.freeze(Object.fromEntries(Object.values(INT
 
 // Turkish strings for the interior names / blurbs and the hazard prompts (core/i18n.js runtime registry)
 addTranslations({
+  'Null Reception': 'Boş Karşılama',
+  'Undelivered messages took a number. No number has been called. Loud steps leave a delayed receipt.': 'Ulaşmayan iletiler sıra numarası aldı. Hiçbir numara çağrılmadı. Gürültülü adımlar gecikmiş bir ses fişi bırakır.',
   'Data Center': 'Veri Merkezi', 'Haunted Homepage': 'Perili Ana Sayfa', 'Deep Web Mine': 'Derin Web Madeni',
   'Corporate Intranet': 'Kurumsal İntranet', 'The Backrooms': 'Arka Odalar', 'Cloud Storage': 'Bulut Depolama',
   'The Comment Sewer': 'Yorum Kanalizasyonu', 'Telehealth Clinic': 'Tele-Sağlık Kliniği',
@@ -93,6 +97,10 @@ addTranslations({
   'was buried by a cave-in.': 'göçük altında kaldı.',
   'dissolved in toxic sludge.': 'zehirli çamurda eridi.',
 });
+addTranslations({
+  'Null Reception': 'Пустая приёмная',
+  'Undelivered messages took a number. No number has been called. Loud steps leave a delayed receipt.': 'Недоставленные сообщения взяли талон. Ни один номер не вызван. Шумные шаги оставляют отложенную звуковую квитанцию.',
+}, 'ru');
 
 export function isInteriorTheme(id) { return typeof id === 'string' && Object.prototype.hasOwnProperty.call(INTERIORS, id); }
 export function getInterior(id) { return isInteriorTheme(id) ? INTERIORS[id] : INTERIORS.factory; }

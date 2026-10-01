@@ -8,8 +8,8 @@ import { scrapTableFor,bigTableFor } from './items.js';
 import { RNG } from '../core/rng.js';
 import { HOST_ONLY } from '../net/session.js';
 import { t,addTranslations,getLang,tf } from '../core/i18n.js';
-import { floorSpec } from './descent21_core.js';
-import { descentRuleText } from './descent21_text.js';
+import { floorSpec,savedFloorSpec } from './descent21_core.js';
+import { descentRuleText,descentDestinationText } from './descent21_text.js';
 import { descentToken,newDescent,inCabin,discovered,stageRequest,chooseSafeFloor } from './descent21_state.js';
 HOST_ONLY.add('ds21floor');
 const TEXT={call:'Call depth lift [E]',descend:'Descend together [E]',back:'Return to surface together [E]',explore:'Explore rooms to authorize the lift.',crew:'All living crew must board; recover downed crew first.',choice:'3s transit. Cabin cargo travels. Deep clock held; abandoned floors seal. Surface clock resumes on return.',busy:'Depth lift travelling. Keep the whole crew aboard.',blocked:'Finish the active pursuit or mission first.',unsafe:'No safe lift on that floor. Transit cancelled.',limit:'Too much loose cargo to preserve safely. Collect it before transit.'};
@@ -17,13 +17,16 @@ addTranslations({[TEXT.call]:'Derinlik asansörünü çağır [E]',[TEXT.descend
 addTranslations({[TEXT.call]:'Вызвать глубинный лифт [E]',[TEXT.descend]:'Спуститься вместе [E]',[TEXT.back]:'Вернуться на поверхность вместе [E]',[TEXT.explore]:'Исследуйте комнаты для доступа к лифту.',[TEXT.crew]:'Вся живая команда должна войти; сначала поднимите раненых.',[TEXT.choice]:'Переход 3 с. Груз в кабине едет с вами. Покинутые глубинные этажи закрываются; часы поверхности продолжатся после возврата.',[TEXT.busy]:'Лифт движется. Вся команда должна оставаться внутри.',[TEXT.blocked]:'Сначала завершите погоню или задание.',[TEXT.unsafe]:'На этаже нет безопасного лифта. Переход отменён.',[TEXT.limit]:'Слишком много груза для безопасного сохранения. Сначала соберите его.'},'ru');
 addTranslations({'Depth {n} / Tier {tier}':'Derinlik {n} / Kademe {tier}',[TEXT.choice]:'3 sn yolculuk. Kabindeki yük taşınır. Derinde saat durur; terk edilen katlar kapanır. Yüzey saati dönüşte sürer.'},'tr');
 addTranslations({'Depth {n} / Tier {tier}':'Глубина {n} / Уровень {tier}',[TEXT.choice]:'Переход 3 с. Груз в кабине едет с вами. В глубине часы стоят; покинутые этажи закрываются. На поверхности часы продолжатся.'},'ru');
+const NEXT_HELP='Cabin cargo travels. Direct surface return stays available.';
+addTranslations({[NEXT_HELP]:'Kabindeki yük taşınır. Doğrudan yüzeye dönüş açık kalır.'},'tr');
+addTranslations({[NEXT_HELP]:'Груз в кабине едет с вами. Прямой возврат на поверхность остаётся доступен.'},'ru');
 
 export function installDescent21(game){
  let disposed=false,fac=null,lift=null,key='',bound=null,swapping=false,lastVisit=-Infinity,lastLiftAttempt=-Infinity,liftAttempts=0,processed='',announced='',lateJoin=false,stageSincePublish=0,arrivalUntil=0,arrivalKey='',depthNotice='';const offs=[];
  const state=()=>game.run?.descent21?.token===descentToken(game.run)?game.run.descent21:null;
  const eligible=run=>{const moon=MOONS[run?.moon];return !!moon&&!['company','home','customMap','expedition','goal','instance','core','raid','voyage','ghost'].some(k=>!!moon[k]);};
  const active=()=>!disposed&&!game.destroyed&&eligible(game.run)&&game.run?.phase==='moon'&&game.world?.moonId===game.run.moon&&game.world?.seed===game.run.seed&&!!game.world.facility;
- const spec=run=>{if(!eligible(run)||run?.descent21?.token!==descentToken(run))return null;const st=run.descent21;if(st.depth===0){const gen=st.surface?.gen;return gen?{depth:0,seed:gen.seed,theme:gen.theme,size:gen.size,layoutOpts:gen.lopts||gen.layoutOpts}:null;}const s=floorSpec(MOONS[run.moon],run.seed,st.depth),choice=st.currentChoice;return choice?{...s,seed:choice.seed,theme:choice.theme,size:choice.size}:s;};
+ const spec=run=>{if(!eligible(run)||run?.descent21?.token!==descentToken(run))return null;const st=run.descent21;if(st.depth===0){const gen=st.surface?.gen;return gen?{depth:0,seed:gen.seed,theme:gen.theme,size:gen.size,layoutOpts:gen.lopts||gen.layoutOpts}:null;}return savedFloorSpec(MOONS[run.moon],run.seed,st);};
  const publish=()=>game.broadcastRun?.(['descent21']);
  const emit=(name,...args)=>game.mods?.emit?.(name,...args);
  const warn=text=>game.ui?.toast?.(t(text),'warn');
@@ -125,7 +128,7 @@ export function installDescent21(game){
   const surface=st.depth===0?{gen:structuredClone(fac.descent21Generation||{seed:fac.layout.seed,theme:fac.layout.theme,size:fac.layout.size}),items:game.items.serialize(it=>indoor(it)&&!cargo.some(c=>c.id===it.id)),doors:fac.doors.map(d=>({id:d.id,open:d.open,locked:d.jam?false:d.locked,silent:true})),darkcollapse20:game.run.darkcollapse20?structuredClone(game.run.darkcollapse20):undefined,budget:{powerUsed:game.hostData?.powerUsed||0,powerBoost:game.hostData?.powerBoost||0,spawnT:game.hostData?.spawnT||20}}:st.surface;
   if(cargo.length>64||(surface?.items?.length||0)>256){st.liftStage='ready';st.rev++;publish();warn(TEXT.limit);return false;}
   const next=chooseFloor(st.target);if(!next){st.liftStage='ready';st.rev++;publish();warn(TEXT.unsafe);return false;}const verifiedPlan=next.plan;
-  const oldDepth=st.depth;st.surface=surface;if(oldDepth===0)st.surfaceVisited=[...st.visited];st.depth=st.target;st.currentChoice=next.choice;st.reached=Math.max(st.reached,st.depth);st.visited=st.depth===0?[...st.surfaceVisited]:[];st.liftStage='idle';st.stageTime=game.time;st.stageElapsed=0;st.rev++;st.nonce++;delete st.target;
+  const oldDepth=st.depth;st.surface=surface;if(oldDepth===0)st.surfaceVisited=[...st.visited];st.depth=st.target;st.currentChoice=next.choice;st.routeVersion=26;st.reached=Math.max(st.reached,st.depth);st.visited=st.depth===0?[...st.surfaceVisited]:[];st.liftStage='idle';st.stageTime=game.time;st.stageElapsed=0;st.rev++;st.nonce++;delete st.target;
   const packet={token:st.token,state:structuredClone(st),cargo,crew:crew().map(p=>p.id),plan:verifiedPlan,origin:{...lift.plan.spawn,yaw:lift.plan.yaw}};
   game.net?.broadcast?.('ds21floor',packet,false);applyFloor(packet,game.selfId);
   if(game.hostData){Object.assign(game.hostData,st.depth>0?{powerUsed:0,powerBoost:0,spawnT:20}:st.surface?.budget||{powerUsed:0,powerBoost:0,spawnT:20});game.hostData.exitField=null;}
@@ -153,7 +156,7 @@ export function installDescent21(game){
   if(['calling','travelling'].includes(st.liftStage))return;
   const ready=discovered(st,lift.plan);
   out.push({pos:new THREE.Vector3(lift.anchors.call.x,lift.anchors.call.y,lift.anchors.call.z),r:.3,reach:2.4,label:()=>t(TEXT.call),sub:()=>`${st.visited.length}/${Math.min(15,lift.plan.discoveryRooms.length)} ${ready?'':t(TEXT.explore)}`,action:()=>request('call')});
-  if(st.liftStage==='ready')out.push({pos:new THREE.Vector3(lift.anchors.descend.x,lift.anchors.descend.y,lift.anchors.descend.z),r:.3,reach:2.4,label:()=>t(TEXT.descend),sub:()=>t(TEXT.choice),action:()=>request('descend')});
+  if(st.liftStage==='ready')out.push({pos:new THREE.Vector3(lift.anchors.descend.x,lift.anchors.descend.y,lift.anchors.descend.z),r:.3,reach:2.4,label:()=>t(TEXT.descend),sub:()=>`${descentDestinationText(floorSpec(MOONS[game.run.moon],game.run.seed,st.reached+1),getLang())}. ${t(NEXT_HELP)}`,action:()=>request('descend')});
   if(st.depth>0)out.push({pos:new THREE.Vector3(lift.anchors.return.x,lift.anchors.return.y,lift.anchors.return.z),r:.3,reach:2.4,label:()=>t(TEXT.back),sub:()=>t(TEXT.choice),action:()=>request('return')});
  });
  const originalDoor=game.doorInteraction;

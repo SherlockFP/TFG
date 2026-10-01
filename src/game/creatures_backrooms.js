@@ -40,6 +40,7 @@ import { planDarkCorridors } from '../world/setpieces.js';
 import { hudDock } from '../ui/dock.js';
 import { registerBackroomsModels, BR_ENV } from '../models/creatures_backrooms.js';
 import { BR_SOUNDS, ensureBrSounds } from './creatures_backrooms_sfx.js';
+import { descentToken } from './descent21_state.js';
 
 export const BR_TYPES = ['br_smiler', 'br_hound', 'br_partygoer', 'br_moth'];
 const BR_SET = new Set(BR_TYPES);
@@ -669,7 +670,10 @@ export function installBackroomsCreatures(game) {
 
   // moonPopulated: the Backrooms get their locals on landing (charged to the indoor power budget)
   function seedLocals() {
-    if (!isHost() || !inBackrooms()) return;
+    // Native deep-floor waves own their quiet arrival, count and power budget.
+    // Do not inject the surface locals/prizes again during a host resume.
+    const d = game.run?.descent21;
+    if (!isHost() || !inBackrooms() || (d?.token === descentToken(game.run) && Number(d.depth) > 0)) return;
     const fac = game.world.facility;
     const key = `${fac.layout.seed}|${game.run?.daysLeft}|${game.run?.quotaIndex}`;
     if (S.seeded === key) return;

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
-import {floorSpec,descentDepth,discoveryThreshold,DESCENT21_LIMITS as L,DESCENT21_THEMES} from '../../src/game/descent21_core.js';
-import {descentRuleText} from '../../src/game/descent21_text.js';
+import {floorSpec,savedFloorSpec,descentDepth,discoveryThreshold,DESCENT21_LIMITS as L,DESCENT21_THEMES,LIMINAL26_THEMES} from '../../src/game/descent21_core.js';
+import {descentRuleText,descentDestinationText} from '../../src/game/descent21_text.js';
+import {chooseSafeFloor} from '../../src/game/descent21_state.js';
 import {capHit,sectorScale} from '../../src/game/balance_core.js';
 import {MOONS} from '../../src/game/moons.js';
 import {LAB20_MOONS} from '../../src/game/lab20_moons.js';
@@ -22,4 +23,25 @@ for(const n of [0,1,7,15,100])assert.equal(discoveryThreshold(n),Math.min(n,15))
 assert.equal(discoveryThreshold(-8),0);assert.equal(discoveryThreshold(Infinity),0);
 assert.equal(descentDepth(-5),0);assert.equal(descentDepth(NaN),0);assert.equal(descentDepth(Infinity),0);assert.equal(descentDepth(1e30),L.maxDepth);
 assert.notEqual(floorSpec(moons[0],1,3).seed,floorSpec(moons[0],2,3).seed);
+// Beginner ordinary landings cannot roll consecutive or unannounced liminal
+// floors. Dedicated liminal moons intentionally keep their first deep theme.
+for(const seed of [1,17,42,77])for(let depth=1;depth<80;depth++){
+ const s=floorSpec(MOONS.hamsi,seed,depth);
+ assert.equal(s.liminal,depth>=3&&depth%4===3);
+ if(s.liminal){assert.equal(s.theme,depth%8===3?'backrooms':'nullreception');assert.equal(s.threat.newIds.length,0);assert(s.threat.maxAlive<=4);assert(!floorSpec(MOONS.hamsi,seed,depth+1).liminal);}
+ for(const lang of ['en','tr','ru']){assert(descentDestinationText(s,lang).includes(String(depth)));if(s.liminal)assert(descentRuleText(s.rule,lang).length>40);}
+}
+assert.equal(floorSpec({id:'br_level0',interior:'backrooms'},17,1).theme,'backrooms');
+for(const depth of [3,7]){
+ const old=floorSpec(MOONS.hamsi,17,depth,{legacy:true}),choice={seed:old.seed,theme:'factory',size:old.size};
+ const kept=savedFloorSpec(MOONS.hamsi,17,{depth,currentChoice:choice});assert.equal(kept.theme,'factory');assert.equal(kept.seed,choice.seed);assert.equal(kept.liminal,false);assert(!['liminal','receipt'].includes(kept.rule));
+ assert.deepEqual(savedFloorSpec(MOONS.hamsi,17,{depth}),old,'legacy run without stored choice reconstructs its previous map');
+ assert.equal(savedFloorSpec(MOONS.hamsi,17,{depth,routeVersion:26}).liminal,true);
+}
+for(const depth of [3,7]){
+ const attempts=[];const selected=chooseSafeFloor(MOONS.hamsi,17,depth,(_,choice)=>{attempts.push(choice);return attempts.length===2?{safe:true}:null;});
+ assert(selected);assert(attempts.every(c=>c.theme===selected.choice.theme&&LIMINAL26_THEMES.includes(c.theme)),'native retry retains announced liminal destination');
+ assert.notEqual(attempts[0].seed,attempts[1].seed);
+ let probes=0;assert.equal(chooseSafeFloor(MOONS.hamsi,17,depth,()=>{probes++;return null;}),null);assert.equal(probes,3,'unsafe liminal transit cancels after bounded retries');
+}
 console.log('descent21 core: deterministic650+deep floors, native damage/sprint caps, themes, discovery and translations pass');
