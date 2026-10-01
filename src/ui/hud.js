@@ -264,7 +264,8 @@ export class HUD {
       const tcls = tier && tier !== 'common' ? ` tier tier-${tier}` : '';
       return `<div class="inv-slot ${i === active ? 'active' : ''} ${it ? 'full' : ''}${tcls}${durClass(it)}"${tcls ? ` style="--tc:${col}"` : ''}><div class="inv-num">${i + 1}</div>${it ? iconHTML(it.type, 'inv-ico') + `<div class="inv-name" style="color:${col}">${escapeHtml(nm)}</div>` : ''}${bar}${durBarHTML(it)}${extra}${it?.on ? '<div class="inv-on">●</div>' : ''}</div>`;
     }).join('');
-    this.$.inv.innerHTML = (this.bagTag || '') + html;
+    const rendered = (this.bagTag || '') + html;
+    if (rendered !== this.inventoryHtml) { this.$.inv.innerHTML = rendered; this.inventoryHtml = rendered; }
   }
   /** [I] inventory hint left of the hotbar: bag cells used / capacity (inventory.js). null hides it. */
   setBagTag(info) {
@@ -296,36 +297,39 @@ export class HUD {
     this.$.lvl.parentElement.classList.remove('pulse'); void this.$.lvl.offsetWidth; this.$.lvl.parentElement.classList.add('pulse');
   }
 
-  toast(text, kind = 'info', ms) {
+  toast(text, kind = 'info', ms, valid) {
+    if (valid && !valid()) return;
     if (this.gate?.() || ((this.routineBusy() || this.cc?.busy?.()) && !toastUrgent(kind))) {
       // queue (no duplicates, bounded) until the report / cinematic is gone
-      if (!this.pendingToasts.some((p) => p[0] === text)) this.pendingToasts.push([text, kind, ms]);
+      if (!this.pendingToasts.some((p) => p[0] === text)) this.pendingToasts.push(valid ? [text, kind, ms, valid] : [text, kind, ms]);
       if (this.pendingToasts.length > 8) this.pendingToasts.shift();
       return;
     }
-    this.showToast(text, kind, ms);
+    this.showToast(text, kind, ms, valid);
   }
-  showToast(text, kind = 'info', ms = TOAST_MS) {
-    if (this.routineBusy() && !toastUrgent(kind)) { this.toast(text, kind, ms); return; }
+  showToast(text, kind = 'info', ms = TOAST_MS, valid) {
+    if (valid && !valid()) return;
+    if (this.routineBusy() && !toastUrgent(kind)) { this.toast(text, kind, ms, valid); return; }
     ms = ms >= TOAST_LONG_MS ? TOAST_LONG_MS : Math.min(ms || TOAST_MS, TOAST_MS);
     // [lanes] lane 2: right column, at most TOAST_MAX on screen, TOAST_MS each. Never evict an unread one: extra toasts queue until a slot frees.
     const txt = typeof text === 'string' ? t(text) : text;
     const box = this.$.toasts, label = typeof txt === 'string' ? txt : null;
-    if (label) for (const k of box.children) if (k._tx === label && !k.classList.contains('out')) { clearTimeout(k._t1); clearTimeout(k._t2); this.armToast(k, ms); return; }
+    if (label) for (const k of box.children) if (k._tx === label && !k.classList.contains('out')) { k._valid = valid; clearTimeout(k._t1); clearTimeout(k._t2); this.armToast(k, ms); return; }
     const q = this.toastQ || (this.toastQ = []);
     // A warning takes the visible slot before routine rewards/messages.
     if (toastUrgent(kind)) for (const node of [...box.children]) {
       if (toastUrgent(node._kind)) continue;
-      if (node._tx && !q.some(p => p[0] === node._tx)) q.push([node._tx, node._kind || 'info', node._ms]);
+      if (node._tx && (!node._valid || node._valid()) && !q.some(p => p[0] === node._tx)) q.push(node._valid ? [node._tx, node._kind || 'info', node._ms, node._valid] : [node._tx, node._kind || 'info', node._ms]);
       clearTimeout(node._t1); clearTimeout(node._t2); node.remove();
     }
     if (box.children.length >= this.toastLimit()) {
-      if (!q.some((p) => p[0] === txt)) toastUrgent(kind) ? q.unshift([txt, kind, ms]) : q.push([txt, kind, ms]);
+      const entry = valid ? [txt, kind, ms, valid] : [txt, kind, ms];
+      if (!q.some((p) => p[0] === txt)) toastUrgent(kind) ? q.unshift(entry) : q.push(entry);
       if (q.length > 8) q.shift();
       return;
     }
     const e = el('div', { class: 'toast ' + kind }, txt);
-    e._tx = label; e._kind = kind; e._ms = ms;
+    e._tx = label; e._kind = kind; e._ms = ms; e._valid = valid;
     box.appendChild(e);
     this.armToast(e, ms);
   }
@@ -340,10 +344,17 @@ export class HUD {
     while (q?.length && this.$.toasts.children.length < this.toastLimit()) {
       const index = (this.routineBusy() || this.cc?.busy?.()) ? q.findIndex(p => toastUrgent(p[1])) : 0;
       if (index < 0) break;
-      const [txt, kind, ms] = q.splice(index, 1)[0]; this.showToast(txt, kind, ms);
+      this.showToast(...q.splice(index, 1)[0]);
     }
   }
   flushPending() {
+    // Context-scoped advice expires in both held queues and on screen. Generic
+    // rewards/warnings keep their existing delivery and three-field tuples.
+    for (const node of [...this.$.toasts.children]) if (node._valid && !node._valid()) {
+      clearTimeout(node._t1); clearTimeout(node._t2); node.remove();
+    }
+    if (this.pendingToasts.some(p => p[3])) this.pendingToasts = this.pendingToasts.filter(p => !p[3] || p[3]());
+    if (this.toastQ?.some(p => p[3])) this.toastQ = this.toastQ.filter(p => !p[3] || p[3]());
     if (this.toastQ?.length) this.drainToastQ();
     if (this.$.toasts.children.length >= this.toastLimit()) return;   // [lanes] both slots busy: keep gated toasts queued instead of pushing one out unread
     if ((!this.pendingToasts.length && !this.pendingBig) || this.gate?.()) return;
@@ -355,8 +366,7 @@ export class HUD {
     const now = performance.now();
     if (now < this.nextFlush) return;
     if (this.pendingBig) { const [m, s, k] = this.pendingBig; this.pendingBig = null; this.bigText(m, s, k); this.nextFlush = now + 2200; return; }
-    const [text, kind, ms] = this.pendingToasts.shift();
-    this.showToast(text, kind, ms);
+    this.showToast(...this.pendingToasts.shift());
     this.nextFlush = now + 1100;
   }
 
@@ -590,13 +600,13 @@ export class HUD {
     if (quiet && (!this.attentionWasQuiet || (hot && !this.attentionWasHot))) {
       // Existing notifications wait intact while the player needs a clear sightline.
       for (const node of [...this.$.toasts.children]) if (!toastUrgent(node._kind)) {
-        this.toast(node._tx || node.textContent, node._kind || 'info', node._ms);
+        this.toast(node._tx || node.textContent, node._kind || 'info', node._ms, node._valid);
         clearTimeout(node._t1); clearTimeout(node._t2); node.remove();
       }
       const warnings = [...this.$.toasts.children].filter(node => toastUrgent(node._kind));
       for (const node of warnings.slice(hot ? 1 : TOAST_MAX)) {
         const q = this.toastQ || (this.toastQ = []);
-        if (!q.some(p => p[0] === node._tx)) q.unshift([node._tx || node.textContent, node._kind, node._ms]);
+        if ((!node._valid || node._valid()) && !q.some(p => p[0] === node._tx)) q.unshift(node._valid ? [node._tx || node.textContent, node._kind, node._ms, node._valid] : [node._tx || node.textContent, node._kind, node._ms]);
         clearTimeout(node._t1); clearTimeout(node._t2); node.remove();
       }
       if (!this.$.big.classList.contains('hidden')) {

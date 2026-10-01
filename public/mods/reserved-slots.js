@@ -95,15 +95,24 @@ KefalAPI.defineMod({
       const orig = hud.setInventory.bind(hud);
       hud.setInventory = (items, active) => {
         orig(items, active);
+        const inv = hud.$?.inv;
+        if (!inv) return;
         const game = api.game;
-        const res = game && reserved(game);
-        if (!res) return;
-        const kids = hud.$?.inv?.children || [];
-        for (const r of res) {
-          const el = kids[r.idx];
-          if (!el) continue;
-          el.classList.add('kmod-res');
-          if (!items[r.idx]) { const l = document.createElement('div'); l.className = 'kmod-res-l'; l.textContent = LABEL[r.kind]; el.appendChild(l); }
+        const res = (game && reserved(game)) || [];
+        // Bag tags and other decorations are siblings of the actual slots.
+        // Cached native HTML retains these nodes across unchanged refreshes.
+        const kids = Array.from(inv.children).filter(el => el.classList.contains('inv-slot'));
+        for (let i = 0; i < kids.length; i++) {
+          const el = kids[i], r = res.find(r => r.idx === i), wanted = !!r;
+          if (el.classList.contains('kmod-res') !== wanted) el.classList[wanted ? 'add' : 'remove']('kmod-res');
+          const labels = Array.from(el.querySelectorAll('.kmod-res-l'));
+          const text = r && !items[i] ? LABEL[r.kind] : '';
+          if (text) {
+            let label = labels.shift();
+            if (!label) { label = document.createElement('div'); label.className = 'kmod-res-l'; el.appendChild(label); }
+            if (label.textContent !== text) label.textContent = text;
+          }
+          for (const label of labels) label.remove();
         }
       };
     });

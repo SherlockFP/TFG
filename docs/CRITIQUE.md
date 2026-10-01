@@ -1,4 +1,42 @@
-# Current quality — Wave27
+# Current experience — Wave28
+
+The owner rates the current game **5/10**. This is the current experience baseline.
+Earlier 8.0 source/native/guided assessments below remain historical records and
+do not override that feedback. Wave28 verifies specific first-session corrections;
+no improved human rating is claimed.
+
+The immediate priority is the ordinary first-session path: title/Host, dock,
+ship choice and boarding, usable tools, first landing, salvage and escape. Observe
+confusion, repeated chores, unclear feedback and actual stutter before choosing
+the fixes. Keep the requested feature access open, but give the player a clear
+next action and defer irrelevant exposure. More systems or passing tests alone
+will not establish a more enjoyable game.
+
+[Wave28 round card](wave28/README.md) and
+[independent criteria/review](wave28/REVIEW.md) track usability, PSX coherence,
+readability, pacing, stability and cooperation. The fresh normal
+[baseline](wave28/BASELINE.md) earned real fleet E and a free Courier, but did not
+reach dispatch, landing or salvage. Mouse-driver and held-Tab grader limits are
+retained. Narrow interaction, dock-cue, status-binding, advice-context and repeated
+presentation-work fixes are implemented; independent source review found and
+closed downstream notification-context gaps. Corrected normal play found another
+real integration issue: unchanged hotbar retention
+duplicates default mod decorations, with bag-tag slot indexing also needing
+correction. Initial component checks had missed these installed wrappers.
+The follow-up fixes both decorator duplication and slot indexing; actual
+ModManager-installed coverage passes in both wrapper orders. The fresh corrected
+normal replay earns those changed actions and native first landing, with one LIGHT
+and zero observed idle hotbar mutations. Facility entry, physical salvage, carry
+and return remain unreached at the ten-minute cap. Eleven native updates exceed
+50 ms; the owner's stutter concern remains open. A separately observed title race,
+skip fallthrough and held-repeat activation now have narrow source corrections.
+Fresh keyboard-title acceptance, focused follow-up checks and the final build
+pass. Independent review closes the changed scope, while the complete ordinary
+shift and direct player reassessment remain open.
+Technical/guided gains, human enjoyment, Internet co-op and representative
+hardware performance remain separate evidence.
+
+# Historical quality — Wave27
 
 The qualified independent score stays **8.0/10**. The latest improvement gives a
 second crew member concrete work during hauling: brace rolling cargo, support a

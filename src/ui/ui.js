@@ -155,7 +155,7 @@ export class UI {
     b.dataset.back = '1';
     return b;
   }
-  toast(text, kind, ms) { this.hud.toast(tNum(text), kind, ms); }   // t(): safety net for static strings that were not wrapped at the call site
+  toast(text, kind, ms, valid) { this.hud.toast(tNum(text), kind, ms, valid); }   // optional context survives native notification queues
   systemMessage(text, kind = 'info') { text = tNum(text); if (this.landHook?.capture(text, kind)) return; /* [landing10] merged into the landing briefing */ this.chatMessage(null, text, false, kind); this.hud.toast(text, kind === 'signal' ? 'info' : kind); }
   chatMessage(name, text, self, kind, avatar) {
     this.chatEl.classList.remove('hidden');

@@ -215,15 +215,20 @@ class App {
     installEscape27(this);
     window.addEventListener('keydown', (e) => {
       const g = this.game;
-      if (!g || input.isTyping() || e.defaultPrevented || e.repeat) return;
+      if (!g || input.isTyping() || e.repeat) return;
       const k = this.settings.keys;
+      // The bound menu action is hold-for-status. HUDcalm owns it in play;
+      // Tab still moves focus in forms, and a remapped panel-close is one gesture.
+      if (e.code === k.menu) {
+        if (!e.defaultPrevented && !g.minigame && !g.terminal.active && this.ui.panelOpen && e.code !== 'Tab') {
+          e.preventDefault(); e.stopImmediatePropagation(); this.ui.closePanel();
+        }
+        return;
+      }
+      if (e.defaultPrevented) return;
       if (e.code === 'Escape') return;   // escape27 owns the gesture, including focused form controls.
       if (g.minigame || g.terminal.active) return;
       if ((e.code === k.chat || e.code === 'KeyT') && !this.ui.panelOpen && input.locked) { e.preventDefault(); this.ui.openChat(); return; }
-      if (e.code === k.menu) {
-        e.preventDefault();
-        if (this.ui.panelOpen) this.ui.closePanel(); else this.ui.openTab();
-      }
     });
   }
 

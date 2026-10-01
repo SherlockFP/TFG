@@ -1,6 +1,6 @@
 // Live canvas textures for the ship: terminal mirror, radar monitor, quota screens, arcade attract.
 import * as THREE from 'three';
-import { t as tt, tf } from '../core/i18n.js';   // [i18n8] ship monitors follow the language
+import { t as tt, tf, getLang } from '../core/i18n.js';   // [i18n8] ship monitors follow the language
 import { MOONS } from './moons.js';
 import { FACILITY_Y } from '../world/facility.js';
 import { insideShip } from '../world/ship.js';
@@ -8,7 +8,14 @@ import { isSellable } from './items.js';
 import { todaysEvent, eventMood } from '../ui/hud.js';
 
 // "TFG Credit" (style.css) is a one-glyph font for the ▮ credit sign; ask the browser to load it for the canvases
-try { document.fonts?.load?.('12px "TFG Credit"', '▮'); } catch { /* optional */ }
+// Shared across screen instances: delayed font loads must repaint cached text.
+let fontRevision = 0;
+try {
+  const fonts = document.fonts, changed = () => { fontRevision++; };
+  fonts?.load?.('12px "TFG Credit"', '▮')?.then?.(changed, () => {});
+  fonts?.ready?.then?.(changed, () => {});
+  fonts?.addEventListener?.('loadingdone', changed);
+} catch { /* optional */ }
 
 function canvasTex(w, h) {
   const c = document.createElement('canvas');
@@ -64,11 +71,22 @@ export class ShipScreens {
     const near = g.camera.position.length() < 20;
     if (!near) return;
     this.drawRadar();
-    this.drawStatus();
-    this.drawQuota();
+    if (this.status) this.refreshStatic('status', this.statusRows(), this.drawStatus);
+    if (this.quota) this.refreshStatic('quota', this.quotaRows(), this.drawQuota);
     if (this.termDirty) { this.termDirty = false; this.drawTerminal(); }
     if (this.arcade && this.drawArcade) { try { this.drawArcade(this.arcade.ctx, 128, 96, this.t); this.arcade.t.needsUpdate = true; } catch { /* ignore */ } }
     if (this.extra) this.drawExtra();
+  }
+
+  // Cache only at the periodic caller. Direct redraw methods remain available;
+  // external texture updates also invalidate the previous canvas presentation.
+  refreshStatic(name, rows, draw) {
+    const s = this[name]; if (!s) return;
+    const key = JSON.stringify([getLang(), fontRevision, rows]);
+    const cache = (this.staticScreens ||= {}), last = cache[name];
+    if (last?.key === key && last.version === s.t.version) return;
+    draw.call(this, rows);
+    cache[name] = { key, version: s.t.version };
   }
 
   crt(ctx, w, h) {
@@ -153,25 +171,34 @@ export class ShipScreens {
     s.t.needsUpdate = true;
   }
 
-  drawStatus() {
-    const s = this.status; if (!s) return;
+  statusRows() {
     const g = this.game; const run = g.run || {};
-    const { ctx, c } = s;
-    ctx.fillStyle = '#060a14'; ctx.fillRect(0, 0, c.width, c.height);
     let shipVal = 0;
     for (const it of g.items.inShipItems()) if (isSellable(it.def) && !it.soulbound) shipVal += it.value;
+    const time = run.time || 480;
+    return [tt('SHIP STATUS'),
+      `${tt('MOON')}: ${MOONS[run.moon]?.short || '-'}`,
+      `${tt('PHASE')}: ${tt(String(run.phase || '').toUpperCase())}`,
+      `${tt('LOOT ONBOARD')}: ▮${shipVal}`,
+      `${tt('CREDITS')}: ▮${run.credits ?? 0}`,
+      `${tt('CREW')}: ${1 + g.remotes.size}`,
+      run.phase === 'moon' ? `${tt('TIME')}: ${String(Math.floor(time / 60)).padStart(2, '0')}:${String(Math.floor(time % 60)).padStart(2, '0')}` : null];
+  }
+
+  drawStatus(rows) {
+    const s = this.status; if (!s) return;
+    rows ||= this.statusRows();
+    const { ctx, c } = s;
+    ctx.fillStyle = '#060a14'; ctx.fillRect(0, 0, c.width, c.height);
     ctx.fillStyle = '#7fd1ff'; ctx.font = '11px "TFG Credit", monospace';
-    ctx.fillText(tt('SHIP STATUS'), 8, 14);
+    ctx.fillText(rows[0], 8, 14);
     ctx.fillStyle = '#e8f4ff';
-    ctx.fillText(`${tt('MOON')}: ${MOONS[run.moon]?.short || '-'}`, 8, 32);
-    ctx.fillText(`${tt('PHASE')}: ${tt(String(run.phase || '').toUpperCase())}`, 8, 46);
-    ctx.fillText(`${tt('LOOT ONBOARD')}: ▮${shipVal}`, 8, 64);
-    ctx.fillText(`${tt('CREDITS')}: ▮${run.credits ?? 0}`, 8, 80);
-    ctx.fillText(`${tt('CREW')}: ${1 + g.remotes.size}`, 8, 96);
-    if (run.phase === 'moon') {
-      const t = run.time || 480;
-      ctx.fillText(`${tt('TIME')}: ${String(Math.floor(t / 60)).padStart(2, '0')}:${String(Math.floor(t % 60)).padStart(2, '0')}`, 8, 112);
-    }
+    ctx.fillText(rows[1], 8, 32);
+    ctx.fillText(rows[2], 8, 46);
+    ctx.fillText(rows[3], 8, 64);
+    ctx.fillText(rows[4], 8, 80);
+    ctx.fillText(rows[5], 8, 96);
+    if (rows[6] !== null) ctx.fillText(rows[6], 8, 112);
     this.crt(ctx, c.width, c.height);
     s.t.needsUpdate = true;
   }
@@ -194,19 +221,26 @@ export class ShipScreens {
     this.crt(ctx, c.width, c.height);
     s.t.needsUpdate = true;
   }
-  drawQuota() {
-    const s = this.quota; if (!s) return;
+  quotaRows() {
     const run = this.game.run || {};
+    return [tt('ENGAGEMENT QUOTA'), `▮${run.sold ?? 0} / ▮${run.quota ?? 0}`,
+      tf('DEADLINE: {n} DAYS', { n: run.daysLeft ?? 3 }), tf('DAY {n}', { n: run.day ?? 1 }),
+      run.sold >= run.quota ? '#7dff7d' : '#ffd9a0'];
+  }
+
+  drawQuota(rows) {
+    const s = this.quota; if (!s) return;
+    rows ||= this.quotaRows();
     const { ctx, c } = s;
     ctx.fillStyle = '#140a02'; ctx.fillRect(0, 0, c.width, c.height);
     ctx.fillStyle = '#ffb347'; ctx.font = 'bold 13px "TFG Credit", monospace';
-    ctx.fillText(tt('ENGAGEMENT QUOTA'), 10, 18);
+    ctx.fillText(rows[0], 10, 18);
     ctx.font = 'bold 18px "TFG Credit", monospace';
-    ctx.fillStyle = run.sold >= run.quota ? '#7dff7d' : '#ffd9a0';
-    ctx.fillText(`▮${run.sold ?? 0} / ▮${run.quota ?? 0}`, 10, 44);
+    ctx.fillStyle = rows[4];
+    ctx.fillText(rows[1], 10, 44);
     ctx.font = '12px "TFG Credit", monospace'; ctx.fillStyle = '#ffb347';
-    ctx.fillText(tf('DEADLINE: {n} DAYS', { n: run.daysLeft ?? 3 }), 10, 66);
-    ctx.fillText(tf('DAY {n}', { n: run.day ?? 1 }), 10, 84);
+    ctx.fillText(rows[2], 10, 66);
+    ctx.fillText(rows[3], 10, 84);
     this.crt(ctx, c.width, c.height);
     s.t.needsUpdate = true;
   }

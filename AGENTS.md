@@ -1,13 +1,13 @@
 # TFG — current agent map
 
-Updated 2026-10-01, Wave27. This is the current entry point; historical Windows,
+Updated 2026-10-01, Wave28. This is the current entry point; historical Windows,
 Claude branch/model, no-test and automatic merge/push instructions are retired.
 Their full prior text is preserved in [the historical snapshot](docs/history/AGENTS-pre-wave25.md).
 Current user/session instructions take precedence. Inspect Git for the publication SHA.
 
 ## Start here
 
-1. Read [current work and evidence](docs/wave27/README.md), then
+1. Read [current work and evidence](docs/wave28/README.md), then
    [Gauntlet procedure](docs/GAUNTLET.md) and [current critique](docs/CRITIQUE.md).
 2. Read [identity/art direction](docs/THEME.md) and the relevant module report.
    [Research](docs/wave25/RESEARCH.md) connects genre design and current agent engineering.
@@ -29,6 +29,8 @@ Continue already-authorized work without redundant confirmation. Reassess scope
 when future user instructions change it; do not infer authority for unrelated actions.
 Prefer a few observed quality improvements over another mandatory meter/catalogue.
 Give concise progress updates and keep scores/evidence honest.
+The owner's current experience baseline is **5/10**. Historical source-review
+scores do not override it; native test counts alone do not raise the fun rating.
 
 Art: faceted, matte PSX industrial workers/CRT/archive props. Dirty ivory, charcoal,
 steel, faded workwear and restrained ochre/amber details. Avoid broad green emissive

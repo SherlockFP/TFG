@@ -1,0 +1,6154 @@
+{
+  "result": {
+    "changedShipAndCacheGoals": "PASS",
+    "normalFirstLanding": "PARTIAL_FIRST_LANDING",
+    "notReached": [
+      "facility entrance",
+      "physical salvage E pickup",
+      "cargo carry",
+      "return loop"
+    ]
+  },
+  "method": "GUIDED_INPUT follow-up; fresh native Host/New-run UI; one visible page with native RAF only; source-assisted desired camera angle converted to genuine mouse input with native before/after receipts. No lifecycle, readiness, pose, loot or outcome fixtures. SwiftShader diagnostic timings are not hardware profiling.",
+  "source": "053ed6655eecabe694075d29f65367027fc88815+wave28_final_runtime",
+  "jsFreeze": "f27150200fefc02a7aa6e29c9275709b6375777a466d627d1260960b127140b4",
+  "allSourceFreeze": "4ce994bf310b71e99af11f53e545f7085dd27366852574eab9a7ef4bce3294ee",
+  "publicModsFreeze": "4ef501890a25a08f151851fe8022ff77e3e1e2b0685e8c14540e0266cb311ed2",
+  "ownerScore": 5,
+  "gameLoadedAt": "2026-10-01T15:38:46.602Z",
+  "finishedAt": "2026-10-01T15:48:47.377Z",
+  "durationAfterGameLoadMs": 600775,
+  "capMs": 600000,
+  "initial": {
+    "markers": [
+      {
+        "text": "FLEET OFFICE",
+        "visible": true,
+        "opacity": "1",
+        "rect": {
+          "x": 539.203125,
+          "y": 239.015625,
+          "width": 101.15625,
+          "height": 16.796875
+        }
+      }
+    ],
+    "nativeTime": 0.2666999999999998,
+    "nativeRay": {
+      "eye": [
+        2.4000000953674316,
+        0.389902890920639,
+        23
+      ],
+      "fwd": [
+        -1.2246467991473532e-16,
+        0,
+        1
+      ],
+      "hit": null,
+      "points": [
+        {
+          "label": "Fleet broker",
+          "pos": [
+            0,
+            0.7,
+            31.56
+          ],
+          "reach": 4,
+          "r": 1,
+          "along": 8.559999999999999,
+          "perp": 2.419950552144208
+        },
+        {
+          "label": "Choose a ship at the fleet office first",
+          "pos": [
+            3,
+            0.2,
+            9.48
+          ],
+          "reach": 4,
+          "r": 1,
+          "along": -13.52,
+          "perp": 0.6293353585641905
+        }
+      ],
+      "floor": {
+        "distance": 1.0199029445648193,
+        "point": {
+          "x": 2.4000000953674316,
+          "y": -1.2500000536441804,
+          "z": 23
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      }
+    },
+    "world": {
+      "seed": 13,
+      "outdoor": true,
+      "company": false,
+      "facility": false,
+      "shipDoor": true,
+      "shipPoints": {
+        "lever": [
+          -5.800000000000001,
+          1,
+          0.9
+        ],
+        "terminal": [
+          -6.05,
+          1.05,
+          2.55
+        ],
+        "doorOpen": [
+          3.98,
+          1.3,
+          3.39
+        ]
+      }
+    },
+    "screen": null,
+    "phase": "orbit",
+    "moon": "hamsi",
+    "run": {
+      "day": 1,
+      "credits": 60,
+      "quota": 330,
+      "time": 480
+    },
+    "profile": {
+      "name": "Intern188",
+      "coins": 50
+    },
+    "settings": {
+      "lang": "en",
+      "difficulty": "standard",
+      "quality": "auto",
+      "fullscreenPlay": true
+    },
+    "diagnostics": {
+      "menuKey": "Tab",
+      "blocksInput": false,
+      "terminal": false,
+      "minigame": false,
+      "hudHidden": false,
+      "hcExists": true,
+      "hcOn": false,
+      "eye": [
+        2.4000000953674316,
+        0.389902890920639,
+        23
+      ],
+      "fwd": [
+        -1.2246467991473532e-16,
+        0,
+        1
+      ]
+    },
+    "input": {
+      "locked": true,
+      "enabled": true,
+      "typing": false,
+      "keys": [],
+      "hidden": false,
+      "pointer": true,
+      "active": "BODY"
+    },
+    "player": {
+      "p": [
+        2.4000000953674316,
+        -1.230097109079361,
+        23
+      ],
+      "yaw": 3.141592653589793,
+      "pitch": 0,
+      "hp": 100,
+      "dead": false,
+      "indoor": false,
+      "inShip": false,
+      "grounded": true,
+      "slots": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "prompt": {
+      "main": null,
+      "dom": ""
+    },
+    "panel": null,
+    "visibleText": [
+      {
+        "class": "hud",
+        "text": "\u25cf LIVE 120\nHP 100/106\nSTA 100/100\n0 lb\nLv.1 LURKER\n\u25ae 60\n\u00b7\nI\nPOCKETS\n0/8\n1\n2\n3\n4\n5\nLIGHT\nYou are the host. Lobby code: U92ET5. ESC > Copy join link\nLocal (same PC) mode: voice chat is not carried between tabs. Use an Online P2P network for voice."
+      },
+      {
+        "class": "toast info",
+        "text": "You are the host. Lobby code: U92ET5. ESC > Copy join link"
+      },
+      {
+        "class": "toast info",
+        "text": "Local (same PC) mode: voice chat is not carried between tabs. Use an Online P2P network for voice."
+      }
+    ],
+    "buttons": [],
+    "forms": [],
+    "render": {
+      "calls": 91,
+      "tris": 30522
+    },
+    "caught": {
+      "total": 0,
+      "ring": []
+    }
+  },
+  "milestones": [
+    {
+      "command": {
+        "op": "hold",
+        "key": "Tab",
+        "ms": 650,
+        "duringShot": "status-held-native-960"
+      },
+      "sinceGameMs": 31278,
+      "before": {
+        "phase": "orbit",
+        "prompt": {
+          "main": null,
+          "dom": ""
+        },
+        "player": {
+          "p": [
+            2.3999154567718506,
+            -1.2300964236259462,
+            28.29921531677246
+          ],
+          "yaw": 3.141592653589793,
+          "pitch": 0,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        "nativeRay": {
+          "eye": [
+            2.399818724891186,
+            0.38991349362252126,
+            28.29921531677246
+          ],
+          "fwd": [
+            -1.2246467991473532e-16,
+            1.88079096131566e-37,
+            1
+          ],
+          "hit": null,
+          "points": [
+            {
+              "label": "Fleet broker",
+              "pos": [
+                0,
+                0.7,
+                31.56
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": 3.2607846832275382,
+              "perp": 2.4197693182978712
+            },
+            {
+              "label": "Choose a ship at the fleet office first",
+              "pos": [
+                3,
+                0.2,
+                9.48
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": -18.81921531677246,
+              "perp": 0.629511475710449
+            }
+          ],
+          "floor": {
+            "distance": 1.0199036598205566,
+            "point": {
+              "x": 2.3999154567718506,
+              "y": -1.2500000834465028,
+              "z": 28.29921531677246
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            2.399818724891186,
+            0.38991349362252126,
+            28.29921531677246
+          ],
+          "fwd": [
+            -1.2246467991473532e-16,
+            1.88079096131566e-37,
+            1
+          ]
+        },
+        "world": {
+          "seed": 13,
+          "outdoor": true,
+          "company": false,
+          "facility": false,
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": [
+          {
+            "text": "FLEET OFFICE",
+            "visible": true,
+            "opacity": "1",
+            "rect": {
+              "x": 702.96875,
+              "y": 217.859375,
+              "width": 101.15625,
+              "height": 16.796875
+            }
+          }
+        ]
+      },
+      "after": {
+        "phase": "orbit",
+        "prompt": {
+          "main": null,
+          "dom": ""
+        },
+        "player": {
+          "p": [
+            2.3999154567718506,
+            -1.2300964236259462,
+            28.29921531677246
+          ],
+          "yaw": 3.141592653589793,
+          "pitch": 0,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        "nativeRay": {
+          "eye": [
+            2.3999154417230546,
+            0.38990357791690256,
+            28.29921531677246
+          ],
+          "fwd": [
+            -1.2246467991473532e-16,
+            0,
+            1
+          ],
+          "hit": null,
+          "points": [
+            {
+              "label": "Fleet broker",
+              "pos": [
+                0,
+                0.7,
+                31.56
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": 3.2607846832275382,
+              "perp": 2.419866508386258
+            },
+            {
+              "label": "Choose a ship at the fleet office first",
+              "pos": [
+                3,
+                0.2,
+                9.48
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": -18.81921531677246,
+              "perp": 0.6294162740095749
+            }
+          ],
+          "floor": {
+            "distance": 1.0199036598205566,
+            "point": {
+              "x": 2.3999154567718506,
+              "y": -1.2500000834465028,
+              "z": 28.29921531677246
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            2.3999154417230546,
+            0.38990357791690256,
+            28.29921531677246
+          ],
+          "fwd": [
+            -1.2246467991473532e-16,
+            0,
+            1
+          ]
+        },
+        "world": {
+          "seed": 13,
+          "outdoor": true,
+          "company": false,
+          "facility": false,
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": [
+          {
+            "text": "FLEET OFFICE",
+            "visible": true,
+            "opacity": "1",
+            "rect": {
+              "x": 702.96875,
+              "y": 217.84375,
+              "width": 101.15625,
+              "height": 16.796875
+            }
+          }
+        ]
+      },
+      "during": {
+        "markers": [
+          {
+            "text": "FLEET OFFICE",
+            "visible": true,
+            "opacity": "1",
+            "rect": {
+              "x": 702.96875,
+              "y": 217.84375,
+              "width": 101.15625,
+              "height": 16.796875
+            }
+          }
+        ],
+        "nativeTime": 19.83545019504581,
+        "nativeRay": {
+          "eye": [
+            2.3999145336563954,
+            0.3899036710146757,
+            28.29921531677246
+          ],
+          "fwd": [
+            -1.2246467991473532e-16,
+            0,
+            1
+          ],
+          "hit": null,
+          "points": [
+            {
+              "label": "Fleet broker",
+              "pos": [
+                0,
+                0.7,
+                31.56
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": 3.2607846832275382,
+              "perp": 2.4198655958762187
+            },
+            {
+              "label": "Choose a ship at the fleet office first",
+              "pos": [
+                3,
+                0.2,
+                9.48
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": -18.81921531677246,
+              "perp": 0.6294171678479129
+            }
+          ],
+          "floor": {
+            "distance": 1.0199036598205566,
+            "point": {
+              "x": 2.3999154567718506,
+              "y": -1.2500000834465028,
+              "z": 28.29921531677246
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "world": {
+          "seed": 13,
+          "outdoor": true,
+          "company": false,
+          "facility": false,
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "screen": null,
+        "phase": "orbit",
+        "moon": "hamsi",
+        "run": {
+          "day": 1,
+          "credits": 60,
+          "quota": 330,
+          "time": 480
+        },
+        "profile": {
+          "name": "Intern188",
+          "coins": 50
+        },
+        "settings": {
+          "lang": "en",
+          "difficulty": "standard",
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": true,
+          "eye": [
+            2.3999145336563954,
+            0.3899036710146757,
+            28.29921531677246
+          ],
+          "fwd": [
+            -1.2246467991473532e-16,
+            0,
+            1
+          ]
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [
+            "Tab"
+          ],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "player": {
+          "p": [
+            2.3999154567718506,
+            -1.2300964236259462,
+            28.29921531677246
+          ],
+          "yaw": 3.141592653589793,
+          "pitch": 0,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        "prompt": {
+          "main": null,
+          "dom": ""
+        },
+        "panel": null,
+        "visibleText": [
+          {
+            "class": "hud",
+            "text": "\u25cf LIVE 121\nHP 100/106\nSTA 100/100\n4 lb\nLv.1 LURKER\n\u25ae 60\n\u00b7\nI\nPOCKETS\n0/8\n1\n2\n3\n4\n5\nLIGHT"
+          }
+        ],
+        "buttons": [],
+        "forms": [],
+        "render": {
+          "calls": 72,
+          "tris": 26514
+        },
+        "caught": {
+          "total": 0,
+          "ring": []
+        }
+      }
+    },
+    {
+      "command": {
+        "op": "look",
+        "yaw": 2.358,
+        "pitch": 0.091,
+        "shot": "clerk-face-native-selected-960"
+      },
+      "sinceGameMs": 33384,
+      "before": {
+        "phase": "orbit",
+        "prompt": {
+          "main": null,
+          "dom": ""
+        },
+        "player": {
+          "p": [
+            2.3999154567718506,
+            -1.2300964236259462,
+            28.29921531677246
+          ],
+          "yaw": 3.141592653589793,
+          "pitch": 0,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        "nativeRay": {
+          "eye": [
+            2.3999154500099906,
+            0.3899035770673005,
+            28.29921531677246
+          ],
+          "fwd": [
+            -1.2246467991473532e-16,
+            0,
+            1
+          ],
+          "hit": null,
+          "points": [
+            {
+              "label": "Fleet broker",
+              "pos": [
+                0,
+                0.7,
+                31.56
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": 3.2607846832275382,
+              "perp": 2.4198665167137436
+            },
+            {
+              "label": "Choose a ship at the fleet office first",
+              "pos": [
+                3,
+                0.2,
+                9.48
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": -18.81921531677246,
+              "perp": 0.6294162658524751
+            }
+          ],
+          "floor": {
+            "distance": 1.0199036598205566,
+            "point": {
+              "x": 2.3999154567718506,
+              "y": -1.2500000834465028,
+              "z": 28.29921531677246
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            2.3999154500099906,
+            0.3899035770673005,
+            28.29921531677246
+          ],
+          "fwd": [
+            -1.2246467991473532e-16,
+            0,
+            1
+          ]
+        },
+        "world": {
+          "seed": 13,
+          "outdoor": true,
+          "company": false,
+          "facility": false,
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": [
+          {
+            "text": "FLEET OFFICE",
+            "visible": true,
+            "opacity": "1",
+            "rect": {
+              "x": 702.96875,
+              "y": 217.84375,
+              "width": 101.15625,
+              "height": 16.796875
+            }
+          }
+        ]
+      },
+      "after": {
+        "phase": "orbit",
+        "prompt": {
+          "main": "Fleet broker",
+          "sub": "",
+          "dom": "FLEET BROKER"
+        },
+        "player": {
+          "p": [
+            2.3999154567718506,
+            -1.2300964236259462,
+            28.29921531677246
+          ],
+          "yaw": 2.3583926535897928,
+          "pitch": 0.09240000000000001,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        "nativeRay": {
+          "eye": [
+            2.3999154567718004,
+            0.3899035763740612,
+            28.29921531677241
+          ],
+          "fwd": [
+            -0.7025409687231445,
+            0.09226857461246797,
+            0.7056363776085595
+          ],
+          "hit": null,
+          "points": [
+            {
+              "label": "Fleet broker",
+              "pos": [
+                0,
+                0.7,
+                31.56
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": 4.015579376888686,
+              "perp": 0.6029867410446993
+            },
+            {
+              "label": "Choose a ship at the fleet office first",
+              "pos": [
+                3,
+                0.2,
+                9.48
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": -13.718629034183973,
+              "perp": 12.897993928856799
+            }
+          ],
+          "floor": {
+            "distance": 1.0199036598205566,
+            "point": {
+              "x": 2.3999154567718506,
+              "y": -1.2500000834465028,
+              "z": 28.29921531677246
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            2.3999154567718004,
+            0.3899035763740612,
+            28.29921531677241
+          ],
+          "fwd": [
+            -0.7025409687231445,
+            0.09226857461246797,
+            0.7056363776085595
+          ],
+          "selected": "Fleet broker"
+        },
+        "world": {
+          "seed": 13,
+          "outdoor": true,
+          "company": false,
+          "facility": false,
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": [
+          {
+            "text": "FLEET OFFICE",
+            "visible": true,
+            "opacity": "1",
+            "rect": {
+              "x": 373.890625,
+              "y": 258.8125,
+              "width": 101.15625,
+              "height": 16.796875
+            }
+          }
+        ]
+      }
+    },
+    {
+      "command": {
+        "op": "press",
+        "key": "KeyE",
+        "expected": "Fleet broker",
+        "shot": "native-clerk-catalog-960"
+      },
+      "sinceGameMs": 37201,
+      "before": {
+        "phase": "orbit",
+        "prompt": {
+          "main": "Fleet broker",
+          "sub": "",
+          "dom": "FLEET BROKER"
+        },
+        "player": {
+          "p": [
+            2.3999154567718506,
+            -1.2300964236259462,
+            28.29921531677246
+          ],
+          "yaw": 2.3583926535897928,
+          "pitch": 0.09240000000000001,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        "nativeRay": {
+          "eye": [
+            2.3999154567718497,
+            0.3899035763740541,
+            28.29921531677246
+          ],
+          "fwd": [
+            -0.7025409687231444,
+            0.09226857461246799,
+            0.7056363776085595
+          ],
+          "hit": null,
+          "points": [
+            {
+              "label": "Fleet broker",
+              "pos": [
+                0,
+                0.7,
+                31.56
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": 4.015579376888686,
+              "perp": 0.6029867410446286
+            },
+            {
+              "label": "Choose a ship at the fleet office first",
+              "pos": [
+                3,
+                0.2,
+                9.48
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": -13.718629034183971,
+              "perp": 12.897993928856872
+            }
+          ],
+          "floor": {
+            "distance": 1.0199036598205566,
+            "point": {
+              "x": 2.3999154567718506,
+              "y": -1.2500000834465028,
+              "z": 28.29921531677246
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            2.3999154567718497,
+            0.3899035763740541,
+            28.29921531677246
+          ],
+          "fwd": [
+            -0.7025409687231444,
+            0.09226857461246799,
+            0.7056363776085595
+          ],
+          "selected": "Fleet broker"
+        },
+        "world": {
+          "seed": 13,
+          "outdoor": true,
+          "company": false,
+          "facility": false,
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": [
+          {
+            "text": "FLEET OFFICE",
+            "visible": true,
+            "opacity": "1",
+            "rect": {
+              "x": 373.890625,
+              "y": 258.8125,
+              "width": 101.15625,
+              "height": 16.796875
+            }
+          }
+        ]
+      },
+      "after": {
+        "phase": "orbit",
+        "prompt": {
+          "main": "Fleet broker",
+          "sub": "",
+          "dom": "FLEET BROKER"
+        },
+        "player": {
+          "p": [
+            2.3999154567718506,
+            -1.2300964236259462,
+            28.29921531677246
+          ],
+          "yaw": 2.3583926535897928,
+          "pitch": 0.09240000000000001,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        "nativeRay": {
+          "eye": [
+            2.3999154567718506,
+            0.38990357637405393,
+            28.29921531677246
+          ],
+          "fwd": [
+            -0.7025409687231444,
+            0.09226857461246797,
+            0.7056363776085595
+          ],
+          "hit": null,
+          "points": [
+            {
+              "label": "Fleet broker",
+              "pos": [
+                0,
+                0.7,
+                31.56
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": 4.015579376888687,
+              "perp": 0.6029867410446286
+            },
+            {
+              "label": "Choose a ship at the fleet office first",
+              "pos": [
+                3,
+                0.2,
+                9.48
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": -13.718629034183971,
+              "perp": 12.897993928856872
+            }
+          ],
+          "floor": {
+            "distance": 1.0199036598205566,
+            "point": {
+              "x": 2.3999154567718506,
+              "y": -1.2500000834465028,
+              "z": 28.29921531677246
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": false,
+          "enabled": false,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": false,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": true,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            2.3999154567718506,
+            0.38990357637405393,
+            28.29921531677246
+          ],
+          "fwd": [
+            -0.7025409687231444,
+            0.09226857461246797,
+            0.7056363776085595
+          ],
+          "selected": "Fleet broker"
+        },
+        "world": {
+          "seed": 13,
+          "outdoor": true,
+          "company": false,
+          "facility": false,
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": [
+          {
+            "text": "FLEET OFFICE",
+            "visible": true,
+            "opacity": "1",
+            "rect": {
+              "x": 373.890625,
+              "y": 258.8125,
+              "width": 101.15625,
+              "height": 16.796875
+            }
+          }
+        ]
+      }
+    },
+    {
+      "command": {
+        "op": "button",
+        "text": "Claim free starter",
+        "shot": "native-courier-claimed-960"
+      },
+      "sinceGameMs": 38943,
+      "before": {
+        "phase": null,
+        "prompt": null,
+        "player": null,
+        "nativeRay": null,
+        "input": null,
+        "diagnostics": null,
+        "world": null,
+        "markers": null
+      },
+      "after": {
+        "phase": "orbit",
+        "prompt": {
+          "main": "Fleet broker",
+          "sub": "",
+          "dom": "FLEET BROKER"
+        },
+        "player": {
+          "p": [
+            2.3999154567718506,
+            -1.2300964236259462,
+            28.29921531677246
+          ],
+          "yaw": 2.3583926535897928,
+          "pitch": 0.09240000000000001,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        "nativeRay": {
+          "eye": [
+            2.3999154567718506,
+            0.38990357637405393,
+            28.29921531677246
+          ],
+          "fwd": [
+            -0.7025409687231444,
+            0.09226857461246797,
+            0.7056363776085595
+          ],
+          "hit": null,
+          "points": [
+            {
+              "label": "Fleet broker",
+              "pos": [
+                0,
+                0.7,
+                31.56
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": 4.015579376888687,
+              "perp": 0.6029867410446286
+            },
+            {
+              "label": "Board Packet Courier",
+              "pos": [
+                3,
+                0.2,
+                9.48
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": -13.718629034183971,
+              "perp": 12.897993928856872
+            }
+          ],
+          "floor": {
+            "distance": 1.0199036598205566,
+            "point": {
+              "x": 2.3999154567718506,
+              "y": -1.2500000834465028,
+              "z": 28.29921531677246
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            2.3999154567718506,
+            0.38990357637405393,
+            28.29921531677246
+          ],
+          "fwd": [
+            -0.7025409687231444,
+            0.09226857461246797,
+            0.7056363776085595
+          ],
+          "selected": "Fleet broker"
+        },
+        "world": {
+          "seed": 13,
+          "outdoor": true,
+          "company": false,
+          "facility": false,
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": [
+          {
+            "text": "DEPARTURE",
+            "visible": true,
+            "opacity": "1",
+            "rect": {
+              "x": 790.2890625,
+              "y": 223.921875,
+              "width": 75.859375,
+              "height": 16.796875
+            }
+          }
+        ]
+      }
+    },
+    {
+      "command": {
+        "op": "press",
+        "key": "Escape",
+        "shot": "departure-marker-after-panel-960"
+      },
+      "sinceGameMs": 61379,
+      "before": {
+        "phase": "orbit",
+        "prompt": {
+          "main": "Fleet broker",
+          "sub": "",
+          "dom": "FLEET BROKER"
+        },
+        "player": {
+          "p": [
+            2.3999154567718506,
+            -1.2300964236259462,
+            28.29921531677246
+          ],
+          "yaw": 2.3583926535897928,
+          "pitch": 0.09240000000000001,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        "nativeRay": {
+          "eye": [
+            2.3999154567718506,
+            0.38990357637405393,
+            28.29921531677246
+          ],
+          "fwd": [
+            -0.7025409687231444,
+            0.09226857461246797,
+            0.7056363776085595
+          ],
+          "hit": null,
+          "points": [
+            {
+              "label": "Fleet broker",
+              "pos": [
+                0,
+                0.7,
+                31.56
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": 4.015579376888687,
+              "perp": 0.6029867410446286
+            },
+            {
+              "label": "Board Packet Courier",
+              "pos": [
+                3,
+                0.2,
+                9.48
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": -13.718629034183971,
+              "perp": 12.897993928856872
+            }
+          ],
+          "floor": {
+            "distance": 1.0199036598205566,
+            "point": {
+              "x": 2.3999154567718506,
+              "y": -1.2500000834465028,
+              "z": 28.29921531677246
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": false,
+          "enabled": false,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": false,
+          "active": "BUTTON"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": true,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            2.3999154567718506,
+            0.38990357637405393,
+            28.29921531677246
+          ],
+          "fwd": [
+            -0.7025409687231444,
+            0.09226857461246797,
+            0.7056363776085595
+          ],
+          "selected": "Fleet broker"
+        },
+        "world": {
+          "seed": 13,
+          "outdoor": true,
+          "company": false,
+          "facility": false,
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": [
+          {
+            "text": "DEPARTURE",
+            "visible": true,
+            "opacity": "1",
+            "rect": {
+              "x": 790.2890625,
+              "y": 223.921875,
+              "width": 75.859375,
+              "height": 16.796875
+            }
+          }
+        ]
+      },
+      "after": {
+        "phase": "orbit",
+        "prompt": {
+          "main": "Fleet broker",
+          "sub": "",
+          "dom": "FLEET BROKER"
+        },
+        "player": {
+          "p": [
+            2.3999154567718506,
+            -1.2300964236259462,
+            28.29921531677246
+          ],
+          "yaw": 2.3583926535897928,
+          "pitch": 0.09240000000000001,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        "nativeRay": {
+          "eye": [
+            2.3999154567718506,
+            0.38990357637405393,
+            28.29921531677246
+          ],
+          "fwd": [
+            -0.7025409687231444,
+            0.09226857461246797,
+            0.7056363776085595
+          ],
+          "hit": null,
+          "points": [
+            {
+              "label": "Fleet broker",
+              "pos": [
+                0,
+                0.7,
+                31.56
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": 4.015579376888687,
+              "perp": 0.6029867410446286
+            },
+            {
+              "label": "Board Packet Courier",
+              "pos": [
+                3,
+                0.2,
+                9.48
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": -13.718629034183971,
+              "perp": 12.897993928856872
+            }
+          ],
+          "floor": {
+            "distance": 1.0199036598205566,
+            "point": {
+              "x": 2.3999154567718506,
+              "y": -1.2500000834465028,
+              "z": 28.29921531677246
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            2.3999154567718506,
+            0.38990357637405393,
+            28.29921531677246
+          ],
+          "fwd": [
+            -0.7025409687231444,
+            0.09226857461246797,
+            0.7056363776085595
+          ],
+          "selected": "Fleet broker"
+        },
+        "world": {
+          "seed": 13,
+          "outdoor": true,
+          "company": false,
+          "facility": false,
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": [
+          {
+            "text": "DEPARTURE",
+            "visible": true,
+            "opacity": "1",
+            "rect": {
+              "x": 790.2890625,
+              "y": 223.921875,
+              "width": 75.859375,
+              "height": 16.796875
+            }
+          }
+        ]
+      }
+    },
+    {
+      "command": {
+        "op": "press",
+        "key": "KeyE",
+        "expected": "Board Packet Courier",
+        "shot": "native-boarded-960"
+      },
+      "sinceGameMs": 138376,
+      "before": {
+        "phase": "orbit",
+        "prompt": {
+          "main": "Board Packet Courier",
+          "sub": "",
+          "dom": "BOARD PACKET COURIER"
+        },
+        "player": {
+          "p": [
+            2.8285014629364014,
+            -1.2316969573497774,
+            13.379490852355957
+          ],
+          "yaw": -0.028607346410207568,
+          "pitch": -0.008800000000000002,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        "nativeRay": {
+          "eye": [
+            2.8285014629364014,
+            0.38830304265022275,
+            13.379490852355957
+          ],
+          "fwd": [
+            0.02860233710366642,
+            -0.008799886421773113,
+            -0.999552133863548
+          ],
+          "hit": null,
+          "points": [
+            {
+              "label": "Fleet broker",
+              "pos": [
+                0,
+                0.7,
+                31.56
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": -18.25601136341717,
+              "perp": 2.3122580922999
+            },
+            {
+              "label": "Board Packet Courier",
+              "pos": [
+                3,
+                0.2,
+                9.48
+              ],
+              "reach": 4,
+              "r": 1,
+              "along": 3.904306706811857,
+              "perp": 0.16519028675446318
+            }
+          ],
+          "floor": {
+            "distance": 1.0183029174804688,
+            "point": {
+              "x": 2.8285014629364014,
+              "y": -1.249999874830246,
+              "z": 13.379490852355957
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            2.8285014629364014,
+            0.38830304265022275,
+            13.379490852355957
+          ],
+          "fwd": [
+            0.02860233710366642,
+            -0.008799886421773113,
+            -0.999552133863548
+          ],
+          "selected": "Board Packet Courier"
+        },
+        "world": {
+          "seed": 13,
+          "outdoor": true,
+          "company": false,
+          "facility": false,
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": [
+          {
+            "text": "DEPARTURE",
+            "visible": true,
+            "opacity": "1",
+            "rect": {
+              "x": 447.7578125,
+              "y": 267.84375,
+              "width": 75.859375,
+              "height": 16.796875
+            }
+          }
+        ]
+      },
+      "after": {
+        "phase": "orbit",
+        "prompt": {
+          "main": null,
+          "dom": ""
+        },
+        "player": {
+          "p": [
+            -1.399999976158142,
+            0.01997337341308586,
+            0.15000000596046448
+          ],
+          "yaw": 1.5707963267948966,
+          "pitch": -0.008800000000000002,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        "nativeRay": {
+          "eye": [
+            -1.399999976158142,
+            1.639973373413086,
+            0.15000000596046448
+          ],
+          "fwd": [
+            -0.9999612802498725,
+            -0.008799886421773113,
+            -1.1102230246251565e-16
+          ],
+          "hit": null,
+          "points": [
+            {
+              "label": "Use terminal [E]",
+              "pos": [
+                -6.05,
+                1.05,
+                2.55
+              ],
+              "r": 0.8,
+              "along": 4.655011675680748,
+              "perp": 2.461998187190922
+            },
+            {
+              "label": "Ship table [E]",
+              "pos": [
+                -2.3,
+                0.95,
+                -1.2
+              ],
+              "reach": 3.4,
+              "r": 1.2,
+              "along": 0.9060368633859027,
+              "perp": 1.5125014106484223
+            },
+            {
+              "label": "Ship charger: hold a battery item [E]",
+              "pos": [
+                -0.35,
+                1.2,
+                -3.1799999999999997
+              ],
+              "r": 0.6,
+              "along": -1.0460876047067913,
+              "perp": 3.3601603060300693
+            },
+            {
+              "label": "Hub door [E]",
+              "pos": [
+                -4.115,
+                1.2,
+                -1.9
+              ],
+              "reach": 3.2,
+              "r": 0.9,
+              "along": 2.718766615433979,
+              "perp": 2.091795834686873
+            }
+          ],
+          "floor": {
+            "distance": 1.0199733972549438,
+            "point": {
+              "x": -1.399999976158142,
+              "y": -2.3841858043383013e-08,
+              "z": 0.15000000596046448
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            -1.399999976158142,
+            1.639973373413086,
+            0.15000000596046448
+          ],
+          "fwd": [
+            -0.9999612802498725,
+            -0.008799886421773113,
+            -1.1102230246251565e-16
+          ]
+        },
+        "world": {
+          "seed": 13,
+          "outdoor": false,
+          "company": false,
+          "facility": false,
+          "shipDoor": false,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": []
+      }
+    },
+    {
+      "command": {
+        "op": "idleShip",
+        "ms": 6000
+      },
+      "sinceGameMs": 140821,
+      "before": {
+        "phase": "orbit",
+        "prompt": {
+          "main": null,
+          "dom": ""
+        },
+        "player": {
+          "p": [
+            -1.399999976158142,
+            0.01997337341308586,
+            0.15000000596046448
+          ],
+          "yaw": 1.5707963267948966,
+          "pitch": -0.008800000000000002,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        "nativeRay": {
+          "eye": [
+            -1.399999976158142,
+            1.639973373413086,
+            0.15000000596046448
+          ],
+          "fwd": [
+            -0.9999612802498725,
+            -0.008799886421773113,
+            -1.1102230246251565e-16
+          ],
+          "hit": null,
+          "points": [
+            {
+              "label": "Use terminal [E]",
+              "pos": [
+                -6.05,
+                1.05,
+                2.55
+              ],
+              "r": 0.8,
+              "along": 4.655011675680748,
+              "perp": 2.461998187190922
+            },
+            {
+              "label": "Ship table [E]",
+              "pos": [
+                -2.3,
+                0.95,
+                -1.2
+              ],
+              "reach": 3.4,
+              "r": 1.2,
+              "along": 0.9060368633859027,
+              "perp": 1.5125014106484223
+            },
+            {
+              "label": "Ship charger: hold a battery item [E]",
+              "pos": [
+                -0.35,
+                1.2,
+                -3.1799999999999997
+              ],
+              "r": 0.6,
+              "along": -1.0460876047067913,
+              "perp": 3.3601603060300693
+            },
+            {
+              "label": "Hub door [E]",
+              "pos": [
+                -4.115,
+                1.2,
+                -1.9
+              ],
+              "reach": 3.2,
+              "r": 0.9,
+              "along": 2.718766615433979,
+              "perp": 2.091795834686873
+            }
+          ],
+          "floor": {
+            "distance": 1.0199733972549438,
+            "point": {
+              "x": -1.399999976158142,
+              "y": -2.3841858043383013e-08,
+              "z": 0.15000000596046448
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            -1.399999976158142,
+            1.639973373413086,
+            0.15000000596046448
+          ],
+          "fwd": [
+            -0.9999612802498725,
+            -0.008799886421773113,
+            -1.1102230246251565e-16
+          ]
+        },
+        "world": {
+          "seed": 13,
+          "outdoor": false,
+          "company": false,
+          "facility": false,
+          "shipDoor": false,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": []
+      },
+      "after": {
+        "phase": "orbit",
+        "prompt": {
+          "main": null,
+          "dom": ""
+        },
+        "player": {
+          "p": [
+            -1.399999976158142,
+            0.01997337341308586,
+            0.15000000596046448
+          ],
+          "yaw": 1.5707963267948966,
+          "pitch": -0.008800000000000002,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        "nativeRay": {
+          "eye": [
+            -1.399999976158142,
+            1.639973373413086,
+            0.15000000596046448
+          ],
+          "fwd": [
+            -0.9999612802498725,
+            -0.008799886421773113,
+            -1.1102230246251565e-16
+          ],
+          "hit": null,
+          "points": [
+            {
+              "label": "Use terminal [E]",
+              "pos": [
+                -6.05,
+                1.05,
+                2.55
+              ],
+              "r": 0.8,
+              "along": 4.655011675680748,
+              "perp": 2.461998187190922
+            },
+            {
+              "label": "Ship table [E]",
+              "pos": [
+                -2.3,
+                0.95,
+                -1.2
+              ],
+              "reach": 3.4,
+              "r": 1.2,
+              "along": 0.9060368633859027,
+              "perp": 1.5125014106484223
+            },
+            {
+              "label": "Ship charger: hold a battery item [E]",
+              "pos": [
+                -0.35,
+                1.2,
+                -3.1799999999999997
+              ],
+              "r": 0.6,
+              "along": -1.0460876047067913,
+              "perp": 3.3601603060300693
+            },
+            {
+              "label": "Hub door [E]",
+              "pos": [
+                -4.115,
+                1.2,
+                -1.9
+              ],
+              "reach": 3.2,
+              "r": 0.9,
+              "along": 2.718766615433979,
+              "perp": 2.091795834686873
+            }
+          ],
+          "floor": {
+            "distance": 1.0199733972549438,
+            "point": {
+              "x": -1.399999976158142,
+              "y": -2.3841858043383013e-08,
+              "z": 0.15000000596046448
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            -1.399999976158142,
+            1.639973373413086,
+            0.15000000596046448
+          ],
+          "fwd": [
+            -0.9999612802498725,
+            -0.008799886421773113,
+            -1.1102230246251565e-16
+          ]
+        },
+        "world": {
+          "seed": 13,
+          "outdoor": false,
+          "company": false,
+          "facility": false,
+          "shipDoor": false,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": []
+      },
+      "idle": {
+        "elapsedMs": 6210.29999999702,
+        "mutationRecords": 0,
+        "childCountBefore": 15,
+        "childCountAfter": 15,
+        "hotbarTextBefore": "I\nPOCKETS\n0/8\n1\n2\n3\n4\n5\nLIGHT",
+        "hotbarTextAfter": "I\nPOCKETS\n0/8\n1\n2\n3\n4\n5\nLIGHT",
+        "phaseBefore": "orbit",
+        "phaseAfter": "orbit",
+        "inputBefore": [],
+        "inputAfter": [],
+        "inShip": true,
+        "rowsBefore": {
+          "status": [
+            "SHIP STATUS",
+            "MOON: Dialup",
+            "PHASE: ORBIT",
+            "LOOT ONBOARD: \u25ae0",
+            "CREDITS: \u25ae60",
+            "CREW: 1",
+            null
+          ],
+          "quota": [
+            "ENGAGEMENT QUOTA",
+            "\u25ae0 / \u25ae330",
+            "DEADLINE: 3 DAYS",
+            "DAY 1",
+            "#ffd9a0"
+          ]
+        },
+        "rowsAfter": {
+          "status": [
+            "SHIP STATUS",
+            "MOON: Dialup",
+            "PHASE: ORBIT",
+            "LOOT ONBOARD: \u25ae0",
+            "CREDITS: \u25ae60",
+            "CREW: 1",
+            null
+          ],
+          "quota": [
+            "ENGAGEMENT QUOTA",
+            "\u25ae0 / \u25ae330",
+            "DEADLINE: 3 DAYS",
+            "DAY 1",
+            "#ffd9a0"
+          ]
+        },
+        "texturesBefore": {
+          "status": 2,
+          "quota": 2
+        },
+        "texturesAfter": {
+          "status": 2,
+          "quota": 2
+        }
+      }
+    },
+    {
+      "command": {
+        "op": "look",
+        "yaw": 2.268,
+        "pitch": -0.341,
+        "shot": "native-lever-selected-1280"
+      },
+      "sinceGameMs": 211869,
+      "before": {
+        "phase": "orbit",
+        "prompt": {
+          "main": null,
+          "dom": ""
+        },
+        "player": {
+          "p": [
+            -4.417566299438477,
+            0.019643461704254073,
+            -0.25755012035369873
+          ],
+          "yaw": 1.4365963267948965,
+          "pitch": -0.08360000000000001,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        "nativeRay": {
+          "eye": [
+            -4.417566299438477,
+            1.6396434617042541,
+            -0.25755012035369873
+          ],
+          "fwd": [
+            -0.9875476427816925,
+            -0.08350265451407943,
+            -0.13333026635173495
+          ],
+          "hit": {
+            "distance": 2.6149964332580566,
+            "point": {
+              "x": -6.999999862985003,
+              "y": 1.4212843179823567,
+              "z": -0.6062082913088322
+            },
+            "normal": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "kind": "static"
+          },
+          "points": [
+            {
+              "label": "Use terminal [E]",
+              "pos": [
+                -6.05,
+                1.05,
+                2.55
+              ],
+              "r": 0.8,
+              "along": 1.2870114419134997,
+              "perp": 3.0394832497221245
+            },
+            {
+              "label": "Ship table [E]",
+              "pos": [
+                -2.3,
+                0.95,
+                -1.2
+              ],
+              "reach": 3.4,
+              "r": 1.2,
+              "along": -1.9079534542474332,
+              "perp": 1.4858063564474366
+            },
+            {
+              "label": "Ship charger: hold a battery item [E]",
+              "pos": [
+                -0.35,
+                1.2,
+                -3.1799999999999997
+              ],
+              "r": 0.6,
+              "along": -3.5905530939238184,
+              "perp": 3.5195203867154543
+            },
+            {
+              "label": "Hub door [E]",
+              "pos": [
+                -4.115,
+                1.2,
+                -1.9
+              ],
+              "reach": 3.2,
+              "r": 0.9,
+              "along": -0.04309895978096642,
+              "perp": 1.7264462997125458
+            }
+          ],
+          "floor": {
+            "distance": 1.0196434259414673,
+            "point": {
+              "x": -4.417566299438477,
+              "y": 3.576278673200761e-08,
+              "z": -0.25755012035369873
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            -4.417566299438477,
+            1.6396434617042541,
+            -0.25755012035369873
+          ],
+          "fwd": [
+            -0.9875476427816925,
+            -0.08350265451407943,
+            -0.13333026635173495
+          ]
+        },
+        "world": {
+          "seed": 13,
+          "outdoor": false,
+          "company": false,
+          "facility": false,
+          "shipDoor": false,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": []
+      },
+      "after": {
+        "phase": "orbit",
+        "prompt": {
+          "main": "Land on 56K-Dialup [E]",
+          "sub": "",
+          "dom": "LAND ON 56K-DIALUP"
+        },
+        "player": {
+          "p": [
+            -4.417566299438477,
+            0.019643461704254073,
+            -0.25755012035369873
+          ],
+          "yaw": 2.2681963267948966,
+          "pitch": -0.341,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        "nativeRay": {
+          "eye": [
+            -4.417566299438477,
+            1.6396434617042541,
+            -0.25755012035369873
+          ],
+          "fwd": [
+            -0.7223791995097086,
+            -0.3344296799056848,
+            0.6052479502764911
+          ],
+          "hit": {
+            "distance": 1.8827378749847412,
+            "point": {
+              "x": -5.777616978456564,
+              "y": 1.0100000368267978,
+              "z": 0.8819731193887326
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "kind": "static"
+          },
+          "points": [
+            {
+              "label": "Use terminal [E]",
+              "pos": [
+                -6.05,
+                1.05,
+                2.55
+              ],
+              "r": 0.8,
+              "along": 3.07569437966313,
+              "perp": 1.1978985599232788
+            },
+            {
+              "label": "Ship table [E]",
+              "pos": [
+                -2.3,
+                0.95,
+                -1.2
+              ],
+              "reach": 3.4,
+              "r": 1.2,
+              "along": -1.8694644640445501,
+              "perp": 1.533952258093107
+            },
+            {
+              "label": "Ship charger: hold a battery item [E]",
+              "pos": [
+                -0.35,
+                1.2,
+                -3.1799999999999997
+              ],
+              "r": 0.6,
+              "along": -4.560102264612356,
+              "perp": 2.1176785896516193
+            },
+            {
+              "label": "Hub door [E]",
+              "pos": [
+                -4.115,
+                1.2,
+                -1.9
+              ],
+              "reach": 3.2,
+              "r": 0.9,
+              "along": -1.0656272021043938,
+              "perp": 1.3590117778225854
+            }
+          ],
+          "floor": {
+            "distance": 1.0196434259414673,
+            "point": {
+              "x": -4.417566299438477,
+              "y": 3.576278673200761e-08,
+              "z": -0.25755012035369873
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            -4.417566299438477,
+            1.6396434617042541,
+            -0.25755012035369873
+          ],
+          "fwd": [
+            -0.7223791995097086,
+            -0.3344296799056848,
+            0.6052479502764911
+          ],
+          "selected": "Land on 56K-Dialup [E]"
+        },
+        "world": {
+          "seed": 13,
+          "outdoor": false,
+          "company": false,
+          "facility": false,
+          "shipDoor": false,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": []
+      }
+    },
+    {
+      "command": {
+        "op": "press",
+        "key": "KeyE",
+        "expected": "Land on",
+        "shot": "native-landing-start-1280"
+      },
+      "sinceGameMs": 215368,
+      "before": {
+        "phase": "orbit",
+        "prompt": {
+          "main": "Land on 56K-Dialup [E]",
+          "sub": "",
+          "dom": "LAND ON 56K-DIALUP"
+        },
+        "player": {
+          "p": [
+            -4.417566299438477,
+            0.019643461704254073,
+            -0.25755012035369873
+          ],
+          "yaw": 2.2681963267948966,
+          "pitch": -0.341,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        "nativeRay": {
+          "eye": [
+            -4.417566299438477,
+            1.6396434617042541,
+            -0.25755012035369873
+          ],
+          "fwd": [
+            -0.7223791995097086,
+            -0.3344296799056848,
+            0.6052479502764911
+          ],
+          "hit": {
+            "distance": 1.8827378749847412,
+            "point": {
+              "x": -5.777616978456564,
+              "y": 1.0100000368267978,
+              "z": 0.8819731193887326
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "kind": "static"
+          },
+          "points": [
+            {
+              "label": "Use terminal [E]",
+              "pos": [
+                -6.05,
+                1.05,
+                2.55
+              ],
+              "r": 0.8,
+              "along": 3.07569437966313,
+              "perp": 1.1978985599232788
+            },
+            {
+              "label": "Ship table [E]",
+              "pos": [
+                -2.3,
+                0.95,
+                -1.2
+              ],
+              "reach": 3.4,
+              "r": 1.2,
+              "along": -1.8694644640445501,
+              "perp": 1.533952258093107
+            },
+            {
+              "label": "Ship charger: hold a battery item [E]",
+              "pos": [
+                -0.35,
+                1.2,
+                -3.1799999999999997
+              ],
+              "r": 0.6,
+              "along": -4.560102264612356,
+              "perp": 2.1176785896516193
+            },
+            {
+              "label": "Hub door [E]",
+              "pos": [
+                -4.115,
+                1.2,
+                -1.9
+              ],
+              "reach": 3.2,
+              "r": 0.9,
+              "along": -1.0656272021043938,
+              "perp": 1.3590117778225854
+            }
+          ],
+          "floor": {
+            "distance": 1.0196434259414673,
+            "point": {
+              "x": -4.417566299438477,
+              "y": 3.576278673200761e-08,
+              "z": -0.25755012035369873
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            -4.417566299438477,
+            1.6396434617042541,
+            -0.25755012035369873
+          ],
+          "fwd": [
+            -0.7223791995097086,
+            -0.3344296799056848,
+            0.6052479502764911
+          ],
+          "selected": "Land on 56K-Dialup [E]"
+        },
+        "world": {
+          "seed": 13,
+          "outdoor": false,
+          "company": false,
+          "facility": false,
+          "shipDoor": false,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": []
+      },
+      "after": {
+        "phase": "landing",
+        "prompt": {
+          "main": "Ship in flight...",
+          "sub": "",
+          "dom": "SHIP IN FLIGHT..."
+        },
+        "player": {
+          "p": [
+            -4.417566299438477,
+            0.019643461704254073,
+            -0.25755012035369873
+          ],
+          "yaw": 2.2681963267948966,
+          "pitch": -0.341,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        "nativeRay": {
+          "eye": [
+            -4.417520675464132,
+            1.6391666362353272,
+            -0.25749566695150133
+          ],
+          "fwd": [
+            -0.7224210492386722,
+            -0.33435485227837486,
+            0.6052393413971056
+          ],
+          "hit": {
+            "distance": 1.8817331790924072,
+            "point": {
+              "x": -5.776924333091292,
+              "y": 1.0100000171125687,
+              "z": 0.8814032830474687
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "kind": "static"
+          },
+          "points": [
+            {
+              "label": "Use terminal [E]",
+              "pos": [
+                -6.05,
+                1.05,
+                2.55
+              ],
+              "r": 0.8,
+              "along": 3.0755349785584043,
+              "perp": 1.1980077570304555
+            },
+            {
+              "label": "Ship table [E]",
+              "pos": [
+                -2.3,
+                0.95,
+                -1.2
+              ],
+              "reach": 3.4,
+              "r": 1.2,
+              "along": -1.8697560010979246,
+              "perp": 1.533352985353172
+            },
+            {
+              "label": "Ship charger: hold a battery item [E]",
+              "pos": [
+                -0.35,
+                1.2,
+                -3.1799999999999997
+              ],
+              "r": 0.6,
+              "along": -4.560439656149199,
+              "perp": 2.116840451951793
+            },
+            {
+              "label": "Hub door [E]",
+              "pos": [
+                -4.115,
+                1.2,
+                -1.9
+              ],
+              "reach": 3.2,
+              "r": 0.9,
+              "along": -1.065818048777302,
+              "perp": 1.358763579306262
+            }
+          ],
+          "floor": {
+            "distance": 1.0196434259414673,
+            "point": {
+              "x": -4.417566299438477,
+              "y": 3.576278673200761e-08,
+              "z": -0.25755012035369873
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            -4.417520675464132,
+            1.6391666362353272,
+            -0.25749566695150133
+          ],
+          "fwd": [
+            -0.7224210492386722,
+            -0.33435485227837486,
+            0.6052393413971056
+          ],
+          "selected": "Ship in flight..."
+        },
+        "world": {
+          "seed": 295221521,
+          "outdoor": false,
+          "company": false,
+          "facility": false,
+          "shipDoor": false,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": []
+      }
+    },
+    {
+      "command": {
+        "op": "wait",
+        "ms": 10000,
+        "shot": "native-first-landed-1280"
+      },
+      "sinceGameMs": 218202,
+      "before": {
+        "phase": null,
+        "prompt": null,
+        "player": null,
+        "nativeRay": null,
+        "input": null,
+        "diagnostics": null,
+        "world": null,
+        "markers": null
+      },
+      "after": {
+        "phase": "moon",
+        "prompt": {
+          "main": "Start the ship / take off [E]",
+          "sub": "",
+          "dom": "START THE SHIP / TAKE OFF"
+        },
+        "player": {
+          "p": [
+            -4.417566299438477,
+            0.019643461704254073,
+            -0.25755012035369873
+          ],
+          "yaw": 2.2681963267948966,
+          "pitch": -0.341,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "slots": [
+            "ibt",
+            "i2b5",
+            "i2cs",
+            null,
+            null
+          ],
+          "held": "ibt"
+        },
+        "nativeRay": {
+          "eye": [
+            -4.417566299438477,
+            1.6396434617042541,
+            -0.25755012035369873
+          ],
+          "fwd": [
+            -0.7223791995097086,
+            -0.3344296799056848,
+            0.6052479502764911
+          ],
+          "hit": {
+            "distance": 1.8827378749847412,
+            "point": {
+              "x": -5.777616978456564,
+              "y": 1.0100000368267978,
+              "z": 0.8819731193887326
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "kind": "static"
+          },
+          "points": [
+            {
+              "label": "Use terminal [E]",
+              "pos": [
+                -6.05,
+                1.05,
+                2.55
+              ],
+              "r": 0.8,
+              "along": 3.07569437966313,
+              "perp": 1.1978985599232788
+            },
+            {
+              "label": "Ship table [E]",
+              "pos": [
+                -2.3,
+                0.95,
+                -1.2
+              ],
+              "reach": 3.4,
+              "r": 1.2,
+              "along": -1.8694644640445501,
+              "perp": 1.533952258093107
+            },
+            {
+              "label": "Ship charger: hold a battery item [E]",
+              "pos": [
+                -0.35,
+                1.2,
+                -3.1799999999999997
+              ],
+              "r": 0.6,
+              "along": -4.560102264612356,
+              "perp": 2.1176785896516193
+            },
+            {
+              "label": "Hub door [E]",
+              "pos": [
+                -4.115,
+                1.2,
+                -1.9
+              ],
+              "reach": 3.2,
+              "r": 0.9,
+              "along": -1.0656272021043938,
+              "perp": 1.3590117778225854
+            }
+          ],
+          "floor": {
+            "distance": 1.0196434259414673,
+            "point": {
+              "x": -4.417566299438477,
+              "y": 3.576278673200761e-08,
+              "z": -0.25755012035369873
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            -4.417566299438477,
+            1.6396434617042541,
+            -0.25755012035369873
+          ],
+          "fwd": [
+            -0.7223791995097086,
+            -0.3344296799056848,
+            0.6052479502764911
+          ],
+          "selected": "Start the ship / take off [E]"
+        },
+        "world": {
+          "seed": 295221521,
+          "outdoor": true,
+          "company": false,
+          "facility": true,
+          "layoutSeed": 295221521,
+          "theme": "factory",
+          "mainExit": [
+            49.24725809533548,
+            -2.3588489985439325,
+            16.377926463110104
+          ],
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": []
+      }
+    },
+    {
+      "command": {
+        "op": "press",
+        "key": "Digit2",
+        "shot": "native-starter-tool-selected-1280"
+      },
+      "sinceGameMs": 328667,
+      "before": {
+        "phase": "moon",
+        "prompt": {
+          "main": "Start the ship / take off [E]",
+          "sub": "",
+          "dom": "START THE SHIP / TAKE OFF"
+        },
+        "player": {
+          "p": [
+            -4.417566299438477,
+            0.019643461704254073,
+            -0.25755012035369873
+          ],
+          "yaw": 2.2681963267948966,
+          "pitch": -0.341,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "slots": [
+            "ibt",
+            "i2b5",
+            "i2cs",
+            null,
+            null
+          ],
+          "held": "ibt"
+        },
+        "nativeRay": {
+          "eye": [
+            -4.417566299438477,
+            1.6396434617042541,
+            -0.25755012035369873
+          ],
+          "fwd": [
+            -0.7223791995097086,
+            -0.3344296799056848,
+            0.6052479502764911
+          ],
+          "hit": {
+            "distance": 1.8827378749847412,
+            "point": {
+              "x": -5.777616978456564,
+              "y": 1.0100000368267978,
+              "z": 0.8819731193887326
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "kind": "static"
+          },
+          "points": [
+            {
+              "label": "Use terminal [E]",
+              "pos": [
+                -6.05,
+                1.05,
+                2.55
+              ],
+              "r": 0.8,
+              "along": 3.07569437966313,
+              "perp": 1.1978985599232788
+            },
+            {
+              "label": "Ship table [E]",
+              "pos": [
+                -2.3,
+                0.95,
+                -1.2
+              ],
+              "reach": 3.4,
+              "r": 1.2,
+              "along": -1.8694644640445501,
+              "perp": 1.533952258093107
+            },
+            {
+              "label": "Ship charger: hold a battery item [E]",
+              "pos": [
+                -0.35,
+                1.2,
+                -3.1799999999999997
+              ],
+              "r": 0.6,
+              "along": -4.560102264612356,
+              "perp": 2.1176785896516193
+            },
+            {
+              "label": "Hub door [E]",
+              "pos": [
+                -4.115,
+                1.2,
+                -1.9
+              ],
+              "reach": 3.2,
+              "r": 0.9,
+              "along": -1.0656272021043938,
+              "perp": 1.3590117778225854
+            }
+          ],
+          "floor": {
+            "distance": 1.0196434259414673,
+            "point": {
+              "x": -4.417566299438477,
+              "y": 3.576278673200761e-08,
+              "z": -0.25755012035369873
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            -4.417566299438477,
+            1.6396434617042541,
+            -0.25755012035369873
+          ],
+          "fwd": [
+            -0.7223791995097086,
+            -0.3344296799056848,
+            0.6052479502764911
+          ],
+          "selected": "Start the ship / take off [E]"
+        },
+        "world": {
+          "seed": 295221521,
+          "outdoor": true,
+          "company": false,
+          "facility": true,
+          "layoutSeed": 295221521,
+          "theme": "factory",
+          "mainExit": [
+            49.24725809533548,
+            -2.3588489985439325,
+            16.377926463110104
+          ],
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": []
+      },
+      "after": {
+        "phase": "moon",
+        "prompt": {
+          "main": "Start the ship / take off [E]",
+          "sub": "",
+          "dom": "START THE SHIP / TAKE OFF"
+        },
+        "player": {
+          "p": [
+            -4.417566299438477,
+            0.019643461704254073,
+            -0.25755012035369873
+          ],
+          "yaw": 2.2681963267948966,
+          "pitch": -0.341,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "slots": [
+            "ibt",
+            "i2b5",
+            "i2cs",
+            null,
+            null
+          ],
+          "held": "i2b5"
+        },
+        "nativeRay": {
+          "eye": [
+            -4.417566299438477,
+            1.6396434617042541,
+            -0.25755012035369873
+          ],
+          "fwd": [
+            -0.7223791995097086,
+            -0.3344296799056848,
+            0.6052479502764911
+          ],
+          "hit": {
+            "distance": 1.8827378749847412,
+            "point": {
+              "x": -5.777616978456564,
+              "y": 1.0100000368267978,
+              "z": 0.8819731193887326
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            },
+            "kind": "static"
+          },
+          "points": [
+            {
+              "label": "Use terminal [E]",
+              "pos": [
+                -6.05,
+                1.05,
+                2.55
+              ],
+              "r": 0.8,
+              "along": 3.07569437966313,
+              "perp": 1.1978985599232788
+            },
+            {
+              "label": "Ship table [E]",
+              "pos": [
+                -2.3,
+                0.95,
+                -1.2
+              ],
+              "reach": 3.4,
+              "r": 1.2,
+              "along": -1.8694644640445501,
+              "perp": 1.533952258093107
+            },
+            {
+              "label": "Ship charger: hold a battery item [E]",
+              "pos": [
+                -0.35,
+                1.2,
+                -3.1799999999999997
+              ],
+              "r": 0.6,
+              "along": -4.560102264612356,
+              "perp": 2.1176785896516193
+            },
+            {
+              "label": "Hub door [E]",
+              "pos": [
+                -4.115,
+                1.2,
+                -1.9
+              ],
+              "reach": 3.2,
+              "r": 0.9,
+              "along": -1.0656272021043938,
+              "perp": 1.3590117778225854
+            }
+          ],
+          "floor": {
+            "distance": 1.0196434259414673,
+            "point": {
+              "x": -4.417566299438477,
+              "y": 3.576278673200761e-08,
+              "z": -0.25755012035369873
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            -4.417566299438477,
+            1.6396434617042541,
+            -0.25755012035369873
+          ],
+          "fwd": [
+            -0.7223791995097086,
+            -0.3344296799056848,
+            0.6052479502764911
+          ],
+          "selected": "Start the ship / take off [E]"
+        },
+        "world": {
+          "seed": 295221521,
+          "outdoor": true,
+          "company": false,
+          "facility": true,
+          "layoutSeed": 295221521,
+          "theme": "factory",
+          "mainExit": [
+            49.24725809533548,
+            -2.3588489985439325,
+            16.377926463110104
+          ],
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": []
+      }
+    },
+    {
+      "command": {
+        "op": "hold",
+        "key": "KeyW",
+        "ms": 2500,
+        "shot": "native-ship-exit-approach-1280"
+      },
+      "sinceGameMs": 337462,
+      "before": {
+        "phase": "moon",
+        "prompt": {
+          "main": null,
+          "dom": ""
+        },
+        "player": {
+          "p": [
+            -4.417566299438477,
+            0.019643461704254073,
+            -0.25755012035369873
+          ],
+          "yaw": 4.303196326794897,
+          "pitch": -0.03739999999999999,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "slots": [
+            "ibt",
+            "i2b5",
+            "i2cs",
+            null,
+            null
+          ],
+          "held": "i2b5"
+        },
+        "nativeRay": {
+          "eye": [
+            -4.417566299438477,
+            1.6396434617042541,
+            -0.25755012035369873
+          ],
+          "fwd": [
+            0.9168007736630037,
+            -0.03739128167243139,
+            0.39759053492985763
+          ],
+          "hit": null,
+          "points": [
+            {
+              "label": "Use terminal [E]",
+              "pos": [
+                -6.05,
+                1.05,
+                2.55
+              ],
+              "r": 0.8,
+              "along": -0.3583136006716603,
+              "perp": 3.28122968420855
+            },
+            {
+              "label": "Ship table [E]",
+              "pos": [
+                -2.3,
+                0.95,
+                -1.2
+              ],
+              "reach": 3.4,
+              "r": 1.2,
+              "along": 1.592463922744881,
+              "perp": 1.819880646413469
+            },
+            {
+              "label": "Ship charger: hold a battery item [E]",
+              "pos": [
+                -0.35,
+                1.2,
+                -3.1799999999999997
+              ],
+              "r": 0.6,
+              "along": 2.5836483518085123,
+              "perp": 4.313218805832689
+            },
+            {
+              "label": "Hub door [E]",
+              "pos": [
+                -4.115,
+                1.2,
+                -1.9
+              ],
+              "reach": 3.2,
+              "r": 0.9,
+              "along": -0.35919067632247953,
+              "perp": 1.6892176899879845
+            }
+          ],
+          "floor": {
+            "distance": 1.0196434259414673,
+            "point": {
+              "x": -4.417566299438477,
+              "y": 3.576278673200761e-08,
+              "z": -0.25755012035369873
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            -4.417566299438477,
+            1.6396434617042541,
+            -0.25755012035369873
+          ],
+          "fwd": [
+            0.9168007736630037,
+            -0.03739128167243139,
+            0.39759053492985763
+          ]
+        },
+        "world": {
+          "seed": 295221521,
+          "outdoor": true,
+          "company": false,
+          "facility": true,
+          "layoutSeed": 295221521,
+          "theme": "factory",
+          "mainExit": [
+            49.24725809533548,
+            -2.3588489985439325,
+            16.377926463110104
+          ],
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": []
+      },
+      "after": {
+        "phase": "moon",
+        "prompt": {
+          "main": null,
+          "dom": ""
+        },
+        "player": {
+          "p": [
+            -2.5935127390548587,
+            0.019843971729278487,
+            0.13991629929887495
+          ],
+          "yaw": 4.303196326794897,
+          "pitch": -0.03739999999999999,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "slots": [
+            "ibt",
+            "i2b5",
+            "i2cs",
+            null,
+            null
+          ],
+          "held": "i2b5"
+        },
+        "nativeRay": {
+          "eye": [
+            -2.591364751472255,
+            1.6417045378241468,
+            0.1349632722407812
+          ],
+          "fwd": [
+            0.9168007736630038,
+            -0.03739128167243139,
+            0.39759053492985763
+          ],
+          "hit": null,
+          "points": [
+            {
+              "label": "Use terminal [E]",
+              "pos": [
+                -6.05,
+                1.05,
+                2.55
+              ],
+              "r": 0.8,
+              "along": -2.1885591361626924,
+              "perp": 3.6544333823980195
+            },
+            {
+              "label": "Ship table [E]",
+              "pos": [
+                -2.3,
+                0.95,
+                -1.2
+              ],
+              "reach": 3.4,
+              "r": 1.2,
+              "along": -0.23778161274615117,
+              "perp": 1.5129228099670713
+            },
+            {
+              "label": "Ship charger: hold a battery item [E]",
+              "pos": [
+                -0.35,
+                1.2,
+                -3.1799999999999997
+              ],
+              "r": 0.6,
+              "along": 0.7534028163174804,
+              "perp": 3.9547673181297176
+            },
+            {
+              "label": "Hub door [E]",
+              "pos": [
+                -4.115,
+                1.2,
+                -1.9
+              ],
+              "reach": 3.2,
+              "r": 0.9,
+              "along": -2.189436211813512,
+              "perp": 1.3652881978026672
+            }
+          ],
+          "floor": {
+            "distance": 1.0198439359664917,
+            "point": {
+              "x": -2.5935127390548587,
+              "y": 3.576278673200761e-08,
+              "z": 0.13991629929887495
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            -2.591364751472255,
+            1.6417045378241468,
+            0.1349632722407812
+          ],
+          "fwd": [
+            0.9168007736630038,
+            -0.03739128167243139,
+            0.39759053492985763
+          ]
+        },
+        "world": {
+          "seed": 295221521,
+          "outdoor": true,
+          "company": false,
+          "facility": true,
+          "layoutSeed": 295221521,
+          "theme": "factory",
+          "mainExit": [
+            49.24725809533548,
+            -2.3588489985439325,
+            16.377926463110104
+          ],
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": []
+      },
+      "during": {
+        "markers": [],
+        "nativeTime": 151.75598001044648,
+        "nativeRay": {
+          "eye": [
+            -2.6848420537168582,
+            1.6410553705269184,
+            0.13308651714369368
+          ],
+          "fwd": [
+            0.9168007736630037,
+            -0.03739128167243139,
+            0.39759053492985785
+          ],
+          "hit": null,
+          "points": [
+            {
+              "label": "Use terminal [E]",
+              "pos": [
+                -6.05,
+                1.05,
+                2.55
+              ],
+              "r": 0.8,
+              "along": -2.1021371662791895,
+              "perp": 3.6188568046030203
+            },
+            {
+              "label": "Ship table [E]",
+              "pos": [
+                -2.3,
+                0.95,
+                -1.2
+              ],
+              "reach": 3.4,
+              "r": 1.2,
+              "along": -0.15135964286264886,
+              "perp": 1.5426830044263469
+            },
+            {
+              "label": "Ship charger: hold a battery item [E]",
+              "pos": [
+                -0.35,
+                1.2,
+                -3.1799999999999997
+              ],
+              "r": 0.6,
+              "along": 0.839824786200982,
+              "perp": 3.989643324187915
+            },
+            {
+              "label": "Hub door [E]",
+              "pos": [
+                -4.115,
+                1.2,
+                -1.9
+              ],
+              "reach": 3.2,
+              "r": 0.9,
+              "along": -2.1030142419300093,
+              "perp": 1.3966579665825394
+            }
+          ],
+          "floor": {
+            "distance": 1.0204541683197021,
+            "point": {
+              "x": -2.6877850145101547,
+              "y": -4.002358777732695e-08,
+              "z": 0.13987266644835472
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "world": {
+          "seed": 295221521,
+          "outdoor": true,
+          "company": false,
+          "facility": true,
+          "layoutSeed": 295221521,
+          "theme": "factory",
+          "mainExit": [
+            49.24725809533548,
+            -2.3588489985439325,
+            16.377926463110104
+          ],
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "screen": null,
+        "phase": "moon",
+        "moon": "hamsi",
+        "run": {
+          "day": 1,
+          "credits": 60,
+          "quota": 330,
+          "time": 532.2542973951254
+        },
+        "profile": {
+          "name": "Intern188",
+          "coins": 50
+        },
+        "settings": {
+          "lang": "en",
+          "difficulty": "standard",
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            -2.6848420537168582,
+            1.6410553705269184,
+            0.13308651714369368
+          ],
+          "fwd": [
+            0.9168007736630037,
+            -0.03739128167243139,
+            0.39759053492985785
+          ]
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [
+            "KeyW"
+          ],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "player": {
+          "p": [
+            -2.6877850145101547,
+            0.020454128296114427,
+            0.13987266644835472
+          ],
+          "yaw": 4.303196326794897,
+          "pitch": -0.03739999999999999,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "slots": [
+            "ibt",
+            "i2b5",
+            "i2cs",
+            null,
+            null
+          ],
+          "held": "i2b5"
+        },
+        "prompt": {
+          "main": null,
+          "dom": ""
+        },
+        "panel": null,
+        "visibleText": [
+          {
+            "class": "hud",
+            "text": "\u25cf LIVE 127\nHP 100/106\nSTA 100/100\n8 lb\n8:50 AM\nLv.1 LURKER\n\u25ae 60\n\u00b7\nI\nPOCKETS\n0/8\n1\nChalk\n2\nLead Pipe\n3\nSpray Paint\n60\n4\n5\nLIGHT\nLOOT ABOARD\n\u25ae0\n0 items\nThe Company pays 37% today: \u25ae0 \u00b7 \u25ae330 to go\nDeadline day pays 100 %"
+          }
+        ],
+        "buttons": [],
+        "forms": [],
+        "render": {
+          "calls": 454,
+          "tris": 91396
+        },
+        "caught": {
+          "total": 0,
+          "ring": []
+        }
+      }
+    },
+    {
+      "command": {
+        "op": "hold",
+        "key": "KeyW",
+        "ms": 2200,
+        "shot": "native-exit-lane-walk-1280"
+      },
+      "sinceGameMs": 417106,
+      "before": {
+        "phase": "moon",
+        "prompt": {
+          "main": null,
+          "dom": ""
+        },
+        "player": {
+          "p": [
+            -3.212014675140381,
+            0.01924536228179924,
+            0.6338890194892883
+          ],
+          "yaw": 4.303196326794897,
+          "pitch": -0.03739999999999999,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "slots": [
+            "ibt",
+            "i2b5",
+            "i2cs",
+            null,
+            null
+          ],
+          "held": "i2b5"
+        },
+        "nativeRay": {
+          "eye": [
+            -3.2119575304112256,
+            1.6393070922877775,
+            0.6337572499241257
+          ],
+          "fwd": [
+            0.9168007736630037,
+            -0.03739128167243139,
+            0.39759053492985763
+          ],
+          "hit": null,
+          "points": [
+            {
+              "label": "Use terminal [E]",
+              "pos": [
+                -6.05,
+                1.05,
+                2.55
+              ],
+              "r": 0.8,
+              "along": -1.818004604270028,
+              "perp": 2.961184466439325
+            },
+            {
+              "label": "Ship table [E]",
+              "pos": [
+                -2.3,
+                0.95,
+                -1.2
+              ],
+              "reach": 3.4,
+              "r": 1.2,
+              "along": 0.13277291914651324,
+              "perp": 2.1568142730292235
+            },
+            {
+              "label": "Ship charger: hold a battery item [E]",
+              "pos": [
+                -0.35,
+                1.2,
+                -3.1799999999999997
+              ],
+              "r": 0.6,
+              "along": 1.1239573482101441,
+              "perp": 4.6545951346991625
+            },
+            {
+              "label": "Hub door [E]",
+              "pos": [
+                -4.115,
+                1.2,
+                -1.9
+              ],
+              "reach": 3.2,
+              "r": 0.9,
+              "along": -1.818881679920847,
+              "perp": 2.029795964920297
+            }
+          ],
+          "floor": {
+            "distance": 1.0192453861236572,
+            "point": {
+              "x": -3.212014675140381,
+              "y": -2.3841858043383013e-08,
+              "z": 0.6338890194892883
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            -3.2119575304112256,
+            1.6393070922877775,
+            0.6337572499241257
+          ],
+          "fwd": [
+            0.9168007736630037,
+            -0.03739128167243139,
+            0.39759053492985763
+          ]
+        },
+        "world": {
+          "seed": 295221521,
+          "outdoor": true,
+          "company": false,
+          "facility": true,
+          "layoutSeed": 295221521,
+          "theme": "factory",
+          "mainExit": [
+            49.24725809533548,
+            -2.3588489985439325,
+            16.377926463110104
+          ],
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": []
+      },
+      "after": {
+        "phase": "moon",
+        "prompt": {
+          "main": "Contract board - The Algorithm [E]",
+          "sub": "",
+          "dom": "CONTRACT BOARD - THE ALGORITHM"
+        },
+        "player": {
+          "p": [
+            -2.900892705656588,
+            0.01915984778518115,
+            1.8409229791723192
+          ],
+          "yaw": 4.303196326794897,
+          "pitch": -0.03739999999999999,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "slots": [
+            "ibt",
+            "i2b5",
+            "i2cs",
+            null,
+            null
+          ],
+          "held": "i2b5"
+        },
+        "nativeRay": {
+          "eye": [
+            -2.904126976999616,
+            1.6452753764808472,
+            1.8483808590990818
+          ],
+          "fwd": [
+            0.9168007736630038,
+            -0.03739128167243139,
+            0.39759053492985785
+          ],
+          "hit": {
+            "distance": 3.4512698650360107,
+            "point": {
+              "x": 0.25999990538520956,
+              "y": 1.5162279728297114,
+              "z": 3.220573090926048
+            },
+            "normal": {
+              "x": -1,
+              "y": 0,
+              "z": 0
+            },
+            "kind": "static"
+          },
+          "points": [
+            {
+              "label": "Use terminal [E]",
+              "pos": [
+                -6.05,
+                1.05,
+                2.55
+              ],
+              "r": 0.8,
+              "along": -2.582923582509843,
+              "perp": 2.017831766148766
+            },
+            {
+              "label": "Ship table [E]",
+              "pos": [
+                -2.3,
+                0.95,
+                -1.2
+              ],
+              "reach": 3.4,
+              "r": 1.2,
+              "along": -0.6321460590933023,
+              "perp": 3.121120708267103
+            },
+            {
+              "label": "Ship charger: hold a battery item [E]",
+              "pos": [
+                -0.35,
+                1.2,
+                -3.1799999999999997
+              ],
+              "r": 0.6,
+              "along": 0.35903836997032834,
+              "perp": 5.646019862574026
+            },
+            {
+              "label": "Hub door [E]",
+              "pos": [
+                -4.115,
+                1.2,
+                -1.9
+              ],
+              "reach": 3.2,
+              "r": 0.9,
+              "along": -2.583800658160663,
+              "perp": 3.0064625163935013
+            }
+          ],
+          "floor": {
+            "distance": 1.0191597938537598,
+            "point": {
+              "x": -2.900892705656588,
+              "y": 5.3931421328812235e-08,
+              "z": 1.8409229791723192
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            -2.904126976999616,
+            1.6452753764808472,
+            1.8483808590990818
+          ],
+          "fwd": [
+            0.9168007736630038,
+            -0.03739128167243139,
+            0.39759053492985785
+          ],
+          "selected": "Contract board - The Algorithm [E]"
+        },
+        "world": {
+          "seed": 295221521,
+          "outdoor": true,
+          "company": false,
+          "facility": true,
+          "layoutSeed": 295221521,
+          "theme": "factory",
+          "mainExit": [
+            49.24725809533548,
+            -2.3588489985439325,
+            16.377926463110104
+          ],
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": []
+      },
+      "during": {
+        "markers": [],
+        "nativeTime": 181.1725800104448,
+        "nativeRay": {
+          "eye": [
+            -2.9840160713900987,
+            1.6492885554619414,
+            1.8085130416799888
+          ],
+          "fwd": [
+            0.916800773663004,
+            -0.03739128167243139,
+            0.39759053492985763
+          ],
+          "hit": {
+            "distance": 3.5384089946746826,
+            "point": {
+              "x": 0.26000003246378256,
+              "y": 1.5169829080697956,
+              "z": 3.2153509666733155
+            },
+            "normal": {
+              "x": -1,
+              "y": 0,
+              "z": 0
+            },
+            "kind": "static"
+          },
+          "points": [
+            {
+              "label": "Use terminal [E]",
+              "pos": [
+                -6.05,
+                1.05,
+                2.55
+              ],
+              "r": 0.8,
+              "along": -2.493680074205586,
+              "perp": 2.0225644167913535
+            },
+            {
+              "label": "Ship table [E]",
+              "pos": [
+                -2.3,
+                0.95,
+                -1.2
+              ],
+              "reach": 3.4,
+              "r": 1.2,
+              "along": -0.5429025507890435,
+              "perp": 3.1166151530186275
+            },
+            {
+              "label": "Ship charger: hold a battery item [E]",
+              "pos": [
+                -0.35,
+                1.2,
+                -3.1799999999999997
+              ],
+              "r": 0.6,
+              "along": 0.44828187827458854,
+              "perp": 5.641294762289269
+            },
+            {
+              "label": "Hub door [E]",
+              "pos": [
+                -4.115,
+                1.2,
+                -1.9
+              ],
+              "reach": 3.2,
+              "r": 0.9,
+              "along": -2.494557149856404,
+              "perp": 3.0018724921711484
+            }
+          ],
+          "floor": {
+            "distance": 1.0200318098068237,
+            "point": {
+              "x": -2.978766068816185,
+              "y": -3.7054997070740114e-08,
+              "z": 1.7964071035385132
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "world": {
+          "seed": 295221521,
+          "outdoor": true,
+          "company": false,
+          "facility": true,
+          "layoutSeed": 295221521,
+          "theme": "factory",
+          "mainExit": [
+            49.24725809533548,
+            -2.3588489985439325,
+            16.377926463110104
+          ],
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "screen": null,
+        "phase": "moon",
+        "moon": "hamsi",
+        "run": {
+          "day": 1,
+          "credits": 60,
+          "quota": 330,
+          "time": 571.4764307284564
+        },
+        "profile": {
+          "name": "Intern188",
+          "coins": 50
+        },
+        "settings": {
+          "lang": "en",
+          "difficulty": "standard",
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            -2.9840160713900987,
+            1.6492885554619414,
+            1.8085130416799888
+          ],
+          "fwd": [
+            0.916800773663004,
+            -0.03739128167243139,
+            0.39759053492985763
+          ],
+          "selected": "Contract board - The Algorithm [E]"
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [
+            "KeyW"
+          ],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "player": {
+          "p": [
+            -2.978766068816185,
+            0.020031772751826715,
+            1.7964071035385132
+          ],
+          "yaw": 4.303196326794897,
+          "pitch": -0.03739999999999999,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "slots": [
+            "ibt",
+            "i2b5",
+            "i2cs",
+            null,
+            null
+          ],
+          "held": "i2b5"
+        },
+        "prompt": {
+          "main": "Contract board - The Algorithm [E]",
+          "sub": "",
+          "dom": "CONTRACT BOARD - THE ALGORITHM"
+        },
+        "panel": null,
+        "visibleText": [
+          {
+            "class": "hud",
+            "text": "\u25cf LIVE 126\nHP 100/106\nSTA 100/100\n8 lb\n9:30 AM\nLv.1 LURKER\n\u25ae 60\n\u00b7\nCONTRACT BOARD - THE ALGORITHM\nI\nPOCKETS\n0/8\n1\nChalk\n2\nLead Pipe\n3\nSpray Paint\n60\n4\n5\nLIGHT\nLOOT ABOARD\n\u25ae0\n0 items\nThe Company pays 37% today: \u25ae0 \u00b7 \u25ae330 to go\nDeadline day pays 100 %"
+          }
+        ],
+        "buttons": [],
+        "forms": [],
+        "render": {
+          "calls": 832,
+          "tris": 175948
+        },
+        "caught": {
+          "total": 0,
+          "ring": []
+        }
+      }
+    },
+    {
+      "command": {
+        "op": "hold",
+        "key": "KeyW",
+        "ms": 5000,
+        "shot": "native-exit-next-lane-1280"
+      },
+      "sinceGameMs": 550258,
+      "before": {
+        "phase": "moon",
+        "prompt": {
+          "main": "Contract board - The Algorithm [E]",
+          "sub": "",
+          "dom": "CONTRACT BOARD - THE ALGORITHM"
+        },
+        "player": {
+          "p": [
+            -2.8946595191955566,
+            0.019159054756164473,
+            1.8444863557815552
+          ],
+          "yaw": 4.303196326794897,
+          "pitch": -0.03739999999999999,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "slots": [
+            "ibt",
+            "i2b5",
+            "i2cs",
+            null,
+            null
+          ],
+          "held": "i2b5"
+        },
+        "nativeRay": {
+          "eye": [
+            -2.8946595191955566,
+            1.6391590547561645,
+            1.8444863557815552
+          ],
+          "fwd": [
+            0.9168007736630037,
+            -0.03739128167243139,
+            0.39759053492985763
+          ],
+          "hit": {
+            "distance": 3.4409432411193848,
+            "point": {
+              "x": 0.2599999063931788,
+              "y": 1.5104977768086205,
+              "z": 3.2125728196814896
+            },
+            "normal": {
+              "x": -1,
+              "y": 0,
+              "z": 0
+            },
+            "kind": "static"
+          },
+          "points": [
+            {
+              "label": "Use terminal [E]",
+              "pos": [
+                -6.05,
+                1.05,
+                2.55
+              ],
+              "r": 0.8,
+              "along": -2.5902836346003317,
+              "perp": 2.022736299200782
+            },
+            {
+              "label": "Ship table [E]",
+              "pos": [
+                -2.3,
+                0.95,
+                -1.2
+              ],
+              "reach": 3.4,
+              "r": 1.2,
+              "along": -0.6395061111837909,
+              "perp": 3.1126338125164903
+            },
+            {
+              "label": "Ship charger: hold a battery item [E]",
+              "pos": [
+                -0.35,
+                1.2,
+                -3.1799999999999997
+              ],
+              "r": 0.6,
+              "along": 0.3516783178798404,
+              "perp": 5.638256667106873
+            },
+            {
+              "label": "Hub door [E]",
+              "pos": [
+                -4.115,
+                1.2,
+                -1.9
+              ],
+              "reach": 3.2,
+              "r": 0.9,
+              "along": -2.5911607102511507,
+              "perp": 2.998192089701614
+            }
+          ],
+          "floor": {
+            "distance": 1.0191590785980225,
+            "point": {
+              "x": -2.8946595191955566,
+              "y": -2.3841858043383013e-08,
+              "z": 1.8444863557815552
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            -2.8946595191955566,
+            1.6391590547561645,
+            1.8444863557815552
+          ],
+          "fwd": [
+            0.9168007736630037,
+            -0.03739128167243139,
+            0.39759053492985763
+          ],
+          "selected": "Contract board - The Algorithm [E]"
+        },
+        "world": {
+          "seed": 295221521,
+          "outdoor": true,
+          "company": false,
+          "facility": true,
+          "layoutSeed": 295221521,
+          "theme": "factory",
+          "mainExit": [
+            49.24725809533548,
+            -2.3588489985439325,
+            16.377926463110104
+          ],
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": []
+      },
+      "after": {
+        "phase": "moon",
+        "prompt": {
+          "main": null,
+          "dom": ""
+        },
+        "player": {
+          "p": [
+            -0.09521187204518355,
+            0.019248300931940243,
+            2.2599000624726884
+          ],
+          "yaw": 4.303196326794897,
+          "pitch": -0.03739999999999999,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "slots": [
+            "ibt",
+            "i2b5",
+            "i2cs",
+            null,
+            null
+          ],
+          "held": "i2b5"
+        },
+        "nativeRay": {
+          "eye": [
+            -0.09522369443826796,
+            1.6388320461707548,
+            2.2599273236325352
+          ],
+          "fwd": [
+            0.9168007736630037,
+            -0.03739128167243139,
+            0.39759053492985785
+          ],
+          "hit": {
+            "distance": 0.38746005296707153,
+            "point": {
+              "x": 0.25999998188545165,
+              "y": 1.6243444181934479,
+              "z": 2.4139777733556644
+            },
+            "normal": {
+              "x": -1,
+              "y": 0,
+              "z": 0
+            },
+            "kind": "static"
+          },
+          "points": [
+            {
+              "label": "Use terminal [E]",
+              "pos": [
+                -6.05,
+                1.05,
+                2.55
+              ],
+              "r": 0.8,
+              "along": -5.321996188467518,
+              "perp": 2.7507422190000383
+            },
+            {
+              "label": "Ship table [E]",
+              "pos": [
+                -2.3,
+                0.95,
+                -1.2
+              ],
+              "reach": 3.4,
+              "r": 1.2,
+              "along": -3.371218665050978,
+              "perp": 2.437521270190094
+            },
+            {
+              "label": "Ship charger: hold a battery item [E]",
+              "pos": [
+                -0.35,
+                1.2,
+                -3.1799999999999997
+              ],
+              "r": 0.6,
+              "along": -2.380034235987347,
+              "perp": 4.917899028299997
+            },
+            {
+              "label": "Hub door [E]",
+              "pos": [
+                -4.115,
+                1.2,
+                -1.9
+              ],
+              "reach": 3.2,
+              "r": 0.9,
+              "along": -5.322873264118339,
+              "perp": 2.307204079300456
+            }
+          ],
+          "floor": {
+            "distance": 1.0192482471466064,
+            "point": {
+              "x": -0.09521187204518355,
+              "y": 5.378533374233996e-08,
+              "z": 2.2599000624726884
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            -0.09522369443826796,
+            1.6388320461707548,
+            2.2599273236325352
+          ],
+          "fwd": [
+            0.9168007736630037,
+            -0.03739128167243139,
+            0.39759053492985785
+          ]
+        },
+        "world": {
+          "seed": 295221521,
+          "outdoor": true,
+          "company": false,
+          "facility": true,
+          "layoutSeed": 295221521,
+          "theme": "factory",
+          "mainExit": [
+            49.24725809533548,
+            -2.3588489985439325,
+            16.377926463110104
+          ],
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": []
+      },
+      "during": {
+        "markers": [],
+        "nativeTime": 221.97258001044247,
+        "nativeRay": {
+          "eye": [
+            -0.0926760970214504,
+            1.6383186823863665,
+            2.2569320563268325
+          ],
+          "fwd": [
+            0.916800773663004,
+            -0.037391281672431394,
+            0.3975905349298581
+          ],
+          "hit": {
+            "distance": 0.3846812844276428,
+            "point": {
+              "x": 0.26000000215549063,
+              "y": 1.6239349561262197,
+              "z": 2.409877693979924
+            },
+            "normal": {
+              "x": -1,
+              "y": 0,
+              "z": 0
+            },
+            "kind": "static"
+          },
+          "points": [
+            {
+              "label": "Use terminal [E]",
+              "pos": [
+                -6.05,
+                1.05,
+                2.55
+              ],
+              "r": 0.8,
+              "along": -5.32316013314977,
+              "perp": 2.7542116791376356
+            },
+            {
+              "label": "Ship table [E]",
+              "pos": [
+                -2.3,
+                0.95,
+                -1.2
+              ],
+              "reach": 3.4,
+              "r": 1.2,
+              "along": -3.37238260973323,
+              "perp": 2.433819261328069
+            },
+            {
+              "label": "Ship charger: hold a battery item [E]",
+              "pos": [
+                -0.35,
+                1.2,
+                -3.1799999999999997
+              ],
+              "r": 0.6,
+              "along": -2.3811981806695988,
+              "perp": 4.91410869516163
+            },
+            {
+              "label": "Hub door [E]",
+              "pos": [
+                -4.115,
+                1.2,
+                -1.9
+              ],
+              "reach": 3.2,
+              "r": 0.9,
+              "along": -5.324037208800591,
+              "perp": 2.303459304616854
+            }
+          ],
+          "floor": {
+            "distance": 1.0192450284957886,
+            "point": {
+              "x": -0.0926497858017683,
+              "y": 4.58982756246229e-08,
+              "z": 2.256871385499835
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "world": {
+          "seed": 295221521,
+          "outdoor": true,
+          "company": false,
+          "facility": true,
+          "layoutSeed": 295221521,
+          "theme": "factory",
+          "mainExit": [
+            49.24725809533548,
+            -2.3588489985439325,
+            16.377926463110104
+          ],
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "screen": null,
+        "phase": "moon",
+        "moon": "hamsi",
+        "run": {
+          "day": 1,
+          "credits": 60,
+          "quota": 330,
+          "time": 625.8764307284533
+        },
+        "profile": {
+          "name": "Intern188",
+          "coins": 50
+        },
+        "settings": {
+          "lang": "en",
+          "difficulty": "standard",
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            -0.0926760970214504,
+            1.6383186823863665,
+            2.2569320563268325
+          ],
+          "fwd": [
+            0.916800773663004,
+            -0.037391281672431394,
+            0.3975905349298581
+          ]
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [
+            "KeyW"
+          ],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "player": {
+          "p": [
+            -0.0926497858017683,
+            0.019245074394064254,
+            2.256871385499835
+          ],
+          "yaw": 4.303196326794897,
+          "pitch": -0.03739999999999999,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "slots": [
+            "ibt",
+            "i2b5",
+            "i2cs",
+            null,
+            null
+          ],
+          "held": "i2b5"
+        },
+        "prompt": {
+          "main": null,
+          "dom": ""
+        },
+        "panel": null,
+        "visibleText": [
+          {
+            "class": "hud",
+            "text": "\u25cf LIVE 125\nHP 100/106\nSTA 100/100\n8 lb\n10:25 AM\nLv.1 LURKER\n\u25ae 60\n\u00b7\nI\nPOCKETS\n0/8\n1\nChalk\n2\nLead Pipe\n3\nSpray Paint\n60\n4\n5\nLIGHT\nLOOT ABOARD\n\u25ae0\n0 items\nThe Company pays 37% today: \u25ae0 \u00b7 \u25ae330 to go\nDeadline day pays 100 %"
+          }
+        ],
+        "buttons": [],
+        "forms": [],
+        "render": {
+          "calls": 353,
+          "tris": 86952
+        },
+        "caught": {
+          "total": 0,
+          "ring": []
+        }
+      }
+    },
+    {
+      "command": {
+        "op": "snap"
+      },
+      "sinceGameMs": 557067,
+      "before": {
+        "phase": null,
+        "prompt": null,
+        "player": null,
+        "nativeRay": null,
+        "input": null,
+        "diagnostics": null,
+        "world": null,
+        "markers": null
+      },
+      "after": {
+        "phase": "moon",
+        "prompt": {
+          "main": null,
+          "dom": ""
+        },
+        "player": {
+          "p": [
+            -0.09527819603681564,
+            0.018726503849029463,
+            2.2599000930786133
+          ],
+          "yaw": 4.303196326794897,
+          "pitch": -0.03739999999999999,
+          "hp": 100,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "slots": [
+            "ibt",
+            "i2b5",
+            "i2cs",
+            null,
+            null
+          ],
+          "held": "i2b5"
+        },
+        "nativeRay": {
+          "eye": [
+            -0.09527853219799018,
+            1.6387146679467357,
+            2.2599008682299258
+          ],
+          "fwd": [
+            0.9168007736630038,
+            -0.03739128167243139,
+            0.39759053492985785
+          ],
+          "hit": {
+            "distance": 0.38751986622810364,
+            "point": {
+              "x": 0.259999980969719,
+              "y": 1.6242248034749378,
+              "z": 2.4139750991395044
+            },
+            "normal": {
+              "x": -1,
+              "y": 0,
+              "z": 0
+            },
+            "kind": "static"
+          },
+          "points": [
+            {
+              "label": "Use terminal [E]",
+              "pos": [
+                -6.05,
+                1.05,
+                2.55
+              ],
+              "r": 0.8,
+              "along": -5.3219397836715405,
+              "perp": 2.750710301828533
+            },
+            {
+              "label": "Ship table [E]",
+              "pos": [
+                -2.3,
+                0.95,
+                -1.2
+              ],
+              "reach": 3.4,
+              "r": 1.2,
+              "along": -3.3711622602549998,
+              "perp": 2.4374789593845985
+            },
+            {
+              "label": "Ship charger: hold a battery item [E]",
+              "pos": [
+                -0.35,
+                1.2,
+                -3.1799999999999997
+              ],
+              "r": 0.6,
+              "along": -2.379977831191369,
+              "perp": 4.917883748650139
+            },
+            {
+              "label": "Hub door [E]",
+              "pos": [
+                -4.115,
+                1.2,
+                -1.9
+              ],
+              "reach": 3.2,
+              "r": 0.9,
+              "along": -5.32281685932236,
+              "perp": 2.307168644506441
+            }
+          ],
+          "floor": {
+            "distance": 1.0187264680862427,
+            "point": {
+              "x": -0.09527819603681564,
+              "y": 3.576278673200761e-08,
+              "z": 2.2599000930786133
+            },
+            "normal": {
+              "x": 0,
+              "y": 1,
+              "z": 0
+            }
+          }
+        },
+        "input": {
+          "locked": true,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": true,
+          "active": "BODY"
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": false,
+          "hcExists": true,
+          "hcOn": false,
+          "eye": [
+            -0.09527853219799018,
+            1.6387146679467357,
+            2.2599008682299258
+          ],
+          "fwd": [
+            0.9168007736630038,
+            -0.03739128167243139,
+            0.39759053492985785
+          ]
+        },
+        "world": {
+          "seed": 295221521,
+          "outdoor": true,
+          "company": false,
+          "facility": true,
+          "layoutSeed": 295221521,
+          "theme": "factory",
+          "mainExit": [
+            49.24725809533548,
+            -2.3588489985439325,
+            16.377926463110104
+          ],
+          "shipDoor": true,
+          "shipPoints": {
+            "lever": [
+              -5.800000000000001,
+              1,
+              0.9
+            ],
+            "terminal": [
+              -6.05,
+              1.05,
+              2.55
+            ],
+            "doorOpen": [
+              3.98,
+              1.3,
+              3.39
+            ]
+          }
+        },
+        "markers": []
+      }
+    }
+  ],
+  "final": {
+    "markers": [],
+    "nativeTime": 237.81760001044157,
+    "nativeRay": {
+      "eye": [
+        -0.09527819603681564,
+        1.6387265038490295,
+        2.2599000930786133
+      ],
+      "fwd": [
+        0.9168007736630037,
+        -0.03739128167243139,
+        0.39759053492985763
+      ],
+      "hit": {
+        "distance": 0.387519508600235,
+        "point": {
+          "x": 0.2599999892573868,
+          "y": 1.6242366527493959,
+          "z": 2.413974181798736
+        },
+        "normal": {
+          "x": -1,
+          "y": 0,
+          "z": 0
+        },
+        "kind": "static"
+      },
+      "points": [
+        {
+          "label": "Use terminal [E]",
+          "pos": [
+            -6.05,
+            1.05,
+            2.55
+          ],
+          "r": 0.8,
+          "along": -5.3219393411119835,
+          "perp": 2.7507145007159877
+        },
+        {
+          "label": "Ship table [E]",
+          "pos": [
+            -2.3,
+            0.95,
+            -1.2
+          ],
+          "reach": 3.4,
+          "r": 1.2,
+          "along": -3.3711618176954428,
+          "perp": 2.437482119518529
+        },
+        {
+          "label": "Ship charger: hold a battery item [E]",
+          "pos": [
+            -0.35,
+            1.2,
+            -3.1799999999999997
+          ],
+          "r": 0.6,
+          "along": -2.3799773886318114,
+          "perp": 4.917884178676014
+        },
+        {
+          "label": "Hub door [E]",
+          "pos": [
+            -4.115,
+            1.2,
+            -1.9
+          ],
+          "reach": 3.2,
+          "r": 0.9,
+          "along": -5.322816416762803,
+          "perp": 2.307171104247035
+        }
+      ],
+      "floor": {
+        "distance": 1.0187264680862427,
+        "point": {
+          "x": -0.09527819603681564,
+          "y": 3.576278673200761e-08,
+          "z": 2.2599000930786133
+        },
+        "normal": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      }
+    },
+    "world": {
+      "seed": 295221521,
+      "outdoor": true,
+      "company": false,
+      "facility": true,
+      "layoutSeed": 295221521,
+      "theme": "factory",
+      "mainExit": [
+        49.24725809533548,
+        -2.3588489985439325,
+        16.377926463110104
+      ],
+      "shipDoor": true,
+      "shipPoints": {
+        "lever": [
+          -5.800000000000001,
+          1,
+          0.9
+        ],
+        "terminal": [
+          -6.05,
+          1.05,
+          2.55
+        ],
+        "doorOpen": [
+          3.98,
+          1.3,
+          3.39
+        ]
+      }
+    },
+    "screen": null,
+    "phase": "moon",
+    "moon": "hamsi",
+    "run": {
+      "day": 1,
+      "credits": 60,
+      "quota": 330,
+      "time": 647.0031240617855
+    },
+    "profile": {
+      "name": "Intern188",
+      "coins": 50
+    },
+    "settings": {
+      "lang": "en",
+      "difficulty": "standard",
+      "quality": "auto",
+      "fullscreenPlay": true
+    },
+    "diagnostics": {
+      "menuKey": "Tab",
+      "blocksInput": false,
+      "terminal": false,
+      "minigame": false,
+      "hudHidden": false,
+      "hcExists": true,
+      "hcOn": false,
+      "eye": [
+        -0.09527819603681564,
+        1.6387265038490295,
+        2.2599000930786133
+      ],
+      "fwd": [
+        0.9168007736630037,
+        -0.03739128167243139,
+        0.39759053492985763
+      ]
+    },
+    "input": {
+      "locked": true,
+      "enabled": true,
+      "typing": false,
+      "keys": [],
+      "hidden": false,
+      "pointer": true,
+      "active": "BODY"
+    },
+    "player": {
+      "p": [
+        -0.09527819603681564,
+        0.018726503849029463,
+        2.2599000930786133
+      ],
+      "yaw": 4.303196326794897,
+      "pitch": -0.03739999999999999,
+      "hp": 100,
+      "dead": false,
+      "indoor": false,
+      "inShip": true,
+      "grounded": true,
+      "slots": [
+        "ibt",
+        "i2b5",
+        "i2cs",
+        null,
+        null
+      ],
+      "held": "i2b5"
+    },
+    "prompt": {
+      "main": null,
+      "dom": ""
+    },
+    "panel": null,
+    "visibleText": [
+      {
+        "class": "hud hud-alert-focus",
+        "text": "\u25cf LIVE 126\nHP 100/106\nSTA 100/100\n10:45 AM\n\u00b7\nI\nPOCKETS\n0/8\n1\nChalk\n2\nLead Pipe\n3\nSpray Paint\n60\n4\n5\nLIGHT\nLOOT ABOARD\n\u25ae0\n0 items\nThe Company pays 37% today: \u25ae0 \u00b7 \u25ae330 to go\nDeadline day pays 100 %"
+      }
+    ],
+    "buttons": [],
+    "forms": [],
+    "render": {
+      "calls": 353,
+      "tris": 86952
+    },
+    "caught": {
+      "total": 0,
+      "ring": []
+    }
+  },
+  "timing": {
+    "clock": "native app RAF, no manual tick",
+    "hiddenSamples": 0,
+    "elapsedMs": 600701.599999994,
+    "update": {
+      "n": 2794,
+      "p50": 5.600000008940697,
+      "p95": 15.299999997019768,
+      "p99": 23.900000005960464,
+      "max": 428.09999999403954,
+      "over50": 11
+    },
+    "physics": {
+      "n": 2794,
+      "p50": 0.29999999701976776,
+      "p95": 2.0999999940395355,
+      "p99": 5.5,
+      "max": 19.799999997019768,
+      "over50": 0
+    },
+    "dt": {
+      "n": 2794,
+      "p50": 0.1,
+      "p95": 0.1,
+      "p99": 0.1,
+      "max": 0.1,
+      "over50": 0
+    },
+    "guards": {
+      "items": {
+        "n": 2794,
+        "p50": 0,
+        "p95": 0.20000000298023224,
+        "p99": 0.4000000059604645,
+        "max": 23.5,
+        "over50": 0
+      },
+      "cruiser": {
+        "n": 2794,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0.10000000894069672,
+        "max": 3.9000000059604645,
+        "over50": 0
+      },
+      "hostUpdate": {
+        "n": 2794,
+        "p50": 0,
+        "p95": 0.29999999701976776,
+        "p99": 0.5999999940395355,
+        "max": 9.599999994039536,
+        "over50": 0
+      },
+      "creatures": {
+        "n": 2794,
+        "p50": 0,
+        "p95": 0.10000000894069672,
+        "p99": 0.20000000298023224,
+        "max": 9.799999997019768,
+        "over50": 0
+      },
+      "director": {
+        "n": 2794,
+        "p50": 0,
+        "p95": 0.09999999403953552,
+        "p99": 0.10000000894069672,
+        "max": 3.5,
+        "over50": 0
+      },
+      "voice": {
+        "n": 2794,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0.10000000894069672,
+        "max": 4.0999999940395355,
+        "over50": 0
+      },
+      "audio": {
+        "n": 2794,
+        "p50": 0,
+        "p95": 0.10000000894069672,
+        "p99": 0.29999999701976776,
+        "max": 6.5,
+        "over50": 0
+      },
+      "companyVis": {
+        "n": 2794,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0.09999999403953552,
+        "max": 3.5,
+        "over50": 0
+      },
+      "viewModel": {
+        "n": 2794,
+        "p50": 0,
+        "p95": 0.10000000894069672,
+        "p99": 0.20000000298023224,
+        "max": 8.099999994039536,
+        "over50": 0
+      },
+      "netSend": {
+        "n": 2794,
+        "p50": 0,
+        "p95": 0.10000000894069672,
+        "p99": 0.20000000298023224,
+        "max": 5.700000002980232,
+        "over50": 0
+      }
+    }
+  },
+  "errors": [],
+  "consoleErrors": [
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "text": "THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported.",
+      "location": {
+        "url": "http://127.0.0.1:5174/@vite/client",
+        "line": 298,
+        "column": 3,
+        "lineNumber": 298,
+        "columnNumber": 3
+      }
+    }
+  ],
+  "cleanup": {
+    "update": true,
+    "guard": true,
+    "physics": true
+  },
+  "inputAfterRelease": {
+    "keys": [],
+    "hidden": false
+  },
+  "browserClosed": true,
+  "shots": [
+    {
+      "file": "qa_shots/final-normal-new-run-960.png"
+    },
+    {
+      "file": "qa_shots/final-status-held-native-960.png"
+    },
+    {
+      "file": "qa_shots/final-clerk-face-native-selected-960.png"
+    },
+    {
+      "file": "qa_shots/final-native-clerk-catalog-960.png"
+    },
+    {
+      "file": "qa_shots/final-native-courier-claimed-960.png"
+    },
+    {
+      "file": "qa_shots/final-departure-marker-after-panel-960.png"
+    },
+    {
+      "file": "qa_shots/final-native-boarded-960.png"
+    },
+    {
+      "file": "qa_shots/final-native-ship-idle-1280.png"
+    },
+    {
+      "file": "qa_shots/final-native-lever-selected-1280.png"
+    },
+    {
+      "file": "qa_shots/final-native-first-landed-1280.png"
+    },
+    {
+      "file": "qa_shots/final-native-starter-tool-selected-1280.png"
+    },
+    {
+      "file": "qa_shots/final-native-ship-exit-approach-1280.png"
+    },
+    {
+      "file": "qa_shots/final-native-exit-next-lane-1280.png"
+    }
+  ],
+  "limits": [
+    "Guided source-assisted native input; no blind-human discovery or fun/retention rating.",
+    "Native lifecycle starter tools are not a physical salvage pickup.",
+    "Off-center static fixture contact at x=0.26, player x=-0.095, actual exit door x=2.6 (root read-only source check). This is not proven door/exit blockage; lateral navigation/operator approach remains unverified at cap.",
+    "Body grounded/floor and eye ray were captured; capsule extents were not separately measured.",
+    "Software renderer diagnosis only; no hardware FPS/stutter or Internet reliability claim."
+  ]
+}

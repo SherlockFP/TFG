@@ -394,7 +394,7 @@ export class CRTMenu {
       if (this.app.game || this.mode !== 'title' || document.activeElement?.tagName === 'INPUT' || (this.room && !this.room.menuActive())) return;
       if (e.code === 'ArrowUp' || e.code === 'KeyW') { this.sel = (this.sel - 1 + this.items.length) % this.items.length; this.app.audio?.ui('ui_hover', 0.3); e.preventDefault(); }
       if (e.code === 'ArrowDown' || e.code === 'KeyS') { this.sel = (this.sel + 1) % this.items.length; this.app.audio?.ui('ui_hover', 0.3); e.preventDefault(); }
-      if (e.code === 'Enter' || e.code === 'Space') { this.activate(this.sel); e.preventDefault(); }
+      if ((e.code === 'Enter' || e.code === 'Space') && !e.repeat) { this.activate(this.sel); e.preventDefault(); }
     };
     canvas.addEventListener('pointermove', this.onMove);
     canvas.addEventListener('click', this.onClick);

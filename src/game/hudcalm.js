@@ -186,7 +186,7 @@ export function installHudCalm(game) {
   }
   const showTab = (v) => { if (v === tabOn) return; tabOn = v; if (v) render(); card.classList.toggle('on', v); document.documentElement.classList.toggle('hc-tab-on', !!v); };
   const onDown = (e) => {
-    if (e.code !== keyCode() || e.repeat) return;
+    if (e.code !== keyCode() || e.repeat || e.isComposing) return;
     if (canShow()) { e.preventDefault(); showTab(true); }
   };
   const onUp = (e) => { if (e.code === keyCode()) showTab(false); };
@@ -208,6 +208,7 @@ export function installHudCalm(game) {
     /** for tests / harness: run the contextual pass now */
     pass,
     dispose() {
+      showTab(false);
       for (const f of offs) { try { f(); } catch { /* ignore */ } }
       window.removeEventListener('keydown', onDown); window.removeEventListener('keyup', onUp); window.removeEventListener('blur', onBlur);
       card.remove(); st.remove();

@@ -1,0 +1,385 @@
+{
+  "method": "GUIDED_INPUT title-only acceptance: fresh profiles, real Enter and Host clicks, one native RAF clock, no outcome/settings/readiness/clock/pose writes. Read-only capture listener records native state at incoming trusted keydown.",
+  "source": "053ed6655eecabe694075d29f65367027fc88815+wave28_final_title",
+  "jsFreeze": "400a0d37823b54ee77b84da42043809e873d40e8077dbdb43a4e60b0a699e0ae",
+  "allSourceFreeze": "24a57c23a87714b803f18ae04f9b01993f2d35ab57400ac31c5ed0cba2f04796",
+  "publicModsFreeze": "05be26557d600a0985ce388f3ec2540f16d176378feca0b799a1cbfcfbc41b68",
+  "capMs": 60000,
+  "firstLoadedAt": "2026-10-01T16:07:46.354Z",
+  "elapsedAfterLoadMs": 16851,
+  "stopReason": "Completed title-only acceptance",
+  "finishedAt": "2026-10-01T16:08:03.437Z",
+  "browserClosed": true,
+  "errors": [],
+  "consoleErrors": [
+    {
+      "label": "earliest-native",
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "earliest-native",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "earliest-native",
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "earliest-native",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "earliest-native",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "earliest-native",
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "earliest-native",
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "active-intro-skip",
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "active-intro-skip",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "active-intro-skip",
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "active-intro-skip",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "active-intro-skip",
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "active-intro-skip",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "active-intro-skip",
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "active-intro-skip",
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "label": "active-intro-skip",
+      "text": "Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently",
+      "location": {
+        "url": "http://127.0.0.1:5174/src/ui/crtmenu.js",
+        "line": 362,
+        "column": 0,
+        "lineNumber": 362,
+        "columnNumber": 0
+      }
+    }
+  ],
+  "result": "PASS_TITLE_NATIVE_EARLY_AND_HELD_SKIP",
+  "cases": [
+    {
+      "label": "earliest-native",
+      "loadedAt": "2026-10-01T16:07:46.355Z",
+      "incomingEnter": {
+        "code": "Enter",
+        "trusted": true,
+        "repeat": false,
+        "time": 2737.7999999970198,
+        "booted": true,
+        "mode": "title",
+        "screen": "title"
+      },
+      "skipConsumed": null,
+      "skipConsumedRequired": false,
+      "earlyModePath": true,
+      "noLateIntro": true,
+      "keysAfterRelease": [],
+      "contextClosed": true,
+      "firstShot": "earliest-native-after-first-enter-960.png",
+      "heldShot": null,
+      "hostShot": "earliest-native-host-stays-visible-960.png",
+      "profile": "Extra937",
+      "caughtAfter": {
+        "total": 0,
+        "ring": []
+      },
+      "afterFirst": {
+        "mode": "sub",
+        "screen": "browser",
+        "bootChecked": true,
+        "bootActive": null,
+        "bootVisible": false,
+        "keys": [],
+        "keydownReceipts": [
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": false,
+            "time": 2737.7999999970198,
+            "booted": true,
+            "mode": "title",
+            "screen": "title"
+          }
+        ]
+      },
+      "duringHeld": {
+        "mode": null,
+        "screen": null,
+        "bootChecked": null,
+        "bootActive": null,
+        "bootVisible": null,
+        "keys": null,
+        "keydownReceipts": null
+      },
+      "afterNativeRafs": {
+        "mode": "sub",
+        "screen": "host",
+        "bootChecked": true,
+        "bootActive": null,
+        "bootVisible": false,
+        "keys": []
+      }
+    },
+    {
+      "label": "active-intro-skip",
+      "loadedAt": "2026-10-01T16:07:55.939Z",
+      "incomingEnter": {
+        "code": "Enter",
+        "trusted": true,
+        "repeat": false,
+        "time": 3238.5999999940395,
+        "booted": true,
+        "mode": "title",
+        "screen": "title",
+        "bootChecked": true,
+        "bootActive": true
+      },
+      "skipConsumed": true,
+      "skipConsumedRequired": true,
+      "earlyModePath": null,
+      "noLateIntro": true,
+      "keysAfterRelease": [],
+      "contextClosed": true,
+      "firstShot": "active-intro-skip-after-first-enter-960.png",
+      "heldShot": "active-intro-skip-during-held-enter-960.png",
+      "hostShot": "active-intro-skip-host-stays-visible-960.png",
+      "profile": "Lurker843",
+      "caughtAfter": {
+        "total": 0,
+        "ring": []
+      },
+      "afterFirst": {
+        "mode": "title",
+        "screen": "title",
+        "bootChecked": true,
+        "bootActive": false,
+        "bootVisible": false,
+        "keys": [],
+        "keydownReceipts": [
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": false,
+            "time": 3238.5999999940395,
+            "booted": true,
+            "mode": "title",
+            "screen": "title",
+            "bootChecked": true,
+            "bootActive": true
+          },
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": true,
+            "time": 3369.8999999910593,
+            "booted": true,
+            "mode": "title",
+            "screen": "title",
+            "bootChecked": true,
+            "bootActive": false
+          },
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": true,
+            "time": 3375,
+            "booted": true,
+            "mode": "title",
+            "screen": "title",
+            "bootChecked": true,
+            "bootActive": false
+          }
+        ]
+      },
+      "duringHeld": {
+        "mode": "title",
+        "screen": "title",
+        "bootChecked": true,
+        "bootActive": false,
+        "bootVisible": false,
+        "keys": [
+          "Enter"
+        ],
+        "keydownReceipts": [
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": false,
+            "time": 3238.5999999940395,
+            "booted": true,
+            "mode": "title",
+            "screen": "title",
+            "bootChecked": true,
+            "bootActive": true
+          },
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": true,
+            "time": 3369.8999999910593,
+            "booted": true,
+            "mode": "title",
+            "screen": "title",
+            "bootChecked": true,
+            "bootActive": false
+          },
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": true,
+            "time": 3375,
+            "booted": true,
+            "mode": "title",
+            "screen": "title",
+            "bootChecked": true,
+            "bootActive": false
+          }
+        ]
+      },
+      "afterNativeRafs": {
+        "mode": "sub",
+        "screen": "host",
+        "bootChecked": true,
+        "bootActive": false,
+        "bootVisible": false,
+        "keys": []
+      }
+    }
+  ]
+}

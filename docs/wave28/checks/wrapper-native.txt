@@ -1,0 +1,9 @@
+
+> kefal-company@0.1.0 test
+> node tools/harness/run_all.mjs -j 4 presentation28 perf5 controls28
+
+ok     1/3 tools/harness/controls28.test.mjs (0.4s)
+ok     2/3 tools/harness/presentation28.test.mjs (0.4s)
+ok     3/3 tools/harness/perf5.test.mjs (3.9s)
+
+3/3 passed in 4s (-j 4). slowest: perf5.test.mjs 4s, presentation28.test.mjs 0s, controls28.test.mjs 0s

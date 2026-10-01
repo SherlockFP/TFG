@@ -46,19 +46,36 @@ KefalAPI.defineMod({
       hud.setInventory = (items, active) => {
         orig(items, active);
         const inv = hud.$?.inv;
-        if (!inv || !on()) return;
-        inv.classList.toggle('kmod-hb-compact', items.length > 5);
-        inv.classList.toggle('kmod-hb-tiny', items.length > 7);
+        if (!inv) return;
+        const enabled = on();
+        for (const [name, wanted] of [['kmod-hb-compact', enabled && items.length > 5], ['kmod-hb-tiny', enabled && items.length > 7]]) {
+          if (inv.classList.contains(name) !== wanted) inv.classList[wanted ? 'add' : 'remove'](name);
+        }
+        const kids = Array.from(inv.children).filter(el => el.classList.contains('inv-slot'));
+        const values = [];
         let sum = 0;
-        items.forEach((it, i) => {
+        if (enabled) items.forEach((it, i) => {
           if (!it || !it.value || !sellable(it.def) || it.def?.kind === 'weapon') return;
           sum += it.value;
-          const el = inv.children[i];
-          if (!el || !cfg.showValues) return;
-          const v = document.createElement('div'); v.className = 'kmod-hb-v'; v.textContent = '▮' + it.value;
-          el.appendChild(v);
+          if (cfg.showValues) values[i] = '▮' + it.value;
         });
-        if (cfg.showTotal && sum > 0) { const t = document.createElement('div'); t.className = 'kmod-hb-total'; t.textContent = `carrying ▮${sum}`; inv.appendChild(t); }
+        for (let i = 0; i < kids.length; i++) {
+          const el = kids[i], labels = Array.from(el.querySelectorAll('.kmod-hb-v'));
+          if (values[i]) {
+            let label = labels.shift();
+            if (!label) { label = document.createElement('div'); label.className = 'kmod-hb-v'; el.appendChild(label); }
+            if (label.textContent !== values[i]) label.textContent = values[i];
+          }
+          for (const label of labels) label.remove();
+        }
+        const totals = Array.from(inv.children).filter(el => el.classList.contains('kmod-hb-total'));
+        if (enabled && cfg.showTotal && sum > 0) {
+          let total = totals.shift();
+          if (!total) { total = document.createElement('div'); total.className = 'kmod-hb-total'; inv.appendChild(total); }
+          const text = `carrying ▮${sum}`;
+          if (total.textContent !== text) total.textContent = text;
+        }
+        for (const total of totals) total.remove();
       };
     });
 

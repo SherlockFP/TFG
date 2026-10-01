@@ -3,13 +3,18 @@ import assert from 'node:assert/strict';
 const canvas=()=>({width:0,height:0,style:{},getContext:()=>new Proxy({},{get:(_,k)=>k==='measureText'?()=>({width:10}):['createLinearGradient','createRadialGradient'].includes(k)?()=>({addColorStop(){}}):['getImageData','createImageData'].includes(k)?()=>({data:new Uint8ClampedArray(1<<22),width:64,height:64}):()=>{},set:()=>true})});
 globalThis.window=globalThis;globalThis.document={createElement:canvas,documentElement:{},body:{appendChild(){}},head:{appendChild(){}},addEventListener(){},getElementById:()=>null};globalThis.localStorage={getItem:()=>null};
 const THREE=await import('three');
-const {buildCompany}=await import('../../src/world/company.js'),{buildHub13}=await import('../../src/world/hub13.js');
+const {buildCompany}=await import('../../src/world/company.js'),{buildHub13,HUB13_BROKER,HUB13_SPAWN}=await import('../../src/world/hub13.js');
 const {hostMethods}=await import('../../src/game/host.js');
-const {fleetLayout,FLEET13}=await import('../../src/game/fleet13_core.js'),{hullBox}=await import('../../src/game/shipyard_core.js');
+const {fleetLayout,FLEET13,sanitizeFleet13}=await import('../../src/game/fleet13_core.js'),{hullBox}=await import('../../src/game/shipyard_core.js');
+const {installFleet13}=await import('../../src/game/fleet13.js'),{LocalPlayer}=await import('../../src/entities/localplayer.js');
+const {register}=await import('node:module');register('data:text/javascript,'+encodeURIComponent("export async function load(u,c,n){if(u.endsWith('.css'))return{format:'module',source:'export default {};',shortCircuit:true};return n(u,c)}"));
+const {actionMethods}=await import('../../src/game/actions.js');
 const {createTrading15}=await import('../../src/game/trading15.js');
 const {CITY_ROUTES13}=await import('../../src/game/life13_core.js');
 const {initPhysics,Physics,G,groups}=await import('../../src/physics/physics.js');
 await initPhysics();
+// The fallback must remain selectable too; build before the real asset enters the production cache.
+const fallbackPhysics=new Physics(),fallbackHub=buildHub13({physics:fallbackPhysics});assert.equal(fallbackHub.dock18.assetReady,false);
 // Preload the actual original GLB through the production loader; only transport is a local file fixture.
 const fs=await import('node:fs/promises'),{loadExtManifest}=await import('../../src/audio/extassets.js'),{preloadExtModels,hasExt,extInstance}=await import('../../src/world/extmodels.js');
 const realFetch=globalThis.fetch;globalThis.ProgressEvent??=class {constructor(type,data){Object.assign(this,data);this.type=type;}};
@@ -22,6 +27,42 @@ const glbJson=JSON.parse(glb.subarray(20,20+glb.readUInt32LE(12)).toString());as
 const companyRoutes=[[[0,10],[-9.5,10],[-9.5,-12],[0,-12],[0,-33.6]],[[0,14],[-29,14],[-29,-10.2],[-29,-21]],[[0,12],[20,12]]];
 const hubRoutes=[[[1.8,23],[1.8,29.8]],[[-2.5,23],[-18,23],[-18,27]],[[3.7,21],[5.2,21],[5.2,11]]];
 const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+function assertBroker(ph,map){
+ const camera=new THREE.PerspectiveCamera(),events={},handlers={};
+ const game={physics:ph,camera,engine:{camera},isHost:true,selfId:'host',profile:{},world:{moonId:'__relay13'},remotes:new Map(),run:{phase:'orbit',credits:60,fleet13:sanitizeFleet13({docked:true})},ui:{toast(){}},net:{},mods:{on(k,fn){events[k]=fn;return ()=>{};}},items:{get:()=>null}};
+ game.player=new LocalPlayer(game);const p=game.player,api=installFleet13(game);events.registerHandlers((k,fn)=>handlers[k]=fn,game);
+ game.interactablesNow=()=>{const out=[];events.interactables(out,game);return out;};
+ const select=()=>actionMethods.findInteraction.call(game),aim=target=>{camera.position.copy(p.eyePos());camera.lookAt(target);camera.updateMatrixWorld();};
+ // Initial feet are a labelled arrival fixture. Every subsequent approach step uses the native standing capsule/controller.
+ p.teleport(V(...HUB13_SPAWN));ph.world.step();
+ try{
+  for(const target of [V(1.8,-1.25,23),V(1.8,-1.25,29.8)]){
+   for(let i=0;i<600;i++){
+    const b=p.body.translation(),dx=target.x-b.x,dz=target.z-b.z,d=Math.hypot(dx,dz);if(d<.06)break;
+    const k=Math.min(.10,d)/d;p.ctrl.computeColliderMovement(p.col,{x:dx*k,y:-.012,z:dz*k},undefined,groups(G.PLAYER,G.STATIC|G.DOOR));
+    const mv=p.ctrl.computedMovement();p.body.setNextKinematicTranslation({x:b.x+mv.x,y:b.y+mv.y,z:b.z+mv.z});ph.world.step();const q=p.body.translation();p.pos.set(q.x,q.y-p.half-.34,q.z);
+   }
+   assert.ok(Math.hypot(p.pos.x-target.x,p.pos.z-target.z)<.12,'native standing customer must physically reach the counter');
+  }
+  const service=map.group.getObjectByName('dockmaster18-service');service.updateMatrixWorld(true);
+  const screen=service.getObjectByName(map.dock18.assetReady?'dockmaster18_actor_dock18_screen':'visor');assert.ok(screen,'actual production/fallback screen node');
+  const face=new THREE.Box3().setFromObject(screen).getCenter(new THREE.Vector3()),broker=V(...HUB13_BROKER);
+  if(map.dock18.assetReady){assert.ok(face.distanceTo(V(0,.705,31.628))<.001,'actual exported CRT transform');assert.ok(broker.z<face.z&&broker.distanceTo(face)<.1,'point must lie immediately in front of exported CRT');}
+  aim(face);assert.equal(ph.lineOfSight(camera.position,broker,G.STATIC|G.DOOR),true,'customer ray clears the real counter');
+  assert.equal(select()?.label,'Fleet broker','actual native selector accepts aim at the visible face');
+  const nativePoints=game.interactablesNow;game.interactablesNow=()=>[{...nativePoints()[0],pos:V(0,.2,30)}];
+  if(map.dock18.assetReady)assert.equal(select(),null,'old empty-aisle anchor reproduces visible-head E miss');game.interactablesNow=nativePoints;
+  const saved=p.pos.clone();p.dead=true;assert.equal(select(),null);handlers.f13act({op:'buy',id:'courier'},'host');assert.equal(game.run.fleet13.selected,null);p.dead=false;
+  p.downed=true;assert.equal(select(),null);handlers.f13act({op:'buy',id:'courier'},'host');assert.equal(game.run.fleet13.selected,null);p.downed=false;
+  handlers.f13act({op:'buy',id:'courier'},'crew');assert.equal(game.run.fleet13.selected,null,'peer cannot purchase');
+  p.pos.set(0,-1.25,23);handlers.f13act({op:'buy',id:'courier'},'host');assert.equal(game.run.fleet13.selected,null,'distant host cannot purchase');p.pos.copy(saved);
+  aim(face);const mid=camera.position.clone().lerp(broker,.5),wall=ph.addStaticBox(mid.x,mid.y,mid.z,.5,.8,.5);ph.world.step();
+  assert.equal(select(),null,'real intervening wall rejects E without noLos');ph.removeCollider(wall);ph.world.step();assert.equal(select()?.label,'Fleet broker');
+  handlers.f13act({op:'buy',id:'courier'},'host');assert.equal(game.run.fleet13.selected,'courier');assert.equal(game.run.credits,60,'physical host can claim the free ship without currency changes');
+  console.log('dock28 broker',JSON.stringify({variant:map.dock18.assetReady?'production-GLB':'fallback',feet:p.pos.toArray(),face:face.toArray(),point:broker.toArray(),eye:p.eyePos().toArray(),nativeE:true,LOS:true,wallRejected:true,hostAuthority:true}));
+ }finally{api.dispose();ph.world.removeCharacterController(p.ctrl);ph.removeBody(p.body);}
+}
+fallbackPhysics.world.step();assertBroker(fallbackPhysics,fallbackHub);fallbackHub.dispose(fallbackPhysics);assert.equal(fallbackPhysics.info.size,0);fallbackPhysics.world.free();
 function assertRoute(ph,label,points){
  for(let j=1;j<points.length;j++){
   const [ax,az]=points[j-1],[bx,bz]=points[j],length=Math.hypot(bx-ax,bz-az),direction=V((bx-ax)/length,0,(bz-az)/length),side=V(direction.z,0,-direction.x);
@@ -55,6 +96,7 @@ for(const kind of ['company','hub']){
   }
  }
  if(kind==='hub'){
+  assertBroker(ph,map);
   assert.equal(map.dock18.assetReady,true);const service=map.group.getObjectByName('dockmaster18-service');assert.ok(service);service.traverse(o=>{if(o.geometry)assert.equal(cachedGeo.has(o.geometry),false,'map clone must own geometry independently of preload cache')});
   const vendor=new THREE.Group();vendor.position.set(-18,-1.25,29);map.group.add(vendor);const trading=createTrading15({physics:ph,items:{all:()=>[]}},()=>true);trading.bind(vendor);ph.world.step();
   for(const r of map.dock18.routes)walk(ph,`dock18/${r.id}`,r.feet.map(p=>[p[0],p[2]]));

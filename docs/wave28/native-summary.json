@@ -1,0 +1,66 @@
+{
+  "baseline": "053ed6655eecabe694075d29f65367027fc88815",
+  "protocol": "0.12.3",
+  "owner_experience_baseline": 5,
+  "initial_native": {
+    "passed": 255,
+    "total": 256,
+    "seconds": 252,
+    "failure": "firstrun static source-owner guard moved to actual helper; corrected owner and caller check"
+  },
+  "core_final_native": {
+    "passed": 256,
+    "total": 256,
+    "seconds": 249,
+    "jobs": 4
+  },
+  "core_build_seconds": 4.37,
+  "core_js_hash": "f27150200fefc02a7aa6e29c9275709b6375777a466d627d1260960b127140b4",
+  "core_all_src_hash": "4ce994bf310b71e99af11f53e545f7085dd27366852574eab9a7ef4bce3294ee",
+  "first_corrected_replay": "Retained failure: installed slot label duplication. Native clerk/claim/dispatch/held-status/screen checks passed.",
+  "wrapper_focused": {
+    "passed": 3,
+    "total": 3,
+    "seconds": 4,
+    "filters": [
+      "presentation28",
+      "controls28",
+      "perf5"
+    ],
+    "actual_component_checks": 13
+  },
+  "wrapper_build_seconds": 2.8,
+  "runtime_digest_src_public_mods": "4ef501890a25a08f151851fe8022ff77e3e1e2b0685e8c14540e0266cb311ed2",
+  "title_focused": {
+    "passed": 3,
+    "total": 3,
+    "seconds": 1,
+    "filters": [
+      "controls28",
+      "presentation28",
+      "escape27"
+    ]
+  },
+  "title_build_seconds": 3.05,
+  "final_js_hash": "400a0d37823b54ee77b84da42043809e873d40e8077dbdb43a4e60b0a699e0ae",
+  "final_all_src_hash": "24a57c23a87714b803f18ae04f9b01993f2d35ab57400ac31c5ed0cba2f04796",
+  "final_runtime_digest_src_public_mods": "05be26557d600a0985ce388f3ec2540f16d176378feca0b799a1cbfcfbc41b68",
+  "verification_boundary": "Full 256-file regression covers the core freeze. Subsequent bounded public-mod decoration and title-only changes passed focused native checks and production builds; fresh browser evidence is separately scoped in PLAYTEST.",
+  "final_title_browser": {
+    "result": "PASS_TITLE_NATIVE_EARLY_AND_HELD_SKIP",
+    "cases": 2,
+    "elapsed_ms": 16851,
+    "page_errors": 0,
+    "caught_application_errors": 0,
+    "scope": "Fresh native early pre-first-RAF Enter and active intro skip with held repeats; actual Host click, no late overlay. See final-title-evidence.json for bootstrap errors and warning."
+  },
+  "final_normal_browser": {
+    "changed_actions": "passed",
+    "first_landing": "passed",
+    "full_shift": "unreached",
+    "idle_hotbar_mutations": 0,
+    "idle_light_labels": 1,
+    "stutter": "unresolved",
+    "scope": "Replay before final title-only correction; exact runtime freeze in PLAYTEST."
+  }
+}

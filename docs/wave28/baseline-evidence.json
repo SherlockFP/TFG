@@ -1,0 +1,173 @@
+{
+  "source": "053ed6655eecabe694075d29f65367027fc88815",
+  "url": "http://127.0.0.1:5174/",
+  "ownerScore": 5,
+  "method": "GUIDED_INPUT; fresh native Host/New-run UI; one visible page with native RAF only; no lifecycle, readiness, pose, loot or outcome fixtures. SwiftShader diagnostic timings are not hardware profiling.",
+  "gameLoadedAt": "2026-10-01T14:45:50.244Z",
+  "finishedAt": "2026-10-01T14:54:59.102Z",
+  "durationAfterGameLoadMs": 548858,
+  "stopReason": "Bounded normal-start baseline; free ship claim earned; departure route partial due operator native mouse bounds, no injected bypass",
+  "timing": {
+    "clock": "native app RAF, no manual tick",
+    "hiddenSamples": 0,
+    "elapsedMs": 548836.8999999911,
+    "update": {
+      "n": 3793,
+      "p50": 3.3999999910593033,
+      "p95": 10.099999994039536,
+      "p99": 19.799999997019768,
+      "max": 30.399999991059303,
+      "over50": 0
+    },
+    "physics": {
+      "n": 3793,
+      "p50": 0.10000000894069672,
+      "p95": 0.29999999701976776,
+      "p99": 0.6000000089406967,
+      "max": 16.299999997019768,
+      "over50": 0
+    },
+    "dt": {
+      "n": 3793,
+      "p50": 0.1,
+      "p95": 0.1,
+      "p99": 0.1,
+      "max": 0.1,
+      "over50": 0
+    },
+    "guards": {
+      "items": {
+        "n": 3793,
+        "p50": 0,
+        "p95": 0.10000000894069672,
+        "p99": 0.10000000894069672,
+        "max": 2.9000000059604645,
+        "over50": 0
+      },
+      "cruiser": {
+        "n": 3793,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0.10000000894069672,
+        "max": 0.10000000894069672,
+        "over50": 0
+      },
+      "hostUpdate": {
+        "n": 3793,
+        "p50": 0,
+        "p95": 0.20000000298023224,
+        "p99": 0.29999999701976776,
+        "max": 2.7000000029802322,
+        "over50": 0
+      },
+      "creatures": {
+        "n": 3793,
+        "p50": 0,
+        "p95": 0.10000000894069672,
+        "p99": 0.10000000894069672,
+        "max": 7.899999991059303,
+        "over50": 0
+      },
+      "director": {
+        "n": 3793,
+        "p50": 0,
+        "p95": 0.09999999403953552,
+        "p99": 0.10000000894069672,
+        "max": 3.2000000029802322,
+        "over50": 0
+      },
+      "voice": {
+        "n": 3793,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0.10000000894069672,
+        "max": 0.20000000298023224,
+        "over50": 0
+      },
+      "audio": {
+        "n": 3793,
+        "p50": 0,
+        "p95": 0.10000000894069672,
+        "p99": 0.10000000894069672,
+        "max": 2.9000000059604645,
+        "over50": 0
+      },
+      "companyVis": {
+        "n": 3793,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0.4000000059604645,
+        "over50": 0
+      },
+      "viewModel": {
+        "n": 3793,
+        "p50": 0,
+        "p95": 0.10000000894069672,
+        "p99": 0.20000000298023224,
+        "max": 6.4000000059604645,
+        "over50": 0
+      },
+      "netSend": {
+        "n": 3793,
+        "p50": 0,
+        "p95": 0.10000000894069672,
+        "p99": 0.10000000894069672,
+        "max": 4.0999999940395355,
+        "over50": 0
+      }
+    }
+  },
+  "cleanup": {
+    "update": true,
+    "guard": true,
+    "physics": true
+  },
+  "inputAfterRelease": {
+    "keys": [],
+    "hidden": false
+  },
+  "browserClosed": true,
+  "status": "PARTIAL_NATIVE_FIRST_E_AND_FREE_SHIP_CLAIM",
+  "firstNativeE": {
+    "command": 36,
+    "sinceGameMs": 329316,
+    "label": "Fleet broker",
+    "sourceGuidance": "Read native broker anchor for camera aim only; all movement/mouse/E remained actual input"
+  },
+  "freeClaim": {
+    "command": 40,
+    "sinceGameMs": 377801,
+    "selected": "Packet Courier",
+    "credits": 60
+  },
+  "captureCounts": {
+    "pageErrors": 0,
+    "consoleErrors": 18,
+    "warnings": 1,
+    "caughtApplicationErrors": 0
+  },
+  "shots": [
+    "normal-new-run-960.png",
+    "fleet-first-prompt-960.png",
+    "fleet-head-aim-960.png",
+    "fleet-anchor-guided-960.png",
+    "fleet-catalog-960.png",
+    "tab-hold-960.png",
+    "dock-after-pause-960.png",
+    "host-normal-local-960.png",
+    "hub-after-claim-1280.png",
+    "fleet-claimed-catalog-1280.png",
+    "departure-native-route-1280.png"
+  ],
+  "unmeasured": [
+    "during-held Tab state",
+    "native broker ray fields",
+    "ship dispatch",
+    "moon entry",
+    "loot pickup/carry",
+    "Internet reliability",
+    "human discovery or fun",
+    "hardware performance"
+  ]
+}

@@ -1,0 +1,312 @@
+{
+  "method": "GUIDED_INPUT follow-up; fresh native Host/New-run UI; one visible page with native RAF only; source-assisted desired camera angle converted to genuine mouse input with native before/after receipts. No lifecycle, readiness, pose, loot or outcome fixtures. SwiftShader diagnostic timings are not hardware profiling.",
+  "source": "053ed6655eecabe694075d29f65367027fc88815+wave28_final_runtime",
+  "jsFreeze": "f27150200fefc02a7aa6e29c9275709b6375777a466d627d1260960b127140b4",
+  "allSourceFreeze": "4ce994bf310b71e99af11f53e545f7085dd27366852574eab9a7ef4bce3294ee",
+  "publicModsFreeze": "4ef501890a25a08f151851fe8022ff77e3e1e2b0685e8c14540e0266cb311ed2",
+  "url": "http://127.0.0.1:5174/",
+  "ownerScore": 5,
+  "capMs": 600000,
+  "commands": [
+    {
+      "command": {
+        "op": "press",
+        "key": "Enter"
+      },
+      "at": "2026-10-01T15:35:59.222Z",
+      "sinceGameMs": null,
+      "before": {
+        "markers": [],
+        "nativeRay": null,
+        "world": null,
+        "screen": "title",
+        "run": null,
+        "profile": {
+          "name": "Trainee409",
+          "coins": 50
+        },
+        "settings": {
+          "lang": "en",
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": true,
+          "hcExists": false,
+          "fwd": null
+        },
+        "input": {
+          "locked": false,
+          "enabled": true,
+          "typing": false,
+          "keys": [],
+          "hidden": false,
+          "pointer": false,
+          "active": "BODY"
+        },
+        "player": null,
+        "prompt": {
+          "main": null,
+          "dom": ""
+        },
+        "panel": null,
+        "visibleText": [
+          {
+            "class": "title-screen crt",
+            "text": "TFG V0.12.3 \u00b7 THREE.JS \u00b7 WEBRTC P2P\nEN\nTR\nRU"
+          }
+        ],
+        "buttons": [
+          {
+            "i": 0,
+            "text": "EN",
+            "aria": null
+          },
+          {
+            "i": 1,
+            "text": "TR",
+            "aria": null
+          },
+          {
+            "i": 2,
+            "text": "RU",
+            "aria": null
+          }
+        ],
+        "forms": [],
+        "caught": {
+          "total": 0,
+          "ring": []
+        }
+      },
+      "after": {
+        "markers": [],
+        "nativeRay": null,
+        "world": null,
+        "screen": "browser",
+        "run": null,
+        "profile": {
+          "name": "Trainee409",
+          "coins": 50
+        },
+        "settings": {
+          "lang": "en",
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "diagnostics": {
+          "menuKey": "Tab",
+          "blocksInput": false,
+          "terminal": false,
+          "minigame": false,
+          "hudHidden": true,
+          "hcExists": false,
+          "fwd": null
+        },
+        "input": {
+          "locked": false,
+          "enabled": true,
+          "typing": true,
+          "keys": [],
+          "hidden": false,
+          "pointer": false,
+          "active": "INPUT"
+        },
+        "player": null,
+        "prompt": {
+          "main": null,
+          "dom": ""
+        },
+        "panel": null,
+        "visibleText": [
+          {
+            "class": "menu-frame crt-panel",
+            "text": "LOBBY BROWSER\nAPPROVED\nNETWORK\nOnline P2P (Nostr relays)\nOnline P2P (MQTT brokers)\nOnline P2P (BitTorrent trackers)\nLocal (same PC, multiple tabs)\nONLINE \u00b7 0 lobbies \u00b7 Players online in the lobby network: 0 \u00b7 Signal relays reachable: 3/10\n\u27f3 REFRESH\nHOST GAME\nLOBBY\nHOST\nPLAYERS\nPHASE\nQUOTA\nMODS\nNo lobbies found yet. Host one, or ask a friend for their code.\nJOIN BY CODE\nJOIN \u25b6\nBACK\n\u2191\u2193 SELECT\nENTER CONFIRM\nESC BACK"
+          }
+        ],
+        "buttons": [
+          {
+            "i": 0,
+            "text": "\u27f3 Refresh",
+            "aria": null
+          },
+          {
+            "i": 1,
+            "text": "HOST GAME",
+            "aria": null
+          },
+          {
+            "i": 2,
+            "text": "Join \u25b6",
+            "aria": null
+          },
+          {
+            "i": 3,
+            "text": "BACK",
+            "aria": null
+          }
+        ],
+        "forms": [
+          {
+            "tag": "SELECT",
+            "type": "select-one",
+            "value": "nostr",
+            "text": null,
+            "options": [
+              {
+                "value": "nostr",
+                "text": "Online P2P (Nostr relays)"
+              },
+              {
+                "value": "mqtt",
+                "text": "Online P2P (MQTT brokers)"
+              },
+              {
+                "value": "torrent",
+                "text": "Online P2P (BitTorrent trackers)"
+              },
+              {
+                "value": "local",
+                "text": "Local (same PC, multiple tabs)"
+              }
+            ]
+          },
+          {
+            "tag": "INPUT",
+            "type": "text",
+            "value": "",
+            "text": null,
+            "options": null
+          },
+          {
+            "tag": "INPUT",
+            "type": "text",
+            "value": "",
+            "text": null,
+            "options": null
+          }
+        ],
+        "render": {
+          "calls": 179,
+          "tris": 3430
+        },
+        "caught": {
+          "total": 0,
+          "ring": []
+        }
+      }
+    },
+    {
+      "command": {
+        "op": "button",
+        "text": "HOST GAME"
+      },
+      "at": "2026-10-01T15:36:00.587Z",
+      "sinceGameMs": null,
+      "error": "TimeoutError: locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button').filter({ hasText: 'HOST GAME' }).first()\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" class=\"btn primary\">HOST GAME</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 \u00d7 waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"cell-boot\">\u2026</div> from <div class=\"cell-ui\">\u2026</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 \u00d7 waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"cell-boot\">\u2026</div> from <div class=\"cell-ui\">\u2026</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <div class=\"cell-boot\">\u2026</div> from <div class=\"cell-ui\">\u2026</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting 500ms\u001b[22m\n"
+    }
+  ],
+  "errors": [],
+  "consoleErrors": [
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    }
+  ],
+  "warnings": [],
+  "shots": [],
+  "menuLoadedAt": "2026-10-01T15:35:59.222Z",
+  "fatal": "TimeoutError: locator.waitFor: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.host-adv summary') to be visible\u001b[22m\n",
+  "cleanupScope": "No game loaded/no native wrapper installed; browser.close awaited in fatal catch; flock process exited1",
+  "browserClosed": true
+}

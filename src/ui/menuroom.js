@@ -468,7 +468,7 @@ export class MenuRoom {
 
   keyDown(e) {
     if (this.disposed || this.terminal.active) return;
-    if (this.boot?.active) { this.skipBoot(); return; }
+    if (this.boot?.active) { e.preventDefault(); e.stopImmediatePropagation(); this.skipBoot(); return; }
     const code = e.code;
     const interact = code === (this.app.settings?.keys?.interact || 'KeyE') || code === 'KeyE';
     if (this.modal) { this.modalKey(e, interact); return; }
@@ -846,7 +846,7 @@ export class MenuRoom {
     if (!this.bootChecked && this.app.booted) {
       this.bootChecked = true;
       const qs = new URLSearchParams(location.search);
-      if (!bootedOnce && !qs.has('autohost') && !qs.has('autojoin') && !this.app.settings?.reduceMotion) this.startBoot();
+      if (!bootedOnce && this.menu.mode === 'title' && !qs.has('autohost') && !qs.has('autojoin') && !this.app.settings?.reduceMotion) this.startBoot();
       bootedOnce = true;
     }
     const b = this.boot;

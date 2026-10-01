@@ -78,10 +78,11 @@ ok(FC_KEYS.includes(pass) && tIn('tr', pass) !== pass && tIn('ru', pass) !== pas
 ok(FC_KEYS.some((k) => k.startsWith('Blind spot: the green ring')), 'blind-spot tip mentions the ring');
 
 // ---- every module really consults the budget (one line each, optional chaining)
-const need = [['src/game/algorithm.js', 'fr?.algoOk'], ['src/game/objectives.js', 'fr?.only'], ['src/game/game.js', 'fr?.active'], ['src/game/mapmods.js', "fr?.calm?.('mapmods')"], ['src/game/facjobs.js', "fr?.calm?.('facjobs')"],
+const need = [['src/game/algorithm.js', 'fr?.algoOk'], ['src/game/objectives.js', 'fr?.only'], ['src/game/phase_help28.js', 'fr?.active'], ['src/game/mapmods.js', "fr?.calm?.('mapmods')"], ['src/game/facjobs.js', "fr?.calm?.('facjobs')"],
   ['src/game/host.js', "fr?.calm?.('dailyEvent')"], ['src/game/daily.js', "locked?.('season')"], ['src/game/guide.js', "fr?.calm?.('tips')"], ['src/game/soul.js', 'fr?.lease'], ['src/game/crdirector.js', 'fr?.lease'],
   ['src/game/worlds3.js', 'firstDay(r)'], ['src/game/feedcams2.js', 'firstDay(r)'], ['src/game/feedcams.js', 'fr?.camDone'], ['src/game/lore.js', 'pri: !!opts.pri']];
 for (const [f, needle] of need) ok(rd(f).includes(needle), `${f} consults the budget (${needle})`);
+ok(rd('src/game/game.js').includes('showPhaseHelp28(this, ph)'), 'native Game tutorial caller reaches the budgeted phase-help owner');
 
 if (fails.length) { console.log('FAIL', fails.length); for (const f of fails.slice(0, 40)) console.log(' -', f); process.exit(1); }
 console.log('firstrun.test: OK');

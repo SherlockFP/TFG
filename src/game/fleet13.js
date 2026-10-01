@@ -159,7 +159,9 @@ export function installFleet13(game) {
   const target=entry?new THREE.Vector3(SHIP.door.x,.6,SHIP.z1+.3):new THREE.Vector3(...(key==='board'?HUB13_BOARD:HUB13_BROKER));
   if(entry&&entryBudget.get(key)<=0)return;
   if(key!==markerKey){marker?.dispose();marker=null;markerKey=key;if(typeof document!=='undefined')marker=new WorldMarker('', entry?'#d9c8a0':'#72e3d6', entry?(entryBudget.get(key)??14):14);if(entry){if(!entryBudget.has(key))entryBudget.set(key,14);if(entryBudget.size>32)entryBudget.delete(entryBudget.keys().next().value);}}
-  if(marker){const label=t(entry?'SHIP ENTRY':key==='board'?'DEPARTURE':'FLEET OFFICE');const visible=marker.update(dt,game.camera,target,label);if(entry)entryBudget.set(key,Math.max(0,marker.life));if(!visible)marker=null;}
+  // Dock tasks retain their single cue until selection/dispatch; reading a panel
+  // cannot spend it. The outdoor ship-entry cue keeps its finite landing budget.
+  if(marker){const label=t(entry?'SHIP ENTRY':key==='board'?'DEPARTURE':'FLEET OFFICE');const visible=marker.update(entry?dt:0,game.camera,target,label);if(entry)entryBudget.set(key,Math.max(0,marker.life));if(!visible)marker=null;}
  }));
  offs.push(game.mods.on('phase',(ph,g)=>{if(g!==game||ph!=='orbit'||!game.isHost||game.run.fleet13)return;game.run.fleet13=sanitizeFleet13({...game.profile.fleet13,docked:true});persist();arrive();for(const id of game.remotes.keys())game.net.sendTo(id,'tp',{p:HUB13_SPAWN,yaw:Math.PI});}));
  offs.push(game.mods.on('registerHandlers',(H,g)=>{if(g!==game)return;H('f13act',(d,from)=>{

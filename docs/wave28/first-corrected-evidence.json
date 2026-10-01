@@ -1,0 +1,226 @@
+{
+  "source": "053ed6655eecabe694075d29f65367027fc88815+wave28_frozen_content",
+  "jsFreeze": "f27150200fefc02a7aa6e29c9275709b6375777a466d627d1260960b127140b4",
+  "allSourceFreeze": "4ce994bf310b71e99af11f53e545f7085dd27366852574eab9a7ef4bce3294ee",
+  "gameLoadedAt": "2026-10-01T15:21:01.775Z",
+  "finishedAt": "2026-10-01T15:24:36.670Z",
+  "durationAfterGameLoadMs": 214895,
+  "stopReason": "FIRST_CORRECTED_REPLAY_FAIL: native LIGHT mod labels grow on cached hotbar; earned clerkE/heldTab/freeCourier/kiosk boarding and texture cache retained; close for root wrapper fix",
+  "cleanup": {
+    "update": true,
+    "guard": true,
+    "physics": true
+  },
+  "inputAfterRelease": {
+    "keys": [],
+    "hidden": false
+  },
+  "browserClosed": true,
+  "status": "FIRST_CORRECTED_REPLAY_FAIL_LIGHT_MOD_GROWTH",
+  "earned": [
+    "visible clerk-face selected actual E",
+    "during-held native Tab, released cleanly",
+    "native free Courier claim",
+    "persistent departure marker after20s pause",
+    "native physical walk and selected kiosk E dispatch",
+    "native ship floor/custody identity",
+    "six-second stable status/quota texture versions"
+  ],
+  "errorCounts": {
+    "errors": 0,
+    "consoleErrors": 18,
+    "warnings": 1
+  },
+  "heldTab": {
+    "menuKey": "Tab",
+    "blocksInput": false,
+    "terminal": false,
+    "minigame": false,
+    "hudHidden": false,
+    "hcExists": true,
+    "hcOn": true,
+    "eye": [
+      2.400025933129427,
+      0.38990813372257604,
+      29.151214599609375
+    ],
+    "fwd": [
+      -1.2246467991473535e-16,
+      0,
+      1
+    ]
+  },
+  "idle": {
+    "elapsedMs": 6023.899999991059,
+    "mutationRecords": 10,
+    "phaseBefore": "orbit",
+    "phaseAfter": "orbit",
+    "inputBefore": [],
+    "inputAfter": [],
+    "inShip": true,
+    "rowsBefore": {
+      "status": [
+        "SHIP STATUS",
+        "MOON: Dialup",
+        "PHASE: ORBIT",
+        "LOOT ONBOARD: \u25ae0",
+        "CREDITS: \u25ae60",
+        "CREW: 1",
+        null
+      ],
+      "quota": [
+        "ENGAGEMENT QUOTA",
+        "\u25ae0 / \u25ae330",
+        "DEADLINE: 3 DAYS",
+        "DAY 1",
+        "#ffd9a0"
+      ]
+    },
+    "rowsAfter": {
+      "status": [
+        "SHIP STATUS",
+        "MOON: Dialup",
+        "PHASE: ORBIT",
+        "LOOT ONBOARD: \u25ae0",
+        "CREDITS: \u25ae60",
+        "CREW: 1",
+        null
+      ],
+      "quota": [
+        "ENGAGEMENT QUOTA",
+        "\u25ae0 / \u25ae330",
+        "DEADLINE: 3 DAYS",
+        "DAY 1",
+        "#ffd9a0"
+      ]
+    },
+    "texturesBefore": {
+      "status": 2,
+      "quota": 2
+    },
+    "texturesAfter": {
+      "status": 2,
+      "quota": 2
+    }
+  },
+  "lightCounts": [
+    {
+      "command": 5,
+      "nativeTime": 0.35,
+      "count": 1
+    },
+    {
+      "command": 6,
+      "nativeTime": 17.654996264372983,
+      "count": 32
+    },
+    {
+      "command": 7,
+      "nativeTime": 18.827977702402197,
+      "count": 34
+    },
+    {
+      "command": 8,
+      "nativeTime": 21.989400792304085,
+      "count": 40
+    },
+    {
+      "command": 9,
+      "nativeTime": 41.33559519516103,
+      "count": 75
+    },
+    {
+      "command": 10,
+      "nativeTime": 41.91600731916102,
+      "count": 76
+    },
+    {
+      "command": 11,
+      "nativeTime": 41.97369073592102,
+      "count": 76
+    },
+    {
+      "command": 12,
+      "nativeTime": 44.30123317685384,
+      "count": 80
+    },
+    {
+      "command": 13,
+      "nativeTime": 44.30123317685384,
+      "count": 80
+    },
+    {
+      "command": 14,
+      "nativeTime": 53.01120386313096,
+      "count": 96
+    },
+    {
+      "command": 15,
+      "nativeTime": 57.071734106932404,
+      "count": 103
+    },
+    {
+      "command": 16,
+      "nativeTime": 62.3720549714379,
+      "count": 113
+    },
+    {
+      "command": 17,
+      "nativeTime": 62.70228024027637,
+      "count": 113
+    },
+    {
+      "command": 18,
+      "nativeTime": 62.70228024027637,
+      "count": 113
+    },
+    {
+      "command": 19,
+      "nativeTime": 73.65116273058756,
+      "count": 133
+    },
+    {
+      "command": 20,
+      "nativeTime": 77.39641332788739,
+      "count": 140
+    },
+    {
+      "command": 21,
+      "nativeTime": 81.92660518788716,
+      "count": 148
+    },
+    {
+      "command": 22,
+      "nativeTime": 87.22613503019623,
+      "count": 158
+    },
+    {
+      "command": 23,
+      "nativeTime": 90.4597016805961,
+      "count": 164
+    },
+    {
+      "command": 24,
+      "nativeTime": 90.69525278059609,
+      "count": 164
+    },
+    {
+      "command": 25,
+      "nativeTime": 90.69525278059609,
+      "count": 164
+    },
+    {
+      "command": 26,
+      "nativeTime": 91.39013771689608,
+      "count": 165
+    }
+  ],
+  "shots": [
+    "first-clerk-face-native-selected-960.png",
+    "first-status-held-native-960.png",
+    "first-native-clerk-catalog-960.png",
+    "first-departure-marker-after-panel-960.png",
+    "first-native-boarded-960.png",
+    "first-native-ship-idle-1280.png"
+  ]
+}

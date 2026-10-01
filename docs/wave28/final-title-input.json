@@ -1,0 +1,691 @@
+{
+  "method": "GUIDED_INPUT title-only acceptance: fresh profiles, real Enter and Host clicks, one native RAF clock, no outcome/settings/readiness/clock/pose writes. Read-only capture listener records native state at incoming trusted keydown.",
+  "source": "053ed6655eecabe694075d29f65367027fc88815+wave28_final_title",
+  "jsFreeze": "400a0d37823b54ee77b84da42043809e873d40e8077dbdb43a4e60b0a699e0ae",
+  "allSourceFreeze": "24a57c23a87714b803f18ae04f9b01993f2d35ab57400ac31c5ed0cba2f04796",
+  "publicModsFreeze": "05be26557d600a0985ce388f3ec2540f16d176378feca0b799a1cbfcfbc41b68",
+  "capMs": 60000,
+  "errors": [],
+  "consoleErrors": [
+    {
+      "label": "earliest-native",
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "earliest-native",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "earliest-native",
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "earliest-native",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "earliest-native",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "earliest-native",
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "earliest-native",
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "active-intro-skip",
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "active-intro-skip",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "active-intro-skip",
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "active-intro-skip",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "active-intro-skip",
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "active-intro-skip",
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "active-intro-skip",
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "label": "active-intro-skip",
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "label": "active-intro-skip",
+      "text": "Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently",
+      "location": {
+        "url": "http://127.0.0.1:5174/src/ui/crtmenu.js",
+        "line": 362,
+        "column": 0,
+        "lineNumber": 362,
+        "columnNumber": 0
+      }
+    }
+  ],
+  "cases": [
+    {
+      "label": "earliest-native",
+      "loadedAt": "2026-10-01T16:07:46.355Z",
+      "beforeFirstEnter": {
+        "omitted": "Earliest native input avoids an extra pre-key RPC; incoming trusted-key receipt records the actual prerequisite state."
+      },
+      "afterFirstEnter": {
+        "at": 4019.2000000029802,
+        "booted": true,
+        "mode": "sub",
+        "screen": "browser",
+        "roomState": "seated",
+        "bootChecked": true,
+        "bootText": "",
+        "bootVisible": false,
+        "profile": "Extra937",
+        "keys": [],
+        "keydownReceipts": [
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": false,
+            "time": 2737.7999999970198,
+            "booted": true,
+            "mode": "title",
+            "screen": "title"
+          }
+        ],
+        "visibleText": [
+          {
+            "class": "menu-frame crt-panel",
+            "text": "LOBBY BROWSER\nAPPROVED\nNETWORK\nOnline P2P (Nostr relays)\nOnline P2P (MQTT brokers)\nOnline P2P (BitTorrent trackers)\nLocal (same PC, multiple tabs)\nONLINE · 0 lobbies · Players online in the lobby network: 0 · Signal relays reachable: 0/10\nNo signal relay reachable from this network - servers cannot be listed or joined.\n⟳ REFRESH\nHOST GAME\nLOBBY\nHOST\nPLAYERS\nPHASE\nQUOTA\nMODS\nNo lobbies found yet. Host one, or ask a friend for their code.\nJOIN BY CODE\nJOIN ▶\nBACK\n↑↓ SELECT\nENTER CONFIRM\nESC BACK"
+          }
+        ],
+        "buttons": [
+          "⟳ Refresh",
+          "HOST GAME",
+          "Join ▶",
+          "BACK"
+        ],
+        "caught": {
+          "total": 0,
+          "ring": []
+        },
+        "hidden": false
+      },
+      "firstShot": "earliest-native-after-first-enter-960.png",
+      "incomingEnter": {
+        "code": "Enter",
+        "trusted": true,
+        "repeat": false,
+        "time": 2737.7999999970198,
+        "booted": true,
+        "mode": "title",
+        "screen": "title"
+      },
+      "earlyModePath": true,
+      "skipConsumedRequired": false,
+      "hostOpened": {
+        "at": 6739.29999999702,
+        "booted": true,
+        "mode": "sub",
+        "screen": "host",
+        "roomState": "seated",
+        "bootChecked": true,
+        "bootText": "",
+        "bootVisible": false,
+        "profile": "Extra937",
+        "keys": [],
+        "keydownReceipts": [
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": false,
+            "time": 2737.7999999970198,
+            "booted": true,
+            "mode": "title",
+            "screen": "title"
+          }
+        ],
+        "visibleText": [
+          {
+            "class": "menu-frame crt-panel",
+            "text": "HOST GAME\nAPPROVED\nGame mode\nCampaign\nQUICK SHIFT\nLobby name\nPublic (listed in lobby browser)\nADVANCED\nSAVE SLOT\nSLOT 1\nNEW RUN\n— — —\nSLOT 2\nNEW RUN\n— — —\nSLOT 3\nNEW RUN\n— — —\nBACK\nSTART ▶\n↑↓ SELECT\nENTER CONFIRM\nESC BACK"
+          },
+          {
+            "class": "menu-frame crt-panel crt-ghost",
+            "text": "LOBBY BROWSER\nAPPROVED\nNETWORK\nOnline P2P (Nostr relays)\nOnline P2P (MQTT brokers)\nOnline P2P (BitTorrent trackers)\nLocal (same PC, multiple tabs)\nONLINE · 0 lobbies · Players online in the lobby network: 0 · Signal relays reachable: 4/10\n⟳ REFRESH\nHOST GAME\nLOBBY\nHOST\nPLAYERS\nPHASE\nQUOTA\nMODS\nNo lobbies found yet. Host one, or ask a friend for their code.\nJOIN BY CODE\nJOIN ▶\nBACK\n↑↓ SELECT\nENTER CONFIRM\nESC BACK"
+          }
+        ],
+        "buttons": [
+          "BACK",
+          "START ▶",
+          "⟳ Refresh",
+          "HOST GAME",
+          "Join ▶",
+          "BACK"
+        ],
+        "caught": {
+          "total": 0,
+          "ring": []
+        },
+        "hidden": false
+      },
+      "afterNativeRafs": {
+        "at": 7844.9000000059605,
+        "booted": true,
+        "mode": "sub",
+        "screen": "host",
+        "roomState": "seated",
+        "bootChecked": true,
+        "bootText": "",
+        "bootVisible": false,
+        "profile": "Extra937",
+        "keys": [],
+        "keydownReceipts": [
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": false,
+            "time": 2737.7999999970198,
+            "booted": true,
+            "mode": "title",
+            "screen": "title"
+          }
+        ],
+        "visibleText": [
+          {
+            "class": "menu-frame crt-panel",
+            "text": "HOST GAME\nAPPROVED\nGame mode\nCampaign\nQUICK SHIFT\nLobby name\nPublic (listed in lobby browser)\nADVANCED\nSAVE SLOT\nSLOT 1\nNEW RUN\n— — —\nSLOT 2\nNEW RUN\n— — —\nSLOT 3\nNEW RUN\n— — —\nBACK\nSTART ▶\n↑↓ SELECT\nENTER CONFIRM\nESC BACK"
+          }
+        ],
+        "buttons": [
+          "BACK",
+          "START ▶"
+        ],
+        "caught": {
+          "total": 0,
+          "ring": []
+        },
+        "hidden": false
+      },
+      "hostShot": "earliest-native-host-stays-visible-960.png",
+      "noLateIntro": true,
+      "keysAfterRelease": [],
+      "contextClosed": true
+    },
+    {
+      "label": "active-intro-skip",
+      "loadedAt": "2026-10-01T16:07:55.939Z",
+      "beforeFirstEnter": {
+        "at": 3234.2999999970198,
+        "booted": true,
+        "mode": "title",
+        "screen": "title",
+        "roomState": "seated",
+        "bootChecked": true,
+        "bootActive": true,
+        "bootTime": 0.30000000000000004,
+        "bootText": "TFG OS v4.1 (c) FEED CORP ALL VIEWS RESERVED\n█\npress any key to skip",
+        "bootVisible": true,
+        "profile": "Lurker843",
+        "keys": [],
+        "keydownReceipts": [],
+        "visibleText": [
+          {
+            "class": "title-screen crt",
+            "text": "TFG V0.12.3 · THREE.JS · WEBRTC P2P\nEN\nTR\nRU"
+          },
+          {
+            "class": "cell-boot",
+            "text": "TFG OS v4.1 (c) FEED CORP ALL VIEWS RESERVED\n█\npress any key to skip"
+          }
+        ],
+        "buttons": [
+          "EN",
+          "TR",
+          "RU"
+        ],
+        "caught": {
+          "total": 0,
+          "ring": []
+        },
+        "hidden": false
+      },
+      "duringHeldEnter": {
+        "at": 3492.2999999970198,
+        "booted": true,
+        "mode": "title",
+        "screen": "title",
+        "roomState": "seated",
+        "bootChecked": true,
+        "bootActive": false,
+        "bootTime": 0.30000000000000004,
+        "bootText": "",
+        "bootVisible": false,
+        "profile": "Lurker843",
+        "keys": [
+          "Enter"
+        ],
+        "keydownReceipts": [
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": false,
+            "time": 3238.5999999940395,
+            "booted": true,
+            "mode": "title",
+            "screen": "title",
+            "bootChecked": true,
+            "bootActive": true
+          },
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": true,
+            "time": 3369.8999999910593,
+            "booted": true,
+            "mode": "title",
+            "screen": "title",
+            "bootChecked": true,
+            "bootActive": false
+          },
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": true,
+            "time": 3375,
+            "booted": true,
+            "mode": "title",
+            "screen": "title",
+            "bootChecked": true,
+            "bootActive": false
+          }
+        ],
+        "visibleText": [
+          {
+            "class": "title-screen crt",
+            "text": "TFG V0.12.3 · THREE.JS · WEBRTC P2P\nEN\nTR\nRU"
+          }
+        ],
+        "buttons": [
+          "EN",
+          "TR",
+          "RU"
+        ],
+        "caught": {
+          "total": 0,
+          "ring": []
+        },
+        "hidden": false
+      },
+      "heldShot": "active-intro-skip-during-held-enter-960.png",
+      "afterFirstEnter": {
+        "at": 5275.29999999702,
+        "booted": true,
+        "mode": "title",
+        "screen": "title",
+        "roomState": "seated",
+        "bootChecked": true,
+        "bootActive": false,
+        "bootTime": 0.30000000000000004,
+        "bootText": "",
+        "bootVisible": false,
+        "profile": "Lurker843",
+        "keys": [],
+        "keydownReceipts": [
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": false,
+            "time": 3238.5999999940395,
+            "booted": true,
+            "mode": "title",
+            "screen": "title",
+            "bootChecked": true,
+            "bootActive": true
+          },
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": true,
+            "time": 3369.8999999910593,
+            "booted": true,
+            "mode": "title",
+            "screen": "title",
+            "bootChecked": true,
+            "bootActive": false
+          },
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": true,
+            "time": 3375,
+            "booted": true,
+            "mode": "title",
+            "screen": "title",
+            "bootChecked": true,
+            "bootActive": false
+          }
+        ],
+        "visibleText": [
+          {
+            "class": "title-screen crt",
+            "text": "TFG V0.12.3 · THREE.JS · WEBRTC P2P\nEN\nTR\nRU"
+          }
+        ],
+        "buttons": [
+          "EN",
+          "TR",
+          "RU"
+        ],
+        "caught": {
+          "total": 0,
+          "ring": []
+        },
+        "hidden": false
+      },
+      "firstShot": "active-intro-skip-after-first-enter-960.png",
+      "incomingEnter": {
+        "code": "Enter",
+        "trusted": true,
+        "repeat": false,
+        "time": 3238.5999999940395,
+        "booted": true,
+        "mode": "title",
+        "screen": "title",
+        "bootChecked": true,
+        "bootActive": true
+      },
+      "skipConsumed": true,
+      "skipConsumedRequired": true,
+      "hostOpened": {
+        "at": 7945.699999988079,
+        "booted": true,
+        "mode": "sub",
+        "screen": "host",
+        "roomState": "seated",
+        "bootChecked": true,
+        "bootActive": false,
+        "bootTime": 0.30000000000000004,
+        "bootText": "",
+        "bootVisible": false,
+        "profile": "Lurker843",
+        "keys": [],
+        "keydownReceipts": [
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": false,
+            "time": 3238.5999999940395,
+            "booted": true,
+            "mode": "title",
+            "screen": "title",
+            "bootChecked": true,
+            "bootActive": true
+          },
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": true,
+            "time": 3369.8999999910593,
+            "booted": true,
+            "mode": "title",
+            "screen": "title",
+            "bootChecked": true,
+            "bootActive": false
+          },
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": true,
+            "time": 3375,
+            "booted": true,
+            "mode": "title",
+            "screen": "title",
+            "bootChecked": true,
+            "bootActive": false
+          },
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": false,
+            "time": 6455.199999988079,
+            "booted": true,
+            "mode": "title",
+            "screen": "title",
+            "bootChecked": true,
+            "bootActive": false
+          }
+        ],
+        "visibleText": [
+          {
+            "class": "menu-frame crt-panel",
+            "text": "HOST GAME\nAPPROVED\nGame mode\nCampaign\nQUICK SHIFT\nLobby name\nPublic (listed in lobby browser)\nADVANCED\nSAVE SLOT\nSLOT 1\nNEW RUN\n— — —\nSLOT 2\nNEW RUN\n— — —\nSLOT 3\nNEW RUN\n— — —\nBACK\nSTART ▶\n↑↓ SELECT\nENTER CONFIRM\nESC BACK"
+          },
+          {
+            "class": "menu-frame crt-panel crt-ghost",
+            "text": "LOBBY BROWSER\nAPPROVED\nNETWORK\nOnline P2P (Nostr relays)\nOnline P2P (MQTT brokers)\nOnline P2P (BitTorrent trackers)\nLocal (same PC, multiple tabs)\nONLINE · 0 lobbies · Players online in the lobby network: 0 · Signal relays reachable: 6/10\n⟳ REFRESH\nHOST GAME\nLOBBY\nHOST\nPLAYERS\nPHASE\nQUOTA\nMODS\nNo lobbies found yet. Host one, or ask a friend for their code.\nJOIN BY CODE\nJOIN ▶\nBACK\n↑↓ SELECT\nENTER CONFIRM\nESC BACK"
+          }
+        ],
+        "buttons": [
+          "BACK",
+          "START ▶",
+          "⟳ Refresh",
+          "HOST GAME",
+          "Join ▶",
+          "BACK"
+        ],
+        "caught": {
+          "total": 0,
+          "ring": []
+        },
+        "hidden": false
+      },
+      "afterNativeRafs": {
+        "at": 9053.79999999702,
+        "booted": true,
+        "mode": "sub",
+        "screen": "host",
+        "roomState": "seated",
+        "bootChecked": true,
+        "bootActive": false,
+        "bootTime": 0.30000000000000004,
+        "bootText": "",
+        "bootVisible": false,
+        "profile": "Lurker843",
+        "keys": [],
+        "keydownReceipts": [
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": false,
+            "time": 3238.5999999940395,
+            "booted": true,
+            "mode": "title",
+            "screen": "title",
+            "bootChecked": true,
+            "bootActive": true
+          },
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": true,
+            "time": 3369.8999999910593,
+            "booted": true,
+            "mode": "title",
+            "screen": "title",
+            "bootChecked": true,
+            "bootActive": false
+          },
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": true,
+            "time": 3375,
+            "booted": true,
+            "mode": "title",
+            "screen": "title",
+            "bootChecked": true,
+            "bootActive": false
+          },
+          {
+            "code": "Enter",
+            "trusted": true,
+            "repeat": false,
+            "time": 6455.199999988079,
+            "booted": true,
+            "mode": "title",
+            "screen": "title",
+            "bootChecked": true,
+            "bootActive": false
+          }
+        ],
+        "visibleText": [
+          {
+            "class": "menu-frame crt-panel",
+            "text": "HOST GAME\nAPPROVED\nGame mode\nCampaign\nQUICK SHIFT\nLobby name\nPublic (listed in lobby browser)\nADVANCED\nSAVE SLOT\nSLOT 1\nNEW RUN\n— — —\nSLOT 2\nNEW RUN\n— — —\nSLOT 3\nNEW RUN\n— — —\nBACK\nSTART ▶\n↑↓ SELECT\nENTER CONFIRM\nESC BACK"
+          }
+        ],
+        "buttons": [
+          "BACK",
+          "START ▶"
+        ],
+        "caught": {
+          "total": 0,
+          "ring": []
+        },
+        "hidden": false
+      },
+      "hostShot": "active-intro-skip-host-stays-visible-960.png",
+      "noLateIntro": true,
+      "keysAfterRelease": [],
+      "contextClosed": true
+    }
+  ],
+  "firstLoadedAt": "2026-10-01T16:07:46.354Z",
+  "stopReason": "Completed title-only acceptance",
+  "elapsedAfterLoadMs": 16851,
+  "browserClosed": true,
+  "finishedAt": "2026-10-01T16:08:03.437Z"
+}

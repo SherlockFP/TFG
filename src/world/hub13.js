@@ -9,7 +9,8 @@ import { dressPort14 } from './port14.js';
 const freeze18=value=>{if(value&&typeof value==='object'){for(const child of Object.values(value))freeze18(child);Object.freeze(value);}return value;};
 
 export const HUB13_SPAWN = [0, -1.15, 23];
-export const HUB13_BROKER = [0, 0.2, 30];
+// Customer-facing CRT, above the physical counter; shared by E, guidance and host range.
+export const HUB13_BROKER = [0, 0.70, 31.56];
 export const HUB13_BOARD = [3, 0.2, 9.48];
 export function buildHub13({ physics }) {
   const group = new THREE.Group(); group.name = 'relay-dock-hub';

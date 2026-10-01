@@ -2,6 +2,7 @@
 // Host-only logic lives in host.js, local player actions in actions.js (mixed into the prototype).
 import * as THREE from 'three';
 import { installFleet13 } from './fleet13.js';
+import { showPhaseHelp28 } from './phase_help28.js';
 import { installBossdress } from './bossdress.js';   // wave 8 night: themed sector boss names + lair dressing (docs/wave8/bossdress.md)
 import { installHerocontent } from './herocontent.js';   // wave 8: themed scrap tables for metro / greenhouse / prison / tower (docs/wave8/herocontent.md); early so every import-time SCRAP_TABLE walker sees them
 import { Physics, G } from '../physics/physics.js';
@@ -964,17 +965,7 @@ export class Game extends Emitter {
 
   // first-time player hints (LC-style onboarding)
   tutorialHint(ph) {
-    const t = (this.profile.tutorial = this.profile.tutorial || {});
-    const show = (key, lines, delay = 1500) => {
-      if (t[key]) return;
-      if (this.onboard?.fr?.active?.()) { t[key] = true; return; }   // [firstrun] a budgeted new player gets ONE teacher (Hiring Day / objectives), not three toast stacks
-      t[key] = true;
-      this.progress.save();
-      lines.forEach((l, i) => setTimeout(() => this.ui.toast('💡 ' + l, 'info'), delay + i * 3800));
-    };
-    if (ph === 'orbit') show('orbit', ['Use the TERMINAL [E]. Type MOONS, then ROUTE <moon>.', 'Buy tools with STORE / BUY (a flashlight is a good start).', 'Pull the LEVER to land. You have until midnight.']);
-    if (ph === 'moon') show('moon', ['Scrap is inside the facility. Follow the path to the MAIN ENTRANCE.', 'Right-click to SCAN for scrap and creatures. Scan monsters to learn their rules.', 'Bring scrap back to the ship. The ship leaves at MIDNIGHT - with or without you.'], 3000);
-    if (ph === 'company') show('company', ['Put scrap on the COUNTER, then ring the BELL to sell.', 'Buy personal gear from Phish Dayı (Black Market). Take BOUNTIES from the board.', 'Meet the quota before the deadline or you are deplatformed.'], 2500);
+    showPhaseHelp28(this, ph);
   }
 
   planetColorFor(moonId) {
