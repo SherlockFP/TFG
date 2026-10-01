@@ -16,6 +16,7 @@ import { LightPool } from './render/lightpool.js';
 import { Environment } from './world/environment.js';
 import { buildShip } from './world/ship.js';
 import { UI } from './ui/ui.js';
+import { hasEscapeLayer27, installEscape27 } from './ui/escape27.js';
 import { ModManager } from './mods/modapi.js';
 import { LobbyDirectory } from './net/lobby.js';
 import { installHub } from './net/hub.js';   // [social]
@@ -193,43 +194,30 @@ class App {
     input.onLockChange = (locked, intentional) => {
       const g = this.game;
       if (!g) return;
-      this.ui.clickHint.classList.toggle('hidden', locked || !!this.ui.panelOpen || !!g.minigame || g.terminal.active || this.ui.chatOpen);
-      if (!locked && !intentional && !this.ui.panelOpen && !g.minigame && !g.terminal.active && !this.ui.chatOpen && !this.ui.fullscreenOpen?.()) {
+      this.ui.clickHint.classList.toggle('hidden', locked || hasEscapeLayer27(this));
+      if (!locked && !intentional && !hasEscapeLayer27(this) && !this.ui.fullscreenOpen?.()) {
         this.pauseFromUnlockAt = performance.now();
         this.ui.openPause();
       }
     };
     this.engine.canvas.addEventListener('click', () => {
-      if (this.game && !this.ui.panelOpen && !this.ui.chatOpen && !this.game.minigame && !this.game.terminal.active) input.lock();
+      if (this.game && !hasEscapeLayer27(this) && !this.ui.fullscreenOpen?.()) input.lock();
     });
-    this.ui.clickHint.addEventListener('click', () => { if (this.game && !this.ui.panelOpen) input.lock(); });
+    this.ui.clickHint.addEventListener('click', () => { if (this.game && !hasEscapeLayer27(this) && !this.ui.fullscreenOpen?.()) input.lock(); });
     // [ux] reliable re-capture: any panel/terminal/minigame closing must return to pointer lock; when the browser refuses
     // (ESC cooldown, focus loss) the next click / key press retries and a "click to resume" hint is shown as fallback.
-    const idle = () => { const g = this.game; return !!g && !g.player?.dead && !this.ui.panelOpen && !this.ui.chatOpen && !g.minigame && !g.terminal?.active && !this.ui.fullscreenOpen?.() && !input.isTyping(); };
+    const idle = () => { const g = this.game; return !!g && !g.player?.dead && !hasEscapeLayer27(this) && !this.ui.fullscreenOpen?.() && !input.isTyping(); };
     const showHint = () => { if (idle() && !input.locked) this.ui.clickHint.classList.remove('hidden'); };
     input.onLockFail = () => setTimeout(showHint, 60);
     document.addEventListener('mousedown', (e) => { if (idle() && !input.locked && !e.target.closest?.('button,input,select,textarea,a')) input.lock(); }, true);
     window.addEventListener('keydown', (e) => { if (e.code !== 'Escape' && idle() && !input.locked && !e.repeat) input.lock(); }, true);
     setInterval(() => { if (this.game && idle() && !input.locked && document.hasFocus?.() !== false) this.ui.clickHint.classList.remove('hidden'); else if (input.locked) this.ui.clickHint.classList.add('hidden'); }, 400);
-    // Escape can release pointer lock before its key event is delivered. Consume that same gesture once.
-    window.addEventListener('keydown', (e) => {
-      if (e.code === 'Escape' && e.repeat && this.game && !input.isTyping()) {
-        e.preventDefault(); e.stopImmediatePropagation();
-      }
-    }, true);
+    installEscape27(this);
     window.addEventListener('keydown', (e) => {
       const g = this.game;
       if (!g || input.isTyping() || e.defaultPrevented || e.repeat) return;
       const k = this.settings.keys;
-      if (e.code === 'Escape') {
-        if (this.ui.panelOpen) {
-          if (!this.pauseFromUnlockAt || performance.now() - this.pauseFromUnlockAt > 250) this.ui.closePanel();
-          this.pauseFromUnlockAt = 0; e.preventDefault();
-        }
-        else if (g.terminal.active) { g.terminal.close(); e.preventDefault(); }   // terminal input lost focus (Tab, HUD click)
-        else if (!g.minigame && !this.ui.chatOpen && !this.ui.fullscreenOpen?.()) { this.ui.openPause(); e.preventDefault(); }
-        return;
-      }
+      if (e.code === 'Escape') return;   // escape27 owns the gesture, including focused form controls.
       if (g.minigame || g.terminal.active) return;
       if ((e.code === k.chat || e.code === 'KeyT') && !this.ui.panelOpen && input.locked) { e.preventDefault(); this.ui.openChat(); return; }
       if (e.code === k.menu) {

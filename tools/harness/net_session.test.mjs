@@ -183,5 +183,26 @@ const log = (s, evs) => { const out = []; for (const e of evs) s.on(e, (...a) =>
   c.leave();
 }
 
+// Manual settings recovery works for an isolated host without clearing native
+// player records. Existing crew links and in-flight/too-early retries are kept.
+for(const isHost of [true,false]){
+  const s=await mk(isHost),transport=s.transport,players=s.players;
+  assert.equal((await s.retryConnection()).reason,'waiting');
+  s._startedAt=performance.now()-NET.FIRST_JOIN_REJOIN_MS-10;
+  let notice=0;s.on('rejoined',()=>notice++);
+  assert.equal((await s.retryConnection()).ok,true);
+  assert.equal(transport.rejoined,1);assert.equal(notice,1);assert.equal(s.players,players);
+  assert.equal((await s.retryConnection()).reason,'waiting');
+  s._lastRejoin-=NET.REJOIN_EVERY_MS+1;transport.peers.add('WORKING');
+  assert.equal((await s.retryConnection()).reason,'connected');assert.equal(transport.rejoined,1);
+  transport.peers.clear();transport._rejoining=true;
+  assert.equal((await s.retryConnection()).reason,'busy');transport._rejoining=false;
+  transport.rejoin=async()=>{throw Error('offline')};assert.equal((await s.retryConnection()).reason,'failed');
+  s.leave();assert.equal((await s.retryConnection()).reason,'stopped');
+}
+{
+ const s=await mk(true);s.transport.rejoin=undefined;
+ assert.equal((await s.retryConnection()).reason,'unsupported');s.leave();
+}
 console.log('net_session.test OK');
 process.exit(0);

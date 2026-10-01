@@ -1,6 +1,7 @@
 // Transports: Trystero (serverless WebRTC; Nostr / MQTT / BitTorrent signaling) and a
 // BroadcastChannel transport for same-machine multi-tab testing ("local").
 import { randomId } from '../core/rng.js';
+import { readTurnServers27 } from './turn_config27.js';
 
 export const APP_ID = 'kefal-company-v1';
 
@@ -16,18 +17,6 @@ class BaseTransport {
 // Optional TURN relay (symmetric NATs / mobile carriers can never connect with STUN only, and links that die after a
 // NAT rebind cannot be re-established). Configure with VITE_TURN_URL(+_USER/_CRED) at build time, or in the browser:
 // localStorage['tfg.turn'] = '{"urls":"turn:host:3478","username":"u","credential":"c"}'.
-function turnServers() {
-  const out = [];
-  try {
-    const env = import.meta.env || {};
-    if (env.VITE_TURN_URL) out.push({ urls: env.VITE_TURN_URL.split(','), username: env.VITE_TURN_USER || '', credential: env.VITE_TURN_CRED || '' });
-  } catch { /* not vite */ }
-  try {
-    const j = typeof localStorage !== 'undefined' && localStorage.getItem('tfg.turn');
-    if (j) { const v = JSON.parse(j); for (const x of Array.isArray(v) ? v : [v]) if (x && x.urls) out.push(x); }
-  } catch { /* bad json */ }
-  return out;
-}
 // Keep the WebRTC data channel under Trystero's 64 KiB bufferedAmount low-water threshold.
 // Session packets are capped at 12 KiB, so four concurrent packets stay below that limit.
 export const CONGEST_AT = 4;
@@ -54,7 +43,7 @@ export class TrysteroTransport extends BaseTransport {
     cfg.relayConfig = { warnOnRelayFailure: false, ...(this.strategy === 'nostr' ? { redundancy: 10 } : {}) };
     const urls = this.strategy === 'nostr' && import.meta.env?.VITE_NOSTR_RELAY_URLS;
     if (urls) cfg.relayConfig.urls = urls.split(',').map(s => s.trim()).filter(Boolean);
-    const turn = turnServers();
+    const turn = readTurnServers27();
     if (turn.length) cfg.turnConfig = turn;
     this.hasTurn = turn.length > 0;
     this.room = mod.joinRoom(cfg, roomId, {

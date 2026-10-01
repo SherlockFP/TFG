@@ -540,6 +540,7 @@ export function installFacjobs(game) {
     layoutOpts: (moon, r) => C.layoutOptsFor(moon, r),
     roll: () => { const r = run(); return r ? rollOf(r) : null; },
     hostSetup, hostRebuild, hostReq, hostTick, droneTick, _mem: mem,
+    get codeOpen() { return !!S.ui; }, closeCode,
     dispose() {
       disposed = true;
       for (const off of offs) { try { off(); } catch { /* ignore */ } }

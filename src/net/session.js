@@ -216,6 +216,24 @@ export class Session extends Emitter {
     t.rejoin().then((ok) => { if (ok) this.emit('rejoined'); }).catch(() => {});
   }
 
+  // Explicit recovery for an isolated host as well as a joiner. Preserve the
+  // session/cargo and any working crew link; never restart a room mid-handshake.
+  async retryConnection() {
+    const t=this.transport,now=performance.now();
+    if(this.leaving)return {ok:false,reason:'stopped'};
+    if(!t?.rejoin)return {ok:false,reason:'unsupported'};
+    if(t._rejoining)return {ok:false,reason:'busy'};
+    if(t.peers.size)return {ok:false,reason:'connected'};
+    if(now-(this._startedAt??now)<NET.FIRST_JOIN_REJOIN_MS||now-(this._lastRejoin??-1e9)<NET.REJOIN_EVERY_MS)return {ok:false,reason:'waiting'};
+    this._lastRejoin=now;this.stats.rejoins++;
+    try {
+      const ok=await t.rejoin();
+      if(this.leaving||this.transport!==t)return {ok:false,reason:'stopped'};
+      if(ok)this.emit('rejoined');
+      return {ok:!!ok,reason:ok?'retried':'failed'};
+    } catch {return {ok:false,reason:'failed'};}
+  }
+
   // message dispatch
   receive(m, from, inner = false) {
     if (!m || typeof m !== 'object') return;
