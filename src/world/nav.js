@@ -84,14 +84,20 @@ export class NavGrid {
     return null;
   }
 
-  // Returns array of world {x,z} waypoints (smoothed) or null
-  findPath(sx, sz, tx, tz, maxIter = 12000) {
+  // Exact native A* existence query; skip constructing a discarded waypoint path.
+  hasPath(sx, sz, tx, tz, maxIter = 12000) {
+    return !!this.findPath(sx, sz, tx, tz, maxIter, true);
+  }
+
+  // Default: smoothed world {x,z} waypoints or null. Explicit reachability-only
+  // calls share every search/heap/cutoff rule and return true when the goal is found.
+  findPath(sx, sz, tx, tz, maxIter = 12000, reachabilityOnly = false) {
     let s = this.nearestWalkable(...this.toGrid(sx, sz));
     let t = this.nearestWalkable(...this.toGrid(tx, tz));
     if (!s || !t) return null;
     const W = this.w;
     const start = s[1] * W + s[0], goal = t[1] * W + t[0];
-    if (start === goal) return [{ x: tx, z: tz }];
+    if (start === goal) return reachabilityOnly ? true : [{ x: tx, z: tz }];
     this.curStamp++;
     if (this.curStamp > 4e9) { this.stamp.fill(0); this.closedStamp.fill(0); this.curStamp = 1; }
     const st = this.curStamp;
@@ -138,6 +144,7 @@ export class NavGrid {
       }
     }
     if (!found) return null;
+    if (reachabilityOnly) return true;
     const cellsPath = [];
     for (let i = goal; i !== -1; i = parent[i]) cellsPath.push(i);
     cellsPath.reverse();

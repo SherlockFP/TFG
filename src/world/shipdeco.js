@@ -33,18 +33,18 @@ export function bakeParts(parts) {
   return out;
 }
 
-function signAtlas() {
+function signAtlas(signs) {
   if (typeof document === 'undefined') return null;
-  const cw = 256, ch = 80, cols = 2, rows = Math.ceil(L.SIGNS.length / cols);
+  const cw = 256, ch = 80, cols = 2, rows = Math.ceil(signs.length / cols);
   const cv = document.createElement('canvas'); cv.width = cw * cols; cv.height = ch * rows;
   const x = cv.getContext('2d');
   if (!x) return null;
-  L.SIGNS.forEach((sg, i) => {
+  signs.forEach((sg, i) => {
     const ox = (i % cols) * cw, oy = Math.floor(i / cols) * ch;
     x.fillStyle = '#15181c'; x.fillRect(ox, oy, cw, ch);
     x.fillStyle = sg.c;
     const r = 14; x.beginPath(); x.moveTo(ox + 6 + r, oy + 6); x.lineTo(ox + cw - 6 - r, oy + 6); x.quadraticCurveTo(ox + cw - 6, oy + 6, ox + cw - 6, oy + 6 + r); x.lineTo(ox + cw - 6, oy + ch - 6 - r); x.quadraticCurveTo(ox + cw - 6, oy + ch - 6, ox + cw - 6 - r, oy + ch - 6); x.lineTo(ox + 6 + r, oy + ch - 6); x.quadraticCurveTo(ox + 6, oy + ch - 6, ox + 6, oy + ch - 6 - r); x.lineTo(ox + 6, oy + 6 + r); x.quadraticCurveTo(ox + 6, oy + 6, ox + 6 + r, oy + 6); x.closePath(); x.fill();
-    x.fillStyle = '#fff8e8'; x.font = 'bold 38px monospace'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(sg.text, ox + cw / 2, oy + ch / 2 + 2);
+    x.fillStyle = '#fff8e8'; x.font = `bold ${sg.fontSize || 38}px monospace`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(sg.text, ox + cw / 2, oy + ch / 2 + 2);
   });
   const tex = new THREE.CanvasTexture(cv); tex.magFilter = THREE.NearestFilter; tex.minFilter = THREE.NearestFilter; tex.generateMipmaps = false; tex.colorSpace = THREE.SRGBColorSpace;
   return { tex, cols, rows };
@@ -76,7 +76,7 @@ export function holedWall(gb, key, z, a0, a1, y0, y1, uv, holes, color) {
   gridWall(gb, key, 'x', z, a0, a1, y0, y1, uv, holes.map((h) => ({ s: h.x0, e: h.x1, y0: h.y0, y1: h.y1 })), color);
 }
 
-export function buildShipDeco({ physics, lightPool, group }) {
+export function buildShipDeco({ physics, lightPool, group, signs = L.SIGNS }) {
   const colliders = [], emitters = [], disposables = [];
   const box = (x, y, z, sx, sy, sz, member = G.STATIC, data) => { const c = physics.addStaticBox(x, y, z, sx / 2, sy / 2, sz / 2, 0, member, data); colliders.push(c); return c; };
   const obstacles = [];
@@ -193,10 +193,10 @@ export function buildShipDeco({ physics, lightPool, group }) {
   disposables.push(...Object.values(decalMats));
 
   // ---- room signs (one atlas, one mesh)
-  const atlas = signAtlas();
+  const atlas = signAtlas(signs);
   if (atlas) {
     const pos = [], uv = [], idx = [];
-    L.SIGNS.forEach((sg, i) => {
+    signs.forEach((sg, i) => {
       const hw = 0.45, hh = 0.16, nx = Math.sin(sg.ry), nz = Math.cos(sg.ry), ux = Math.cos(sg.ry), uz = -Math.sin(sg.ry);
       const cx = sg.x + nx * (sg.off ?? 0), cz = sg.z + nz * (sg.off ?? 0);
       const base = pos.length / 3;
@@ -210,7 +210,7 @@ export function buildShipDeco({ physics, lightPool, group }) {
     const mat = new THREE.MeshBasicMaterial({ map: atlas.tex, side: THREE.DoubleSide });
     const mesh = new THREE.Mesh(geo, mat); mesh.name = 'ship2_signs'; group.add(mesh);
     disposables.push(geo, mat, atlas.tex);
-    for (const sg of L.SIGNS) {
+    for (const sg of signs) {
       const n = Math.abs(Math.sin(sg.ry)) > 0.5, cx = sg.x + Math.sin(sg.ry) * (sg.off ?? 0), cz = sg.z + Math.cos(sg.ry) * (sg.off ?? 0);
       obst(cx - (n ? 0.02 : 0.45), cx + (n ? 0.02 : 0.45), cz - (n ? 0.45 : 0.02), cz + (n ? 0.45 : 0.02), sg.y - 0.16, sg.y + 0.16);
     }

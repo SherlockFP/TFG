@@ -1,0 +1,2809 @@
+{
+  "method": "GUIDED_INPUT normal first expedition, scripted before launch; fresh actual Host/Local/new-slot UI. Native RAF only, source-guided finite standing waypoints and read-only natural geometry. No teleport, seeded start, lifecycle/readiness/items/AI/outcome/clock writes or hostReq.",
+  "source": "9925fc194f05b93cbe8af20259e9ab33cda10632",
+  "jsFreeze": "400a0d37823b54ee77b84da42043809e873d40e8077dbdb43a4e60b0a699e0ae",
+  "allSourceFreeze": "24a57c23a87714b803f18ae04f9b01993f2d35ab57400ac31c5ed0cba2f04796",
+  "runtimeFreeze": "05be26557d600a0985ce388f3ec2540f16d176378feca0b799a1cbfcfbc41b68",
+  "ownerScore": 5,
+  "capMs": 600000,
+  "gameLoadedAt": "2026-10-01T17:00:39.775Z",
+  "durationAfterGameLoadMs": 29345,
+  "stopReason": "First failure: Error: Bounded waypoint timeout [2.9,-1.23,12.8]",
+  "firstFailure": {
+    "stage": "boarding",
+    "error": "Error: Bounded waypoint timeout [2.9,-1.23,12.8]",
+    "sinceGameMs": 27974
+  },
+  "initial": {
+    "at": 9938.40000000596,
+    "t": 0.17161000000000032,
+    "screen": null,
+    "phase": "orbit",
+    "seed": 881351060,
+    "run": {
+      "day": 1,
+      "credits": 60,
+      "quota": 330,
+      "time": 480,
+      "moon": "hamsi"
+    },
+    "profile": "Anon751",
+    "selfId": "Lrvk29yqkg",
+    "language": "en",
+    "settings": {
+      "difficulty": "standard",
+      "quality": "auto",
+      "fullscreenPlay": true
+    },
+    "player": {
+      "p": [
+        2.4000000953674316,
+        -1.2300970494747163,
+        23
+      ],
+      "yaw": 3.141592653589793,
+      "pitch": 0,
+      "hp": 100,
+      "maxHp": 106,
+      "dead": false,
+      "indoor": false,
+      "inShip": false,
+      "grounded": true,
+      "crouch": false,
+      "half": 0.56,
+      "slots": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "slot": 0
+    },
+    "eye": [
+      2.4000000953674316,
+      0.3899029505252838,
+      23
+    ],
+    "input": {
+      "locked": true,
+      "keys": [],
+      "typing": false,
+      "hidden": false
+    },
+    "panel": null,
+    "prompt": {
+      "main": null
+    },
+    "hud": "\u25cf LIVE 120\nHP 100/106\nSTA 100/100\n0 lb\nLv.1 LURKER\n\u25ae 60\n\u00b7\nI\nPOCKETS\n0/8\n1\n2\n3\n4\n5\nLIGHT\nYou are the host. Lobby code: AHK6AQ. ESC > Copy join link",
+    "sensitivity": 0.0022
+  },
+  "final": {
+    "at": 37907,
+    "t": 14.375705311308982,
+    "screen": null,
+    "phase": "orbit",
+    "seed": 881351060,
+    "run": {
+      "day": 1,
+      "credits": 60,
+      "quota": 330,
+      "time": 480,
+      "moon": "hamsi"
+    },
+    "profile": "Anon751",
+    "selfId": "Lrvk29yqkg",
+    "language": "en",
+    "settings": {
+      "difficulty": "standard",
+      "quality": "auto",
+      "fullscreenPlay": true
+    },
+    "player": {
+      "p": [
+        2.8520653165478507,
+        -1.232481473684311,
+        13.760309449047782
+      ],
+      "yaw": -0.048407346410207275,
+      "pitch": 0,
+      "hp": 100,
+      "maxHp": 106,
+      "dead": false,
+      "indoor": false,
+      "inShip": false,
+      "grounded": true,
+      "crouch": false,
+      "half": 0.56,
+      "slots": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "slot": 0
+    },
+    "eye": [
+      2.852724666296487,
+      0.3878843646466346,
+      13.760341391373212
+    ],
+    "input": {
+      "locked": true,
+      "keys": [],
+      "typing": false,
+      "hidden": false
+    },
+    "panel": null,
+    "prompt": {
+      "main": "Board Packet Courier",
+      "sub": ""
+    },
+    "hud": "\u25cf LIVE 124\nHP 100/106\nSTA 100/100\n0 lb\nLv.1 LURKER\n\u25ae 60\n\u00b7\nBOARD PACKET COURIER\nI\nPOCKETS\n0/8\n1\n2\n3\n4\n5\nLIGHT",
+    "sensitivity": 0.0022
+  },
+  "finalGeometry": {
+    "eye": [
+      2.852724666296487,
+      0.3878843646466346,
+      13.760341391373212
+    ],
+    "forward": [
+      0.04838844336841471,
+      8.470329472543003e-22,
+      -0.9988285931772186
+    ],
+    "ray": null,
+    "floor": {
+      "distance": 1.0175185203552246,
+      "point": {
+        "x": 2.8520653165478507,
+        "y": -1.2499999940395357,
+        "z": 13.760309449047782
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      }
+    },
+    "capsule": {
+      "half": 0.56,
+      "radius": 0.34,
+      "center": {
+        "x": 2.852065324783325,
+        "y": -0.3324814736843109,
+        "z": 13.760309219360352
+      },
+      "overlaps": []
+    },
+    "door": {
+      "open": true,
+      "actualCenter": [
+        2.6,
+        1.6,
+        3.5
+      ],
+      "point": [
+        3.98,
+        1.3,
+        3.39
+      ]
+    }
+  },
+  "milestones": [
+    {
+      "name": "free-Courier-claimed",
+      "sinceGameMs": 6762,
+      "state": {
+        "at": 16692.09999999404,
+        "t": 3.580069870000002,
+        "screen": null,
+        "phase": "orbit",
+        "seed": 881351060,
+        "run": {
+          "day": 1,
+          "credits": 60,
+          "quota": 330,
+          "time": 480,
+          "moon": "hamsi"
+        },
+        "profile": "Anon751",
+        "selfId": "Lrvk29yqkg",
+        "language": "en",
+        "settings": {
+          "difficulty": "standard",
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "player": {
+          "p": [
+            2.3968265056610107,
+            -1.2300962150096895,
+            28.327198028564453
+          ],
+          "yaw": 2.507992653589793,
+          "pitch": 0.077,
+          "hp": 100,
+          "maxHp": 106,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "crouch": false,
+          "half": 0.56,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "slot": 0
+        },
+        "eye": [
+          2.3968264624606257,
+          0.3899037935215095,
+          28.32719799682759
+        ],
+        "input": {
+          "locked": false,
+          "keys": [],
+          "typing": false,
+          "hidden": false
+        },
+        "panel": null,
+        "prompt": {
+          "main": "Fleet broker",
+          "sub": ""
+        },
+        "hud": "\u25cf LIVE 121\nHP 100/106\nSTA 100/100\n0 lb\nLv.1 LURKER\n\u25ae 60\n\u00b7\nFLEET BROKER\nI\nPOCKETS\n0/8\n1\n2\n3\n4\n5\nLIGHT\nYou are the host. Lobby code: AHK6AQ. ESC > Copy join link\nRole: Scout. Fast. Far-sighted. Travels light.",
+        "sensitivity": 0.0022
+      }
+    }
+  ],
+  "cleanup": [
+    {
+      "name": "mods.emit",
+      "exact": true
+    },
+    {
+      "name": "HUD.update",
+      "exact": true
+    },
+    {
+      "name": "environment.update",
+      "exact": true
+    },
+    {
+      "name": "physics.step",
+      "exact": true
+    },
+    {
+      "name": "guard-names",
+      "exact": true
+    },
+    {
+      "name": "guard",
+      "exact": true
+    },
+    {
+      "name": "update",
+      "exact": true
+    }
+  ],
+  "cleanupErrors": [],
+  "inputAfterRelease": {
+    "keys": [],
+    "hidden": false
+  },
+  "caught": {
+    "total": 0,
+    "ring": []
+  },
+  "errors": [],
+  "consoleErrors": [
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    }
+  ],
+  "warnings": [],
+  "browserClosed": true,
+  "finishedAt": "2026-10-01T17:01:09.120Z",
+  "classification": "DRIVER_BUDGET: native boarding selection already available before overly strict waypoint timeout; no physical contact proof",
+  "timing": {
+    "frameCount": 184,
+    "worstFrames": [
+      {
+        "n": 3,
+        "at": 11090.09999999404,
+        "dt": 0.1,
+        "stage": "new-run",
+        "before": {
+          "phase": "orbit",
+          "time": 0.4716100000000003,
+          "indoor": false,
+          "inShip": false
+        },
+        "scopes": [
+          {
+            "name": "mods.emit:interactables",
+            "ms": 0.3999999910593033,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "physics.step",
+            "ms": 0.4000000059604645,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:items",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:cruiser",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:hostUpdate",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:creatures",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:director",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "environment.update",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:voice",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:audio",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:companyVis",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:viewModel",
+            "ms": 0.10000000894069672,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.10000000894069672,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "mods.emit:tfg:story",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "mods.emit:update",
+            "ms": 49.3999999910593,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "HUD.update",
+            "ms": 2.2999999970197678,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:netSend",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.10000000894069672,
+            "phase": "orbit",
+            "time": 0.5716100000000003,
+            "indoor": false,
+            "inShip": false
+          }
+        ],
+        "hidden": false,
+        "qBefore": null,
+        "ms": 53.6000000089407,
+        "after": {
+          "phase": "orbit",
+          "time": 0.5716100000000003,
+          "indoor": false,
+          "inShip": false
+        },
+        "qAfter": null
+      },
+      {
+        "n": 33,
+        "at": 15634.70000000298,
+        "dt": 0.1,
+        "stage": "fleet",
+        "before": {
+          "phase": "orbit",
+          "time": 3.0781200000000024,
+          "indoor": false,
+          "inShip": false
+        },
+        "scopes": [
+          {
+            "name": "mods.emit:interactables",
+            "ms": 0.20000000298023224,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "physics.step",
+            "ms": 0.29999999701976776,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:items",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:cruiser",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:hostUpdate",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:creatures",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:director",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "environment.update",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:voice",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:audio",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:companyVis",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:viewModel",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "mods.emit:update",
+            "ms": 24.700000002980232,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "HUD.update",
+            "ms": 0.20000000298023224,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:netSend",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.1781200000000025,
+            "indoor": false,
+            "inShip": false
+          }
+        ],
+        "hidden": false,
+        "qBefore": null,
+        "ms": 29.299999997019768,
+        "after": {
+          "phase": "orbit",
+          "time": 3.1781200000000025,
+          "indoor": false,
+          "inShip": false
+        },
+        "qAfter": null
+      },
+      {
+        "n": 8,
+        "at": 11773.5,
+        "dt": 0.1,
+        "stage": "fleet",
+        "before": {
+          "phase": "orbit",
+          "time": 0.9165300000000003,
+          "indoor": false,
+          "inShip": false
+        },
+        "scopes": [
+          {
+            "name": "mods.emit:interactables",
+            "ms": 0.30000001192092896,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "physics.step",
+            "ms": 0.7999999970197678,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:items",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:cruiser",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:hostUpdate",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:creatures",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:director",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "environment.update",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:voice",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:audio",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:companyVis",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:viewModel",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "mods.emit:stats",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "mods.emit:update",
+            "ms": 22.099999994039536,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "HUD.update",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:netSend",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 1.0165300000000004,
+            "indoor": false,
+            "inShip": false
+          }
+        ],
+        "hidden": false,
+        "qBefore": null,
+        "ms": 24.299999997019768,
+        "after": {
+          "phase": "orbit",
+          "time": 1.0165300000000004,
+          "indoor": false,
+          "inShip": false
+        },
+        "qAfter": null
+      },
+      {
+        "n": 2,
+        "at": 10919.09999999404,
+        "dt": 0.1,
+        "stage": "new-run",
+        "before": {
+          "phase": "orbit",
+          "time": 0.37161000000000033,
+          "indoor": false,
+          "inShip": false
+        },
+        "scopes": [
+          {
+            "name": "mods.emit:interactables",
+            "ms": 0.7000000029802322,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "physics.step",
+            "ms": 5.399999991059303,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:items",
+            "ms": 0.10000000894069672,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.10000000894069672,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:cruiser",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:hostUpdate",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:creatures",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:director",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "environment.update",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:voice",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:audio",
+            "ms": 7.4000000059604645,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 7.5,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:companyVis",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:viewModel",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "mods.emit:update",
+            "ms": 3.300000011920929,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "HUD.update",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:netSend",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 0.4716100000000003,
+            "indoor": false,
+            "inShip": false
+          }
+        ],
+        "hidden": false,
+        "qBefore": null,
+        "ms": 18,
+        "after": {
+          "phase": "orbit",
+          "time": 0.4716100000000003,
+          "indoor": false,
+          "inShip": false
+        },
+        "qAfter": null
+      },
+      {
+        "n": 4,
+        "at": 11264.59999999404,
+        "dt": 0.1,
+        "stage": "new-run",
+        "before": {
+          "phase": "orbit",
+          "time": 0.5716100000000003,
+          "indoor": false,
+          "inShip": false
+        },
+        "scopes": [
+          {
+            "name": "mods.emit:interactables",
+            "ms": 2.7999999970197678,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "physics.step",
+            "ms": 0.29999999701976776,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:items",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:cruiser",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:hostUpdate",
+            "ms": 0.10000000894069672,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.10000000894069672,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:creatures",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:director",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "environment.update",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:voice",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:audio",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:companyVis",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:viewModel",
+            "ms": 0.10000000894069672,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.10000000894069672,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "mods.emit:update",
+            "ms": 13.599999994039536,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "HUD.update",
+            "ms": 0.10000000894069672,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:netSend",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 0.6716100000000003,
+            "indoor": false,
+            "inShip": false
+          }
+        ],
+        "hidden": false,
+        "qBefore": null,
+        "ms": 17.900000005960464,
+        "after": {
+          "phase": "orbit",
+          "time": 0.6716100000000003,
+          "indoor": false,
+          "inShip": false
+        },
+        "qAfter": null
+      },
+      {
+        "n": 113,
+        "at": 28384.70000000298,
+        "dt": 0.1,
+        "stage": "boarding",
+        "before": {
+          "phase": "orbit",
+          "time": 9.061070175409997,
+          "indoor": false,
+          "inShip": false
+        },
+        "scopes": [
+          {
+            "name": "mods.emit:interactables",
+            "ms": 0.29999999701976776,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "physics.step",
+            "ms": 9.899999991059303,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:items",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:cruiser",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:hostUpdate",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:creatures",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:director",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "environment.update",
+            "ms": 0.10000000894069672,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:voice",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:audio",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:companyVis",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:viewModel",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "mods.emit:update",
+            "ms": 6.799999997019768,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "HUD.update",
+            "ms": 0.10000000894069672,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:netSend",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 9.161070175409996,
+            "indoor": false,
+            "inShip": false
+          }
+        ],
+        "hidden": false,
+        "qBefore": null,
+        "ms": 17.700000002980232,
+        "after": {
+          "phase": "orbit",
+          "time": 9.161070175409996,
+          "indoor": false,
+          "inShip": false
+        },
+        "qAfter": null
+      },
+      {
+        "n": 72,
+        "at": 23181.29999999702,
+        "dt": 0.1,
+        "stage": "boarding",
+        "before": {
+          "phase": "orbit",
+          "time": 5.97807017541,
+          "indoor": false,
+          "inShip": false
+        },
+        "scopes": [
+          {
+            "name": "mods.emit:interactables",
+            "ms": 0.30000001192092896,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "physics.step",
+            "ms": 0.19999998807907104,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:items",
+            "ms": 0.30000001192092896,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.30000001192092896,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:cruiser",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:hostUpdate",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:creatures",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:director",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "environment.update",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:voice",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:audio",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:companyVis",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:viewModel",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "mods.emit:tfg:viewers",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "mods.emit:update",
+            "ms": 2.5,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "HUD.update",
+            "ms": 11.900000005960464,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:netSend",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 6.07807017541,
+            "indoor": false,
+            "inShip": false
+          }
+        ],
+        "hidden": false,
+        "qBefore": null,
+        "ms": 15.799999997019768,
+        "after": {
+          "phase": "orbit",
+          "time": 6.07807017541,
+          "indoor": false,
+          "inShip": false
+        },
+        "qAfter": null
+      },
+      {
+        "n": 31,
+        "at": 15508.5,
+        "dt": 0.1,
+        "stage": "fleet",
+        "before": {
+          "phase": "orbit",
+          "time": 2.9331300000000025,
+          "indoor": false,
+          "inShip": false
+        },
+        "scopes": [
+          {
+            "name": "mods.emit:interactables",
+            "ms": 0.20000000298023224,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "physics.step",
+            "ms": 0.29999999701976776,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:items",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:cruiser",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:hostUpdate",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:creatures",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:director",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.10000000894069672,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "environment.update",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:voice",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:audio",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:companyVis",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:viewModel",
+            "ms": 5.200000002980232,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 5.200000002980232,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "mods.emit:update",
+            "ms": 5.5999999940395355,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "HUD.update",
+            "ms": 2.5,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:netSend",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 3.0331300000000025,
+            "indoor": false,
+            "inShip": false
+          }
+        ],
+        "hidden": false,
+        "qBefore": null,
+        "ms": 14.5,
+        "after": {
+          "phase": "orbit",
+          "time": 3.0331300000000025,
+          "indoor": false,
+          "inShip": false
+        },
+        "qAfter": null
+      },
+      {
+        "n": 0,
+        "at": 10468.5,
+        "dt": 0.1,
+        "stage": "new-run",
+        "before": {
+          "phase": "orbit",
+          "time": 0.17161000000000032,
+          "indoor": false,
+          "inShip": false
+        },
+        "scopes": [
+          {
+            "name": "mods.emit:interactables",
+            "ms": 0.3999999910593033,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "physics.step",
+            "ms": 1.3999999910593033,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:items",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:cruiser",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:hostUpdate",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:creatures",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:director",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "environment.update",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:voice",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:audio",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:companyVis",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:viewModel",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "mods.emit:update",
+            "ms": 5,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "HUD.update",
+            "ms": 0.20000000298023224,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:netSend",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 0.27161000000000035,
+            "indoor": false,
+            "inShip": false
+          }
+        ],
+        "hidden": false,
+        "qBefore": 0,
+        "ms": 14.099999994039536,
+        "after": {
+          "phase": "orbit",
+          "time": 0.27161000000000035,
+          "indoor": false,
+          "inShip": false
+        },
+        "qAfter": null
+      },
+      {
+        "n": 1,
+        "at": 10799.09999999404,
+        "dt": 0.1,
+        "stage": "new-run",
+        "before": {
+          "phase": "orbit",
+          "time": 0.27161000000000035,
+          "indoor": false,
+          "inShip": false
+        },
+        "scopes": [
+          {
+            "name": "mods.emit:interactables",
+            "ms": 0.4000000059604645,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "physics.step",
+            "ms": 0.7999999970197678,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:items",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:cruiser",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:hostUpdate",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:creatures",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:director",
+            "ms": 0.10000000894069672,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.10000000894069672,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "environment.update",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:voice",
+            "ms": 0.10000000894069672,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.10000000894069672,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:audio",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:companyVis",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:viewModel",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0.09999999403953552,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "mods.emit:update",
+            "ms": 6.299999997019768,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "HUD.update",
+            "ms": 1,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard:netSend",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          },
+          {
+            "name": "guard",
+            "ms": 0,
+            "phase": "orbit",
+            "time": 0.37161000000000033,
+            "indoor": false,
+            "inShip": false
+          }
+        ],
+        "hidden": false,
+        "qBefore": null,
+        "ms": 14,
+        "after": {
+          "phase": "orbit",
+          "time": 0.37161000000000033,
+          "indoor": false,
+          "inShip": false
+        },
+        "qAfter": null
+      }
+    ],
+    "standalone": [
+      {
+        "name": "mods.emit:stats",
+        "ms": 0.10000000894069672,
+        "phase": "orbit",
+        "time": 0.6716100000000003,
+        "indoor": false,
+        "inShip": false,
+        "stage": "fleet",
+        "at": 11419.79999999702
+      },
+      {
+        "name": "mods.emit:tfg:rpg",
+        "ms": 0,
+        "phase": "orbit",
+        "time": 0.6716100000000003,
+        "indoor": false,
+        "inShip": false,
+        "stage": "fleet",
+        "at": 11420.29999999702
+      },
+      {
+        "name": "mods.emit:tfg:role",
+        "ms": 0.09999999403953552,
+        "phase": "orbit",
+        "time": 0.6716100000000003,
+        "indoor": false,
+        "inShip": false,
+        "stage": "fleet",
+        "at": 11420.40000000596
+      },
+      {
+        "name": "mods.emit:chat",
+        "ms": 5.100000008940697,
+        "phase": "orbit",
+        "time": 0.6716100000000003,
+        "indoor": false,
+        "inShip": false,
+        "stage": "fleet",
+        "at": 11420.79999999702
+      },
+      {
+        "name": "mods.emit:tfg:autorole",
+        "ms": 0,
+        "phase": "orbit",
+        "time": 0.6716100000000003,
+        "indoor": false,
+        "inShip": false,
+        "stage": "fleet",
+        "at": 11429
+      },
+      {
+        "name": "mods.emit:interactables",
+        "ms": 0.29999999701976776,
+        "phase": "orbit",
+        "time": 2.1165300000000014,
+        "indoor": false,
+        "inShip": false,
+        "stage": "fleet",
+        "at": 13318.40000000596
+      }
+    ],
+    "qSnapshots": [
+      {
+        "at": 10468.59999999404,
+        "phase": "orbit",
+        "time": 0.17161000000000032,
+        "indoor": false,
+        "inShip": false,
+        "pending": 0,
+        "running": false,
+        "flushing": false,
+        "wait": 0,
+        "last": [],
+        "report": []
+      }
+    ],
+    "landingReport": []
+  }
+}

@@ -2,11 +2,23 @@
 import * as THREE from 'three';
 import { MOONS } from './moons.js';
 import { isSellable } from './items.js';
+import { carriedSalvage29 } from './carried_salvage29.js';
 import { insideShip } from '../world/ship.js';
 import { bountyText, quotaState } from './progression.js';
 import { escapeHtml, fmtClock } from '../core/util.js';
 import { greedOn } from './onegoal_core.js';
-import { t, tf } from '../core/i18n.js';
+import { t, tf, addTranslations } from '../core/i18n.js';
+
+addTranslations({
+  'Leave the ship through the AIRLOCK': 'HAVA KİLİDİ kapısından gemiden çık',
+  'Unload your recovered cargo inside the ship': 'Topladığın yükü geminin içinde yere bırak',
+  'Terminal: MOONS / ROUTE': 'Terminal: MOONS / ROUTE',
+});
+addTranslations({
+  'Leave the ship through the AIRLOCK': 'Выйди из корабля через ШЛЮЗ',
+  'Unload your recovered cargo inside the ship': 'Выгрузи найденный груз внутри корабля',
+  'Terminal: MOONS / ROUTE': 'Терминал: MOONS / ROUTE',
+}, 'ru');
 
 export class Objectives {
   constructor(game) {
@@ -33,7 +45,7 @@ export class Objectives {
         else if (shipValue > 0 && !moon?.company && g.onboard?.fr?.wantSell?.(shipValue)) add(tf('Sell your ▮{v} of scrap at the HQ', { v: shipValue }), 'main');   // [firstrun] the first sale beat: sell before landing again
         else if (!moon?.company) add(tf('Land on {moon}: pull the LEVER', { moon: moon?.name || t('a moon') }), 'main');
         else add(t('Pull the LEVER to land at the HQ and sell'), 'main');
-        add(t('Terminal: MOONS / ROUTE / STORE / BUY'), 'hint');
+        add(t('Terminal: MOONS / ROUTE'), 'hint');
         if (run.weekly) add(tf('WEEKLY {key}: score ▮{score} · quotas {quotas}', { key: run.weekly.key, score: run.weekly.score || 0, quotas: run.weekly.quotas || 0 }), 'hint');
         if (shipValue > 0 && run.daysLeft <= 1) add(tf('Sell your ▮{v} of scrap at the HQ', { v: shipValue }), 'main');
         break;
@@ -61,14 +73,21 @@ export class Objectives {
           add(dm > 5 ? tf('▮{left} still in here · deep room {m} m · leaves {time}', { left, m: dm, time: fmtClock(24 * 60) }) : tf('▮{left} still in here · leaves {time}', { left, time: fmtClock(24 * 60) }), 'main').greed = true;
         } else if (target <= 0 && need > 0) add(t('Quota covered by the scrap aboard. More scrap is overtime bonus'), 'main', true, 1);
         else add(tf('Bring scrap to the ship: ▮{a} / ▮{b} today', { a: today, b: target }), 'main', today >= target && target > 0, target ? Math.min(1, today / target) : 1);
-        const carrying = p.slots.filter((id) => id && isSellable(g.items.get(id)?.def || {})).length;
+        const carrying = carriedSalvage29(g).length;
         const fcp = run.fc?.p?.[g.selfId], pv = g.onegoal?.preview?.();
         if (carrying && !p.inShip && pv && pv.net < pv.v && fcp && (fcp[0] > 0 || fcp[1] || fcp[2])) add(tf(fcp[2] ? '▮{v} → ▮{n} (viewer tax)' : '▮{v} → ▮{n} if tagged', { v: pv.v, n: pv.net }), 'sub').lead = true;   // [greed] on camera: the carry line prices being on air
         else if (carrying && !p.inShip) add(tf(carrying > 1 ? 'Carrying {n} items - get them to the ship' : 'Carrying {n} item - get it to the ship', { n: carrying }), 'sub').lead = true;   // [onegoal] loot in hand = the goal
         if (!p.indoor && g.world.outdoor) {
           const e = g.world.outdoor.mainExit.pos;
           const d = Math.round(Math.hypot(e.x - p.pos.x, e.z - p.pos.z));
-          if (!this.enteredToday) { const ent = add(tf('Find the facility entrance ({d} m)', { d }), 'sub'); if (ent && typeof ent === 'object') ent.first = true; }   // [firstrun] 'first' = the one goal shown while budgeted
+          const aboard = p.inShip && !moon?.expedition && !moon?.home && !moon?.company;
+          if (aboard && carrying) add(t('Unload your recovered cargo inside the ship'), 'sub').lead = true;
+          else if (!this.enteredToday) {
+            // A first landing starts aboard: name the nearby airlock before the
+            // distant entrance. Special destinations retain their native filter.
+            const ent = add(aboard ? t('Leave the ship through the AIRLOCK') : tf('Find the facility entrance ({d} m)', { d }), 'sub');
+            if (ent && typeof ent === 'object') ent.first = true;
+          }   // [firstrun] 'first' = the one goal shown while budgeted
           else if (!p.inShip) add(tf('Ship: {d} m', { d: Math.round(Math.hypot(p.pos.x, p.pos.z)) }), 'sub').cat = 'other';
         }
         if (p.indoor) {

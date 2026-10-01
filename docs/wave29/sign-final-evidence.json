@@ -1,0 +1,333 @@
+{
+  "method": "LABELLED RENDERED FIXTURE ONLY. Fresh native dev autohost/local session; native orbit/landing lifecycle setup seeded to recorded natural landing, and body/camera pose fixture at recorded AIRLOCK approach. Default mods installed including lootBoard. Single unchanged app RAF, no manual clock. Does not earn expedition/input/pickup/return.",
+  "capAfterLoadMs": 90000,
+  "source": "9925fc1 + Wave29 final jamb-only source",
+  "jsFreeze": "9a5aadb4d31350e1fa79f52680397e3a11ecfe82b0ca206daf5fcadd2249e4ba",
+  "allSourceFreeze": "7cf0c4c6f9ba6c83390b59e5c343a226fd82ccb4219a55179e3c19dcae9c6bc0",
+  "runtimeFreeze": "b52935e44b4f4e4f664c8da072291af1741308e012f6229e0b84c5ba7cede3f8",
+  "errors": [],
+  "consoleErrors": [
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "text": "Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently",
+      "location": {
+        "url": "http://127.0.0.1:5174/src/ui/crtmenu.js",
+        "line": 362,
+        "column": 0,
+        "lineNumber": 362,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported.",
+      "location": {
+        "url": "http://127.0.0.1:5174/@vite/client",
+        "line": 298,
+        "column": 3,
+        "lineNumber": 298,
+        "columnNumber": 3
+      }
+    }
+  ],
+  "shots": [
+    {
+      "width": 960,
+      "snapshot": {
+        "phase": "moon",
+        "p": [
+          2.5163543224334717,
+          0.01999471187591545,
+          1.7573338747024536
+        ],
+        "yaw": -3.0932036732051054,
+        "pitch": 0.2596,
+        "eye": [
+          2.5163543224334717,
+          1.6399947118759155,
+          1.7573338747024536
+        ],
+        "grounded": true,
+        "indoor": false,
+        "inShip": true,
+        "visible": true,
+        "keys": [],
+        "language": "en",
+        "objectives": "\u25c6Leave the ship through the AIRLOCK",
+        "boardMeshes": [
+          {
+            "position": [
+              2.6,
+              3.02,
+              3.415
+            ],
+            "parent": [
+              2.6,
+              3.02,
+              3.43
+            ],
+            "texture": [
+              192,
+              56
+            ],
+            "visible": true
+          }
+        ],
+        "signMeshPresent": true,
+        "signMeshVisible": true,
+        "signGeometryVertices": 40,
+        "plaque": {
+          "point": [
+            4.18,
+            2.4,
+            3.47
+          ],
+          "NDC": [
+            -0.6347240583616653,
+            0.19637399038491032,
+            0.9483163872055171
+          ],
+          "rayHits": [
+            {
+              "name": "ship2_signs",
+              "type": "BufferGeometry",
+              "faceIndex": 19,
+              "distance": 2.5057035828228926,
+              "point": [
+                4.180000027791339,
+                2.4000000126959513,
+                3.4700000286102295
+              ],
+              "canvas": 512
+            }
+          ]
+        },
+        "sceneHashBoundary": "new frozen coordinate-only jamb source"
+      },
+      "file": "sign-jamb-960.png"
+    },
+    {
+      "width": 1280,
+      "snapshot": {
+        "phase": "moon",
+        "p": [
+          2.5163543224334717,
+          0.01999471187591545,
+          1.7573338747024536
+        ],
+        "yaw": -3.0932036732051054,
+        "pitch": 0.2596,
+        "eye": [
+          2.5163543224334717,
+          1.6399947118759155,
+          1.7573338747024536
+        ],
+        "grounded": true,
+        "indoor": false,
+        "inShip": true,
+        "visible": true,
+        "keys": [],
+        "language": "en",
+        "objectives": "\u25c6Leave the ship through the AIRLOCK",
+        "boardMeshes": [
+          {
+            "position": [
+              2.6,
+              3.02,
+              3.415
+            ],
+            "parent": [
+              2.6,
+              3.02,
+              3.43
+            ],
+            "texture": [
+              192,
+              56
+            ],
+            "visible": true
+          }
+        ],
+        "signMeshPresent": true,
+        "signMeshVisible": true,
+        "signGeometryVertices": 40,
+        "plaque": {
+          "point": [
+            4.18,
+            2.4,
+            3.47
+          ],
+          "NDC": [
+            -0.6347019882889728,
+            0.19636716223937908,
+            0.9483163872055171
+          ],
+          "rayHits": [
+            {
+              "name": "ship2_signs",
+              "type": "BufferGeometry",
+              "faceIndex": 19,
+              "distance": 2.5057035828228926,
+              "point": [
+                4.180000027791339,
+                2.4000000126959513,
+                3.4700000286102295
+              ],
+              "canvas": 512
+            }
+          ]
+        },
+        "sceneHashBoundary": "new frozen coordinate-only jamb source"
+      },
+      "file": "sign-jamb-1280.png"
+    }
+  ],
+  "fixtures": [
+    {
+      "label": "NATIVE LIFECYCLE/SEED FIXTURE, not played landing",
+      "phase": "moon",
+      "seed": 699464887,
+      "worldSeed": 699464887
+    },
+    {
+      "label": "BODY/CAMERA POSE FIXTURE: exact recorded final-focused native-airlock approach; not physical walk",
+      "p": [
+        2.5163543224334717,
+        0.018053030967712325,
+        1.7573338747024536
+      ],
+      "yaw": -3.0932036732051054,
+      "pitch": 0.2596
+    }
+  ],
+  "loadedAt": "2026-10-01T17:52:07.369Z",
+  "status": "PASS_RENDERED_SIGN_VISIBILITY_ONLY",
+  "cleanup": {
+    "noDiagnosticWrappersInstalled": true,
+    "inputKeys": [],
+    "hidden": false,
+    "caught": {
+      "total": 0,
+      "ring": []
+    }
+  },
+  "durationAfterLoadMs": 13317,
+  "browserClosed": true,
+  "visualReview": {
+    "by": "play27",
+    "plaqueReadableAt960": true,
+    "plaqueReadableAt1280": true,
+    "installedDefaultLootBoardVisible": true,
+    "limits": "Native lifecycle/seed/body/camera pose fixture, not normal playthrough. 960 screenshot preserves transient landing/tutorial notices; no UI suppression. Actual scene-ray first hit confirms plaque, not board, at recorded approach."
+  }
+}

@@ -1,8 +1,8 @@
 # TFG — current project entry
 
-Updated 2026-10-01, Wave28. Read [AGENTS.md](AGENTS.md),
+Updated 2026-10-01, Wave29. Read [AGENTS.md](AGENTS.md),
 [the current Gauntlet procedure](docs/GAUNTLET.md),
-[Wave28 work/evidence](docs/wave28/README.md) and [critique](docs/CRITIQUE.md).
+[Wave29 work/evidence](docs/wave29/README.md) and [critique](docs/CRITIQUE.md).
 For "devam", start with [CONTINUE](docs/session/CONTINUE.md).
 
 Workspace `/workspace/TFG`; Node22 activation `/workspace/.tfg-tools/activate.sh`.

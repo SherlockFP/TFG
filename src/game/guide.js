@@ -14,6 +14,8 @@ import { getLang, t } from '../core/i18n.js';
 import { saveSettings } from '../core/save.js';
 import { wrapMethod } from './dailyEvents.js';
 import { isSellable, itemDef } from './items.js';
+import { carriedSalvage29 } from './carried_salvage29.js';
+import { insideShip } from '../world/ship.js';
 import { threatNearNoise } from './stealth_core.js';
 import {
   FEATURES, CATS, UI, TUT_STEPS, TUT_DONE_SAY, HIDDEN_CMDS, pick, fmt,
@@ -201,11 +203,7 @@ export function installGuide(game) {
     price: game.shop?.priceOf?.('flashlight') ?? itemDef('flashlight')?.price ?? 15,
     key: (game.input?.key?.('flashlight') || 'KeyF').replace(/^Key/, '').replace(/^Digit/, ''),
   });
-  const holdsScrap = () => {
-    const p = game.player;
-    for (const id of p?.slots || []) { const it = id && game.items?.get?.(id); if (it && it.def && isSellable(it.def) && !it.soulbound && it.type !== 'body') return true; }
-    return false;
-  };
+  const holdsScrap = () => carriedSalvage29(game).length > 0;
 
   // objectives hook: the current step (+ how to skip)
   on('objectives', (add, g, phase) => {
@@ -324,9 +322,13 @@ export function installGuide(game) {
       let fl = false; try { fl = !!game.flashlightOn?.(); } catch { /* optional */ }
       if (fl) { use('flashlight'); tut('flash'); }
       const carrying = holdsScrap();
-      if (carrying) { S.last.scrap = 1; tut('scrap'); }
-      if (S.last.scrap && p.inShip && !carrying && run.phase !== 'company') tut('ship');
-      try { for (const it of game.items?.inShipItems?.() || []) if (it.collected && it.def && isSellable(it.def)) { tut('scrap'); tut('ship'); break; } } catch { /* optional */ }
+      if (!p.dead && !p.downed) {
+        const home = p.inShip && insideShip(p.pos);
+        if (carrying) { tut('scrap'); if (home && run.phase !== 'company') tut('ship'); }
+        // A pocket move is not unloading. Only an actual return or a native
+        // collected floor receipt proves the haul reached the ship.
+        try { for (const it of game.items?.inShipItems?.() || []) if (it.collected && !it.soulbound && it.type !== 'body' && it.def && isSellable(it.def)) { tut('scrap'); if (home) tut('ship'); break; } } catch { /* optional */ }
+      }
       if (run.sold != null) { if (S.last.sold != null && run.sold > S.last.sold) tut('sell'); S.last.sold = run.sold; }
     }
     // usage flags that have no event

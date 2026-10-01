@@ -8,7 +8,7 @@ export function planDescent21(fac,{clear=()=>true,reachable=()=>true}={}){
  const discoveryNav=new NavGrid(L,nav.res);discoveryNav.walk.set(nav.walk);discoveryNav.blockedEdges=new Set(nav.blockedEdges);
  // Only discovery eligibility relaxes a normal key-unlockable door. Physical placement remains on the original nav.
  for(const door of fac.doors){const info=door.info;if(door.kind!=='door'||info?.type!=='door'||info.treasure||info.arena||info.shortcut||info.required||info.permanent||info.code)continue;const a=L.rooms[L.roomOf[info.a]],b=L.rooms[L.roomOf[info.b]];if(a&&excluded(a)||b&&excluded(b))continue;discoveryNav.blockedEdges.delete(info.key);}
- const discoveryRooms=rooms.filter(r=>discoveryNav.findPath(start.x,start.z,L.ox+(r.cx+.5)*C,L.oz+(r.cz+.5)*C,90000)).map(r=>r.id);
+ const discoveryRooms=rooms.filter(r=>discoveryNav.hasPath(start.x,start.z,L.ox+(r.cx+.5)*C,L.oz+(r.cz+.5)*C,90000)).map(r=>r.id);
  for(const r of [...rooms,...L.rooms.filter(r=>r.type==='entrance')]){
   if((L.heightOf[L.idx(r.cx,r.cz)]||0)<3.2)continue;
   const x0=L.ox+r.x*C,z0=L.oz+r.z*C,x1=x0+r.w*C,z1=z0+r.h*C;

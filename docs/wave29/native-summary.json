@@ -1,0 +1,97 @@
+{
+  "baseline": "9925fc194f05b93cbe8af20259e9ab33cda10632",
+  "protocol": "0.12.3",
+  "owner_experience_baseline": 5,
+  "initial_full": {
+    "passed": 257,
+    "total": 258,
+    "seconds": 253,
+    "jobs": 4,
+    "failure": "onegoal.test.mjs: legacy anonymous item fixture lacked canonical ID/held state/self holder, so three TAGGED assertions failed."
+  },
+  "fixture_followup": {
+    "passed": 2,
+    "total": 2,
+    "seconds": 2,
+    "filters": [
+      "onegoal",
+      "carryfeedback29"
+    ],
+    "correction": "Only native-shaped fixture metadata and missing-ID lookup were corrected; original assertions and production source were preserved."
+  },
+  "verification_boundary": "Full257/258, corrected fixture follow-up2/2 and normal browser attempts used the earlier normal-route freeze. The only subsequent production change moves the existing AIRLOCK quad to a visible right jamb; final ship hull/overlap2/2 and build2.65s passed. No second full258/258 command or whole normal route on the final sign position is claimed.",
+  "build_seconds": 2.65,
+  "final_js_hash": "9a5aadb4d31350e1fa79f52680397e3a11ecfe82b0ca206daf5fcadd2249e4ba",
+  "final_all_src_hash": "7cf0c4c6f9ba6c83390b59e5c343a226fd82ccb4219a55179e3c19dcae9c6bc0",
+  "final_runtime_digest_src_public_mods": "b52935e44b4f4e4f664c8da072291af1741308e012f6229e0b84c5ba7cede3f8",
+  "browser": {
+    "result": "PARTIAL_NATIVE_SHIP_EXIT",
+    "last_attempt_seconds": 186.84,
+    "physical_exit_seconds": 153.766,
+    "stop": "Static contact on helper-selected exterior detour; generic ray does not identify the collider. Facility E, world scrap pickup, pocket stash and return were not earned.",
+    "final_sign_fixture": {
+      "result": "PASS_RENDERED_SIGN_VISIBILITY",
+      "seconds_after_load": 13.317,
+      "evidence": "sign-final-evidence.json",
+      "sizes": [
+        "960x540",
+        "1280x720"
+      ],
+      "label": "Native landing/body pose and camera setup fixture, not normal expedition progress. Installed loot board and transient native notices remain visible.",
+      "errors": {
+        "page": 0,
+        "caught": 0,
+        "bootstrap_console": 11,
+        "warnings": 2
+      }
+    },
+    "normal_evidence": "final-focused-evidence.json",
+    "native_update_diagnostic": {
+      "updates": 881,
+      "updates_over_50_ms": 13,
+      "maximum_ms": 329.7,
+      "limit": "Different natural seeds and instrumentation; inclusive anonymous callback costs do not identify a mod or prove hardware/renderer improvement."
+    }
+  },
+  "normal_route_freeze": {
+    "final_js_hash": "100d8ca3954b070fac6a92429de0e153c133cec9325149b5639ba2d8debf4d44",
+    "final_all_src_hash": "42be1a15f016cd7dfd33edda6f4aafd04081a3342eda33beebc66af33aa9cc49",
+    "final_runtime_digest_src_public_mods": "ccbfccddeeb448f66c02ec7777347a46298ea88dcf774393be4512de7bc378cc",
+    "build_seconds": 2.97
+  },
+  "final_ship_checks": {
+    "passed": 2,
+    "total": 2,
+    "filters": [
+      "ship2_overlap",
+      "ship2_hull"
+    ],
+    "longest_file_seconds": 0.4
+  },
+  "lossless_raw_traces": [
+    {
+      "file": "baseline-native-input.json.gz",
+      "original_sha256": "8059d16188f44bf1c862056ab91b3db5e05b47aae4c686e3c4dfa5f439a73794",
+      "original_bytes": 1217816,
+      "gzip_bytes": 32004
+    },
+    {
+      "file": "final-focused-input.json.gz",
+      "original_sha256": "8a02a5cc8e678694d7fb83b767df539389f95b8ab8cc9dc4b3d55ba9f287c931",
+      "original_bytes": 7676016,
+      "gzip_bytes": 188838
+    },
+    {
+      "file": "first-corrected-driver-input.json.gz",
+      "original_sha256": "ce7b561a7f222252a73bedcbab7b70d5ffb8a4a3ebca1df758838bade5a3f9c8",
+      "original_bytes": 4618306,
+      "gzip_bytes": 110834
+    },
+    {
+      "file": "first-final-driver-input.json.gz",
+      "original_sha256": "b17a70d9482beeb1783f2350c511bb0cbe0455ff315296aa792b2c60ad994be1",
+      "original_bytes": 6467609,
+      "gzip_bytes": 151437
+    }
+  ]
+}

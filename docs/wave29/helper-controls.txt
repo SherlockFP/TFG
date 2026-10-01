@@ -1,0 +1,14 @@
+[event update] Error: EXPECTED diagnostic callback negative control
+    at file:///workspace/[eval1]:4:16
+    at ModuleJob.run (node:internal/modules/esm/module_job:271:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:217:26)
+    at async ModuleLoader.eval (node:internal/modules/esm/loader:213:20)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+[event update] Error: EXPECTED diagnostic callback negative control
+    at file:///workspace/[eval1]:4:16
+    at ModuleJob.run (node:internal/modules/esm/module_job:271:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:217:26)
+    at async ModuleLoader.eval (node:internal/modules/esm/loader:213:20)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+PASS actual Emitter: cached snapshot/off/add during dispatch, same-size deletion/replacement creates new native array and new WeakMap shadow, native args/order/error catches, registered Sets/stored arrays untouched, off/clear invalidation and exact Map.get restoration.
+First uncached emits deliberately untraced. Expected error negative controls appear above. Initial prior checker incorrectly expected cache reuse despite repeated off invalidation; corrected stable-cache fixture passed.

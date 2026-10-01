@@ -1,0 +1,8 @@
+
+> kefal-company@0.1.0 test
+> node tools/harness/run_all.mjs -j 4 onegoal carryfeedback29
+
+ok     1/2 tools/harness/onegoal.test.mjs (0.1s)
+ok     2/2 tools/harness/carryfeedback29.test.mjs (1.7s)
+
+2/2 passed in 2s (-j 4). slowest: carryfeedback29.test.mjs 2s, onegoal.test.mjs 0s

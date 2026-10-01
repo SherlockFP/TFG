@@ -45,7 +45,7 @@ ok(OG.algoOk({ nowMs: 2000, lastMs: 1000, chatty: true, peak: true }), 'Chatty A
 // ---- module: tagged emit + the TAGGED line + lease
 globalThis.performance ??= { now: () => Date.now() };
 const mods = new Emitter();
-const game = { mods, selfId: 'me', settings: {}, run: { phase: 'moon', fc: { p: { me: [80, 1, 1] } } }, player: { pos: { x: 30, z: 40 }, dead: false, inShip: false, slots: ['a'] }, items: { get: (id) => ({ type: 'scrap', value: 50, def: { kind: 'scrap' } }) } };
+const game = { mods, selfId: 'me', settings: {}, run: { phase: 'moon', fc: { p: { me: [80, 1, 1] } } }, player: { pos: { x: 30, z: 40 }, dead: false, inShip: false, slots: ['a'] }, items: { get: (id) => id === 'a' ? { id: 'a', state: 'held', holder: 'me', type: 'scrap', value: 50, def: { kind: 'scrap' } } : null } };
 const h1 = (add) => add('Job line', 'main'); h1._src = 'facjobs'; mods.on('objectives', h1);
 mods.on('objectives', (add) => add('mod line', 'sub'));
 const { installOneGoal } = await import('../../src/game/onegoal.js');

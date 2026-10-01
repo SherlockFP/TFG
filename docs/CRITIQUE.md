@@ -1,4 +1,41 @@
-# Current experience — Wave28
+# Current experience — Wave29 partial expedition
+
+The owner's current experience baseline remains **5/10**. Wave29 starts from
+root-reported clean main `9925fc1` after Wave28's first-session fixes. Earlier
+source/guided scores remain historical and do not override the owner feedback.
+
+Wave29 now earns the actual furnished ship exit through normal native movement.
+The final bounded attempt stops on static contact on its selected exterior detour;
+that contact does not prove the surface or facility inaccessible. Facility entry,
+natural salvage, pocket stash and cargo return remain unearned. The complete first
+shift and meaningful salvage decision are still the next player-facing target.
+
+[Wave29 round card](wave29/README.md) and [independent review](wave29/REVIEW.md)
+define the source/evidence boundaries. Observe normal native input, readable
+actions and meaningful salvage decisions while preserving open feature access,
+PSX maintenance identity and native cargo/host rules. The first two attempts
+retain driver budget/keyup failures; no blocked ship route is inferred. Narrow
+source changes now keep pocket cargo in the carry/return goal, require real cargo
+home for Guide credit, clarify AIRLOCK/unloading and skip discarded A* smoothing.
+Native integration accepts those narrow contracts. The full run passes 257/258;
+the sole legacy fixture is corrected with assertions preserved, then focused
+OneGoal/carry checks pass 2/2. A later coordinate-only sign correction and its
+ship checks/build have their own source boundary. Its first placement was hidden
+behind an enabled default mod's loot board, which an isolated atlas fixture missed.
+The separate final rendered fixture confirms readable AIRLOCK at 960/1280 pixels
+with the installed loot board present; native lifecycle/seed/body/camera setup is
+explicit, so it earns no further normal play. Independent review closes the
+changed release scope; source readiness and the partial expedition remain distinct.
+
+Stutter remains open: the final 881-update software diagnostic still has 13 updates
+over 50 ms, maximum 329.7 ms. The costly callback's recorded source hint uniquely
+matches native LandingQueue; its atomic facility report is 301.6 ms. This scopes
+the next profiling target without explaining all stutter or proving same-frame
+job attribution. Different seeds and partial routes prevent a matched smoothness
+claim. The owner's **5/10** remains current; no higher human score,
+complete shift, blind discovery or representative hardware improvement is claimed.
+
+# Historical experience — Wave28
 
 The owner rates the current game **5/10**. This is the current experience baseline.
 Earlier 8.0 source/native/guided assessments below remain historical records and

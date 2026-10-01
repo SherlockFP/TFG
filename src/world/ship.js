@@ -6,8 +6,9 @@ import { createProp } from '../models/props.js';
 import { G } from '../physics/physics.js';
 import { boxOccupied } from './doorsafe.js';
 import { CORE_GAPS } from './hardpoints.js';
-import { SPOTS, SPAWNS, LAMPS, WINDOWS_Z, PAD, MOD_SPOTS, WELL, withoutWell } from './shiplayout.js';
+import { SPOTS, SPAWNS, LAMPS, WINDOWS_Z, PAD, MOD_SPOTS, WELL, SIGNS, withoutWell } from './shiplayout.js';
 import { buildShipDeco, gridWall } from './shipdeco.js';
+import { L } from '../core/i18n.js';
 
 export const SHIP = {
   x0: -7, x1: 7, z0: -3.5, z1: 3.5, h: 3.4,
@@ -366,7 +367,12 @@ export function buildShip({ physics, lightPool, scene }) {
   }
 
   // [ship2] partitions / floor tints / signs / crates / reactor (merged meshes); colliders + light emitters join the ship's own lists
-  const deco = buildShipDeco({ physics, lightPool, group });
+  // The tenth sign fills the atlas's spare cell beside the exit, clear of the loot board.
+  // A smaller label fits HAVA KİLİDİ without changing the legacy room signs.
+  const deco = buildShipDeco({ physics, lightPool, group, signs: [...SIGNS, {
+    id: 'airlock', text: L({ en: 'AIRLOCK', tr: 'HAVA KİLİDİ', ru: 'ШЛЮЗ' }),
+    fontSize: 32, c: '#30302a', x: S.door.x + 1.58, y: 2.4, z: S.z1 - .03, ry: Math.PI, off: 0,
+  }] });
   colliders.push(...deco.colliders); emitters.push(...deco.emitters);
 
   scene.add(group);

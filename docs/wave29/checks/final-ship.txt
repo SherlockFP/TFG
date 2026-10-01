@@ -1,0 +1,8 @@
+
+> kefal-company@0.1.0 test
+> node tools/harness/run_all.mjs -j 2 ship2_overlap ship2_hull
+
+ok     1/2 tools/harness/ship2_hull.test.mjs (0.1s)
+ok     2/2 tools/harness/ship2_overlap.test.mjs (0.4s)
+
+2/2 passed in 0s (-j 2). slowest: ship2_overlap.test.mjs 0s, ship2_hull.test.mjs 0s

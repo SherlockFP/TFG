@@ -1,0 +1,65 @@
+// NATIVE_INTEGRATION with labelled flat floor/initial arrival/loose cargo fixtures;
+// actual native item bodies, range/LOS E selector, Inventory request, Session
+// self-delivery and custody transitions. Not normal seeded browser play.
+import assert from 'node:assert/strict';
+const root=new URL('../../',import.meta.url).pathname;
+await import(root+'tools/harness/ship2_env.mjs');
+globalThis.addEventListener=()=>{};globalThis.removeEventListener=()=>{};
+// This fixture does not render WebGL icons. Gameplay/event clocks are unchanged.
+globalThis.requestIdleCallback=()=>0;
+const nativeTimeout=globalThis.setTimeout,ownedTimers=new Set();globalThis.setTimeout=(fn,ms,...a)=>{let t;t=nativeTimeout(()=>{ownedTimers.delete(t);fn(...a);},ms);ownedTimers.add(t);return t;};
+const makeElement=document.createElement;document.createElement=(...a)=>{const e=makeElement(...a);e.style.setProperty=(k,v)=>{e.style[k]=v;};e.querySelectorAll=()=>[];return e;};
+const {register}=await import('node:module');register('data:text/javascript,'+encodeURIComponent("export async function load(u,c,n){if(u.endsWith('.css'))return{format:'module',source:'export default {};',shortCircuit:true};return n(u,c)}"));
+const THREE=await import('three');
+const {Emitter}=await import(root+'src/core/events.js'),{Physics,initPhysics,G,groups}=await import(root+'src/physics/physics.js');
+const {Session}=await import(root+'src/net/session.js'),{ItemManager}=await import(root+'src/entities/items.js'),{LocalPlayer}=await import(root+'src/entities/localplayer.js');
+const {hostMethods}=await import(root+'src/game/host.js'),{actionMethods}=await import(root+'src/game/actions.js');
+const {installInventory}=await import(root+'src/game/inventory.js'),{installOneGoal}=await import(root+'src/game/onegoal.js'),{installGuide}=await import(root+'src/game/guide.js');
+const {Objectives}=await import(root+'src/game/objectives.js'),{insideShip}=await import(root+'src/world/ship.js');
+await initPhysics();
+const V=(...p)=>new THREE.Vector3(...p),physics=new Physics(),scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(),wire=[],xp=[],errors=[];
+const oldError=console.error;console.error=(...a)=>{errors.push(a.map(String).join(' '));oldError(...a);};
+const net=new Session({strategy:'local',isHost:true,code:'CARRY29',profile:{}});net.selfId=net.hostId='host';net.connected=true;net.transport.send=(m,to)=>wire.push({m:structuredClone(m),to});
+const run={phase:'moon',moon:'hamsi',seed:17,day:1,quotaIndex:0,quota:330,sold:0,credits:60,daysLeft:3,time:500};
+const game={physics,scene,camera,engine:{scene,camera},net,isHost:true,selfId:'host',run,config:{inventorySlots:5,dayLengthSec:720},profile:{id:'fixture-host',level:1,coins:0,stats:{},bounties:[]},settings:{guideTips:false},mods:new Emitter(),remotes:new Map(),world:{outdoor:{mainExit:{pos:V(48,0,16)}}},ui:{toast(){},blocksInput:()=>false},input:{locked:true,isTyping:()=>false,key:()=>'',mouseDown:()=>false,pressed:()=>false},progress:{save(){}},sfx(){},refreshHeldVisuals(){},refreshRemoteHeld(){},refreshStats(){},broadcastRun(){},hostAnnounce(){},hostThrowables(){},creatures:{views:new Map(),hostUpdate(){}},interactablesNow:()=>[],aiPlayers:()=>[{id:'host',dead:false}],hostData:{dayStats:{collected:0,per:{}},collected:new Set(),spawnT:1e9,outdoorSpawnT:1e9,lastTimeSync:1e9,collectT:0,runSyncT:1e9,announceT:1e9}};
+for(const name of ['pickup','findInteraction','onPickFail','onItemHeld','onItemDropped','dropItem','dropHeld'])game[name]=actionMethods[name];
+game.dayPer=hostMethods.dayPer;game.items=new ItemManager(game);game.player=new LocalPlayer(game);game.player.slots=[null,null,null,null,null];game.player.teleport(V(15,0,15));game.player.inShip=false;
+physics.addStaticBox(10,-.1,10,30,.1,30);physics.world.step();
+net.on_('it',d=>game.items.onEvent(d));net.on_('pickfail',d=>game.onPickFail(d.id,d));net.on_('xp',d=>xp.push(d));
+game.inventory=installInventory(game);game.onegoal=installOneGoal(game);game.guide=installGuide(game);game.mods.emit('netReady',net,game);hostMethods.registerHandlers.call(game);
+const obj=Object.create(Objectives.prototype);obj.game=game;obj.enteredToday=false;
+const goals=()=>game.onegoal.resolve(obj.compute(),2);
+const tick=()=>game.mods.emit('update',.25,game);
+const aim=p=>{camera.position.copy(game.player.eyePos());camera.lookAt(p);camera.updateMatrixWorld();};
+function walk(x,z){const p=game.player;for(let n=0;n<1000;n++){const b=p.body.translation(),dx=x-b.x,dz=z-b.z,d=Math.hypot(dx,dz);if(d<.06)break;const k=Math.min(.15,d)/d;p.ctrl.computeColliderMovement(p.col,{x:dx*k,y:-.012,z:dz*k},undefined,groups(G.PLAYER,G.STATIC|G.DOOR));const mv=p.ctrl.computedMovement();p.body.setNextKinematicTranslation({x:b.x+mv.x,y:b.y+mv.y,z:b.z+mv.z});physics.world.step();const q=p.body.translation();p.pos.set(q.x,q.y-p.half-.34,q.z);}assert.ok(Math.hypot(p.pos.x-x,p.pos.z-z)<.12);p.inShip=insideShip(p.pos);}
+try{
+ const id=game.items.hostSpawn('bolt',V(15,.5,14),{value:31,tier:'common'}),it=game.items.get(id);physics.world.step();aim(it.obj.position);
+ const wallAt=camera.position.clone().lerp(it.obj.position,.5),wall=physics.addStaticBox(wallAt.x,wallAt.y,wallAt.z,.5,.5,.1);physics.world.step();assert.equal(game.findInteraction(),null,'real wall rejects native E before pickup');physics.removeCollider(wall);physics.world.step();
+ assert.match(game.findInteraction()?.label||'',/Pick up/);game.findInteraction().action();assert.equal(it.holder,'host');assert.equal(it.state,'held');assert.deepEqual(game.onegoal.carriedValues(),[31]);assert.match(goals()[0].text,/Carrying 1 item/);tick();assert.ok(game.profile.guide.tut.done.scrap);
+ assert.equal(errors.length,0,'native setup must be error-free before the intended regression');assert.equal(game.inventory.quickMove(id),true);assert.equal(it.inv.k,'bag');assert.equal(game.player.slots.includes(id),false);assert.equal(game.inventory.bagItems()[0],it);
+ // Regression: real pocket custody must retain the same carry feedback as hotbar cargo.
+ assert.deepEqual(game.onegoal.carriedValues(),[31],'native pocket move must retain carried salvage value');assert.match(goals()[0].text,/Carrying 1 item/);tick();assert.equal(game.profile.guide.tut.done.ship,undefined,'stashing outdoors cannot complete return');
+ walk(2,1);tick();assert.ok(game.profile.guide.tut.done.ship,'actual physical return with pocket cargo satisfies Bringback');assert.equal(it.collected,false);assert.equal(game.hostData.dayStats.collected,0);assert.equal(xp.length,0,'guide truth does not write extraction or wallet outcomes');obj.enteredToday=true;assert.match(goals()[0].text,/Unload your recovered cargo/,'after actual entry history pocket cargo aboard still names unloading');
+ assert.equal(game.inventory.quickMove(id),true);assert.equal(it.inv,null);assert.ok(game.player.slots.includes(id));assert.deepEqual(game.onegoal.carriedValues(),[31]);game.player.slot=game.player.slots.indexOf(id);aim(V(2,1,0));game.dropHeld(false);assert.equal(it.state,'world');assert.equal(it.holder,null);assert.equal(game.items.get(id),it);assert.equal(game.onegoal.carriedValues().length,0);assert.equal(it.value,31);
+ hostMethods.hostUpdate.call(game,.1);assert.equal(it.collected,true);assert.equal(game.hostData.dayStats.collected,31);assert.equal(xp.length,1);hostMethods.hostUpdate.call(game,1.1);assert.equal(game.hostData.dayStats.collected,31);assert.equal(xp.length,1,'native repeated collect cannot mint rewards');assert.equal(run.credits,60);assert.equal(run.sold,0);assert.doesNotMatch(goals().map(o=>o.text).join(' '),/Unload your recovered cargo/,'real drop clears unloading objective');game.guide.restartTutorial();tick();assert.ok(game.guide.state().tut.done.ship,'real collected floor receipt remains valid for the living returned crew');obj.enteredToday=false;
+ // Real full-hotbar E selects the existing native pocket-pick route too.
+ net.broadcast('it',{e:'rm',id});walk(15,15);game.guide.restartTutorial();
+ const toolIds=[];for(let i=0;i<5;i++)toolIds.push(game.items.hostSpawn('flashlight',V(15,1,15),{holder:'host',value:99}));assert.ok(game.player.slots.every(Boolean));
+ const second=game.items.hostSpawn('bolt',V(15,.5,14),{value:27,tier:'common'}),pocket=game.items.get(second);physics.world.step();aim(pocket.obj.position);
+ assert.match(game.findInteraction()?.label||'',/Pick up/);game.findInteraction().action();assert.equal(pocket.inv.k,'bag');assert.equal(pocket.holder,'host');assert.equal(game.player.slots.includes(second),false);assert.deepEqual(game.onegoal.carriedValues(),[27],'pocket tools must not masquerade as haul');tick();assert.ok(game.guide.state().tut.done.scrap);
+ run.fc={p:{host:[0,1,true]}};const tagged=goals();assert.match(tagged[0].text,/TAGGED/);assert.ok(game.onegoal.preview().net<27);run.time=23*60+1;assert.equal(goals()[0].kind,'warn','midnight warning retains survival priority');run.time=500;delete run.fc;
+ assert.equal(game.inventory.doMove(second,{k:'world'}),true);assert.equal(pocket.state,'world');assert.equal(pocket.holder,null);tick();walk(2,1);tick();assert.equal(game.guide.state().tut.done.ship,undefined,'dropping outside then returning empty cannot pretend to bring cargo back');
+ assert.match(goals()[0].text,/AIRLOCK/i,'first empty living ship goal points to actual airlock');walk(15,15);assert.match(goals()[0].text,/Find the facility entrance/);obj.enteredToday=true;assert.doesNotMatch(goals()[0].text,/AIRLOCK|Find the facility entrance/);obj.enteredToday=false;
+ for(const tid of toolIds)net.broadcast('it',{e:'rm',id:tid});
+ // Invalid ownership and exclusion fixtures create actual native IDs; they never alter earned custody/value outcomes.
+ const valid=game.items.hostSpawn('bolt',V(15,1,15),{holder:'host',inv:'bag',value:17}),foreign=game.items.hostSpawn('bolt',V(15,1,15),{holder:'crew',value:80}),body=game.items.hostSpawn('body',V(15,1,15),{holder:'host',value:99}),bound=game.items.hostSpawn('bolt',V(15,1,15),{holder:'host',soulbound:'fixture-host',value:99}),tool=game.items.hostSpawn('flashlight',V(15,1,15),{holder:'host',value:99}),equipped=game.items.hostSpawn('arm_hoodie',V(15,1,15),{holder:'host',inv:{k:'eq',s:'armor'},value:99}),cabinet=game.items.hostSpawn('bolt',V(15,1,15),{holder:'c:fixture',value:99});
+ assert.equal(game.items.get(equipped).inv.k,'eq');
+ const originalBagItems=game.inventory.bagItems,originalSlots=game.player.slots.slice();game.player.slots=[valid,valid,foreign,body,bound,tool,equipped,cabinet,'missing'];game.inventory.bagItems=()=>[game.items.get(valid),game.items.get(valid),game.items.get(foreign),null,{id:'missing'}];
+ assert.deepEqual(game.onegoal.carriedValues(),[17],'canonical local native ID dedupes all cargo views and rejects invalid custody');game.player.dead=true;assert.equal(goals()[0].kind,'warn');assert.deepEqual(game.onegoal.carriedValues(),[17],'death does not change native custody truth');game.player.dead=false;game.player.downed=true;game.guide.restartTutorial();walk(2,1);tick();assert.equal(game.guide.state().tut.done.ship,undefined,'downed state cannot complete return');assert.deepEqual(game.onegoal.carriedValues(),[17]);game.player.downed=false;game.player.dead=true;tick();assert.equal(game.guide.state().tut.done.ship,undefined,'dead state cannot complete return');game.player.dead=false;
+ game.inventory.bagItems=originalBagItems;game.player.slots=originalSlots;
+ // Actual installed special-mode filtering/ownership keeps ordinary airlock advice out of its own experience.
+ const {installExpeditions}=await import(root+'src/game/expeditions.js');const expeditions=installExpeditions(game);game.expeditions=expeditions;run.moon='ex_barge';assert.doesNotMatch(goals().map(o=>o.text).join(' '),/AIRLOCK|Find the facility entrance|Bring scrap to the ship:/);run.moon='hamsi';expeditions.dispose();game.expeditions=null;
+ await import(root+'src/game/homeworld.js');run.moon='home';assert.doesNotMatch(goals().map(o=>o.text).join(' '),/AIRLOCK|Unload your recovered cargo/);run.moon='hq';assert.doesNotMatch(goals().map(o=>o.text).join(' '),/AIRLOCK|Unload your recovered cargo/);run.moon='hamsi';
+ const {installDeadletter24}=await import(root+'src/game/deadletter24.js');const combat=installDeadletter24(game);game.deadletter24=combat;run.phase='deadletter';run.deadletter24={token:'existing-state-fixture',floor:0,stage:'intro',elapsed:0,players:{host:{pending:0}}};assert.match(goals()[0].text,/Dead Letter/);assert.doesNotMatch(goals().map(o=>o.text).join(' '),/AIRLOCK|Find the facility entrance/);delete run.deadletter24;run.phase='moon';combat.dispose();game.deadletter24=null;
+ assert.equal(errors.length,0);console.log('carryfeedback29 native pickup/stash/walk/unbag/drop/self-delivery/once-extraction/identity/priority/special-mode PASS');
+}finally{game.guide.dispose();game.onegoal.dispose();game.inventory.dispose();game.items.clearAll();physics.world.removeCharacterController(game.player.ctrl);physics.removeBody(game.player.body);physics.world.free();net.transport.close?.();for(const t of ownedTimers)clearTimeout(t);globalThis.setTimeout=nativeTimeout;console.error=oldError;}
