@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { levelMaterial } from '../world/geobuilder.js';
 import { createAnyProp } from '../world/propfactory.js';
 import { t, tf } from '../core/i18n.js';
+import { DEADLETTER30 } from '../game/deadletter30_access.js';
 import { rankOf, xpForLevel } from '../game/progression.js';
 import { listRuns, loadRun, saveProfile } from '../core/save.js';
 import { MenuRoom } from './menuroom.js';
@@ -209,6 +210,7 @@ export class CRTMenu {
     let open = true;   // [joinplay] veterans and anyone past quota 1 see everything; a fresh profile sees PLAY first and no DAILY / HUB
     try { const p = this.app.profile; if (p) { decideMode(p); open = isOpen('shop', p.unlocks, null); } } catch { open = true; }
     const items = [{ id: 'play', label: t('PLAY') }];
+    items.push({ id: 'deadletter', label: DEADLETTER30.title });
     if (open) items.push({ id: 'daily', label: t('DAILY') });
     items.push({ id: 'profile', label: t('PROFILE') });
     if (open) items.push({ id: 'hub', label: t('HUB') });
@@ -422,6 +424,7 @@ export class CRTMenu {
     if (!it) return;
     this.app.audio?.ui('ui_confirm', 0.6);
     if (it.id === 'play') { this.app.ui.showMenu('browser'); return; }
+    if (it.id === 'deadletter') { this.app.ui.showMenu('host', { mode: 'deadletter' }); return; }
     this.app.ui.showMenu(it.id);
   }
   setMode(mode, label) {

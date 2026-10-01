@@ -5,6 +5,7 @@
 // Full-screen reports (day summary, quota met, deplatformed) play one at a time; toasts wait while one is up.
 import { el, escapeHtml, clamp, fmtMoney } from '../core/util.js';
 import { t, setLang, getLang, LANGS, tf } from '../core/i18n.js';
+import { DEADLETTER30 } from '../game/deadletter30_access.js';
 import { tNum } from '../i18n/tnum.js';   // [i18n8] toasts: exact key, then numbers as {}
 import { HUD, randomTip } from './hud.js';
 import { createCenterCards } from './centercards.js';
@@ -500,13 +501,15 @@ export class UI {
       row(t('Max players'), max), row(t('Network'), net),
       row(t('Difficulty'), diff), diffNote,   // [hardmode]
     );
-    const mode = el('select', {}, el('option', { value: 'campaign' }, t('Campaign')), el('option', { value: 'quick' }, t('QUICK SHIFT')));
-    form.append(row(t('Game mode'), mode), row(t('Lobby name'), name), row(t('Public (listed in lobby browser)'), pub), adv);
+    const mode = el('select', { 'data-nav': 'host:mode' }, el('option', { value: 'campaign' }, t('Campaign')), el('option', { value: 'quick' }, t('QUICK SHIFT')), el('option', { value: 'deadletter' }, DEADLETTER30.title));
+    mode.value = this.menuOpts?.mode === 'deadletter' ? 'deadletter' : 'campaign';
+    const modeNote = el('div', { class: 'cp-note' });
+    form.append(row(t('Game mode'), mode), modeNote, row(t('Lobby name'), name), row(t('Public (listed in lobby browser)'), pub), adv);
     const slots = el('div', { class: 'slots' });
     let chosen = { slot: this.menuOpts?.slot || listRuns().filter((r) => r.data).sort((a, b) => (b.data.savedAt || 0) - (a.data.savedAt || 0))[0]?.slot || 1, data: null };
     const start = () => {
       s.netStrategy = net.value; s.difficulty = diff.value; saveSettings(s);
-      this.app.hostGame({ lobbyName: name.value.trim() || 'Crew', isPublic: pub.checked, password: pw.value.trim(), maxPlayers: +max.value, difficulty: diff.value, strategy: net.value, slot: mode.value === 'quick' ? 0 : chosen.slot, runData: mode.value === 'quick' ? null : loadRun(chosen.slot), quick: mode.value === 'quick' });
+      this.app.hostGame({ lobbyName: name.value.trim() || 'Crew', isPublic: pub.checked, password: pw.value.trim(), maxPlayers: +max.value, difficulty: diff.value, strategy: net.value, slot: mode.value === 'campaign' ? chosen.slot : 0, runData: mode.value === 'campaign' ? loadRun(chosen.slot) : null, quick: mode.value === 'quick', deadletter: mode.value === 'deadletter' });
     };
     const renderSlots = () => {
       const focused = document.activeElement?.dataset?.slot;
@@ -537,10 +540,19 @@ export class UI {
       if (focused) slots.querySelector(`[data-slot="${focused}"]`)?.focus({ preventScroll: true });
     };
     renderSlots();
+    const slotColumn = el('div', { class: 'col' }, el('div', { class: 'cp-sec' }, t('Save slot')), slots);
+    const hostGrid = el('div', { class: 'host-grid' }, form, slotColumn);
+    const updateMode = () => {
+      slotColumn.classList.toggle('hidden', mode.value !== 'campaign');
+      hostGrid.style.gridTemplateColumns = mode.value === 'campaign' ? '' : 'minmax(0, 1fr)';
+      modeNote.hidden = mode.value !== 'deadletter';
+      modeNote.textContent = mode.value === 'deadletter' ? `${t(DEADLETTER30.description)} ${t(DEADLETTER30.fresh)}` : '';
+    };
+    mode.addEventListener('change', updateMode); updateMode();
     const f = this.frame(t('HOST GAME'),
-      el('div', { class: 'host-grid' }, form, el('div', { class: 'col' }, el('div', { class: 'cp-sec' }, t('Save slot')), slots)),
+      hostGrid,
       el('div', { class: 'menu-row end' }, this.backButton(() => this.showMenu('title')), this.button(t('START') + ' ▶', start, 'primary big')));
-    this.focusFirst(f, '.slot-card.sel');
+    this.focusFirst(f, mode.value === 'campaign' ? '.slot-card.sel' : '[data-nav="host:mode"]');
   }
 
   netSelect() {
@@ -1116,6 +1128,15 @@ export class UI {
         el('span', { class: 'dim' }, `${g?.isHost ? t('You are the host') : t('Connected')} · ${t('Players')} ${1 + (g?.remotes.size || 0)}`)),
       el('div', { class: 'menu-list' },
         this.button(t('Resume'), () => this.closePanel(), 'big'),
+        ...(g?.deadletter24 ? (() => {
+          const status = g.deadletter24.menuStatus();
+          const enter = this.button(t(DEADLETTER30.start), () => {
+            if (this.app.game !== g || !g.deadletter24.menuStatus().enabled) { this.toast(t(g.deadletter24.menuStatus().reason), 'warn'); return; }
+            this.closePanel(); g.deadletter24.enterFromMenu();
+          }, 'primary');
+          enter.disabled = !status.enabled;
+          return [enter, el('div', { class: 'cp-note' }, t(status.reason || DEADLETTER30.description))];
+        })() : []),
         this.button(t('Copy join link'), () => { copyJoinLink(this, g); }, 'primary'),   // [joinplay] ?join=CODE&net=X
         this.button(t('Copy invite code'), () => { navigator.clipboard?.writeText(code); this.toast(`${t('Copied')}: ${code}`); }),
         this.button(t('CHARACTER'), () => this.openPanel(this.characterPanel(true))),

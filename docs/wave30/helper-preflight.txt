@@ -1,0 +1,1 @@
+First admission helper extraction matched an inner page.evaluate(async) instead of the top-level runner and failed node --check with Unexpected end of input. No browser launched. Corrected extraction uses a newline/top-level runner delimiter; syntax validation passes before launch. Production untouched.

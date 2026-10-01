@@ -3,7 +3,7 @@
 import * as THREE from 'three';
 import { RNG } from '../core/rng.js';
 import { addPracticals } from './interiors/practicals.js';
-import { GeoBuilder, levelMaterial, mergeStaticMeshes, compactSubtree } from './geobuilder.js';
+import { GeoBuilder, levelMaterial, mergeStaticMeshesSteps30, compactSubtree } from './geobuilder.js';
 import { NavGrid } from './nav.js';
 import { freeTree } from '../render/textures.js';
 import { createAnyProp as createProp } from './propfactory.js';
@@ -788,7 +788,62 @@ function propSize(id, obj) {
 }
 
 // ---------- build (geometry, colliders, props, lights, nav) ----------
-export function buildFacility(layout, { physics, lightPool }) {
+// Sync callers and queued landings execute the same seeded build in the same order.
+export function buildFacility(layout, context) {
+  return createFacilityBuild30(layout, context).finish();
+}
+
+export function createFacilityBuild30(layout, context) {
+  const owned = { dispose: null }, iterator = buildFacilitySteps30(layout, context, owned);
+  let done = false, cancelled = false, value = null, units = 0;
+  const build = {
+    get done() { return done; }, get cancelled() { return cancelled; }, get units() { return units; },
+    advance(budgetMs = 6, now = () => performance.now()) {
+      if (cancelled || done) return { done: true, value };
+      const start = now(); let step;
+      try {
+        do { step = iterator.next(); units++; if (step.done) { done = true; value = step.value; return step; } }
+        while (now() - start < budgetMs);
+        return step;
+      } catch (error) { build.cancel(); throw error; }
+    },
+    finish() { while (!done && !cancelled) build.advance(Infinity); return value; },
+    cancel() {
+      if (done || cancelled) return;
+      cancelled = true;
+      try { iterator.return(); } finally { owned.dispose?.(); }
+    },
+  };
+  return build;
+}
+
+// Call inside the native facility job: every continuation precedes later map hooks.
+export function queueFacilityBuild30(layout, context, queue, onReady) {
+  if (!queue?._inJob) { onReady(buildFacility(layout, context)); return null; }
+  const build = createFacilityBuild30(layout, context);
+  const off = queue.onClear(() => build.cancel());
+  const advance = () => {
+    if (build.cancelled) return;
+    let ready = null;
+    try {
+      const step = build.advance(6, queue.now);
+      if (step.done) { ready = step.value; off(); onReady(ready); }
+      else queue.addNext('facility:' + step.value, advance, { yieldFrame: true });
+    } catch (error) {
+      off(); build.cancel(); ready?.dispose(context.physics); queue.clear(); throw error;
+    }
+  };
+  queue.addNext('facility:start', advance, { yieldFrame: true });
+  return build;
+}
+
+function* buildFacilitySteps30(layout, { physics, lightPool: pool }, owned) {
+  const addedLights = new Set();
+  const lightPool = new Proxy(pool, { get(target, key) {
+    if (key === 'add') return e => { addedLights.add(e); return target.add(e); };
+    if (key === 'remove') return e => { addedLights.delete(e); return target.remove(e); };
+    return Reflect.get(target, key, target);
+  } });
   const L = layout;
   const rng = new RNG((L.seed ^ 0x77b1) >>> 0);
   const theme = THEMES[L.theme] || THEMES.factory;
@@ -813,6 +868,22 @@ export function buildFacility(layout, { physics, lightPool }) {
   const decals = [];
   const wallSpots = [];
   const ceilingSpots = [];
+  let setPieces = null, themeOut = null, heroOut = null, sys = null, m2 = null, variety = null, disposed = false;
+  const dispose = physicsRef => {
+    if (disposed) return;
+    disposed = true;
+    freeTree(group);
+    try { sys?.dispose(); } catch (e) { console.warn('facility systems dispose', e); }
+    try { m2?.dispose?.(); } catch (e) { console.warn('maps2 dispose', e); }
+    try { variety?.dispose?.(); } catch (e) { console.warn('variety dispose', e); }
+    try { themeOut?.lab?.dispose?.(); } catch (e) { console.warn('lab dispose', e); }
+    setPieces?.dispose(physicsRef);
+    for (const c of colliders) physicsRef.removeCollider(c);
+    for (const e of [...addedLights]) lightPool.remove(e);
+    group.removeFromParent();
+  };
+  owned.dispose = () => dispose(physics);
+  let floorUnits = 0, wallUnits = 0, corridorUnits = 0, decalUnits = 0, doorUnits = 0;
 
   const pit = def.pit ? def.pit(L) : null;   // [labyrinths] tower: a well through the floor of the hub room ({ cells:Set, x0,z0,x1,z1, depth })
   const wx = (x) => L.ox + x * C, wz = (z) => L.oz + z * C;
@@ -840,7 +911,9 @@ export function buildFacility(layout, { physics, lightPool }) {
     if (L.cells[i] === 2 && theme.corridor.carpet) {
       gb.hrect('f:' + theme.corridor.carpet, wx(x) + 0.9, wz(z) + 0.9, wx(x + 1) - 0.9, wz(z + 1) - 0.9, Y + 0.01, true, 0.5);
     }
+    if (++floorUnits % 16 === 0) yield 'floors';
   }
+  yield 'floors';
   // one big floor slab
   if (!pit) addBox(0, Y - 0.5, 0, W * C + 8, 1, H * C + 8);
   else {   // [labyrinths] the same slab with a hole for the well: four boxes around it
@@ -936,13 +1009,16 @@ export function buildFacility(layout, { physics, lightPool }) {
         addBox(ecx, Y + hh / 2, ecz, alongX ? C + 0.3 : 0.3, hh, alongX ? 0.3 : C + 0.3);
       }
     }
+    if (++wallUnits % 8 === 0) yield 'walls';
   }
+  yield 'walls';
 
-  const levelMesh = gb.build((key) => {
+  const levelMesh = yield* gb.buildSteps30((key) => {
     const tex = key.split(':')[1];
     return levelMaterial(tex, { vertexColors: key.startsWith('f:') });
-  });
+  }, meshGroup => group.add(meshGroup));
   group.add(levelMesh);
+  yield 'level-mesh';
 
   // ---------- props ----------
   const nav = new NavGrid(L, 1);
@@ -1035,6 +1111,7 @@ export function buildFacility(layout, { physics, lightPool }) {
         }
       }
     }
+    yield 'room-lamps';
     // wall props
     const wallSlots = [];
     for (let zz = r.z; zz < r.z + r.h; zz++) for (let xx = r.x; xx < r.x + r.w; xx++) {
@@ -1073,6 +1150,7 @@ export function buildFacility(layout, { physics, lightPool }) {
         interactables.push({ type: 'fuse', obj, pos: new THREE.Vector3(px, Y + 1.5, pz), id: 'fuse' + interactables.length });
       }
     }
+    yield 'room-walls';
     // free wall spots (used by the host for mimic doors etc.)
     if (!['entrance', 'vault', 'generator', 'core'].includes(r.type)) {
       for (let k = wallCount + 2; k < wallSlots.length && k < wallCount + 4; k++) {
@@ -1115,7 +1193,9 @@ export function buildFacility(layout, { physics, lightPool }) {
           const px = horizontal ? rcx + u : lx;
           const pz = horizontal ? lz : rcz + u;
           if (placeProp(st.rows, px, Y, pz, rot)) r.rowSlots.push({ x: px, z: pz, rot, spacing: len / n });
+          if (k % 4 === 3) yield 'room-row';
         }
+        yield 'room-row';
       }
     } else if (st.grid) {
       // regular grid of workstations (office cubicle farms) with walkable aisles between them
@@ -1127,6 +1207,7 @@ export function buildFacility(layout, { physics, lightPool }) {
         for (let j = 0; j < ngz; j++) for (let i2 = 0; i2 < ngx; i2++) {
           if (rng.chance(g.skip || 0)) continue;
           placeProp(g.id, ox + i2 * step, Y, oz + j * step, j % 2 ? 0 : Math.PI);
+          if ((j * ngx + i2) % 4 === 3) yield 'room-grid';
         }
       }
     } else if (st.center?.length) {
@@ -1143,6 +1224,7 @@ export function buildFacility(layout, { physics, lightPool }) {
         }
       }
     }
+    yield 'room-furniture';
     // reactor pedestal spot
     if (st.reactor) {
       r.reactorSpot = new THREE.Vector3(rcx, Y + 0.05, rcz);
@@ -1171,6 +1253,7 @@ export function buildFacility(layout, { physics, lightPool }) {
         placeProp(id, cx, Y, cz, rng.float(0, Math.PI * 2) * (id === 'office_chair' ? 1 : 0) + rng.int(0, 3) * Math.PI / 2, { visualOnly: true });
       }
     }
+    yield 'room-clutter';
     // posters / decals
     const nPost = st.posters || (rng.chance(0.5) ? 1 : 0);
     for (let k = 0; k < nPost && wallSlots.length; k++) {
@@ -1195,6 +1278,7 @@ export function buildFacility(layout, { physics, lightPool }) {
       ventSpots.push({ x: ecx + inward[0] * 1.2, y: Y, z: ecz + inward[1] * 1.2, room: r.id, obj });
     }
     if (st.webs) for (let k = 0; k < 3; k++) mineSpots.push({ web: true, x: rng.float(x0 + 1, x1 - 1), y: Y, z: rng.float(z0 + 1, z1 - 1) });
+    yield 'room-spots';
   }
 
   // corridor details: lamps, pipes, hazards
@@ -1259,7 +1343,9 @@ export function buildFacility(layout, { physics, lightPool }) {
         break;
       }
     }
+    if (++corridorUnits % 8 === 0) yield 'corridor';
   }
+  yield 'corridor';
 
   // decals (posters etc.) as small planes on walls
   for (const dcl of decals) {
@@ -1273,7 +1359,9 @@ export function buildFacility(layout, { physics, lightPool }) {
     m.rotation.y = [-Math.PI / 2, Math.PI, Math.PI / 2, 0][s.d];
     group.add(m);
     if (!globalThis.__kefalLegacyMerge) propsList.push(m); // TEMP-BENCH
+    if (++decalUnits % 8 === 0) yield 'decals';
   }
+  yield 'decals';
 
   // ---------- doors ----------
   let doorId = 0;
@@ -1375,8 +1463,10 @@ export function buildFacility(layout, { physics, lightPool }) {
       group.add(sign);
     }
     doorsOut.push(door);
+    if (++doorUnits % 2 === 0) yield 'doors';
   }
 
+  yield 'doors';
   // vault loot spots & reactor spot
   const vaultSpots = [];
   for (const r of L.rooms) {
@@ -1388,46 +1478,53 @@ export function buildFacility(layout, { physics, lightPool }) {
   const reactorRoom = L.rooms.find((r) => r.reactorSpot);
 
   // set pieces: catwalks, steam vents, flooded room, dark corridors, blood trails
-  const setPieces = buildSetPieces({
+  setPieces = buildSetPieces({
     layout: L, group, physics, lightPool, rng: new RNG((L.seed ^ 0x5e7a1ece) >>> 0),
     addBox: (cx, cy, cz, sx, sy, sz) => addBox(cx, cy, cz, sx, sy, sz),
     placeProp: (id, x, y, z, rotY) => placeProp(id, x, y, z, rotY),
     nav, Y, CELL: C, levelMaterial, GeoBuilder, interior: def,
   });
+  yield 'set-pieces';
   if (L.theme === 'mineshaft') {
     decorateMineshaft({
       layout: L, group, physics, lightPool, rng: new RNG((L.seed ^ 0x3171e5) >>> 0), addBox, placeProp, nav, Y, CELL: C, levelMaterial, GeoBuilder, emitters,
       darkCells: typeof planDarkCorridors === 'function' ? planDarkCorridors(L) : null,
     });
   }
+  yield 'mineshaft';
   // theme decoration (src/world/interiors/*.js): pillars, water channels, cable trays, pools ...
   const themeCtx = {
     layout: L, group, lightPool, addBox, placeProp, propBoxes, nav, Y, CELL: C, levelMaterial, GeoBuilder, emitters,
     zones: setPieces.zones, scrapSpots, darkCells, setPieces,
   };
-  let themeOut = null, heroOut = null;   // [labyrinths] decorate() may return { lab } (runtime data for src/game/labyrinths.js)
   if (typeof def.decorate === 'function') themeOut = def.decorate({ ...themeCtx, rng: new RNG((L.seed ^ 0x7de1c0) >>> 0) }) || null;
+  yield 'theme-decoration';
   try { addPracticals({ ...themeCtx, def }); } catch (e) { console.warn('practicals', e); }   // [qa] emissive strips + exit signs: rooms read without a torch
+  yield 'practicals';
   try { heroOut = decorateHeroes({ ...themeCtx, rng: new RNG((L.seed ^ 0x4e70c1) >>> 0), theme }); } catch (e) { console.warn('hero rooms', e); }   // [labyrinths]
+  yield 'hero-decoration';
   // gameplay set pieces shared by every theme: laser grids, breaker rooms, cave-ins, vent shortcuts, sludge
   const hazards = buildHazards({ ...themeCtx, rng: new RNG((L.seed ^ 0x4a2a7d) >>> 0), interior: def });
   setPieces.hazards = hazards;
+  yield 'hazards';
   // facility systems (interiors/facsys.js): generator console, puzzle panels, notes, consoles, containment chamber,
   // emergency lighting. Own rng fork; the runtime (state machine, net, HUD) lives in src/game/facilitysys.js.
-  let sys = null;
   try { sys = buildFacilitySystems({ ...themeCtx, rng: new RNG((L.seed ^ 0xfac5175) >>> 0), interior: def, doors: doorsOut, hazards, physics, lightPool, colliders }); } catch (e) { console.warn('facility systems', e); }
+  yield 'systems';
   // [maps2] story / liminal rooms + interactable furniture (own RNG fork; failure-isolated)
-  let m2 = null;
   try { m2 = buildRooms2({ ...themeCtx, rng: new RNG((L.seed ^ 0x3a92c1 ^ 0x51ed) >>> 0), theme, physics, colliders }); } catch (e) { console.warn('maps2 build', e); }
+  yield 'story-rooms';
   // [stealth] wave 4: cubicle farm / pool room / hall loop dressing, nook rewards, hatches, shortcut latch (own RNG fork; failure-isolated)
-  let variety = null;
   try { variety = buildVariety({ ...themeCtx, rng: new RNG((L.seed ^ 0x57ea1b) >>> 0), theme }); } catch (e) { console.warn('variety build', e); }
+  yield 'variety';
   setPieces.releaseNav();
   // lights
   for (const e of emitters) lightPool.add(e);
+  yield 'lights';
   // merge static props per chunk/material (doors are separate objects and stay animated)
-  mergeStaticMeshes(propsList, group, globalThis.__kefalLegacyMerge ? 12 : globalThis.__kefalMergeChunk || 24, globalThis.__kefalMergeCoarse ?? 2.5);
+  yield* mergeStaticMeshesSteps30(propsList, group, globalThis.__kefalLegacyMerge ? 12 : globalThis.__kefalMergeChunk || 24, globalThis.__kefalMergeCoarse ?? 2.5);
 
+  yield 'merge-props';
   // filter scrap spots by nav
   const okSpot = (s) => nav.walkableAt(s.x, s.z);
   const scrap = scrapSpots.filter(okSpot);
@@ -1451,18 +1548,7 @@ export function buildFacility(layout, { physics, lightPool }) {
     sys, chestSpots, m2, variety, lab: themeOut?.lab || null, heroes: heroOut || null,   // [labyrinths]   // [stealth] fac.variety = hatches / rewards / shortcut latch (src/game/stealth.js); [maps2] fac.m2 = story-room notes / light switches / windows (src/game/maps2.js)
     // facility systems runtime data + chest spots (dead-end / treasure / vault rooms) for the world module
     interior: def.id, interiorName: def.name, atmosphere: def.atmosphere || null,
-    dispose(physicsRef) {
-      freeTree(group);   // [leak] first: maps2 / variety / lab detach their groups below, the traverse at the end never saw them
-      try { sys?.dispose(); } catch (e) { console.warn('facility systems dispose', e); }
-      try { m2?.dispose?.(); } catch (e) { console.warn('maps2 dispose', e); }   // [maps2]
-      try { variety?.dispose?.(); } catch (e) { console.warn('variety dispose', e); }   // [stealth]
-      try { themeOut?.lab?.dispose?.(); } catch (e) { console.warn('lab dispose', e); }   // [labyrinths]
-      setPieces.dispose(physicsRef);
-      for (const c of colliders) physicsRef.removeCollider(c);
-      for (const e of emitters) lightPool.remove(e);
-      group.traverse((o) => { if (o.geometry && o.parent && !o.geometry.userData?.shared) o.geometry.dispose(); });
-      group.removeFromParent();
-    },
+    dispose,
     // which room/zone is a world position in
     cellAt(x, z) {
       const gx = Math.floor((x - L.ox) / C), gz = Math.floor((z - L.oz) / C);

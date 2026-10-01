@@ -1,0 +1,10 @@
+Command: source /workspace/.tfg-tools/activate.sh; node tools/harness/maploading30.test.mjs
+Corrected focused result: exit 0. Captured from the actual focused run.
+
+maploading30 completed native Game landing {"ticks":47,"outdoorChunks":8,"facilityChunks":29}
+maploading30 native Game unload during partial outdoor: PASS
+maploading30 native Game unload during partial facility: PASS
+maploading30 native Game/Physics/LightPool/ItemManager/staged/instant/unload integration: PASS
+
+The harness also asserts zero captured console warnings/errors and unchanged native errLog.total.
+Renderer/canvas calls are explicitly recorded Node fixtures, not real browser/GPU compilation.

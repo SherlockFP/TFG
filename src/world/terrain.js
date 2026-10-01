@@ -5,7 +5,7 @@ import { RNG, Noise2D } from '../core/rng.js';
 import { BIOMES } from '../game/moons.js';
 import { createAnyProp as createProp } from './propfactory.js';
 import { getTexture, freeTree } from '../render/textures.js';
-import { levelTexture, mergeStaticMeshes } from './geobuilder.js';
+import { levelTexture, mergeStaticMeshesSteps30 } from './geobuilder.js';
 import { G } from '../physics/physics.js';
 import { planBroadcast18, buildBroadcast18, broadcast18Reserved } from './broadcast18.js';
 import { buildOutposts } from './outposts.js';
@@ -280,14 +280,20 @@ export class Terrain {
     return h00 + (h11 - h01) * tx + (h01 - h00) * tz;
   }
 
-  buildMesh() {
+  buildMesh() { return finishOutdoorSteps30(this.buildMeshSteps30()); }
+
+  // Same row/triangle order as the synchronous terrain mesh; detached output is
+  // attached to its owner before yielding so unload can free partial buckets.
+  *buildMeshSteps30(ownGroup = null) {
+    const group = new THREE.Group();
+    ownGroup?.(group);
     const RES_ = this.res, W = RES_ + 1;
     const b = this.biome;
     const tintOf = (hex) => { const c = new THREE.Color(hex ?? 0xffffff); return [c.r, c.g, c.b]; };
     const tints = { ground: tintOf(b.tint), rock: tintOf(b.rockTint ?? b.tint), path: tintOf(b.pathTint ?? b.tint) };
-    const groundTex = levelTexture(b.ground);
-    const rockTex = levelTexture(b.rock || 'rock');
-    const pathTex = levelTexture(b.ground2 || 'dirt');
+    const groundTex = levelTexture(b.ground); yield 'terrain-texture-ground';
+    const rockTex = levelTexture(b.rock || 'rock'); yield 'terrain-texture-rock';
+    const pathTex = levelTexture(b.ground2 || 'dirt'); yield 'terrain-texture-path';
     const buckets = { ground: { p: [], n: [], uv: [], c: [], t: tints.ground }, rock: { p: [], n: [], uv: [], c: [], t: tints.rock }, path: { p: [], n: [], uv: [], c: [], t: tints.path } };
     const v = (i, j) => new THREE.Vector3(-this.half + i * this.step, this.heights[j * W + i], -this.half + j * this.step);
     const tmp1 = new THREE.Vector3(), tmp2 = new THREE.Vector3(), nrm = new THREE.Vector3();
@@ -308,11 +314,13 @@ export class Terrain {
         else bk.c.push(shade * bk.t[0], shade * bk.t[1], shade * bk.t[2]);
       }
     };
-    for (let j = 0; j < RES_; j++) for (let i = 0; i < RES_; i++) {
-      const a = v(i, j), bb = v(i + 1, j), c = v(i + 1, j + 1), d = v(i, j + 1);
-      tri(a, c, bb); tri(a, d, c);
+    for (let j = 0; j < RES_; j++) {
+      for (let i = 0; i < RES_; i++) {
+        const a = v(i, j), bb = v(i + 1, j), c = v(i + 1, j + 1), d = v(i, j + 1);
+        tri(a, c, bb); tri(a, d, c);
+      }
+      if ((j + 1) % 4 === 0 || j + 1 === RES_) yield 'terrain-mesh-rows';
     }
-    const group = new THREE.Group();
     const mk = (bk, tex) => {
       if (!bk.p.length) return;
       const g = new THREE.BufferGeometry();
@@ -321,11 +329,15 @@ export class Terrain {
       g.setAttribute('uv', new THREE.Float32BufferAttribute(bk.uv, 2));
       g.setAttribute('color', new THREE.Float32BufferAttribute(bk.c, 3));
       g.computeBoundingSphere();
-      const m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ map: tex, vertexColors: true, side: THREE.DoubleSide }));
+      let m;
+      try { m = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ map: tex, vertexColors: true, side: THREE.DoubleSide })); }
+      catch (error) { g.dispose(); throw error; }
       m.matrixAutoUpdate = false;
       group.add(m);
     };
-    mk(buckets.ground, groundTex); mk(buckets.rock, rockTex); mk(buckets.path, pathTex);
+    mk(buckets.ground, groundTex); yield 'terrain-mesh-ground';
+    mk(buckets.rock, rockTex); yield 'terrain-mesh-rock';
+    mk(buckets.path, pathTex); yield 'terrain-mesh-path';
     return group;
   }
 
@@ -390,7 +402,70 @@ function instanceProps(id, placements, group, tint = null, ownMats = null) {
   }
 }
 
-export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
+function finishOutdoorSteps30(iterator) {
+  let step; do { step = iterator.next(); } while (!step.done);
+  return step.value;
+}
+
+// Sync and queued callers drain the same seeded body in the same order.
+export function buildMoonOutdoor(seed, moon, context) {
+  return createOutdoorBuild30(seed, moon, context).finish();
+}
+
+export function createOutdoorBuild30(seed, moon, context) {
+  const owned = { dispose: null }, iterator = buildOutdoorSteps30(seed, moon, context, owned);
+  let done = false, cancelled = false, value = null, units = 0;
+  const build = {
+    get done() { return done; }, get cancelled() { return cancelled; }, get units() { return units; },
+    advance(budgetMs = 6, now = () => performance.now()) {
+      if (done || cancelled) return { done: true, value };
+      const start = now(); let step;
+      try {
+        do {
+          step = iterator.next(); units++;
+          if (step.done) { done = true; value = step.value; return step; }
+        } while (now() - start < budgetMs);
+        return step;
+      } catch (error) { build.cancel(); throw error; }
+    },
+    finish() { while (!done && !cancelled) build.advance(Infinity); return value; },
+    cancel() {
+      if (done || cancelled) return;
+      cancelled = true;
+      try { iterator.return(); } finally { owned.dispose?.(); }
+    },
+  };
+  return build;
+}
+
+// Called inside the existing outdoor queue job; descendants precede layout,
+// facility, mapLoaded and prewarm. Detached output becomes visible only onReady.
+export function queueOutdoorBuild30(seed, moon, context, queue, onReady) {
+  if (!queue?._inJob) { onReady(buildMoonOutdoor(seed, moon, context)); return null; }
+  const build = createOutdoorBuild30(seed, moon, context);
+  const off = queue.onClear(() => build.cancel());
+  const advance = () => {
+    if (build.cancelled) return;
+    let ready = null;
+    try {
+      const step = build.advance(6, queue.now);
+      if (step.done) { ready = step.value; off(); onReady(ready); }
+      else queue.addNext('outdoor:' + step.value, advance, { yieldFrame: true });
+    } catch (error) {
+      off(); build.cancel(); ready?.dispose(context.physics); queue.clear(); throw error;
+    }
+  };
+  queue.addNext('outdoor:start', advance, { yieldFrame: true });
+  return build;
+}
+
+function* buildOutdoorSteps30(seed, moon, { physics, lightPool: pool }, owned) {
+  const addedLights = new Set();
+  const lightPool = new Proxy(pool, { get(target, key) {
+    if (key === 'add') return e => { addedLights.add(e); return target.add(e); };
+    if (key === 'remove') return e => { if (addedLights.delete(e)) return target.remove(e); };
+    return Reflect.get(target, key, target);
+  } });
   const plan = planMoon(seed, moon);
   const terrain = new Terrain(seed, moon, plan);
   const broadcastPlan18 = planBroadcast18({ moon, terrain, plan });
@@ -400,11 +475,32 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
   const colliders = [];
   const emitters = [];
   const interactables = [];
-  group.add(terrain.buildMesh());
+  const ownMats = [];   // tinted material clones owned by this moon
+  let voyage = null, decor = null, outposts = null, landmarks = null, broadcast18 = null, disposed = false;
+  const dispose = physicsRef => {
+    if (disposed) return;
+    disposed = true;
+    broadcast18?.dispose();
+    for (const c of colliders) physicsRef.removeCollider(c);
+    for (const em of [...addedLights]) lightPool.remove(em);
+    // Free before native sub-systems detach their groups, preserving ownership.
+    const treeMats = new Set();
+    group.traverse(o => { for (const m of [].concat(o.material || [])) treeMats.add(m); });
+    freeTree(group);
+    outposts?.dispose(physicsRef);
+    landmarks?.dispose();
+    voyage?.dispose();
+    decor?.dispose();
+    for (const m of ownMats) if (!treeMats.has(m)) m.dispose();
+    group.removeFromParent();
+  };
+  owned.dispose = () => dispose(physics);
+  yield 'terrain-init';   // constructor remains an explicit atomic unit
+  yield* terrain.buildMeshSteps30(mesh => group.add(mesh));
   colliders.push(terrain.buildCollider(physics));
+  yield 'terrain-collider';   // Rapier trimesh creation remains atomic
   const b = plan.biome;
   const sc = terrain.scale || 1, sc2 = sc * sc;
-  const ownMats = [];   // tinted material clones owned by this moon
 
   const footprints = [];   // [geomfix] every solid box of the map (x, y, z, hx, hy, hz, rotY) so scatter passes can test "is this spot inside something"
   const solidAt = (x, z, r = 0, y = null) => {
@@ -457,8 +553,9 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
   mainExit.spawn.y = Math.max(entDoorPos.y, terrain.heightAt(mainExit.spawn.x, mainExit.spawn.z)) + 0.05;   // keep the landing height (was 0.18 m inside the slab)
   interactables.push({ type: 'exit', index: 0, pos: entDoorPos.clone().add(new THREE.Vector3(0, 1.4, 0)).addScaledVector(fwd, 0.3) });
 
+  yield 'entrance';   // cold native model/material creation remains atomic
   const fireExits = [];
-  plan.fires.forEach((f, k) => {
+  for (const [k, f] of plan.fires.entries()) {
     const yaw = rng.float(0, Math.PI * 2);
     const obj = placeProp('fire_exit', f.x, f.z, yaw, { y: f.y });
     const dl = obj?.userData.anchors?.door;
@@ -468,7 +565,8 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
     sp.y = terrain.heightAt(sp.x, sp.z) + 0.1;
     fireExits.push({ pos: dp.clone(), spawn: sp, yaw: Math.atan2(-fw.x, -fw.z) });
     interactables.push({ type: 'exit', index: k + 1, pos: dp.clone().add(new THREE.Vector3(0, 1.2, 0)).addScaledVector(fw, 0.3) });
-  });
+    yield 'fire-exit';
+  }
 
   // ponds
   const ponds = [];
@@ -486,6 +584,7 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
       const a = rng.float(0, Math.PI * 2);
       const rx = p.x + Math.cos(a) * (p.r * 1.3), rz = p.z + Math.sin(a) * (p.r * 1.3);
       placeStatic(rng.chance(0.6) ? 'grass_clump' : 'rock_small', rx, rz, rng.float(0, 6.28));
+      yield 'pond-prop';
     }
     interactables.push({ type: 'pond', pos: new THREE.Vector3(p.x, p.y, p.z), r: p.r * 1.25 + 2.5 });
   }
@@ -509,16 +608,18 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
   // wave 1 landmarks (towers, ruins, parkour, billboards) reserve their footprint before trees / rocks / outposts are placed
   const flatAvoid = (x, z, m = 0) => (plan.flats || []).some((f) => Math.hypot(x - f.x, z - f.z) < f.r + 4 + m);   // wave 4 voyage: landmarks keep off the set piece / mission zones
   try { landmarkSites = planLandmarks({ seed, moon, plan, terrain, avoid: (x, z, m = 0) => avoidBase(x, z, m) || flatAvoid(x, z, m) }); } catch (err) { console.warn('landmark plan', err); landmarkSites = []; }
+  yield 'landmark-plan';
   const reserved = [];   // wave 3 (worlds2): footprints reserved by biome decor (Soviet blocks, cantina outpost) so props / outposts keep off them
   const avoid = (x, z, m = 0) => avoidBase(x, z, m) || landmarkSites.some((st) => siteBlocks(st, x, z, m)) || reserved.some((st) => siteBlocks(st, x, z, m));
   // wave 4 voyage: set piece of a voyage moon + structures of the active mission (reserves its footprint before trees / rocks / props are placed)
-  let voyage = null;
   try { voyage = buildVoyageWorld({ seed, moon, plan, terrain, group, addBox, emitters, colliders, avoid, reserved }); } catch (err) { console.warn('voyage world', err); voyage = null; }
+  yield 'voyage';
   const treeId = b.trees;
   const trees = [];
   if (treeId) {
     const n = Math.round(260 * (b.treeDensity ?? 0.5) * sc2 * (moon.treeMul || 1));
     for (let k = 0; k < n * 3 && trees.length < n; k++) {
+      if (k && k % 16 === 0) yield 'tree-placement';
       const x = rng.float(-138, 138) * sc, z = rng.float(-138, 138) * sc;
       if (avoid(x, z)) continue;
       // clusters: accept more where noise is high
@@ -527,10 +628,12 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
       trees.push({ x, y: y - 0.1, z, rot: rng.float(0, 6.28), scale: rng.float(0.8, 1.35), variant: rng.int(0, 2) });
     }
     instanceProps(treeId, trees, group, b.treeTint ?? null, ownMats);
+    yield 'tree-instances';
   }
   const treeIsRock = !!treeId && treeId.includes('rock');
   const rocks = [];
   for (let k = 0; k < Math.round(90 * sc2); k++) {
+    if (k && k % 16 === 0) yield 'rock-placement';
     const x = rng.float(-140, 140) * sc, z = rng.float(-140, 140) * sc;
     if (avoid(x, z, -4)) continue;
     const rk = { x, y: terrain.heightAt(x, z) - 0.2, z, rot: rng.float(0, 6.28), scale: rng.float(0.6, 1.6), variant: rng.int(0, 2) };
@@ -539,22 +642,28 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
   }
   const rockTint = b.rockTint != null && b.decor ? b.rockTint : null;
   instanceProps(rng.chance(0.5) ? 'rock_big' : 'rock_small', rocks.slice(0, Math.round(45 * sc2)), group, rockTint, ownMats);
+  yield 'rock-instances-big';
   instanceProps('rock_small', rocks.slice(Math.round(45 * sc2)), group, rockTint, ownMats);
+  yield 'rock-instances-small';
   const bushes = [];
   if (b.ground !== 'snow' && b.ground !== 'red_sand' && !b.noBushes) {
     for (let k = 0; k < Math.round(160 * sc2); k++) {
+      if (k && k % 16 === 0) yield 'bush-placement';
       const x = rng.float(-140, 140) * sc, z = rng.float(-140, 140) * sc;
       if (avoid(x, z, -8)) continue;
       bushes.push({ x, y: terrain.heightAt(x, z), z, rot: rng.float(0, 6.28), scale: rng.float(0.7, 1.3), variant: 0 });
     }
     const nGrass = Math.round(110 * sc2);
     instanceProps('grass_clump', bushes.slice(0, nGrass), group, b.treeTint && b.flood != null ? b.treeTint : null, ownMats);
+    yield 'grass-instances';
     instanceProps('bush', bushes.slice(nGrass), group);
+    yield 'bush-instances';
   }
   // colliders for trees/rocks (trunks); harvestable ones (src/game/harvest.js) are tagged with their id
   const harvest = { trees: [], rocks: [] };
-  [[trees, treeIsRock ? 'rock' : 'tree'], [rocks, 'rock']].forEach(([list, kind]) => {
-    list.forEach((p, i) => {
+  let harvestUnits = 0;
+  for (const [list, kind] of [[trees, treeIsRock ? 'rock' : 'tree'], [rocks, 'rock']]) {
+    for (const [i, p] of list.entries()) {
       const id = (kind === 'tree' ? 't' : treeIsRock && list === trees ? 'q' : 'r') + i;
       p.id = id; p.kind = kind; p.cols = [];
       for (const c of p.colliders || []) {
@@ -564,17 +673,20 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
         p.cols.push(addBox(p.x + lx * cs + lz * sn, p.y + c.c[1] * p.scale, p.z - lx * sn + lz * cs, sx, sy, sz, p.rot, { kind, hid: id }));
       }
       (kind === 'tree' ? harvest.trees : harvest.rocks).push(p);
-    });
-  });
+      if (++harvestUnits % 16 === 0) yield 'harvest-colliders';
+    }
+  }
+  yield 'harvest-colliders';
 
   // biome set dressing (neon grid + monoliths, flooded racks, burnt husks + fires, crystal fields): own RNG
   // stream, instanced/merged geometry, added straight to the group so the outposts see it as obstacles
-  let decor = null;
   if (b.decor) {
     try {
       decor = buildBiomeDecor({ seed, moon, biome: b, terrain, plan, group, addBox, avoid, emitters, sc, reserve: (x, z, radius) => reserved.push({ x, z, radius }) });
     } catch (err) { console.warn('biome decor', err); decor = null; }
   }
+
+  yield 'biome-decor';
 
   // points of interest / junk
   const poi = b.poi || ['shipping_container', 'car_wreck', 'oil_drum_stack', 'ruined_wall', 'fence_segment', 'fence_segment', 'lamp_post', 'power_pylon', 'radio_tower',
@@ -588,12 +700,14 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
       placeStatic(lm, x, z, rng.float(0, 6.28));
       break;
     }
+    yield 'industrial-landmark';
   }
   const nPoi = Math.round((10 + Math.round((moon.size || 1) * 6)) * (0.4 + 0.6 * sc));   // [pacing] compact maps keep most of their props (denser, not emptier)
   const outdoorScrapSpots = [];
   for (const s of (decor?.scrapSpots || []).slice(0, 2)) outdoorScrapSpots.push({ x: s.x, z: s.z });
   const poiAt = [];
   for (let k = 0; k < nPoi; k++) {
+    if (k) yield 'poi-prop';
     const id = rng.pick(poi);
     for (let t = 0; t < 10; t++) {
       const x = rng.float(-120, 120) * sc, z = rng.float(-120, 120) * sc;
@@ -605,25 +719,28 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
       break;
     }
   }
+  yield 'poi-prop';
   // outposts: hand-built outdoor points of interest (camp / cargo drop / bunker / radio station / lander)
-  let outposts = null;
   try {
     outposts = buildOutposts({ seed, moon, plan, terrain, group, physics, lightPool, rng, addBox, placeProp, avoid });
   } catch (err) { console.warn('outposts', err); }
+  yield 'outposts';
   // lamp posts along the path
   for (let k = 3; k < terrain.pathPts.length - 2; k += 6) {
     const p = terrain.pathPts[k];
     if (Math.hypot(p.x + 3.5, p.z + 1) < 18) continue;
     placeStatic('lamp_post', p.x + 3.5, p.z + 1, rng.float(0, 6.28));
+    yield 'path-lamp';
   }
 
   // wave 1 landmarks: geometry + colliders + chest / scrap spots (own RNG streams: the layout above is unchanged)
-  let landmarks = null;
   try { landmarks = buildLandmarks({ seed, moon, plan, terrain, group, addBox, emitters, avoid: avoidBase, sites: landmarkSites }); } catch (err) { console.warn('landmarks', err); landmarks = null; }
 
-  const broadcast18 = buildBroadcast18({ plan: broadcastPlan18, terrain, group, physics });
+  yield 'landmarks';
+  broadcast18 = buildBroadcast18({ plan: broadcastPlan18, terrain, group, physics });
+  yield 'broadcast';
 
-  try { if (globalThis.__kefalOutMerge) mergeStaticMeshes(placed.filter(isStaticProp), group); } catch (err) { console.warn('outdoor prop merge', err); }
+  try { if (globalThis.__kefalOutMerge) yield* mergeStaticMeshesSteps30(placed.filter(isStaticProp), group); } catch (err) { console.warn('outdoor prop merge', err); }
   for (const em of emitters) lightPool.add(em);
   for (const s of outdoorScrapSpots) s.y = terrain.heightAt(s.x, s.z);
 
@@ -635,18 +752,6 @@ export function buildMoonOutdoor(seed, moon, { physics, lightPool }) {
     landmarks, harvest, avoid, solidAt, ownMats, voyage, broadcast18,
     // per-frame visuals of the biome decor (glitch cubes, pulsing grid, fires, blinking racks); cheap when idle
     update(dt, game) { decor?.update(dt, game); landmarks?.update(dt, game); voyage?.update(dt); },
-    dispose(physicsRef) {
-      broadcast18?.dispose();
-      for (const c of colliders) physicsRef.removeCollider(c);
-      for (const em of emitters) lightPool.remove(em);
-      freeTree(group);   // [leak] first: sub-systems detach their groups below (instanced geometry / uncached materials were never freed)
-      outposts?.dispose(physicsRef);
-      landmarks?.dispose();
-      voyage?.dispose();
-      decor?.dispose();
-      group.traverse((o) => { if (o.geometry && o.isMesh && !o.isInstancedMesh) o.geometry.dispose(); });
-      for (const m of ownMats) m.dispose();
-      group.removeFromParent();
-    },
+    dispose,
   };
 }

@@ -1,0 +1,16 @@
+Command: source /workspace/.tfg-tools/activate.sh; node tools/harness/maploading30.test.mjs
+Initial fixture result: exit 1. Captured from the first focused run before correction.
+
+file:///workspace/TFG/tools/harness/maploading30.test.mjs:58
+  const g = Object.assign(Object.create(Game.prototype), {
+                   ^
+
+TypeError: Cannot set property isHost of #<Game> which has only a getter
+    at Function.assign (<anonymous>)
+    at fixture (file:///workspace/TFG/tools/harness/maploading30.test.mjs:58:20)
+    at file:///workspace/TFG/tools/harness/maploading30.test.mjs:111:15
+
+Node.js v22.12.0
+
+Correction: test fixture uses net.isHost/net.selfId instead of assigning Game's getters.
+No production source was changed to accommodate this fixture error.

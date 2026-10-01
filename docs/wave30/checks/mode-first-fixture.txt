@@ -1,0 +1,8 @@
+[event update] TypeError: document.getElementById is not a function
+    at uiRoot (file:///workspace/TFG/src/render/br_fx.js:150:37)
+    at new WorldMarker (file:///workspace/TFG/src/render/br_fx.js:311:5)
+    at file:///workspace/TFG/src/game/fleet13.js:163:107
+    at Emitter.emit (file:///workspace/TFG/src/core/events.js:49:26)
+    at file:///workspace/TFG/tools/harness/deadletter24_mode.test.mjs:117:75
+captured Auditor reconstruction {"seconds":60,"startDistance":46.21626574368824,"minDistance":1.577956819972318,"final":[-1.3263323290263784,-300,-27.31958273719973],"penetrating":0,"maxFrameCasts":3}
+deadletter24: native scheduled waves/boss, card/wall damage, personal drafts/replay, pause, floor, exact campaign custody and wipe pass

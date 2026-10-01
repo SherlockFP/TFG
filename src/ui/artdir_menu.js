@@ -4,14 +4,15 @@
 // Screen changes trigger a scanline wipe (skipped with reduceMotion). Colours: docs/wave6/artdir.md.
 import * as THREE from 'three';
 import { t, getLang } from '../core/i18n.js';
+import { DEADLETTER30 } from '../game/deadletter30_access.js';
 import { glyphPath } from './glyphs.js';
 import { WM_LETTERS, COL, drawWordmark, drawSeal, drawEye } from './logo.js';
 import './artdir_i18n.js';
 
 const F = (px) => `700 ${px}px "TFG Plate", "TFG Plate Cyr", "Arial Narrow", Impact, sans-serif`;
 const V = (px) => `${px}px "TFG Credit", VT323, "TFG Cyr VT", monospace`;
-const COL_LEFT = new Set(['play', 'continue', 'host', 'quick', 'browser', 'daily']);
-const MODE_GLYPH = { play: 'van', host: 'van', browser: 'web', daily: 'calendar', profile: 'user', hub: 'building', character: 'mask', mods: 'gear', settings: 'gear', howto: 'help' };
+const COL_LEFT = new Set(['play', 'deadletter', 'continue', 'host', 'quick', 'browser', 'daily']);
+const MODE_GLYPH = { deadletter: 'doc', play: 'van', host: 'van', browser: 'web', daily: 'calendar', profile: 'user', hub: 'building', character: 'mask', mods: 'gear', settings: 'gear', howto: 'help' };
 export const MEMOS = [
   'MEMO 07-A: YOUR ENGAGEMENT IS MONITORED FOR YOUR OWN SAFETY.',
   'MEMO 12: QUOTA IS NOT A SUGGESTION. NEITHER IS THE ALGORITHM.',
@@ -22,7 +23,7 @@ export const MEMOS = [
   'MEMO 58: LOST EQUIPMENT WILL BE DEDUCTED FROM YOUR NEXT LIFE.',
   'MEMO 66: SMILE. THE VIEWERS CAN SEE YOU.',
 ];
-export const HINTS = { play: 'BROWSE CREWS OR HOST YOUR OWN', continue: 'RESUME YOUR LAST SAVE', host: 'START A CREW SESSION', browser: 'FIND A CREW ONLINE', daily: 'REWARDS AND CHALLENGES', profile: 'YOUR SERVICE RECORD',
+export const HINTS = { deadletter: DEADLETTER30.description, play: 'BROWSE CREWS OR HOST YOUR OWN', continue: 'RESUME YOUR LAST SAVE', host: 'START A CREW SESSION', browser: 'FIND A CREW ONLINE', daily: 'REWARDS AND CHALLENGES', profile: 'YOUR SERVICE RECORD',
   hub: 'MEET THE OTHER STAFF', character: 'CHANGE YOUR FACE', mods: 'EXTRA CONTENT PACKS', settings: 'AUDIO, VIDEO, CONTROLS', howto: 'ORIENTATION MANUAL' };
 
 const _v = new THREE.Vector3();

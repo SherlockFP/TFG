@@ -149,8 +149,18 @@ function mergeBucket(list, mat, parent) {
 // userData.dynamic / userData.noMerge (or inside such a parent) and transparent/skinned/instanced meshes are
 // skipped. Two passes: `chunk`-sized cells first, then whatever was alone in its cell is merged again in
 // cells of `chunk * coarse` (a lone colour variant no longer costs its own draw call).
+function finishSteps30(iterator) {
+  let step; do { step = iterator.next(); } while (!step.done); return step.value;
+}
+
 export function mergeStaticMeshes(objects, parent, chunk = 24, coarse = 2.5) {
-  const entries = [];
+  return finishSteps30(mergeStaticMeshesSteps30(objects, parent, chunk, coarse));
+}
+
+// Same collection/bucket order as the synchronous merge; each completed bucket
+// is already owned by parent when a staged caller yields or cancels.
+export function* mergeStaticMeshesSteps30(objects, parent, chunk = 24, coarse = 2.5) {
+  const entries = []; let collected = 0;
   for (const root of objects) {
     root.updateMatrixWorld(true);
     root.traverse((m) => {
@@ -164,9 +174,11 @@ export function mergeStaticMeshes(objects, parent, chunk = 24, coarse = 2.5) {
       const c = new THREE.Vector3().setFromMatrixPosition(m.matrixWorld);
       entries.push({ m, c, canon, mat: canon || mat, sig: `${(canon || mat).uuid}|${g.attributes.uv ? 1 : 0}|${canon || g.attributes.color ? 1 : 0}` });
     });
+    if (++collected % 8 === 0) yield 'merge-collect';
   }
+  yield 'merge-collect';
   let merged = 0;
-  const pass = (list, size) => {
+  const pass = function* (list, size) {
     const buckets = new Map();
     for (const e of list) {
       const key = `${Math.floor(e.c.x / size)},${Math.floor(e.c.z / size)},${Math.floor(e.c.y / 20)}|${e.sig}`;
@@ -179,11 +191,12 @@ export function mergeStaticMeshes(objects, parent, chunk = 24, coarse = 2.5) {
       if (b.length < 2) { left.push(...b); continue; }
       mergeBucket(b, b[0].mat, parent);
       merged += b.length;
+      yield 'merge-bucket';
     }
     return left;
   };
-  const left = pass(entries, chunk);
-  if (coarse > 1 && !globalThis.__kefalLegacyMerge) pass(left, chunk * coarse); // TEMP-BENCH
+  const left = yield* pass(entries, chunk);
+  if (coarse > 1 && !globalThis.__kefalLegacyMerge) yield* pass(left, chunk * coarse); // TEMP-BENCH
   return merged;
 }
 
@@ -271,8 +284,12 @@ export class GeoBuilder {
     this.vrect(key, x1, z1, x1, z0, y0, y1, uvScale, color); // +x
     this.vrect(key, x0, z0, x0, z1, y0, y1, uvScale, color); // -x
   }
-  build(materialFor) {
+  build(materialFor) { return finishSteps30(this.buildSteps30(materialFor)); }
+  // Optional ownership callback runs before the first material is constructed,
+  // so a cancelled facility can free already-finished detached output meshes.
+  *buildSteps30(materialFor, ownGroup = null) {
     const group = new THREE.Group();
+    ownGroup?.(group);
     for (const [key, b] of this.buckets) {
       if (!b.idx.length) continue;
       const g = new THREE.BufferGeometry();
@@ -283,11 +300,13 @@ export class GeoBuilder {
       g.setIndex(b.idx);
       g.computeBoundingSphere();
       g.computeBoundingBox();
-      const mesh = new THREE.Mesh(g, materialFor(key));
+      let mesh;
+      try { mesh = new THREE.Mesh(g, materialFor(key)); } catch (error) { g.dispose(); throw error; }
       mesh.matrixAutoUpdate = false;
       mesh.updateMatrix();
       mesh.userData.levelKey = key;
       group.add(mesh);
+      yield 'level-mesh';
     }
     return group;
   }

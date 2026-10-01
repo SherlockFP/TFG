@@ -1,0 +1,2 @@
+captured Auditor reconstruction {"seconds":60,"startDistance":46.21626574368824,"minDistance":1.5697602375132966,"final":[-1.319425680684749,-300,-27.3133589055673],"penetrating":0,"maxFrameCasts":3}
+deadletter24: native scheduled waves/boss, card/wall damage, personal drafts/replay, pause, floor, exact campaign custody and wipe pass

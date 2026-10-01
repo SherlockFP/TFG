@@ -1,3 +1,39 @@
+# Current experience — Wave30 access and loading improvements
+
+The owner's baseline remains **5/10**. This round addresses failed mode discovery,
+unclear moon routing/menu, invisible fleet choices and map-transition stalls.
+Dead Letter now has title/Host and pause entrances with native admission and
+protected campaign slots. Searchable moon details preserve real fees/confirmation,
+unambiguous short names and live sector identity. Four fitted-hull illustrations
+make fleet selection visual without another renderer. Ordinary outdoor/facility
+builders now share synchronous/queued deterministic generators with detached
+publication and cancellation of pending resources.
+
+The full native suite passes **263/263 in254s**, production build **2.99s**. Frozen
+original outdoor/facility output and actual Game load/unload have separate native
+proof. Rendered/input checks earn title preselection, fleet bounds960/1280, actual
+free ship claim/boarding, functional moon directory and confirmation/DENY, native
+lever first landing, and actual orbit pause-menu mode admission. Setup body poses,
+Terminal.open and final autohost are explicitly labelled; these are not blind
+discovery or a walked salvage expedition. The final browser checkpoint preserves ten unheld zero-value survival starters;
+valuable recovered cargo, bag custody and return remain native integration proof.
+
+Failures remain visible: a stopped test server, a cockpit stance selecting the
+old mode plate instead of the terminal, and two driver errors around landing
+briefing/Esc ownership. The final orbit admission passes on the same frozen source.
+No generic pause defect or globally inaccessible terminal is inferred. Initial
+lobby relay errors and software shader warnings are retained; P2P is untested.
+
+A6ms construction budget is cooperative. Native allocation-heavy oracle retains
+a70.7ms facility batch; cold entrance/terrain/Rapier and existing sub-builders or
+required flushes remain atomic. Later queue batches overwrite last, preventing a
+complete browser cost comparison in this round. Hardware smoothness, full combat,
+natural salvage/return and higher human fun remain unearned. Prioritize physical
+terminal interaction, the full first-shift loop and matched hardware profiling
+over more mandatory systems. [Wave30](wave30/README.md),
+[independent review](wave30/REVIEW.md) and [input evidence](wave30/PLAYTEST.md)
+define the precise boundaries.
+
 # Current experience — Wave29 partial expedition
 
 The owner's current experience baseline remains **5/10**. Wave29 starts from

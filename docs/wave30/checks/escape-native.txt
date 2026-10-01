@@ -1,0 +1,1 @@
+escape27: captured foremost menus/text/rebind/chat/native close handoff, wheel/build cancellation, native pending/cancel minigames, popup priority, IME, pause repeat and browser unlock passed

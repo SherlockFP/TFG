@@ -1,6 +1,6 @@
 // The ship terminal (Lethal-Company-style typed commands). UI is a DOM overlay; side-effect commands
 // are executed by the host (hostExecute) which replies with text.
-import { MOONS, MOON_ORDER, WEATHER } from './moons.js';
+import { MOONS, WEATHER } from './moons.js';
 import { ensureSector, sectorMoons, INTERIOR_NAMES, MODIFIERS, biomeName } from './moongen.js';
 import * as FACILITY from '../world/facility.js';
 import { RNG, hashString } from '../core/rng.js';
@@ -16,6 +16,8 @@ const n0 = (v) => Math.round(v || 0).toLocaleString('en-US');   // credits are a
 import { t, tf, tfIn, sysMsg, addTranslations, getLang } from '../core/i18n.js';
 import { tNum } from '../i18n/tnum.js';   // [i18n8] safety net for literal terminal lines that were not wrapped
 import { LAB_HINT } from './labyrinths_core.js';   // [labyrinths]
+import { resolveMoonQuery30 } from './moonroute30.js';
+import { createTerminalMoons30, directoryMoons30, moonNames30, moonDirectoryData30, routeFee30, MOON_DIRECTORY_TEXT30 } from './terminalmoons30.js';
 
 addTranslations({ '>HELP ALL     every command': '>HELP ALL     tüm komutlar' }, 'tr');
 addTranslations({ '>HELP ALL     every command': '>HELP ALL     все команды' }, 'ru');
@@ -32,17 +34,9 @@ const BANNER = [
 const interiorName = (id) => t(FACILITY.INTERIOR_NAMES?.[id] || INTERIOR_NAMES[id] || id);
 const sizeLabel = (s) => (s < 1.3 ? 'S' : s < 1.7 ? 'M' : s < 2.1 ? 'L' : 'XL');
 const riskBar = (m) => { const n = Math.max(1, Math.min(5, Math.round(m.riskScore ?? m.tier ?? 1))); return '[' + '#'.repeat(n) + '-'.repeat(5 - n) + ']'; };
-const weatherName = (run, m) => WEATHER[run.forecast?.[m.id] || 'clear']?.name || t('Clear');
-const costText = (m) => (m.cost ? '▮' + m.cost : t('FREE'));
+const weatherName = (run, m) => t(WEATHER[run.forecast?.[m.id] || 'clear']?.name || 'Clear');
 // every moon the autopilot can fly to right now (generated moons of older sectors are gone)
-const routable = () => MOON_ORDER.map((id) => MOONS[id]).filter((m) => m && !m.stale);
-const moonKey = (m) => m.name.replace(/^[^-]+-/, '') + ' ' + m.id + ' ' + m.name + ' ' + (m.short || '') + ' ' + (m.$name || '');
-function findMoon(q) {
-  q = String(q || '').trim();
-  const slot = /^#?([1-9])$/.exec(q);
-  if (slot) { const m = sectorMoons()[+slot[1] - 1]; if (m) return m; }
-  return fuzzyFind(routable(), q, moonKey);
-}
+const findMoon = q => resolveMoonQuery30(q, directoryMoons30(), sectorMoons(), moonNames30);
 
 function fuzzyFind(list, q, key = (x) => x) {
   q = q.toLowerCase().replace(/[^a-z0-9а-яёçğıöşü]/g, '');
@@ -61,6 +55,7 @@ export class Terminal {
     this.histIdx = -1;
     this.el = null;
     this.radarTarget = null;
+    this.moonMenu = createTerminalMoons30(this);
   }
 
   ensureDom() {
@@ -83,7 +78,7 @@ export class Terminal {
       else if (e.key === 'ArrowDown') { if (this.histIdx >= 0) { this.histIdx = Math.min(this.history.length, this.histIdx + 1); this.inp.value = this.history[this.histIdx] || ''; } e.preventDefault(); }
       else this.game.sfx(this.game.audio.variant('terminal_key', 3), 0.25);
     });
-    el.addEventListener('mousedown', () => setTimeout(() => this.inp.focus(), 0));
+    el.addEventListener('mousedown', () => setTimeout(() => { if (this.active && !this.moonMenu?.visible()) this.inp?.focus(); }, 0));
   }
 
   open() {
@@ -95,11 +90,12 @@ export class Terminal {
     if (this.codeEl && this.game.net?.code) this.codeEl.textContent = tf('LOBBY {code}', { code: this.game.net.code }) + '  [' + t('Copy join link') + ']';
     if (!this.lines.length) { this.print(BANNER.join('\n'), 'banner'); this.print(t('Company terminal online. Type HELP.')); }
     this.render();
-    setTimeout(() => this.inp.focus(), 30);
+    setTimeout(() => { if (this.active && !this.moonMenu?.visible()) this.inp?.focus(); }, 30);
     this.game.sfx('terminal_enter', 0.4);
     this.game.player.frozen = true;
   }
   close() {
+    this.moonMenu?.hide(false);
     if (!this.active) return;
     this.active = false;
     this.el?.classList.add('hidden');
@@ -131,6 +127,38 @@ export class Terminal {
     this.out.innerHTML = html;
     this.game.ui?.decorateTerminal?.(this.out);
     this.out.scrollTop = this.out.scrollHeight;
+    this.moonMenu?.refresh();
+  }
+
+  showMoons30(textOnly = false) {
+    const g = this.game, run = g.run || {}, data = moonDirectoryData30(g);
+    this.displayedSectorKey30 = data.sector?.key;
+    if (textOnly) this.moonMenu.hide(false);
+    if (!textOnly && this.moonMenu.show()) return;
+    const out = [t('CURRENT ROUTE') + ': ' + t(MOONS[run.moon]?.name || '-'), data.sector?.name || '', ''];
+    if (run.dailyEvent) out.push(tf('TODAY: {name} - {desc}', {name:t(run.dailyEvent.name),desc:t(run.dailyEvent.desc)}), '');
+    for (const c of data.rows) {
+      out.push(`${c.current ? '>' : '*'} ${c.name} · ${c.fee ? '▮' + n0(c.fee) : t('FREE')} · ${c.moon.company ? tf('buying at {r}%', {r:Math.round(buyRate(run.daysLeft,run.buyRnd)*100)}) : c.danger + ' · ' + c.weather}`);
+      out.push(`  ROUTE ${c.alias}${c.slot ? ' / #' + c.slot : ''} · ID ${c.id}${c.stock ? ' · ' + t(MOON_DIRECTORY_TEXT30.stock[0]) + ' ' + c.stock.join('–') + ' · x' + c.valueMul.toFixed(2) : ''}`);
+      if (c.reason) out.push('  ' + c.reason);
+      if (c.moon.desc) out.push('  ' + t(c.moon.desc).split(/(?<=\.)\s/)[0]);
+    }
+    out.push('', t(MOON_DIRECTORY_TEXT30.slots[0]), t('Type SECTOR for the map, INFO <moon> for details.'));
+    this.print(out.join('\n'));
+  }
+
+  moonMatchError30(match, query) {
+    if (match.choices.length > 1) {
+      this.print(tf(MOON_DIRECTORY_TEXT30.ambiguous[0], {q:query}) + '\n' + match.choices.map(m =>
+        `  ${t(m.$name || m.name)} · ROUTE ${m.id}${m.generated ? ' / #' + (sectorMoons().findIndex(x => x.id === m.id) + 1) : ''}`).join('\n'), 'err');
+    } else this.print(t('Unknown moon. Type MOONS (or SECTOR for uncharted servers).'), 'err');
+  }
+
+  moonSlotChanged30(query, sector) {
+    if (/^(?:#\s*\d+|[1-9])$/.test(String(query || '').trim()) && this.displayedSectorKey30 && this.displayedSectorKey30 !== sector?.key) {
+      this.print(t(MOON_DIRECTORY_TEXT30.changed[0]), 'err'); return true;
+    }
+    return false;
   }
 
   submit(raw) {
@@ -147,6 +175,7 @@ export class Terminal {
     const run = g.run || {};
     const [w0, ...rest] = cmd.toLowerCase().split(/\s+/);
     const arg = rest.join(' ');
+    if (!['moons','moon','routes'].includes(w0)) this.moonMenu?.hide(false);
     // mod commands
     if (g.mods?.terminalCommand(w0, rest, this)) return;
     if (this.pending && (w0 === 'confirm' || w0 === 'c' || w0 === 'yes' || w0 === 'y')) {
@@ -184,44 +213,28 @@ export class Terminal {
         return;
       }
       case 'clear': this.clear(); return;
-      case 'moons': case 'moon': {
-        const sector = ensureSector(run);
-        const out = [t('CURRENT ROUTE') + ': ' + (MOONS[run.moon]?.name || '-'), ''];
-        if (run.dailyEvent) out.push(tf('TODAY: {name} - {desc}', { name: t(run.dailyEvent.name), desc: t(run.dailyEvent.desc) }), '');
-        out.push(t('CHARTED MOONS:'));
-        for (const id of MOON_ORDER) {
-          const m = MOONS[id];
-          if (!m || m.generated) continue;
-          const w = m.company ? '' : ` (${weatherName(run, m)})`;
-          const rate = m.company ? '  ' + tf('buying at {r}%', { r: Math.round(buyRate(run.daysLeft, run.buyRnd) * 100) }) : '';
-          out.push(`* ${m.name.padEnd(14)} ${m.company ? '' : 'T' + m.tier} ${costText(m)}${w}${rate}${g.routeboard?.lockTag?.(m) || ''}`);   // [routeboard] campaign ladder
-        }
-        const gen = sectorMoons();
-        if (gen.length) {
-          out.push('', tf('UNCHARTED: {name}  ({n} servers)', { name: sector?.name || t('SECTOR'), n: gen.length }) + '  ' + t('Type SECTOR for the map, INFO <moon> for details.'));   // [lanes] the servers are listed ONCE, by SECTOR
-        }
-        this.print(out.join('\n'));
-        return;
-      }
+      case 'moons': case 'moon': case 'routes': this.showMoons30(arg === 'text'); return;
       case 'sector': case 'map': {
         this.printSector(run);
         return;
       }
       case 'info': {
-        ensureSector(run);
-        const m = arg ? findMoon(arg) : MOONS[run.moon];
-        if (!m) { this.print(t('Unknown moon. Type MOONS.'), 'err'); return; }
+        const sector = ensureSector(run);
+        if (this.moonSlotChanged30(arg,sector)) return;
+        const match = arg ? findMoon(arg) : {moon:MOONS[run.moon],choices:[]}, m = match.moon;
+        if (!m) { this.moonMatchError30(match,arg); return; }
         this.print(this.moonInfo(m, run));
         return;
       }
       case 'route': case 'r': {
-        ensureSector(run);
-        const moon = findMoon(arg);
-        if (!moon) { this.print(t('Unknown moon. Type MOONS (or SECTOR for uncharted servers).'), 'err'); return; }
+        const sector = ensureSector(run);
+        if (this.moonSlotChanged30(arg,sector)) return;
+        const match = findMoon(arg), moon = match.moon;
+        if (!moon) { this.moonMatchError30(match,arg); return; }
         if (run.phase !== 'orbit') { this.print(t('Routing is only possible while in orbit.'), 'err'); return; }
         if (moon.id === run.moon) { this.print(tf('Already routed to {name}.', { name: moon.name })); return; }
-        this.pending = { op: 'route', moon: moon.id };
-        const rcost = g.shipyard?.routeFee ? g.shipyard.routeFee(moon, !!g.config?.freeTravel) : (g.config?.freeTravel ? 0 : moon.cost);   // [shipyard] +5 % per module
+        this.pending = { op: 'route', moon: moon.id, ...(moon.generated ? {sectorKey:sector?.key} : {}) };
+        const rcost = routeFee30(g,moon);
         this.print(`${tf('Route the autopilot to {name}?', { name: moon.name })} ${rcost ? tf('It will cost ▮{c}.', { c: rcost }) : t('Free travel.')}\n${this.moonInfo(moon, run, true)}\n${tf('Credits: ▮{c}', { c: n0(run.credits) })}${run.credits < rcost ? '  ' + t('(NOT ENOUGH)') : ''}\n\n${t('Type CONFIRM or DENY.')}`);
         return;
       }
@@ -338,8 +351,9 @@ export class Terminal {
       default: {
         // codes
         if (/^[a-z]\d{1,2}$/.test(w0)) { g.net.request('term', { cmd: { op: 'code', code: w0 } }); return; }
-        const moon = fuzzyFind(routable(), w0, moonKey);
-        if (moon) { this.exec('route ' + w0); return; }
+        ensureSector(run);
+        const match = findMoon(cmd);
+        if (match.choices.length) { this.exec('route ' + cmd); return; }
         const cr = Object.keys(g.profile.bestiary).find((id) => (CREATURES[id]?.name || '').toLowerCase().startsWith(w0));
         if (cr) { this.exec('bestiary ' + w0); return; }
         this.print(t('[There was no action supplied with the word.]'), 'err');
@@ -349,24 +363,26 @@ export class Terminal {
 
   // moon details (INFO / ROUTE confirmation)
   moonInfo(m, run, brief = false) {
-    if (m.company) return `${m.name}\n${m.desc}`;
+    if (m.company) return `${t(m.name)}\n${t(m.desc || '')}`;
     const lines = [];
     if (!brief) lines.push(`${m.name.toLocaleUpperCase(getLang())}${m.generated ? '  [' + t('UNCHARTED') + ']' : ''}`);
-    lines.push(`${t('Tier')} ${m.tier}  ·  ${t('Risk')} ${riskBar(m)} ${t(m.risk || ['', 'LOW', 'MODERATE', 'HIGH', 'SEVERE', 'LETHAL'][Math.min(5, m.tier)])}  ·  ${costText(m)}`);
-    lines.push(`${t('Biome')}: ${t(biomeName(m.biome))}   ${t('Interior')}: ${interiorName(m.interior)}   ${t('Size')}: ${sizeLabel(m.size || 1)}${(m.mapScale || 1) > 1 ? ' (' + t('big map') + ')' : ''}`);
+    const fee = routeFee30(this.game,m);
+    lines.push(`${t('Tier')} ${m.tier}  ·  ${t('Risk')} ${riskBar(m)} ${t(m.risk || ['', 'LOW', 'MODERATE', 'HIGH', 'SEVERE', 'LETHAL'][Math.min(5, m.tier)])}  ·  ${fee ? '▮' + n0(fee) : t('FREE')}`);
+    lines.push(`${t('Biome')}: ${t(biomeName(m.biome))}   ${t('Interior')}: ${m.interiorName ? t(m.interiorName) : interiorName(m.interior)}   ${t('Size')}: ${sizeLabel(m.size || 1)}${(m.mapScale || 1) > 1 ? ' (' + t('big map') + ')' : ''}`);
     lines.push(`${t('Forecast')}: ${weatherName(run, m)}   ${t('Scrap value')}: x${(m.scrapMul || 1).toFixed(2)}`);
     const pool = run ? poolFor(run, m) : null;   // [threatmerge] the curated headline residents of this moon (seeded per run + moon + sector)
     if (pool?.all.length) lines.push(`${t('KNOWN RESIDENTS')}: ${pool.all.map((id) => t(id === 'zombie' ? 'Zombie Accounts' : CREATURES[id]?.name || id)).join(', ')}`);
     if (LAB_HINT[m.interior]) lines.push(`${t('Hazard')}: ${t(LAB_HINT[m.interior])}`);   // [labyrinths] the interior's signature mechanic
-    for (const k of m.mods || []) lines.push(`+ ${MODIFIERS[k]?.name || k}: ${MODIFIERS[k]?.desc || ''}`);
-    if (!brief || !m.generated) lines.push(m.desc || '');
-    else lines.push(m.desc.split('. ')[0].replace(/\.?$/, '.'));
+    for (const k of m.mods || []) lines.push(`+ ${t(MODIFIERS[k]?.name || k)}: ${t(MODIFIERS[k]?.desc || '')}`);
+    if (!brief || !m.generated) lines.push(t(m.desc || ''));
+    else lines.push(t(m.desc || '').split('. ')[0].replace(/\.?$/, '.'));
     return lines.join('\n');
   }
 
   // ASCII sector map: the ship, the current sector's servers and the flight lines between them
   printSector(run) {
     const sector = ensureSector(run);
+    this.displayedSectorKey30 = sector?.key;
     const moons = sectorMoons();
     if (!sector || !moons.length) { this.print(t('No uncharted sector in range.'), 'err'); return; }
     const W = 46, H = 9;
@@ -395,7 +411,8 @@ export class Terminal {
     out.push('+' + '-'.repeat(W) + '+', '[@] ' + t('your ship') + (MOONS[run.moon]?.generated ? '   === ' + t('current route') : ''));
     pos.forEach((p, i) => {
       const m = p.m;
-      out.push(`[${i + 1}] ${m.name.padEnd(28)} T${m.tier} ${costText(m).padEnd(6)} ${riskBar(m)} ${t(m.risk)}`);
+      const fee = routeFee30(this.game,m), cost = fee ? '▮' + n0(fee) : t('FREE');
+      out.push(`[${i + 1}] ${m.name.padEnd(28)} T${m.tier} ${cost.padEnd(6)} ${riskBar(m)} ${t(m.risk)}`);
       out.push(`    ${t(biomeName(m.biome))} / ${interiorName(m.interior)} / ${sizeLabel(m.size)} / ${weatherName(run, m)}${m.mods.length ? '  +' + m.mods.map((k) => MODIFIERS[k]?.name || k).join(' +') : ''}`);
     });
     out.push('', t('ROUTE #n (or a name) to fly there. Meet the quota and this sector goes dark: a new one is charted.'));
@@ -419,6 +436,8 @@ export class Terminal {
     if (!cmd || typeof cmd !== 'object') return;
     switch (cmd.op) {
       case 'route': {
+        const sector = ensureSector(run);
+        if (cmd.sectorKey && cmd.sectorKey !== sector?.key) { reply(MOON_DIRECTORY_TEXT30.changed[0], true); return; }
         const m = MOONS[cmd.moon];
         if (!m || m.deadletter24 || m.deadletter || run.phase !== 'orbit') { reply('Cannot route now.', true); return; }
         if (m.stale) { reply('That server went dark with the old sector. Type SECTOR.', true); return; }

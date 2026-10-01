@@ -14,6 +14,7 @@ import {t,addTranslations,tf} from '../core/i18n.js';
 import {installDeadletter24Draft} from '../ui/deadletter24.js';
 import {newProgress,gainXp,nextOffer,chooseCard,effects,xpThreshold} from './deadletter24_core.js';
 import {DL24_TYPES,registerDeadletter24Actors,createDeadletter24Projectiles} from './deadletter24_combat.js';
+import {deadletter30Admission} from './deadletter30_access.js';
 HOST_ONLY.add('dl24fx');HOST_ONLY.add('dl24end');
 export const DL24_GEAR='dl24_cards';
 const THEMES=['deadletter24','mutedswitch24','permissions24'];
@@ -34,6 +35,7 @@ const copy=v=>JSON.parse(JSON.stringify(v));
 const V=(p)=>new THREE.Vector3(p.x,p.y,p.z);
 export function installDeadletter24(game){
  let entryVisual=null,entryShip=null;
+ let menuLaunchConsumed=false;
  let disposed=false,building=false,built='',fac=null,bound=null,readyFrames=0,pauseClock=0,autoShown='',statsKey='',statsCopy=null,localSeq=0,mainCheckpoint=null,localCheckpoint=null,cabinet=null,rareCase=null,checkpointToken='',restoredToken='';const offs=[],shots=new Map(),seqs=new Map();
  const actorRegistryDispose=registerDeadletter24Actors(game);
  const registry=(typeof window!=='undefined'?window.__kefalMods?.itemModels:null)||game.mods?.itemModels;const previousGear=registry?.get(DL24_GEAR),gearFactory=()=>{const m=WEAPON_MODELS.stackeddeck();const aura=m.userData.deck?.aura;if(aura){m.traverse(o=>{if(o.material===aura)o.material=getBasicMaterial(null,0xffffff,{transparent:true,opacity:0,depthWrite:false});});aura.dispose();}return m;};registry?.set(DL24_GEAR,gearFactory);
@@ -78,10 +80,10 @@ export function installDeadletter24(game){
  function entryPoint(){return game.ship?.points?.terminal?.clone().add(new THREE.Vector3(.7,.6,0))||game.ship?.spawns?.[0]?.clone().add(new THREE.Vector3(.8,1.1,0))||new THREE.Vector3(1,1.1,0);}
  function snapshot(){const ps={};for(const p of game.aiPlayers?.()||[])ps[p.id]={p:p.pos.toArray(),yaw:p.id===game.selfId?game.player.yaw:game.remotes?.get(p.id)?.yaw||0,hp:p.id===game.selfId?game.player.hp:game.remotes?.get(p.id)?.hp||100,dead:p.dead};
   return {run:copy(game.run),items:copy(game.items?.serialize?.()||[]),players:ps};}
- function start(from=game.selfId){if(!game.isHost||active()||!['orbit','company','hub'].includes(game.run?.phase)||from!==game.selfId)return false;
+ function start(from=game.selfId){if(disposed||from!==game.selfId||!deadletter30Admission(game).enabled)return false;
   const items=game.items?.serialize?.()||[];if(items.length>128||game.aiPlayers?.().some(p=>p.dead||down(p)))return false;
   const backup=snapshot(),seed=hashString(`${game.run.seed}:${game.time}:${game.selfId}`),token=`dl24:${seed}:${Math.floor(game.time*1000)}`;const players={};for(const p of game.aiPlayers?.()||[])players[p.id]=newProgress({seed:hashString(token+p.id),floor:0});
-  mainCheckpoint=backup;localCheckpoint={slots:[...(game.player?.slots||[])],slot:game.player?.slot||0,stamina:game.player?.stamina??100};checkpointToken=token;restoredToken='';seqs.clear();shots.clear();localSeq=0;game.hostSave?.();game.run.deadletter24={version:1,token,seed,floor:0,floorRev:1,stage:'intro',elapsed:0,wave:0,spawned:0,kills:0,rareDrops:0,players,backup};
+  menuLaunchConsumed=true;mainCheckpoint=backup;localCheckpoint={slots:[...(game.player?.slots||[])],slot:game.player?.slot||0,stamina:game.player?.stamina??100};checkpointToken=token;restoredToken='';seqs.clear();shots.clear();localSeq=0;game.hostSave?.();game.run.deadletter24={version:1,token,seed,floor:0,floorRev:1,stage:'intro',elapsed:0,wave:0,spawned:0,kills:0,rareDrops:0,players,backup};
   game.hostSetPhase('deadletter',{moon:'deadletter24',deadletter24:game.run.deadletter24});onState();return true;
  }
  function restoreCheckpoint(backup){if(!backup||restoredToken===checkpointToken)return;restoredToken=checkpointToken;draft?.close();removeMap();clearItems();delete game.run.deadletter24;if(['company','hub'].includes(backup.run?.phase)&&(!game.world.company||game.world.moonId!==backup.run.moon))game.loadMapFor?.(backup.run,true);for(const row of backup?.items||[]){let restored=row;if(row.h&&row.h!==game.selfId&&!game.remotes?.has(row.h)){restored={...row,h:null,iv:undefined,p:(game.ship?.spawns?.[0]||new THREE.Vector3(0,1,0)).toArray()};}game.items.onEvent({e:'sp',...restored});}const p=backup?.players?.[game.selfId];if(p&&game.player){game.player.dead=false;game.player.downed=false;game.player.frozen=false;game.player.hp=p.hp;game.player.stamina=localCheckpoint?.stamina??100;if(localCheckpoint){game.player.slots=localCheckpoint.slots.map(id=>game.items.get(id)?id:null);game.player.slot=localCheckpoint.slot;}game.player.indoor=p.p[1]<FACILITY_Y+40;game.player.inShip=false;game.spectating=null;if(game.engine?.fx){game.engine.fx.blind=0;game.engine.fx.noise=0;}game.player.teleport(new THREE.Vector3().fromArray(p.p),p.yaw);game.player.vel?.set(0,0,0);game.ui?.hud?.setDead?.(false);game.net?.send?.('pst',{dead:false,hp:p.hp});}game.refreshStats?.();game.refreshHeldVisuals?.();mainCheckpoint=null;localCheckpoint=null;}
@@ -145,11 +147,15 @@ export function installDeadletter24(game){
   if(state().pickup&&!state().pickup.claimed)out.push({pos:new THREE.Vector3().fromArray(state().pickup.p),r:.45,reach:2.8,label:t(TEXT.loot),action:()=>request('loot')});
  });
  on('objectives',(add,g,phase)=>{if(g!==game||phase!=='deadletter')return;const st=state();if(!st)return;const rescue=living().some(down);add(`Dead Letter / ${st.floor+1} / ${t(st.stage==='intro'?TEXT.introStage:st.stage==='wave'?TEXT.waveStage:st.stage==='boss-intro'?TEXT.bossIntroStage:st.stage==='boss'?TEXT.bossStage:TEXT.clearedStage)}`,'main');add(rescue?t(RESCUE):combatPaused()?`${t(TEXT.paused)} ${t(TEXT.auto)}`:st.stage==='cleared'?t(TEXT.clear):t(TEXT.ready),rescue?'warn':'sub');});
- on('update',(dt,g)=>{if(g!==game)return;syncEntry();if(!active())return;readyFrames++;if(!combatPaused())projectiles.update(dt);onState();});
+ on('update',(dt,g)=>{if(g!==game)return;syncEntry();if(!active()){
+  // Host-form expeditions start only after real fleet boarding, in a temporary slot.
+  if(game.opts?.deadletter&&!menuLaunchConsumed&&game.player?.inShip&&!game.ui?.blocksInput?.()&&!game.terminal?.active&&!game.minigame&&deadletter30Admission(game).enabled){start();}
+  return;
+ }readyFrames++;if(!combatPaused())projectiles.update(dt);onState();});
  offs.push(()=>{entryVisual?.dispose();entryVisual=null;entryShip=null;});
  const oldSpeed=game.creatures?.speedMul;if(oldSpeed){const wrapped=function(c,speed){return ownsCreature(c)?Math.min(3.6,Math.max(0,speed)):oldSpeed.call(this,c,speed);};game.creatures.speedMul=wrapped;offs.push(()=>{if(game.creatures.speedMul===wrapped)game.creatures.speedMul=oldSpeed;});}
  const oldSpawn=game.items?.hostSpawn;if(oldSpawn){const wrapped=function(type,pos,opts){if(active()&&type!==DL24_GEAR)return null;return oldSpawn.call(this,type,pos,opts);};game.items.hostSpawn=wrapped;offs.push(()=>{if(game.items.hostSpawn===wrapped)game.items.hostSpawn=oldSpawn;});}
- return{active,state,start,entryPoint,presentationQuiet:()=>active()&&state().stage==='intro'&&state().elapsed<4&&!living().some(down),acceptItemEvent(d){if(d?.e==='sp'){if(active())return d.ty===DL24_GEAR&&d.lb===`${state().token}:${state().floorRev}`;return d.ty!==DL24_GEAR;}if(active()&&mainCheckpoint?.items?.some(it=>it.id===d?.id))return false;return true;},requestStart:()=>request('start'),request,hostReq,loadMapFor,onState,onPhase,placeLateJoin,hostTick,combatPaused,ownsCreature,spawnOptions,afterSpawn,onKill,attack,special,stats,playerDamage,
+ return{active,state,start,entryPoint,menuStatus:()=>deadletter30Admission(game),enterFromMenu(){const status=deadletter30Admission(game);if(!status.enabled){warn(status.reason);return false;}return start();},presentationQuiet:()=>active()&&state().stage==='intro'&&state().elapsed<4&&!living().some(down),acceptItemEvent(d){if(d?.e==='sp'){if(active())return d.ty===DL24_GEAR&&d.lb===`${state().token}:${state().floorRev}`;return d.ty!==DL24_GEAR;}if(active()&&mainCheckpoint?.items?.some(it=>it.id===d?.id))return false;return true;},requestStart:()=>request('start'),request,hostReq,loadMapFor,onState,onPhase,placeLateJoin,hostTick,combatPaused,ownsCreature,spawnOptions,afterSpawn,onKill,attack,special,stats,playerDamage,
   statsProgress:()=>{const st=state();return st?{floor:st.floor+1,stage:st.stage,kills:st.kills,players:st.players,projectiles:projectiles.count(),paused:combatPaused(),anchor:anchor()?.toArray(),start:anchor()?.clone().setY(FACILITY_Y+.02).add(new THREE.Vector3(0,0,2.4)).toArray(),spawnSpots:fac?.lab?.spawnSpots}:null;},
   dispose(){if(disposed)return;disposed=true;pendingThrow=null;draft?.dispose();projectiles.clear();removeMap();for(const off of offs.splice(0))off?.();bound?.off?.('msg:dl24fx',onFx);bound?.off?.('msg:dl24end',onEnd);seqs.clear();shots.clear();if(registry?.get(DL24_GEAR)===gearFactory){if(previousGear)registry.set(DL24_GEAR,previousGear);else registry.delete(DL24_GEAR);}actorRegistryDispose?.();}};
 }

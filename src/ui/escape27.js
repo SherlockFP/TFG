@@ -43,6 +43,7 @@ export function installEscape27(app, target = window) {
     // Leave native minigame Escape to its own capture handler. In particular,
     // finished gambling results must flush normally instead of being discarded.
     if (g.minigame) return;
+    if (g.terminal?.moonMenu?.visible?.()) { consume(app, e); g.terminal.moonMenu.hide(); return; }
     if (g.routeboard?.visible?.()) { consume(app, e); g.routeboard.hide(); return; }
     if (g.terminal?.active) { consume(app, e); g.terminal.close(); return; }
     if (g.magic?.wheelOpen) { consume(app, e); g.magic.closeWheel(false); return; }

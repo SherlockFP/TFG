@@ -3,6 +3,7 @@ import { t, tf, addTranslations } from '../core/i18n.js';
 import { el } from '../core/util.js';
 import { buildHub13, HUB13_SPAWN, HUB13_BROKER, HUB13_BOARD } from '../world/hub13.js';
 import { FLEET13, sanitizeFleet13, purchaseFleet13, fleetQuote13, fleetSpawnIndex13 } from './fleet13_core.js';
+import { fleetPreview13 } from './fleet13_preview.js';
 import { sanitize, aboardVolumes } from './shipyard_core.js';
 import { SHIP } from '../world/ship.js';
 import { BIOMES } from './moons.js';
@@ -103,14 +104,15 @@ export function installFleet13(game) {
   panel.classList.add('fleet13');
   const selected=f.selected ? t(FLEET13[f.selected].name) : t('No vessel selected');
   const body=el('div',{class:'cp-body'},
-   el('p',{},tf('Selected vessel: {name}',{name:selected})),
+   el('p',{},(game.opts?.deadletter?'Dead Letter Run · ':'')+tf('Selected vessel: {name}',{name:selected})),
    el('p',{class:'dim'},t('Ship rooms and upgrades are saved per vessel.')));
   if(!game.isHost)body.append(el('p',{},t('Only the host can purchase and dispatch the crew.')));
   const cards=el('div',{style:'display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:12px'});
   for(const [id,def] of Object.entries(FLEET13)){
    const q=fleetQuote13(f,id,game.run.credits), e=q.effects;
-   const row=el('section',{class:'menu-row',style:'padding:10px 0;border-bottom:1px solid var(--line,#53606a);display:block'},
+   const row=el('section',{class:'menu-row', 'data-vessel':id, 'aria-current':f.selected===id?'true':null,style:'padding:10px;border:1px solid '+(f.selected===id?'#b99655':'var(--line,#53606a)')+';display:block;background:'+(f.selected===id?'#272b27':'#1c2223')},
     el('h3',{style:'margin:0 0 6px;font-size:21px'},t(def.name)+' — '+(q.owned?t('Owned'):q.price===0?t('Free starter'):q.price+' CR')),
+    el('div',{class:'fleet13-preview',html:fleetPreview13(q.layout,t(def.name)),style:'margin:8px 0;border:1px solid #454947'}),
     el('p',{class:'dim',style:'margin:4px 0;font-size:16px'},t(def.tip)));
    const facts=[tf('Route surcharge: +{n}%',{n:q.routePct})];
    if(e.sellBonus)facts.push(tf('Scrap sale bonus: +{n}%',{n:Math.round(e.sellBonus*100)}));
@@ -147,7 +149,7 @@ export function installFleet13(game) {
   const selected=game.run.fleet13.selected, target=selected?HUB13_BOARD:HUB13_BROKER;
   const distance=Math.round(Math.hypot(game.player.pos.x-target[0],game.player.pos.z-target[2]));
   const text=game.isHost ? tf(selected?'Board {name} at the departure kiosk ({n} m)':'Claim a free ship at the fleet office ({n} m)',{name:selected?t(FLEET13[selected].name):'',n:distance}) : t(selected?'Waiting for the host to dispatch the selected vessel.':'Waiting for the host to choose a vessel.');
-  return [{text,kind:'main',first:true,done:false}];
+  return [{text:(game.opts?.deadletter?'Dead Letter Run · ':'')+text,kind:'main',first:true,done:false}];
  });
  offs.push(game.mods.on('update',(dt,g)=>{
   if(g!==game)return;

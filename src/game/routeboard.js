@@ -1,6 +1,7 @@
 // ROUTE BOARD (wave 8, module 'routeboard'; docs/wave8/routeboard.md; CRITIQUE_W8 P13 + REVIEW_W8_NIGHT item 12).
 //   The terminal's MOONS wall becomes a board of 3 big ROUTE CARDS (palette + interior silhouette, danger pips, scrap-on-site payout, the moon's
-//   hook, interior, weather, fee) + one HQ row. It opens by itself the first time the terminal is used in orbit, and on MOONS / ROUTES.
+//   hook, interior, weather, fee) + one HQ row. BOARD retains these daily cards.
+//   MOONS and the first orbit visit now use the searchable native moon directory when available.
 //   Keys: 1-3 cards, 4 HQ, arrows move, ENTER routes, TAB = ALL ROUTES (the old text list, also MOONS ALL), ESC = type commands; any letter
 //   drops to the prompt. Mouse: click a card to select it, click its ROUTE button to go.
 //   Campaign ladder (routeboard_core.js): a fresh staged profile starts with 3 hero moons, +2 routes per quota; veterans / Unlock everything /
@@ -252,7 +253,7 @@ export function installRouteboard(game) {
     if (!el) return;
     el.classList.add('hidden');
     try { game.onboard?.note?.('terminal'); } catch { /* optional */ }
-    setTimeout(() => { try { term.inp?.focus(); } catch { /* gone */ } }, 0);
+    setTimeout(() => { try { if (term.active && !term.moonMenu?.visible?.()) term.inp?.focus(); } catch { /* gone */ } }, 0);
   }
   function showAll() { hide(); bypass = true; try { term.print('> MOONS ALL', 'echo'); term.exec('moons'); } finally { bypass = false; } }
   function route() {
@@ -267,11 +268,16 @@ export function installRouteboard(game) {
     game.net?.request?.('term', { cmd: { op: 'route', moon: m.id } });
   }
 
-  // MOONS / MOON / ROUTES open the board; MOONS ALL keeps the old list (voyage's MOONS wrapper passes through here with `bypass`)
+  // Keep the legacy daily cards explicit; directory delegation happens before
+  // mod command wrappers can discard MOONS ALL/TEXT arguments.
   restores.push(wrapMethod(term, 'exec', (orig) => function (cmd) {
     if (!disposed && !bypass) {
       const [w0, ...rest] = String(cmd || '').toLowerCase().trim().split(/\s+/);
       if (['moons', 'moon', 'routes', 'board'].includes(w0)) {
+        if (w0 === 'board' && !rest.length) { term.moonMenu?.hide(false); show(); return undefined; }
+        if (w0 !== 'board' && typeof term.showMoons30 === 'function' && (!rest.length || ['all','list','text'].includes(rest[0]))) {
+          hide(); term.showMoons30(rest[0] === 'text'); return undefined;
+        }
         if (rest[0] === 'all' || rest[0] === 'list') { bypass = true; try { return orig.call(this, 'moons'); } finally { bypass = false; } }
         if (!rest.length) { show(); return undefined; }
       }
@@ -282,7 +288,10 @@ export function installRouteboard(game) {
   restores.push(wrapMethod(term, 'open', (orig) => function (...a) {
     const was = this.active;
     const r = orig.apply(this, a);
-    if (!disposed && !was && this.active && !autoShown && game.run?.phase === 'orbit') { autoShown = true; try { show(); } catch (e) { warn('show', e); } }
+    if (!disposed && !was && this.active && !autoShown && game.run?.phase === 'orbit') {
+      autoShown = true;
+      try { if (typeof this.showMoons30 === 'function') this.showMoons30(); else show(); } catch (e) { warn('show', e); }
+    }
     else if (!was && el) el.classList.add('hidden');   // a later visit opens on the prompt (MOONS brings the board back)
     return r;
   }));

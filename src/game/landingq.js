@@ -11,14 +11,16 @@
 export class LandingQueue {
   constructor({ budgetMs = 8, startDelay = 0.35, now = () => (typeof performance !== 'undefined' ? performance.now() : Date.now()) } = {}) {
     this.budgetMs = budgetMs; this.startDelay = startDelay; this.now = now;
-    this.enabled = true; this.afterPrewarm = []; this.jobs = []; this.wait = 0; this.last = []; this.running = false; this.flushing = false; this._inJob = false; this._ins = 0;
+    this.enabled = true; this.afterPrewarm = []; this.clearCleanups = new Set(); this.jobs = []; this.wait = 0; this.last = []; this.running = false; this.flushing = false; this._inJob = false; this._ins = 0;
   }
   get pending() { return this.jobs.length; }
   /** queue one job; the first one of a batch arms the start delay (title card + thrusters get a frame first) */
   add(name, fn) { if (!this.jobs.length && !this.running && !this.flushing) { this.wait = this.startDelay; this.last = []; } this.jobs.push({ name, fn }); }
   /** a handler that is itself running as a job splits its work: the parts run NEXT, in the order added (before the jobs queued behind it, so later
    *  handlers + prewarm still see the finished result). Outside a job (instant load) it just runs fn now. */
-  addNext(name, fn) { if (!this._inJob) { fn(); return; } this.jobs.splice(this._ins++, 0, { name, fn }); }
+  addNext(name, fn, { yieldFrame = false } = {}) { if (!this._inJob) { fn(); return; } this.jobs.splice(this._ins++, 0, { name, fn, yieldFrame }); }
+  /** Pending detached builds release their owned resources if the map goes away. */
+  onClear(fn) { this.clearCleanups.add(fn); return () => this.clearCleanups.delete(fn); }
   _run(job) {
     const t = this.now(), pj = this._inJob, pi = this._ins;
     this._inJob = true; this._ins = 0;
@@ -31,7 +33,7 @@ export class LandingQueue {
     if (this.wait > 0) { this.wait -= dt; return; }
     const t0 = this.now(), budget = Math.min(60, Math.max(this.budgetMs, dt * 500));   // slow frames (weak GPU / software GL) get a bigger slice so the queue still ends inside the descent
     this.running = true;
-    try { while (this.jobs.length && this.now() - t0 < budget) this._run(this.jobs.shift()); } finally { this.running = false; }
+    try { while (this.jobs.length && this.now() - t0 < budget) { const job = this.jobs.shift(); this._run(job); if (job.yieldFrame) break; } } finally { this.running = false; }
   }
   /** run everything that is left right now, in order (a job may add more jobs) */
   flush() {
@@ -40,7 +42,7 @@ export class LandingQueue {
     try { while (this.jobs.length) { this._run(this.jobs.shift()); n++; } } finally { this.flushing = false; }
     return n;
   }
-  clear() { this.jobs.length = 0; this.wait = 0; for (const f of this.afterPrewarm.splice(0)) { try { f(); } catch { /* ignore */ } } }   // [perf6] a cleared landing still removes its warm group
+  clear() { this.jobs.length = 0; this.wait = 0; const cleanups = [...this.clearCleanups]; this.clearCleanups.clear(); for (const f of cleanups) { try { f(); } catch (e) { console.warn('[landingq] clear cleanup', e); } } for (const f of this.afterPrewarm.splice(0)) { try { f(); } catch { /* ignore */ } } }   // [perf6] a cleared landing still removes its warm group
   report() { return this.last.slice().sort((a, b) => b.ms - a.ms); }
   get totalMs() { return this.last.reduce((s, j) => s + j.ms, 0); }
 }

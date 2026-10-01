@@ -1,0 +1,4648 @@
+{
+  "method": "Wave30 GUIDED_INPUT + VISUAL_REPLAY. Fresh real title/Host/Local UI, actual keyboard/mouse/E/menu controls. Labelled body approach fixtures and final native orbit lifecycle fixture; not a walked expedition. Single native app RAF, no manual clock/item/AI/reward writes or hostReq. SwiftShader is not hardware profiling.",
+  "source": "1ac10f8+frozen-wave30",
+  "jsFreeze": "98c42810a60e049a75e542973fdd913ab90346775526082699649a8a8477fe31",
+  "allSourceFreeze": "06470904b1e3754a62c84fc484af8da40896f80e1d81c4905884ceee60f2b8b1",
+  "runtimeFreeze": "8669e33029f0b6165cb0d373c899cb1a4398e653e4b5c42ba11bbe98987fb208",
+  "ownerScore": 5,
+  "capMs": 45000,
+  "steps": [
+    {
+      "kind": "LABELLED_BODY_APPROACH_FIXTURE",
+      "stage": "native-claim-board-setup",
+      "at": "2026-10-01T19:29:58.208Z",
+      "sinceGameMs": 1524,
+      "label": "Broker approach setup only",
+      "before": {
+        "at": 7669.9000000059605,
+        "t": 0.2,
+        "screen": null,
+        "phase": "orbit",
+        "seed": 27835183,
+        "run": {
+          "day": 1,
+          "credits": 60,
+          "quota": 330,
+          "time": 480,
+          "moon": "hamsi"
+        },
+        "profile": "QA30Admit",
+        "selfId": "Ly7pf4k2g2",
+        "language": "en",
+        "settings": {
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "player": {
+          "p": [
+            2.4000000953674316,
+            -1.2300504063299742,
+            23
+          ],
+          "yaw": 3.141592653589793,
+          "pitch": 0,
+          "hp": 100,
+          "maxHp": 106,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "crouch": false,
+          "half": 0.56,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "slot": 0
+        },
+        "eye": [
+          2.4000000953674316,
+          0.3899495936700259,
+          23
+        ],
+        "input": {
+          "locked": true,
+          "keys": [],
+          "typing": false,
+          "hidden": false
+        },
+        "panel": null,
+        "prompt": {
+          "main": null
+        },
+        "hud": "● LIVE 120\nHP 100/106\nSTA 100/100\n0 lb\nLv.1 LURKER\n▮ 60\n·\nI\nPOCKETS\n0/8\n1\n2\n3\n4\n5\nLIGHT\nYou are the host. Lobby code: W30ADMIT. ESC > Copy join link\nLocal (same PC) mode: voice chat is not carried between tabs. Use an Online P2P network for voice.",
+        "objectives": {
+          "visible": "◆Claim a free ship at the fleet office (9 m)",
+          "full": [
+            {
+              "text": "Claim a free ship at the fleet office (9 m)",
+              "kind": "main",
+              "first": true,
+              "done": false
+            }
+          ],
+          "preview": {
+            "v": 0,
+            "net": 0
+          }
+        },
+        "sensitivity": 0.0022
+      },
+      "applied": {
+        "p": [
+          2.4,
+          -1.23,
+          28.3
+        ],
+        "yaw": 0,
+        "pitch": 0
+      },
+      "geometry": {
+        "eye": [
+          2.4000000953674316,
+          0.38990372538566587,
+          28.299999237060547
+        ],
+        "forward": [
+          0,
+          0,
+          -1
+        ],
+        "ray": null,
+        "floor": {
+          "distance": 1.0199036598205566,
+          "point": {
+            "x": 2.4000000953674316,
+            "y": -1.2499999344348909,
+            "z": 28.299999237060547
+          },
+          "normal": {
+            "x": 0,
+            "y": 1,
+            "z": 0
+          }
+        },
+        "capsule": {
+          "half": 0.56,
+          "radius": 0.34,
+          "center": {
+            "x": 2.4000000953674316,
+            "y": -0.3300962746143341,
+            "z": 28.299999237060547
+          },
+          "overlaps": []
+        },
+        "door": {
+          "open": true,
+          "actualCenter": [
+            2.6,
+            1.6,
+            3.5
+          ],
+          "point": [
+            3.98,
+            1.3,
+            3.39
+          ]
+        }
+      },
+      "state": {
+        "at": 9062.40000000596,
+        "t": 0.4166000000000004,
+        "screen": null,
+        "phase": "orbit",
+        "seed": 27835183,
+        "run": {
+          "day": 1,
+          "credits": 60,
+          "quota": 330,
+          "time": 480,
+          "moon": "hamsi"
+        },
+        "profile": "QA30Admit",
+        "selfId": "Ly7pf4k2g2",
+        "language": "en",
+        "settings": {
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "player": {
+          "p": [
+            2.4000000953674316,
+            -1.2300962746143342,
+            28.299999237060547
+          ],
+          "yaw": 0,
+          "pitch": 0,
+          "hp": 100,
+          "maxHp": 106,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "crouch": false,
+          "half": 0.56,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "slot": 0
+        },
+        "eye": [
+          2.4000000953674316,
+          0.38990372538566587,
+          28.299999237060547
+        ],
+        "input": {
+          "locked": true,
+          "keys": [],
+          "typing": false,
+          "hidden": false
+        },
+        "panel": null,
+        "prompt": {
+          "main": null
+        },
+        "hud": "● LIVE 120\nHP 100/106\nSTA 100/100\n0 lb\nLv.1 LURKER\n▮ 60\n·\nI\nPOCKETS\n0/8\n1\n2\n3\n4\n5\nLIGHT\nYou are the host. Lobby code: W30ADMIT. ESC > Copy join link\nLocal (same PC) mode: voice chat is not carried between tabs. Use an Online P2P network for voice.",
+        "objectives": {
+          "visible": "◆Claim a free ship at the fleet office (9 m)",
+          "full": [
+            {
+              "text": "Claim a free ship at the fleet office (9 m)",
+              "kind": "main",
+              "first": true,
+              "done": false
+            }
+          ],
+          "preview": {
+            "v": 0,
+            "net": 0
+          }
+        },
+        "sensitivity": 0.0022
+      }
+    },
+    {
+      "kind": "look",
+      "stage": "native-claim-board-setup",
+      "sinceGameMs": 6558,
+      "target": [
+        2.5069846837448315,
+        0.07645246560756211
+      ],
+      "receipts": [
+        {
+          "before": {
+            "p": [
+              2.4000000953674316,
+              -1.2300962746143342,
+              28.299999237060547
+            ],
+            "yaw": 0,
+            "pitch": 0,
+            "hp": 100,
+            "maxHp": 106,
+            "dead": false,
+            "indoor": false,
+            "inShip": false,
+            "grounded": true,
+            "crouch": false,
+            "half": 0.56,
+            "slots": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "slot": 0
+          },
+          "reset": {
+            "p": [
+              2.4000000953674316,
+              -1.2300962746143342,
+              28.299999237060547
+            ],
+            "yaw": 0,
+            "pitch": 0,
+            "hp": 100,
+            "maxHp": 106,
+            "dead": false,
+            "indoor": false,
+            "inShip": false,
+            "grounded": true,
+            "crouch": false,
+            "half": 0.56,
+            "slots": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "slot": 0
+          },
+          "delta": [
+            -320,
+            -34.75112073071005
+          ],
+          "after": {
+            "p": [
+              2.4000000953674316,
+              -1.2300962746143342,
+              28.299999237060547
+            ],
+            "yaw": 0.7040000000000001,
+            "pitch": 0.077,
+            "hp": 100,
+            "maxHp": 106,
+            "dead": false,
+            "indoor": false,
+            "inShip": false,
+            "grounded": true,
+            "crouch": false,
+            "half": 0.56,
+            "slots": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "slot": 0
+          }
+        },
+        {
+          "before": {
+            "p": [
+              2.4000000953674316,
+              -1.2300962746143342,
+              28.299999237060547
+            ],
+            "yaw": 0.7040000000000001,
+            "pitch": 0.077,
+            "hp": 100,
+            "maxHp": 106,
+            "dead": false,
+            "indoor": false,
+            "inShip": false,
+            "grounded": true,
+            "crouch": false,
+            "half": 0.56,
+            "slots": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "slot": 0
+          },
+          "reset": {
+            "p": [
+              2.4000000953674316,
+              -1.2300962746143342,
+              28.299999237060547
+            ],
+            "yaw": 0.7040000000000001,
+            "pitch": 0.077,
+            "hp": 100,
+            "maxHp": 106,
+            "dead": false,
+            "indoor": false,
+            "inShip": false,
+            "grounded": true,
+            "crouch": false,
+            "half": 0.56,
+            "slots": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "slot": 0
+          },
+          "delta": [
+            -320,
+            0.24887926928995
+          ],
+          "after": {
+            "p": [
+              2.4000000953674316,
+              -1.2300962746143342,
+              28.299999237060547
+            ],
+            "yaw": 1.4080000000000001,
+            "pitch": 0.077,
+            "hp": 100,
+            "maxHp": 106,
+            "dead": false,
+            "indoor": false,
+            "inShip": false,
+            "grounded": true,
+            "crouch": false,
+            "half": 0.56,
+            "slots": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "slot": 0
+          }
+        },
+        {
+          "before": {
+            "p": [
+              2.4000000953674316,
+              -1.2300962746143342,
+              28.299999237060547
+            ],
+            "yaw": 1.4080000000000001,
+            "pitch": 0.077,
+            "hp": 100,
+            "maxHp": 106,
+            "dead": false,
+            "indoor": false,
+            "inShip": false,
+            "grounded": true,
+            "crouch": false,
+            "half": 0.56,
+            "slots": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "slot": 0
+          },
+          "reset": {
+            "p": [
+              2.4000000953674316,
+              -1.2300962746143342,
+              28.299999237060547
+            ],
+            "yaw": 1.4080000000000001,
+            "pitch": 0.077,
+            "hp": 100,
+            "maxHp": 106,
+            "dead": false,
+            "indoor": false,
+            "inShip": false,
+            "grounded": true,
+            "crouch": false,
+            "half": 0.56,
+            "slots": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "slot": 0
+          },
+          "delta": [
+            -320,
+            0.24887926928995
+          ],
+          "after": {
+            "p": [
+              2.4000000953674316,
+              -1.2300962746143342,
+              28.299999237060547
+            ],
+            "yaw": 2.112,
+            "pitch": 0.077,
+            "hp": 100,
+            "maxHp": 106,
+            "dead": false,
+            "indoor": false,
+            "inShip": false,
+            "grounded": true,
+            "crouch": false,
+            "half": 0.56,
+            "slots": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "slot": 0
+          }
+        },
+        {
+          "before": {
+            "p": [
+              2.4000000953674316,
+              -1.2300962746143342,
+              28.299999237060547
+            ],
+            "yaw": 2.112,
+            "pitch": 0.077,
+            "hp": 100,
+            "maxHp": 106,
+            "dead": false,
+            "indoor": false,
+            "inShip": false,
+            "grounded": true,
+            "crouch": false,
+            "half": 0.56,
+            "slots": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "slot": 0
+          },
+          "reset": {
+            "p": [
+              2.4000000953674316,
+              -1.2300962746143342,
+              28.299999237060547
+            ],
+            "yaw": 2.112,
+            "pitch": 0.077,
+            "hp": 100,
+            "maxHp": 106,
+            "dead": false,
+            "indoor": false,
+            "inShip": false,
+            "grounded": true,
+            "crouch": false,
+            "half": 0.56,
+            "slots": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "slot": 0
+          },
+          "delta": [
+            -179.538492611287,
+            0.24887926928995
+          ],
+          "after": {
+            "p": [
+              2.4000000953674316,
+              -1.2300962746143342,
+              28.299999237060547
+            ],
+            "yaw": 2.508,
+            "pitch": 0.077,
+            "hp": 100,
+            "maxHp": 106,
+            "dead": false,
+            "indoor": false,
+            "inShip": false,
+            "grounded": true,
+            "crouch": false,
+            "half": 0.56,
+            "slots": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "slot": 0
+          }
+        }
+      ],
+      "state": {
+        "at": 14096.40000000596,
+        "t": 2.565930470000001,
+        "screen": null,
+        "phase": "orbit",
+        "seed": 27835183,
+        "run": {
+          "day": 1,
+          "credits": 60,
+          "quota": 330,
+          "time": 480,
+          "moon": "hamsi"
+        },
+        "profile": "QA30Admit",
+        "selfId": "Ly7pf4k2g2",
+        "language": "en",
+        "settings": {
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "player": {
+          "p": [
+            2.4000000953674316,
+            -1.2300962746143342,
+            28.299999237060547
+          ],
+          "yaw": 2.508,
+          "pitch": 0.077,
+          "hp": 100,
+          "maxHp": 106,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "crouch": false,
+          "half": 0.56,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "slot": 0
+        },
+        "eye": [
+          2.4000000953674316,
+          0.38990372538566587,
+          28.299999237060547
+        ],
+        "input": {
+          "locked": true,
+          "keys": [],
+          "typing": false,
+          "hidden": false
+        },
+        "panel": null,
+        "prompt": {
+          "main": "Fleet broker",
+          "sub": ""
+        },
+        "hud": "● LIVE 121\nHP 100/106\nSTA 100/100\n0 lb\nLv.1 LURKER\n▮ 60\n·\nFLEET BROKER\nI\nPOCKETS\n0/8\n1\n2\n3\n4\n5\nLIGHT\nYou are the host. Lobby code: W30ADMIT. ESC > Copy join link\nACT I: HIRED\nWelcome to the Company. Your position is the same as everyone else's.",
+        "objectives": {
+          "visible": "◆Claim a free ship at the fleet office (4 m)",
+          "full": [
+            {
+              "text": "Claim a free ship at the fleet office (4 m)",
+              "kind": "main",
+              "first": true,
+              "done": false
+            }
+          ],
+          "preview": {
+            "v": 0,
+            "net": 0
+          }
+        },
+        "sensitivity": 0.0022
+      }
+    },
+    {
+      "kind": "E-before",
+      "stage": "native-claim-board-setup",
+      "at": "2026-10-01T19:30:03.262Z",
+      "sinceGameMs": 6578,
+      "expected": "Fleet broker",
+      "diagnostics": {
+        "eye": [
+          2.4000000953674316,
+          0.38990372538566587,
+          28.299999237060547
+        ],
+        "forward": [
+          -0.5902896653597287,
+          0.07692393372001735,
+          0.8035177778932698
+        ],
+        "ray": null,
+        "floor": {
+          "distance": 1.0199036598205566,
+          "point": {
+            "x": 2.4000000953674316,
+            "y": -1.2499999344348909,
+            "z": 28.299999237060547
+          },
+          "normal": {
+            "x": 0,
+            "y": 1,
+            "z": 0
+          }
+        },
+        "capsule": {
+          "half": 0.56,
+          "radius": 0.34,
+          "center": {
+            "x": 2.4000000953674316,
+            "y": -0.3300962746143341,
+            "z": 28.299999237060547
+          },
+          "overlaps": []
+        },
+        "door": {
+          "open": true,
+          "actualCenter": [
+            2.6,
+            1.6,
+            3.5
+          ],
+          "point": [
+            3.98,
+            1.3,
+            3.39
+          ]
+        }
+      },
+      "state": {
+        "at": 14116,
+        "t": 2.565930470000001,
+        "screen": null,
+        "phase": "orbit",
+        "seed": 27835183,
+        "run": {
+          "day": 1,
+          "credits": 60,
+          "quota": 330,
+          "time": 480,
+          "moon": "hamsi"
+        },
+        "profile": "QA30Admit",
+        "selfId": "Ly7pf4k2g2",
+        "language": "en",
+        "settings": {
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "player": {
+          "p": [
+            2.4000000953674316,
+            -1.2300962746143342,
+            28.299999237060547
+          ],
+          "yaw": 2.508,
+          "pitch": 0.077,
+          "hp": 100,
+          "maxHp": 106,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "crouch": false,
+          "half": 0.56,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "slot": 0
+        },
+        "eye": [
+          2.4000000953674316,
+          0.38990372538566587,
+          28.299999237060547
+        ],
+        "input": {
+          "locked": true,
+          "keys": [],
+          "typing": false,
+          "hidden": false
+        },
+        "panel": null,
+        "prompt": {
+          "main": "Fleet broker",
+          "sub": ""
+        },
+        "hud": "● LIVE 121\nHP 100/106\nSTA 100/100\n0 lb\nLv.1 LURKER\n▮ 60\n·\nFLEET BROKER\nI\nPOCKETS\n0/8\n1\n2\n3\n4\n5\nLIGHT\nYou are the host. Lobby code: W30ADMIT. ESC > Copy join link\nACT I: HIRED\nWelcome to the Company. Your position is the same as everyone else's.",
+        "objectives": {
+          "visible": "◆Claim a free ship at the fleet office (4 m)",
+          "full": [
+            {
+              "text": "Claim a free ship at the fleet office (4 m)",
+              "kind": "main",
+              "first": true,
+              "done": false
+            }
+          ],
+          "preview": {
+            "v": 0,
+            "net": 0
+          }
+        },
+        "sensitivity": 0.0022
+      }
+    },
+    {
+      "kind": "E-after",
+      "stage": "native-claim-board-setup",
+      "at": "2026-10-01T19:30:03.726Z",
+      "sinceGameMs": 7042,
+      "expected": "Fleet broker",
+      "state": {
+        "at": 14580.5,
+        "t": 2.665930470000001,
+        "screen": null,
+        "phase": "orbit",
+        "seed": 27835183,
+        "run": {
+          "day": 1,
+          "credits": 60,
+          "quota": 330,
+          "time": 480,
+          "moon": "hamsi"
+        },
+        "profile": "QA30Admit",
+        "selfId": "Ly7pf4k2g2",
+        "language": "en",
+        "settings": {
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "player": {
+          "p": [
+            2.4000000953674316,
+            -1.2300962746143342,
+            28.299999237060547
+          ],
+          "yaw": 2.508,
+          "pitch": 0.077,
+          "hp": 100,
+          "maxHp": 106,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "crouch": false,
+          "half": 0.56,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "slot": 0
+        },
+        "eye": [
+          2.4000000953674316,
+          0.38990372538566587,
+          28.299999237060547
+        ],
+        "input": {
+          "locked": false,
+          "keys": [],
+          "typing": false,
+          "hidden": false
+        },
+        "panel": {
+          "class": "menu-frame crt-panel wide fleet13",
+          "text": "RELAY DOCK\n60 CR\nAPPROVED\n\nSelected vessel: No vessel selected\n\nShip rooms and upgrades are saved per vessel.\n\nPacket Courier — Free starter\n\nCompact hull. No extra route weight; build your own rooms.\n\nFitted rooms: core cockpit only\n\nRoute surcharge: +0%\n\nCLAIM FREE STARTER\nCache Hauler — 520 CR\n\nLong freight hull. Cargo sale bonus and engine room; heavier routes.\n\nFitted rooms: Cargo Bay II · Engine Room I\n\nRoute surcharge: +7.5% · Scrap sale bonus: +6% · Cargo rack slots: 24\n\nNeed 460 more crew credits\n\nPURCHASE VESSEL\nRecovery Vessel — 680 CR\n\nTwin side rooms. Mid-shift body revival and rested crew buff.\n\nFitted rooms: Med Bay I · Bunk Room I\n\nRoute surcharge: +10% · Body revival: 100 CR per use · Rested buff: 180s\n\nNeed 620 more crew credits\n\nPURCHASE VESSEL\nSignal Surveyor — 880 CR\n\nResearch wing and roof observatory. Better samples, crafting and scan.\n\nFitted rooms: Lab I · Workshop I · Observation Deck I\n\nRoute surcharge: +15% · Craft time: −10% · Observation scan range: +25%\n\nNeed 820 more crew credits\n\nPURCHASE VESSEL\n\nPersonal gear is sold separately. Hull price includes the fitted rooms.\n\nStart with the free Courier; save your credits for field equipment.\n\nCLOSE\n↑↓ SELECT\nENTER CONFIRM\nESC BACK"
+        },
+        "prompt": {
+          "main": "Fleet broker",
+          "sub": ""
+        },
+        "hud": "● LIVE 121\nHP 100/106\nSTA 100/100\n0 lb\nLv.1 LURKER\n▮ 60\n·\nFLEET BROKER\nI\nPOCKETS\n0/8\n1\n2\n3\n4\n5\nLIGHT\nYou are the host. Lobby code: W30ADMIT. ESC > Copy join link\nACT I: HIRED\nWelcome to the Company. Your position is the same as everyone else's.",
+        "objectives": {
+          "visible": "◆Claim a free ship at the fleet office (4 m)",
+          "full": [
+            {
+              "text": "Claim a free ship at the fleet office (4 m)",
+              "kind": "main",
+              "first": true,
+              "done": false
+            }
+          ],
+          "preview": {
+            "v": 0,
+            "net": 0
+          }
+        },
+        "sensitivity": 0.0022
+      }
+    },
+    {
+      "kind": "LABELLED_BODY_APPROACH_FIXTURE",
+      "stage": "native-claim-board-setup",
+      "at": "2026-10-01T19:30:05.292Z",
+      "sinceGameMs": 8608,
+      "label": "Board approach setup only",
+      "before": {
+        "at": 15590.40000000596,
+        "t": 3.013849930300001,
+        "screen": null,
+        "phase": "orbit",
+        "seed": 27835183,
+        "run": {
+          "day": 1,
+          "credits": 60,
+          "quota": 330,
+          "time": 480,
+          "moon": "hamsi"
+        },
+        "profile": "QA30Admit",
+        "selfId": "Ly7pf4k2g2",
+        "language": "en",
+        "settings": {
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "player": {
+          "p": [
+            2.4000000953674316,
+            -1.2300962746143342,
+            28.299999237060547
+          ],
+          "yaw": 2.508,
+          "pitch": 0.077,
+          "hp": 100,
+          "maxHp": 106,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "crouch": false,
+          "half": 0.56,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "slot": 0
+        },
+        "eye": [
+          2.4000000953674316,
+          0.38990372538566587,
+          28.299999237060547
+        ],
+        "input": {
+          "locked": false,
+          "keys": [],
+          "typing": false,
+          "hidden": false
+        },
+        "panel": null,
+        "prompt": {
+          "main": "Fleet broker",
+          "sub": ""
+        },
+        "hud": "● LIVE 121\nHP 100/106\nSTA 100/100\n0 lb\nLv.1 LURKER\n▮ 60\n·\nFLEET BROKER\nI\nPOCKETS\n0/8\n1\n2\n3\n4\n5\nLIGHT\nACT I: HIRED\nWelcome to the Company. Your position is the same as everyone else's.",
+        "objectives": {
+          "visible": "◆Claim a free ship at the fleet office (4 m)",
+          "full": [
+            {
+              "text": "Claim a free ship at the fleet office (4 m)",
+              "kind": "main",
+              "first": true,
+              "done": false
+            }
+          ],
+          "preview": {
+            "v": 0,
+            "net": 0
+          }
+        },
+        "sensitivity": 0.0022
+      },
+      "applied": {
+        "p": [
+          2.9,
+          -1.23,
+          12.8
+        ],
+        "yaw": 0,
+        "pitch": 0
+      },
+      "geometry": {
+        "eye": [
+          2.9000000953674316,
+          0.3893362295627594,
+          12.800000190734863
+        ],
+        "forward": [
+          0,
+          0,
+          -1
+        ],
+        "ray": {
+          "distance": 3.4000000953674316,
+          "point": {
+            "x": 2.9000000953674316,
+            "y": 0.3893362295627594,
+            "z": 9.400000095367432
+          },
+          "normal": {
+            "x": 0,
+            "y": 0,
+            "z": 1
+          },
+          "kind": "static"
+        },
+        "floor": {
+          "distance": 1.019336223602295,
+          "point": {
+            "x": 2.9000000953674316,
+            "y": -1.2499999940395357,
+            "z": 12.800000190734863
+          },
+          "normal": {
+            "x": 0,
+            "y": 1,
+            "z": 0
+          }
+        },
+        "capsule": {
+          "half": 0.56,
+          "radius": 0.34,
+          "center": {
+            "x": 2.9000000953674316,
+            "y": -0.3306637704372406,
+            "z": 12.800000190734863
+          },
+          "overlaps": []
+        },
+        "door": {
+          "open": true,
+          "actualCenter": [
+            2.6,
+            1.6,
+            3.5
+          ],
+          "point": [
+            3.98,
+            1.3,
+            3.39
+          ]
+        }
+      },
+      "state": {
+        "at": 16147.09999999404,
+        "t": 3.213849930300001,
+        "screen": null,
+        "phase": "orbit",
+        "seed": 27835183,
+        "run": {
+          "day": 1,
+          "credits": 60,
+          "quota": 330,
+          "time": 480,
+          "moon": "hamsi"
+        },
+        "profile": "QA30Admit",
+        "selfId": "Ly7pf4k2g2",
+        "language": "en",
+        "settings": {
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "player": {
+          "p": [
+            2.9000000953674316,
+            -1.2306637704372407,
+            12.800000190734863
+          ],
+          "yaw": 0,
+          "pitch": 0,
+          "hp": 100,
+          "maxHp": 106,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "crouch": false,
+          "half": 0.56,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "slot": 0
+        },
+        "eye": [
+          2.9000000953674316,
+          0.3893362295627594,
+          12.800000190734863
+        ],
+        "input": {
+          "locked": true,
+          "keys": [],
+          "typing": false,
+          "hidden": false
+        },
+        "panel": null,
+        "prompt": {
+          "main": "Board Packet Courier",
+          "sub": ""
+        },
+        "hud": "● LIVE 121\nHP 100/106\nSTA 100/100\n0 lb\nLv.1 LURKER\n▮ 60\n·\nBOARD PACKET COURIER\nI\nPOCKETS\n0/8\n1\n2\n3\n4\n5\nLIGHT",
+        "objectives": {
+          "visible": "◆Claim a free ship at the fleet office (4 m)",
+          "full": [
+            {
+              "text": "Claim a free ship at the fleet office (4 m)",
+              "kind": "main",
+              "first": true,
+              "done": false
+            }
+          ],
+          "preview": {
+            "v": 0,
+            "net": 0
+          }
+        },
+        "sensitivity": 0.0022
+      }
+    },
+    {
+      "kind": "look",
+      "stage": "native-claim-board-setup",
+      "sinceGameMs": 9414,
+      "target": [
+        -0.030111347585130302,
+        -0.05694150851291731
+      ],
+      "receipts": [
+        {
+          "before": {
+            "p": [
+              2.9000000953674316,
+              -1.2306637704372407,
+              12.800000190734863
+            ],
+            "yaw": 0,
+            "pitch": 0,
+            "hp": 100,
+            "maxHp": 106,
+            "dead": false,
+            "indoor": false,
+            "inShip": false,
+            "grounded": true,
+            "crouch": false,
+            "half": 0.56,
+            "slots": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "slot": 0
+          },
+          "reset": {
+            "p": [
+              2.9000000953674316,
+              -1.2306637704372407,
+              12.800000190734863
+            ],
+            "yaw": 0,
+            "pitch": 0,
+            "hp": 100,
+            "maxHp": 106,
+            "dead": false,
+            "indoor": false,
+            "inShip": false,
+            "grounded": true,
+            "crouch": false,
+            "half": 0.56,
+            "slots": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "slot": 0
+          },
+          "delta": [
+            13.686976175059227,
+            25.882503869507865
+          ],
+          "after": {
+            "p": [
+              2.9000000953674316,
+              -1.2306637704372407,
+              12.800000190734863
+            ],
+            "yaw": -0.0286,
+            "pitch": -0.055,
+            "hp": 100,
+            "maxHp": 106,
+            "dead": false,
+            "indoor": false,
+            "inShip": false,
+            "grounded": true,
+            "crouch": false,
+            "half": 0.56,
+            "slots": [
+              null,
+              null,
+              null,
+              null,
+              null
+            ],
+            "slot": 0
+          }
+        }
+      ],
+      "state": {
+        "at": 16954.70000000298,
+        "t": 3.547249930300001,
+        "screen": null,
+        "phase": "orbit",
+        "seed": 27835183,
+        "run": {
+          "day": 1,
+          "credits": 60,
+          "quota": 330,
+          "time": 480,
+          "moon": "hamsi"
+        },
+        "profile": "QA30Admit",
+        "selfId": "Ly7pf4k2g2",
+        "language": "en",
+        "settings": {
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "player": {
+          "p": [
+            2.9000000953674316,
+            -1.2306637704372407,
+            12.800000190734863
+          ],
+          "yaw": -0.0286,
+          "pitch": -0.055,
+          "hp": 100,
+          "maxHp": 106,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "crouch": false,
+          "half": 0.56,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "slot": 0
+        },
+        "eye": [
+          2.9000000953674316,
+          0.3893362295627594,
+          12.800000190734863
+        ],
+        "input": {
+          "locked": true,
+          "keys": [],
+          "typing": false,
+          "hidden": false
+        },
+        "panel": null,
+        "prompt": {
+          "main": "Board Packet Courier",
+          "sub": ""
+        },
+        "hud": "● LIVE 121\nHP 100/106\nSTA 100/100\n0 lb\nLv.1 LURKER\n▮ 60\n·\nBOARD PACKET COURIER\nI\nPOCKETS\n0/8\n1\n2\n3\n4\n5\nLIGHT\nRole: Engineer. Duct tape, then physics.\nRole auto-assigned: Engineer. One free reroll: terminal REROLL (or pick in the ROLE panel).",
+        "objectives": {
+          "visible": "◆Board Packet Courier at the departure kiosk (3 m)",
+          "full": [
+            {
+              "text": "Board Packet Courier at the departure kiosk (3 m)",
+              "kind": "main",
+              "first": true,
+              "done": false
+            }
+          ],
+          "preview": {
+            "v": 0,
+            "net": 0
+          }
+        },
+        "sensitivity": 0.0022
+      }
+    },
+    {
+      "kind": "E-before",
+      "stage": "native-claim-board-setup",
+      "at": "2026-10-01T19:30:06.105Z",
+      "sinceGameMs": 9421,
+      "expected": "Board Packet Courier",
+      "diagnostics": {
+        "eye": [
+          2.9000000953674316,
+          0.3893362295627594,
+          12.800000190734863
+        ],
+        "forward": [
+          0.028552860515607743,
+          -0.05497227502706774,
+          -0.998079547498457
+        ],
+        "ray": {
+          "distance": 3.4065423011779785,
+          "point": {
+            "x": 2.997266622533484,
+            "y": 0.2020708492910633,
+            "z": 9.399999992240794
+          },
+          "normal": {
+            "x": 0,
+            "y": 0,
+            "z": 1
+          },
+          "kind": "static"
+        },
+        "floor": {
+          "distance": 1.019336223602295,
+          "point": {
+            "x": 2.9000000953674316,
+            "y": -1.2499999940395357,
+            "z": 12.800000190734863
+          },
+          "normal": {
+            "x": 0,
+            "y": 1,
+            "z": 0
+          }
+        },
+        "capsule": {
+          "half": 0.56,
+          "radius": 0.34,
+          "center": {
+            "x": 2.9000000953674316,
+            "y": -0.3306637704372406,
+            "z": 12.800000190734863
+          },
+          "overlaps": []
+        },
+        "door": {
+          "open": true,
+          "actualCenter": [
+            2.6,
+            1.6,
+            3.5
+          ],
+          "point": [
+            3.98,
+            1.3,
+            3.39
+          ]
+        }
+      },
+      "state": {
+        "at": 16961.79999999702,
+        "t": 3.547249930300001,
+        "screen": null,
+        "phase": "orbit",
+        "seed": 27835183,
+        "run": {
+          "day": 1,
+          "credits": 60,
+          "quota": 330,
+          "time": 480,
+          "moon": "hamsi"
+        },
+        "profile": "QA30Admit",
+        "selfId": "Ly7pf4k2g2",
+        "language": "en",
+        "settings": {
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "player": {
+          "p": [
+            2.9000000953674316,
+            -1.2306637704372407,
+            12.800000190734863
+          ],
+          "yaw": -0.0286,
+          "pitch": -0.055,
+          "hp": 100,
+          "maxHp": 106,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "crouch": false,
+          "half": 0.56,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "slot": 0
+        },
+        "eye": [
+          2.9000000953674316,
+          0.3893362295627594,
+          12.800000190734863
+        ],
+        "input": {
+          "locked": true,
+          "keys": [],
+          "typing": false,
+          "hidden": false
+        },
+        "panel": null,
+        "prompt": {
+          "main": "Board Packet Courier",
+          "sub": ""
+        },
+        "hud": "● LIVE 121\nHP 100/106\nSTA 100/100\n0 lb\nLv.1 LURKER\n▮ 60\n·\nBOARD PACKET COURIER\nI\nPOCKETS\n0/8\n1\n2\n3\n4\n5\nLIGHT\nRole: Engineer. Duct tape, then physics.\nRole auto-assigned: Engineer. One free reroll: terminal REROLL (or pick in the ROLE panel).",
+        "objectives": {
+          "visible": "◆Board Packet Courier at the departure kiosk (3 m)",
+          "full": [
+            {
+              "text": "Board Packet Courier at the departure kiosk (3 m)",
+              "kind": "main",
+              "first": true,
+              "done": false
+            }
+          ],
+          "preview": {
+            "v": 0,
+            "net": 0
+          }
+        },
+        "sensitivity": 0.0022
+      }
+    },
+    {
+      "kind": "E-after",
+      "stage": "native-claim-board-setup",
+      "at": "2026-10-01T19:30:06.725Z",
+      "sinceGameMs": 10041,
+      "expected": "Board Packet Courier",
+      "state": {
+        "at": 17580.09999999404,
+        "t": 3.647249930300001,
+        "screen": null,
+        "phase": "orbit",
+        "seed": 27835183,
+        "run": {
+          "day": 1,
+          "credits": 60,
+          "quota": 330,
+          "time": 480,
+          "moon": "hamsi"
+        },
+        "profile": "QA30Admit",
+        "selfId": "Ly7pf4k2g2",
+        "language": "en",
+        "settings": {
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "player": {
+          "p": [
+            0,
+            0.05,
+            -1
+          ],
+          "yaw": 1.5707963267948966,
+          "pitch": -0.055,
+          "hp": 100,
+          "maxHp": 106,
+          "dead": false,
+          "indoor": false,
+          "inShip": false,
+          "grounded": true,
+          "crouch": false,
+          "half": 0.56,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "slot": 0
+        },
+        "eye": [
+          2.9000000953674316,
+          0.3893362295627594,
+          12.800000190734863
+        ],
+        "input": {
+          "locked": true,
+          "keys": [],
+          "typing": false,
+          "hidden": false
+        },
+        "panel": null,
+        "prompt": {
+          "main": "Board Packet Courier",
+          "sub": ""
+        },
+        "hud": "● LIVE 121\nHP 100/106\nSTA 100/100\n0 lb\nLv.1 LURKER\n▮ 60\n·\nBOARD PACKET COURIER\nI\nPOCKETS\n0/8\n1\n2\n3\n4\n5\nLIGHT\nRole: Engineer. Duct tape, then physics.\nRole auto-assigned: Engineer. One free reroll: terminal REROLL (or pick in the ROLE panel).",
+        "objectives": {
+          "visible": "◆Board Packet Courier at the departure kiosk (3 m)",
+          "full": [
+            {
+              "text": "Board Packet Courier at the departure kiosk (3 m)",
+              "kind": "main",
+              "first": true,
+              "done": false
+            }
+          ],
+          "preview": {
+            "v": 0,
+            "net": 0
+          }
+        },
+        "sensitivity": 0.0022
+      }
+    },
+    {
+      "kind": "milestone",
+      "stage": "native-claim-board-setup",
+      "at": "2026-10-01T19:30:07.671Z",
+      "sinceGameMs": 10987,
+      "name": "native-free-Courier-claim-and-board-setup",
+      "state": {
+        "at": 18525.70000000298,
+        "t": 4.047249930300001,
+        "screen": null,
+        "phase": "orbit",
+        "seed": 27835183,
+        "run": {
+          "day": 1,
+          "credits": 60,
+          "quota": 330,
+          "time": 480,
+          "moon": "hamsi"
+        },
+        "profile": "QA30Admit",
+        "selfId": "Ly7pf4k2g2",
+        "language": "en",
+        "settings": {
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "player": {
+          "p": [
+            1.3097507522985552e-9,
+            0.01997039318084709,
+            -1
+          ],
+          "yaw": 1.5707963267948966,
+          "pitch": -0.055,
+          "hp": 100,
+          "maxHp": 106,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "crouch": false,
+          "half": 0.56,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "slot": 0
+        },
+        "eye": [
+          1.3097507522985552e-9,
+          1.6399703931808471,
+          -1
+        ],
+        "input": {
+          "locked": true,
+          "keys": [],
+          "typing": false,
+          "hidden": false
+        },
+        "panel": null,
+        "prompt": {
+          "main": "Ship table [E]",
+          "sub": "Hold food or a drink and press E. Eat together: Well Fed on the next landing."
+        },
+        "hud": "● LIVE 121\nHP 100/106\nSTA 100/100\n0 lb\nLv.1 LURKER\n▮ 60\n·\nSHIP TABLE\nHold food or a drink and press E. Eat together: Well Fed on the next landing.\nI\nPOCKETS\n0/8\n1\n2\n3\n4\n5\nLIGHT\nRole: Engineer. Duct tape, then physics.\nRole auto-assigned: Engineer. One free reroll: terminal REROLL (or pick in the ROLE panel).\nLOOT ABOARD\n▮0\n0 items\nThe Company pays 36% today: ▮0 · ▮330 to go\nDeadline day pays 100 %",
+        "objectives": {
+          "visible": "◆Land on 56K-Dialup: pull the LEVER",
+          "full": [
+            {
+              "text": "Land on 56K-Dialup: pull the LEVER",
+              "kind": "main",
+              "done": false,
+              "progress": null,
+              "src": "core"
+            },
+            {
+              "text": "TUTORIAL 1/7: Move: WASD, hold Shift to sprint, C to crouch",
+              "kind": "main",
+              "done": false,
+              "progress": null,
+              "src": "guide",
+              "pin": true
+            },
+            {
+              "text": "Terminal: MOONS / ROUTE",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "core"
+            },
+            {
+              "text": "Contract board: terminal CONTRACTS or the board in the ship",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "lore"
+            },
+            {
+              "text": "Patron jobs: terminal JOBS",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "story"
+            },
+            {
+              "text": "TRENDING: The Moderator",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "story"
+            },
+            {
+              "text": "Job: PHOTOGRAPH THE ANOMALY",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "facjobs"
+            },
+            {
+              "text": "Terminal: JOBS shows today's facility jobs",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "facjobs"
+            },
+            {
+              "text": "Skip: terminal TUTORIAL SKIP",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "guide"
+            }
+          ],
+          "preview": {
+            "v": 0,
+            "net": 0
+          }
+        },
+        "sensitivity": 0.0022
+      }
+    },
+    {
+      "kind": "actual-native-boarded-orbit-admission",
+      "stage": "labelled-safe-orbit",
+      "at": "2026-10-01T19:30:07.686Z",
+      "sinceGameMs": 11002,
+      "label": "Actual native free-ship dispatch supplied orbit; no phase fixture for this final short entry check.",
+      "state": {
+        "at": 18541.90000000596,
+        "t": 4.047249930300001,
+        "screen": null,
+        "phase": "orbit",
+        "seed": 27835183,
+        "run": {
+          "day": 1,
+          "credits": 60,
+          "quota": 330,
+          "time": 480,
+          "moon": "hamsi"
+        },
+        "profile": "QA30Admit",
+        "selfId": "Ly7pf4k2g2",
+        "language": "en",
+        "settings": {
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "player": {
+          "p": [
+            1.3097507522985552e-9,
+            0.01997039318084709,
+            -1
+          ],
+          "yaw": 1.5707963267948966,
+          "pitch": -0.055,
+          "hp": 100,
+          "maxHp": 106,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "crouch": false,
+          "half": 0.56,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "slot": 0
+        },
+        "eye": [
+          1.3097507522985552e-9,
+          1.6399703931808471,
+          -1
+        ],
+        "input": {
+          "locked": true,
+          "keys": [],
+          "typing": false,
+          "hidden": false
+        },
+        "panel": null,
+        "prompt": {
+          "main": "Ship table [E]",
+          "sub": "Hold food or a drink and press E. Eat together: Well Fed on the next landing."
+        },
+        "hud": "● LIVE 121\nHP 100/106\nSTA 100/100\n0 lb\nLv.1 LURKER\n▮ 60\n·\nSHIP TABLE\nHold food or a drink and press E. Eat together: Well Fed on the next landing.\nI\nPOCKETS\n0/8\n1\n2\n3\n4\n5\nLIGHT\nRole: Engineer. Duct tape, then physics.\nRole auto-assigned: Engineer. One free reroll: terminal REROLL (or pick in the ROLE panel).\nLOOT ABOARD\n▮0\n0 items\nThe Company pays 36% today: ▮0 · ▮330 to go\nDeadline day pays 100 %",
+        "objectives": {
+          "visible": "◆Land on 56K-Dialup: pull the LEVER",
+          "full": [
+            {
+              "text": "Land on 56K-Dialup: pull the LEVER",
+              "kind": "main",
+              "done": false,
+              "progress": null,
+              "src": "core"
+            },
+            {
+              "text": "TUTORIAL 1/7: Move: WASD, hold Shift to sprint, C to crouch",
+              "kind": "main",
+              "done": false,
+              "progress": null,
+              "src": "guide",
+              "pin": true
+            },
+            {
+              "text": "Terminal: MOONS / ROUTE",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "core"
+            },
+            {
+              "text": "Contract board: terminal CONTRACTS or the board in the ship",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "lore"
+            },
+            {
+              "text": "Patron jobs: terminal JOBS",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "story"
+            },
+            {
+              "text": "TRENDING: The Moderator",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "story"
+            },
+            {
+              "text": "Job: PHOTOGRAPH THE ANOMALY",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "facjobs"
+            },
+            {
+              "text": "Terminal: JOBS shows today's facility jobs",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "facjobs"
+            },
+            {
+              "text": "Skip: terminal TUTORIAL SKIP",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "guide"
+            }
+          ],
+          "preview": {
+            "v": 0,
+            "net": 0
+          }
+        },
+        "sensitivity": 0.0022
+      }
+    },
+    {
+      "kind": "milestone",
+      "stage": "labelled-safe-orbit",
+      "at": "2026-10-01T19:30:10.280Z",
+      "sinceGameMs": 13596,
+      "name": "native-Esc-menu-DeadLetter-admission",
+      "state": {
+        "at": 21135.40000000596,
+        "t": 4.813749930299997,
+        "screen": null,
+        "phase": "deadletter",
+        "seed": 27835183,
+        "layoutSeed": 508253137,
+        "theme": "deadletter24",
+        "run": {
+          "day": 1,
+          "credits": 60,
+          "quota": 330,
+          "time": 480,
+          "moon": "deadletter24"
+        },
+        "profile": "QA30Admit",
+        "selfId": "Ly7pf4k2g2",
+        "language": "en",
+        "settings": {
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "player": {
+          "p": [
+            5.412406078875165e-10,
+            -299.9800000429153,
+            -33.150001525878906
+          ],
+          "yaw": 0,
+          "pitch": -0.055,
+          "hp": 100,
+          "maxHp": 100,
+          "dead": false,
+          "indoor": true,
+          "inShip": false,
+          "grounded": true,
+          "crouch": false,
+          "half": 0.56,
+          "slots": [
+            "ibj",
+            null,
+            null,
+            null,
+            null
+          ],
+          "slot": 0,
+          "held": "ibj"
+        },
+        "eye": [
+          5.412406078875165e-10,
+          -298.3600000429153,
+          -33.150001525878906
+        ],
+        "input": {
+          "locked": true,
+          "keys": [],
+          "typing": false,
+          "hidden": false
+        },
+        "panel": null,
+        "prompt": {
+          "main": null
+        },
+        "hud": "● LIVE 122\nHP 100/100\nSTA 100/100\n0 lb\nLv.1 LURKER\n▮ 60\n·\nI\nPOCKETS\n0/8\n1\nArchive Card Stack\n2\n3\n4\n5\nLIGHT",
+        "objectives": {
+          "visible": "◆Land on 56K-Dialup: pull the LEVER",
+          "full": [
+            {
+              "text": "Land on 56K-Dialup: pull the LEVER",
+              "kind": "main",
+              "done": false,
+              "progress": null,
+              "src": "core"
+            },
+            {
+              "text": "TUTORIAL 1/7: Move: WASD, hold Shift to sprint, C to crouch",
+              "kind": "main",
+              "done": false,
+              "progress": null,
+              "src": "guide",
+              "pin": true
+            },
+            {
+              "text": "Terminal: MOONS / ROUTE",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "core"
+            },
+            {
+              "text": "Contract board: terminal CONTRACTS or the board in the ship",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "lore"
+            },
+            {
+              "text": "Patron jobs: terminal JOBS",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "story"
+            },
+            {
+              "text": "TRENDING: The Moderator",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "story"
+            },
+            {
+              "text": "Job: PHOTOGRAPH THE ANOMALY",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "facjobs"
+            },
+            {
+              "text": "Terminal: JOBS shows today's facility jobs",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "facjobs"
+            },
+            {
+              "text": "Skip: terminal TUTORIAL SKIP",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "guide"
+            }
+          ],
+          "preview": {
+            "v": 0,
+            "net": 0
+          }
+        },
+        "sensitivity": 0.0022
+      }
+    }
+  ],
+  "milestones": [
+    {
+      "name": "native-free-Courier-claim-and-board-setup",
+      "sinceGameMs": 10988,
+      "state": {
+        "at": 18525.70000000298,
+        "t": 4.047249930300001,
+        "screen": null,
+        "phase": "orbit",
+        "seed": 27835183,
+        "run": {
+          "day": 1,
+          "credits": 60,
+          "quota": 330,
+          "time": 480,
+          "moon": "hamsi"
+        },
+        "profile": "QA30Admit",
+        "selfId": "Ly7pf4k2g2",
+        "language": "en",
+        "settings": {
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "player": {
+          "p": [
+            1.3097507522985552e-9,
+            0.01997039318084709,
+            -1
+          ],
+          "yaw": 1.5707963267948966,
+          "pitch": -0.055,
+          "hp": 100,
+          "maxHp": 106,
+          "dead": false,
+          "indoor": false,
+          "inShip": true,
+          "grounded": true,
+          "crouch": false,
+          "half": 0.56,
+          "slots": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "slot": 0
+        },
+        "eye": [
+          1.3097507522985552e-9,
+          1.6399703931808471,
+          -1
+        ],
+        "input": {
+          "locked": true,
+          "keys": [],
+          "typing": false,
+          "hidden": false
+        },
+        "panel": null,
+        "prompt": {
+          "main": "Ship table [E]",
+          "sub": "Hold food or a drink and press E. Eat together: Well Fed on the next landing."
+        },
+        "hud": "● LIVE 121\nHP 100/106\nSTA 100/100\n0 lb\nLv.1 LURKER\n▮ 60\n·\nSHIP TABLE\nHold food or a drink and press E. Eat together: Well Fed on the next landing.\nI\nPOCKETS\n0/8\n1\n2\n3\n4\n5\nLIGHT\nRole: Engineer. Duct tape, then physics.\nRole auto-assigned: Engineer. One free reroll: terminal REROLL (or pick in the ROLE panel).\nLOOT ABOARD\n▮0\n0 items\nThe Company pays 36% today: ▮0 · ▮330 to go\nDeadline day pays 100 %",
+        "objectives": {
+          "visible": "◆Land on 56K-Dialup: pull the LEVER",
+          "full": [
+            {
+              "text": "Land on 56K-Dialup: pull the LEVER",
+              "kind": "main",
+              "done": false,
+              "progress": null,
+              "src": "core"
+            },
+            {
+              "text": "TUTORIAL 1/7: Move: WASD, hold Shift to sprint, C to crouch",
+              "kind": "main",
+              "done": false,
+              "progress": null,
+              "src": "guide",
+              "pin": true
+            },
+            {
+              "text": "Terminal: MOONS / ROUTE",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "core"
+            },
+            {
+              "text": "Contract board: terminal CONTRACTS or the board in the ship",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "lore"
+            },
+            {
+              "text": "Patron jobs: terminal JOBS",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "story"
+            },
+            {
+              "text": "TRENDING: The Moderator",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "story"
+            },
+            {
+              "text": "Job: PHOTOGRAPH THE ANOMALY",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "facjobs"
+            },
+            {
+              "text": "Terminal: JOBS shows today's facility jobs",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "facjobs"
+            },
+            {
+              "text": "Skip: terminal TUTORIAL SKIP",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "guide"
+            }
+          ],
+          "preview": {
+            "v": 0,
+            "net": 0
+          }
+        },
+        "sensitivity": 0.0022
+      }
+    },
+    {
+      "name": "native-Esc-menu-DeadLetter-admission",
+      "sinceGameMs": 13598,
+      "state": {
+        "at": 21135.40000000596,
+        "t": 4.813749930299997,
+        "screen": null,
+        "phase": "deadletter",
+        "seed": 27835183,
+        "layoutSeed": 508253137,
+        "theme": "deadletter24",
+        "run": {
+          "day": 1,
+          "credits": 60,
+          "quota": 330,
+          "time": 480,
+          "moon": "deadletter24"
+        },
+        "profile": "QA30Admit",
+        "selfId": "Ly7pf4k2g2",
+        "language": "en",
+        "settings": {
+          "quality": "auto",
+          "fullscreenPlay": true
+        },
+        "player": {
+          "p": [
+            5.412406078875165e-10,
+            -299.9800000429153,
+            -33.150001525878906
+          ],
+          "yaw": 0,
+          "pitch": -0.055,
+          "hp": 100,
+          "maxHp": 100,
+          "dead": false,
+          "indoor": true,
+          "inShip": false,
+          "grounded": true,
+          "crouch": false,
+          "half": 0.56,
+          "slots": [
+            "ibj",
+            null,
+            null,
+            null,
+            null
+          ],
+          "slot": 0,
+          "held": "ibj"
+        },
+        "eye": [
+          5.412406078875165e-10,
+          -298.3600000429153,
+          -33.150001525878906
+        ],
+        "input": {
+          "locked": true,
+          "keys": [],
+          "typing": false,
+          "hidden": false
+        },
+        "panel": null,
+        "prompt": {
+          "main": null
+        },
+        "hud": "● LIVE 122\nHP 100/100\nSTA 100/100\n0 lb\nLv.1 LURKER\n▮ 60\n·\nI\nPOCKETS\n0/8\n1\nArchive Card Stack\n2\n3\n4\n5\nLIGHT",
+        "objectives": {
+          "visible": "◆Land on 56K-Dialup: pull the LEVER",
+          "full": [
+            {
+              "text": "Land on 56K-Dialup: pull the LEVER",
+              "kind": "main",
+              "done": false,
+              "progress": null,
+              "src": "core"
+            },
+            {
+              "text": "TUTORIAL 1/7: Move: WASD, hold Shift to sprint, C to crouch",
+              "kind": "main",
+              "done": false,
+              "progress": null,
+              "src": "guide",
+              "pin": true
+            },
+            {
+              "text": "Terminal: MOONS / ROUTE",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "core"
+            },
+            {
+              "text": "Contract board: terminal CONTRACTS or the board in the ship",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "lore"
+            },
+            {
+              "text": "Patron jobs: terminal JOBS",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "story"
+            },
+            {
+              "text": "TRENDING: The Moderator",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "story"
+            },
+            {
+              "text": "Job: PHOTOGRAPH THE ANOMALY",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "facjobs"
+            },
+            {
+              "text": "Terminal: JOBS shows today's facility jobs",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "facjobs"
+            },
+            {
+              "text": "Skip: terminal TUTORIAL SKIP",
+              "kind": "hint",
+              "done": false,
+              "progress": null,
+              "src": "guide"
+            }
+          ],
+          "preview": {
+            "v": 0,
+            "net": 0
+          }
+        },
+        "sensitivity": 0.0022
+      }
+    }
+  ],
+  "errors": [],
+  "consoleErrors": [
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.vulpem.com/' failed: Error during WebSocket handshake: Unexpected response code: 503",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://chorus.pjv.me/' failed: Establishing a tunnel via proxy server failed.",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    },
+    {
+      "text": "WebSocket connection to 'wss://nostr.tegila.com.br/' failed: Error during WebSocket handshake: Unexpected response code: 404",
+      "location": {
+        "url": "http://127.0.0.1:5174/node_modules/.vite/deps/dist-CLmkKIDF.js?v=d1212410",
+        "line": 82,
+        "column": 0,
+        "lineNumber": 82,
+        "columnNumber": 0
+      }
+    }
+  ],
+  "warnings": [],
+  "shots": [
+    {
+      "name": "native-dead-letter-entry-960.png",
+      "stage": "labelled-safe-orbit",
+      "sinceGameMs": 14442
+    },
+    {
+      "name": "final-960.png",
+      "stage": "labelled-safe-orbit",
+      "sinceGameMs": 15221
+    }
+  ],
+  "plans": [],
+  "gameLoadedAt": "2026-10-01T19:29:56.684Z",
+  "initial": {
+    "at": 7606,
+    "t": 0.1,
+    "screen": null,
+    "phase": "orbit",
+    "seed": 27835183,
+    "run": {
+      "day": 1,
+      "credits": 60,
+      "quota": 330,
+      "time": 480,
+      "moon": "hamsi"
+    },
+    "profile": "QA30Admit",
+    "selfId": "Ly7pf4k2g2",
+    "language": "en",
+    "settings": {
+      "quality": "auto",
+      "fullscreenPlay": true
+    },
+    "player": {
+      "p": [
+        2.4000000953674316,
+        -1.2606666624546052,
+        23
+      ],
+      "yaw": 3.141592653589793,
+      "pitch": 0,
+      "hp": 100,
+      "maxHp": 100,
+      "dead": false,
+      "indoor": false,
+      "inShip": false,
+      "grounded": false,
+      "crouch": false,
+      "half": 0.56,
+      "slots": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "slot": 0
+    },
+    "eye": [
+      2.4000000953674316,
+      0.35933333754539487,
+      23
+    ],
+    "input": {
+      "locked": false,
+      "keys": [],
+      "typing": false,
+      "hidden": false
+    },
+    "panel": null,
+    "prompt": {
+      "main": null
+    },
+    "hud": "● LIVE 120\nHP 100/100\nSTA 100/100\n0 lb\nLv.1 LURKER\n▮ 60\n·\nI\nPOCKETS\n0/8\n1\n2\n3\n4\n5\nLIGHT\nYou are the host. Lobby code: W30ADMIT. ESC > Copy join link",
+    "objectives": {
+      "visible": "◆Claim a free ship at the fleet office (9 m)",
+      "full": [
+        {
+          "text": "Claim a free ship at the fleet office (9 m)",
+          "kind": "main",
+          "first": true,
+          "done": false
+        }
+      ],
+      "preview": {
+        "v": 0,
+        "net": 0
+      }
+    },
+    "sensitivity": 0.0022
+  },
+  "bootLabel": "Fresh native dev autohost/local functional setup only, not genuine title/Host UI (already earned separately).",
+  "checkpointBefore": {
+    "run": {
+      "phase": "orbit",
+      "moon": "hamsi",
+      "seed": 27835183,
+      "weather": "clear",
+      "time": 480,
+      "day": 1,
+      "daysLeft": 3,
+      "quota": 330,
+      "quotaIndex": 0,
+      "sold": 0,
+      "credits": 60,
+      "upgrades": {},
+      "powerOn": true,
+      "buyRnd": 0.7524882410128925,
+      "forecast": {
+        "hq": "clear",
+        "hamsi": "clear",
+        "lufer": "rainy",
+        "palamut": "clear",
+        "levrek": "foggy",
+        "cipura": "stormy",
+        "orkinos": "eclipsed",
+        "w2sov": "stormy",
+        "w2sun": "eclipsed",
+        "x8feed": "clear",
+        "x503": "eclipsed",
+        "c9sky": "clear",
+        "dcable": "clear",
+        "echo13": "clear",
+        "ember13": "clear",
+        "archive20": "rainy",
+        "foundry20": "foggy",
+        "letterfield24": "clear",
+        "switchfield24": "clear",
+        "permitfield24": "clear",
+        "home": "clear",
+        "m5est": "foggy",
+        "m5cold": "foggy",
+        "istavrit": "rainy",
+        "kalkan": "foggy",
+        "lagos": "clear",
+        "br_level0": "foggy",
+        "gen0_0": "stormy",
+        "gen0_1": "eclipsed",
+        "gen0_2": "clear",
+        "gen0_3": "rainy"
+      },
+      "totalScrap": 0,
+      "runId": "63S3YY",
+      "threat": 0,
+      "fleet13": {
+        "v": 1,
+        "docked": false,
+        "selected": "courier",
+        "owned": {
+          "courier": {
+            "v": 1,
+            "m": {},
+            "parts": {
+              "plate": 0,
+              "bulk": 0,
+              "coil": 0,
+              "brk": 0
+            },
+            "paint": {
+              "c1": "orange",
+              "c2": "slate",
+              "pat": "hazard"
+            },
+            "theme": "steel",
+            "name": "PACKET COURIER",
+            "day": {},
+            "deco": {
+              "decal": "none",
+              "furn": []
+            },
+            "deck": {
+              "t": 0,
+              "rooms": [
+                null,
+                null,
+                null,
+                null
+              ]
+            }
+          }
+        }
+      },
+      "cargo13": {
+        "map": "__relay13:13:1:dock",
+        "p": [
+          7.7,
+          -1.25,
+          7
+        ],
+        "yaw": 0,
+        "driver": null,
+        "ids": []
+      },
+      "life13": {
+        "day": "27835183:1",
+        "time": 3.547249930300001,
+        "mission": {
+          "stage": "idle",
+          "paid": 0
+        }
+      },
+      "crew": {
+        "name": "Cursed Guild",
+        "tag": "CG",
+        "level": 1,
+        "xp": 0,
+        "into": 0,
+        "need": 250,
+        "members": 0,
+        "quotas": 0
+      },
+      "factions": {
+        "algorithm": 10,
+        "archive": 0,
+        "bureau": 0,
+        "darkweb": -10
+      },
+      "chains": {
+        "algorithm": 0,
+        "archive": 0,
+        "bureau": 0,
+        "darkweb": 0
+      },
+      "contracts": {
+        "key": "63S3YY:1:0",
+        "offers": [
+          {
+            "id": "archive:retrieval:1:1ydu",
+            "faction": "archive",
+            "type": "retrieval",
+            "n": 1,
+            "chain": null,
+            "rival": "algorithm",
+            "cls": "artifact",
+            "title": [
+              "Collector's Request",
+              "Koleksiyoncu Siparişi"
+            ],
+            "brief": [
+              "Bring back {n}× {cls} to the ship.",
+              "Gemiye {n}× {cls} getir."
+            ],
+            "reward": {
+              "credits": 75,
+              "rep": 8,
+              "xp": 80
+            },
+            "patron": "company"
+          },
+          {
+            "id": "algorithm:salvage:1:926f",
+            "faction": "algorithm",
+            "type": "salvage",
+            "n": 60,
+            "chain": 0,
+            "rival": "archive",
+            "title": [
+              "Onboarding Video",
+              "Tanıtım Videosu"
+            ],
+            "brief": [
+              "Bring back scrap on camera. Smile. Your first upload matters.",
+              "Kamerada hurda getir. Gülümse. İlk yüklemen önemli."
+            ],
+            "goal": [
+              "Secure ▮{n} of scrap in the ship today.",
+              "Bugün gemiye ▮{n} değerinde hurda getir."
+            ],
+            "reward": {
+              "credits": 90,
+              "rep": 12,
+              "xp": 120
+            },
+            "patron": "algorithm"
+          },
+          {
+            "id": "bureau:extraction:1:d286",
+            "faction": "bureau",
+            "type": "extraction",
+            "n": 1,
+            "chain": null,
+            "rival": "darkweb",
+            "title": [
+              "Hot Extract",
+              "Sıcak Tahliye"
+            ],
+            "brief": [
+              "Complete a facility extraction (or secure the Reactor Core).",
+              "Bir tesis tahliyesini tamamla (ya da Reaktör Çekirdeğini güvenceye al)."
+            ],
+            "reward": {
+              "credits": 95,
+              "rep": 8,
+              "xp": 80
+            },
+            "patron": "company"
+          }
+        ]
+      },
+      "contractLog": [],
+      "algo": {
+        "focus": null,
+        "mood": "curious",
+        "lines": [],
+        "n": 0,
+        "day": 0,
+        "scores": null
+      },
+      "sy": {
+        "v": 1,
+        "m": {},
+        "parts": {
+          "plate": 0,
+          "bulk": 0,
+          "coil": 0,
+          "brk": 0
+        },
+        "paint": {
+          "c1": "orange",
+          "c2": "slate",
+          "pat": "hazard"
+        },
+        "theme": "steel",
+        "name": "PACKET COURIER",
+        "day": {},
+        "deco": {
+          "decal": "none",
+          "furn": []
+        },
+        "deck": {
+          "t": 0,
+          "rooms": [
+            null,
+            null,
+            null,
+            null
+          ]
+        }
+      },
+      "hw": {
+        "v": 1,
+        "b": [],
+        "n": 1,
+        "s": {
+          "cr": 0,
+          "clout": 0,
+          "parts": 14,
+          "meals": 0,
+          "s1": 0,
+          "s2": 0,
+          "s3": 0,
+          "s4": 0
+        },
+        "days": 0,
+        "mk": {
+          "run": "63S3YY",
+          "day": 1
+        },
+        "lastRaid": -9,
+        "st": {
+          "repelled": 0,
+          "held": 0,
+          "breached": 0,
+          "visits": 0,
+          "produced": 0,
+          "collected": 0,
+          "built": 0
+        },
+        "xcap": 0
+      },
+      "hwr": null,
+      "h2": {
+        "v": 1,
+        "w": {
+          "left": 0,
+          "armed": 0,
+          "shield": 0,
+          "n": 0
+        },
+        "gate": {
+          "n": 0,
+          "v": 0,
+          "ok": 0
+        },
+        "pw": {
+          "sup": 0,
+          "dem": 0,
+          "un": 0
+        },
+        "inc": 0,
+        "gt": null,
+        "pvp": 0,
+        "exported": 0,
+        "st": {
+          "built": 0,
+          "exported": 0,
+          "exportedCr": 0,
+          "waves": 0,
+          "repelled": 0,
+          "lost": 0,
+          "harvested": 0,
+          "ghostWins": 0,
+          "ghostRuns": 0
+        },
+        "raided": {},
+        "mine": null,
+        "imp": [],
+        "rooms": 0,
+        "storage": 0,
+        "speed": 0,
+        "clout": 0,
+        "off": null,
+        "seed": 1826142240
+      },
+      "cycle": {
+        "v": 1,
+        "mode": "classic",
+        "stage": "days",
+        "sector": 0,
+        "fails": 0,
+        "cores": 0,
+        "bossDead": false,
+        "attempts": 0,
+        "declined": false,
+        "firstKills": {},
+        "endless": null,
+        "ks": {
+          "level": 2
+        },
+        "inst": null,
+        "live": null
+      },
+      "c3": {
+        "v": 1,
+        "trophies": {},
+        "gates": {
+          "v": 1,
+          "seq": 0,
+          "lastRoll": -1,
+          "rolled": -1,
+          "list": []
+        }
+      },
+      "s2": {
+        "v": 1,
+        "sp": [],
+        "seq": 0,
+        "mt": {},
+        "pl": {},
+        "on": [],
+        "ps": 1
+      },
+      "hullDamage": 0,
+      "sv:stove0": {
+        "id": "stove0",
+        "k": "stove",
+        "w": "ship",
+        "x": -3.25,
+        "y": 0,
+        "z": -3.15,
+        "yaw": 0,
+        "ver": 2,
+        "b": 1
+      },
+      "sv:brew0": {
+        "id": "brew0",
+        "k": "brew",
+        "w": "ship",
+        "x": -2.05,
+        "y": 0,
+        "z": -3.15,
+        "yaw": 0,
+        "ver": 2,
+        "b": 1,
+        "job": null
+      },
+      "sv:ship0": {
+        "id": "ship0",
+        "k": "crate",
+        "w": "ship",
+        "x": 6.61,
+        "y": 0,
+        "z": 1.75,
+        "yaw": -1.57,
+        "ver": 2,
+        "b": 1,
+        "t": 1,
+        "lab": "SHIP",
+        "col": "#c9a06a",
+        "n": 0,
+        "it": []
+      },
+      "sv:ship1": {
+        "id": "ship1",
+        "k": "planter",
+        "w": "ship",
+        "x": -6.65,
+        "y": 0,
+        "z": 0,
+        "yaw": 1.57,
+        "ver": 2,
+        "b": 1,
+        "cells": [
+          null,
+          null,
+          null
+        ]
+      },
+      "svStart": 1,
+      "vy": {
+        "v": 1,
+        "warp": "on",
+        "prev": null,
+        "mission": null,
+        "done": 0,
+        "earned": 0,
+        "lastWarpDay": -99,
+        "u": []
+      },
+      "zn": {
+        "v": 1,
+        "m": {},
+        "col": 5,
+        "pend": [],
+        "rt": 1790882995235,
+        "day": 0,
+        "stat": {
+          "cap": 0,
+          "held": 0,
+          "lost": 0,
+          "earned": 0
+        }
+      },
+      "st": {
+        "v": 1,
+        "k": "63S3YY",
+        "a": 0,
+        "act": 1,
+        "beats": {
+          "hire": 1
+        },
+        "done": {
+          "company": 0,
+          "algorithm": 0
+        },
+        "betrayed": {
+          "company": 0,
+          "algorithm": 0
+        },
+        "offers": [
+          {
+            "uid": "co_report:63S3YY:1:0",
+            "id": "co_report",
+            "patron": "company",
+            "p": {
+              "n": 2
+            },
+            "pay": {
+              "credits": 35,
+              "xp": 80
+            },
+            "shift": 7
+          }
+        ],
+        "offerKey": "63S3YY:1:0",
+        "job": null,
+        "ending": null,
+        "claimed": {},
+        "stat": {
+          "peak": 0,
+          "valley": 0,
+          "jobs": 0
+        },
+        "trend": {
+          "week": "2026-W40",
+          "type": "moderator",
+          "x": 0.4
+        }
+      },
+      "rs": {
+        "v": 1,
+        "b": [],
+        "rep": 0,
+        "pantry": {},
+        "till": 0,
+        "open": true,
+        "mk": {
+          "run": "63S3YY",
+          "day": 1
+        },
+        "gross": {
+          "day": -1,
+          "n": 0
+        },
+        "ct": null,
+        "ctDone": 0,
+        "ctAt": -99,
+        "inspAt": 0,
+        "st": {
+          "served": 0,
+          "angry": 0,
+          "earned": 0,
+          "reviews": 0,
+          "raves": 0
+        }
+      },
+      "hs": {
+        "v": 1,
+        "b": [],
+        "rb": 0,
+        "pile": 0,
+        "g": {
+          "run": "63S3YY",
+          "day": 1,
+          "n": 0
+        },
+        "cl": 1,
+        "who": {},
+        "by": {},
+        "st": {
+          "earned": 0,
+          "collects": 0
+        }
+      },
+      "industry13": {
+        "shift": 0,
+        "lastShift": null,
+        "jobs": [],
+        "goods": {},
+        "robot": null,
+        "report": null,
+        "heat": 0,
+        "serial": 0,
+        "soldShift": -1,
+        "soldValue": 0
+      },
+      "mm": {
+        "n": 1,
+        "nxt": {
+          "r": 1,
+          "a": [
+            "static",
+            "fatigue"
+          ]
+        },
+        "cur": null
+      },
+      "hub": {
+        "mode": "all",
+        "q": 0,
+        "boss": false,
+        "sale": false
+      },
+      "contract": null
+    },
+    "items": [
+      {
+        "id": "i1k",
+        "ty": "sv_meat",
+        "v": 0,
+        "bv": 0,
+        "p": [
+          -2.5487427711486816,
+          0.8252911567687988,
+          -1.6487265825271606
+        ],
+        "q": [
+          -0.0000028436102184059564,
+          0.9517847895622253,
+          0.0005006803548894823,
+          0.3067663013935089
+        ],
+        "h": null,
+        "o": null
+      },
+      {
+        "id": "i2k",
+        "ty": "sv_meat",
+        "v": 0,
+        "bv": 0,
+        "p": [
+          -2.282770872116089,
+          0.8878954648971558,
+          -1.6815216541290283
+        ],
+        "q": [
+          -0.09649922698736191,
+          0.33262765407562256,
+          -0.2611656188964844,
+          0.9010211825370789
+        ],
+        "h": null,
+        "o": null
+      },
+      {
+        "id": "i34",
+        "ty": "sv_p_wildmint",
+        "v": 0,
+        "bv": 0,
+        "p": [
+          -1.7034001350402832,
+          0.5221667289733887,
+          -1.6181055307388306
+        ],
+        "q": [
+          0.4768548607826233,
+          -0.5221040844917297,
+          -0.5221152305603027,
+          -0.47687798738479614
+        ],
+        "h": null,
+        "o": null
+      },
+      {
+        "id": "i4q",
+        "ty": "sv_p_wildmint",
+        "v": 0,
+        "bv": 0,
+        "p": [
+          -2.5517847537994385,
+          0.8227487802505493,
+          -1.3499743938446045
+        ],
+        "q": [
+          0.0005275850999169052,
+          0.09256600588560104,
+          0.00027066722395829856,
+          0.9957064390182495
+        ],
+        "h": null,
+        "o": null
+      },
+      {
+        "id": "i5j",
+        "ty": "sv_p_bloodberry",
+        "v": 0,
+        "bv": 0,
+        "p": [
+          -2.3279895782470703,
+          0.8598707318305969,
+          -1.3575901985168457
+        ],
+        "q": [
+          0.00025536841712892056,
+          0.9999094009399414,
+          -0.00015413854271173477,
+          0.013462633825838566
+        ],
+        "h": null,
+        "o": null
+      },
+      {
+        "id": "i6q",
+        "ty": "sv_p_bloodberry",
+        "v": 0,
+        "bv": 0,
+        "p": [
+          -1.9602630138397217,
+          0.8597915768623352,
+          -1.3485081195831299
+        ],
+        "q": [
+          0.0002545110764913261,
+          0.8934860825538635,
+          -0.0005059699760749936,
+          0.4490906596183777
+        ],
+        "h": null,
+        "o": null
+      },
+      {
+        "id": "i72",
+        "ty": "sv_s_wildmint",
+        "v": 0,
+        "bv": 0,
+        "p": [
+          -2.5511488914489746,
+          0.8248889446258545,
+          -1.0525157451629639
+        ],
+        "q": [
+          2.3244541580424993e-7,
+          0.9036035537719727,
+          -3.7220684134808835e-7,
+          0.4283698797225952
+        ],
+        "h": null,
+        "o": null
+      },
+      {
+        "id": "i80",
+        "ty": "sv_s_bloodberry",
+        "v": 0,
+        "bv": 0,
+        "p": [
+          -2.299886703491211,
+          0.8248889446258545,
+          -1.0472360849380493
+        ],
+        "q": [
+          3.7276259945429047e-7,
+          0.779228925704956,
+          2.0891043561732658e-7,
+          -0.626739501953125
+        ],
+        "h": null,
+        "o": null
+      },
+      {
+        "id": "i9t",
+        "ty": "sv_can",
+        "v": 0,
+        "bv": 0,
+        "p": [
+          -2.027430772781372,
+          0.8799749612808228,
+          -1.0300559997558594
+        ],
+        "q": [
+          0.10560128837823868,
+          0.6007019281387329,
+          0.13739325106143951,
+          0.7804670333862305
+        ],
+        "h": null,
+        "o": null
+      },
+      {
+        "id": "ia1",
+        "ty": "sv_sickle",
+        "v": 0,
+        "bv": 0,
+        "p": [
+          -2.5497536659240723,
+          0.871843159198761,
+          -0.7509151697158813
+        ],
+        "q": [
+          7.137780926314008e-7,
+          0.0972556620836258,
+          0.0000011906945474038366,
+          0.9952594637870789
+        ],
+        "h": null,
+        "o": null
+      }
+    ],
+    "slots": [
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "profile": {
+      "id": "dev-QA30Admit",
+      "name": "QA30Admit",
+      "suit": "orange",
+      "hat": "none",
+      "avatar": null,
+      "level": 1,
+      "xp": 0,
+      "xpCurve": 3,
+      "skillPoints": 0,
+      "skills": {
+        "vit": 0,
+        "end": 0,
+        "str": 0,
+        "agi": 0,
+        "lck": 0,
+        "tec": 0
+      },
+      "coins": 50,
+      "owned": [
+        "pipe"
+      ],
+      "loadout": {
+        "weapon": "pipe",
+        "head": null,
+        "body": null,
+        "perk": null
+      },
+      "cosmetics": {
+        "suits": [
+          "orange",
+          "green",
+          "blue"
+        ],
+        "hats": [
+          "none",
+          "cap"
+        ],
+        "faces": [
+          "none"
+        ],
+        "backs": [
+          "none"
+        ]
+      },
+      "bestiary": {},
+      "stats": {
+        "kills": 0,
+        "deaths": 0,
+        "quotasMet": 0,
+        "runs": 0,
+        "scrapCollected": 0,
+        "sold": 0,
+        "fish": 0,
+        "days": 0,
+        "bestArcade": 0,
+        "arcadeDay": -1,
+        "arcadeXp": 0,
+        "creatureKills": 0,
+        "scrapSecured": 0,
+        "vaults": 0,
+        "fuses": 0,
+        "jackpots": 0,
+        "bigWins": 0,
+        "slotSpins": 0,
+        "shinyFish": 0,
+        "flawlessDays": 0,
+        "closeShaves": 0,
+        "fired": 0,
+        "reactors": 0,
+        "daysSurvived": 0,
+        "coinsEarned": 0,
+        "maxCrew": 1,
+        "arcadePlays": 0,
+        "deathsBy": {},
+        "moonsVisited": [],
+        "custom": {},
+        "bestCrewLevel": 1
+      },
+      "bounties": [],
+      "bountyDay": -1,
+      "created": 1790882991262,
+      "_noSave": true,
+      "menuSecrets": {},
+      "eggs": {
+        "v": 1,
+        "found": {},
+        "n": {
+          "mug": 0,
+          "duck": 0,
+          "call": 0
+        },
+        "flags": {},
+        "meta": 0
+      },
+      "unlocks": {
+        "v": 1,
+        "mode": "all",
+        "q": 0,
+        "boss": false,
+        "sale": false,
+        "given": {}
+      },
+      "daily": {
+        "v": 1,
+        "hw": 1790883005250,
+        "tamper": 0,
+        "login": {
+          "last": "",
+          "streak": 0,
+          "best": 0,
+          "total": 0,
+          "grace": true,
+          "graceRun": 0,
+          "keys": []
+        },
+        "q": {
+          "day": "2026-10-01",
+          "rerolled": false,
+          "list": [
+            {
+              "id": "d_kill4",
+              "prog": 0,
+              "claimed": false
+            },
+            {
+              "id": "d_scrap800",
+              "prog": 0,
+              "claimed": false
+            },
+            {
+              "id": "d_sell2000",
+              "prog": 0,
+              "claimed": false
+            }
+          ]
+        },
+        "w": {
+          "week": "2026-W40",
+          "crate": false,
+          "list": [
+            {
+              "id": "w_melee30",
+              "prog": 0,
+              "claimed": false
+            },
+            {
+              "id": "w_anomaly3",
+              "prog": 0,
+              "claimed": false
+            },
+            {
+              "id": "w_boss1",
+              "prog": 0,
+              "claimed": false
+            }
+          ]
+        },
+        "firstWin": "",
+        "crates": [],
+        "crateSeq": 0,
+        "stash": {},
+        "season": {
+          "key": "2026-10",
+          "xp": 0,
+          "claimed": []
+        },
+        "caps": {},
+        "newKeys": [],
+        "stats": {}
+      },
+      "prestige": {
+        "stars": 0,
+        "history": [],
+        "peak": 0,
+        "claimed": {}
+      },
+      "mastery": {},
+      "emotes": [],
+      "rpg": {
+        "v": 1,
+        "role": "engineer",
+        "nodes": [],
+        "kit": {}
+      },
+      "achievements": {},
+      "titles": [],
+      "login": {
+        "day": -1,
+        "streak": 0,
+        "best": 0,
+        "total": 0
+      },
+      "codex": {
+        "scrap": {},
+        "moons": {},
+        "interiors": {},
+        "events": {},
+        "claimed": {},
+        "pct": 0
+      },
+      "weekly": {
+        "boards": {},
+        "best": {},
+        "runs": 0,
+        "quotas": 0
+      },
+      "crew": {
+        "name": "Cursed Guild",
+        "tag": "CG",
+        "xp": 0,
+        "founded": 1790882994460,
+        "members": {},
+        "days": 0,
+        "quotas": 0
+      },
+      "face": "none",
+      "back": "none",
+      "fun": {
+        "tasks": 0,
+        "taskDays": 0,
+        "bonuses": 0,
+        "goals": 0,
+        "juggleBest": 0,
+        "echoUses": 0,
+        "pranks": 0,
+        "symbiote": false
+      },
+      "pets": {
+        "v": 1,
+        "stable": [],
+        "active": null,
+        "incubator": [],
+        "clock": 0,
+        "skins": {
+          "c": [
+            "none",
+            "red"
+          ],
+          "h": [
+            "none"
+          ],
+          "v": [
+            "base"
+          ],
+          "s": [
+            "none"
+          ]
+        },
+        "dex": {},
+        "stats": {
+          "hatched": 0,
+          "adopted": 0,
+          "captured": 0,
+          "evolved": 0,
+          "fetched": 0,
+          "kills": 0
+        },
+        "dest": "me"
+      },
+      "cosm5": {
+        "skins": [],
+        "skin": "none",
+        "combo": [],
+        "flags": {},
+        "spent": 0
+      },
+      "guide": {
+        "v": 1,
+        "used": {
+          "role": 1790882998158
+        },
+        "shown": {},
+        "tut": {
+          "done": {},
+          "prog": {},
+          "said": {},
+          "s": "run",
+          "startedAt": 1790882994661
+        },
+        "seeded": 1
+      },
+      "tutorial": {
+        "dock": true
+      },
+      "shipyard": {
+        "v": 1,
+        "m": {},
+        "parts": {
+          "plate": 0,
+          "bulk": 0,
+          "coil": 0,
+          "brk": 0
+        },
+        "paint": {
+          "c1": "orange",
+          "c2": "slate",
+          "pat": "hazard"
+        },
+        "theme": "steel",
+        "name": "PACKET COURIER",
+        "day": {},
+        "deco": {
+          "decal": "none",
+          "furn": []
+        },
+        "deck": {
+          "t": 0,
+          "rooms": [
+            null,
+            null,
+            null,
+            null
+          ]
+        }
+      },
+      "homeworld": {
+        "v": 1,
+        "b": [],
+        "n": 1,
+        "s": {
+          "cr": 0,
+          "clout": 0,
+          "parts": 14,
+          "meals": 0,
+          "s1": 0,
+          "s2": 0,
+          "s3": 0,
+          "s4": 0
+        },
+        "days": 0,
+        "mk": {
+          "run": "63S3YY",
+          "day": 1
+        },
+        "lastRaid": -9,
+        "st": {
+          "repelled": 0,
+          "held": 0,
+          "breached": 0,
+          "visits": 0,
+          "produced": 0,
+          "collected": 0,
+          "built": 0
+        },
+        "xcap": 0
+      },
+      "homeworld2": {
+        "v": 1,
+        "seed": 1826142240,
+        "n": 1,
+        "p": [],
+        "ms": 1790882995230,
+        "wv": {
+          "left": 0,
+          "n": 0,
+          "armed": 0,
+          "shield": 0,
+          "called": 0
+        },
+        "st": {
+          "built": 0,
+          "exported": 0,
+          "exportedCr": 0,
+          "waves": 0,
+          "repelled": 0,
+          "lost": 0,
+          "harvested": 0,
+          "ghostWins": 0,
+          "ghostRuns": 0
+        },
+        "pvp": 0,
+        "g": {
+          "raided": {},
+          "mine": null,
+          "imported": []
+        }
+      },
+      "cycle3": {
+        "trophies": {},
+        "cases": {}
+      },
+      "ship2": {
+        "mounts": {},
+        "planters": {}
+      },
+      "survival": {
+        "hunger": 80,
+        "home": {}
+      },
+      "resto": {
+        "v": 1,
+        "b": [],
+        "rep": 0,
+        "pantry": {},
+        "till": 0,
+        "open": true,
+        "mk": {
+          "run": "63S3YY",
+          "day": 1
+        },
+        "gross": {
+          "day": -1,
+          "n": 0
+        },
+        "ct": null,
+        "ctDone": 0,
+        "ctAt": -99,
+        "inspAt": 0,
+        "st": {
+          "served": 0,
+          "angry": 0,
+          "earned": 0,
+          "reviews": 0,
+          "raves": 0
+        }
+      },
+      "homestead": {
+        "v": 1,
+        "b": [],
+        "rb": 0,
+        "pile": 0,
+        "g": {
+          "run": "63S3YY",
+          "day": 1,
+          "n": 0
+        },
+        "cl": 1,
+        "who": {},
+        "by": {},
+        "st": {
+          "earned": 0,
+          "collects": 0
+        }
+      },
+      "fleet13": {
+        "v": 1,
+        "docked": false,
+        "selected": "courier",
+        "owned": {
+          "courier": {
+            "v": 1,
+            "m": {},
+            "parts": {
+              "plate": 0,
+              "bulk": 0,
+              "coil": 0,
+              "brk": 0
+            },
+            "paint": {
+              "c1": "orange",
+              "c2": "slate",
+              "pat": "hazard"
+            },
+            "theme": "steel",
+            "name": "PACKET COURIER",
+            "day": {},
+            "deco": {
+              "decal": "none",
+              "furn": []
+            },
+            "deck": {
+              "t": 0,
+              "rooms": [
+                null,
+                null,
+                null,
+                null
+              ]
+            }
+          }
+        }
+      },
+      "g2": {},
+      "achievementsSeeded": true
+    }
+  },
+  "orbitAdmission": {
+    "text": "PAUSED\nON BREAK\nLobby code: W30ADMIT\nYou are the host · Players 1\nRESUME\nSTART DEAD LETTER RUN\nCard combat: waves, bosses and three upgrade choices at every level.\nCOPY JOIN LINK\nCOPY INVITE CODE\nCHARACTER\nSETTINGS\nLEAVE GAME\n↑↓ SELECT\nENTER CONFIRM\nESC BACK",
+    "native": {
+      "enabled": true,
+      "reason": ""
+    }
+  },
+  "deadLetterEntered": {
+    "token": "dl24:3769102353:4497",
+    "phase": "deadletter",
+    "stage": "intro",
+    "backup": {
+      "run": {
+        "phase": "orbit",
+        "moon": "hamsi",
+        "seed": 27835183,
+        "weather": "clear",
+        "time": 480,
+        "day": 1,
+        "daysLeft": 3,
+        "quota": 330,
+        "quotaIndex": 0,
+        "sold": 0,
+        "credits": 60,
+        "upgrades": {},
+        "powerOn": true,
+        "buyRnd": 0.7524882410128925,
+        "forecast": {
+          "hq": "clear",
+          "hamsi": "clear",
+          "lufer": "rainy",
+          "palamut": "clear",
+          "levrek": "foggy",
+          "cipura": "stormy",
+          "orkinos": "eclipsed",
+          "w2sov": "stormy",
+          "w2sun": "eclipsed",
+          "x8feed": "clear",
+          "x503": "eclipsed",
+          "c9sky": "clear",
+          "dcable": "clear",
+          "echo13": "clear",
+          "ember13": "clear",
+          "archive20": "rainy",
+          "foundry20": "foggy",
+          "letterfield24": "clear",
+          "switchfield24": "clear",
+          "permitfield24": "clear",
+          "home": "clear",
+          "m5est": "foggy",
+          "m5cold": "foggy",
+          "istavrit": "rainy",
+          "kalkan": "foggy",
+          "lagos": "clear",
+          "br_level0": "foggy",
+          "gen0_0": "stormy",
+          "gen0_1": "eclipsed",
+          "gen0_2": "clear",
+          "gen0_3": "rainy"
+        },
+        "totalScrap": 0,
+        "runId": "63S3YY",
+        "threat": 0,
+        "fleet13": {
+          "v": 1,
+          "docked": false,
+          "selected": "courier",
+          "owned": {
+            "courier": {
+              "v": 1,
+              "m": {},
+              "parts": {
+                "plate": 0,
+                "bulk": 0,
+                "coil": 0,
+                "brk": 0
+              },
+              "paint": {
+                "c1": "orange",
+                "c2": "slate",
+                "pat": "hazard"
+              },
+              "theme": "steel",
+              "name": "PACKET COURIER",
+              "day": {},
+              "deco": {
+                "decal": "none",
+                "furn": []
+              },
+              "deck": {
+                "t": 0,
+                "rooms": [
+                  null,
+                  null,
+                  null,
+                  null
+                ]
+              }
+            }
+          }
+        },
+        "cargo13": {
+          "map": "__relay13:13:1:dock",
+          "p": [
+            7.7,
+            -1.25,
+            7
+          ],
+          "yaw": 0,
+          "driver": null,
+          "ids": []
+        },
+        "life13": {
+          "day": "27835183:1",
+          "time": 3.547249930300001,
+          "mission": {
+            "stage": "idle",
+            "paid": 0
+          }
+        },
+        "crew": {
+          "name": "Cursed Guild",
+          "tag": "CG",
+          "level": 1,
+          "xp": 0,
+          "into": 0,
+          "need": 250,
+          "members": 0,
+          "quotas": 0
+        },
+        "factions": {
+          "algorithm": 10,
+          "archive": 0,
+          "bureau": 0,
+          "darkweb": -10
+        },
+        "chains": {
+          "algorithm": 0,
+          "archive": 0,
+          "bureau": 0,
+          "darkweb": 0
+        },
+        "contracts": {
+          "key": "63S3YY:1:0",
+          "offers": [
+            {
+              "id": "archive:retrieval:1:1ydu",
+              "faction": "archive",
+              "type": "retrieval",
+              "n": 1,
+              "chain": null,
+              "rival": "algorithm",
+              "cls": "artifact",
+              "title": [
+                "Collector's Request",
+                "Koleksiyoncu Siparişi"
+              ],
+              "brief": [
+                "Bring back {n}× {cls} to the ship.",
+                "Gemiye {n}× {cls} getir."
+              ],
+              "reward": {
+                "credits": 75,
+                "rep": 8,
+                "xp": 80
+              },
+              "patron": "company"
+            },
+            {
+              "id": "algorithm:salvage:1:926f",
+              "faction": "algorithm",
+              "type": "salvage",
+              "n": 60,
+              "chain": 0,
+              "rival": "archive",
+              "title": [
+                "Onboarding Video",
+                "Tanıtım Videosu"
+              ],
+              "brief": [
+                "Bring back scrap on camera. Smile. Your first upload matters.",
+                "Kamerada hurda getir. Gülümse. İlk yüklemen önemli."
+              ],
+              "goal": [
+                "Secure ▮{n} of scrap in the ship today.",
+                "Bugün gemiye ▮{n} değerinde hurda getir."
+              ],
+              "reward": {
+                "credits": 90,
+                "rep": 12,
+                "xp": 120
+              },
+              "patron": "algorithm"
+            },
+            {
+              "id": "bureau:extraction:1:d286",
+              "faction": "bureau",
+              "type": "extraction",
+              "n": 1,
+              "chain": null,
+              "rival": "darkweb",
+              "title": [
+                "Hot Extract",
+                "Sıcak Tahliye"
+              ],
+              "brief": [
+                "Complete a facility extraction (or secure the Reactor Core).",
+                "Bir tesis tahliyesini tamamla (ya da Reaktör Çekirdeğini güvenceye al)."
+              ],
+              "reward": {
+                "credits": 95,
+                "rep": 8,
+                "xp": 80
+              },
+              "patron": "company"
+            }
+          ]
+        },
+        "contractLog": [],
+        "algo": {
+          "focus": null,
+          "mood": "curious",
+          "lines": [],
+          "n": 0,
+          "day": 0,
+          "scores": null
+        },
+        "sy": {
+          "v": 1,
+          "m": {},
+          "parts": {
+            "plate": 0,
+            "bulk": 0,
+            "coil": 0,
+            "brk": 0
+          },
+          "paint": {
+            "c1": "orange",
+            "c2": "slate",
+            "pat": "hazard"
+          },
+          "theme": "steel",
+          "name": "PACKET COURIER",
+          "day": {},
+          "deco": {
+            "decal": "none",
+            "furn": []
+          },
+          "deck": {
+            "t": 0,
+            "rooms": [
+              null,
+              null,
+              null,
+              null
+            ]
+          }
+        },
+        "hw": {
+          "v": 1,
+          "b": [],
+          "n": 1,
+          "s": {
+            "cr": 0,
+            "clout": 0,
+            "parts": 14,
+            "meals": 0,
+            "s1": 0,
+            "s2": 0,
+            "s3": 0,
+            "s4": 0
+          },
+          "days": 0,
+          "mk": {
+            "run": "63S3YY",
+            "day": 1
+          },
+          "lastRaid": -9,
+          "st": {
+            "repelled": 0,
+            "held": 0,
+            "breached": 0,
+            "visits": 0,
+            "produced": 0,
+            "collected": 0,
+            "built": 0
+          },
+          "xcap": 0
+        },
+        "hwr": null,
+        "h2": {
+          "v": 1,
+          "w": {
+            "left": 0,
+            "armed": 0,
+            "shield": 0,
+            "n": 0
+          },
+          "gate": {
+            "n": 0,
+            "v": 0,
+            "ok": 0
+          },
+          "pw": {
+            "sup": 0,
+            "dem": 0,
+            "un": 0
+          },
+          "inc": 0,
+          "gt": null,
+          "pvp": 0,
+          "exported": 0,
+          "st": {
+            "built": 0,
+            "exported": 0,
+            "exportedCr": 0,
+            "waves": 0,
+            "repelled": 0,
+            "lost": 0,
+            "harvested": 0,
+            "ghostWins": 0,
+            "ghostRuns": 0
+          },
+          "raided": {},
+          "mine": null,
+          "imp": [],
+          "rooms": 0,
+          "storage": 0,
+          "speed": 0,
+          "clout": 0,
+          "off": null,
+          "seed": 1826142240
+        },
+        "cycle": {
+          "v": 1,
+          "mode": "classic",
+          "stage": "days",
+          "sector": 0,
+          "fails": 0,
+          "cores": 0,
+          "bossDead": false,
+          "attempts": 0,
+          "declined": false,
+          "firstKills": {},
+          "endless": null,
+          "ks": {
+            "level": 2
+          },
+          "inst": null,
+          "live": null
+        },
+        "c3": {
+          "v": 1,
+          "trophies": {},
+          "gates": {
+            "v": 1,
+            "seq": 0,
+            "lastRoll": -1,
+            "rolled": -1,
+            "list": []
+          }
+        },
+        "s2": {
+          "v": 1,
+          "sp": [],
+          "seq": 0,
+          "mt": {},
+          "pl": {},
+          "on": [],
+          "ps": 1
+        },
+        "hullDamage": 0,
+        "sv:stove0": {
+          "id": "stove0",
+          "k": "stove",
+          "w": "ship",
+          "x": -3.25,
+          "y": 0,
+          "z": -3.15,
+          "yaw": 0,
+          "ver": 2,
+          "b": 1
+        },
+        "sv:brew0": {
+          "id": "brew0",
+          "k": "brew",
+          "w": "ship",
+          "x": -2.05,
+          "y": 0,
+          "z": -3.15,
+          "yaw": 0,
+          "ver": 2,
+          "b": 1,
+          "job": null
+        },
+        "sv:ship0": {
+          "id": "ship0",
+          "k": "crate",
+          "w": "ship",
+          "x": 6.61,
+          "y": 0,
+          "z": 1.75,
+          "yaw": -1.57,
+          "ver": 2,
+          "b": 1,
+          "t": 1,
+          "lab": "SHIP",
+          "col": "#c9a06a",
+          "n": 0,
+          "it": []
+        },
+        "sv:ship1": {
+          "id": "ship1",
+          "k": "planter",
+          "w": "ship",
+          "x": -6.65,
+          "y": 0,
+          "z": 0,
+          "yaw": 1.57,
+          "ver": 2,
+          "b": 1,
+          "cells": [
+            null,
+            null,
+            null
+          ]
+        },
+        "svStart": 1,
+        "vy": {
+          "v": 1,
+          "warp": "on",
+          "prev": null,
+          "mission": null,
+          "done": 0,
+          "earned": 0,
+          "lastWarpDay": -99,
+          "u": []
+        },
+        "zn": {
+          "v": 1,
+          "m": {},
+          "col": 5,
+          "pend": [],
+          "rt": 1790882995235,
+          "day": 0,
+          "stat": {
+            "cap": 0,
+            "held": 0,
+            "lost": 0,
+            "earned": 0
+          }
+        },
+        "st": {
+          "v": 1,
+          "k": "63S3YY",
+          "a": 0,
+          "act": 1,
+          "beats": {
+            "hire": 1
+          },
+          "done": {
+            "company": 0,
+            "algorithm": 0
+          },
+          "betrayed": {
+            "company": 0,
+            "algorithm": 0
+          },
+          "offers": [
+            {
+              "uid": "co_report:63S3YY:1:0",
+              "id": "co_report",
+              "patron": "company",
+              "p": {
+                "n": 2
+              },
+              "pay": {
+                "credits": 35,
+                "xp": 80
+              },
+              "shift": 7
+            }
+          ],
+          "offerKey": "63S3YY:1:0",
+          "job": null,
+          "ending": null,
+          "claimed": {},
+          "stat": {
+            "peak": 0,
+            "valley": 0,
+            "jobs": 0
+          },
+          "trend": {
+            "week": "2026-W40",
+            "type": "moderator",
+            "x": 0.4
+          }
+        },
+        "rs": {
+          "v": 1,
+          "b": [],
+          "rep": 0,
+          "pantry": {},
+          "till": 0,
+          "open": true,
+          "mk": {
+            "run": "63S3YY",
+            "day": 1
+          },
+          "gross": {
+            "day": -1,
+            "n": 0
+          },
+          "ct": null,
+          "ctDone": 0,
+          "ctAt": -99,
+          "inspAt": 0,
+          "st": {
+            "served": 0,
+            "angry": 0,
+            "earned": 0,
+            "reviews": 0,
+            "raves": 0
+          }
+        },
+        "hs": {
+          "v": 1,
+          "b": [],
+          "rb": 0,
+          "pile": 0,
+          "g": {
+            "run": "63S3YY",
+            "day": 1,
+            "n": 0
+          },
+          "cl": 1,
+          "who": {},
+          "by": {},
+          "st": {
+            "earned": 0,
+            "collects": 0
+          }
+        },
+        "industry13": {
+          "shift": 0,
+          "lastShift": null,
+          "jobs": [],
+          "goods": {},
+          "robot": null,
+          "report": null,
+          "heat": 0,
+          "serial": 0,
+          "soldShift": -1,
+          "soldValue": 0
+        },
+        "mm": {
+          "n": 1,
+          "nxt": {
+            "r": 1,
+            "a": [
+              "static",
+              "fatigue"
+            ]
+          },
+          "cur": null
+        },
+        "hub": {
+          "mode": "all",
+          "q": 0,
+          "boss": false,
+          "sale": false
+        },
+        "contract": null
+      },
+      "items": [
+        {
+          "id": "i1k",
+          "ty": "sv_meat",
+          "v": 0,
+          "bv": 0,
+          "p": [
+            -2.5487427711486816,
+            0.8252911567687988,
+            -1.6487265825271606
+          ],
+          "q": [
+            -0.0000028436102184059564,
+            0.9517847895622253,
+            0.0005006803548894823,
+            0.3067663013935089
+          ],
+          "h": null,
+          "o": null
+        },
+        {
+          "id": "i2k",
+          "ty": "sv_meat",
+          "v": 0,
+          "bv": 0,
+          "p": [
+            -2.282770872116089,
+            0.8878954648971558,
+            -1.6815216541290283
+          ],
+          "q": [
+            -0.09649922698736191,
+            0.33262765407562256,
+            -0.2611656188964844,
+            0.9010211825370789
+          ],
+          "h": null,
+          "o": null
+        },
+        {
+          "id": "i34",
+          "ty": "sv_p_wildmint",
+          "v": 0,
+          "bv": 0,
+          "p": [
+            -1.7034001350402832,
+            0.5221667289733887,
+            -1.6181055307388306
+          ],
+          "q": [
+            0.4768548607826233,
+            -0.5221040844917297,
+            -0.5221152305603027,
+            -0.47687798738479614
+          ],
+          "h": null,
+          "o": null
+        },
+        {
+          "id": "i4q",
+          "ty": "sv_p_wildmint",
+          "v": 0,
+          "bv": 0,
+          "p": [
+            -2.5517847537994385,
+            0.8227487802505493,
+            -1.3499743938446045
+          ],
+          "q": [
+            0.0005275850999169052,
+            0.09256600588560104,
+            0.00027066722395829856,
+            0.9957064390182495
+          ],
+          "h": null,
+          "o": null
+        },
+        {
+          "id": "i5j",
+          "ty": "sv_p_bloodberry",
+          "v": 0,
+          "bv": 0,
+          "p": [
+            -2.3279895782470703,
+            0.8598707318305969,
+            -1.3575901985168457
+          ],
+          "q": [
+            0.00025536841712892056,
+            0.9999094009399414,
+            -0.00015413854271173477,
+            0.013462633825838566
+          ],
+          "h": null,
+          "o": null
+        },
+        {
+          "id": "i6q",
+          "ty": "sv_p_bloodberry",
+          "v": 0,
+          "bv": 0,
+          "p": [
+            -1.9602630138397217,
+            0.8597915768623352,
+            -1.3485081195831299
+          ],
+          "q": [
+            0.0002545110764913261,
+            0.8934860825538635,
+            -0.0005059699760749936,
+            0.4490906596183777
+          ],
+          "h": null,
+          "o": null
+        },
+        {
+          "id": "i72",
+          "ty": "sv_s_wildmint",
+          "v": 0,
+          "bv": 0,
+          "p": [
+            -2.5511488914489746,
+            0.8248889446258545,
+            -1.0525157451629639
+          ],
+          "q": [
+            2.3244541580424993e-7,
+            0.9036035537719727,
+            -3.7220684134808835e-7,
+            0.4283698797225952
+          ],
+          "h": null,
+          "o": null
+        },
+        {
+          "id": "i80",
+          "ty": "sv_s_bloodberry",
+          "v": 0,
+          "bv": 0,
+          "p": [
+            -2.299886703491211,
+            0.8248889446258545,
+            -1.0472360849380493
+          ],
+          "q": [
+            3.7276259945429047e-7,
+            0.779228925704956,
+            2.0891043561732658e-7,
+            -0.626739501953125
+          ],
+          "h": null,
+          "o": null
+        },
+        {
+          "id": "i9t",
+          "ty": "sv_can",
+          "v": 0,
+          "bv": 0,
+          "p": [
+            -2.027430772781372,
+            0.8799749612808228,
+            -1.0300559997558594
+          ],
+          "q": [
+            0.10560128837823868,
+            0.6007019281387329,
+            0.13739325106143951,
+            0.7804670333862305
+          ],
+          "h": null,
+          "o": null
+        },
+        {
+          "id": "ia1",
+          "ty": "sv_sickle",
+          "v": 0,
+          "bv": 0,
+          "p": [
+            -2.5497536659240723,
+            0.871843159198761,
+            -0.7509151697158813
+          ],
+          "q": [
+            7.137780926314008e-7,
+            0.0972556620836258,
+            0.0000011906945474038366,
+            0.9952594637870789
+          ],
+          "h": null,
+          "o": null
+        }
+      ],
+      "players": {
+        "Ly7pf4k2g2": {
+          "p": [
+            1.3097507522985552e-9,
+            0.01997039318084709,
+            -1
+          ],
+          "yaw": 1.5707963267948966,
+          "hp": 100,
+          "dead": false
+        }
+      }
+    },
+    "worldSeed": 3769102353,
+    "facilityToken": "dl24:3769102353:4497",
+    "facilityGroups": 1,
+    "player": {
+      "p": [
+        5.412406078875165e-10,
+        -299.9800000429153,
+        -33.150001525878906
+      ],
+      "indoor": true,
+      "dead": false
+    },
+    "objective": "◆Land on 56K-Dialup: pull the LEVER"
+  },
+  "checkpointEquality": {
+    "comparison": "IDs/type/value/baseValue/holder/owner/bag/inventory/soulbound/slot/affix/collected; naturally moving transforms retained raw but not asserted equal across input latency",
+    "itemSerialization": true,
+    "credits": 60,
+    "quota": 330,
+    "sold": 0,
+    "phase": "orbit"
+  },
+  "status": "PASS_NATIVE_ORBIT_PAUSE_ADMISSION_EMPTY_CHECKPOINT_ONLY",
+  "stopReason": "Bounded Wave30 menu scenario complete",
+  "cleanupErrors": [],
+  "final": {
+    "at": 21986,
+    "t": 5.2952429302999935,
+    "screen": null,
+    "phase": "deadletter",
+    "seed": 27835183,
+    "layoutSeed": 508253137,
+    "theme": "deadletter24",
+    "run": {
+      "day": 1,
+      "credits": 60,
+      "quota": 330,
+      "time": 480,
+      "moon": "deadletter24"
+    },
+    "profile": "QA30Admit",
+    "selfId": "Ly7pf4k2g2",
+    "language": "en",
+    "settings": {
+      "quality": "auto",
+      "fullscreenPlay": true
+    },
+    "player": {
+      "p": [
+        5.412406078875165e-10,
+        -299.9800000429153,
+        -33.150001525878906
+      ],
+      "yaw": 0,
+      "pitch": -0.055,
+      "hp": 100,
+      "maxHp": 100,
+      "dead": false,
+      "indoor": true,
+      "inShip": false,
+      "grounded": true,
+      "crouch": false,
+      "half": 0.56,
+      "slots": [
+        "ibj",
+        null,
+        null,
+        null,
+        null
+      ],
+      "slot": 0,
+      "held": "ibj"
+    },
+    "eye": [
+      5.412406078875165e-10,
+      -298.3600000429153,
+      -33.150001525878906
+    ],
+    "input": {
+      "locked": true,
+      "keys": [],
+      "typing": false,
+      "hidden": false
+    },
+    "panel": null,
+    "prompt": {
+      "main": null
+    },
+    "hud": "● LIVE 122\nHP 100/100\nSTA 100/100\n0 lb\nLv.1 LURKER\n▮ 60\n·\nI\nPOCKETS\n0/8\n1\nArchive Card Stack\n2\n3\n4\n5\nLIGHT",
+    "objectives": {
+      "visible": "◆Dead Letter / 1 / Archive entry\n◆LMB: throw cards. R: change special.",
+      "full": [
+        {
+          "text": "Dead Letter / 1 / Archive entry",
+          "kind": "main",
+          "done": false,
+          "progress": null,
+          "src": "deadletter24"
+        },
+        {
+          "text": "LMB: throw cards. R: change special.",
+          "kind": "sub",
+          "done": false,
+          "progress": null,
+          "src": "deadletter24"
+        }
+      ],
+      "preview": {
+        "v": 0,
+        "net": 0
+      }
+    },
+    "sensitivity": 0.0022
+  },
+  "finalGeometry": {
+    "eye": [
+      5.412406078875165e-10,
+      -298.3600000429153,
+      -33.150001525878906
+    ],
+    "forward": [
+      0,
+      -0.05497227502706774,
+      -0.9984878812375985
+    ],
+    "ray": {
+      "distance": 2.9110021591186523,
+      "point": {
+        "x": 5.412406078875165e-10,
+        "y": -298.5200244542108,
+        "z": -36.056601904015366
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      "kind": "static"
+    },
+    "floor": {
+      "distance": 1.019989013671875,
+      "point": {
+        "x": 5.412406078875165e-10,
+        "y": -299.9999890565872,
+        "z": -33.150001525878906
+      },
+      "normal": {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      }
+    },
+    "capsule": {
+      "half": 0.56,
+      "radius": 0.34,
+      "center": {
+        "x": 5.412406078875165e-10,
+        "y": -299.0799865722656,
+        "z": -33.150001525878906
+      },
+      "overlaps": []
+    },
+    "door": {
+      "open": false,
+      "actualCenter": [
+        2.6,
+        1.6,
+        3.5
+      ],
+      "point": [
+        3.98,
+        1.3,
+        3.39
+      ]
+    }
+  },
+  "queue": {
+    "report": [],
+    "last": [],
+    "pending": 0
+  },
+  "cleanup": {
+    "inputKeys": [],
+    "hidden": false,
+    "noClockOrDiagnosticWrappersInstalled": true,
+    "caught": {
+      "total": 0,
+      "ring": []
+    }
+  },
+  "durationAfterLoadMs": 15222,
+  "browserClosed": true
+}

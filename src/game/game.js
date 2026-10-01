@@ -9,12 +9,12 @@ import { Physics, G } from '../physics/physics.js';
 import { LightPool } from '../render/lightpool.js';
 import { Environment } from '../world/environment.js';
 import { buildShip, insideShip, SHIP } from '../world/ship.js';
-import { generateLayout, buildFacility, FACILITY_Y } from '../world/facility.js';
+import { generateLayout, buildFacility, queueFacilityBuild30, FACILITY_Y } from '../world/facility.js';
 import { mineshaftFootstep, mineshaftAmbience } from '../world/mineshaft.js';
 import { interiorFootstep, interiorAmbience } from '../world/interiors/index.js';
 import { updateThemeOneShots } from '../audio/extassets.js';
 import { stepSoundAt, surfaceAt } from '../world/setpieces.js';
-import { buildMoonOutdoor, fogCapFor } from '../world/terrain.js';
+import { buildMoonOutdoor, queueOutdoorBuild30, fogCapFor } from '../world/terrain.js';
 import { buildCompany } from '../world/company.js';
 import { LocalPlayer, footSurface } from '../entities/localplayer.js';
 import { RemotePlayer, suitColor } from '../entities/remote.js';
@@ -1010,26 +1010,34 @@ export class Game extends Emitter {
       });
     } else {
       step('outdoor', () => {
-        const outdoor = buildMoonOutdoor(run.seed, moon, { physics: this.physics, lightPool: this.lights });
-        this.world.outdoor = outdoor; this.world.terrain = outdoor.terrain;
-        this.scene.add(outdoor.group);
-        this.world.mapGroup = outdoor.group;
-        this.env.setMoon(BIOMES[moon.biome], run.weather || 'clear', 'moon');
-        { const sp = outdoor.mainExit?.spawn; if (sp) this.env.fogCap = outdoor.expedition ? null : fogCapFor(Math.hypot(sp.x, sp.z)); }   // [expedfix] expedition maps set their own fog (the barge dive needs 0.04 underwater)   // [pacing] the entrance stays visible from the ship
-        this.weatherMud = run.weather === 'rainy' || run.weather === 'stormy';
-        slide();
+        const publish = outdoor => {
+          this.world.outdoor = outdoor; this.world.terrain = outdoor.terrain;
+          this.scene.add(outdoor.group);
+          this.world.mapGroup = outdoor.group;
+          this.env.setMoon(BIOMES[moon.biome], run.weather || 'clear', 'moon');
+          { const sp = outdoor.mainExit?.spawn; if (sp) this.env.fogCap = outdoor.expedition ? null : fogCapFor(Math.hypot(sp.x, sp.z)); }   // [expedfix] expedition maps set their own fog (the barge dive needs 0.04 underwater)   // [pacing] the entrance stays visible from the ship
+          this.weatherMud = run.weather === 'rainy' || run.weather === 'stormy';
+          slide();
+        };
+        const context = { physics: this.physics, lightPool: this.lights };
+        if (q) queueOutdoorBuild30(run.seed, moon, context, q, publish);
+        else publish(buildMoonOutdoor(run.seed, moon, context));
       });
       let layout = null;
       const depthSpec = this.descent21?.spec?.(run);
       const size = depthSpec?.size ?? moon.size, lopts = moon.layoutOpts || this.facjobs?.layoutOpts?.(moon, run) || undefined;   // read now: worlds3 patches moon.size around this call
       step('layout', () => { layout = generateLayout(depthSpec?.seed ?? run.seed, depthSpec?.theme ?? moon.interior, size, depthSpec ? depthSpec.layoutOpts : lopts); });   // [cycle] Sector Core / Raid / Keystone moons carry layoutOpts
       step('facility', () => {
-        const fac = buildFacility(layout, { physics: this.physics, lightPool: this.lights });
-        this.world.facility = fac;
-        this.world.descent21Depth = depthSpec?.depth ?? 0;
-        fac.descent21Generation = { seed: depthSpec?.seed ?? run.seed, theme: depthSpec?.theme ?? moon.interior, size, layoutOpts: depthSpec ? depthSpec.layoutOpts : lopts };
-        this.env.interiorFog = fac.atmosphere || null;   // per-theme indoor haze (backrooms yellow, sewer green, server farm blue)
-        this.scene.add(fac.group);
+        const publish = fac => {
+          this.world.facility = fac;
+          this.world.descent21Depth = depthSpec?.depth ?? 0;
+          fac.descent21Generation = { seed: depthSpec?.seed ?? run.seed, theme: depthSpec?.theme ?? moon.interior, size, layoutOpts: depthSpec ? depthSpec.layoutOpts : lopts };
+          this.env.interiorFog = fac.atmosphere || null;   // per-theme indoor haze (backrooms yellow, sewer green, server farm blue)
+          this.scene.add(fac.group);
+        };
+        const context = { physics: this.physics, lightPool: this.lights };
+        if (q) queueFacilityBuild30(layout, context, q, publish);
+        else publish(buildFacility(layout, context));
       });
     }
     if (q) {

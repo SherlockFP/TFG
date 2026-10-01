@@ -41,7 +41,7 @@ function rollForecast(run) {
 
 export const hostMethods = {
   hostInit(runData, slot) {
-    this.saveSlot = slot || 1;
+    this.saveSlot = this.opts?.deadletter ? 0 : slot || 1;
     const run = runData ? { ...newRun(), ...runData, phase: 'orbit', time: 480 } : newRun();
     if (!run.forecast || !Object.keys(run.forecast).length) rollForecast(run);
     this.run = run;
@@ -494,7 +494,7 @@ export const hostMethods = {
       this.hostSetPhase('fired');
       const fresh = newRun();
       rollForecast(fresh);
-      { const { phase, ...rest } = fresh; saveRun(this.saveSlot, { ...rest, shipItems: [], crew: [this.profile.name] }); }
+      if (!this.opts?.deadletter) { const { phase, ...rest } = fresh; saveRun(this.saveSlot, { ...rest, shipItems: [], crew: [this.profile.name] }); }
       this.hostData.firedRun = true;
       this.later(() => {
         this.hostData.firedRun = false;
@@ -514,7 +514,7 @@ export const hostMethods = {
   },
 
   hostSave() {
-    if (this.destroyed || this.hostData?.firedRun || this.deadletter24?.active?.()) return;
+    if (this.destroyed || this.opts?.deadletter || this.hostData?.firedRun || this.deadletter24?.active?.()) return;
     const held = [...this.items.all()].filter((it) => it.holder && !String(it.holder).startsWith('c:') && !it.soulbound && it.type !== 'body' && (this.run.phase === 'orbit' || this.run.phase === 'company'));
     const shipItems = [...this.items.inShipItems(), ...held].filter((it) => !it.soulbound && it.type !== 'body').map((it, k) => ({
       ty: it.type, v: it.value, bv: it.baseValue, p: it.holder ? [3.5 + (k % 4) * 0.5, 1.0, -1.5 + Math.floor(k / 4) * 0.5] : it.obj.position.toArray(), q: it.holder ? [0, 0, 0, 1] : it.obj.quaternion.toArray(), col: it.collected ? 1 : undefined, af: it.affix || undefined, b: it.battery ?? undefined, c: it.charges ?? undefined, am: it.ammo ?? undefined,

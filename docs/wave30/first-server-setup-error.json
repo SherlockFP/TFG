@@ -1,0 +1,46 @@
+{
+  "method": "Wave30 GUIDED_INPUT + VISUAL_REPLAY. Fresh real title/Host/Local UI, actual keyboard/mouse/E/menu controls. Labelled body approach fixtures and final native orbit lifecycle fixture; not a walked expedition. Single native app RAF, no manual clock/item/AI/reward writes or hostReq. SwiftShader is not hardware profiling.",
+  "source": "1ac10f8+frozen-wave30",
+  "jsFreeze": "98c42810a60e049a75e542973fdd913ab90346775526082699649a8a8477fe31",
+  "allSourceFreeze": "06470904b1e3754a62c84fc484af8da40896f80e1d81c4905884ceee60f2b8b1",
+  "runtimeFreeze": "8669e33029f0b6165cb0d373c899cb1a4398e653e4b5c42ba11bbe98987fb208",
+  "ownerScore": 5,
+  "capMs": 180000,
+  "steps": [],
+  "milestones": [],
+  "errors": [],
+  "consoleErrors": [
+    {
+      "text": "Not allowed to load local resource: chrome-error://chromewebdata/src/core/events.js",
+      "location": {
+        "url": "",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      }
+    }
+  ],
+  "warnings": [],
+  "shots": [],
+  "plans": [],
+  "firstFailure": {
+    "stage": "bootstrap",
+    "error": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:5174/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:5174/\", waiting until \"load\"\u001b[22m\n",
+    "sinceGameMs": null
+  },
+  "status": "PARTIAL_STOP",
+  "stopReason": "First failure Error: page.goto: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:5174/\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:5174/\", waiting until \"load\"\u001b[22m\n",
+  "cleanupErrors": [
+    {
+      "name": "final",
+      "error": "Error: page.evaluate: Execution context was destroyed, most likely because of a navigation"
+    },
+    {
+      "name": "cleanup",
+      "error": "Error: page.evaluate: TypeError: Failed to fetch dynamically imported module: chrome-error://chromewebdata/src/core/events.js"
+    }
+  ],
+  "durationAfterLoadMs": null,
+  "browserClosed": true
+}
