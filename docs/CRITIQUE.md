@@ -1,4 +1,12 @@
-# Latest quality direction — Wave23
+# Planned next direction — Company casino and Dead Letter Run
+
+The owner requested a concrete plan for deeper Company gambling, cards/affixes and an optional survivors/Torghast-style combat descent. [The implementation plan](DEAD_LETTER_PLAN.md) records original places, a three-floor playable prototype, rare-drop versus guaranteed-draft progression, co-op/reward boundaries and staged acceptance criteria. Three agents audited casino, moons and native combat read-only. This is planning, not a shipped new mode or a score increase; the independent assessment remains7.9/10.
+
+The casino audit found a real economic priority: exhaustive native payout enumeration gives slot47.22% and wheel97.30% return; Packet's two-push/cash strategy gives143% expected redeemable return. Unlimited plays expose Credit farming, while slots punish too harshly. Versioned legacy-round preservation, whole-wallet payout liability and full card-session distributions precede expansion. Existing Stacked Deck and weapon/creature affixes are genuine foundations; personal draft progression, continuous mode-owned waves and one boss per floor still require new contracts.
+
+Moon count is less pressing than differentiated decisions. Cloud-9, Deep Cable and Dark Web already support distinct actions; 503 and Infinite Feed rely more on presentation. Planned optional route/privacy or energy-versus-salvage choices strengthen those places. The combat mode uses TFG's archive-worker identity, finite room themes and capped crowd pressure, while preserving normal custody, quota and chips. Natural full-shift readability and representative hardware evidence remain quality gates.
+
+# Latest implemented quality direction — Wave23
 
 This round addresses the previous review's three concrete priorities: furnished lift access, dark control separation and calm-arrival message competition. Default placement now waits for the normal refreshed Rapier step. Fresh browser QA exposed the old early-hook route certificate entering a wall and shelf; post-fix read-only certification passes at a different physical location. Standing-body routes retain actual furniture, normal E-open doors and required locks, and native controller regressions walk the entrance, all four crew positions and reverse routes. This improves a real reliability boundary rather than adding another catalogue.
 
