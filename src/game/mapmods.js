@@ -174,12 +174,14 @@ export function installMapmods(game) {
     const it = game.items.get(id);
     if (!it || !it.def || !['scrap', 'big', 'drop'].includes(it.def.kind) || it.soulbound || it._mmBoom || insideShip(it.obj.position)) return;
     if (!new RNG(hashString(`mmboom:${seed(mmOf())}:${S.boomSeq++}`)).chance(f.boom)) return;
+    const ownerFacility=game.world?.facility && Math.abs(it.obj.position.y-game.world.facility.layout.y)<40?game.world.facility:null, ownerDepth=game.run?.descent21?.depth|0;
+    const validOwner=()=>game.items.get(it.id)===it && (!ownerFacility || (ownerFacility===game.world?.facility && ownerDepth===(game.run?.descent21?.depth|0)));
     it._mmBoom = true; S.boom++;
     const at = () => [+it.obj.position.x.toFixed(2), +(it.obj.position.y + 0.3).toFixed(2), +it.obj.position.z.toFixed(2)];
     game.net.broadcast('fx', { k: 'snd', s: 'mine_beep', p: at(), v: 0.9, r: 6 });
-    game.later(() => { if (!S.disposed && it.state === 'world' && !it.holder) game.net.broadcast('fx', { k: 'snd', s: 'mine_beep', p: at(), v: 1, r: 6 }); }, BOOM_FUSE_MS * 0.5);
+    game.later(() => { if (!S.disposed && validOwner() && it.state === 'world' && !it.holder) game.net.broadcast('fx', { k: 'snd', s: 'mine_beep', p: at(), v: 1, r: 6 }); }, BOOM_FUSE_MS * 0.5);
     game.later(() => {
-      if (S.disposed || run()?.phase !== 'moon' || it.state !== 'world' || it.holder || insideShip(it.obj.position)) return;   // picked up in time: defused
+      if (S.disposed || !validOwner() || run()?.phase !== 'moon' || it.state !== 'world' || it.holder || insideShip(it.obj.position)) return;   // picked up in time: defused
       game.creatures.blast(it.obj.position.clone(), BOOM_R, capOne(BOOM_DMG, q()), null, 'explosion');
     }, BOOM_FUSE_MS);
   }

@@ -40,6 +40,7 @@ export function installDarkCollapse20(game) {
   }
   function occupants(){return [...(game.aiPlayers?.()||[]).filter(p=>!p.dead&&p.zone==='in'),...(game.items?.all?.()||[]).filter(it=>it.state==='world'&&it.obj?.position).map(it=>({pos:it.obj.position,radius:it.type==='body'?.75:.8,height:it.type==='body'?1:1.5}))];}
   const on=(ev,fn)=>{const off=game.mods?.on?.(ev,fn);if(off)offs.push(off);};
+  on('facilityWillChange',(_,g)=>{if(g===game)cleanup();});
   on('update',(dt,g)=>{if(g&&g!==game)return;if(!prepare())return;const st=state();if(!st)return;
     if(game.isHost){let changed=false;const alive=(game.aiPlayers?.()||[]).filter(p=>!p.dead&&p.zone==='in'&&!game.downed?.isDowned?.(p.id));
       for(const c of candidates){const s=st.rooms.find(s=>s.id===c.door.id);if(!s)continue;const crew=alive.filter(p=>insideRoom(p.pos,c.bounds));changed=stepDarkRoom(s,dt,crew.length>0,lit(c,crew))||changed;

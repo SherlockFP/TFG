@@ -391,10 +391,11 @@ export function installShift11(game) {
   // ==================================================================================== events
   on('netReady', (net) => bindNet(net));
   if (g.net) bindNet(g.net);
+  on('facilityWillChange',(w,gg)=>{if(gg===g)teardown();});
   on('mapLoaded', (world) => {
     teardown();
     const fac = world?.facility;
-    if (!fac || !cfgFor()) return;
+    if (!fac || (g.run?.descent21?.depth|0)>0 || !cfgFor()) return;
     try {
       if (!build(fac)) return;
       if (g.isHost) S.host = { step: 0, t: 0, warned: false, lost: {} };

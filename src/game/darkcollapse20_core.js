@@ -1,5 +1,5 @@
 export const DC20 = Object.freeze({ darkSeconds:45, warningSeconds:6, maxRooms:2 });
-export const collapseToken=run=>`${run?.moon}:${run?.seed}:${run?.day}`;
+export const collapseToken=run=>`${run?.moon}:${run?.seed}:${run?.day}${run?.descent21?.depth > 0 ? ':depth'+run.descent21.depth : ''}`;
 export const newDarkRoom=id=>({id,dark:0,warning:0,stage:'safe',rev:0});
 export function stepDarkRoom(s,dt,occupied,lit) {
   if(!s||s.stage==='collapsed'||!Number.isFinite(dt)||dt<=0)return false;

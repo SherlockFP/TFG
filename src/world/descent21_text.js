@@ -1,0 +1,3 @@
+import {addTranslations} from '../core/i18n.js';
+addTranslations({'DEPTH TRANSIT':'DERİNLİK AKTARMASI','EXPLORE TO AUTHORIZE':'YETKİ İÇİN KEŞFET','CALL / DESCEND / RETURN':'ÇAĞIR / İN / GERİ DÖN','TRANSIT BUSY':'AKTARMA MEŞGUL'},'tr');
+addTranslations({'DEPTH TRANSIT':'ТРАНЗИТ В ГЛУБИНУ','EXPLORE TO AUTHORIZE':'ИССЛЕДУЙТЕ ДЛЯ ДОПУСКА','CALL / DESCEND / RETURN':'ВЫЗОВ / СПУСК / ВОЗВРАТ','TRANSIT BUSY':'ТРАНЗИТ ЗАНЯТ'},'ru');

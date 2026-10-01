@@ -331,7 +331,7 @@ export function installTrade(game) {
       for (const r of game.remotes.values()) {
         if (r.dead || r.pos.distanceTo(game.player.pos) > TRADE_REACH + 0.3) continue;
         const p = r.pos.clone(); p.y += 1.15;
-        list.push({ pos: p, r: 0.8, reach: TRADE_REACH, label: tf('Trade with {name} [E]', { name: r.name }), sub: t('or press [N]'), action: () => requestTrade(r.id) });
+        list.push({ optionalPeer: true, pos: p, r: 0.8, reach: TRADE_REACH, label: tf('Trade with {name} [E]', { name: r.name }), sub: t('or press [N]'), action: () => requestTrade(r.id) });
       }
     }));
     offs.push(mods.on('phase', (ph, g) => {

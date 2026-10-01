@@ -20,7 +20,7 @@ export function installExpedition13(game) {
   undo.push(()=>{if(game.mods.itemModels?.get('e17_fuse')===fuseModel){if(oldModel)game.mods.itemModels.set('e17_fuse',oldModel);else game.mods.itemModels.delete('e17_fuse');}});
   const token=()=>`${game.run?.moon}:${game.run?.seed}:${game.run?.day}`;
   const state=()=>game.run?.expedition13?.token===token()?game.run.expedition13:null;
-  const active=()=>!!plan && game.run?.phase==='moon';
+  const active=()=>!!plan && game.run?.phase==='moon' && !(game.run?.descent21?.depth>0 && plan.kind==='vault');
   const sync=()=>game.broadcastRun?.(['expedition13','credits']);
   const player=id=>game.aiPlayerById?.(id)||game.aiPlayers?.().find(p=>p.id===id);
   const near=(p,node)=>p && !p.dead && !p.downed && Math.hypot(p.pos.x-node.x,p.pos.z-node.z)<=4 && Math.abs(p.pos.y-node.y)<3;
@@ -117,8 +117,8 @@ export function installExpedition13(game) {
   }
   offs.push(game.mods.on('warm',(reg,g)=>{if(g===game&&plan?.kind==='repair')reg(fuseModel(),'e17:fuse');}));
   offs.push(game.mods.on('netReady',(net,g)=>{if(g===game)bind(net);}));if(game.net)bind(game.net);
-  offs.push(game.mods.on('mapLoaded',(world,g)=>{
-    if(g!==game)return;restorePlan();if(game.missions14?.reserved(world))return;const r=game.run,m=MOONS[r?.moon];
+  const bindMap=(world,g)=>{
+    if(g!==game||game.run?.descent21?.depth>0)return;restorePlan();if(game.missions14?.reserved(world))return;const r=game.run,m=MOONS[r?.moon];
     if(!m || Math.max(r.quotaIndex|0,r.hub?.q|0)<1 || m.company||m.home||m.expedition||m.goal||m.instance||m.voyage||m.core||m.raid||['echoregistry','embercache'].includes(m.interior))return;
     const old=state();
     if(isField17(old?.kind)||(!old&&(r.seed>>>0)%4>=2))plan=planField17(world,old?.kind||((r.seed>>>0)%4===2?'repair':'uplink'));
@@ -128,7 +128,10 @@ export function installExpedition13(game) {
     mesh=buildFieldJob(plan);
     if(isField17(plan.kind)){const lamp=new THREE.Mesh(new THREE.BoxGeometry(.22,.16,.04),new THREE.MeshBasicMaterial({color:0xd7ac65}));lamp.name='field17-status';lamp.position.set(plan.anchor.x,plan.anchor.y+.1,plan.anchor.z+.16);mesh.add(lamp);}
     if(game.isHost){if(!old || old.kind!==plan.kind)r.expedition13=createFieldJob(token(),plan.kind);if(plan.kind==='vault')r.expedition13.gateId=plan.door.id;sync();}applyGate();
-  }));
+  };
+  offs.push(game.mods.on('mapLoaded',bindMap));
+  offs.push(game.mods.on('facilityWillChange',(world,g)=>{if(g===game&&plan?.kind==='vault')restorePlan();}));
+  offs.push(game.mods.on('facilityChanged',(world,g,depth)=>{if(g===game&&depth===0)bindMap(world,g);}));
   offs.push(game.mods.on('interactables',(out,g)=>{
     if(g!==game||!active()||game.player?.dead)return;const st=state();if(!st)return;
     const indoor=!!game.player?.indoor;

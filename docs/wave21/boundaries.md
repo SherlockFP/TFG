@@ -1,0 +1,19 @@
+# Facility streaming boundaries
+
+Native contract: `facilityWillChange(world, game, targetDepth)` fires before old facility disposal. `facilityChanged(world, game)` fires after the new facility is assigned and `run.descent21.depth` is final. Neither is a new landing; do not emit broad mapLoaded/moonPopulated for streaming.
+
+Maps2 removes its separate barriers/colliders before disposal, clears cached room geometry and advances an epoch so delayed challenge callbacks cannot spawn waves on another floor. Deep floors suppress old room prompts, server requests, states and ticks. Return to depth0 rebinds regenerated surface geometry with the original finite `run.m2s` used/done/sealed ledger. No population reset. Initial deep joins also suppress this surface module.
+
+Facility systems suppress host simulation and client prompts/status while deep. Surface state stays in the same `run.fac` object. Return rebinds host facility/core location without spawning components, keys or another core. A host resumed initially at depth can rebuild host bookkeeping from an existing matching surface state without respawning rewards. Private challenge/event timers pause; progression is not reset.
+
+Chests remove only facility chest models, lights and their separately owned colliders before streaming. Outdoor entities and their opened/claimed records stay identical. Facility chests remain unavailable for the remainder of that landing after any floor transition; this deliberate conservative limit avoids chest rerolls and duplicate XP/loot. Initial deep joins do not build facility chests. A normal next landing remains unchanged.
+
+Volatile scrap delayed callbacks now require the same item to remain in the native item manager. Indoor callbacks also require their original facility and depth. A disposed item or prior floor cannot create a phantom blast; per-landing affix caps remain unchanged.
+
+`descent21_boundaries.test.mjs` installs actual Maps2 world, Facility Systems, Chests and Mapmods with real generated facilities/physics. It verifies extra collider removal, deep request/tick/prompt refusal, same-object surface progression, original outdoor chest claimed record, surface rebinding and disposed-item/old-floor callback suppression. Browser elevator/peer/save layout checks belong to coordinator QA; these fixtures do not certify long-session economy.
+
+Additional surface extensions: Horror destroys its native closet/pocket/trap extras and host bookkeeping before streaming. These optional rooms/traps remain unavailable for the rest of that landing, including surface return, so finite herbs/boxes/ambushes are not rerolled. Paid unused traps are not refunded by transit; earned inventory/credits remain unchanged. Initial deep joins build no Horror extras. Shift11 purging geometry also tears down before disposal and does not build on an initial deep join.
+
+Events11 stops separate client water/terminal/strap geometry and timers before changing floors, while retaining the same pending crisis plan and earned state. Deep host requests/start/ticks/prompts are suppressed. The elevator refuses an active crisis before both start and commit; streaming never serves as an escape that cancels a running threat. Gear11 only removes old door-jam timer/visual bindings and unlocks its own ordinary jammed door; no charge refund. Elevator snapshot normalization for temporary jam locks belongs to the descent integration.
+
+Additional verification: native Horror installer17 groups passes with real extra-room teardown/deep join/return-no-reroll checks; Events11 installed1707 checks passes with pending-plan/deep-refusal/no-payout checks; boundary fixture now creates an actual Gear11 jam on a generated ordinary door and verifies its separate visual count1→0 and lock/jam cleanup before disposal. Shift11 existing44 plans/1320 steps pass. These safety limits deliberately do not introduce a new per-depth optional-room economy.

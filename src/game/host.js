@@ -758,7 +758,7 @@ export const hostMethods = {
       this.creatures.hostUpdate(dt);
     } else if (run.phase === 'moon') {
       hd.moonT = (hd.moonT || 0) + dt;
-      const rate = (16 * 60) / (this.config.dayLengthSec || 720);
+      const rate = (16 * 60) / (this.config.dayLengthSec || 720) * (this.descent21?.clockRate?.() ?? 1);
       run.time += dt * rate;
       hd.lastTimeSync -= dt;
       if (hd.lastTimeSync <= 0) { hd.lastTimeSync = 3; this.broadcastRun(['time']); }

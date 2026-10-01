@@ -17,7 +17,7 @@ import * as THREE from 'three';
 import { ITEMS, registerItem } from './items.js';
 import { RECIPES } from './recipes.js';
 import { addTranslations, t, getLang } from '../core/i18n.js';
-import { G } from '../physics/physics.js';
+import { G, RAPIER, groups } from '../physics/physics.js';
 import { insideShip } from '../world/ship.js';
 import { hudDock } from '../ui/dock.js';
 import { HOST_ONLY } from '../net/session.js';
@@ -25,6 +25,7 @@ import { EMOTE_BY_ID } from './emotes.js';
 import { synth, sin, ex, nz, clamp, fin3, arr3, movable } from './combat_kit.js';
 import { GRENADE_MODELS, createBallMesh } from '../models/grenades.js';
 import * as C from './grenades_core.js';
+import { BOOMBOT22_SOUNDS } from '../audio/boombot22_sfx.js';
 
 const { KINDS, THROW } = C;
 
@@ -95,6 +96,8 @@ const TR = {
   'COOKING': 'FİTİL KISALIYOR', 'Blinded!': 'Kör oldun!', 'DANCE!': 'DANS!', 'Rare bomb': 'Nadir bomba',
 };
 addTranslations(TR);
+addTranslations({'Hold LMB, release to deploy':'LMB tut, bırakınca konuşlandır','Echo Runner':'Yankı Koşucusu','A ground runner that bounces off walls, lures creatures and warns before its small blast. Keep clear.':'Yerde ilerler, duvarlardan seker, yaratıkları çeker ve küçük patlamasından önce uyarır. Uzak dur.'});
+addTranslations({'Hold LMB, release to deploy':'Удерживай ЛКМ, отпусти для запуска','Echo Runner':'Эхо-бегун','A ground runner that bounces off walls, lures creatures and warns before its small blast. Keep clear.':'Наземный робот отскакивает от стен, приманивает существ и предупреждает перед небольшим взрывом. Держитесь подальше.'},'ru');
 
 // ================================================================================================== procedural sounds
 const SOUNDS = {
@@ -130,7 +133,7 @@ export function installGrenades(game) {
     obj[name] = mine;
     undo.push(() => { if (obj[name] === mine) { if (had) obj[name] = raw; else delete obj[name]; } });
   }
-  if (mm?.soundGens) for (const [n, fn] of Object.entries(SOUNDS)) if (!mm.soundGens.has(n)) mm.soundGens.set(n, fn);
+  if (mm?.soundGens) for (const [n, fn] of Object.entries({...SOUNDS,...BOOMBOT22_SOUNDS})) if (!mm.soundGens.has(n)) mm.soundGens.set(n, fn);
   if (mm?.itemModels) for (const [id, fn] of Object.entries(GRENADE_MODELS)) if (!mm.itemModels.has(id)) mm.itemModels.set(id, () => fn());
 
   const snd = (name, pos, vol = 1, pitch, opts = {}) => {
@@ -178,8 +181,8 @@ export function installGrenades(game) {
   function makeBallObj(kind, gid, by, o, v, fuse) {
     const def = KINDS[kind];
     const mesh = createBallMesh(kind, def.color);
-    mesh.position.copy(o); g.scene.add(mesh);
-    const b = { gid, kind, def, by, y0: o.y, p: C.makeBall(o, v, { sticky: !!def.sticky }), fuse, mesh, age: 0, stickT: -1, beepT: 0.12, ledT: 0, cid: null, off: null, spin: Math.random() * 6 };
+    mesh.position.copy(o); g.scene.add(mesh);if(def.runner)snd('bb22_drive',o,.45,1,{ref:3,max:35});
+    const b = { gid, kind, def, by, y0: o.y, p: C.makeBall(o, v, { sticky: !!def.sticky }), fuse, mesh, warnLeft:-1, pulseT:0, syncT:0, snapshot:null, age: 0, stickT: -1, beepT: 0.12, ledT: 0, cid: null, off: null, spin: Math.random() * 6 };
     balls.set(gid, b);
     return b;
   }
@@ -191,7 +194,8 @@ export function installGrenades(game) {
     const o = fin3(d.o), v = fin3(d.v);
     if (!o || !v || !KINDS[d.ty] || balls.has(d.gid)) return;
     if (balls.size > 40) return;
-    makeBallObj(d.ty, d.gid, d.by, o, v, clamp(Number(d.f) || KINDS[d.ty].fuse, 0.3, 6));
+    seq=Math.max(seq,Number(d.gid)||0);
+    makeBallObj(d.ty, d.gid, d.by, o, v, clamp(Number(d.f) || KINDS[d.ty].fuse, 0.3, KINDS[d.ty].runner?10:6));
   }
   function ballEvent(b, ev) {
     if (ev.stick) {
@@ -201,10 +205,48 @@ export function installGrenades(game) {
     } else if (ev.bounce && ev.speed > 1.4) snd('gr_tink', tmpA.set(ev.x, ev.y, ev.z), clamp(ev.speed / 8, 0.15, 0.8), 0.85 + Math.random() * 0.3, { ref: 3 });
   }
   function ballClock(b) { return b.def.sticky ? b.stickT : b.age; }
+  const runnerShape=new RAPIER.Cuboid(.22,.22,.22),runnerQ={x:0,y:0,z:0,w:1};
+  const runnerSweep=(x,y,z,dx,dy,dz,len)=>{
+    const hit=g.physics.world?.castShape({x,y,z},runnerQ,{x:dx,y:dy,z:dz},runnerShape,.001,len,true,undefined,groups(0xffff,G.STATIC|G.DOOR));
+    if(!hit)return null;const n=hit.normal1||hit.normal2||{x:-dx,y:-dy,z:-dz};
+    return {distance:hit.time_of_impact??hit.timeOfImpact??0,nx:n.x,ny:n.y,nz:n.z};
+  };
+  function runnerState(b){return {k:'rb',gid:b.gid,p:[b.p.x,b.p.y,b.p.z],v:[b.p.vx,b.p.vy,b.p.vz],age:b.age,w:b.warnLeft,by:b.by};}
+  function onRunner(d){if(g.isHost)return;const b=balls.get(d.gid),pos=fin3(d.p),vel=fin3(d.v);if(!b?.def.runner||!pos||!vel)return;
+    b.snapshot={pos,vel};b.age=clamp(Number(d.age)||0,0,12);b.warnLeft=Number.isFinite(d.w)?clamp(d.w,-1,2):-1;
+    // Replicas retain the native host state for a later authority transfer; only visuals interpolate.
+    b.p.vx=vel.x;b.p.vy=vel.y;b.p.vz=vel.z;
+  }
+  function updateRunner(b,dt){
+    const p=b.p;
+    if(g.isHost){
+      if(b.snapshot){p.x=b.snapshot.pos.x;p.y=b.snapshot.pos.y;p.z=b.snapshot.pos.z;b.snapshot=null;}
+      if(b.warnLeft>=0)b.warnLeft=Math.max(0,b.warnLeft-dt);
+      if(b.warnLeft<0){
+        let trigger=b.age>=b.def.fuse-b.def.warn;
+        if(b.age>.6)for(const c of g.creatures.host.values()){
+          if(c.dead||c.def?.hazard||!(c.def?.dmg>0)||(!c.def?.power&&!c.def?.xp&&!c.def?.coin&&!c.def?.boss))continue;
+          const center=ctrOf(c),at=tmpA.set(p.x,p.y,p.z);if(center.distanceTo(at)<2.5&&g.physics.lineOfSight(at,center,G.STATIC|G.DOOR)){trigger=true;break;}
+        }
+        if(trigger){b.warnLeft=b.def.warn;bcast(runnerState(b));}
+      }
+      C.stepRunner(p,dt,runnerSweep,b.def.speed,b.warnLeft>=0);
+      b.pulseT-=dt;if(b.pulseT<=0&&b.warnLeft<0){b.pulseT=b.def.pulse;noise(tmpA.set(p.x,p.y,p.z),b.def.lure);}
+      b.syncT-=dt;if(b.syncT<=0){b.syncT=.1;bcast(runnerState(b));}
+      if(p.y<b.y0-80){removeBall(b);bcast({k:'bm',gid:b.gid,ty:b.kind,dud:1,p:[p.x,p.y,p.z]});return;}
+      if(b.warnLeft===0){hostBoom(b);return;}
+    }else if(b.snapshot){p.x+=(b.snapshot.pos.x-p.x)*Math.min(1,dt*14);p.y+=(b.snapshot.pos.y-p.y)*Math.min(1,dt*14);p.z+=(b.snapshot.pos.z-p.z)*Math.min(1,dt*14);}
+    if(b.mesh){b.mesh.position.set(p.x,p.y,p.z);if(Math.hypot(p.vx,p.vz)>.01)b.mesh.rotation.y=Math.atan2(p.vx,p.vz);
+      const warning=b.warnLeft>=0;b.beepT-=dt;if(b.beepT<=0){b.beepT=warning?.2:.8;snd(warning?'bb22_warn':'bb22_ping',b.mesh.position,.4,1,{ref:3,max:35});}
+      if(b.mesh.userData.led)b.mesh.userData.led.visible=warning&&Math.sin(b.age*24)>0;
+    }
+    if(!g.isHost&&b.age>14)removeBall(b);
+  }
   function updateBalls(dt) {
     for (const b of [...balls.values()]) {
       const p = b.p;
       b.age += dt;
+      if(b.def.runner){updateRunner(b,dt);continue;}
       if (b.cid) {
         const v = g.creatures.views.get(b.cid);
         if (v && b.off) { p.x = v.pos.x + b.off.x; p.y = v.pos.y + b.off.y; p.z = v.pos.z + b.off.z; }
@@ -310,6 +352,7 @@ export function installGrenades(game) {
   }
   function drawPreview(kind, hold) {
     const def = KINDS[kind];
+    if(def.runner){hidePreview();return;}
     const { dir, o } = aimVectors();
     const v = velFor(dir, hold);
     const fuse = C.fuseAfterCook(kind, C.cookTime(hold));
@@ -371,19 +414,20 @@ export function installGrenades(game) {
     if (key !== hudKey) {
       hudKey = key;
       if (!key) hud.style.display = 'none';
-      else { hud.style.display = 'block'; hudText.textContent = `${t(KINDS[kind].name).toLocaleUpperCase(getLang())}${(it.charges ?? 1) > 1 ? '  x' + it.charges : ''}`; hudHint.textContent = t('Hold LMB to aim, release to throw'); }
+      else { hud.style.display = 'block'; hudText.textContent = `${t(KINDS[kind].name).toLocaleUpperCase(getLang())}${(it.charges ?? 1) > 1 ? '  x' + it.charges : ''}`; hudHint.textContent = t(KINDS[kind].runner?'Hold LMB, release to deploy':'Hold LMB to aim, release to throw'); }
     }
     if (!cook.it) return;
     if (held() !== cook.it || !canAct()) { cancelCook(); return; }
     if (!g.input.mouseDown(0)) { releaseThrow(); return; }
     cook.t += dt;
+    if(KINDS[cook.kind].runner){hidePreview();barBox.style.display='none';return;}
     const power = C.throwPower(cook.t), cooking = cook.t > THROW.chargeT;
     drawPreview(cook.kind, cook.t);
     barBox.style.display = 'block';
     barFill.style.width = Math.round(clamp((cook.t / (THROW.chargeT + THROW.cookMax)) * 100, 0, 100)) + '%';
     barFill.style.background = cooking ? 'linear-gradient(90deg,#ff8a3d,#ff3020)' : 'linear-gradient(90deg,#ffe07a,#ff8a3d)';
     void power;
-    if (cooking && !KINDS[cook.kind].sticky) {          // the fuse burns in your hand: beeps get faster
+    if (cooking && !KINDS[cook.kind].sticky && !KINDS[cook.kind].runner) {          // the fuse burns in your hand: beeps get faster
       cook.beepT -= dt;
       if (cook.beepT <= 0) {
         const left = C.fuseAfterCook(cook.kind, C.cookTime(cook.t)), prog = 1 - clamp(left / KINDS[cook.kind].fuse, 0, 1);
@@ -404,6 +448,13 @@ export function installGrenades(game) {
     if (g.time - (lastThrow.get(from) ?? -9) < 0.3) return;
     const o = fin3(d.o), v = fin3(d.v);
     if (!o || !v) return;
+    if(KINDS[kind].runner){
+      const actor=g.aiPlayerById?.(from);if(!actor||actor.dead||g.downed?.isDowned?.(from)||it.inv||!Number.isInteger(it.charges??1)||(it.charges??1)<=0||!['moon','company','orbit'].includes(g.run?.phase))return;
+      const active=[...balls.values()].filter(b=>b.def.runner);if(active.length>=6||active.filter(b=>b.by===from).length>=2)return;
+      const eye=actor.eye;if(!eye||eye.distanceTo(o)>1||!g.physics.lineOfSight(eye,o,G.STATIC|G.DOOR))return;
+      const forward=actor.look?.clone();if(!forward)return;forward.y=0;if(forward.lengthSq()<.01)return;forward.normalize();v.copy(forward).multiplyScalar(KINDS[kind].speed);
+      const clearance=runnerSweep(o.x,o.y,o.z,forward.x,0,forward.z,.25);if(clearance&&clearance.distance<.22)return;
+    }
     const sp = from === g.selfId ? g.player.pos : g.remotes.get(from)?.pos;
     if (sp && sp.distanceTo(o) > 5) return;
     lastThrow.set(from, g.time);
@@ -444,7 +495,7 @@ export function installGrenades(game) {
     for (const { c, d } of creaturesIn(pos, R, true)) {
       const direct = o.direct === c.id;
       const f = direct ? 1.25 : 1 - 0.6 * clamp(d / R, 0, 1);
-      hurt(c, dmg * f, by, { stun: o.stun || 0 });
+      hurt(c, (c.def?.boss && o.bossDmg!=null?o.bossDmg:dmg) * f, by, { stun: o.stun || 0 });
     }
     if (o.crew) {
       const up = pos.clone().setY(pos.y + 0.3);
@@ -452,7 +503,7 @@ export function installGrenades(game) {
         if (p.dead || p.inShip) continue;
         const d = p.pos.distanceTo(pos);
         if (d > R || !g.physics.lineOfSight(up, p.eye, G.STATIC | G.DOOR)) continue;
-        g.hostHurtPlayer(p.id, Math.round(Math.min(35, dmg * o.crew * (1 - d / R))), 'explosion', by, pos);
+        g.hostHurtPlayer(p.id, Math.round(Math.min(o.crewMax??35, dmg * o.crew * (1 - d / R))), 'explosion', by, pos);
       }
     }
   }
@@ -468,6 +519,7 @@ export function installGrenades(game) {
     bcast({ k: 'bm', gid: b.gid, ty: kind, p: P3(at), by });
     const fxOn = (o) => g.net.broadcast('fx', { k: 'crfx', ...o });
     switch (kind) {
+      case 'bouncer':{noise(at,def.noise);hurtArea(at,def.R,def.dmg,by,{bossDmg:def.bossDmg,crew:def.crew,crewMax:def.crewMax});break;}
       case 'stun': {
         g.net.broadcast('fx', { k: 'stunbang', p: P3(at) });
         noise(at, def.noise);
@@ -941,6 +993,7 @@ export function installGrenades(game) {
     const def = KINDS[d.ty];
     if (!def || d.dud) return;
     switch (d.ty) {
+      case 'bouncer':sphereFx(pos,0xe3bb79,.2,def.R,.35,.55);burst(pos,'sparks',.7);snd('gr_bang',pos,.65,1.3,{ref:5,max:55});shake(pos,.18,10);break;
       case 'stun': break;                                                // the stock 'stunbang' fx draws it
       case 'flash':
         snd('gr_bang', pos, 1.2, 1, { ref: 8, max: 90 });
@@ -1011,6 +1064,7 @@ export function installGrenades(game) {
     if (from && g.net && from !== g.net.hostId && from !== g.selfId) return;
     safe('net:' + d.k, () => {
       switch (d.k) {
+        case 'rb': onRunner(d); break;
         case 'th': onThrowMsg(d); break;
         case 'sk': onStick(d); break;
         case 'bm': onBoom(d); break;
@@ -1026,7 +1080,12 @@ export function installGrenades(game) {
     try { HOST_ONLY.add('grfx'); } catch { /* the session tolerates it missing */ }
     net.on_('grfx', onNet);
   });
-  on('registerHandlers', (H, gg) => { if (gg === g) H('grth', hostThrow); });
+  on('registerHandlers', (H, gg) => { if (gg === g){H('grth', hostThrow);H('grrs',(_,from)=>{if(!g.isHost||!g.aiPlayerById?.(from))return;for(const b of balls.values())if(b.def.runner){g.net.sendTo(from,'grfx',{k:'th',gid:b.gid,ty:b.kind,o:[b.p.x,b.p.y,b.p.z],v:[b.p.vx,b.p.vy,b.p.vz],by:b.by,f:b.fuse});g.net.sendTo(from,'grfx',runnerState(b));}});} });
+
+  // Map reconstruction may happen without a phase transition for a joining peer.
+  on('mapLoaded',(_,gg)=>{if((!gg||gg===g)&&!g.isHost)g.net?.request?.('grrs',{});});
+
+  on('facilityWillChange',()=>{for(const b of [...balls.values()])if(b.def.runner&&b.p.y<-100){if(g.isHost)bcast({k:'bm',gid:b.gid,ty:b.kind,dud:1,p:[b.p.x,b.p.y,b.p.z]});removeBall(b);}});
 
   // ---------------------------------------------------------------- housekeeping
   function clearAll() {
@@ -1051,7 +1110,7 @@ export function installGrenades(game) {
       if (u >= 1) { anims.splice(i, 1); a.end?.(); }
     }
   }
-  on('phase', (ph, gg) => { if (gg === g) safe('phase', clearAll); });
+  on('phase', (ph, gg) => { if (gg === g){safe('phase', clearAll);if(!g.isHost)g.net?.request?.('grrs',{});} });
   on('update', (dt, gg) => {
     if (gg !== g || disposed) return;
     safe1('throw', updateThrow, dt);

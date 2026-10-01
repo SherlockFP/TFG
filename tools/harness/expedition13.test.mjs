@@ -59,6 +59,7 @@ if(valid) {
  okc(api.plan()?.kind==='vault','one real vault job chosen');
  const st=api.state(), token=st.token, request=(op,i)=>{game.time++;handlers.get('e13req')({token,op,i},p.id);};
  handlers.get('vault')({id:plan.door.id},p.id);okc(plan.door.locked,'keypad bypass denied');
+ game.run.descent21={depth:1};request('accept');okc(!st.accepted,'old surface vault cannot start on another floor');game.run.descent21.depth=0;
  request('accept');okc(st.accepted,'job explicitly accepted');
  const original=p.pos.clone();p.pos.x+=100;request('relay',0);okc(st.values[0]===0,'remote relay exploit denied');p.pos.copy(original);
  game.run.industry13.robot={};request('robot');okc(!st.drone&&game.run.credits===100,'busy scout denied');game.run.industry13.robot=null;
@@ -74,6 +75,7 @@ if(valid) {
  request('robot');okc(game.run.credits===65,'completed gate cannot repeat service');
  // Same-map late peer/map reload retains completion and opens its matching gate.
  listeners.get('mapLoaded')(game.world,game);okc(api.state().done&&api.plan().door.open,'same-map completion retained');
+ game.run.descent21.depth=1;listeners.get('facilityWillChange')(game.world,game,1);okc(!api.plan(),'old vault geometry cleared before streaming');game.run.descent21.depth=0;listeners.get('facilityChanged')(game.world,game,0);okc(api.state()===st&&api.state().done,'surface vault keeps the same finite completion ledger');request('robot');okc(game.run.credits===65,'surface return never recharges completed robot service');
  listeners.get('phase')('orbit',game);okc(game.run.expedition13===null,'orbit clears job and robot lease');
  game.run.seed=1234;game.run.expedition13=K.createFieldJob('hamsi:1234:1','signal');game.world={terrain:{pathPts:Array.from({length:25},(_,i)=>({x:0,z:i*4})),heightAt:()=>0},outdoor:{group:new THREE.Group(),solidAt:()=>false}};
  listeners.get('mapLoaded')(game.world,game);const signalPlan=api.plan(),signalState=api.state();

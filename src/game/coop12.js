@@ -337,7 +337,7 @@ export function installCoop12(game) {
         if (Math.hypot(rp.x - P.pos.x, rp.z - P.pos.z) > C.HF.prompt || Math.abs(rp.y - P.pos.y) > 1.5 || !C.facing(P.yaw, P.pos, rp, 0.5)) continue;
         const hand = S.hands.get(id), offered = hand && hand.to === game.selfId && hand.until > S.clock;
         out.push({
-          pos: new V3(rp.x, rp.y + 1.2, rp.z), r: 1.0, reach: C.HF.prompt, noLos: true,
+          optionalPeer: true, pos: new V3(rp.x, rp.y + 1.2, rp.z), r: 1.0, reach: C.HF.prompt, noLos: true,
           label: () => tf(offered ? '{name} holds out a hand. High-five [hold E]' : 'High-five {name} [hold E]', { name: nameOf(id) }),
           sub: () => t('Face each other and both hold [E].'),
           action: () => { S.hfLocal = { to: id, ping: 0, t0: S.clock }; },

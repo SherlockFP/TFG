@@ -96,6 +96,11 @@ export function installChests(game, api) {
   const posOf = (from) => (from === game.selfId ? game.player?.pos : game.remotes?.get(from)?.pos);
   const snd = (name, p, vol = 0.8) => { try { game.audio?.at?.(name, p, vol, { occlude: true, refDistance: 2.5 }); } catch { /* audio is optional */ } };
 
+  const lifecycleOff=game.mods?.on?.('facilityWillChange',(w,g)=>{
+    if(g!==game)return;
+    for(const [id,c] of chests)if(c.where==='facility'){disposeChestModel(c.model);if(c.light)game.lights?.remove(c.light);if(hold?.chest===c)hold=null;chests.delete(id);}
+    for(const c of cols.splice(0))game.physics.removeCollider(c);
+  });
   function clear() {
     for (const c of chests.values()) {
       disposeChestModel(c.model);
@@ -185,7 +190,7 @@ export function installChests(game, api) {
       for (const s of outdoor) spawnChest(s, 'outdoor', world.outdoor.group, world.outdoor.colliders);
     } catch (e) { console.warn('outdoor chests', e); }
     try {
-      if (world.facility?.group) for (const s of facilitySpecs(world)) spawnChest(s, 'facility', world.facility.group, cols);
+      if (!(game.run?.descent21?.depth|0) && world.facility?.group) for (const s of facilitySpecs(world)) spawnChest(s, 'facility', world.facility.group, cols);
     } catch (e) { console.warn('facility chests', e); }
   }
 
@@ -396,6 +401,6 @@ export function installChests(game, api) {
     list: () => [...chests.values()].map((c) => ({ id: c.id, tier: c.tier, kind: c.kind, where: c.where, x: c.x, y: c.y, z: c.z, opened: c.opened })),
     get: (id) => chests.get(id) || null,
     onMapLoaded, onPopulated, addInteractables, update, hostOpen, onPry, bindNet, onState,
-    dispose() { clear(); },
+    dispose() { lifecycleOff?.();clear(); },
   };
 }

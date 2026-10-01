@@ -304,6 +304,8 @@ ok('fake closet: knock answers, hooking is telegraphed, opening by hand from clo
   reset(); stand(f, C.CLOSET.d + 9); req('fake', { i: f.id, mode: 'open' }); assert.equal(a.data.op, null, 'too far to work the door');
 });
 
+ok('facility streaming tears down extras without rerolling rewards',()=>{const credits=game.run.credits;game.mods.emit('facilityWillChange',game.world,game,1);assert.equal(S.active,false);assert.deepEqual([hz.closets.length,hz.pockets.length,hz.traps.length],[0,0,0]);game.run.descent21={depth:1};game.mods.emit('mapLoaded',game.world,game);assert.equal(S.active,false,'initial deep join cannot build surface horror');game.run.descent21.depth=0;game.mods.emit('facilityChanged',game.world,game);tick(2);assert.equal(S.active,false,'surface return cannot reroll finite horror rewards');assert.equal(game.run.credits,credits);});
+
 ok('dispose restores every patched method and clears the scene', () => {
   hz.dispose();
   assert.equal(game.creatures.damage === origDamage, true); assert.equal(game.creatures.nav === origNav, true); assert.equal(game.creatures.playersFor === origPF, true); assert.equal(game.creatures.raycast === origRay, true);

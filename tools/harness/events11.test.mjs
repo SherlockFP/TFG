@@ -235,6 +235,8 @@ for (const id of ['lockdown', 'flood', 'power', 'viral']) {
   api.debug.end(false); tick(1);
 }
 ok(true, 'client visuals built and disposed for all four');
+// Native streaming pauses the existing plan and refuses crises on a deep floor.
+armed();const samePlan=game.run.ev11.plan,earned=game.run.credits;mods.emit('facilityWillChange',game.world,game,1);game.run.descent21={depth:1};mods.emit('facilityChanged',game.world,game);tick(120);ok(!api.active(),'no crisis auto-start on deep floor');eq(game.run.ev11.plan,samePlan,'no crisis reroll');ok(api.debug.trigger('flood')!=='started flood','native debug/server hostStart deep refusal');eq(game.run.credits,earned,'no deep payout');game.run.descent21.depth=0;mods.emit('facilityChanged',game.world,game);eq(game.run.ev11.plan,samePlan,'surface restores original pending plan');
 api.dispose();
 ok(game.creatures.playersFor({}).length === 2 && game.doorInteraction(sealedDoor).label.startsWith('orig'), 'dispose restores the wrapped methods');
 console.log(`events11: ${n} checks passed`);

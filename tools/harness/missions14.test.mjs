@@ -39,6 +39,7 @@ const send=op=>handlers.get('m14req')({token:`${run.moon}:${run.seed}:${run.day}
 const before=fac.doors.map(d=>[d.id,d.open,d.locked]);
 assert.equal(planArchive14({facility:fac},{...run,quotaIndex:1}),null);
 handlers.get('m14req')({token:'stale',op:'accept'},'host');assert.equal(count,0);
+run.descent21={depth:1};send('accept');assert.equal(count,0,'old surface mission cannot grant a cell below ground');run.descent21.depth=0;
 send('accept');send('accept');assert.equal(count,1);assert.equal(api.state().stage,'cell');
 assert(fac.nav.findPath(fac.mainDoor.spawn.x,fac.mainDoor.spawn.z,api.plan().cellPos.x,api.plan().cellPos.z,60000));
 send('install');assert.equal(bossCount,0);all.get(api.state().cellId).holder='host';
@@ -49,5 +50,7 @@ assert(fac.nav.findPath(api.plan().bossPos.x,api.plan().bossPos.z,fac.mainDoor.s
 for(const d of fac.doors)if(d.id!==api.plan().door.id)assert.deepEqual([d.id,d.open,d.locked],before.find(b=>b[0]===d.id));
 send('cache');assert.equal(count,1);game.hostOnCreatureKilled({id:'other',dead:true},'host');assert.equal(api.state().stage,'guard');
 game.hostOnCreatureKilled({id:'guard1',dead:true},'host');assert.equal(api.state().stage,'won');player.pos.copy(api.plan().bossPos);send('cache');send('cache');assert.equal(count,2);assert.equal([...all.values()][0].opts.value,180);
+const earned=api.state();run.descent21.depth=1;events.get('facilityWillChange')(game.world,game,1);assert.equal(api.plan(),null);send('cache');assert.equal(count,2,'old floor request cannot duplicate earned cache');
+run.descent21.depth=0;events.get('facilityChanged')(game.world,game,0);assert.equal(api.state(),earned,'surface mission retains the earned ledger');send('cache');assert.equal(count,2,'surface rebind retains claimed reward');
 events.get('phase')('orbit',game);assert.equal(game.run.mission14,null);assert.equal(api.plan(),null);api.dispose();fac.dispose(physics);
 realWarn('missions14: real vault routes, opt-in finite cell, holder validation, escape guard, one shared boss, exact death reward and phase cleanup passed');

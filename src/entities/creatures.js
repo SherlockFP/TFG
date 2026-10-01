@@ -568,7 +568,9 @@ export class CreatureManager {
     }
     if (this.game.forge) opts = this.game.forge.creatureOpts(type, opts);   // [forge] tier + extra affixes
     if (opts.affix === undefined) opts = { ...opts, affix: rollAffix(type, opts.level || 1, !!opts.elite) };
+    if (this.game.descentThreat21?.allowSpawn?.(type, opts) === false) return null;
     const c = new HostCreature(this, id, type, pos, opts);
+    this.game.descentThreat21?.limit?.(c, opts);   // bounded deep-floor stats before native replication
     c.fakeLv = opts.fakeLv; c.fakeTitle = opts.fakeTitle || '';   // disguise tag data, re-sent to late joiners by serializeFor
     this.host.set(id, c);
     this.game.net.broadcast('cev', {

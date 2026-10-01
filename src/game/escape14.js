@@ -243,7 +243,9 @@ export function installEscape14(game){
  const on=(ev,fn)=>{const off=game.mods?.on?.(ev,fn);if(off)offs.push(off);};
  on('warm',(reg,g)=>{if(g&&g!==game)return;if((game.run?.quotaIndex|0)<T.quota||!game.world?.facility||game.world?.company)return;reg(wardenModel().root);});
  on('netReady',ready);if(game.net)ready(game.net);
- on('registerHandlers',H=>H('e14act',request));on('mapLoaded',world=>{clear();pendingWorld=world;readyFrames=0;});
+ on('registerHandlers',H=>H('e14act',request));on('mapLoaded',world=>{clear();if(!(game.run?.descent21?.depth>0)){pendingWorld=world;readyFrames=0;}});
+ on('facilityWillChange',()=>clear());
+ on('facilityChanged',(world,g,depth)=>{if(g===game&&depth===0){pendingWorld=world;readyFrames=0;}});
  if(game.creatures?.openDoorsNear)restores.push(wrapMethod(game.creatures,'openDoorsNear',old=>function(c,...args){if(c.type!==ID)return old.call(this,c,...args);}));
  restores.push(wrapMethod(game,'unloadMap',old=>function(...args){clear();return old.apply(this,args);}));
  on('phase',ph=>{if(ph!=='moon'&&ph!=='landing')clear();});

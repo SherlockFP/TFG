@@ -297,7 +297,7 @@ export function createRpsClient({ game, request, isHost }) {
     interactables(list) {
       if (disposed || C.ask || C.m || !game.player || game.player.dead) return;
       for (const { r } of remotesNear(4.5)) {
-        list.push({ pos: r.pos.clone().add(new THREE.Vector3(0, 1.2, 0)), r: 0.75, reach: 4.2, label: () => tf('Rock-Paper-Scissors with {name} [E]', { name: r.name || nameOf(r.id) }), sub: () => t('Best of 3. Wager: /rps <Followers> <name>'), action: () => challenge(r.id, 0) });
+        list.push({ optionalPeer: true, pos: r.pos.clone().add(new THREE.Vector3(0, 1.2, 0)), r: 0.75, reach: 4.2, label: () => tf('Rock-Paper-Scissors with {name} [E]', { name: r.name || nameOf(r.id) }), sub: () => t('Best of 3. Wager: /rps <Followers> <name>'), action: () => challenge(r.id, 0) });
       }
     },
     update(dt) {

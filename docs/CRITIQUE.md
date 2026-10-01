@@ -1,4 +1,14 @@
-# Latest quality direction — waves19–20
+# Latest quality direction — waves21–22
+
+The current wave gives ordinary facilities a second decision: return with today's salvage or commit the whole crew to a deeper generated archive. Quieter first-surface admission, one short rule per floor and direct return reduce early pressure and mandatory friction. The lift has actual physical access proof, one active facility, native custody and bounded threat stats. Tower of God informs the layered trial structure through TFG's original dead-network art and rules.
+
+The depth loop must earn its score through readable physical controls and two-player cargo/return behavior. Surface loot snapshots refresh before each departure, abandoned deep floors seal and native earned ledgers persist. Old surface trap/chest variants conservatively disappear for that landing after transit; they need a future explicit resumable contract if restored. Finite rule/theme combinations can still become repetitive, and a short automatic gauntlet cannot measure long-session human enjoyment.
+
+Echo Runner adds a tactical purchase to the existing economy: a neutral PSX speaker cart bounces off real walls, attracts hearing-based threats and warns before one small blast. Native Company purchase, deployment, real Hound hearing/damage and two-peer disposal passed. It supports a shared escape decision without another compulsory meter or currency.
+
+The gauntlet found delayed surface-item ghosts, optional peer invitations capturing lift E, and a locked ordinary entrance permanently freezing discovery eligibility. Native packet cleanup, one cabin-selection policy and private structural discovery metadata fix those boundaries while preserving custody, emergency interactions and required physical gates. Fresh two-peer automatic arrival/Return E passed without repositioning. The independent assessment remains **7.9/10**; [Wave22 review](wave22/REVIEW.md) owns the score and [playtest](wave22/PLAYTEST.md) separates real input from fixture setup. Furnished approach wayfinding, dark material separation, full campaign balance and human replay appeal still need stronger evidence. Full native236/236 preceded the last corrections; final14/14 relevant files and production build passed afterwards.
+
+# Earlier quality direction — waves19–20
 
 The independent Wave19 slice is **7.8/10**, up from7.7, with [review](wave19/REVIEW.md) and browser boundaries in [playtest](wave19/PLAYTEST.md). Real GPU framebuffer feedback came from the built-in helmet-camera monitor sampling its own render target; hiding only that screen during its feed render fixes the actual reproduced error. This is not a universal hardware stutter claim. Native ship stairs, worker contrast, downed-target safety and station selection also improved.
 

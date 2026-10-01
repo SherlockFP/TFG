@@ -100,7 +100,7 @@ export function installHorror(game) {
   function build(world) {
     teardown();
     const fac = world?.facility;
-    if (!fac || !g.run || !fac.layout) return;
+    if (!fac || !g.run || (g.run.descent21?.depth|0)>0 || !fac.layout) return;
     const L = fac.layout;
     let plan;
     try { plan = planFacility(L, { day: g.run.day, quotaIndex: g.run.quotaIndex }); } catch (e) { console.warn('[horror] plan', e); return; }
@@ -389,6 +389,8 @@ export function installHorror(game) {
     } catch (e) { if (!S.warnedU) { S.warnedU = true; console.warn('[horror] update', e); } }
     if (S.host) { try { S.host.tick(dt); } catch (e) { if (!S.warnedH) { S.warnedH = true; console.warn('[horror] host tick', e); } } }
   });
+  on('facilityWillChange',(w,gg)=>{if(gg===g)teardown();});
+  // Conservative: no pocket/trap rebuild until a genuine next landing.
   on('mapLoaded', (world) => { try { build(world); } catch (e) { console.warn('[horror] build', e); teardown(); } });
   on('moonPopulated', () => { try { S.host?.populate(); } catch (e) { console.warn('[horror] populate', e); } });
   on('phase', (ph) => { if (ph === 'orbit' || ph === 'fired') teardown(); });

@@ -1,6 +1,7 @@
 // TFG wave 2 - GRENADES: procedural models. GRENADE_MODELS are the inventory / in-hand item models (same conventions as
 // combat_wave2.js: meters, +Y up), createBallMesh(kind) is the cheap unlit projectile that flies, sticks and beeps.
 import * as THREE from 'three';
+import {createBoomBot22} from './boombot22.js';
 import { ModelKit } from './items.js';
 import { getMaterial, getBasicMaterial } from '../render/textures.js';
 
@@ -114,13 +115,14 @@ function bombCluster() {
 }
 
 export const GRENADE_MODELS = {
-  flashbang, smokegrenade, decoybeacon, stickycharge, noisemaker,
+  flashbang, smokegrenade, decoybeacon, stickycharge, noisemaker, bouncebot:()=>createBoomBot22({sharedMaterials:true}),
   bomb_gravity: bombGravity, bomb_blackout: bombBlackout, bomb_confetti: bombConfetti, bomb_glitch: bombGlitch, bomb_cluster: bombCluster,
 };
 
 // ------------------------------------------------------------------------------------------------ flying / stuck ball
 // Unlit and cheap. userData.led blinks with the fuse beeps, userData.dispose frees the geometry.
 export function createBallMesh(kind, color = 0x888888) {
+  if(kind==='bouncer')return createBoomBot22();
   const g = new THREE.Group();
   const geos = [], mats = [];
   const part = (geo, col, o = {}) => {

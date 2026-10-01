@@ -17,7 +17,7 @@ const dim = (hex, k) => ((((hex >> 16) & 255) * k) << 16) | ((((hex >> 8) & 255)
 export function installChallenge(game, W) {
   const H = { plate: new Map(), arena: null, puzzle: new Map(), gamble: new Map(), idol: new Map(), rocks: [], timers: 0 };
   const vis = { rings: new Map(), arms: new Map(), armT: new Map(), leverT: new Map(), panels: new Map(), rockMarks: [] };
-  const later = (fn, ms) => (game.later ? game.later(fn, ms) : setTimeout(fn, ms));
+  const later = (fn, ms) => {const epoch=W.epoch;const guarded=()=>{if(!W.disposed&&W.host()&&W.epoch===epoch)fn();};return game.later?game.later(guarded,ms):setTimeout(guarded,ms);};
   const host = () => W.host();
   const ch = () => W.challenge();
   const spotOf = (k, room, i) => W.spots.find((s) => s.k === k && s.room === room && (i === undefined || s.i === i));

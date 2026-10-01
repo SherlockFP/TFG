@@ -35,7 +35,7 @@ export function installMissions14(game){
  let plan=null,mesh=null,keypad=null;
  const token=()=>`${game.run?.moon}:${game.run?.seed}:${game.run?.day}`;
  const state=()=>game.run?.mission14?.token===token()?game.run.mission14:null;
- const active=()=>!!plan&&game.run?.phase==='moon'&&state()?.stage!=='ready'&&state()?.stage!=='claimed';
+ const active=()=>!!plan&&!(game.run?.descent21?.depth>0)&&game.run?.phase==='moon'&&state()?.stage!=='ready'&&state()?.stage!=='claimed';
  const sync=()=>game.broadcastRun?.(['mission14']);
  const pOf=id=>game.aiPlayerById?.(id)||game.aiPlayers?.().find(p=>p.id===id);
  const near=(p,n)=>p&&!p.dead&&!p.downed&&p.zone==='in'&&Math.hypot(p.pos.x-n.x,p.pos.z-n.z)<4&&Math.abs(p.pos.y-n.y)<3;
@@ -44,7 +44,7 @@ export function installMissions14(game){
  function clear(){if(plan?.door){plan.door.keypadPos=keypad;delete plan.door.m14gate;}mesh?.removeFromParent();mesh?.traverse(o=>o.geometry?.dispose?.());mesh=null;plan=null;keypad=null;}
  function openGate(){if(plan&&['guard','won','claimed'].includes(state()?.stage)){plan.door.locked=false;game.onDoor?.({id:plan.door.id,open:true,locked:false,silent:false});}}
  function request(d,from){
-  if(!game.isHost||!plan||game.run.phase!=='moon'||d?.token!==token())return;
+  if(!game.isHost||!plan||game.run.descent21?.depth>0||game.run.phase!=='moon'||d?.token!==token())return;
   const s=state(),p=pOf(from);if(!s||!near(p,d.op==='cache'?plan.bossPos:plan.anchor))return;
   if(d.op==='accept'&&s.stage==='ready'){
    if(busy())return game.net.sendTo(from,'sys',sysMsg('Archive job waits while another guardian or stalker is active.'));
@@ -70,11 +70,14 @@ export function installMissions14(game){
   const factory=game.mods.creatureModels?.get('keyholder') || globalThis.window?.__kefalMods?.creatureModels?.get('keyholder');
   if(factory){const model=factory(THREE,{elite:false,seed:1});if(model?.root)reg(model.root,'m14:keyholder');}
  }));
- offs.push(game.mods.on('mapLoaded',(w,g)=>{if(g!==game)return;clear();plan=planArchive14(w,game.run);if(!plan)return;
+ const bindMap=(w,g)=>{if(g!==game||game.run?.descent21?.depth>0)return;clear();plan=planArchive14(w,game.run);if(!plan)return;
   keypad=plan.door.keypadPos;plan.door.keypadPos=null;plan.door.m14gate=true;
   mesh=buildFieldJob({...plan,nodes:[{i:0,x:plan.anchor.x,y:plan.anchor.y,z:plan.anchor.z},{i:1,x:plan.cellPos.x,y:plan.cellPos.y+1,z:plan.cellPos.z}]});
   if(game.isHost&&!state()){game.run.mission14={token:token(),gateId:plan.door.id,stage:'ready',cellId:null,bossId:null,rewardId:null};sync();}openGate();
- }));
+ };
+ offs.push(game.mods.on('mapLoaded',bindMap));
+ offs.push(game.mods.on('facilityWillChange',(w,g)=>{if(g===game)clear();}));
+ offs.push(game.mods.on('facilityChanged',(w,g,depth)=>{if(g===game&&depth===0)bindMap(w,g);}));
  offs.push(game.mods.on('registerHandlers',(H,g)=>{if(g!==game)return;H('m14req',request);
   for(const k of ['vault','unlock','door']){const prev=game.net.handlers.get(k);H(k,(d,from)=>{if(plan&&d?.id===plan.door.id)return;prev?.(d,from);});}
  }));

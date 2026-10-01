@@ -30,13 +30,14 @@ export function installEvents11(game) {
   const mods = game.mods;
   if (!mods) return null;
   const offs = [], restores = [], timers = [], sounds = [];
-  let disposed = false, time = 0, lastNet = null;
+  let disposed = false, time = 0, lastNet = null, streaming21=false;
+  const deep21=()=>streaming21 || (game.run?.descent21?.depth|0)>0;
   const hasDom = typeof document !== 'undefined';
 
   // ------------------------------------------------------------------------------------------------ small helpers
   const isHost = () => !!game.isHost;
   const run = () => game.run;
-  const fac = () => game.world?.facility || null;
+  const fac = () => deep21()?null:game.world?.facility || null;
   const evd = () => run()?.ev11 || null;
   const live = () => { const e = evd(); return e && e.live && e.live.st === 'run' ? e.live : null; };
   const bcast = () => { try { game.broadcastRun?.(['ev11']); } catch { /* net closing */ } };
@@ -79,6 +80,7 @@ export function installEvents11(game) {
   const rngFor = (salt) => { const r = run(); return new RNG(hashString(`${r?.runId}|${r?.day}|${r?.moon}|ev11|${salt}`)); };
 
   function hostArm() {
+    if(deep21())return;
     const r = run();
     if (!r || !isHost()) return;
     const moon = MOONS[r.moon];
@@ -105,6 +107,7 @@ export function installEvents11(game) {
   }
 
   function hostStart(id, force = false) {
+    if(deep21())return false;
     const r = run();
     if (!r?.ev11 || r.ev11.live) return false;
     if (!force && !canStart(id)) return false;
@@ -400,6 +403,7 @@ export function installEvents11(game) {
     else if (L.id === 'viral') tickViral(dt, L);
   }
   function hostReq(d, from) {
+    if(deep21())return false;
     const e = evd(), L = live();
     if (!isHost() || !e || !L || d?.k !== e.key) return;
     const pp = posOf(from), pl = (game.aiPlayers?.() || []).find((q) => q.id === from);
@@ -680,6 +684,7 @@ export function installEvents11(game) {
 
   // ---- messages every peer gets ----
   function onFx(d) {
+    if(deep21())return false;
     if (!d) return;
     if (d.k === 'snd') { game.sfx?.(d.s, 0.8); return; }
     if (d.k === 'free') {
@@ -720,6 +725,8 @@ export function installEvents11(game) {
   }
   offs.push(mods.on('netReady', (net) => bindNet(net)));
   if (game.net) { try { bindNet(game.net); } catch { /* netReady binds it */ } }
+  offs.push(mods.on('facilityWillChange',(w,g)=>{if(g!==game)return;streaming21=true;stopClient();H.sec=null;for(const t of timers.splice(0))clearTimeout(t);setBar(null); }));
+  offs.push(mods.on('facilityChanged',(w,g)=>{if(g===game)streaming21=false;}));
   offs.push(mods.on('moonPopulated', (g) => { if (g === game || !g) { try { hostArm(); } catch (e) { console.warn('[events11] arm', e); } } }));
   offs.push(mods.on('phase', (ph, g) => {
     if (g && g !== game) return;
@@ -729,13 +736,13 @@ export function installEvents11(game) {
     }
   }));
   offs.push(mods.on('update', (dt, g) => {
-    if (g !== game || disposed) return;
+    if (g !== game || disposed || deep21()) return;
     time += dt;
     if (isHost()) { try { hostTick(dt); } catch (e) { console.warn('[events11] hostTick', e); } }
     try { syncClient(); Cl.m?.tick?.(dt); } catch (e) { console.warn('[events11] client', e); }
   }));
   offs.push(mods.on('interactables', (list, g) => {
-    if (g !== game || !Cl.m) return;
+    if (g !== game || deep21() || !Cl.m) return;
     const p = game.player;
     if (!p || p.dead) return;
     for (const f of interactLists) { try { f(list, p); } catch { /* ignore */ } }

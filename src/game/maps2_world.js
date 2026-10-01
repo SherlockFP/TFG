@@ -19,18 +19,20 @@ export function createWorld(game, api) {
   const offs = [];
   const W = {
     game, api, disposed: false,
-    F: null, spots: [], byKey: new Map(), bar: new Map(), boundNet: null,
+    epoch:0,F: null, spots: [], byKey: new Map(), bar: new Map(), boundNet: null,
     hs: { sealed: {}, used: {}, done: {} },   // host mirror (also what run.m2s carries); sealed: id -> edge descriptor
     handlers: new Map(),                        // request op -> fn(d, from)
     stateFns: new Map(),                        // m2s kind -> fn(d)
     tickFns: [], mapFns: [], popFns: [], interFns: [],
   };
-  const host = () => !!game.isHost;
+  let streaming=false;
+  const deep = () => streaming || (game.run?.descent21?.depth|0)>0;
+  const host = () => !!game.isHost && !deep();
   W.host = host;
   W.V = THREE.Vector3;
 
   // ------------------------------------------------------------------------------------------------ facility + spots
-  W.fac = () => (game.world?.facility?.layout ? game.world.facility : null);
+  W.fac = () => (!deep() && game.world?.facility?.layout ? game.world.facility : null);
   W.spotList = (k, room) => W.spots.filter((s) => s.k === k && (room === undefined || s.room === room));
   W.roomOf = (id) => W.F?.m2?.rooms?.find((r) => r.room === id) || null;
   W.challenge = () => W.F?.m2?.challenge || null;
@@ -49,7 +51,7 @@ export function createWorld(game, api) {
   W.on = (kind, fn) => W.stateFns.set(kind, fn);
   W.handle = (op, fn) => W.handlers.set(op, fn);
   function onState(d, from) {
-    if (W.disposed || !d || (from !== game.net?.hostId && from !== game.selfId)) return;
+    if (W.disposed || deep() || !d || (from !== game.net?.hostId && from !== game.selfId)) return;
     try { W.stateFns.get(d.k)?.(d); } catch (e) { console.warn('[maps2] state', d.k, e); }
   }
   function bind(net) {
@@ -194,7 +196,9 @@ export function createWorld(game, api) {
     }
     for (const f of W.mapFns) { try { f(F); } catch (e) { console.warn('[maps2] map', e); } }
   }
-  offs.push(mods.on('mapLoaded', (w, g) => { if (g === game) onMap(); }));
+  offs.push(mods.on('mapLoaded', (w, g) => { if (g === game) { streaming=false; if(!deep())onMap(); } }));
+  offs.push(mods.on('facilityWillChange', (w,g) => { if(g!==game)return; streaming=true;W.epoch++; for(const id of [...W.bar.keys()])W.unbarrier(id); W.F=null;W.spots=[];W.byKey.clear(); }));
+  offs.push(mods.on('facilityChanged', (w,g) => { if(g!==game)return;streaming=false;if(!deep())onMap(); }));
   offs.push(mods.on('moonPopulated', (g) => {
     if (g !== game || !host() || !W.F) return;
     W.hs = { sealed: {}, used: {}, done: {} };
@@ -207,11 +211,11 @@ export function createWorld(game, api) {
     if (ph === 'landing' || ph === 'takeoff' || ph === 'orbit') { W.hs = { sealed: {}, used: {}, done: {} }; if (game.run && game.run.m2s) { delete game.run.m2s; try { game.broadcastRun(['m2s']); } catch { /* ignore */ } } }
   }));
   offs.push(mods.on('update', (dt, g) => {
-    if (g !== game || W.disposed) return;
+    if (g !== game || W.disposed || deep()) return;
     for (const f of W.tickFns) { try { f(dt); } catch (e) { if (!W._warned) { W._warned = 1; console.warn('[maps2] tick', e); } } }
   }));
   offs.push(mods.on('interactables', (list, g) => {
-    if (g !== game || W.disposed || !W.F || !game.player?.indoor || game.player.dead) return;
+    if (g !== game || W.disposed || deep() || !W.F || !game.player?.indoor || game.player.dead) return;
     try { for (const f of W.interFns) f(list, game.player); } catch (e) { console.warn('[maps2] interactables', e); }
   }));
   if (W.fac()) onMap();

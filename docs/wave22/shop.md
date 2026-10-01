@@ -1,0 +1,7 @@
+# Echo Runner native purchase
+
+Owner scope: native purchase/access validation; grenade/runtime owner registers `KINDS.bouncer` / `ITEMS.bouncebot` (Echo Runner). No additional storefront catalog, wallet, cooldown or charge ledger is introduced.
+
+Existing `grenades.js` data registration gives `kind:'consumable'`, `shop:'consumables'`, base price90credits and one native charge. The data-driven Company Store lists it automatically. Existing seeded deals may discount the quoted price; host recomputes that quote. Native physical field broker proximity/living guards apply; pickup tray capacity and delivery coordinates remain industry13/trading15-owned. Fresh all-access unlocks the interface, not free items or extra charges.
+
+Regression `tools/harness/boombot22_shop.test.mjs` uses the actual grenade registry, shop installer, industry broker wrapper, ItemManager and native host pickup handler. Covers fresh day1/quota0 category visibility, unaffordable/far rejection without debit, successful exact native price debit, one world item on the pickup tray, order-ID replay rejection, exact-ID held custody retaining charges1, and duplicate spawn-event idempotence. Actual fixture passed after the runtime registration landed. Purchase uses the existing seeded quote, exact native debit, physical delivery and one-charge held item; no production storefront changes were necessary. Browser purchase evidence belongs to shared QA.

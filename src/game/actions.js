@@ -213,7 +213,11 @@ export const actionMethods = {
     // 2) point interactables
     const pts = this.interactablesNow();
     let best = null, bestLabel = '', bestScore = 1e9;
+    const cabinControls = this.descent21?.controlsActive?.();
     for (const ip of pts) {
+      // Optional crew invitations yield to the physical lift. Rescue, cargo,
+      // doors and NPC commerce retain their native interaction paths.
+      if (cabinControls && ip.optionalPeer === true) continue;
       tmp.copy(ip.pos).sub(eye);
       const along = tmp.dot(fwd);
       const r = ip.r || 0.7;

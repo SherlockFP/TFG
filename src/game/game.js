@@ -305,6 +305,9 @@ import { installReplay19 } from './replay19.js';
 import { installCreatures20 } from './creatures20.js';
 import { installDarkCollapse20 } from './darkcollapse20.js';
 import { installCargo20 } from './cargo20.js';
+import { installDescent21 } from './descent21.js';
+import { installFirstDepth21 } from './firstdepth21.js';
+import { installDescent21Threats } from './descent21_threats.js';
 import './lab20_moons.js';
 import { installDowned } from './downed.js';   // [import:downed] wave 8: 0 HP = downed, crew revives (docs/wave8/downed.md)
 import { installHubgate } from './hubgate.js';   // [import:hubgate]
@@ -682,6 +685,9 @@ export class Game extends Emitter {
     this.useModule('life13', installLife13);
     this.useModule('darkcollapse20', installDarkCollapse20);
     this.useModule('cargo20', installCargo20);
+    this.useModule('descent21', installDescent21);
+    this.useModule('descentThreat21', installDescent21Threats);
+    this.useModule('firstdepth21', installFirstDepth21);
 
 
   }
@@ -800,7 +806,7 @@ export class Game extends Emitter {
     net.on_('pjoin', (d) => { if (d?.id) this.ensureRemote(d.id, d)?.setInfo(d); });
     net.on_('gs', (d) => this.applyRunState(d));
     net.on_('phase', (d) => this.onPhase(d));
-    net.on_('it', (d) => this.items.onEvent(d));
+    net.on_('it', (d) => this.onItemEvent(d));
     net.on_('itst', (d, from) => { if (from !== this.selfId) this.items.onState(d); });
     net.on_('is', (d, from) => { if (from !== this.selfId) this.items.applySnapshot(d); });
     net.on_('cev', (d) => this.creatures.onEvent(d));
@@ -866,7 +872,7 @@ export class Game extends Emitter {
     } else this.items.clearAll();
     // creatures first: items carried by a creature ('c:<id>' holder) attach to its view on spawn
     for (const c of d.creatures || []) this.creatures.onEvent(c);
-    for (const it of d.items || []) this.items.onEvent({ e: 'sp', ...it });
+    for (const it of d.items || []) this.onItemEvent({ e: 'sp', ...it });
     // late joiners: lit glowsticks, playing boomboxes, burning flares...
     for (const it of this.items.all()) if (it.on) { try { this.onItemState(it); } catch (e) { console.warn('item state', e); } }
     for (const dr of d.doors || []) this.onDoor(dr);
@@ -874,6 +880,7 @@ export class Game extends Emitter {
     this.ship.door.setOpen(!!d.shipDoor);
     if (resume) { this.ui.toast(t('Reconnected - world state resynced.'), 'good'); return; }
     this.spawnInShip();
+    this.descent21?.placeLateJoin?.();
     if (d.run.phase === 'moon' || d.run.phase === 'company') this.requestLoadout();
     this.tutorialHint(d.run.phase);
     this.emit('joined');
@@ -889,6 +896,13 @@ export class Game extends Emitter {
     if (!silent && prev && d.credits !== undefined && d.credits !== prev.credits) this.ui.hud?.pulse('credits');
     if (d.upgrades) this.refreshStats();
     this.ui.hud?.setRun(this.run);
+    this.descent21?.onState?.(this.run);
+  }
+
+  onItemEvent(d) {
+    if (this.descent21?.acceptItemEvent?.(d) === false) return false;
+    this.items.onEvent(d);
+    return true;
   }
 
   onPhase(d) {
@@ -999,11 +1013,14 @@ export class Game extends Emitter {
         slide();
       });
       let layout = null;
-      const size = moon.size, lopts = moon.layoutOpts || this.facjobs?.layoutOpts?.(moon, run) || undefined;   // read now: worlds3 patches moon.size around this call
-      step('layout', () => { layout = generateLayout(run.seed, moon.interior, size, lopts); });   // [cycle] Sector Core / Raid / Keystone moons carry layoutOpts
+      const depthSpec = this.descent21?.spec?.(run);
+      const size = depthSpec?.size ?? moon.size, lopts = moon.layoutOpts || this.facjobs?.layoutOpts?.(moon, run) || undefined;   // read now: worlds3 patches moon.size around this call
+      step('layout', () => { layout = generateLayout(depthSpec?.seed ?? run.seed, depthSpec?.theme ?? moon.interior, size, depthSpec ? depthSpec.layoutOpts : lopts); });   // [cycle] Sector Core / Raid / Keystone moons carry layoutOpts
       step('facility', () => {
         const fac = buildFacility(layout, { physics: this.physics, lightPool: this.lights });
         this.world.facility = fac;
+        this.world.descent21Depth = depthSpec?.depth ?? 0;
+        fac.descent21Generation = { seed: depthSpec?.seed ?? run.seed, theme: depthSpec?.theme ?? moon.interior, size, layoutOpts: depthSpec ? depthSpec.layoutOpts : lopts };
         this.env.interiorFog = fac.atmosphere || null;   // per-theme indoor haze (backrooms yellow, sewer green, server farm blue)
         this.scene.add(fac.group);
       });

@@ -755,6 +755,7 @@ export function installGear11(game) {
   }
   offs.push(mods.on('netReady', (net) => bindNet(net)));
   if (g.net && g.net !== netRef) { try { bindNet(g.net); } catch { /* the netReady hook binds it */ } }
+  offs.push(mods.on('facilityWillChange',(w,gg)=>{if(gg!==g)return;for(const id of host.jams.keys()){const door=g.doorById?.(id);if(door){door.locked=false;door.jam=0;}}host.jams.clear();for(const id of [...jams.keys()]){const j=jams.get(id);if(j?.door)j.door.locked=false;endJam(id,false);}}));
   offs.push(mods.on('mapLoaded', (world, gg) => {
     if (gg !== g) return;
     resetAll();

@@ -35,6 +35,7 @@ export const THROW = {
 // item: inventory item id. stack: bombs per item (charges). R: effect radius (m). fuse: s (sticky: s AFTER it sticks).
 // noise: creatures.noise units (via game.balance.noise). tier: item tier / rarity. rare: never sold, drops only.
 export const KINDS = {
+  bouncer: { item:'bouncebot',name:'Echo Runner',fuse:9,R:3.6,dmg:75,bossDmg:35,crew:.24,crewMax:18,noise:3,stack:1,price:90,tier:'common',color:0xc9b783,runner:true,speed:2.8,pulse:.8,lure:2.6,warn:1.2 },
   stun:     { item: 'stungrenade', name: 'Stun Grenade', legacy: true, fuse: 2.2, R: 12, stun: 5, noise: 3, color: 0x6a7a55, tier: 'common' },
   flash:    { item: 'flashbang', name: 'Flashbang', fuse: 1.6, R: 14, stunMin: 3, stunMax: 4, blind: 2.5, noise: 3.5, stack: 3, price: 60, tier: 'common', color: 0xd8dde4 },
   smoke:    { item: 'smokegrenade', name: 'Smoke Grenade', fuse: 1.2, R: 5.5, dur: 20, noise: 0.8, stack: 2, price: 55, tier: 'common', color: 0x8a949a },
@@ -76,7 +77,7 @@ export const cookTime = (hold) => clamp(hold - THROW.chargeT, 0, THROW.cookMax);
 export function fuseAfterCook(kind, cook = 0) {
   const d = KINDS[kind];
   if (!d) return 1;
-  if (d.sticky) return d.fuse;
+  if (d.sticky || d.runner) return d.fuse;
   return Math.max(THROW.minFuse, d.fuse - clamp(cook, 0, THROW.cookMax));
 }
 /** launch velocity for a forward vector, throw power and the thrower's velocity */
@@ -256,4 +257,22 @@ export function rollRareDrop(source, rnd = Math.random) {
   let r = rnd() * tot;
   for (const [k, w] of entries) { r -= w; if (r <= 0) return k; }
   return entries[entries.length - 1][0];
+}
+
+/** Ground runner: bounded volume sweeps, horizontal reflection and vertical gravity; never teleports over a wall. */
+export function stepRunner(p,dt,sweep,speed=2.8,warning=false){
+ const total=Math.max(0,Math.min(dt,.25)),n=Math.max(1,Math.ceil(total/SUBSTEP)),h=total/n;
+ for(let i=0;i<n;i++){
+  let length=Math.hypot(p.vx,p.vz);if(!warning&&length>.01){p.vx=p.vx/length*speed;p.vz=p.vz/length*speed;}else if(warning){p.vx=p.vz=0;}
+  const dx=p.vx*h,dz=p.vz*h,dist=Math.hypot(dx,dz);
+  if(dist>.00001){const hit=sweep(p.x,p.y+.015,p.z,dx/dist,0,dz/dist,dist);if(hit&&hit.distance<=dist){
+    const travel=Math.max(0,hit.distance-.008);p.x+=dx/dist*travel;p.z+=dz/dist*travel;
+    let nx=hit.nx,nz=hit.nz,nl=Math.hypot(nx,nz);if(nl<.1){nx=-dx/dist;nz=-dz/dist;nl=1;}
+    nx/=nl;nz/=nl;const dot=p.vx*nx+p.vz*nz;p.vx-=2*dot*nx;p.vz-=2*dot*nz;p.bounces++;
+   }else{p.x+=dx;p.z+=dz;}}
+  p.vy=Math.max(-12,p.vy-GRAV*h);const dy=p.vy*h;
+  if(Math.abs(dy)>.00001){const hit=sweep(p.x,p.y,p.z,0,Math.sign(dy),0,Math.abs(dy));if(hit&&hit.distance<=Math.abs(dy)){
+    p.y+=Math.sign(dy)*Math.max(0,hit.distance-.004);p.grounded=dy<0&&hit.ny>.45;p.vy=0;
+   }else{p.y+=dy;p.grounded=false;}}
+ }
 }

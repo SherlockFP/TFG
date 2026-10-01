@@ -13,6 +13,12 @@ localStorage keys, `KefalAPI`) stay as they are, so saves and mods keep working.
 lore, UI strings, textures with text/logos, and visible models/sprites change. Add `ViralAPI` as an alias
 of `KefalAPI`. Avoid real trademarks (no YouTube/Twitter/TikTok names or logos) — parody is fine.
 
+## Depth archive direction — wave21
+
+The depth lift treats the dead network as layered storage rather than another numbered mining moon. A compact maintenance cabin links data-center, archival, acoustic and heavy-processing spaces. Vertical trial fiction such as Tower of God informs changing floor atmosphere and rules; TFG uses its own Algorithm bureaucracy, physical salvage and noise/cargo decisions. Do not import that work's names, guardians, costumes, architecture or assets. The authored theme/creature pool stays finite while layouts and depth combinations are procedural.
+
+Keep the lift faceted and matte: worn neutral steel, dirty ivory and restrained ochre signage, with no broad green body surfaces or new dynamic lights. A floor teaches one short rule and keeps the familiar exploration/carry/escape controls. It does not add a mandatory puzzle, new wallet or extra progression meter merely to label a tier.
+
 ## Names
 | Old | New |
 |---|---|

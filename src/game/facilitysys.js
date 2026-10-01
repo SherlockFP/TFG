@@ -131,7 +131,9 @@ export function installFacilitySystems(game) {
   game.deathText = function (cause) { return DEATHS[cause] ? t(DEATHS[cause]) : origDeath.call(this, cause); };
 
   // ================================================================ helpers
+  let streaming21=false;
   const fac = () => {
+    if(streaming21 || (game.run?.descent21?.depth|0)>0)return null;
     const f = game.run?.fac;
     const w = game.world.facility;
     return f && w?.sys && game.run?.phase === 'moon' && f.seed === game.run.seed ? f : null;
@@ -156,7 +158,8 @@ export function installFacilitySystems(game) {
   const posOf = (id) => (id === game.selfId ? game.player.pos : game.remotes.get(id)?.pos);
   const near = (id, p, r = NEAR) => { const q = posOf(id); return !!(q && p && q.distanceTo(p) < r); };
 
-  function hostInit() {
+  function hostInit(preserve=false) {
+    if((game.run?.descent21?.depth|0)>0)return;
     const F = game.world.facility, sys = F?.sys, run = game.run;
     if (!sys || !run || run.phase !== 'moon') { if (run?.fac) { run.fac = null; push(); } hs = null; return; }
     const L = F.layout;
@@ -167,6 +170,7 @@ export function installFacilitySystems(game) {
       nextEvtT: EVENT_START + rng.int(0, 200), events: 0, ventAt: sys.plan.ventEvent?.at ?? null, closedByLock: new Set(),
       overload: null, codeFails: 0, vanished: null, coreSpot: sys.core?.spot?.clone() || null, lastPower: null,
     };
+    if(preserve && run.fac?.seed===run.seed)return; // Rebind resumed surface metadata; never respawn components/core.
     run.fac = {
       seed: run.seed, power: run.powerOn === false ? 'off' : sys.gen ? 'low' : 'normal', security: 'passive', containment: 'normal', vent: 'clean',
       stage: sys.gen ? 'find' : 'route', extraction: false, chain: sys.chain, need: sys.need, core: sys.coreName,
@@ -908,6 +912,8 @@ export function installFacilitySystems(game) {
   });
   if (game.net) { boundNet = game.net; game.net.on('msg:facFx', fxHandler); }
   on('registerHandlers', (Hh) => { Hh('facAct', (d, from) => { try { onRequest(d, from); } catch (e) { console.error('facAct', e); } }); });
+  on('facilityWillChange',(w,g)=>{if(g===game){streaming21=true;clientUpdate(0);}});
+  on('facilityChanged',(w,g)=>{if(g!==game)return;streaming21=false;if((game.run?.descent21?.depth|0)===0&&!hs&&game.isHost&&game.run?.fac?.seed===game.run.seed)hostInit(true);if((game.run?.descent21?.depth|0)===0&&hs){hs.fac=game.world.facility;hs.coreSpot=hs.fac?.sys?.core?.spot?.clone()||null;}cs.prev=null;cs.sig='';});
   on('moonPopulated', () => { try { hostInit(); } catch (e) { console.error('facility init', e); } });
   on('phase', (ph) => {
     if (!game.isHost || !game.run) return;

@@ -22,9 +22,10 @@ export function installMaps2(game) {
   const lightState = new Map();   // room id -> { on, base: [[emitter, intensity]] }
   let tune = 0;
 
-  const fac = () => (game.world?.facility?.m2 ? game.world.facility : null);
+  const fac = () => (!(game.run?.descent21?.depth|0) && game.world?.facility?.m2 ? game.world.facility : null);
   const roomRect = (F, id) => { const L = F.layout, r = L.rooms[id], C = L.cell; return { x0: L.ox + r.x * C, z0: L.oz + r.z * C, x1: L.ox + (r.x + r.w) * C, z1: L.oz + (r.z + r.h) * C }; };
   function toggleLights(F, roomId) {
+    if(F!==fac())return;
     let st = lightState.get(roomId);
     if (!st) {
       const rc = roomRect(F, roomId), base = [];
@@ -66,6 +67,7 @@ export function installMaps2(game) {
     } catch (e) { console.warn('maps2 interactables', e); }
   });
   on('mapLoaded', () => { lightState.clear(); });
+  on('facilityWillChange',()=>{lightState.clear();});
 
   // [finish] host-authoritative runtime parts (each failure-isolated)
   const W = createWorld(game, {});

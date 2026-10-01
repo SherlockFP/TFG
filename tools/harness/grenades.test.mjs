@@ -93,7 +93,7 @@ const ray = (ox, oy, oz, dx, dy, dz, len) => {
 
 // ---- 4. effect table -----------------------------------------------------------------------------------------------
 {
-  const R = { stun: 12, flash: 14, smoke: 5.5, sticky: 4.2, cryo: 5, molotov: 3.2, emp: 10, gravity: 9, blackout: 16, confetti: 9, glitch: 8, mini: 3.4 };
+  const R = { bouncer: 3.6, stun: 12, flash: 14, smoke: 5.5, sticky: 4.2, cryo: 5, molotov: 3.2, emp: 10, gravity: 9, blackout: 16, confetti: 9, glitch: 8, mini: 3.4 };
   for (const [k, r] of Object.entries(R)) near(C.EFFECT_RADII[k], r, 1e-9, `${k} radius`);
   ok(Object.keys(C.EFFECT_RADII).length === Object.keys(R).length, 'no undocumented radius');
   const K = C.KINDS;
