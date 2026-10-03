@@ -8,17 +8,26 @@ import { PRODUCTS, ROBOT, industryOf, transactIndustry, completeIndustryShift } 
 import './industry13_text.js';
 import { createTrading15 } from './trading15.js';
 import { installWorkshop14 } from './workshop14.js';
+import { buildFieldBroker38 } from '../models/fieldbroker38.js';
+import { insideShip } from '../world/ship.js';
 HOST_ONLY.add('i13reply');
 const ORDER_HISTORY_LIMIT = 4096;
 const validOrderId = id => typeof id === 'string' && /^[A-Za-z0-9:_-]{1,64}$/.test(id);
 export function installIndustry13(game) {
   const offs = [], undo = [];
   const inFlightOrders = new Set();
-  let vendor = null, avatar = null, anchor = null, panel = null, live = true, pending = false, wait = null;
+  let vendor = null, avatar = null, brokerModel=null, anchor = null, panel = null, live = true, pending = false, wait = null;
   let lastMessage = '', lastPanelKey = '', ticks = 0, pendingOrder = null;
   const near = id => {
     const p = game.aiPlayerById?.(id);
     return !!anchor && !!p && !p.dead && !p.downed && !p.inShip && p.pos.distanceTo(anchor) <= 4.5 && (game.run?.phase === 'company' || game.run?.phase === 'moon' || game.fleet13?.docked?.());
+  };
+  const atStore = id => {
+    const p=game.aiPlayerById?.(id);
+    if(!p||p.dead||p.downed)return false;
+    if(['orbit','moon','company'].includes(game.run?.phase)&&insideShip(p.pos))return true;
+    const kiosk=game.world.company?.group?.userData.tfgStore;
+    return game.run?.phase==='company'&&!!kiosk&&p.pos.distanceTo(kiosk.getWorldPosition(new THREE.Vector3()))<4;
   };
   const trading=createTrading15(game,near);let buyPending=false,buyTimer=null;let orderSerial=0;const orderEpoch=Math.random().toString(36).slice(2,10);
   const workshop=installWorkshop14(game,{near,open,send});
@@ -29,6 +38,7 @@ export function installIndustry13(game) {
     undo.push(() => { if (obj[name] === next) { if (had) obj[name] = previous; else delete obj[name]; } });
   }
   function removeVendor() {
+    brokerModel?.dispose();brokerModel=null;
     workshop.clear();trading.clear();
     vendor?.removeFromParent();
     avatar?.dispose?.(); avatar = null;
@@ -47,15 +57,8 @@ export function installIndustry13(game) {
       xyz = [11, world.terrain.heightAt(11, 9), 9];
     }
     vendor = new THREE.Group(); vendor.name = 'field-broker13'; vendor.position.fromArray(xyz); group.add(vendor);
-    const box = (x,y,z,w,h,d,color) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color})); m.position.set(x,y,z);m.userData.i13owned=true;vendor.add(m);return m; };
-    box(0,-.08,0,5,.16,3.8,0x22343a);box(0,2.7,-.8,5,.2,2.7,0x48646a);
-    for(const x of [-2.2,2.2])box(x,1.3,-.8,.14,2.7,.14,0x33454b);
-    box(0,.55,0,3.4,1.1,.8,0x41515a);box(0,1.13,0,3.7,.08,1,0xc3aa68);
-    for(const [i,c] of [[-1,0x78cab4],[0,0x929ec8],[1,0xc792c0]]){box(i,.5,-1.4,.6,.9,.6,0x26363d);box(i,.8,-1.06,.4,.15,.025,c);}
-    // The workshop14 scout sits in this stationary cradle while docked.
-    box(2.8,.45,-.8,.8,.1,1,0x556b72);
-    for(const dx of [-.4,.4])box(2.8+dx,.3,-.8,.14,.6,.12,0x293d46);
-    avatar = createAvatar({suitColor:'#759f96'});avatar.root.position.set(0,0,-1.2);vendor.add(avatar.root);
+    brokerModel=buildFieldBroker38(vendor,game.physics);
+    avatar = createAvatar({suitColor:'#77766e'});avatar.root.position.set(0,0,-1.2);vendor.add(avatar.root);
     anchor = new THREE.Vector3(xyz[0],xyz[1]+1.1,xyz[2]+.6);
     workshop.bind(vendor);trading.bind(vendor);
     if (typeof document !== 'undefined') {
@@ -129,7 +132,7 @@ export function installIndustry13(game) {
   wrap(game.shop,'buy',previous=>function(lines){if(buyPending)return;buyPending=true;clearTimeout(buyTimer);buyTimer=setTimeout(()=>{buyPending=false;},5000);game.net.request('term',{cmd:{op:'cart',lines,orderId:`${orderEpoch}:${++orderSerial}`}});});
   wrap(game.shop,'hostCart',previous=>function(cmd,from,reply){
     const fail=message=>{reply(t(message),true);notify(from,message);game.net.sendTo(from,'fx',{k:'sh',t:'shopres',ok:false,msg:t(message)});};
-    if(!near(from))return fail('Approach the broker before ordering.');
+    if(!near(from)&&!atStore(from))return fail('Approach the broker before ordering.');
     if(!validOrderId(cmd?.orderId))return fail('Invalid order ID. Reopen the broker and try again.');
     const key=from+':'+cmd.orderId,ledger=industryOf(game.run);
     if(inFlightOrders.has(key)||(ledger.orders15||[]).includes(key))return fail('That order was already processed.');
@@ -143,8 +146,8 @@ export function installIndustry13(game) {
     };
     try{return previous.call(this,cmd,from,finish);}finally{inFlightOrders.delete(key);}
   });
-  wrap(game.shop,'open',previous=>function(...args){if(!near(game.selfId)){game.ui.toast(t('Meet a field broker to buy supplies. The ship terminal is now a route console.'),'info');return;}return previous.apply(this,args);});
-  wrap(game.terminal,'hostExecute',previous=>function(cmd,from){if(['buy','cart','upgrade','van'].includes(cmd?.op)&&!near(from)){notify(from,'Approach the broker before ordering.');return;}return previous.call(this,cmd,from);});
+  wrap(game.shop,'open',previous=>function(...args){if(!near(game.selfId)&&!atStore(game.selfId)){game.ui.toast(t('Company Store [E]'),'info');return;}return previous.apply(this,args);});
+  wrap(game.terminal,'hostExecute',previous=>function(cmd,from){if(['buy','cart','upgrade','van'].includes(cmd?.op)&&!near(from)&&!atStore(from)){notify(from,'Approach the broker before ordering.');return;}return previous.call(this,cmd,from);});
   offs.push(game.mods.on('fx',d=>{if(d?.k==='sh'&&d.t==='shopres'){buyPending=false;clearTimeout(buyTimer);}}));
   // Fault repairs can call a captured original takeoff and bypass outer wrappers.
   // Record the actual phase transition in shared/saveable state, including migration.

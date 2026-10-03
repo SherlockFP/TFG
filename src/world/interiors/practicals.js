@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { getBasicMaterial } from '../../render/textures.js';
 import { layoutKit } from './common.js';
+import { neutralLighting38,WORKLIGHT38 } from './lighting38.js';
 
 const box = (w, h, d, x, y, z, ry = 0) => { const g = new THREE.BoxGeometry(w, h, d); if (ry) g.rotateY(ry); g.translate(x, y, z); return g; };
 const scale = (hex, k) => { const c = new THREE.Color(hex); c.multiplyScalar(k); return c.getHex(); };
@@ -11,7 +12,7 @@ const scale = (hex, k) => { const c = new THREE.Color(hex); c.multiplyScalar(k);
 /** ctx = { layout, group, Y, darkCells, def } ; returns { mesh, count } (mesh is added to ctx.group) */
 export function addPracticals(ctx) {
   const L = ctx.layout, K = layoutKit(L), Y = ctx.Y, C = K.C, def = ctx.def || {};
-  const tint = def.lampColor ?? def.lamps?.color ?? 0xffe6c0;
+  const neutral=neutralLighting38(L),tint = neutral?WORKLIGHT38:def.lampColor ?? def.lamps?.color ?? 0xffe6c0;
   const corridorH = L.corridorH || 3.2;
   const cmod = def.practicals?.corridor | 0 || 5;   // [feelfix2] theme knob: 1 dim strip per cmod corridor cells (5 by default; metro / influencer use 2)
   const strips = [], exits = [];
@@ -44,7 +45,7 @@ export function addPracticals(ctx) {
     m.frustumCulled = false; m.matrixAutoUpdate = false; m.userData.noMerge = true; group.add(m);
   };
   mk(strips, scale(tint, 0.55));
-  mk(exits, 0x2cff78);
+  mk(exits, neutral?0x7c806e:0x2cff78);
   ctx.group.add(group);
   return { group, count: strips.length + exits.length / 2 };
 }

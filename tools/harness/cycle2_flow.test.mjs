@@ -166,7 +166,9 @@ const revive = (g) => { for (const p of g.players) p.dead = false; };
 const alive = (g, f) => [...g.creatures.host.values()].filter((c) => !c.dead && (!f || f(c)));
 const kill = (g, c) => g.creatures.damage(c.id, 1e9, 'p0', {});
 /** end of a normal day: everybody aboard, lever -> takeoff -> orbit */
-function leaveDay(g) { board(g); g.hostLever('p0'); g.advance(8); }
+// Wave38 native lever: 8s crew warning followed by the existing 7s flight.
+const DEPARTURE_WAIT38 = 16; // 1s timer-step tolerance; do not bypass either real phase.
+function leaveDay(g) { board(g); g.hostLever('p0'); g.advance(DEPARTURE_WAIT38); }
 function landOn(g) { g.hostLever('p0'); g.advance(10); }
 
 /** drive the ship from a fresh run to "quota met" at the HQ on the deadline day */
@@ -175,7 +177,7 @@ function metQuota(g) {
   run.phase = 'company'; run.moon = 'hq'; run.daysLeft = 0; run.sold = run.quota;
   g.world.facility = null;
   g.hostBeginTakeoff('lever');
-  g.advance(8);
+  g.advance(DEPARTURE_WAIT38);
 }
 
 // ================================================================ A) the classic loop: gate -> core -> win
@@ -331,7 +333,7 @@ function metQuota(g) {
   const c2 = cy(g2);
   c2.firstKills = { office: 1 };
   g2.run.phase = 'company'; g2.run.moon = 'hq'; g2.run.daysLeft = 0; g2.run.sold = 0;
-  g2.hostBeginTakeoff('lever'); g2.advance(8);
+  g2.hostBeginTakeoff('lever'); g2.advance(DEPARTURE_WAIT38);
   ok(g2.run.phase === 'fired', 'quota missed -> fired (unchanged)');
   g2.advance(9);
   ok(g2.run.phase === 'orbit' && cy(g2) && cy(g2).stage === 'days' && cy(g2).firstKills.office === 1, 'the run reset brings the cycle back, first kills kept');
@@ -621,7 +623,7 @@ function metQuota(g) {
         const r = rand();
         if (c.stage === 'core' && r < 0.3) { enterAll(g); const b = alive(g, (x) => x.def.boss)[0]; if (b) kill(g, b); }
         if (r > 0.8) { enterAll(g); wipe(g); g.advance(11); revive(g); board(g); } else leaveDay(g);
-      } else { board(g); g.hostLever('p0'); g.advance(8); }
+      } else { board(g); g.hostLever('p0'); g.advance(DEPARTURE_WAIT38); }
       if (g.run.phase === 'fired') break;
     }
     worst = Math.max(worst, steps);
@@ -653,7 +655,7 @@ function metQuota(g) {
           else if (pick < 0.52) cmds.get('raid')(['go', ['normal', 'heroic', 'mythic'][Math.floor(R() * 3)]], term);
           else if (pick < 0.58) { cmds.get('keystone')(['cancel'], term); cmds.get('raid')(['cancel'], term); }
           else if (pick < 0.66) { const ids = MOON_ORDER.filter((id) => !MOONS[id].company); g.run.moon = ids[Math.floor(R() * ids.length)]; }
-          else if (pick < 0.74 && c.mode === 'classic' && c.stage === 'days') { g.run.sold = g.run.quota; g.run.phase = 'company'; g.run.moon = 'hq'; g.run.daysLeft = 0; g.hostBeginTakeoff('lever'); g.advance(8); }
+          else if (pick < 0.74 && c.mode === 'classic' && c.stage === 'days') { g.run.sold = g.run.quota; g.run.phase = 'company'; g.run.moon = 'hq'; g.run.daysLeft = 0; g.hostBeginTakeoff('lever'); g.advance(DEPARTURE_WAIT38); }
           else if (pick < 0.80) { cmds.get('endless')(['accept'], term); }
           else if (pick < 0.84 && c.mode === 'endless') cmds.get('cashout')([], term);
           else g.advance(1);
@@ -677,7 +679,7 @@ function metQuota(g) {
     let guard = 0;
     while (guard++ < 30 && g.run.phase !== 'fired' && !(cy(g)?.stage === 'days' && g.run.phase === 'orbit' && !cy(g).inst)) {
       if (g.run.phase === 'orbit') { const c3 = cy(g); if (c3.inst?.state === 'armed') { cmds.get('keystone')(['cancel'], term); cmds.get('raid')(['cancel'], term); } if (c3.stage === 'grace' || (c3.stage === 'days' && !MOONS[g.run.moon])) g.run.moon = 'hamsi'; landOn(g); }
-      else if (g.run.phase === 'moon' || g.run.phase === 'company') { board(g); g.hostLever('p0'); g.advance(8); }
+      else if (g.run.phase === 'moon' || g.run.phase === 'company') { board(g); g.hostLever('p0'); g.advance(DEPARTURE_WAIT38); }
       else g.advance(9);
     }
     ok(g.run.phase === 'fired' || (cy(g)?.stage === 'days' && g.run.phase === 'orbit'), `random ops ${seed}: give-up policy back to the days stage in ${guard} steps`);

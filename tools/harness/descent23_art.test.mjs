@@ -17,27 +17,14 @@ const createElement=document.createElement;
 document.createElement=()=>({width:0,height:0,getContext:()=>ctx});
 const root=new THREE.Group(),art=buildDescent23Art({root,floor:1});
 document.createElement=createElement;
-const caption=i=>text.find(row=>row.x===i*256+128&&row.y===172);
-const label=i=>text.find(row=>row.x===i*256+128&&row.y===139);
-
-art.setState({available:true,discovered:false,ready:false});
-assert.equal(caption(2).value,'DIRECT RETURN','an unexplored deep floor never demands discovery before escape');
-assert.equal(label(2).color,'#c9c1ac');
-assert.equal(label(1).color,'#877f6d','descent remains visibly unavailable until the native lift is called');
-art.setState({discovered:true});assert.equal(caption(1).value,'CALL FIRST');
-art.setState({ready:true});assert.equal(caption(1).value,'ACCESS VERIFIED');assert.equal(label(1).color,'#c9c1ac');
+assert.equal(text.length,0,'service lift has icon controls without signs or text');
+art.setState({available:true,discovered:true,ready:true});
 const version=art.metrics.redraws;
 for(let i=0;i<100;i++)art.setState({ready:true,available:true,discovered:true});
 assert.equal(art.metrics.redraws,version,'unchanged native state never uploads another atlas');
-art.setState({busy:true});assert.equal(caption(2).value,'IN TRANSIT');assert.equal(label(2).color,'#877f6d');
-art.setState({floor:0,busy:false,ready:false,discovered:false});
-assert.equal(caption(2).value,'SURFACE LEVEL');assert.equal(label(2).color,'#877f6d');
+art.setState({busy:true});assert.equal(text.length,0);
 art.setState({floor:2});
-for(const [lang,word]of [['tr','DOĞRUDAN DÖN'],['ru','ПРЯМОЙ ВОЗВРАТ'],['en','DIRECT RETURN']]){
- const before=art.metrics.redraws;setLang(lang);assert.equal(art.metrics.redraws,before+1);
- assert.equal(caption(2).value,word,'localized escape caption retains the same native condition');
-}
-
+for(const lang of ['tr','ru','en']){setLang(lang);assert.equal(text.length,0);}
 const geometry=new Set(),material=new Set(),texture=new Set();
 root.traverse(o=>{assert(!o.isLight);if(o.isMesh){geometry.add(o.geometry);material.add(o.material);if(o.material.map)texture.add(o.material.map);}});
 assert(art.metrics.batches<=4&&art.metrics.triangles<=300);assert.equal(art.metrics.colliders,0);

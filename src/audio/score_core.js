@@ -19,11 +19,11 @@ export const S16 = BEAT / 4;
 
 export const FAMILIES = ['wild', 'cold', 'arid', 'dark', 'indoor'];
 export const LAYERS = ['tension', 'chase', 'boss', 'extract'];             // stack on top of the bed in the field scene
-export const THEMES = ['menu', 'orbit', 'home', 'muzak'];                    // exclusive themes (one stem each)
+export const THEMES = ['menu', 'orbit', 'home', 'muzak', 'survey'];          // exclusive themes (one stem each)
 export const STEM_KEYS = [...FAMILIES.map((f) => 'bed_' + f), ...LAYERS, ...THEMES];
 
 /** Per-stem playback gain (stems are peak-normalised when rendered, this is the mix). */
-export const STEM_GAIN = { bed_wild: 0.8, bed_cold: 0.8, bed_arid: 0.8, bed_dark: 0.85, bed_indoor: 0.85, tension: 0.7, chase: 0.8, boss: 0.85, extract: 0.75, menu: 0.9, orbit: 0.8, home: 0.8, muzak: 0.7 };
+export const STEM_GAIN = { bed_wild: 0.8, bed_cold: 0.8, bed_arid: 0.8, bed_dark: 0.85, bed_indoor: 0.85, tension: 0.7, chase: 0.8, boss: 0.85, extract: 0.75, menu: 0.9, orbit: 0.8, home: 0.8, muzak: 0.7, survey: 0.65 };
 
 /** Attack / release time constants (s) of a stem's gain and hold time (s) after its trigger stops. */
 export const DYN = {
@@ -65,6 +65,10 @@ export function pickScene(c0) {
   if (c.home) return { scene: 'home', family: null, stems: { home: 1 } };
   if (c.phase === 'company') return { scene: 'muzak', family: null, stems: { muzak: 1 } };
   if (c.phase !== 'moon') return { scene: 'orbit', family: null, stems: { orbit: 1 } };   // orbit, landing, takeoff, fired
+  // Original mellow synth groove in safe broad places. Danger takes the same
+  // adaptive chase/boss path; maze rooms retain their existing horror beds.
+  if(c.surface&&!c.dead&&!c.boss&&!c.extract&&(c.chase||0)<.12&&(c.locked||0)<.15&&(c.tension||0)<.45)
+    return {scene:'survey',family:null,stems:{survey:1}};
   const family = biomeFamily(c.biome, c.indoor);
   const k = 0.35 + 0.9 * clamp(c.intensity);                                             // intensity scales the reactive layers only
   const stems = {};
@@ -245,7 +249,7 @@ export const VOICES = ['pad', 'pluck', 'bell', 'ep', 'fm', 'square', 'vibes', 's
 export const STEM_META = {
   bed_wild: { echo: 0.25 }, bed_cold: { echo: 0.4 }, bed_arid: { echo: 0.2 }, bed_dark: { echo: 0.35 }, bed_indoor: { echo: 0.3 },
   tension: { echo: 0.2 }, chase: { echo: 0.1 }, boss: { echo: 0.2 }, extract: { echo: 0.12 },
-  menu: { echo: 0.4 }, orbit: { echo: 0.35 }, home: { echo: 0.2 }, muzak: { echo: 0.15 },
+  menu: { echo: 0.4 }, orbit: { echo: 0.35 }, home: { echo: 0.2 }, muzak: { echo: 0.15 }, survey:{echo:.2},
 };
 
 const BED = {
@@ -416,6 +420,20 @@ function muzakEvents() {
 }
 
 const CACHE = new Map();
+function surveyEvents(){
+ const ev=[],chords=[[48,55,59,64],[45,52,55,60],[41,48,52,57],[43,50,55,62]];
+ for(let bar=0;bar<BARS;bar++){
+  const t0=bar*BAR,ch=chords[Math.floor(bar/2)];
+  ev.push({voice:'pad',t:t0,dur:BAR*.9,midi:ch,vel:.15,cut:1600,att:.18,rel:.4});
+  for(let beat=0;beat<4;beat++){
+   ev.push({voice:'bass',t:t0+beat*BEAT,dur:BEAT*.65,midi:[ch[0]-12+(beat===2?7:0)],vel:.23});
+   ev.push({voice:'pluck',t:t0+(beat+.5)*BEAT,dur:BEAT*.8,midi:[ch[1+((bar+beat)%3)]+12],vel:.16,pan:beat%2?.2:-.2});
+   ev.push({voice:'hat',t:t0+beat*BEAT,dur:.05,vel:.035});
+  }
+  ev.push({voice:'kick',t:t0,dur:.2,vel:.13},{voice:'snare',t:t0+2*BEAT,dur:.1,vel:.07});
+ }
+ return ev;
+}
 /** Sorted event list of a stem (times in [0, LOOP)). Deterministic. Cached. */
 export function stemEvents(key) {
   if (CACHE.has(key)) return CACHE.get(key);
@@ -429,6 +447,7 @@ export function stemEvents(key) {
   else if (key === 'home') ev = homeEvents();
   else if (key === 'menu') ev = menuEvents();
   else if (key === 'muzak') ev = muzakEvents();
+  else if (key === 'survey') ev = surveyEvents();
   else return null;
   ev.sort((a, b) => a.t - b.t);
   CACHE.set(key, ev);

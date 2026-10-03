@@ -66,6 +66,18 @@ test('replayed broker request spends and consumes one batch, including restored 
  }finally{f.close();}
 });
 
+test('Company Store restores ship orders without a field broker and retains replay protection',()=>{
+ const f=fixture();try{
+  f.g.run.phase='orbit';f.peer.pos.set(-1.75,.05,2.35);f.peer.inShip=true;
+  const before=f.g.run.credits,price=f.g.shop.priceOf('flashlight');
+  const result=f.buy('ship-store-38',[{id:'flashlight',n:1}]);
+  assert.ok(!result.err,'native cart should accept a living crew member aboard ship');
+  assert.equal(f.g.run.credits,before-price);assert.equal([...f.g.items.all()].length,1);
+  const it=[...f.g.items.all()][0];assert(it.obj.position.x<7&&it.obj.position.z<3.5,'delivery remains in native ship storage');
+  f.buy('ship-store-38',[{id:'flashlight',n:1}]);assert.equal(f.g.run.credits,before-price);
+ }finally{f.close();}
+});
+
 test('a rejected commission keeps its request retryable and full bays cannot charge',()=>{
  const f=fixture();try{
   const command={op:'produce',product:'cells',orderId:'retry-after-funds'};

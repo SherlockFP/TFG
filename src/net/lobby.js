@@ -2,7 +2,7 @@
 // joins a shared discovery room; hosts announce their lobby info periodically.
 import { makeTransport } from './transport.js';
 
-export const GAME_VERSION = '0.12.7';   // native open-place generation and density admission; all peers reload
+export const GAME_VERSION = '0.13.0';   // exploration, power, oxygen and native reactor exchanges; all peers reload
 const DISCOVERY_ROOM = 'kefal-lobbies-v1';
 
 export class LobbyDirectory {

@@ -1,3 +1,7 @@
+# Current owner direction — Wave38 connected salvage loop
+
+[Wave38](wave38/README.md) connects surveys, rare deep salvage, power, finite oxygen, physical refuelling and manual extraction. Company Store and paid upgrades return to native owners. Guided actual E dock/landing/refuel evidence is separate from harness tests. The owner still rates the experience1/10; no score increase is claimed. Next review should observe a blind crew's complete exploration, return and sale, improve screen clutter and remaining creature silhouettes. Full room swallowing is not implemented. Prior shutdown was completed; current scope does not request another.
+
 # Current owner direction — Wave36 readable places
 
 The additional requested round corrects actual new-place descriptions and adds finite physical entrance/bay identities without changing paths, lights, cargo or the native economy. Windows harness fixture failures have separate provenance and retained negative probes. [Wave36](wave36/README.md) owns final checks, visual/controller evidence and remaining limits. The owner's enjoyment rating needs human reassessment; test counts do not raise it. Final PC shutdown follows verified saving/publication, as explicitly requested.

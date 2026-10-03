@@ -13,6 +13,7 @@ import { MINESHAFT_THEME, MINESHAFT_ROOM_TYPES, mineshaftRoomHeight, decorateMin
 import { buildSetPieces, planDarkCorridors } from './setpieces.js';
 import { INTERIORS, INTERIOR_THEMES, INTERIOR_NAMES, getInterior, isInteriorTheme } from './interiors/index.js';
 import { tintLampLights } from './interiors/common.js';
+import { neutralLighting38,normalizeLights38 } from './interiors/lighting38.js';
 import { buildHazards } from './interiors/hazards.js';
 import { buildFacilitySystems, planChestSpots } from './interiors/facsys.js';
 import { planMaps2, buildRooms2, installRoomStyles2 } from './rooms2.js';   // [maps2]
@@ -1529,6 +1530,7 @@ function* buildFacilitySteps30(layout, { physics, lightPool: pool }, owned) {
   yield 'variety';
   setPieces.releaseNav();
   // lights
+  normalizeLights38(L,emitters);
   for (const e of emitters) lightPool.add(e);
   yield 'lights';
   // merge static props per chunk/material (doors are separate objects and stay animated)
@@ -1557,7 +1559,7 @@ function* buildFacilitySteps30(layout, { physics, lightPool: pool }, owned) {
     setPieces, zones: setPieces.zones, landmarkSpots, hazards,
     sys, chestSpots, m2, variety, lab: themeOut?.lab || null, heroes: heroOut || null,   // [labyrinths]   // [stealth] fac.variety = hatches / rewards / shortcut latch (src/game/stealth.js); [maps2] fac.m2 = story-room notes / light switches / windows (src/game/maps2.js)
     // facility systems runtime data + chest spots (dead-end / treasure / vault rooms) for the world module
-    interior: def.id, interiorName: def.name, atmosphere: def.atmosphere || null, viewFar: def.viewFar || null, open35: sky35,
+    interior: def.id, interiorName: def.name, atmosphere: neutralLighting38(L)?{...def.atmosphere,lighting38:'neutral'}:def.atmosphere || null, viewFar: def.viewFar || null, open35: sky35,
     dispose,
     // which room/zone is a world position in
     cellAt(x, z) {

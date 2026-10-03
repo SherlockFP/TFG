@@ -90,32 +90,37 @@ mods.emit('netReady', net, game);
   r.time = 24 * 60 - 200 * (16 * 60 / 720);   // 200 s left
   mods.emit('update', 0.1, game);
   ok(sys().length === 0, '200 s before midnight: no warning yet');
-  r.time = 24 * 60 - 89 * (16 * 60 / 720);    // 89 s left
+  r.time = 24 * 60 - 1;
   mods.emit('update', 0.1, game);
-  ok(sys().filter((k) => k.startsWith('SHIP DOOR LOCKS')).length === 1, 'warning at 90 s');
-  ok(sent.some((s) => s[0] === 'hms' && s[1].k === 'lock' && s[1].s > 80 && s[1].s < 90), 'countdown message carries the seconds');
+  ok(sys().length === 0, 'midnight has no automatic lock warning');
+  r.departure38 = { seconds: 8 };
+  mods.emit('update', 0.1, game);
+  ok(sys().filter((k) => k.startsWith('SHIP DOOR LOCKS')).length === 1, 'one warning when crew starts eight-second departure');
+  ok(sent.some((s) => s[0] === 'hms' && s[1].k === 'lock' && s[1].s === 8), 'countdown message carries actual boarding seconds');
   mods.emit('update', 0.1, game);
   ok(sys().length === 1, 'not repeated every frame');
-  r.time = 24 * 60 - 59 * (16 * 60 / 720);
+  r.departure38.seconds = 4;
   mods.emit('update', 0.1, game);
-  ok(sys().length === 2, '60 s mark');
-  r.time = 24 * 60 - 29 * (16 * 60 / 720);
+  ok(sys().length === 2, 'four-second boarding reminder');
+  r.departure38.seconds = 1;
   mods.emit('update', 0.1, game);
-  r.time = 24 * 60 - 9 * (16 * 60 / 720);
+  ok(sys().length === 3, 'one-second boarding reminder');
+  delete r.departure38;
   mods.emit('update', 0.1, game);
-  ok(sys().length === 4, '30 s and 10 s marks: ' + sys().length);
   clearSent();
+  r.departure38={seconds:8};
   // casual: nothing
   game.config.difficulty = 'casual'; mods.emit('update', 0.1, game);
   game.run.time = 24 * 60 - 60 * (16 * 60 / 720);
   mods.emit('update', 0.1, game);
   ok(sys().length === 0, 'casual: no lock warning');
-  game.config.difficulty = 'standard'; game.run.time = 480; mods.emit('update', 0.1, game);
+  delete r.departure38; game.config.difficulty = 'standard'; game.run.time = 480; mods.emit('update', 0.1, game);
   // early quota: nothing
+  r.departure38={seconds:8};
   game.run.quotaIndex = 1; game.run.time = 24 * 60 - 60 * (16 * 60 / 720);
   mods.emit('update', 0.1, game);
   ok(sys().length === 0, 'quota 1: no lock warning in any mode');
-  game.run.quotaIndex = 3; game.run.time = 480;
+  game.run.quotaIndex = 3; game.run.time = 480; delete game.run.departure38;
 }
 
 // -------------------------------------------------------------- stranded crew (host.js hook)

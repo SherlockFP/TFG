@@ -171,9 +171,11 @@ const enterAll = (g, roomId) => {
 };
 const alive = (g, f) => [...g.creatures.host.values()].filter((c) => !c.dead && (!f || f(c)));
 const kill = (g, c) => g.creatures.damage(c.id, 1e9, 'p0', {});
-const leaveDay = (g) => { board(g); g.hostLever('p0'); g.advance(8); };
+// Actual Wave38 lever countdown (8s) plus native takeoff flight (7s), with timer-step tolerance.
+const DEPARTURE_WAIT38=16;
+const leaveDay = (g) => { board(g); g.hostLever('p0'); g.advance(DEPARTURE_WAIT38); };
 const landOn = (g) => { g.hostLever('p0'); g.advance(10); };
-const metQuota = (g) => { const run = g.run; run.phase = 'company'; run.moon = 'hq'; run.daysLeft = 0; run.sold = run.quota; g.world.facility = null; g.hostBeginTakeoff('lever'); g.advance(8); };
+const metQuota = (g) => { const run = g.run; run.phase = 'company'; run.moon = 'hq'; run.daysLeft = 0; run.sold = run.quota; g.world.facility = null; g.hostBeginTakeoff('lever'); g.advance(DEPARTURE_WAIT38); };
 const req = (g, op, data = {}, from = 'p0') => g.handlers.get('c3req')({ a: 'c3req', op, ...data }, from);
 const term = () => ({ out: [], print(t) { this.out.push(t); } });
 const msgs = (g, kind, k) => g.log.filter(([t, d]) => t === kind && (!k || d.k === k));

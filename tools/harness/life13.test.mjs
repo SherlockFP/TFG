@@ -22,6 +22,14 @@ mods.emit('update', .1, game);
 api.dispose();
 console.log('life13: actual company unload removes citizens before orbit update');
 
+// Expeditions are solitary apart from the native crew and creatures; no wandering surveyor clutter.
+{
+ const m=new Emitter(),g={mods:m,run:{phase:'moon',moon:'hamsi',day:1,seed:12},isHost:true,
+  world:{facility:{},outdoor:{group:new THREE.Group()},terrain:{heightAt:()=>-1.25,blocked:()=>false}},
+  physics:{raycast(){return null;}},broadcastRun(){},unloadMap(){}};
+ const a=installLife13(g);m.emit('mapLoaded',g.world,g);assert.equal(a.actors.length,0,'moon surveyors removed');assert.equal(a.beacon,null);a.dispose();
+}
+
 // Execute the actual registered host handler and interactable actions, not a parallel state model.
 const oldNow=Date.now;let tick=100000;Date.now=()=>tick;
 try{
@@ -52,7 +60,7 @@ try{
  req('deliver',1,'peer');at(0);req('dispatch',0);assert.equal(g.run.credits,32);assert.equal(spawns,1,'reward is crew/day finite');
  // City payment also closes the existing moon survey/barter budget.
  g.unloadMap();g.run.phase='moon';g.run.moon='test';g.world={facility:{},outdoor:{group:new THREE.Group(),terrain:{heightAt:()=>-1.25,blocked:()=>false}}};
- m.emit('mapLoaded',g.world,g);at(0);req('accept',0);assert.equal(g.run.life13.mission.paid,12);assert.equal(g.run.credits,32);
+ m.emit('mapLoaded',g.world,g);assert.equal(a.actors.length,0);req('accept',0);assert.equal(g.run.life13.mission.paid,12);assert.equal(g.run.credits,32);
  // New day restores one shared opportunity; unloading cancels the unclaimed physical parcel.
  g.unloadMap();g.run.day=3;g.run.phase='company';g.run.moon='hq';g.world={company:{group:new THREE.Group(),groundY:-1.25}};
  m.emit('mapLoaded',g.world,g);at(0);req('dispatch',0);assert.equal(spawns,2);

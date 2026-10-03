@@ -97,7 +97,7 @@ export const ITEMS = {
   stopsign: { id: 'stopsign', name: 'Stop Sign', kind: 'weapon', price: 0, weight: 12, hands: 1, dmg: 22, cd: 0.9, reach: 2.5, charge: true, rarity: 'uncommon', value: [20, 30] },
   machete: { id: 'machete', name: 'Machete', kind: 'weapon', price: 90, coin: 350, weight: 5, hands: 1, dmg: 26, cd: 0.5, reach: 2.1, rarity: 'rare' },
   sledge: { id: 'sledge', name: 'Sledgehammer', kind: 'weapon', price: 150, coin: 600, weight: 20, hands: 2, dmg: 48, cd: 1.3, reach: 2.6, charge: true, knock: 2, rarity: 'rare' },
-  taser: { id: 'taser', name: 'Zap Gun', kind: 'weapon', price: 650, coin: 900, weight: 11, hands: 1, dmg: 4, cd: 1.5, reach: 12, stun: 3.5, battery: 60, rarity: 'epic', ranged: true },
+  taser: { id: 'taser', name: 'Retired Zap Gun', kind: 'weapon', noShop: true, retired: true, weight: 11, hands: 1, dmg: 0, cd: 1.5, reach: 0, battery: 60, rarity: 'epic', ranged: true },
   harpoon: { id: 'harpoon', name: 'Kefal Harpoon', kind: 'weapon', price: 600, coin: 1400, weight: 14, hands: 2, dmg: 70, cd: 1.6, reach: 30, ranged: true, rarity: 'epic' },
   shotgun: { id: 'shotgun', name: 'Double Barrel', kind: 'weapon', price: 0, coin: 2500, weight: 16, hands: 2, dmg: 90, cd: 0.7, reach: 25, ranged: true, ammo: 2, rarity: 'legendary' },
 
@@ -262,7 +262,7 @@ export const FISH_TABLE = [
 ];
 
 // Terminal store stock (credits)
-export const STORE_ITEMS = ['flashlight', 'proflash', 'walkie', 'shovel', 'pipe', 'stungrenade', 'medkit', 'adrenaline', 'boombox', 'spraypaint', 'glowstick', 'rod', 'lockpick', 'shells', 'taser', 'jetpack',
+export const STORE_ITEMS = ['flashlight', 'proflash', 'walkie', 'shovel', 'pipe', 'stungrenade', 'medkit', 'adrenaline', 'boombox', 'spraypaint', 'glowstick', 'rod', 'lockpick', 'shells', 'jetpack',
   'ladder', 'booster', 'inhaler', 'beltbag', 'adblock',
   'bag_fieldpack', 'bag_hauler', 'arm_hoodie', 'arm_riot', 'arm_kevlar', 'trk_dongle', 'trk_charm', 'trk_amulet'];
 /** Wave-1 gear ids (bags / armor / trinkets) for loot tables and the store. */

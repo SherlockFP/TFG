@@ -161,10 +161,10 @@ export function buildShipDeco({ physics, lightPool, group, signs = L.SIGNS }) {
   disposables.push(bakedGeo, bakedMat);
   // reactor core glow (emissive, unlit) + one pooled light
   if (R) {
-    const coreMat = new THREE.MeshBasicMaterial({ color: 0x66ffd8 }), coreGeo = new THREE.CylinderGeometry(0.26, 0.26, 1.8, 12);
+    const coreMat = new THREE.MeshLambertMaterial({ color: 0xd6b878, flatShading: true }), coreGeo = new THREE.CylinderGeometry(0.26, 0.26, 1.8, 8);
     const core = new THREE.Mesh(coreGeo, coreMat); core.position.set(R.x, 1.3, R.z); core.name = 'reactorCore'; group.add(core);
     disposables.push(coreGeo, coreMat);
-    emitters.push(lightPool.add({ pos: new THREE.Vector3(R.x - 0.2, 1.4, R.z + 0.5), color: 0x66ffd8, intensity: 0.7, distance: 5.5, group: 'ship' }));
+    emitters.push(lightPool.add({ pos: new THREE.Vector3(R.x - 0.2, 1.4, R.z + 0.5), color: 0xffdda0, intensity: 0.24, distance: 3.5, group: 'ship' }));
     group.userData.reactorCore = core;
   }
   // ---- walls / trims mesh

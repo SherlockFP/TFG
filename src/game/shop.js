@@ -28,7 +28,7 @@ export const CATEGORIES = [
   { id: 'weapons', name: 'Weapons' }, { id: 'tools', name: 'Tools' }, { id: 'bags', name: 'Bags' }, { id: 'consumables', name: 'Consumables' },
   { id: 'magic', name: 'Magic' }, { id: 'components', name: 'Components' }, { id: 'suits', name: 'Suits' }, { id: 'ship', name: 'Ship' },
 ];
-const KIND_CAT = { weapon: 'weapons', tool: 'tools', consumable: 'consumables', bag: 'bags', suit: 'suits', component: 'components', skillbook: 'magic', spell: 'magic' };
+const KIND_CAT = { weapon: 'weapons', tool: 'tools', consumable: 'consumables', bag: 'bags', suit: 'suits', armor: 'suits', trinket: 'suits', component: 'components', skillbook: 'magic', spell: 'magic' };
 const DEAL_STEPS = [0.15, 0.2, 0.25, 0.3, 0.35];
 const EOM_OFF = 0.12;
 const EOM_QUOTES = [
@@ -245,7 +245,7 @@ export function installShop(game) {
     buy(lines) { g.net.request('term', { cmd: { op: 'cart', lines } }); },
     /** lines for the terminal STORE LIST (text purists) */
     textList() {
-      const out = g.industry13 ? [t('Meet a field broker to buy supplies. The ship terminal is now a route console.'), ''] : ['Company Store. Delivery is instant. The fee is not mentioned.', 'Type STORE for the store screen. BUY <item> [n] still works here.', ''];
+      const out = [t('COMPANY STORE'), 'Type STORE for the store screen. BUY <item> [n] still works here.', ''];
       const st = stock();
       const deals = st.filter((e) => e.dealKind === 'deal'), eom = st.find((e) => e.dealKind === 'eom');
       if (deals.length) out.push("TODAY'S DEALS: " + deals.map((e) => `${e.name} -${Math.round(e.off * 100)}%`).join(', '));
@@ -309,8 +309,9 @@ export function installShop(game) {
     const itemTotal = itemLines.reduce((s, p) => s + p.unit * p.n, 0);
     const done = [];
     const deliveryTypes=itemLines.flatMap(p=>Array(p.n).fill(p.e.id));
-    const delivery=g.industry13?g.industry13.deliveryPlanFor?.(from,deliveryTypes):null;
-    if(g.industry13&&deliveryTypes.length&&!delivery)return fail(t('Collect items from the pickup tray before ordering more.'));
+    const fieldOrder=!!g.industry13?.near(from);
+    const delivery=fieldOrder?g.industry13.deliveryPlanFor?.(from,deliveryTypes):null;
+    if(fieldOrder&&deliveryTypes.length&&!delivery)return fail(t('Collect items from the pickup tray before ordering more.'));
     let deliveryIndex=0;
     if (itemLines.length) {
       run.credits -= itemTotal;
@@ -337,14 +338,14 @@ export function installShop(game) {
       }
     }
     g.broadcastRun(['credits', 'shop', 'upgrades']);
-    const msg = `Ordered ${done.join(', ')}. Your new balance is ▮${run.credits}.\n${t(g.industry13 ? 'Collect your order beside the field broker.' : "Your order has been delivered to the ship's storage.")}`;
+    const msg = `Ordered ${done.join(', ')}. Your new balance is ▮${run.credits}.\n${t(fieldOrder ? 'Collect your order beside the field broker.' : "Your order has been delivered to the ship's storage.")}`;
     reply(msg);
-    result(from, true, msg, { total, done, delivered:deliveryTypes.length });
+    result(from, true, msg, { total, done, delivered:deliveryTypes.length, fieldOrder });
   };
   // ---------------------------------------------------------------- client: purchase results
   ctx.onFx('shopres', (d) => {
     g.ui.toast(t(d.ok ? 'Ordered' : 'Order failed') + (d.ok ? '' : ': ' + t(String(d.msg || ''))), d.ok ? 'good' : 'bad');
-    if (d.ok) {g.audio.ui('ui_buy', 0.7);if(g.industry13&&d.delivered>0)g.ui.toast(t('Your order is on the blue pickup tray beside the broker. Aim at a tool and press E.'),'good');} else g.ui.sfx('ui_error');
+    if (d.ok) {g.audio.ui('ui_buy', 0.7);if(d.fieldOrder&&d.delivered>0)g.ui.toast(t('Your order is on the blue pickup tray beside the broker. Aim at a tool and press E.'),'good');} else g.ui.sfx('ui_error');
     api.panel?.onResult?.(d);
   });
 
@@ -372,9 +373,9 @@ export function installShop(game) {
   offs.push(mm.on('interactables', (list, gg) => {
     if (gg !== g || !g.run) return;
     const p = g.player;
-    if (!g.industry13 && shipKiosk && (p.inShip || p.pos.lengthSq() < 144)) list.push({ pos: new THREE.Vector3(S.x, 1.15, S.z - 0.3), r: 0.8, label: t('Company Store [E]'), action: () => api.open() });
+    if (shipKiosk && (p.inShip || p.pos.lengthSq() < 144)) list.push({ pos: new THREE.Vector3(S.x, 1.15, S.z - 0.3), r: 0.8, label: t('Company Store [E]'), action: () => api.open() });
     const co = g.world.company;
-    if (!g.industry13 && co?.group?.userData.tfgStore && g.run.phase === 'company') {
+    if (co?.group?.userData.tfgStore && g.run.phase === 'company') {
       const k = co.group.userData.tfgStore;
       hqPos = k.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0, 0.7, 0));
       list.push({ pos: hqPos, r: 0.9, reach: 3, label: t('Company Store - counter [E]'), action: () => api.open() });

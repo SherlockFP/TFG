@@ -267,7 +267,6 @@ export const MARKET = {
     { id: 'shovel', coin: 120, minLevel: 2 },
     { id: 'machete', coin: 350, minLevel: 5 },
     { id: 'sledge', coin: 600, minLevel: 9 },
-    { id: 'taser', coin: 900, minLevel: 12 },
     { id: 'harpoon', coin: 1400, minLevel: 16 },
     { id: 'shotgun', coin: 2500, minLevel: 22 },
   ],

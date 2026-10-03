@@ -10,6 +10,7 @@ import { insideShip, SHIP } from '../world/ship.js';
 import { FACILITY_Y } from '../world/facility.js';
 import { clamp, damp } from '../core/util.js';
 import { MINIGAMES } from '../minigames/index.js';
+import {fuseReceipt38} from './power38.js';
 import { applyAffixes, applyAffixEffects, affixCooldown, affixDisplayName, affixColor, describeAffix } from './loot.js';
 import { TIERS } from './tiers.js';
 import { plusMul } from './enhance.js';   // [forge]
@@ -276,7 +277,7 @@ export const actionMethods = {
         pos: sp.lever, r: 0.6, label: () => ph === 'orbit' ? (this.run.daysLeft <= 0 && this.run.moon !== 'hq' ? t('Deadline. Route to 0-Algorithm HQ') : tf('Land on {name} [E]', { name: MOONS[this.run.moon]?.name })) : (ph === 'moon' || ph === 'company') ? t('Start the ship / take off [E]') : t('Ship in flight...'),
         action: () => { if (ph === 'orbit' || ph === 'moon' || ph === 'company') { this.sfx('lever_pull', 0.9); this.animLever(); this.net.request('lever'); } },
       });
-      add({ pos: sp.doorOpen, r: 0.5, label: () => this.ship.door.label(this.run?.phase), action: () => this.net.request('shipdoor', { open: !this.ship.door.open }) });
+      add({ pos: sp.doorOpen, r: 0.5, reach: 2.8, label: () => this.ship.door.label(this.run?.phase), action: () => this.net.request('shipdoor', { open: !this.ship.door.open }) });
       add({ pos: sp.arcade, r: 0.6, label: t('Play FLAPPY PHISH [E]'), action: () => this.startArcade() });
       if (held?.battery !== undefined && held?.battery !== null && itemDef(held.type).battery) add({ pos: sp.charger, r: 0.6, label: tf('Charge {name} [E]', { name: itemDef(held.type).name }), action: () => { this.net.request('charge', { id: held.id, mul: this.stats.batteryMul }); } });
       add({ pos: sp.suits, r: 0.7, label: t('Change suit [E]'), action: () => this.cycleSuit() });
@@ -285,7 +286,7 @@ export const actionMethods = {
     const fac = this.world.facility;
     if (fac && p.indoor) {
       for (const ip of fac.interactables) {
-        if (!cardExpedition && ip.type === 'fuse') add({ pos: ip.pos, r: 0.6, label: () => (this.run?.powerOn ? t('Fuse box: run diagnostics [E]') : t('Fuse box: restore power [E]')), action: () => this.startFuse(ip) });
+        if (!cardExpedition && ip.type === 'fuse') add({ pos: ip.pos, r: 0.6, reach: 2.3, label: () => (this.run?.powerOn ? t('Fuse box: run diagnostics [E]') : t('Fuse box: restore power [E]')), action: () => this.startFuse(ip) });
       }
       for (const d of fac.doors) {
         if (d.kind === 'vault' && d.locked && d.keypadPos) add({ pos: d.keypadPos, r: 0.6, label: t('Crack the vault keypad [E]'), action: () => this.startSafe(d) });
@@ -1202,8 +1203,9 @@ export const actionMethods = {
     });
   },
   startFuse(ip) {
+    const receipt=fuseReceipt38(this,ip);
     this.openMinigame('fuse', { difficulty: clamp(0.3 + this.hostDangerGuess() * 0.1, 0, 0.9) }, (res) => {
-      if (res.success) this.net.request('fuse', {});
+      if (res.success) this.net.request('fuse', receipt);
       else if (!res.cancelled) { this.engine.flash(0x88ccff, 0.4); this.damageLocal(10, 'electric'); }
     });
   },

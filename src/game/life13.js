@@ -41,7 +41,7 @@ export function installLife13(game) {
   clear();if(disposed)return;
   if(world.company){kind='company';root=world.company.group;}
   else if(world.outdoor?.vendorSpace && game.fleet13?.docked?.()){kind='hub';root=world.outdoor.group;}
-  else if(world.facility && world.outdoor?.group && terrain()?.heightAt && !MOONS[game.run?.moon]?.home && !MOONS[game.run?.moon]?.expedition){kind='moon';root=world.outdoor.group;}
+  // Field surveyors were distracting roaming actors. Exploration rewards now come from the native facility survey.
   else return;
   const st=ensure();time=st?.time || 0;lastWire=st?.time ?? -1;
   for(const [i,route]of CITY_ROUTES13[kind].entries()){

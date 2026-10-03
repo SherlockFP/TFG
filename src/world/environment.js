@@ -313,7 +313,8 @@ export class Environment {
     L.hemi.intensity = this.indoor ? 0.02 : (Math.max(0.15 + dayF * 0.7 * overcast + lf * 1.5, pal ? 0.24 : 0)) * (this.eclipse ? 0.5 : 1);
     if (this.indoor) {   // [qa] readable-dim interiors: a low neutral baseline (tinted by the theme haze) so room shapes read without a torch; the fog still eats the far corners
       const af = this.interiorFog;
-      L.hemi.color.set(af?.fog ?? 0x000000).lerp(_white, 0.62); L.hemi.groundColor.set(af?.fog ?? 0x000000).lerp(_white, 0.18);
+      if(af?.lighting38==='neutral'){L.hemi.color.set(0xd4d0c6);L.hemi.groundColor.set(0x35332f);}
+      else {L.hemi.color.set(af?.fog ?? 0x000000).lerp(_white, 0.62); L.hemi.groundColor.set(af?.fog ?? 0x000000).lerp(_white, 0.18);}
       L.hemi.intensity = af?.hemi ?? 0.16; L.ambient.intensity = af?.ambient ?? 0.045;
     } else {
       L.hemi.color.copy(horizon).lerp(new THREE.Color(0xffffff), b.hemiW ?? 0.35);   // [soul] per-moon hemisphere tint

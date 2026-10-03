@@ -1,13 +1,13 @@
 # TFG — current agent map
 
-Updated 2026-10-03, Wave36 readable places and verified Windows regressions. This is the current entry point; historical Windows,
+Updated 2026-10-03, Wave38 exploration, reactor and crew extraction. This is the current entry point; historical Windows,
 Claude branch/model, no-test and automatic merge/push instructions are retired.
 Their full prior text is preserved in [the historical snapshot](docs/history/AGENTS-pre-wave25.md).
 Current user/session instructions take precedence. Inspect Git for the publication SHA.
 
 ## Start here
 
-1. Read [current work and evidence](docs/wave36/README.md),
+1. Read [current work and evidence](docs/wave38/README.md), [previous readable places](docs/wave36/README.md),
    [wide places](docs/wave35/README.md),
    [early salvage haul](docs/wave34/README.md),
    [experimental crew threats](docs/wave33/README.md),

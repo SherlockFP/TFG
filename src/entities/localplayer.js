@@ -464,7 +464,7 @@ export class LocalPlayer {
     // stair smoothing: autostep / snap-to-ground move the feet in one frame; ease the eye instead
     const dy = this.pos.y - (this._prevY ?? this.pos.y);
     this._prevY = this.pos.y;
-    if (this.grounded && wasGrounded && Math.abs(dy) > 0.04 && Math.abs(dy) < 0.6 && Math.abs(dy) / Math.max(dt, 1e-4) > 7) {
+    if (this.grounded && wasGrounded && Math.abs(dy) > 0.04 && Math.abs(dy) < 0.6) {
       this.stepOff = clamp(this.stepOff - dy, -0.5, 0.5);
     }
     this.stepOff = damp(this.stepOff, 0, 13, dt);

@@ -48,6 +48,7 @@ export function installScore(game) {
     const ext = !!(fac?.extraction && fac.ext);
     return {
       phase, biome: moon?.biome || 'hills', indoor, inShip: !!p?.inShip, home: !!moon?.home, dead: !!p?.dead,
+      surface: !moon?.expedition && (!indoor || !!game.world?.facility?.layout?.open35 && !(game.world?.descent21Depth>0)),
       chase, tension, locked, boss, extract: ext, extractFrac: ext ? Math.max(0, Math.min(1, (fac.ext.left || 0) / Math.max(1, fac.ext.total || 1))) : 1,
     };
   }

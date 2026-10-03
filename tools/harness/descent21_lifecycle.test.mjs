@@ -61,7 +61,9 @@ assert.equal(socialPrompts().length,1);assert.equal(socialPrompts()[0].optionalP
 const approach=W.g.descent21.plan().approach;W.player.pos.set(approach.x,approach.y+.05,approach.z);W.remote.pos.copy(W.player.pos).add(new THREE.Vector3(.55,0,0));
 assert.equal(W.g.descent21.controlsActive(),false);assert.equal(socialPrompts().length,1,'native high-five returns immediately outside cabin');
 W.aboard();W.player.indoor=false;assert.equal(socialPrompts().length,1,'cabin coordinates alone never suppress outdoor high-five');W.player.indoor=true;coop.dispose();
-assert.equal(W.request('call'),false,'not unlocked at zero visits');W.visit();W.aboard();
+assert.equal(W.request('call'),false,'not unlocked at zero visits');W.visit();
+assert.ok(W.g.run.credits>0,'actual host room ticks pay the native run wallet');
+const surveyPaid=W.g.run.credits;W.visit();assert.equal(W.g.run.credits,surveyPaid,'repeated actual host visits do not pay twice');W.aboard();
 const st=W.g.descent21.state(),forged={op:'call',token:st.token,rev:st.rev,nonce:st.nonce};assert.equal(W.g.descent21.hostReq({...forged,nonce:999},'a'),false,'forged challenge denied');
 W.g.events11={active:()=>true};assert.equal(W.request('call'),false,'active native crisis cannot be silently cancelled by transit');W.g.events11=null;
 assert(W.request('call'));W.tick(3.1);assert.equal(W.g.descent21.state().liftStage,'ready');

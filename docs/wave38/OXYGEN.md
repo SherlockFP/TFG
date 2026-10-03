@@ -1,0 +1,9 @@
+# Wave38 facility air
+
+Normal facility exploration has 240 seconds of personal air. The host drains native living indoor players, with a 15% sprint penalty where the native sprint state is known. Outdoors and aboard ship refill at 24 seconds per second. Company/home/expedition/instance/voyage/raid/goal/custom maps are excluded, preserving the existing underwater expedition system. At zero air the existing host hurt path applies 8 damage every two seconds; there is no automatic departure or teleport.
+
+Each active floor presents up to three matte oxygen cylinders at scrap positions reachable by the native standing-capsule flood. Supplies are shared and finite: each consumption is saved under run/day/moon/seed/depth plus cylinder ID. Returning to a floor preserves spent cylinders. Requests require the same current floor, living connected native player, correct native floor support, normal range and unobstructed Rapier LOS. A stale request cannot consume another floor's supply. Supply receipts are capped at 384 per run; after the cap outdoor refill remains available. Player state prunes disconnected identities when history exceeds sixteen entries.
+
+A compact translated air percentage appears only while the local player is inside the active facility. One low-air warning encourages refilling or leaving; it resets after recovery. The module owns its HUD, finite cylinder geometry/materials and map callbacks, and disposes them once on unload.
+
+Evidence: `oxygen38.test.mjs` uses a real native facility and Rapier physics with a real Session self-request callback. It verifies indoor depletion and native damage invocation, outdoor recovery, dead guards, finite cylinders, physical refill, once-only supplies, reentry persistence, stale-floor rejection, wrong-floor rejection, wall LOS rejection, disconnected peer rejection and range rejection. Browser visual QA and multiplayer Internet testing remain outside this native test's evidence.

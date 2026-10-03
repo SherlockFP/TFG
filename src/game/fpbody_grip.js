@@ -251,7 +251,15 @@ export function fitGrip(geom, def, id = '', dp = 0) {
     pen = clearOfArms(geom.pts, q, pos, hand, caps);
   } else {
     if (cls === 'long2h') caps = [...armCaps(R1), ...armCaps(L1)];
+    const anchored=cls==='long2h'&&def?.ranged&&geom.hasGrip;
+    const before=anchored?pos.clone():null;
     pen = clearOfArms(geom.pts, q, pos, hand, caps);
+    if(anchored){
+      // A stock may need clearance from the sleeve, but its handle cannot leave
+      // the fist. Move the arm's IK target with the fitted gun instead.
+      const shift=pos.clone().sub(before);
+      hand.add(shift);pos.copy(before);grip.R=hand.clone();
+    }
   }
 
   // ---- left hand on the fore-end of guns / hammers

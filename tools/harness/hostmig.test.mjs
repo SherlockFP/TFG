@@ -6,6 +6,7 @@ import { GAME_VERSION } from '../../src/net/lobby.js';
 import { Emitter } from '../../src/core/events.js';
 import { HM, candidates, cmpRank, nextOrder, creatureOptsFromView, buildX, hostDataFrom } from '../../src/game/hostmig_core.js';
 import { installHostMig } from '../../src/game/hostmig.js';
+import {hostMethods} from '../../src/game/host.js';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let checks = 0;
@@ -148,6 +149,8 @@ const done = (games) => { for (const g of games) g.destroy(); };
   ok(A.hm.state().order[0] === 'H' && A.hm.state().order.join() === 'H,A,B', 'crew order replicated to clients: ' + A.hm.state().order);
   ok(A.hm.state().hasSnapshot && B.hm.state().hasSnapshot, 'clients hold the migration snapshot');
   ok(A.creatures.views.size === 3 && A.items.all().length === 4, 'clients replicate creatures + items');
+  H.run.departure38={seconds:5};H.broadcastRun();await sleep(30);
+  ok(A.run.departure38.seconds===5&&B.run.departure38.seconds===5,'pending boarding countdown is actually replicated before host loss');
   H.hm.dispose();    // the crashed host does nothing any more
   H.destroyed = true;
   mesh.drop('H');
@@ -159,6 +162,10 @@ const done = (games) => { for (const g of games) g.destroy(); };
   await sleep(HM.AUTO_CLAIM_MS + 300);
   ok(A.net.isHost && A.net.hostId === 'A' && A.net.hostEpoch === 1, 'A is the host, epoch 1');
   ok(!B.net.isHost && B.net.hostId === 'A' && B.net.hostEpoch === 1, 'B follows A');
+  ok(A.run.phase==='moon'&&A.run.departure38===null&&B.run.departure38===null,'promotion cancels orphaned departure for host and follower without automatic flight');
+  hostMethods.hostBeginTakeoff.call(A,'lever');
+  ok(A.run.departure38?.seconds===8&&A.run.phase==='moon','actual native manual lever can start a fresh boarding countdown after promotion');
+  A.run.departure38=null;A.broadcastRun();
   ok(A.hm.state().phase === 'idle' && B.hm.state().phase === 'idle', 'dialogs closed');
   ok(A.handlersRegistered === 1 && B.handlersRegistered === 0, 'host request handlers registered on the successor only');
   ok(A.creatures.host.size === 3 && ['c1', 'c2', 'c3'].every((id) => A.creatures.host.has(id)), 'creature authority rebuilt under the SAME ids');

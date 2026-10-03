@@ -32,7 +32,7 @@ const BODY_SVG = `<svg viewBox="0 0 40 80" class="hud-body"><g fill="currentColo
 // ------------------------------------------------------------------ shared run helpers (also used by ui.js / objectives)
 export const TIPS = [
   'Scan (right click) before you grab: the value is shown on every label.',
-  'The ship leaves at midnight, with or without you.',
+  'The ship waits for a crew member to pull the lever.',
   'Carry bodies back to the ship: the fine is smaller.',
   'Sprinting and your voice make noise. Trolls hunt by sound.',
   'NPCs only move when nobody is looking at them.',

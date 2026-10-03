@@ -132,6 +132,7 @@ const viewMap = new Map(views.map((v) => [v.id, v]));
 const game = new Proxy({
   // real bits
   mods: new Emitter(), time: 100, dtLast: DT, isHost: true, selfId: 'h', destroyed: false, paused: false, tick: 0,
+  profile: (await import('../../src/core/save.js')).defaultProfile(),
   run: { phase: 'moon', moon: moonId, day: 3, daysLeft: 2, quota: 260, quotaIndex: 1, credits: 200, seed: 1234, runId: 'r1', hour: 12 * 60, clock: 12 * 60, fc: null, fc2: null, mm: {}, rs: {}, hub: {}, difficulty: 'normal', scrap: [], modifiers: [], moonState: {} },
   player: players[0], players,
   remotes: new Map(players.slice(1).map((p) => [p.id, p])),

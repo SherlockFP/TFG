@@ -255,6 +255,10 @@ export function installHostMig(game) {
     // 3. phases that were mid-flight on the old host (its timers died with it)
     try {
       const ph = game.run.phase;
+      // Boarding countdown callbacks belong to the departed host. Cancel the
+      // orphaned request; the living crew can explicitly start another countdown.
+      // Null travels in the following full keyframe so followers clear their HUD.
+      if((ph==='moon'||ph==='company')&&game.run.departure38)game.run.departure38=null;
       if (ph === 'landing') later(() => game.hostFinishLanding(), 3000, true);
       else if (ph === 'takeoff') later(() => game.hostFinishTakeoff(), 3000, true);
     } catch (e) { console.warn('[hostmig] phase', e); }

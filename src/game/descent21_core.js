@@ -16,10 +16,10 @@ export function floorSpec(moon={},baseSeed=1,depth=0,{choice=null,legacy=false,c
  if(!available.includes(baseTheme))available.push(baseTheme);
  // Introductory descent stays familiar. One announced liminal route per four
  // deep floors leaves three ordinary floors between encounters; maps stay seeded.
- const ordinaryTheme=d<2?baseTheme:available[rng.int(0,available.length-1)];
- const plannedTheme=!legacy&&d>=3&&d%4===3?LIMINAL26_THEMES[Math.floor((d-3)/4)%2]:ordinaryTheme;
+ const ordinaryTheme=routeVersion===38&&d>0?ORDINARY_THEMES[rng.int(0,ORDINARY_THEMES.length-1)]:d<2?baseTheme:available[rng.int(0,available.length-1)];
+ const plannedTheme=!legacy&&d>=3&&d%4===3?LIMINAL26_THEMES[Math.floor((d-3)/4)%2]:routeVersion===38&&d>=2&&rng.chance(.22)?rng.pick(LIMINAL26_THEMES):ordinaryTheme;
  const theme=choice?.theme??plannedTheme;
- const layoutOpts=floorOptions35(theme,d,routeVersion,choice?.layoutOpts);
+ const layoutOpts=floorOptions35(theme,d,routeVersion===38?35:routeVersion,choice?.layoutOpts);
  const liminal=LIMINAL26_THEMES.includes(theme)&&d>0;
  const tier=clamp(Math.floor(Number(moon.tier)||1)+Math.floor(progress/2),1,6);
  const rules=d===0?['quiet']:d<3?['archive','quiet']:d<6?['archive','listening','quiet']:['archive','listening','inspection','heavy'];
@@ -38,4 +38,4 @@ export function floorSpec(moon={},baseSeed=1,depth=0,{choice=null,legacy=false,c
 }
 // Older in-flight runs keep the certified map and ordinary rule they started
 // with. New routing starts at their next accepted native transition.
-export function savedFloorSpec(moon,baseSeed,state,{creatures32=false}={}){return floorSpec(moon,baseSeed,state?.depth,{choice:state?.currentChoice,legacy:![26,35].includes(state?.routeVersion),creatures32,routeVersion:state?.routeVersion});}
+export function savedFloorSpec(moon,baseSeed,state,{creatures32=false}={}){return floorSpec(moon,baseSeed,state?.depth,{choice:state?.currentChoice,legacy:![26,35,38].includes(state?.routeVersion),creatures32,routeVersion:state?.routeVersion});}

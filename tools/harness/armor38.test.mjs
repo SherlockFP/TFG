@@ -1,0 +1,33 @@
+import './ship2_env.mjs';
+import assert from 'node:assert/strict';
+import {ITEMS} from '../../src/game/items.js';
+import {categoryOf,catalogEntries} from '../../src/game/shop.js';
+import {equipBonuses} from '../../src/game/inventory_core.js';
+import {canEnhance,resolveEnhance} from '../../src/game/enhance.js';
+import * as THREE from 'three';
+import {Emitter} from '../../src/core/events.js';
+import {installArmor38,upgradeOffer38} from '../../src/game/armor38.js';
+for(const id of ['arm_hoodie','arm_riot','arm_kevlar']){
+ const def=ITEMS[id];assert.equal(categoryOf(def),'suits','armor must be discoverable in actual Suits tab');
+ assert.ok(catalogEntries().some(e=>e.id===id&&e.cat==='suits'));
+ assert.ok(canEnhance(def));
+ const entry={id:'armor',def,inv:{k:'eq',s:'armor'},tier:'common',it:{plus:0}};
+ const ordinary=equipBonuses([entry]).armor;
+ assert.equal(equipBonuses([{...entry,inv:null}]).armor,0,'carried armor is not worn protection');
+ entry.it.plus=resolveEnhance(0,0).to;
+ assert.ok(equipBonuses([entry]).armor>ordinary,'native successful enhancement raises worn protection');
+ entry.tier='rare';assert.ok(equipBonuses([entry]).armor>ordinary,'tier ascension strengthens worn armor');
+ entry.it.dur=0;assert.equal(equipBonuses([entry]).armor,0,'broken armor still gives no protection');
+}
+console.log('armor38 actual suit catalogue and worn upgrade rules PASS');
+for(const def of Object.values(ITEMS).filter(d=>d.kind==='weapon'))assert.ok(upgradeOffer38({def,plus:0}),'every registered weapon can receive paid enhancement');
+const it={id:'W',def:ITEMS.pipe,holder:'H',plus:0,tier:'common'},messages=[],game={isHost:true,selfId:'H',time:1,mods:new Emitter(),run:{phase:'orbit',moon:'hamsi',seed:1,credits:900},world:{descent21Depth:0},ship:{points:{charger:new THREE.Vector3(0,1,0)}},player:{pos:new THREE.Vector3(0,0,1),dead:false},remotes:new Map(),items:{get:id=>id==='W'?it:null},physics:{raycast:(_,dir)=>dir.y===-1?{normal:{y:1},point:{y:0}}:null},net:{on_(){},off(){},broadcast:(...a)=>messages.push(a),sendTo:(...a)=>messages.push(a)},refreshStats(){},hostSave(){},broadcastRun(){}};
+const api=installArmor38(game),receipt={id:'W',plus:0,tier:'common',moon:'hamsi',seed:1,depth:0,nonce:'once'};
+assert.equal(api.request(receipt,'stranger'),false);assert.equal(game.run.credits,900);
+assert.equal(api.request(receipt,'H'),true);assert.equal(it.plus,1);assert.equal(game.run.credits,810);assert.ok(messages.some(m=>m[0]==='fgit'&&m[1].pl===1));
+assert.equal(api.request(receipt,'H'),false);assert.equal(game.run.credits,810,'replayed request cannot charge twice');
+game.physics.raycast=()=>({});assert.equal(api.request({...receipt,plus:1,nonce:'wall'},'H'),false);assert.equal(game.run.credits,810);
+game.physics.raycast=(_,dir)=>dir.y===-1?{normal:{y:1},point:{y:0}}:null;it.def=ITEMS.arm_riot;it.plus=3;
+assert.equal(api.request({...receipt,plus:3,nonce:'armor'},'H'),true);assert.equal(it.tier,'uncommon');assert.equal(game.run.credits,570,'armor enchant spends shared native credits');
+api.dispose();assert.equal(api.request({...receipt,plus:3,tier:'uncommon',nonce:'after'},'H'),false);
+console.log('armor38 paid weapon/armor authority, replay, cost and existing fgit sync PASS');

@@ -16,6 +16,8 @@ import { rollWeaponAffixes, lootLevelFor, affixDisplayName } from './loot.js';
 import { dailyEventFor } from './dailyEvents.js';
 import { liteOf } from '../ui/avatarpic.js';   // [profile]
 import { admitOpenPlaces35 } from './openplaces35.js';
+import { lootCount38, lootTable38 } from './exploration38.js';
+import {validFuse38,certifiedFuse38,shipDoorReach38} from './power38.js';
 
 const EARLY_SAFE_T = 90;   // s after landing with no creature spawns near the facility doors
 const EARLY_SAFE_D = 25;   // m of walking distance
@@ -26,7 +28,7 @@ export function newRun() {
   return {
     phase: 'orbit', moon: 'hamsi', seed: Math.floor(Math.random() * 1e9), weather: 'clear',
     time: 480, day: 1, daysLeft: 3, quota: nextQuota(0, 0), quotaIndex: 0, sold: 0, credits: 60,
-    upgrades: {}, powerOn: true, buyRnd: Math.random(), forecast: {}, totalScrap: 0, runId: lobbyCode(), threat: 0,
+    upgrades: {}, powerOn: true, power38: 1, buyRnd: Math.random(), forecast: {}, totalScrap: 0, runId: lobbyCode(), threat: 0,
   };
 }
 
@@ -44,6 +46,8 @@ export const hostMethods = {
   hostInit(runData, slot) {
     this.saveSlot = this.opts?.deadletter ? 0 : slot || 1;
     const run = runData ? { ...newRun(), ...runData, phase: 'orbit', time: 480 } : newRun();
+    if(runData && runData.power38!==1)delete run.power38;
+    delete run.departure38; // A saved interrupted countdown must never launch after reload.
     if (!run.forecast || !Object.keys(run.forecast).length) rollForecast(run);
     this.run = run;
     this.hostData = { collected: new Set(), dayStats: this.freshDayStats(), spawnT: 0, outdoorSpawnT: 0, powerUsed: 0, outPowerUsed: 0, lastTimeSync: 0, alarmPlayed: false, allDeadT: 0 };
@@ -226,6 +230,7 @@ export const hostMethods = {
       this.net.broadcast('fx', { k: 'snd', s: 'alarm_loop', p: d.p, v: 1, r: 8, m: 90 });
     });
     H('fuse', (d, from) => {
+      if(!validFuse38(this,d,from))return;
       const fk = (d.fuse || 'fuse') + ':' + from;
       this.hostData.fuseDone = this.hostData.fuseDone || new Set();
       const repeat = this.hostData.fuseDone.has(fk) && this.run.powerOn;
@@ -247,7 +252,9 @@ export const hostMethods = {
       // hostSpawn with holder: we also need the slot -> handled by client picking the first free slot on 'sp'
     });
     H('shipdoor', (d, from) => {
-      if (['landing', 'takeoff', 'orbit', 'fired'].includes(this.run.phase)) { this.net.sendTo(from, 'sys', sysMsg('The door is sealed during flight.', {}, 'bad')); return; }
+      const docked=this.run.phase==='orbit'&&this.run.fleet13?.docked===true&&this.world?.moonId==='__relay13';
+      if (['landing', 'takeoff', 'fired'].includes(this.run.phase)||this.run.phase==='orbit'&&!docked) { this.net.sendTo(from, 'sys', sysMsg('The door is sealed during flight.', {}, 'bad')); return; }
+      if(!shipDoorReach38(this,from))return;
       // state-set request, not a toggle: two players pressing at once end in the last request, and a request for the state the door
       // is already in (double press, stale label) is dropped instead of replaying the hydraulics for everybody
       if (this.ship.door.open === !!d.open) return;
@@ -337,7 +344,7 @@ export const hostMethods = {
       this.hostData.fuseDone = new Set();   // fuse-box XP is once per player per DAY (new facility), not per session
       // Weekly selection may change seed. Phase carries admission before every
       // synchronous Game.onPhase build, including peers that have no later gs.
-      this.hostSetPhase('landing', { dailyEvent: run.dailyEvent, openPlaces35: admitOpenPlaces35(run, MOONS[run.moon]) });
+      this.hostSetPhase('landing', { dailyEvent: run.dailyEvent, exploration38:1, openPlaces35: admitOpenPlaces35(run, MOONS[run.moon]) });
       this.later(() => this.hostFinishLanding(), 9000);
     } else if (run.phase === 'moon' || run.phase === 'company') {
       this.hostBeginTakeoff('lever');
@@ -363,6 +370,10 @@ export const hostMethods = {
       this.hostData.pressureStage = 0;
       this.hostData.moonT = 0;
       this.hostPopulateMoon();
+      if(this.run.power38===1&&certifiedFuse38(this)) {
+        this.hostSetPower(false);
+        this.net.broadcast('sys',sysMsg('Restore the facility power at a fuse box. Ship and exit lights remain on.',{},'info'));
+      }
       // blackout event: a real power cut (dims every peer's lights, opens secure doors); a fuse box restores it
       if (ev?.blackout && this.run.powerOn) this.hostSetPower(false);
     }
@@ -371,6 +382,21 @@ export const hostMethods = {
 
   hostBeginTakeoff(reason) {
     if (this.run.phase !== 'moon' && this.run.phase !== 'company') return;
+    if(reason==='midnight')return;
+    if(reason==='lever') {
+      if(this.run.departure38)return;
+      const pending=this.run.departure38={seconds:8};
+      this.broadcastRun(['departure38']);
+      const tick=()=>{
+        if(this.run.departure38!==pending||!['moon','company'].includes(this.run.phase))return;
+        pending.seconds--;
+        this.broadcastRun(['departure38']);
+        if(pending.seconds>0)this.later(tick,1000);
+        else {this.run.departure38=null;this.broadcastRun(['departure38']);this.hostBeginTakeoff('crew');}
+      };
+      this.later(tick,1000);return;
+    }
+    this.run.departure38=null;
     this.hostData.takeoffReason = reason;
     this.net.broadcast('door', { id: 'ship', open: false });
     // everybody outside the ship is left behind (only when the ship leaves at midnight / all dead)
@@ -545,12 +571,12 @@ export const hostMethods = {
     const afRng = new RNG((run.seed ^ 0xaff1c5) >>> 0);   // own stream: weapon affixes don't shift the world rolls
     const lootLvl = lootLevelFor(danger);
     // scrap inside
-    const count = scrapCountFor(rng.int(moon.scrapCount[0], moon.scrapCount[1]), run.quotaIndex);   // wave 3: -30 % (BALANCE.lootCountMul), early-game bonus kept
+    const count = lootCount38(scrapCountFor(rng.int(moon.scrapCount[0], moon.scrapCount[1]), run.quotaIndex), moon.tier, 0);
     const spots = rng.shuffle(fac.scrapSpots.slice());
     spots.sort((a, b) => (b.item ? 1 : 0) - (a.item ? 1 : 0));   // set-piece spots that ask for an item (skull at blood trails) first
     for (let i = 0; i < Math.min(count, spots.length); i++) {
       const s = spots[i];
-      const rolled = rng.weighted(tableW).id;
+      const rolled = rng.weighted(lootTable38(table, moon.tier, 0, s.dist || 0)).id;
       const type = s.item || rolled;
       // Deep rooms are intentionally a little richer: exploration should pay for the extra danger.
       const depthMul = 1 + Math.min(0.22, Math.max(0, (s.dist || 0) - 5) * 0.018);
@@ -785,10 +811,10 @@ export const hostMethods = {
       void moon;
       if (run.time >= 23 * 60 && !hd.alarmPlayed) {
         hd.alarmPlayed = true;
-        this.net.broadcast('sys', sysMsg('The autopilot leaves at midnight. Get back to the ship.', {}, 'bad'));
+        this.net.broadcast('sys', sysMsg('Night has fallen. Return when ready; the ship waits for your command.', {}, 'warn'));
         this.net.broadcast('fx', { k: 'snd', s: 'ship_alarm', p: [0, 2, 0], v: 1, r: 30, m: 400 });
       }
-      if (run.time >= 24 * 60 - 1) { run.time = 24 * 60; hd.alarmPlayed = false; this.hostBeginTakeoff('midnight'); }
+      if (run.time >= 24 * 60 - 1) run.time = 24 * 60;
       // collected scrap rewards
       hd.collectT = (hd.collectT || 0) - dt;
       if (hd.collectT <= 0) {

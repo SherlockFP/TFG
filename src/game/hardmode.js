@@ -109,12 +109,15 @@ export function installHardmode(game) {
     return m;
   }
   function lockTick() {
+    // Departure is crew commanded. Midnight must never advertise an automatic
+    // door lock; the shared departure38 HUD owns the actual boarding countdown.
+    if(!run()?.departure38){S.lockMarks=null;S.lockEnd=0;return;}
     const r = run(), warn = D.lockWarnSec(q());
     if (!warn || !realMoon()) { S.lockMarks = null; return; }
-    const rate = (16 * 60) / (game.config?.dayLengthSec || 720);   // game minutes per real second
-    const left = (24 * 60 - (r.time || 0)) / rate;
+    const left = r.departure38.seconds;
+    if(!Number.isFinite(left)||left<=0){S.lockMarks=null;S.lockEnd=0;return;}
     if (left > warn + 1) { S.lockMarks = null; return; }
-    if (!S.lockMarks) { S.lockMarks = lockMarks(warn, D.eff(q()).lockRepeatSec || 30); S.lockI = 0; }
+    if (!S.lockMarks) { S.lockMarks = [8,4,1]; S.lockI = 0; }
     while (S.lockI < S.lockMarks.length && left <= S.lockMarks[S.lockI] + 0.5) {
       const n = Math.max(1, Math.round(left));
       S.lockI++;

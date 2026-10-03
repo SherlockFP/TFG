@@ -31,17 +31,21 @@ const api = (K, root, parts, height, radius, update, extra = {}) => ({
 // ------------------------------------------------------------------------------------------------ Blood Witch
 export function createWitchModel(o = {}) {
   const K = kit(), root = new THREE.Group();
-  const dress = K.L(0x1a0c14), trim = K.L(0x5a0f18, 0x120204), skin = K.L(0xb9aaa8), eye = K.B(0xff2a2a);
+  const dress = K.L(0x343039), trim = K.L(0x593a3b), skin = K.L(0xb9aaa0), eye = K.B(0xb84642), hair=K.L(0x202126), seam=K.L(0x8b8174);
   const body = K.pivot(root, 0, 0, 0);
-  K.cone(body, dress, 0.62, 1.55, 0, 0.78, 0, 9, true);
-  K.cone(body, trim, 0.64, 0.14, 0, 0.09, 0, 9, true);
-  K.box(body, dress, 0.34, 0.5, 0.22, 0, 1.75, 0);
+  K.add(body,new THREE.CylinderGeometry(.22,.52,1.5,7,1,true),dress,0,.79,0);
+  for(const x of [-.36,-.12,.12,.36])K.box(body,trim,.12,.3,.06,x,.22,.33-Math.abs(x)*.4);
+  K.box(body, dress, 0.39, 0.55, 0.25, 0, 1.75, 0);
+  K.box(body,seam,.025,.51,.016,0,1.72,.135);
+  K.box(body,seam,.16,.12,.025,.1,1.78,.14);
   const head = K.pivot(body, 0, 2.08, 0);
-  K.ball(head, skin, 0.16, 0, 0, 0);
-  K.add(head, new THREE.CylinderGeometry(0.4, 0.4, 0.03, 9), dress, 0, 0.13, 0);
-  K.cone(head, dress, 0.24, 0.62, 0, 0.45, 0, 7);
-  K.box(head, eye, 0.05, 0.03, 0.02, -0.06, 0.02, 0.15); K.box(head, eye, 0.05, 0.03, 0.02, 0.06, 0.02, 0.15);
-  const arms = [-1, 1].map((sx) => { const s = K.pivot(body, sx * 0.24, 1.92, 0); K.box(s, skin, 0.07, 0.62, 0.07, 0, -0.31, 0); K.box(s, K.B(0x9a0b14), 0.05, 0.14, 0.05, 0, -0.68, 0); return s; });
+  K.box(head,skin,.23,.33,.21,0,-.035,.035);
+  K.add(head,new THREE.IcosahedronGeometry(.255,0),hair,0,.05,-.05);
+  // Long uneven veil locks frame the exposed face; no fantasy pointed hat.
+  for(const [x,h]of [[-.18,.69],[.18,.58],[-.1,.52],[.12,.76]])K.box(head,hair,.07,h,.09,x,-h/2+.08,.14);
+  K.box(head, eye, 0.035, 0.024, 0.02, -0.052, 0.02, 0.15); K.box(head, eye, 0.035, 0.024, 0.02, 0.052, 0.02, 0.15);
+  K.box(head,trim,.09,.025,.02,0,-.12,.15);
+  const arms = [-1, 1].map((sx) => { const s = K.pivot(body, sx * 0.27, 1.92, 0); K.box(s,dress,.16,.42,.16,0,-.18,0);K.box(s, skin, 0.085, 0.43, 0.085, sx*.025, -.55, .03);K.box(s,trim,.09,.14,.075,sx*.025,-.81,.03);for(const x of [-.027,0,.027])K.box(s,skin,.015,.13,.02,sx*.025+x,-.94,.06);return s; });
   let ritual = 0, dead = 0;
   const update = (dt, a) => {
     dt = clamp(dt || 0, 0, 0.1); const st = a.state, tm = a.time || 0;
@@ -51,7 +55,7 @@ export function createWitchModel(o = {}) {
     arms.forEach((s, i) => { s.rotation.x = -ritual * 2.7 + Math.sin(tm * 1.3 + i) * 0.08 + (st === 'walk' ? -0.5 : 0); s.rotation.z = (i ? -1 : 1) * ritual * 0.5; });
     head.rotation.y = Math.sin(tm * 0.7) * 0.25;
   };
-  return api(K, root, { head }, 2.6, 0.5, update);
+  return api(K, root, { head, body, arms }, 2.6, 0.5, update);
 }
 
 // ------------------------------------------------------------------------------------------------ Lantern Keeper

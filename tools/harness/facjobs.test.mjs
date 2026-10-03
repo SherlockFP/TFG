@@ -135,7 +135,7 @@ function runtime(job) {
     if (delayRestore && d.e === 'sp' && run.descent21?.depth === 0 && run.descent21?.surface?.items?.some(row => row.id === d.id)) queued.push(structuredClone(d));
     else g.items.onEvent(d);
   });
-  g.facjobs = installFacjobs(g); g.descent21 = installDescent21(g);
+  g.facjobs = installFacjobs(g); const jobObjectiveHandlers=[...(mods._h.get('objectives')||[])]; g.descent21 = installDescent21(g);
   mods.emit('registerHandlers', (k, fn) => net.handle(k, fn), g);
   const frame = dt => { g.time += dt; physics.step(dt); mods.emit('update', dt, g); };
   const tick = seconds => { for (let i = 0; i < Math.round(seconds * 60); i++) frame(1 / 60); };
@@ -148,7 +148,7 @@ function runtime(job) {
   const back = delayed => { aboard(); delayRestore = delayed; assert(request('return')); tick(3.1); assert.equal(run.descent21.depth, 0); };
   const restore = () => { delayRestore = false; for (const d of queued.splice(0)) net.broadcast('it', d); tick(.1); };
   const dispose = () => { g.facjobs.dispose(); g.descent21.dispose(); g.items.dispose(); g.items.clearAll(); g.world.facility?.dispose(physics); physics.world.free(); };
-  return { g, run, player, net, frame, tick, aboard, visit, request, descend, back, restore, queued, sent, dispose };
+  return { g, run, player, net, frame, tick, aboard, visit, request, descend, back, restore, queued, sent, jobObjectiveHandlers, dispose };
 }
 for (const id of ['core', 'rescue']) {
   const R = runtime(id), { g, run } = R;
@@ -163,7 +163,7 @@ for (const id of ['core', 'rescue']) {
     g.mods.emit('moonPopulated', g); g.mods.emit('hostMigrated', g, { self: true });
     assert.deepEqual(run.fj, before, `${id}: missing checkpoint item cannot fail or reset deep job`);
     assert.equal(g.facjobs._mem.ids, memory, 'deep setup and migration preserve host memory');
-    assert.equal(run.credits, wallet); assert(!R.sent.some(m => m.type === 'fjfx' && m.data.k === 'pay'));
+    assert.equal(run.credits, wallet + (run.descent21?.survey38?.total || 0), 'only independently recorded native survey rewards change the wallet'); assert(!R.sent.some(m => m.type === 'fjfx' && m.data.k === 'pay'));
     // A new host admitted while deep has no prior surface runtime IDs. Its
     // actual migration handler must defer reconstruction until restore delivery.
     g.facjobs.dispose(); g.facjobs = installFacjobs(g); g.mods.emit('hostMigrated', g, { self: true });
@@ -171,7 +171,7 @@ for (const id of ['core', 'rescue']) {
     R.back(true); assert(R.queued.some(d => d.id === itemId)); assert(!g.items.get(itemId));
     g.mods.emit('hostMigrated', g, { self: true }); g.facjobs.hostRebuild(); g.facjobs.hostTick(10); R.tick(.2);
     assert.deepEqual(run.fj, before, `${id}: no failure while surface restore is in transit`);
-    assert.equal(run.credits, wallet);
+    assert.equal(run.credits, wallet + (run.descent21?.survey38?.total || 0), 'only independently recorded native survey rewards change the wallet');
     R.restore(); assert.equal(g.facjobs._mem.ids.m, itemId, 'deferred actual update rebuilt native ID');
     const restored = g.items.serialize(it => it.id === itemId)[0];
     assert.deepEqual({ id: restored.id, ty: restored.ty, v: restored.v, h: restored.h, iv: restored.iv }, { id: original.id, ty: original.ty, v: original.v, h: original.h, iv: original.iv });
@@ -180,7 +180,7 @@ for (const id of ['core', 'rescue']) {
     // writing p/st/pd, credits or a mission result directly.
     g.net.broadcast('it', { e: 'held', id: itemId, h: 'crew' }); R.player.inShip = true;
     g.facjobs.hostTick(.5); assert.equal(run.fj.j[0].st, 1); assert.equal(run.fj.j[0].pd, 1);
-    const paid = run.credits; assert(paid > wallet); g.facjobs.hostTick(.5); assert.equal(run.credits, paid, 'native completion pays once');
+    const paid = run.credits; assert(paid > wallet + (run.descent21?.survey38?.total || 0)); g.facjobs.hostTick(.5); assert.equal(run.credits, paid, 'native completion pays once');
     assert.equal(R.sent.filter(m => m.type === 'fjfx' && m.data.k === 'pay').length, 1);
   } finally { R.dispose(); }
 }
@@ -207,7 +207,9 @@ for (const id of ['feed', 'vault', 'drone']) {
     assert.deepEqual(run.fj, before, `${id}: a deep actor cannot operate surface coordinates`);
     assert.deepEqual(g.facjobs._mem.drone, memory, 'surface drone cannot move or take deep damage');
     const prompts = [], objectives = []; g.mods.emit('interactables', prompts, g); g.mods.emit('objectives', (...args) => objectives.push(args), g, 'moon');
-    assert(!prompts.some(p => /splitter|Vault panel|Read the note/.test(p.label()))); assert.equal(objectives.length, 0);
+    assert(!prompts.some(p => /splitter|Vault panel|Read the note/.test(p.label())));
+    const jobObjectives=[]; for(const fn of R.jobObjectiveHandlers)fn((...args)=>jobObjectives.push(args),g,'moon');
+    assert.equal(jobObjectives.length,0,'actual registered surface-job objective handler stays silent at depth; survey/lift owners may publish their own objectives');
     const nativeMeshCount = g.world.facility.group.children.length;
     g.net.receiveLocal('fjd', { token: descentToken(run), x: 100, y: -290, z: 100, hp: 100 }); R.tick(.1);
     assert.equal(g.world.facility.group.children.length, nativeMeshCount, 'late drone message cannot attach surface drone to deep facility');

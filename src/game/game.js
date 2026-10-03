@@ -2,6 +2,12 @@
 // Host-only logic lives in host.js, local player actions in actions.js (mixed into the prototype).
 import * as THREE from 'three';
 import { installFleet13 } from './fleet13.js';
+import { installReactor38 } from './reactor38.js';
+import { installOxygen38 } from './oxygen38.js';
+import { installArmor38 } from './armor38.js';
+import { installCrew38 } from './crew38.js';
+import { installPerk38 } from './perk38.js';
+import { installHazard38 } from './hazard38.js';
 import { showPhaseHelp28 } from './phase_help28.js';
 import { installBossdress } from './bossdress.js';   // wave 8 night: themed sector boss names + lair dressing (docs/wave8/bossdress.md)
 import { installHerocontent } from './herocontent.js';   // wave 8: themed scrap tables for metro / greenhouse / prison / tower (docs/wave8/herocontent.md); early so every import-time SCRAP_TABLE walker sees them
@@ -693,6 +699,12 @@ export class Game extends Emitter {
     this.useModule('onegoal', installOneGoal);   // [onegoal] one goal line (+1 warning) for every profile, message pacing for veterans
     this.useModule('algoslot', installAlgoSlot);   // wave 9: LIVE strip above HP + chat reactions (docs/wave9/algoslot.md)
     this.useModule('fleet13', installFleet13);
+    this.useModule('reactor38', installReactor38);
+    this.useModule('oxygen38', installOxygen38);
+    this.useModule('armor38', installArmor38);
+    this.useModule('crew38', installCrew38);
+    this.useModule('perk38', installPerk38);
+    this.useModule('hazard38', installHazard38);
     this.useModule('hudcalm', installHudCalm);   // wave 8: calm HUD (docs/wave8/declutter.md)
     this.useModule('industry13', installIndustry13);
     this.useModule('arsenal13', installArsenal13);
@@ -1106,7 +1118,7 @@ export class Game extends Emitter {
     for (const it of [...this.items.all()]) {
       if (it.state === 'world' && !insideShip(it.obj.position)) { it.dispose(); this.items.items.delete(it.id); }
     }
-    this.lights.globalDim = 1;
+    this.lights.globalDim = this.run?.powerOn === false ? 0 : 1;
     this.env.indoor = false;
   }
 
@@ -1340,10 +1352,11 @@ export class Game extends Emitter {
     if (!ph || ph === 'orbit') {
       a.setAmbience('base', 'orbit_ambience', 0.35);
       a.setAmbience('ship', 'ship_hum', 0.3);
+      a.setAmbience('buzz', null);
       a.setEnvironment('ship');
       return;
     }
-    if (p.inShip) { a.setAmbience('ship', 'ship_hum', 0.35); a.setEnvironment('ship'); }
+    if (p.inShip) { a.setAmbience('ship', 'ship_hum', 0.25); a.setAmbience('base', null); a.setAmbience('buzz', null); a.setEnvironment('ship'); return; }
     else a.setAmbience('ship', null);
     if (p.indoor) {
       const mansion = this.world.facility?.layout.theme === 'mansion';

@@ -1,0 +1,13 @@
+<!doctype html><html><meta charset="utf-8"><base href="/"><title>Wave38 disposable game</title>
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#000}#loading{position:fixed;inset:0;background:#111;color:#ddd;display:grid;place-items:center;z-index:100}#loading.hidden{display:none}</style>
+<div id="game"></div><div id="ui"></div><div id="fps"></div><div id="loading">LOADING</div>
+<script type="module">
+if(!import.meta.env.DEV)throw Error('DEV only');
+// Clone reads, isolate every write (including slot3 and profile), mute before boot.
+const data=new Map();for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);data.set(k,localStorage.getItem(k));}
+for(const [k,v]of data)if(k.includes('settings')){try{const s=JSON.parse(v);s.masterVolume=0;data.set(k,JSON.stringify(s));}catch{}}
+data.set('kefal.settings.v1',JSON.stringify({...JSON.parse(data.get('kefal.settings.v1')||'{}'),masterVolume:0}));
+Object.defineProperty(window,'localStorage',{value:{getItem:k=>data.get(k)??null,setItem:(k,v)=>data.set(k,String(v)),removeItem:k=>data.delete(k),clear:()=>data.clear(),key:i=>[...data.keys()][i]??null,get length(){return data.size;}}});
+await import('/src/main.js');
+window.kefal.audio.settings={...window.kefal.audio.settings,masterVolume:0};window.kefal.audio.applyVolumes();
+</script></html>

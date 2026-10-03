@@ -1,0 +1,41 @@
+import './ship2_env.mjs';
+import assert from 'node:assert/strict';
+import * as THREE from 'three';
+import { Physics, initPhysics } from '../../src/physics/physics.js';
+import { RNG } from '../../src/core/rng.js';
+import { surveyRoom38, surveyState38, lootCount38, lootTable38 } from '../../src/game/exploration38.js';
+import { floorSpec } from '../../src/game/descent21_core.js';
+import { newDescent, discovered } from '../../src/game/descent21_state.js';
+import { MOONS } from '../../src/game/moons.js';
+
+await initPhysics(); const physics = new Physics();
+physics.addStaticBox(0,-.5,0,8,.5,8);
+physics.world.step();
+const L={seed:12,w:2,h:2,cell:4,ox:-4,oz:-4,idx:(x,z)=>z*2+x,roomOf:new Int16Array([0,1,2,3]),cells:new Uint8Array([1,1,1,1])};
+const fac={layout:L,contains:p=>p.y>=-.1&&p.y<3&&p.x>=-4&&p.x<4&&p.z>=-4&&p.z<4};
+const st={depth:0,visited:[]};
+surveyState38(st,L,[0,1,2,3]);
+const p={id:'H',zone:'in',dead:false,pos:new THREE.Vector3(-2,.05,-2)};
+assert.equal(surveyRoom38(st,fac,[0,1,2,3],p,physics),0);
+st.visited.push(0);
+assert.equal(st.survey38.surface.rooms.length,1);
+assert.equal(st.survey38.total,2);
+assert.equal(surveyRoom38(st,fac,[0,1,2,3],p,physics),null);
+assert.equal(st.survey38.total,2,'same room and repeated host ticks cannot farm');
+for(const q of [ {...p,dead:true}, {...p,downed:true}, {...p,zone:'out'}, {...p,pos:new THREE.Vector3(2,10,-2)}, {...p,pos:new THREE.Vector3(20,.05,-2)} ])assert.equal(surveyRoom38(st,fac,[0,1,2,3],q,physics),null);
+for(const [id,x,z] of [[1,2,-2],[2,-2,2],[3,2,2]]){p.pos.set(x,.05,z);assert.equal(surveyRoom38(st,fac,[0,1,2,3],p,physics),id);st.visited.push(id);}
+assert.equal(st.survey38.total,28,'four rooms plus one completion bonus');
+const restored=structuredClone(st);assert.equal(surveyRoom38(restored,fac,[0,1,2,3],p,physics),null);
+st.depth=1;st.visited=[];L.seed=13;surveyState38(st,L,[0,1,2,3]);p.pos.set(-2,.05,-2);assert.equal(surveyRoom38(st,fac,[0,1,2,3],p,physics),0);st.visited.push(0);
+st.depth=0;L.seed=12;st.visited=[0,1,2,3];assert.equal(surveyRoom38(st,fac,[0,1,2,3],p,physics),null,'surface return preserves paid discoveries');
+const legacy={depth:0,visited:[0,1]};surveyState38(legacy,L,[0,1,2,3]);assert.equal(surveyRoom38(legacy,fac,[0,1,2,3],p,physics),null,'no retrospective old-save payout');
+assert.ok(lootCount38(18,1,0)<18);assert.ok(lootCount38(18,5,12)>lootCount38(18,1,0));
+const table=[['duck',10],['goldbar',10]];const shallow=lootTable38(table,1,0,0),deep=lootTable38(table,4,10,12);
+assert.ok(shallow[1].w<shallow[0].w/10,'expensive scrap is scarce on shallow floors');assert.ok(deep[1].w>shallow[1].w);
+assert.deepEqual(new RNG(42).shuffle(deep.slice()),new RNG(42).shuffle(deep.slice()));
+assert.equal(newDescent({moon:'hamsi',seed:1,day:1,exploration38:1}).routeVersion,38);
+assert.equal(discovered({visited:[0,1,2,3,4],survey38:{version:38}}, {discoveryRooms:Array.from({length:15},(_,i)=>i)}),true);
+const themes=new Set();for(let seed=1;seed<=40;seed++){const one=floorSpec(MOONS.hamsi,seed,1,{routeVersion:38});themes.add(one.theme);assert.deepEqual(one,floorSpec(MOONS.hamsi,seed,1,{routeVersion:38}));assert.equal(floorSpec(MOONS.hamsi,seed,3,{routeVersion:38}).theme,'backrooms');}
+assert.ok(themes.size>=8,'fresh routes vary among the established industrial/archive maze palettes');
+physics.world.free();
+console.log('exploration38: native floor discovery, once-only save/return reward and tier loot pass');

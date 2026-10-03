@@ -113,7 +113,7 @@ assert.equal(host.profile.coins,cosmeticBefore-cosmetic.coin);
 holdReceipts=true;
 const lost=peer.market31.buy('sledge');pump();assert.equal(count(host).filter(it=>it.type==='sledge').length,1);
 heldPackets=[];peer.net.lost.set('host',{});
-assert.equal((await peer.market31.buy('taser')).reason,'disconnected');
+assert.equal((await peer.market31.buy('harpoon')).reason,'disconnected');
 peer.net.lost.delete('host');holdReceipts=false;peer.net.emit('ready');pump();
 assert.equal((await lost).ok,true);assert.equal(peer.profile.coins,2075);assert.equal(count(host).filter(it=>it.type==='sledge').length,1);
 // A stale snapshot with a new nonce cannot replenish the host purchase ledger.
@@ -179,11 +179,11 @@ peer.profile.coins+=2000;
 const beforeFault=peer.profile.coins,faultNative=peer.net.msgHandlers.get('it');let faulted=false;
 peer.net.on_('it',(d,from)=> {
   faultNative(d,from);
-  if(d.e==='sp' && d.ty==='taser') {faulted=true;peer.items.onEvent({e:'rm',id:d.id});}
+  if(d.e==='sp' && d.ty==='harpoon') {faulted=true;peer.items.onEvent({e:'rm',id:d.id});}
 });
-const failedDelivery=peer.market31.buy('taser');pump();peer.net.on_('it',faultNative);
+const failedDelivery=peer.market31.buy('harpoon');pump();peer.net.on_('it',faultNative);
 assert.equal((await failedDelivery).reason,'delivery');assert.ok(faulted);
-assert.equal(peer.profile.coins,beforeFault);assert.ok(!peer.profile.owned.includes('taser'));
-assert.equal(count(host).filter(it=>it.type==='taser').length,0,'failed native delivery must remove queued remote spawn even when the local item is already gone');
+assert.equal(peer.profile.coins,beforeFault);assert.ok(!peer.profile.owned.includes('harpoon'));
+assert.equal(count(host).filter(it=>it.type==='harpoon').length,0,'failed native delivery must remove queued remote spawn even when the local item is already gone');
 for(const g of games){g.market31.dispose();g.items.clearAll();g.items.dispose();}physics.dispose();
 console.log('market31 native UI, host/peer receipt, debit/delivery, double click/replay, funds/level/range/LOS/full, reward preservation, reconnect and forged/stale response PASS');

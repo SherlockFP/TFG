@@ -55,14 +55,14 @@ export function buildDescent23Art({root,plan,anchors,floor=0}){
   for(let i=0;i<3;i++){
    const x=i*256+128,usable=state.available&&!state.busy&&(i===0?state.discovered:i===1?state.ready:state.floor>0);
    ctx.fillStyle=usable?'#c9c1ac':'#877f6d';ctx.strokeStyle=ctx.fillStyle;ctx.lineWidth=7;
-   ctx.font='bold 17px sans-serif';ctx.fillText(`0${i+1} / ${state.floor}`,x,25,240);
+   ctx.font='bold 17px sans-serif';
    // Bell, descending arrow and surface arrow are visually unrelated to gameplay
    // world markers; their positions match the three existing physical consoles.
    if(i===0){ctx.beginPath();ctx.moveTo(x-26,88);ctx.lineTo(x-23,60);ctx.lineTo(x-12,45);ctx.lineTo(x+12,45);ctx.lineTo(x+23,60);ctx.lineTo(x+26,88);ctx.closePath();ctx.stroke();ctx.fillRect(x-9,94,18,6);}
    else{const down=i===1,tip=down?97:43,tail=down?43:97,wing=down?76:64;ctx.fillRect(x-4,Math.min(tip,tail),8,Math.abs(tip-tail));ctx.beginPath();ctx.moveTo(x-24,wing);ctx.lineTo(x,tip);ctx.lineTo(x+24,wing);ctx.stroke();if(i===2)ctx.fillRect(x-30,32,60,6);}
-   ctx.font='bold 27px sans-serif';ctx.fillText(words.labels[i],x,139,240);
+   ctx.font='bold 27px sans-serif';
    ctx.font='bold 14px sans-serif';ctx.fillStyle='#ab915e';const caption=state.busy?words.busy:i===2?(state.floor>0?words.direct:words.surface):i===0?(state.discovered?words.call:words.explore):state.ready?words.ready:state.discovered?words.callFirst:words.explore;
-   ctx.fillText(caption,x,172,240);
+
   }
   texture.needsUpdate=true;
  }

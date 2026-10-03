@@ -10,6 +10,7 @@ import { BIOMES } from './moons.js';
 import { WorldMarker } from '../render/br_fx.js';
 import { insideShip } from '../world/ship.js';
 import { attentionHot } from '../ui/hud_attention.js';
+import { G } from '../physics/physics.js';
 const words = {
  'No vessel selected':['Gemi seçilmedi', 'Корабль не выбран'],
  'Selected vessel: {name}':['Seçilen gemi: {name}', 'Выбранный корабль: {name}'],
@@ -142,7 +143,18 @@ export function installFleet13(game) {
  wrap(game,'loadMapFor',orig=>function(...a){if(docked())return loadHub();return orig.apply(this,a);});
  wrap(game,'spawnInShip',orig=>function(...a){if(docked())return arrive();return orig.apply(this,a);});
  wrap(game,'applyRunState',orig=>function(...a){const before=docked(),out=orig.apply(this,a);if(before!==docked())this.loadMapFor(this.run,true);return out;});
- wrap(game,'hostLever',orig=>function(from){if(docked()){if(from===game.selfId)say('Visit the dock before launching.');return;}return orig.call(this,from);});
+ wrap(game,'hostLever',orig=>function(from){
+  if(!docked())return orig.call(this,from);
+  // Entering the dock's physical ship does not itself dispatch the fleet.
+  // The cockpit control may use the same owned dispatch lifecycle as the kiosk.
+  const p=game.player, target=game.ship?.points?.lever;
+  if(disposed||from!==game.selfId||!game.isHost||p.dead||p.downed||game.world?.moonId!=='__relay13'||!insideShip(p.pos)||!target)return;
+  const eye=p.eyePos(),delta=target.clone().sub(eye),distance=delta.length();
+  if(distance>3.36||distance<.01)return;
+  const hit=game.physics.raycast(eye,delta.divideScalar(distance),distance,G.STATIC|G.DOOR,p.col);
+  if(hit&&hit.distance<=distance-.15)return;
+  dispatch();
+ });
  wrap(game,'hostSave',orig=>function(...a){keepLayout();return orig.apply(this,a);});
  if(game.objectives)wrap(game.objectives,'compute',orig=>function(...a){
   if(!docked())return orig.apply(this,a);
@@ -176,6 +188,10 @@ export function installFleet13(game) {
   else if(d?.op==='dock'&&game.run.phase==='orbit'&&game.player.inShip){keepLayout();game.run.fleet13=sanitizeFleet13(game.run.fleet13);game.run.fleet13.docked=true;persist();loadHub();for(const id of [game.selfId,...game.remotes.keys()])game.net.sendTo(id,'tp',{p:HUB13_SPAWN,yaw:Math.PI});}
  });}));
  offs.push(game.mods.on('interactables',(list,g)=>{if(g!==game||game.player.dead||game.player.downed)return;if(docked()){
+  const lever=list.find(ip=>ip.pos===game.ship?.points?.lever);
+  if(lever)lever.label=game.isHost?t(game.run.fleet13.selected?'Board selected vessel':'Choose a ship at the fleet office first'):t('Only the host can purchase and dispatch the crew.');
+  const door=list.find(ip=>ip.pos===game.ship?.points?.doorOpen);
+  if(door)door.label=()=>t(game.ship.door.open?'Close ship door [E]':'Open ship door [E]');
   list.push({pos:new THREE.Vector3(...HUB13_BROKER),r:1,reach:4,label:t('Fleet broker'),action:open});
   list.push({pos:new THREE.Vector3(...HUB13_BOARD),r:1,reach:4,label:game.run.fleet13.selected?tf('Board {name}',{name:t(FLEET13[game.run.fleet13.selected].name)}):t('Choose a ship at the fleet office first'),action:()=>game.isHost?request('board'):say('Only the host can purchase and dispatch the crew.')});
  }else if(game.run?.phase==='orbit'&&game.player.inShip)list.push({pos:new THREE.Vector3(3,1.1,2.8),r:.8,reach:3,label:t('Return to Relay Dock'),action:()=>game.isHost?request('dock'):say('Only the host can purchase and dispatch the crew.')});}));

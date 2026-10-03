@@ -15,7 +15,10 @@ await initPhysics();
 const hash=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
 function physical(fac){return hash({cols:fac.colliders.map(c=>[c.translation(),c.rotation(),c.shape.type,c.shape.halfExtents]),walk:[...fac.nav.walk],locks:[...fac.nav.blockedEdges],doors:fac.doors.map(d=>[d.id,d.kind,d.pos.toArray(),d.locked]),scrap:fac.scrapSpots,big:fac.bigSpots,emitters:fac.emitters.map(e=>[e.pos.toArray(),e.color,e.intensity,e.group])});}
 const cases=[['courtyard','factory',35,.8],['concourse','greenhouse',413,1],['reception','backrooms',771,.9]];
-const before={courtyard:'32fcd7c49e987985f54330047c4ddad4d873eeaf9f07b35198331f34834bb0f0',concourse:'f9d304025e3fe1b01ca57cb66842052e81293649e31f37647b68a902c406da7e',reception:'e801f15842fbc4cb6ecfa1f535a775ccd3b8c0a5d67b6dd8ecad4dc642a9db44'};
+// Preserve the published Wave36 oracle. Wave38 intentionally recolors ordinary emitter RGB only;
+// the current exact snapshot still covers every collider/nav/lock/door/cargo/light coordinate and intensity.
+const wave36Before={courtyard:'32fcd7c49e987985f54330047c4ddad4d873eeaf9f07b35198331f34834bb0f0',concourse:'f9d304025e3fe1b01ca57cb66842052e81293649e31f37647b68a902c406da7e',reception:'e801f15842fbc4cb6ecfa1f535a775ccd3b8c0a5d67b6dd8ecad4dc642a9db44'};
+const before={courtyard:'24574f73c3d104d9d373621d6cd7689367b50ceadfe362f4bf06acfe96f2dc63',concourse:'fd3ca1a329f17ef52fbdec11070dd73bbde7581643140fbcf0e475ab363692fa',reception:wave36Before.reception};
 // Capture real Canvas drawing calls through the headless DOM adapter; no rendered-pixel claim.
 const create=document.createElement.bind(document),draws=new WeakMap();
 document.createElement=function(tag){const node=create(tag);if(tag!=='canvas')return node;const original=node.getContext.bind(node),calls=[];draws.set(node,calls);node.getContext=type=>{const ctx=original(type);return new Proxy(ctx,{get(t,key){if(key==='fillText')return(...args)=>{calls.push(args);t.fillText(...args);};return Reflect.get(t,key);},set(t,key,value){return Reflect.set(t,key,value);}});};return node;};
@@ -26,7 +29,8 @@ try{
   setLang('en');const scene=new THREE.Scene(),physics=new Physics(),pool=new LightPool(scene),initialLights=lightCount(scene),started=performance.now();
   const L=generateLayout(seed,theme,size,{open35:{version:35,kind}}),fac=buildFacility(L,{physics,lightPool:pool});scene.add(fac.group);physics.world.step();
   const root=fac.group.getObjectByName('openplaces36-landmarks');assert(root?.isGroup,'the actual admitted courtyard must identify its real entrance and four bay purposes');
-  assert.equal(physical(fac),before[kind],'pre-edit native collision/nav/doors/cargo/emitter snapshot remains exact');
+  assert.equal(physical(fac),before[kind],'native collision/nav/doors/cargo/emitter snapshot remains exact after the explicit Wave38 ordinary lamp palette change');
+  if(kind!=='reception')assert(fac.emitters.filter(e=>e.group==='facility').every(e=>e.color===0xe6ded0&&!e.flicker),'only ordinary lamps receive the steady industrial palette');
   const meshes=[];root.traverse(o=>{if(o.isMesh)meshes.push(o);});assert(meshes.length>=1&&meshes.length<=2,'five landmarks share at most two actual draw meshes');
   const mesh=meshes[0],ownedMat=mesh.material,atlas=mesh.material.map,calls=draws.get(atlas.image),signs=root.userData.signs,geoHash=geometryBody(mesh);
   assert.equal(signs.length,5);assert.deepEqual(signs.filter(s=>s.role==='bay').map(s=>s.room),L.open35.bayRooms);assert.equal(new Set(signs.map(s=>s.title.en)).size,5,'four purposes are distinct physical destinations');
