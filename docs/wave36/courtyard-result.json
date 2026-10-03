@@ -1,0 +1,184 @@
+{
+  "place": "courtyard",
+  "running": false,
+  "initial": {
+    "population": "actual native lever and hostFinishLanding",
+    "seed": "temporary weekly fixture1235",
+    "pose": "initial ship centre",
+    "checkpoint": "fresh surface",
+    "profile": "Extra481"
+  },
+  "inShip": false,
+  "docked": false,
+  "phase": "moon",
+  "moon": "hamsi",
+  "seed": 1235,
+  "size": 0.8,
+  "theme": "factory",
+  "receipt": {
+    "version": 35,
+    "token": "hamsi:1235:1",
+    "kind": "courtyard"
+  },
+  "depth": 0,
+  "open35": {
+    "version": 35,
+    "kind": "courtyard",
+    "publicRooms": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "skyRooms": [
+      5
+    ],
+    "bayRooms": [
+      7,
+      8,
+      9,
+      10
+    ],
+    "height": 7.2,
+    "viewFar": 96
+  },
+  "queue": 0,
+  "hidden": false,
+  "audio": {
+    "testMaster": 0,
+    "gain": 0,
+    "normalPreference": 0.8
+  },
+  "cameraFar": 96,
+  "atmosphere": {
+    "fog": 7435631,
+    "density": 0.016,
+    "hemi": 0.22,
+    "ambient": 0.18
+  },
+  "sky": {
+    "parent": true,
+    "vertices": 153,
+    "texture": 128,
+    "visible": true
+  },
+  "player": {
+    "p": [
+      -33.70501708984375,
+      -299.9800009918548,
+      -11.874746322631836
+    ],
+    "yaw": 1.543189775428971,
+    "pitch": 0.506026346620716,
+    "hp": 100,
+    "dead": false,
+    "indoor": true,
+    "input": true,
+    "locked": false
+  },
+  "population": {
+    "clock": 136.5440511257751,
+    "actors": [
+      {
+        "id": "c1",
+        "type": "sw_nest",
+        "dead": false,
+        "zone": "in"
+      }
+    ],
+    "density": {
+      "v": 35,
+      "token": "hamsi:1235:1",
+      "depth": 0,
+      "arrival": 0,
+      "last": null
+    },
+    "glass": "ilf"
+  },
+  "nativeLift": 7,
+  "prompt": {
+    "main": "",
+    "sub": ""
+  },
+  "trace": [
+    {
+      "e": "initial-admission-setup",
+      "place": "courtyard"
+    },
+    {
+      "e": "initial-entrance-body-setup",
+      "p": [
+        0,
+        -299.9,
+        60.4
+      ]
+    },
+    {
+      "e": "native-controller-walk",
+      "from": [
+        0,
+        -299.98000170758985,
+        60.400001525878906
+      ],
+      "to": [
+        -1.9673480888595805,
+        -299.98000104234086,
+        34.44673665612936
+      ],
+      "metres": 26.02772398620586,
+      "t": 108.5013115306618
+    },
+    {
+      "e": "native-controller-walk",
+      "from": [
+        -1.9673480888595805,
+        -299.98000104234086,
+        34.44673665612936
+      ],
+      "to": [
+        -1.993610027863724,
+        -299.98000068968975,
+        6.448266793042421
+      ],
+      "metres": 27.998482179640163,
+      "t": 114.40916770487983
+    },
+    {
+      "e": "complete",
+      "name": "native-public-crossing"
+    },
+    {
+      "e": "native-controller-walk",
+      "from": [
+        -1.9937453269958496,
+        -299.98002268682865,
+        6.275196552276611
+      ],
+      "to": [
+        -33.55510734952986,
+        -299.9765852348413,
+        -11.789096682332456
+      ],
+      "metres": 36.365344417446,
+      "t": 148.96093138661718
+    },
+    {
+      "e": "native-landmark-look",
+      "name": "FUSE WORKSHOP",
+      "signs": 5,
+      "kind": "courtyard",
+      "approach": "native controller,8m from actual frontage"
+    },
+    {
+      "e": "complete",
+      "name": "native-look-at-bay-sign"
+    }
+  ],
+  "errors": {
+    "total": 0,
+    "last": []
+  },
+  "eventErrors": 0
+}

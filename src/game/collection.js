@@ -11,7 +11,8 @@ import { DAILY_EVENTS, wrapMethod } from './dailyEvents.js';
 import { unlockEmote, EMOTES } from './emotes.js';
 import { SUIT_COLORS } from '../models/avatar.js';
 import { INTERIOR_NAMES as REG_INTERIOR_NAMES, INTERIOR_THEMES } from '../world/interiors/index.js';
-import { tf } from '../core/i18n.js';
+import { t, tf } from '../core/i18n.js';
+import { openPlacePresentation36 } from './openplaces36_text.js';
 
 // ------------------------------------------------------------------ reward suits (colour-only cosmetics)
 // Registered at import so every peer can render them (remote suit colours are looked up in SUIT_COLORS).
@@ -210,7 +211,8 @@ export function installCollection(game) {
     const known = !!p.codex.interiors[theme];
     const e = p.codex.interiors[theme] || (p.codex.interiors[theme] = { n: 0, at: Date.now() });
     e.n = num(e.n) + 1;
-    if (!known) game.ui?.toast?.(tf('New Codex entry: interior "{name}"', { name: interiorName(theme) }), 'info');
+    const place = openPlacePresentation36(game.run, game.world, MOONS[game.run?.moon]);
+    if (!known) game.ui?.toast?.(tf('New Codex entry: interior "{name}"', { name: place ? t(place.name) : interiorName(theme) }), 'info');
     save();
   };
   const recordScrap = (it) => {

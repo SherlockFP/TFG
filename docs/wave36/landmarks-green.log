@@ -1,0 +1,4 @@
+native landmarks36 {"kind":"courtyard","signs":5,"draws":1,"triangles":10,"atlas":[512,256],"textureBytes":524288,"elapsedMs":455.9,"disposals":{"geometry":1,"material":1,"texture":1}}
+native landmarks36 {"kind":"concourse","signs":5,"draws":1,"triangles":10,"atlas":[512,256],"textureBytes":524288,"elapsedMs":303.55,"disposals":{"geometry":1,"material":1,"texture":1}}
+native landmarks36 {"kind":"reception","signs":5,"draws":1,"triangles":10,"atlas":[512,256],"textureBytes":524288,"elapsedMs":312.19,"disposals":{"geometry":1,"material":1,"texture":1}}
+openplaces36_landmarks: PASS actual visibility/door and bay provenance,pre-edit native physical snapshots,3m cargo/lift,EN/TR/RU atlas updates,once-only resources/staged/legacy

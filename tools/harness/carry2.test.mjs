@@ -103,6 +103,7 @@ ok(C.isBreak(100, 20) && !C.isBreak(100, 6) && !C.isBreak(400, 20), 'breakage th
     items:{get:id=>map.get(id),all:()=>map.values()},playerName:id=>id};
   const mgr={game,physics,scene,fxPickup(){}},it=new WorldItem(mgr,{id:'rack27',ty:'cy_rack',v:240,h:'a'});map.set(it.id,it);
   const initialErrors=errLog.total,api=installCarry2(game);game.carry2=api;
+  try {
   mods.emit('registerHandlers',(k,fn)=>net.handle(k,fn),game);
   const grip=()=>net.handlers.get('cy2q')({op:'grip',id:it.id,on:true},'b');
   const wall=physics.addStaticBox(0,1,0,.12,1,2);physics.step(1/30);
@@ -131,7 +132,7 @@ ok(C.isBreak(100, 20) && !C.isBreak(100, 6) && !C.isBreak(400, 20), 'breakage th
   ok(api.helperFor(it.id)===null,'helper API expires an unrenewed actual grip');
   mods.emit('hostMigrated',game,{self:true});ok(!api.state.coHost.size&&!api.state.co.size,'migration discards old transient grip');
   ok(errLog.total===initialErrors,'native event callbacks had no caught errors');
-  api.dispose();it.dispose();physics.world.free();mods.clear();
+  } finally { api.dispose();net.leave();it.dispose();physics.world.free();mods.clear(); }
 }
 
 // 3. items + strings
@@ -144,4 +145,4 @@ for (const k of [...C.LINES, 'Catch the {name} [E]', 'Help carry the {name} [hol
 
 console.log(`carry2: ${fails.length ? 'FAIL' : 'ok'}`);
 for (const f of fails) console.log('  x ' + f);
-process.exit(fails.length ? 1 : 0);
+process.exitCode = fails.length ? 1 : 0;

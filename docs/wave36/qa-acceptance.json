@@ -1,0 +1,65 @@
+[
+  {
+    "case": "concourse-near",
+    "phase": "moon",
+    "kind": "concourse",
+    "nativeWalkMetres": [
+      26.0378257342088,
+      32.005148458940056,
+      29.451004603975484
+    ],
+    "namedCompletions": [
+      "native-public-crossing",
+      "native-look-at-bay-sign"
+    ],
+    "hp": 100,
+    "cameraFar": 96,
+    "testAudioGain": 0,
+    "normalAudioPreference": 0.8,
+    "appErrors": 0,
+    "eventErrors": 0,
+    "limits": "Labelled initial body/seed/checkpoint + synthetic input; no human/Internet/hardware/fun claim."
+  },
+  {
+    "case": "courtyard",
+    "phase": "moon",
+    "kind": "courtyard",
+    "nativeWalkMetres": [
+      26.02772398620586,
+      27.998482179640163,
+      36.365344417446
+    ],
+    "namedCompletions": [
+      "native-public-crossing",
+      "native-look-at-bay-sign"
+    ],
+    "hp": 100,
+    "cameraFar": 96,
+    "testAudioGain": 0,
+    "normalAudioPreference": 0.8,
+    "appErrors": 0,
+    "eventErrors": 0,
+    "limits": "Labelled initial body/seed/checkpoint + synthetic input; no human/Internet/hardware/fun claim."
+  },
+  {
+    "case": "reception",
+    "phase": "moon",
+    "kind": "reception",
+    "nativeWalkMetres": [
+      26.02653472237523,
+      28.011986620623514,
+      32.11526250676092
+    ],
+    "namedCompletions": [
+      "native-public-crossing",
+      "native-look-at-bay-sign"
+    ],
+    "hp": 100,
+    "cameraFar": 96,
+    "testAudioGain": 0,
+    "normalAudioPreference": 0.8,
+    "appErrors": 0,
+    "eventErrors": 0,
+    "limits": "Labelled initial body/seed/checkpoint + synthetic input; no human/Internet/hardware/fun claim."
+  }
+]

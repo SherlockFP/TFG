@@ -20,6 +20,7 @@ import { G } from '../physics/physics.js';
 import { MOONS } from './moons.js';
 import * as K from './labyrinths_core.js';
 import './labyrinths_i18n.js';
+import { openPlacePresentation36 } from './openplaces36_text.js';
 
 HOST_ONLY.add('labfx');
 
@@ -304,7 +305,7 @@ export function installLabyrinths(game) {
   // ------------------------------------------------------------------------------------------------ landing card row
   function briefRow() {
     const r = run();
-    if (!r || r.phase !== 'landing' || typeof document === 'undefined') return;
+    if (!r || r.phase !== 'landing' || typeof document === 'undefined' || openPlacePresentation36(r, game.world, MOONS[r.moon])) return;
     const hint = K.LAB_HINT[MOONS[r.moon]?.interior];
     const grid = hint && document.querySelector('.br-card .br-grid');
     if (!grid || grid.querySelector('.lab-row')) return;

@@ -1,0 +1,18 @@
+Wave36 independent archived-baseline capture
+Archive publication SHA: 2e50c8b588343769fbc9e10cfada24be62bba189
+Archive provenance: docs/wave31/baseline-failures.txt; existing exported published source, unchanged shared node_modules
+Archive: C:/Users/Sher/AppData/Local/Temp/tfg-outdoor31-Jm8Ts2
+Runtime: v24.19.0 win32 x64; Three0.186.1; Rapier0.21.0
+Diagnostic skips ONLY the three historical digest assertions in memory to capture independent fingerprints/counts. Remaining archive test assertions run unchanged. This diagnostic does not certify the unmodified historical oracle as passing.
+COMMAND: ["C:\\Users\\Sher\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe","--input-type=module","-e","import assert from \"node:assert/strict\";const equal=assert.equal,deep=assert.deepEqual;assert.equal=(a,b,m)=>{if(typeof m===\"string\"&&m.endsWith(\"frozen-HEAD oracle\")){console.log(\"ARCHIVE DIGEST\",JSON.stringify({case:m.split(\" \")[0],actual:a,historical:b}));return;}return equal(a,b,m);};assert.deepEqual=(a,b,m)=>{if(m===\"exact shared sync/queued native output equality\")console.log(\"ARCHIVE COUNTS\",JSON.stringify({meshes:b.meshes.length,colliders:b.cols.length}));return deep(a,b,m);};await import(\"file:///C:/Users/Sher/AppData/Local/Temp/tfg-outdoor31-Jm8Ts2/tools/harness/outdoor30_staged.test.mjs\");"]
+EXIT: 0
+ARCHIVE DIGEST {"case":"hamsi","actual":"0f331a010288465cba6a29c33d1d6379ef1422100744baca4e38922530d93d19","historical":"6a935019a6fde094e627bbc03cd832cae8e919735c4bcaabf27d1662eb3a2359"}
+ARCHIVE COUNTS {"meshes":111,"colliders":394}
+outdoor30 staged hamsi {"merge":false,"ticks":6,"units":72,"chunks":5,"maxChunkMs":7}
+ARCHIVE DIGEST {"case":"lufer","actual":"06c5371fbde2e2c5f3d8d6a5dbc34fb3cdb9e060f183d05914726c48d1b69173","historical":"fbda038b31e2dd8f6f7e39926bad9c82c262cfc5ab68bfb5f06efebdf0ce75ef"}
+ARCHIVE COUNTS {"meshes":144,"colliders":365}
+outdoor30 staged lufer {"merge":false,"ticks":5,"units":102,"chunks":4,"maxChunkMs":6.7}
+ARCHIVE DIGEST {"case":"hamsi","actual":"eaa8d0adaf2eedcc231fdae78e9a3217069743d2f36eafd7837e1c094f9ba990","historical":"a7c1e0ff2349ea949c7f0c70e388d0373d7cd3875645cc026e6aa752183fb80a"}
+ARCHIVE COUNTS {"meshes":157,"colliders":419}
+outdoor30 staged hamsi {"merge":true,"ticks":4,"units":97,"chunks":3,"maxChunkMs":7.8}
+outdoor30 frozen-HEAD oracle / queue / cancel / flush / fault PASS

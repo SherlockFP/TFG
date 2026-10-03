@@ -1,0 +1,52 @@
+- banner:
+  - text: DEV NATIVE_INTEGRATION / VISUAL_REPLAY. Silent disposable local game. Actual lever/phase/maps/controller/App RAF. Initial campaign, deterministic weekly seed and entrance body pose are labelled setup. Reception is an initial saved depth checkpoint. No human discovery, full expedition or hardware claim.
+  - button "Set up fresh native landing"
+  - button "Initial entrance body setup" [active]
+  - button "Walk broad public hall"
+  - button "Look at cloudy roof"
+  - button "Look at native bay sign"
+  - button "Read native result"
+  - generic: "{ \"place\": \"reception\", \"running\": false, \"initial\": { \"population\": \"actual native lever and hostFinishLanding\", \"seed\": \"temporary weekly fixture1235\", \"pose\": \"initial ship centre\", \"checkpoint\": \"initial saved depth3 checkpoint\", \"profile\": \"Extra481\" }, \"inShip\": true, \"docked\": false, \"phase\": \"moon\", \"moon\": \"hamsi\", \"seed\": 3009280683, \"size\": 0.89, \"theme\": \"backrooms\", \"receipt\": { \"version\": 35, \"token\": \"hamsi:1235:1\", \"kind\": \"courtyard\" }, \"depth\": 3, \"open35\": { \"version\": 35, \"kind\": \"reception\", \"publicRooms\": [ 1, 2, 3, 4, 5, 6 ], \"skyRooms\": [ 5 ], \"bayRooms\": [ 7, 8, 9, 10 ], \"height\": 7.2, \"viewFar\": 96 }, \"queue\": 0, \"hidden\": false, \"audio\": { \"testMaster\": 0, \"gain\": 0, \"normalPreference\": 0.8 }, \"cameraFar\": 420, \"atmosphere\": { \"fog\": 7435631, \"density\": 0.016, \"hemi\": 0.22, \"ambient\": 0.18 }, \"sky\": { \"parent\": true, \"vertices\": 153, \"texture\": 128, \"visible\": true }, \"player\": { \"p\": [ 2, -299.9, 62.4 ], \"yaw\": 0, \"pitch\": 0, \"hp\": 100, \"dead\": false, \"indoor\": false, \"input\": true, \"locked\": false }, \"population\": { \"clock\": 46.86032864813426, \"actors\": [], \"density\": { \"v\": 35, \"token\": \"hamsi:1235:1\", \"depth\": 3, \"arrival\": 0, \"last\": null }, \"glass\": \"il0\" }, \"nativeLift\": 7, \"prompt\": { \"main\": \"Ship charger: hold a battery item\", \"sub\": \"\" }, \"trace\": [ { \"e\": \"initial-admission-setup\", \"place\": \"reception\" }, { \"e\": \"initial-entrance-body-setup\", \"p\": [ 2, -299.9, 62.4 ] } ], \"errors\": { \"total\": 0, \"last\": [] }, \"eventErrors\": 0 }"
+- iframe [id="game"]:
+  - generic: ● LIVE 124
+  - generic: HP 100/100
+  - generic: STA 100/100
+  - generic: 10 lb
+  - text: RUSH HOUR
+  - generic: scrap +30% · clock +30%
+  - generic: Lv.2
+  - text: Lurker (+1)
+  - generic: ▮ 60
+  - generic: ·
+  - generic: I
+  - generic: POCKETS
+  - generic: 0/8
+  - generic: "1"
+  - generic: Chalk
+  - generic: "2"
+  - generic: Lead Pipe
+  - generic: "3"
+  - generic: Hull Patch
+  - generic: "4"
+  - generic: "5"
+  - generic: LIGHT
+  - generic: "DAILY EVENT: RUSH HOUR - The clock runs 30% faster today. Scrap is worth +30%."
+  - generic: CREW TASKS assigned - finish yours for the team bonus. Check the objectives list.
+  - generic: "Engineer kit: Hull Patch."
+  - generic: Click to resume
+  - generic: ◆
+  - text: "Bring scrap to the ship: ▮0 / ▮110 today"
+  - generic: THREAT
+  - generic: CALM
+  - generic: Reception Atrium
+  - generic: Search the undelivered counters. Use the lift to return to the surface.
+  - generic "Push":
+    - generic: "1"
+  - generic: "100"
+  - generic: "F2 DAILY NEW! First win: XP x2"
+  - generic: HUNGER
+  - generic: Starving
+  - generic: Cameras are live. Your bodycams are the most-watched channel in the sector. No pressure.
+  - generic: ● REC
+  - generic: ▮▮▮ BATT
+  - text: TFG TFG

@@ -1,0 +1,55 @@
+- banner:
+  - text: DEV NATIVE_INTEGRATION / VISUAL_REPLAY. Silent disposable local game. Actual lever/phase/maps/controller/App RAF. Initial campaign, deterministic weekly seed and entrance body pose are labelled setup. Reception is an initial saved depth checkpoint. No human discovery, full expedition or hardware claim.
+  - button "Set up fresh native landing" [active]
+  - button "Initial entrance body setup"
+  - button "Walk broad public hall"
+  - button "Look at cloudy roof"
+  - button "Look at native bay sign"
+  - button "Read native result"
+  - generic: "{ \"place\": \"courtyard\", \"running\": false, \"initial\": { \"population\": \"actual native lever and hostFinishLanding\", \"seed\": \"temporary weekly fixture1235\", \"pose\": \"initial ship centre\", \"checkpoint\": \"fresh surface\", \"profile\": \"Extra481\" }, \"inShip\": true, \"docked\": false, \"phase\": \"moon\", \"moon\": \"hamsi\", \"seed\": 1235, \"size\": 0.8, \"theme\": \"factory\", \"receipt\": { \"version\": 35, \"token\": \"hamsi:1235:1\", \"kind\": \"courtyard\" }, \"depth\": 0, \"open35\": { \"version\": 35, \"kind\": \"courtyard\", \"publicRooms\": [ 1, 2, 3, 4, 5, 6 ], \"skyRooms\": [ 5 ], \"bayRooms\": [ 7, 8, 9, 10 ], \"height\": 7.2, \"viewFar\": 96 }, \"queue\": 0, \"hidden\": false, \"audio\": { \"testMaster\": 0, \"gain\": 0, \"normalPreference\": 0.8 }, \"cameraFar\": 420, \"atmosphere\": { \"fog\": 7435631, \"density\": 0.016, \"hemi\": 0.22, \"ambient\": 0.18 }, \"sky\": { \"parent\": true, \"vertices\": 153, \"texture\": 128, \"visible\": true }, \"player\": { \"p\": [ 9.074425122435059e-8, 0.018843269348144454, 3.01724014661886e-8 ], \"yaw\": 0, \"pitch\": 0, \"hp\": 100, \"dead\": false, \"indoor\": false, \"input\": true, \"locked\": false }, \"population\": { \"clock\": 0, \"actors\": [ { \"id\": \"c1\", \"type\": \"sw_nest\", \"dead\": false, \"zone\": \"in\" } ], \"density\": { \"v\": 35, \"token\": \"hamsi:1235:1\", \"depth\": 0, \"arrival\": 0, \"last\": null }, \"glass\": \"ilf\" }, \"prompt\": { \"main\": \"Ship charger: hold a battery item\", \"sub\": \"\" }, \"trace\": [ { \"e\": \"initial-admission-setup\", \"place\": \"courtyard\" } ], \"errors\": { \"total\": 0, \"last\": [] }, \"eventErrors\": 0 }"
+- iframe [id="game"]:
+  - generic: ● LIVE 125
+  - generic: HP 100/100
+  - generic: STA 100/100
+  - generic: 10 lb
+  - text: SERVER MIGRATION
+  - generic: scrap +20% · scrap moves every 70s
+  - generic: 8:35 AM
+  - generic: Lv.2
+  - text: Lurker (+1)
+  - generic: ▮ 60
+  - generic: ·
+  - generic: "[E] Ship charger: hold a battery item"
+  - generic: I
+  - generic: POCKETS
+  - generic: 0/8
+  - generic: "1"
+  - generic: Chalk
+  - generic: "2"
+  - generic: Lead Pipe
+  - generic: "3"
+  - generic: Hull Patch
+  - generic: "4"
+  - generic: "5"
+  - generic: LIGHT
+  - generic: LOOT ABOARD
+  - generic: ▮0
+  - generic: 0 items
+  - generic: "The Company pays 34% today: ▮0 · ▮330 to go"
+  - generic: Deadline day pays 100 %
+  - generic: "DAILY EVENT: SERVER MIGRATION - Loose content is being moved between rooms every minute. Scrap +20%."
+  - generic: CREW TASKS assigned - finish yours for the team bonus. Check the objectives list.
+  - generic: "Engineer kit: Hull Patch."
+  - generic: Click to resume
+  - generic: ◆
+  - text: Leave the ship through the AIRLOCK
+  - generic: THREAT
+  - generic: CALM
+  - generic "Push":
+    - generic: "1"
+  - generic: "100"
+  - generic: "F2 DAILY NEW! First win: XP x2"
+  - generic: HUNGER
+  - generic: Starving
+  - generic: Cameras are live. Your bodycams are the most-watched channel in the sector. No pressure.
+  - text: TFG TFG

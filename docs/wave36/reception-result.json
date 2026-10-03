@@ -1,0 +1,184 @@
+{
+  "place": "reception",
+  "running": false,
+  "initial": {
+    "population": "actual native lever and hostFinishLanding",
+    "seed": "temporary weekly fixture1235",
+    "pose": "initial ship centre",
+    "checkpoint": "initial saved depth3 checkpoint",
+    "profile": "Extra481"
+  },
+  "inShip": false,
+  "docked": false,
+  "phase": "moon",
+  "moon": "hamsi",
+  "seed": 3009280683,
+  "size": 0.89,
+  "theme": "backrooms",
+  "receipt": {
+    "version": 35,
+    "token": "hamsi:1235:1",
+    "kind": "courtyard"
+  },
+  "depth": 3,
+  "open35": {
+    "version": 35,
+    "kind": "reception",
+    "publicRooms": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "skyRooms": [
+      5
+    ],
+    "bayRooms": [
+      7,
+      8,
+      9,
+      10
+    ],
+    "height": 7.2,
+    "viewFar": 96
+  },
+  "queue": 0,
+  "hidden": false,
+  "audio": {
+    "testMaster": 0,
+    "gain": 0,
+    "normalPreference": 0.8
+  },
+  "cameraFar": 96,
+  "atmosphere": {
+    "fog": 7435631,
+    "density": 0.016,
+    "hemi": 0.22,
+    "ambient": 0.18
+  },
+  "sky": {
+    "parent": true,
+    "vertices": 153,
+    "texture": 128,
+    "visible": true
+  },
+  "player": {
+    "p": [
+      -31.66999626159668,
+      -299.98000103615357,
+      2.0433242321014404
+    ],
+    "yaw": 1.558719619076578,
+    "pitch": 0.5029319854644814,
+    "hp": 100,
+    "dead": false,
+    "indoor": true,
+    "input": true,
+    "locked": false
+  },
+  "population": {
+    "clock": 199.93242829978655,
+    "actors": [
+      {
+        "id": "c56",
+        "type": "lm_keeper",
+        "dead": false,
+        "zone": "in"
+      }
+    ],
+    "density": {
+      "v": 35,
+      "token": "hamsi:1235:1",
+      "depth": 3,
+      "arrival": 0,
+      "last": 160.33382370282746
+    },
+    "glass": "il0"
+  },
+  "nativeLift": 7,
+  "prompt": {
+    "main": "",
+    "sub": ""
+  },
+  "trace": [
+    {
+      "e": "initial-admission-setup",
+      "place": "reception"
+    },
+    {
+      "e": "initial-entrance-body-setup",
+      "p": [
+        2,
+        -299.9,
+        62.4
+      ]
+    },
+    {
+      "e": "native-controller-walk",
+      "from": [
+        2,
+        -299.98000141382215,
+        62.400001525878906
+      ],
+      "to": [
+        0.03798203251790255,
+        -299.97974231196565,
+        36.44752582348883
+      ],
+      "metres": 26.02653472237523,
+      "t": 124.3149286462871
+    },
+    {
+      "e": "native-controller-walk",
+      "from": [
+        0.03798203251790255,
+        -299.97974231196565,
+        36.44752582348883
+      ],
+      "to": [
+        0.013785404469672358,
+        -299.9799445513112,
+        8.435549654066563
+      ],
+      "metres": 28.011986620623514,
+      "t": 130.2252517463875
+    },
+    {
+      "e": "complete",
+      "name": "native-public-crossing"
+    },
+    {
+      "e": "native-controller-walk",
+      "from": [
+        0.01400817558169365,
+        -299.98002037408503,
+        8.261892318725586
+      ],
+      "to": [
+        -31.499982684850693,
+        -299.98000083809745,
+        2.0765494885854423
+      ],
+      "metres": 32.11526250676092,
+      "t": 174.88730511158116
+    },
+    {
+      "e": "native-landmark-look",
+      "name": "UNDELIVERED",
+      "signs": 5,
+      "kind": "reception",
+      "approach": "native controller,8m from actual frontage"
+    },
+    {
+      "e": "complete",
+      "name": "native-look-at-bay-sign"
+    }
+  ],
+  "errors": {
+    "total": 0,
+    "last": []
+  },
+  "eventErrors": 0
+}

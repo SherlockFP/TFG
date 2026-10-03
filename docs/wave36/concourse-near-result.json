@@ -1,0 +1,176 @@
+{
+  "place": "concourse",
+  "running": false,
+  "initial": {
+    "population": "actual native lever and hostFinishLanding",
+    "seed": "temporary weekly fixture1235",
+    "pose": "initial ship centre",
+    "checkpoint": "fresh surface",
+    "profile": "Extra481"
+  },
+  "inShip": false,
+  "docked": false,
+  "phase": "moon",
+  "moon": "lufer",
+  "seed": 1235,
+  "size": 1,
+  "theme": "greenhouse",
+  "receipt": {
+    "version": 35,
+    "token": "lufer:1235:1",
+    "kind": "concourse"
+  },
+  "depth": 0,
+  "open35": {
+    "version": 35,
+    "kind": "concourse",
+    "publicRooms": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "skyRooms": [
+      5
+    ],
+    "bayRooms": [
+      7,
+      8,
+      9,
+      10
+    ],
+    "height": 7.2,
+    "viewFar": 96
+  },
+  "queue": 0,
+  "hidden": false,
+  "audio": {
+    "testMaster": 0,
+    "gain": 0,
+    "normalPreference": 0.8
+  },
+  "cameraFar": 96,
+  "atmosphere": {
+    "fog": 7435631,
+    "density": 0.016,
+    "hemi": 0.22,
+    "ambient": 0.18
+  },
+  "sky": {
+    "parent": true,
+    "vertices": 153,
+    "texture": 128,
+    "visible": true
+  },
+  "player": {
+    "p": [
+      -19.76228141784668,
+      -299.9800170898437,
+      -13.810667037963867
+    ],
+    "yaw": 1.5325876747942921,
+    "pitch": 0.5117867663217699,
+    "hp": 100,
+    "dead": false,
+    "indoor": true,
+    "input": true,
+    "locked": false
+  },
+  "population": {
+    "clock": 73.47117859035508,
+    "actors": [],
+    "density": {
+      "v": 35,
+      "token": "lufer:1235:1",
+      "depth": 0,
+      "arrival": 0,
+      "last": null
+    }
+  },
+  "nativeLift": 7,
+  "prompt": {
+    "main": "",
+    "sub": ""
+  },
+  "trace": [
+    {
+      "e": "initial-admission-setup",
+      "place": "concourse"
+    },
+    {
+      "e": "initial-entrance-body-setup",
+      "p": [
+        2,
+        -299.9,
+        66.4
+      ]
+    },
+    {
+      "e": "native-controller-walk",
+      "from": [
+        2,
+        -299.9800170898437,
+        66.4000015258789
+      ],
+      "to": [
+        0.041530498885549605,
+        -299.9781654465245,
+        40.43593476526439
+      ],
+      "metres": 26.0378257342088,
+      "t": 41.66136808241897
+    },
+    {
+      "e": "native-controller-walk",
+      "from": [
+        0.041530498885549605,
+        -299.9781654465245,
+        40.43593476526439
+      ],
+      "to": [
+        0.02581067728351627,
+        -299.9800006332656,
+        8.430790219455957
+      ],
+      "metres": 32.005148458940056,
+      "t": 48.07980900513226
+    },
+    {
+      "e": "complete",
+      "name": "native-public-crossing"
+    },
+    {
+      "e": "native-controller-walk",
+      "from": [
+        0.025772443041205406,
+        -299.9801086425781,
+        8.248178482055664
+      ],
+      "to": [
+        -19.640165499411523,
+        -299.9800000429153,
+        -13.674698998220265
+      ],
+      "metres": 29.451004603975484,
+      "t": 69.51453018268926
+    },
+    {
+      "e": "native-landmark-look",
+      "name": "CLOSED ELECTRONICS",
+      "signs": 5,
+      "kind": "concourse",
+      "approach": "native controller,8m from actual frontage"
+    },
+    {
+      "e": "complete",
+      "name": "native-look-at-bay-sign"
+    }
+  ],
+  "errors": {
+    "total": 0,
+    "last": []
+  },
+  "eventErrors": 0
+}

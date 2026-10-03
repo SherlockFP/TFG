@@ -1,0 +1,11 @@
+# Native place presentation
+
+The actual concourse landing card said Link Rot Greenhouse; its job row said Classic and its hazard row promised vines. The first new-place presentation test reproduced the actual HUD markup before any root production change ([RED](presentation-red.txt)).
+
+`openPlacePresentation36` keeps generation/economy/theme IDs unchanged. A matching currently built facility wins over a valid pending receipt, including an actual legacy map. Only a validated landing receipt may describe a pending ordinary surface; stale moon/seed/day, orbit, special generation options and old route26 deep choices are rejected. A current native reception map uses its actual metadata, rather than requiring the deep layout seed to equal the surface seed.
+
+The existing HUD describes the place and return route. Its cached card refreshes only when the pending/built place changes, and still yields immediately to threats. Native job rows and the registered JOBS terminal use the actual place; the existing job itself is unchanged. The old labyrinth hazard row remains on legacy greenhouse maps. Codex discoveries retain the registered greenhouse/backrooms key and once-only count, while the toast names the actual place. Reception Level0 captions use the atrium name and lift return; native level IDs, audio, seen-day events, light and breaker darkness stay with their owners. EN/TR/RU strings are finite.
+
+[GREEN](presentation-green.txt) covers seven groups through actual HUD methods, installed Facjobs/Labyrinths/Collection event callbacks, the registered terminal command, and real built Backrooms with its normal caption dock. Positive legacy controls and stale/unsupported admission cases are retained. The first expanded fixture reused its previous language-loop map; that fixture was corrected. A subsequent caption fixture lacked a canvas context and triggered texture fallback warnings ([retained observation](presentation-fixture-check.txt)); giving canvas creation back to the existing Node DOM fixture removes those warnings. Neither is reported as a production fix.
+
+These native callbacks do not establish rendered readability, human enjoyment, natural expedition discovery, Internet play or representative hardware speed. Root owns fresh visual/controller QA and final combined verification.

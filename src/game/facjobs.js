@@ -22,6 +22,7 @@ import { fallbackChestLoot } from './chests.js';
 import { descentToken } from './descent21_state.js';
 import * as C from './facjobs_core.js';
 import './facjobs_i18n.js';
+import { openPlacePresentation36 } from './openplaces36_text.js';
 
 HOST_ONLY.add('fjfx'); HOST_ONLY.add('fjd');
 
@@ -487,7 +488,8 @@ export function installFacjobs(game) {
     const row = (k, v) => { const d = document.createElement('div'); d.className = 'fj-row'; const a = document.createElement('span'); a.textContent = k; const b = document.createElement('b'); b.textContent = v; d.append(a, b); grid.appendChild(d); };
     row(t('JOB'), title(roll.main));
     if (roll.side) row(t('SIDE'), title(roll.side));
-    row(t('LAYOUT'), roll.arch && !LAB_IDS.includes(MOONS[r.moon]?.interior) ? t(ARCH_NAME[roll.arch]) : t('Classic'));   // [labyrinths]
+    const place = openPlacePresentation36(r, game.world, MOONS[r.moon]);
+    row(t('LAYOUT'), place ? t(place.layout) : roll.arch && !LAB_IDS.includes(MOONS[r.moon]?.interior) ? t(ARCH_NAME[roll.arch]) : t('Classic'));   // [labyrinths]
   }
 
   offs.push(mods.on('update', (dt, g) => {
@@ -577,7 +579,8 @@ export function installFacjobs(game) {
       if (!id) continue;
       lines.push(`${t(sl === 'm' ? 'MAIN' : 'SIDE')}: ${title(id)}`, '  ' + tf(BRIEF[id], { n: sl === 's' && id === 'sample' ? 3 : C.JOBS[id].n }), '  ' + rewardText(id, sl, r.quotaIndex | 0));
     }
-    lines.push('', `${t('LAYOUT')}: ${roll.arch ? `${t(ARCH_NAME[roll.arch])} - ${t(ARCH_DESC[roll.arch])}` : t('Classic')}`);
+    const place = openPlacePresentation36(r, game.world, moon);
+    lines.push('', `${t('LAYOUT')}: ${place ? `${t(place.layout)} - ${t(place.hint)}` : roll.arch ? `${t(ARCH_NAME[roll.arch])} - ${t(ARCH_DESC[roll.arch])}` : t('Classic')}`);
     term.print(lines.join('\n'));
   }
   try { window.KefalAPI?.registerCommand?.('jobs', (rest, term) => printJobs(term), t("today's facility jobs and layout")); } catch { /* no terminal */ }

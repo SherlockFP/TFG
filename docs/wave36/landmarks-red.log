@@ -1,0 +1,16 @@
+pre-landmark physical baselines [["courtyard","32fcd7c49e987985f54330047c4ddad4d873eeaf9f07b35198331f34834bb0f0"],["concourse","f9d304025e3fe1b01ca57cb66842052e81293649e31f37647b68a902c406da7e"],["reception","e801f15842fbc4cb6ecfa1f535a775ccd3b8c0a5d67b6dd8ecad4dc642a9db44"]]
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: the actual admitted courtyard must identify its real entrance and four bay purposes
+    at file:///C:/Users/Sher/Desktop/TFG/tools/harness/openplaces36_landmarks.test.mjs:13:1 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: undefined,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

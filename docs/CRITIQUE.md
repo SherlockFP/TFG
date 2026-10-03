@@ -1,3 +1,7 @@
+# Current owner direction — Wave36 readable places
+
+The additional requested round corrects actual new-place descriptions and adds finite physical entrance/bay identities without changing paths, lights, cargo or the native economy. Windows harness fixture failures have separate provenance and retained negative probes. [Wave36](wave36/README.md) owns final checks, visual/controller evidence and remaining limits. The owner's enjoyment rating needs human reassessment; test counts do not raise it. Final PC shutdown follows verified saving/publication, as explicitly requested.
+
 # Current owner direction — Wave35 wide places
 
 Three bounded open plans, cloudy roofs and fewer ordinary encounters now have native/rendered evidence in [Wave35](wave35/README.md). Old saves retain geometry. Human enjoyment is not inferred from tests. Observed next problem: briefing/HUD still describe the replaced maze/greenhouse, and the broad spaces need useful physical landmarks. The owner authorized one further round and PC shutdown after completed saving/publication.

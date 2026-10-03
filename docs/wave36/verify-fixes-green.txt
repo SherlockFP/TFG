@@ -1,0 +1,63 @@
+Wave36 verification repairs GREEN and failure-preservation probes
+Runtime: v24.19.0 win32 x64
+
+PROBE: carry2 native assertions and natural shutdown
+COMMAND: ["C:\\Users\\Sher\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe","tools/harness/carry2.test.mjs"]
+EXPECTED EXIT: 0
+ACTUAL EXIT: 0
+SIGNAL: null
+carry2: ok
+
+
+
+PROBE: outdoor archived oracle and native lifecycle
+COMMAND: ["C:\\Users\\Sher\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe","tools/harness/outdoor30_staged.test.mjs"]
+EXPECTED EXIT: 0
+ACTUAL EXIT: 0
+SIGNAL: null
+outdoor30 oracle {"sha":"2e50c8b588343769fbc9e10cfada24be62bba189","verifiedRuntime":"Node24.19.0 win32 x64; Three0.186.1; Rapier0.21.0"}
+outdoor30 staged hamsi {"merge":false,"ticks":6,"units":72,"chunks":5,"maxChunkMs":6.8}
+outdoor30 staged lufer {"merge":false,"ticks":5,"units":102,"chunks":4,"maxChunkMs":8.1}
+outdoor30 staged hamsi {"merge":true,"ticks":4,"units":97,"chunks":3,"maxChunkMs":7.7}
+outdoor30 Windows published-archive oracle / queue / cancel / flush / fault PASS
+
+
+
+PROBE: carry2 labelled blocked-LOS fixture must retain failure exit
+COMMAND: ["C:\\Users\\Sher\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe","--input-type=module","-e","import {Physics} from \"./src/physics/physics.js\"; const native=Physics.prototype.lineOfSight; Physics.prototype.lineOfSight=()=>false; try{await import(\"./tools/harness/carry2.test.mjs\");}finally{Physics.prototype.lineOfSight=native;}"]
+EXPECTED EXIT: 1
+ACTUAL EXIT: 1
+SIGNAL: null
+carry2: FAIL
+  x clear native pair accepts and Session self-delivers co state
+  x authoritative helper API returns a genuine live pair
+
+
+
+PROBE: outdoor labelled .25m collider drift must fail independent oracle
+COMMAND: ["C:\\Users\\Sher\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe","--input-type=module","-e","import {Physics} from \"./src/physics/physics.js\"; const native=Physics.prototype.addStaticBox; Physics.prototype.addStaticBox=function(x,...rest){return native.call(this,x+.25,...rest);}; try{await import(\"./tools/harness/outdoor30_staged.test.mjs\");}finally{Physics.prototype.addStaticBox=native;}"]
+EXPECTED EXIT: 1
+ACTUAL EXIT: 1
+SIGNAL: null
+outdoor30 oracle {"sha":"2e50c8b588343769fbc9e10cfada24be62bba189","verifiedRuntime":"Node24.19.0 win32 x64; Three0.186.1; Rapier0.21.0"}
+
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: hamsi geometry, material, native collider, height, spawn and placement Windows published-archive oracle
++ actual - expected
+
++ 'a6c0c31f7743eaf86d87a0e994ce49f7b0c18efc91a5607476c45b7ea1a4200c'
+- '0f331a010288465cba6a29c33d1d6379ef1422100744baca4e38922530d93d19'
+
+    at file:///C:/Users/Sher/Desktop/TFG/tools/harness/outdoor30_staged.test.mjs:80:10 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 'a6c0c31f7743eaf86d87a0e994ce49f7b0c18efc91a5607476c45b7ea1a4200c',
+  expected: '0f331a010288465cba6a29c33d1d6379ef1422100744baca4e38922530d93d19',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

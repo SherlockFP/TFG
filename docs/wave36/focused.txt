@@ -1,0 +1,8 @@
+ok     1/6 tools\harness\collection.test.mjs (0.2s)
+ok     2/6 tools\harness\openplaces36_presentation.test.mjs (0.6s)
+ok     3/6 tools\harness\readability14.test.mjs (0.2s)
+ok     4/6 tools\harness\openplaces36_landmarks.test.mjs (1.6s)
+ok     5/6 tools\harness\labyrinths.test.mjs (10.8s)
+ok     6/6 tools\harness\facjobs.test.mjs (15.0s)
+
+6/6 passed in 15s (-j 4). slowest: tools\harness\facjobs.test.mjs 15s, tools\harness\labyrinths.test.mjs 11s, tools\harness\openplaces36_landmarks.test.mjs 2s, tools\harness\openplaces36_presentation.test.mjs 1s, tools\harness\readability14.test.mjs 0s

@@ -1,0 +1,30 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: native landing briefing must describe the admitted concourse rather than the old greenhouse
+    at file:///C:/Users/Sher/Desktop/TFG/tools/harness/openplaces36_presentation.test.mjs:20:8
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: '<div class="br-bar top"></div><div class="br-bar bot"><span class="br-tip"><b>TIP</b> Daily events change the rules: check the terminal before you land.</span></div>\n' +
+    '      <div class="br-card">\n' +
+    '        <div class="br-k"><span>DESCENT BRIEFING</span><span>Day 1</span></div>\n' +
+    '        <div class="br-moon">12-Forum</div>\n' +
+    '        <div class="br-desc">A swampy old message board. Frequent rain and ponds full of phish. An empty shopping concourse opens beneath a cloudy glass roof; search the side bays and keep a return route.</div>\n' +
+    '        <div class="br-grid"><div><span>INTERIOR</span><b>Link Rot Greenhouse</b></div>\n' +
+    '         <div><span>WEATHER</span><b style="color:#9fd49f">Clear</b></div>\n' +
+    '         <div><span>DANGER</span><b class="br-danger d1"><span class="br-pips"><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span>LOW</b></div>\n' +
+    '         <div><span>LOOT</span><b>×1.16</b></div></div>\n' +
+    '        <div class="br-event mixed"><div class="br-ek">DAILY EVENT</div><div class="br-en"><svg class="tfg-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg> GLASS CANNON UPDATE</div>\n' +
+    '      <div class="br-ed">Balance patch: -30% max health, +40% melee damage. Scrap +10%.</div><div class="br-fx"><i>scrap +10%</i><i>max HP -30%</i><i>melee +40%</i></div></div>\n' +
+    '        <div class="br-prog"><div class="br-pbar"><i></i></div><span class="br-pl">DESCENT 0%</span></div>\n' +
+    '      </div>',
+  expected: /<b>Empty Concourse<\/b>/,
+  operator: 'match',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

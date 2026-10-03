@@ -1,8 +1,8 @@
 # TFG — current project entry
 
-Updated 2026-10-03, Wave35 wide places and quieter encounters. Read [AGENTS.md](AGENTS.md),
+Updated 2026-10-03, Wave36 readable places and verified Windows regressions. Read [AGENTS.md](AGENTS.md),
 [the current Gauntlet procedure](docs/GAUNTLET.md),
-[Wave35 evidence](docs/wave35/README.md), [Wave34 haul](docs/wave34/README.md), [Wave33 threats](docs/wave33/README.md), [Wave32 asset intake](docs/wave32/README.md)
+[Wave36 evidence](docs/wave36/README.md), [Wave35 open places](docs/wave35/README.md), [Wave34 haul](docs/wave34/README.md), [Wave33 threats](docs/wave33/README.md), [Wave32 asset intake](docs/wave32/README.md)
 and [critique](docs/CRITIQUE.md).
 For "devam", start with [CONTINUE](docs/session/CONTINUE.md).
 

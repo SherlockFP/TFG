@@ -1,0 +1,37 @@
+Wave36 verification repairs RED
+Runtime: v24.19.0 win32 x64
+Three: 0.186.1
+Rapier: 0.21.0
+
+COMMAND: C:\Users\Sher\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe tools/harness/carry2.test.mjs
+EXIT: 3221226505
+SIGNAL: null
+carry2: ok
+
+Assertion failed: !(handle->flags & UV_HANDLE_CLOSING), file src\win\async.c, line 94
+
+
+COMMAND: C:\Users\Sher\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe tools/harness/outdoor30_staged.test.mjs
+EXIT: 1
+SIGNAL: null
+
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: hamsi geometry, material, native collider, height, spawn and placement frozen-HEAD oracle
++ actual - expected
+
++ '0f331a010288465cba6a29c33d1d6379ef1422100744baca4e38922530d93d19'
+- '6a935019a6fde094e627bbc03cd832cae8e919735c4bcaabf27d1662eb3a2359'
+
+    at file:///C:/Users/Sher/Desktop/TFG/tools/harness/outdoor30_staged.test.mjs:62:10 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: '0f331a010288465cba6a29c33d1d6379ef1422100744baca4e38922530d93d19',
+  expected: '6a935019a6fde094e627bbc03cd832cae8e919735c4bcaabf27d1662eb3a2359',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

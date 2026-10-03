@@ -22,6 +22,7 @@ import { tNum } from '../i18n/tnum.js';
 import { LABEL as HL_LABEL } from '../game/headline_core.js';
 import { walletRow } from '../game/wallet.js';   // [unify] one wallet row: credits + clout
 import { INTERIOR_NAMES as REG_INTERIOR_NAMES } from '../world/interiors/index.js';
+import { openPlacePresentation36 } from '../game/openplaces36_text.js';
 
 const BODY_SVG = `<svg viewBox="0 0 40 80" class="hud-body"><g fill="currentColor">
 <circle cx="20" cy="9" r="7"/><rect x="11" y="18" width="18" height="26" rx="4"/>
@@ -524,6 +525,7 @@ export class HUD {
   buildBrief(game) {
     const run = this.run || {};
     const moon = MOONS[run.moon] || {};
+    const place = openPlacePresentation36(run, game?.world, moon);
     const ev = todaysEvent(run);
     const w = weatherInfo(run.weather);
     const danger = dangerOf(moon, run, ev);
@@ -532,7 +534,7 @@ export class HUD {
     const rows = moon.company
       ? `<div><span>${t('SELL ZONE')}</span><b>${escapeHtml(t('Put scrap on the counter and ring the bell.'))}</b></div>
          <div><span>${t('WEATHER')}</span><b style="color:${w.color}">${escapeHtml(w.name)}</b></div>`
-      : `<div><span>${t('INTERIOR')}</span><b>${escapeHtml(interiorName(moon))}</b></div>
+      : `<div><span>${t('INTERIOR')}</span><b>${escapeHtml(place ? t(place.name) : interiorName(moon))}</b></div>
          <div><span>${t('WEATHER')}</span><b style="color:${w.color}">${escapeHtml(w.name)}</b></div>
          <div><span>${t('DANGER')}</span><b class="br-danger d${danger}"><span class="br-pips">${pips}</span>${dangerName(danger)}</b></div>
          <div><span>${t('LOOT')}</span><b>×${lootMul.toFixed(2)}</b></div>`;
@@ -546,7 +548,7 @@ export class HUD {
       <div class="br-card">
         <div class="br-k"><span>${t('DESCENT BRIEFING')}</span><span>${t('Day')} ${run.day ?? 1}</span></div>
         <div class="br-moon">${escapeHtml(moon.name || run.moon || '?')}</div>
-        ${moon.desc ? `<div class="br-desc">${escapeHtml(moon.desc)}</div>` : ''}
+        ${place || moon.desc ? `<div class="br-desc">${escapeHtml(place ? t(place.hint) : moon.desc)}</div>` : ''}
         <div class="br-grid">${rows}</div>
         ${evHtml}
         <div class="br-prog"><div class="br-pbar"><i></i></div><span class="br-pl">${t('DESCENT')} 0%</span></div>
@@ -554,7 +556,7 @@ export class HUD {
     this.briefFill = this.$.brief.querySelector('.br-pbar i');
     this.briefLabel = this.$.brief.querySelector('.br-pl');
     this.briefKey = `${run.moon}|${run.seed}|${ev?.id || ev?.name || ''}`;
-    void game;
+    this.briefPlace36 = place?.kind || '';
   }
   updateBrief(dt, game) {
     const run = this.run || {};
@@ -569,8 +571,9 @@ export class HUD {
     }
     if (want) {
       const key = `${run.moon}|${run.seed}`;
-      if (!this.briefOn || !String(this.briefKey || '').startsWith(key + '|')) {
-        if (!this.briefPaused || !String(this.briefKey || '').startsWith(key + '|')) this.buildBrief(game);
+      const placeChanged = (this.briefPlace36 || '') !== (openPlacePresentation36(run, game?.world, MOONS[run.moon])?.kind || '');
+      if (!this.briefOn || placeChanged || !String(this.briefKey || '').startsWith(key + '|')) {
+        if (placeChanged || !this.briefPaused || !String(this.briefKey || '').startsWith(key + '|')) this.buildBrief(game);
         this.briefPaused = false;
         this.briefOn = true;
         clearTimeout(this.briefHideT);

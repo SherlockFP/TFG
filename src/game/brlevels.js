@@ -23,6 +23,7 @@ import { brMaterials, bakeMaterial, BAKE } from '../world/interiors/backrooms_te
 import { planDarkCorridors } from '../world/setpieces.js';
 import { descentToken } from './descent21_state.js';
 import { hudDock } from '../ui/dock.js';
+import { openPlacePresentation36 } from './openplaces36_text.js';
 
 const SUBTITLE = {
   l0: 'Mono-yellow. Damp carpet. The hum never stops.',
@@ -247,7 +248,8 @@ export function installBackroomsLevels(game) {
   function showCaption(id) {
     const lv = LEVEL_BY_ID[id];
     if (!lv) return;
-    S.caption = { id, title: t(lv.caption), sub: t(SUBTITLE[id] || ''), t: 0 };
+    const place = id === 'l0' ? openPlacePresentation36(game.run, game.world) : null;
+    S.caption = { id, title: t(place?.kind === 'reception' ? place.name : lv.caption), sub: t(place?.kind === 'reception' ? place.hint : SUBTITLE[id] || ''), t: 0 };
     const el = ensureCaption();
     if (el) el.style.opacity = '1';
     // a burst of tape noise

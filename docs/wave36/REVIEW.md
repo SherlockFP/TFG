@@ -1,0 +1,11 @@
+# Independent review and acceptance limits
+
+Root owns the combined verification and publication. The independent reviewer read the current production/native tests and compared the two harness repairs directly with the retained independent historical archive. It found no actionable P1/P2 in the reviewed scope; it did not rerun a full suite or use the browser.
+
+The review checked current-facility authority over pending admission, matching surface/deep route boundaries, stable native Codex/theme/Level0 identity, HUD threat priority, finite sign geometry/light/collider boundaries, actual Backrooms material identity and once-only disposal, and retained native assertions/failure exits in the Windows test repairs. The specific historical digest divergence remains unproven. Rendered sign legibility, natural route discovery, native darkness appearance and human enjoyment require distinct evidence; source inspection and test counts cannot certify them.
+
+The owner explicitly requested finishing Wave35, one additional improvement/bugfix round and shutting down the PC afterward. Wave35 is already published at baab7fc. Wave36 completes the observed inaccurate place presentation, physical landmarks and verification fixture failures. It does not promise that every existing bug is eliminated or assign an invented higher fun rating. Shutdown is the final operation after saving, verified main publication and cleanup of owned QA.
+
+The reviewer separately inspected the actual concourse near/far frames, final result traces, briefing DOM and raw console logs. CLOSED ELECTRONICS is readable near8m; it is not established as readable from the hall centre. The approach trace is29.451m of native walking to8m from frontage, not an8m walk. Native App/event0 and the retained console MutationObserver error are distinguished. No new blocker was found; screenshots establish visual evidence, final JSON establishes named action completion.
+
+Final evidence text was also checked against all captured case logs: courtyard's warn/error capture is empty, while concourse and reception retain the MutationObserver error. The evidence text is normalized to LF for Git whitespace verification; native source/frozen SHA values are unchanged.

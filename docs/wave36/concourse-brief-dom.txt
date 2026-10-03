@@ -1,0 +1,68 @@
+- banner:
+  - text: DEV NATIVE_INTEGRATION / VISUAL_REPLAY. Silent disposable local game. Actual lever/phase/maps/controller/App RAF. Initial campaign, deterministic weekly seed and entrance body pose are labelled setup. Reception is an initial saved depth checkpoint. No human discovery, full expedition or hardware claim.
+  - button "Set up fresh native landing" [active]
+  - button "Initial entrance body setup"
+  - button "Walk broad public hall"
+  - button "Look at cloudy roof"
+  - button "Look at native bay sign"
+  - button "Read native result"
+  - generic: Booting disposable local room. No microphone.
+- iframe [id="game"]:
+  - generic: ● LIVE 123
+  - generic: HP 100/100
+  - generic: STA 100/100
+  - generic: 0 lb
+  - text: DOUBLE XP WEEKEND
+  - generic: danger +12% · XP +100%
+  - generic: Lv.2
+  - text: Lurker (+1)
+  - generic: ▮ 60
+  - generic: ·
+  - generic: "[E] Ship charger: hold a battery item"
+  - generic: I
+  - generic: POCKETS
+  - generic: 0/8
+  - generic: "1"
+  - generic: Chalk
+  - generic: "2"
+  - generic: "3"
+  - generic: "4"
+  - generic: "5"
+  - generic: LIGHT
+  - generic: TIP Push-to-talk is V. Creatures can hear you, too.
+  - generic: DESCENT BRIEFING
+  - generic: Day 1
+  - generic: 12-Forum
+  - generic: Search the closed shopfronts. The main entrance leads back toward the ship.
+  - generic: INTERIOR
+  - generic: Empty Concourse
+  - generic: WEATHER
+  - generic: Clear
+  - generic: DANGER
+  - generic: LOW
+  - generic: LOOT
+  - generic: ×1.05
+  - generic: JOB
+  - generic: CRACK THE VAULT
+  - generic: LAYOUT
+  - generic: Open shopping hall
+  - generic: DAILY EVENT
+  - text: DOUBLE XP WEEKEND
+  - generic: Engagement event. All XP earned on this moon is doubled. Creatures are hyped too.
+  - generic: danger +12%
+  - generic: XP +100%
+  - generic: DESCENT 74%
+  - generic: LOOT ABOARD
+  - generic: ▮0
+  - generic: 0 items
+  - generic: "The Company pays 36% today: ▮0 · ▮330 to go"
+  - generic: Deadline day pays 100 %
+  - generic: Click to resume
+  - generic "Push":
+    - generic: "1"
+  - generic: "100"
+  - generic: F2 DAILY NEW!
+  - generic: HUNGER
+  - generic: Starving
+  - generic: "HR: Congratulations on your employment. Your benefits are described in a document we will not show you."
+  - text: TFG TFG

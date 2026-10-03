@@ -1,0 +1,11 @@
+{
+  "utc": "2026-10-03T05:34:06.6911105Z",
+  "finalCount": 0,
+  "finalDrift": [],
+  "fileListDifferences": 0,
+  "fullSuiteCount": 1,
+  "fullSuiteDrift": [
+    "test/openplaces35.html"
+  ],
+  "reason": "Only DEV bay-sign look helper now walks natively to8m; production unchanged since274/274 full suite."
+}

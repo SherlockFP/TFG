@@ -46,11 +46,29 @@ const cases = [
 ];
 // Generated from frozen HEAD terrain/geobuilder, not this shared generator.
 // Terrain source SHA256: 8e2f1570b83cfd4d20e04b9fb63cbd4f0729675e92860531e06195eb91771ca7.
-const GOLDEN = [
+// Geobuilder SHA256: 888ae76871571a9536c606784dc27268cb91c37a4fc3795c091e5613ff9b6781.
+const HISTORICAL_GOLDEN = [
   '6a935019a6fde094e627bbc03cd832cae8e919735c4bcaabf27d1662eb3a2359',
   'fbda038b31e2dd8f6f7e39926bad9c82c262cfc5ab68bfb5f06efebdf0ce75ef',
   'a7c1e0ff2349ea949c7f0c70e388d0373d7cd3875645cc026e6aa752183fb80a',
 ];
+// Independently captured from the Wave31 published archive, not current output.
+// The precise field behind the historical digest disagreement is unproven.
+const WINDOWS_ARCHIVE = {
+  sha: '2e50c8b588343769fbc9e10cfada24be62bba189',
+  verifiedRuntime: 'Node24.19.0 win32 x64; Three0.186.1; Rapier0.21.0',
+  digests: [
+    '0f331a010288465cba6a29c33d1d6379ef1422100744baca4e38922530d93d19',
+    '06c5371fbde2e2c5f3d8d6a5dbc34fb3cdb9e060f183d05914726c48d1b69173',
+    'eaa8d0adaf2eedcc231fdae78e9a3217069743d2f36eafd7837e1c094f9ba990',
+  ],
+};
+// Counts agree with the original Wave30 capture and the independent archive.
+const ORIGINAL_COUNTS = [[111,394],[144,365],[157,419]];
+const windowsArchive = process.platform === 'win32' && process.arch === 'x64';
+const GOLDEN = windowsArchive ? WINDOWS_ARCHIVE.digests : HISTORICAL_GOLDEN;
+const oracleName = windowsArchive ? 'Windows published-archive oracle' : 'frozen-HEAD oracle';
+if (windowsArchive) console.log('outdoor30 oracle',JSON.stringify({sha:WINDOWS_ARCHIVE.sha,verifiedRuntime:WINDOWS_ARCHIVE.verifiedRuntime}));
 function context() { return { physics:new Physics(), lightPool:new LightPool(new THREE.Scene()) }; }
 function release(out,c) {
   out?.dispose(c.physics); out?.dispose(c.physics);
@@ -59,7 +77,8 @@ function release(out,c) {
 for (const [index,[id,seed,merge]] of cases.entries()) {
   globalThis.__kefalOutMerge = merge;
   const instant=context(), out=buildMoonOutdoor(seed,MOONS[id],instant), expected=snapshot(out,instant.physics);
-  assert.equal(digest(expected),GOLDEN[index],id+' geometry, material, native collider, height, spawn and placement frozen-HEAD oracle');
+  assert.equal(digest(expected),GOLDEN[index],id+' geometry, material, native collider, height, spawn and placement '+oracleName);
+  assert.deepEqual([expected.meshes.length,expected.cols.length],ORIGINAL_COUNTS[index],id+' original native mesh/collider counts');
   release(out,instant);
   const c=context(), q=new LandingQueue({startDelay:0}), events=[];let result=null,build=null,ticks=0;
   q.add('outdoor',()=>{build=queueOutdoorBuild30(seed,MOONS[id],c,q,ready=>{result=ready;events.push('ready');});q.addNext('sibling',()=>events.push('sibling'));});
@@ -131,4 +150,4 @@ for(const queued of [false,true]) {
   else {const q=new LandingQueue({startDelay:0}),warn=console.warn;console.warn=()=>{};try{q.add('outdoor',()=>queueOutdoorBuild30(42,MOONS.hamsi,c,q,()=>ready++));q.add('mapLoaded',()=>hooks++);q.flush();assert.equal(q.pending,0);assert.equal(q.clearCleanups.size,0);}finally{console.warn=warn;}assert.equal(ready,0);assert.equal(hooks,0);}
   assert.equal(c.physics.info.size,0);assert.equal(c.lightPool.emitters.size,0);c.physics.world.free();
 }
-console.log('outdoor30 frozen-HEAD oracle / queue / cancel / flush / fault PASS');
+console.log('outdoor30 '+oracleName+' / queue / cancel / flush / fault PASS');

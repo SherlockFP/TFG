@@ -1,0 +1,8 @@
+PASS actual pending landing HUD name
+PASS translations, actual legacy authority, stale/unsupported admission and old/deep route boundaries
+PASS actual HUD transition cache and threatened briefing pause
+PASS actual registered jobs terminal describes the built place and retains its job
+PASS installed native job/hazard display callbacks and legacy positive control
+PASS actual Codex toast with stable once-only theme save identity
+PASS actual reception/legacy Backrooms captions with native level identity
+openplaces36_presentation: 7 PASS groups; native callbacks, no human-play or rendered claim

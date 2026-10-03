@@ -1,0 +1,4 @@
+ok     1/2 tools\harness\openplaces36_presentation.test.mjs (0.7s)
+ok     2/2 tools\harness\openplaces36_landmarks.test.mjs (1.6s)
+
+2/2 passed in 2s (-j 4). slowest: tools\harness\openplaces36_landmarks.test.mjs 2s, tools\harness\openplaces36_presentation.test.mjs 1s
