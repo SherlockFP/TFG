@@ -1,0 +1,83 @@
+{
+  "at": "2026-10-03T16:27:03.0437706Z",
+  "head": "e1e7365cf81b7549b9e5cd777a24043d8500e2f8",
+  "case": "09",
+  "files": [
+    {
+      "path": "src/game/extraction39.js",
+      "sha256": "19E959C0D9651AA19A1341D8CCCA69DC428B67A6F01207221DA59BBCC1FD80AD"
+    },
+    {
+      "path": "src/game/host.js",
+      "sha256": "65CBA428AA65AE6CA1B63D58ABDB8B341D7213012D29B731A84D24432C27F813"
+    },
+    {
+      "path": "src/game/actions.js",
+      "sha256": "73E27FED9999D30A34D75CE092495BB44ECA987B4A832825A172CD7339B3349F"
+    },
+    {
+      "path": "src/game/crew38.js",
+      "sha256": "F24B88FD3266519782F803B026B95AD52356D0E7CA2349C85C602A3A60CBC576"
+    },
+    {
+      "path": "src/game/shipfaults.js",
+      "sha256": "14B2DFD449D4F73CAF132734EB89E33C27307C4845F432978BC3A5D056563F0E"
+    },
+    {
+      "path": "src/game/voyage.js",
+      "sha256": "D16E2A1FCA5EF48179F89003773DCEEA4C3635881720E84601AB97E458C19991"
+    },
+    {
+      "path": "src/game/cargo13.js",
+      "sha256": "56CDD48166007B4E032CB0CC7347375122216B79683A50CF2F5CBC402C2C8009"
+    },
+    {
+      "path": "src/game/objectives.js",
+      "sha256": "34C92EE9175C7044BFA70FDCD9B624E7929295E19455865F41E7F29DC37FA887"
+    },
+    {
+      "path": "src/game/onegoal.js",
+      "sha256": "8ACC59A4DA12514C23E2FDAC7BD9A8CA68BE7E7EAB9F4B34AAF5ECC4EDD3CE21"
+    },
+    {
+      "path": "src/game/phase_help28.js",
+      "sha256": "F0ED5BD7121C70E6ADBE09A2678132E0D7D89AFB3351D372A5208A05D5742917"
+    },
+    {
+      "path": "src/game/loredata.js",
+      "sha256": "D86B0A74D34D0D852A114BA413DF13DC94697BBD64A03DE43B5B9EF3E040630F"
+    },
+    {
+      "path": "src/game/reactor38.js",
+      "sha256": "ECD570ADA356556C0F4FCF614CEA670EE5BD5295FF06DCCEA25DB3A117F09436"
+    },
+    {
+      "path": "src/ui/ui.js",
+      "sha256": "65BC6E9D34C72F624B95B76B801D05213EFC7830352C47F2D807514EBC4C660A"
+    },
+    {
+      "path": "src/ui/hud.js",
+      "sha256": "F9C9ED27783798805D568ED7B6D9A5A40FAB57922BE1610B6CA84B7BC8947B7D"
+    },
+    {
+      "path": "src/game/salvage39.js",
+      "sha256": "0F2CB38AB3A66D7B1509FD10DEB3B75F8AD704CE5F04098575FDB880C8974AEC"
+    },
+    {
+      "path": "src/net/lobby.js",
+      "sha256": "D3D8AC790CCF15BC44ECE9BD1520E7183372F99DDB2B7C380B480E1266BCD4D6"
+    },
+    {
+      "path": "test/gauntlet39.html",
+      "sha256": "64D5FF6A34C266BECF44D3723612D68FB43C4E81370BACBA96183AFFFFE0FF87"
+    },
+    {
+      "path": "test/gauntlet39_game.html",
+      "sha256": "19F94BB2F54FFDE8618D2762AD3DA362321A50180373BF8C682422F637890805"
+    },
+    {
+      "path": "test/gauntlet39_nav.js",
+      "sha256": "DBDC10A15674C43FD397BF2B6EA93EB6C104E7AB4FC42BA308749A2D81248247"
+    }
+  ]
+}

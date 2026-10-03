@@ -1,13 +1,13 @@
 # TFG — current agent map
 
-Updated 2026-10-03, Wave38 exploration, reactor and crew extraction. This is the current entry point; historical Windows,
+Updated 2026-10-03, Wave39 reversible extraction, fuel recovery and earned-return Gauntlet. This is the current entry point; historical Windows,
 Claude branch/model, no-test and automatic merge/push instructions are retired.
 Their full prior text is preserved in [the historical snapshot](docs/history/AGENTS-pre-wave25.md).
 Current user/session instructions take precedence. Inspect Git for the publication SHA.
 
 ## Start here
 
-1. Read [current work and evidence](docs/wave38/README.md), [previous readable places](docs/wave36/README.md),
+1. Read [current work and evidence](docs/wave39/README.md), [connected salvage loop](docs/wave38/README.md), [previous readable places](docs/wave36/README.md),
    [wide places](docs/wave35/README.md),
    [early salvage haul](docs/wave34/README.md),
    [experimental crew threats](docs/wave33/README.md),
@@ -57,7 +57,7 @@ HMR is off; browser checks require fresh pages. Install dependencies only if mis
 Keep automated game QA in the background and silent, using a disposable test audio
 mix with masterVolume0. Preserve the owner's saved volume for normal play.
 Use focused native checks, then a final full suite for shared lifecycle/host contracts.
-One browser owner holds `/tmp/tfg-browser.lock`; do not share CPU-heavy suites with QA.
+One browser owner holds `$env:TEMP/tfg-browser.lock` on Windows (`/tmp/tfg-browser.lock` in cloud); do not share CPU-heavy suites with QA.
 Setup, native integration, guided input, human play and hardware profiling are
 different evidence. See GAUNTLET for single simulation clock, source freeze,
 normal range/LOS input, failure capture and exact first-floor acceptance.

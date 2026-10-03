@@ -265,8 +265,14 @@ export function installVoyage(game) {
   });
   wrap(game, 'hostBeginTakeoff', (orig) => function (reason) {
     const r = this.run;
-    if (r && (r.phase === 'moon' || r.phase === 'company')) { try { hostTick(0, true); mstep({ t: 'takeoff' }); } catch (e) { console.warn('[voyage] takeoff', e); } }
-    return orig.call(this, reason);
+    if (reason === 'lever' && r?.departure38) return orig.call(this, reason);
+    const departing = r && (r.phase === 'moon' || r.phase === 'company');
+    if (departing) { try { hostTick(0, true); } catch (e) { console.warn('[voyage] takeoff', e); } }
+    const res = orig.call(this, reason);
+    // Starting a crew warning or a blocked preflight is still on the moon.
+    // Mission departure resolves only after the native phase accepts takeoff.
+    if (departing && r.phase === 'takeoff') { try { mstep({ t: 'takeoff' }); } catch (e) { console.warn('[voyage] takeoff', e); } }
+    return res;
   });
   wrap(game, 'hostUpdate', (orig) => function (dt) {
     const r = this.run, moon = MOONS[r?.moon];

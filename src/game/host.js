@@ -17,7 +17,9 @@ import { dailyEventFor } from './dailyEvents.js';
 import { liteOf } from '../ui/avatarpic.js';   // [profile]
 import { admitOpenPlaces35 } from './openplaces35.js';
 import { lootCount38, lootTable38 } from './exploration38.js';
+import { relocateSalvage39 } from './salvage39.js';
 import {validFuse38,certifiedFuse38,shipDoorReach38} from './power38.js';
+import {leverReceipt39,leverReach39} from './extraction39.js';
 
 const EARLY_SAFE_T = 90;   // s after landing with no creature spawns near the facility doors
 const EARLY_SAFE_D = 25;   // m of walking distance
@@ -261,7 +263,11 @@ export const hostMethods = {
       if (this.ship2?.doorJam?.(from, !!d.open)) return;   // [ship2] damaged hull: the door actuator can jam (never twice in a row)
       this.net.broadcast('door', { id: 'ship', open: !!d.open });
     });
-    H('lever', (d, from) => this.hostLever(from));
+    H('lever', (d, from) => {
+      const receipt=leverReceipt39(this);
+      if(d?.token!==receipt.token||d?.revision!==receipt.revision||!leverReach39(this,from))return;
+      this.hostLever(from);
+    });
     H('term', (d, from) => this.terminal.hostExecute(d.cmd, from));
     H('bell', (d, from) => this.hostSell(from));
     H('hit', (d, from) => {
@@ -321,8 +327,7 @@ export const hostMethods = {
 
   hostLever(from) {
     const run = this.run;
-    const inShip = from === this.selfId ? this.player.inShip : insideShip(this.remotes.get(from)?.pos || new THREE.Vector3(0, -99, 0));
-    if (!inShip) return;
+    if (!leverReach39(this,from)) return;
     if (run.phase === 'orbit') {
       if (run.daysLeft <= 0 && run.moon !== 'hq') {
         this.net.sendTo(from, 'sys', sysMsg('Deadline. Route to 0-Algorithm HQ and sell your scrap.', {}, 'bad'));
@@ -384,11 +389,18 @@ export const hostMethods = {
     if (this.run.phase !== 'moon' && this.run.phase !== 'company') return;
     if(reason==='midnight')return;
     if(reason==='lever') {
-      if(this.run.departure38)return;
-      const pending=this.run.departure38={seconds:8};
-      this.broadcastRun(['departure38']);
+      this.run.departure39Revision=leverReceipt39(this).revision+1;
+      if(this.run.departure38){
+        // Invalidate the captured pending object before synchronous self/peer
+        // delivery. Its scheduled callback cannot decrement a restarted run.
+        this.run.departure38=null;
+        this.broadcastRun(['departure38','departure39Revision']);
+        return;
+      }
+      const pending=this.run.departure38={seconds:8},epoch=this.net?.hostEpoch??0;
+      this.broadcastRun(['departure38','departure39Revision']);
       const tick=()=>{
-        if(this.run.departure38!==pending||!['moon','company'].includes(this.run.phase))return;
+        if(!this.isHost||(this.net?.hostEpoch??0)!==epoch||this.run.departure38!==pending||!['moon','company'].includes(this.run.phase))return;
         pending.seconds--;
         this.broadcastRun(['departure38']);
         if(pending.seconds>0)this.later(tick,1000);
@@ -399,7 +411,7 @@ export const hostMethods = {
     this.run.departure38=null;
     this.hostData.takeoffReason = reason;
     this.net.broadcast('door', { id: 'ship', open: false });
-    // everybody outside the ship is left behind (only when the ship leaves at midnight / all dead)
+    // Crew left outside after the manual warning is resolved by native takeoff.
     this.hostSetPhase('takeoff');
     this.later(() => this.hostFinishTakeoff(), 7000);
   },
@@ -574,6 +586,7 @@ export const hostMethods = {
     const count = lootCount38(scrapCountFor(rng.int(moon.scrapCount[0], moon.scrapCount[1]), run.quotaIndex), moon.tier, 0);
     const spots = rng.shuffle(fac.scrapSpots.slice());
     spots.sort((a, b) => (b.item ? 1 : 0) - (a.item ? 1 : 0));   // set-piece spots that ask for an item (skull at blood trails) first
+    const smallSalvage39 = [];
     for (let i = 0; i < Math.min(count, spots.length); i++) {
       const s = spots[i];
       const rolled = rng.weighted(lootTable38(table, moon.tier, 0, s.dist || 0)).id;
@@ -581,8 +594,11 @@ export const hostMethods = {
       // Deep rooms are intentionally a little richer: exploration should pay for the extra danger.
       const depthMul = 1 + Math.min(0.22, Math.max(0, (s.dist || 0) - 5) * 0.018);
       const iid = this.items.hostSpawn(type, new THREE.Vector3(s.x, s.y + 0.5, s.z), { valueMul: valueMul * depthMul, af: rollWeaponAffixes(itemDef(type), lootLvl, afRng) });
-      void iid;
+      smallSalvage39.push(iid);
     }
+    // Only a compatible fresh surface may move one already-rolled ordinary
+    // valuable into a signed optional bay; every native roll and ID stays intact.
+    relocateSalvage39(this, smallSalvage39, spots.slice(0, smallSalvage39.length));
     // big physics valuables
     const bigN = Math.min(fac.bigSpots.length, Math.max(1, Math.round(rng.int(1, 2 + Math.floor(moon.tier / 2)) * BALANCE.lootCountMul)));   // wave 3: -30 %
     const bigSpots = rng.shuffle(fac.bigSpots.slice());
@@ -1064,10 +1080,12 @@ export const hostMethods = {
     this.later(() => {
       this.hostData.selling = false;
       for (const it of inZone) this.net.broadcast('it', { e: 'rm', id: it.id });
-      this.run.credits += total;
+      const receipt={total,credit:total};
+      this.mods?.emit('salvageCredit38',receipt,this);
+      this.run.credits += Math.max(0,Math.min(total,receipt.credit));
       this.run.sold += total;
-      this.broadcastRun(['credits', 'sold']);
-      this.net.broadcast('sell', { total, rate, list, by: from });
+      this.broadcastRun(['credits', 'sold', 'reactor38']);
+      this.net.broadcast('sell', { total, credit:receipt.credit, fuelPaid:receipt.fuelPaid||0, rate, list, by: from });
       const players = this.aiPlayers();
       const n = Math.max(1, players.length);
       for (const p of players) this.net.broadcast('xp', { to: p.id, xp: Math.round(total * 0.25 / Math.sqrt(n)), coin: Math.round(total * 0.1 / n), reason: 'Scrap sold', bounty: { type: 'sell', target: 'value', n: total } });

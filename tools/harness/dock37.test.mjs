@@ -10,6 +10,7 @@ import {Emitter} from '../../src/core/events.js';
 import {installFleet13} from '../../src/game/fleet13.js';
 import {sanitizeFleet13,fleetLayout} from '../../src/game/fleet13_core.js';
 import {hostMethods} from '../../src/game/host.js';
+import {leverReceipt39} from '../../src/game/extraction39.js';
 import {register} from 'node:module';
 register('data:text/javascript,'+encodeURIComponent("export async function load(u,c,n){if(u.endsWith('.css'))return{format:'module',source:'export default {};',shortCircuit:true};return n(u,c)}"));
 const {actionMethods}=await import('../../src/game/actions.js');
@@ -26,9 +27,10 @@ const phases=[];
 const game={net,mods,physics,scene,ship,player,selfId:'H',isHost:true,remotes:new Map(),world:{moonId:'__relay13'},run:{phase:'orbit',moon:'hamsi',day:1,daysLeft:3,fleet13:fleet,sy:fleetLayout('courier')},profile:{shipyard:{}},ui:{toast:s=>toasts.push(s)},hostLever:hostMethods.hostLever,hostData:{},items:{inShipItems:()=>[],get:()=>null},freshDayStats:()=>({}),hostSetPhase(ph){this.run.phase=ph;phases.push(ph);},later(){},loadMapFor(){this.world.moonId=null;},hostSave(){},broadcastRun(){}};
 net.on_('tp',d=>{received.push(d);player.teleport(new THREE.Vector3().fromArray(d.p));});
 const api=installFleet13(game);
-net.handlers.set('lever',(_,from)=>game.hostLever(from));
+hostMethods.registerHandlers.call(game);
 try {
- const lever={pos:ship.points.lever,r:.6,label:'Land on hamsi [E]',action:()=>net.request('lever')};
+ const dispatchReceipt=leverReceipt39(game);
+ const lever={pos:ship.points.lever,r:.6,label:'Land on hamsi [E]',action:()=>net.request('lever',dispatchReceipt)};
  const camera=new THREE.PerspectiveCamera();camera.position.copy(player.eyePos());camera.lookAt(ship.points.lever);camera.updateMatrixWorld();game.camera=camera;
  game.interactablesNow=()=>{const list=[lever];mods.emit('interactables',list,game);return list;};
  const interaction=actionMethods.findInteraction.call(game);
@@ -38,7 +40,12 @@ try {
  assert.equal(api.docked(),false,'usable dock cockpit lever must dispatch instead of saying visit the dock');
  assert.equal(received.length,1,'native Session delivers dispatch teleport to host');
  assert.deepEqual(phases,[],'dispatch and planetary landing remain distinct');
- net.request('lever');assert.deepEqual(phases,['landing'],'next lever request reaches actual host landing');
+ // Dispatch owns a teleport to its ship spawn. Restore the certified cockpit
+ // access as labelled setup, just as an independently walked browser operator
+ // must regain range; this fixture does not claim an earned walk.
+ player.teleport(new THREE.Vector3(-5.25,.05,.9));physics.step(1/30);
+ interaction.action();assert.deepEqual(phases,[],'cached dock dispatch cannot become a planetary landing after dispatch');
+ net.request('lever',leverReceipt39(game));assert.deepEqual(phases,['landing'],'fresh cockpit lever reaches actual host landing');
  for(const invalid of ['far','dead','downed','peer','stale','wall','unselected']){
   game.run.phase='orbit';game.run.fleet13.docked=true;game.run.fleet13.selected=invalid==='unselected'?null:'courier';
   game.world.moonId=invalid==='stale'?'hamsi':'__relay13';player.pos.set(invalid==='far'?0:-5.25,.05,.9);

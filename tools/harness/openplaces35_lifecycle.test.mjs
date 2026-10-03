@@ -9,12 +9,14 @@ import {hostMethods} from '../../src/game/host.js';
 import {MOONS} from '../../src/game/moons.js';
 import {newDescent,chooseSafeFloor} from '../../src/game/descent21_state.js';
 import {savedFloorSpec} from '../../src/game/descent21_core.js';
+import {nativeCockpit39} from './extraction39_cockpit.mjs';
+const cockpit39=await nativeCockpit39();
 register('data:text/javascript,'+encodeURIComponent("export async function load(u,c,n){if(u.endsWith('.css'))return{format:'module',source:'export default {};',shortCircuit:true};return n(u,c)}"));
 const {Game}=await import('../../src/game/game.js');
 const hostNet=new Session({strategy:'local',isHost:true,code:'open35'}),peerNet=new Session({strategy:'local',isHost:false,code:'open35'});
 hostNet.selfId=hostNet.hostId='H';peerNet.selfId='P';peerNet.hostId='H';hostNet.transport.peers.add('P');
 const builds=[];
-function game(net){return {net,selfId:net.selfId,isHost:net.isHost,run:{phase:'orbit',moon:'hamsi',seed:2,day:1,daysLeft:3,quotaIndex:0},hostData:{},player:{inShip:true},remotes:new Map(),mods:new Emitter(),ship:{door:{setOpen(){}}},audio:{play(){}},engine:{shake(){}},ui:{hud:{bigText(){}}},items:{inShipItems:()=>[]},meta:{weekly:{hostOnLever:r=>{r.seed=1235;}}},freshDayStats:()=>({}),later(){},markRunSent(){},hostAnnounce(){},hostSetPhase:hostMethods.hostSetPhase,applyRunState(d){Object.assign(this.run,d);},loadMapFor(run){
+function game(net){return {net,selfId:net.selfId,isHost:net.isHost,run:{phase:'orbit',moon:'hamsi',seed:2,day:1,daysLeft:3,quotaIndex:0},hostData:{},player:cockpit39.player(),physics:cockpit39.physics,remotes:new Map(),mods:new Emitter(),ship:{points:cockpit39.ship.points,door:{setOpen(){}}},audio:{play(){}},engine:{shake(){}},ui:{hud:{bigText(){}}},items:{inShipItems:()=>[]},meta:{weekly:{hostOnLever:r=>{r.seed=1235;}}},freshDayStats:()=>({}),later(){},markRunSent(){},hostAnnounce(){},hostSetPhase:hostMethods.hostSetPhase,applyRunState(d){Object.assign(this.run,d);},loadMapFor(run){
   // Runs synchronously inside the real Game phase callback, before any gs.
   assert.deepEqual(run.openPlaces35,{version:35,token:'hamsi:1235:1',kind:'courtyard'},'receipt must reach the actual build callback after weekly seed selection');
   builds.push({id:net.selfId,receipt:structuredClone(run.openPlaces35)});
@@ -27,7 +29,7 @@ try {
   assert.equal(builds.length,2,'both actual Session phase callbacks enter the map build');
   assert.deepEqual(peer.run.openPlaces35,host.run.openPlaces35);
   console.log('PASS native host/self/peer phase receipt precedes synchronous build');
-} finally {hostNet.transport.leave();peerNet.transport.leave();hostNet.clear();peerNet.clear();}
+} finally {hostNet.transport.leave();peerNet.transport.leave();hostNet.clear();peerNet.clear();cockpit39.dispose();}
 
 const {surfaceOptions35,interiorViewFar35}=await import('../../src/game/openplaces35.js');
 const run={moon:'hamsi',seed:1235,day:1,openPlaces35:builds[0].receipt},opts={variant:'atrium'};

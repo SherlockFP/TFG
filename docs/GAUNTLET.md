@@ -1,6 +1,6 @@
 # TFG Gauntlet — güncel geliştirme ve doğrulama döngüsü
 
-Sürüm 2026-10-01. Bu belge mevcut `/workspace/TFG` bulut çalışmasının yöntemidir. `tools/lead` içindeki eski Claude/worktree/otomatik merge-push akışının ve tarihsel handoff test talimatlarının yerini alır. Geçmiş dalga raporları geçmiş kanıt olarak kalır. Genel tasarım gerekçesi: [Wave25 araştırması](wave25/RESEARCH.md).
+Sürüm 2026-10-03. Güncel çalışma alanı Windows `C:/Users/Sher/Desktop/TFG`; ortam ve komutların sahibi AGENTS.md'dir. Bu belge `tools/lead` içindeki eski Claude/worktree/otomatik merge-push akışının ve tarihsel handoff test talimatlarının yerini alır. Geçmiş dalga raporları geçmiş kanıt olarak kalır. Genel tasarım gerekçesi: [Wave25 araştırması](wave25/RESEARCH.md).
 
 ## Döngünün amacı
 
@@ -37,7 +37,7 @@ En fazla birkaç bağlı kalite hedefi seç. Bir ajanın “eklenebilir” öner
 
 ## 3. Teknik doğrulama: davranışı ve sınırı test et
 
-Node 22: `source /workspace/.tfg-tools/activate.sh`. Değişen modülleri ve doğrudan komşularını çalıştır:
+Windows'ta AGENTS.md'deki bundled Node24.19 ile `tools/harness/run_all.mjs -j 4 <filters>` ve `node_modules/vite/bin/vite.js build` çalıştır. Tarihsel bulut ortamında Node22 aktivasyonu `source /workspace/.tfg-tools/activate.sh` idi. Değişen modülleri ve doğrudan komşularını çalıştır:
 
 ```bash
 npm test -- -j 4 deadletter lab24
@@ -69,7 +69,7 @@ Bir etiketi diğerine yükseltme. “Node testleri geçti” ile “oyunun boss'
 
 Önce kaynakları dondur, Vite/HMR-off için yeni sayfa aç ve senaryo yardımcısını hazırla. Normal hedef 1–2 kısa seans; tam ilk kat gibi daha uzun bir hedef için önceden yazılmış süre sınırı kullan. Bug çıktıysa donmuş düzeltilmiş kaynakla ilgili kısa tekrar gerekçelidir. Eski çelişkili “hiç tarayıcı yok / tam bir tarayıcı var” kuralları gerçek hatanın doğrulamasını engellemez.
 
-1. `/tmp/tfg-browser.lock` altında tek sahibi çalıştır. Dev portunu, yeni oda kodunu, throwaway profil veya kalıcı kayıt fixture'ını açıkça belirt. Sadece kendi açtığın PID/context'i kapat; pattern ile `pkill` kullanma.
+1. Windows'ta `$env:TEMP/tfg-browser.lock` (bulutta `/tmp/tfg-browser.lock`) altında tek sahibi çalıştır. Dev portunu, yeni oda kodunu, throwaway profil veya kalıcı kayıt fixture'ını açıkça belirt. Sadece kendi açtığın PID/context'i kapat; pattern ile `pkill` kullanma.
 2. Host ve peer için phase/world/facility/map queue hazır olmasını bekle. Sadece phase metnine bakmak harita hazır demek değildir. Gerçek zemin sorgusu ve tek facility sahibi kontrol edilir.
 3. Her yürüyüş/aim öncesi yaşayan, downed olmayan, doğru konumdaki oyuncuyu ve input/panel durumunu doğrula. Her hareket sonunda tuşları bırak. `finally` bütün input/context/lock temizliğini yapar. App RAF, gizli-sekme fallback'i ve elle tick aynı anda simülasyonu ilerletiyorsa birden fazla saat üreticisi vardır: ya gerçek zamanlı tek üreticiyi kullan ya da açıkça etiketli test fixture'ında native Game.update/Input.endFrame yalnız aynı manual tick içinde çalışsın. Bütün fizik/AI/host/mod saatleri o değişmeyen pipeline'dan ilerlemeli; sonda exact wrapper'lar geri yüklenir. Kontrol edilen saat insan zorluğu ve performans kanıtı değildir.
 4. E öncesi gerçekten seçilen etiketi kaydet. Normal range/LOS/kapsül yolunu kullan; `hostReq`, teleport veya `noLos` ile bozuk etkileşimi passed gösterme. İlk kurulum pozisyonu gerekiyorsa fixture olarak yaz.

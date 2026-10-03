@@ -4,7 +4,7 @@
 // gamepad navigable (arrows / D-pad move focus, Enter / A confirm, Esc / B back, LB / RB switch tabs).
 // Full-screen reports (day summary, quota met, deplatformed) play one at a time; toasts wait while one is up.
 import { el, escapeHtml, clamp, fmtMoney } from '../core/util.js';
-import { t, setLang, getLang, LANGS, tf } from '../core/i18n.js';
+import { t, setLang, getLang, LANGS, tf, addTranslations } from '../core/i18n.js';
 import { DEADLETTER30 } from '../game/deadletter30_access.js';
 import { tNum } from '../i18n/tnum.js';   // [i18n8] toasts: exact key, then numbers as {}
 import { HUD, randomTip } from './hud.js';
@@ -71,6 +71,9 @@ function followerCardEl(p) {
     el('div', { class: 'dim' }, next.name ? tf('Next milestone: {name} at {n} followers', { name: t(next.name), n: next.at }) : tf('Next milestone: {n} followers', { n: next.at })),
     el('div', { class: 'xpbar' }, el('div', { style: { width: Math.round(next.pct * 100) + '%' } })));
 }
+
+addTranslations({'Emergency fuel repayment':'Acil yakıt borcu ödemesi','Deposited to crew wallet':'Ekip cüzdanına yatırılan'}, 'tr');
+addTranslations({'Emergency fuel repayment':'Погашение аварийного топлива','Deposited to crew wallet':'Внесено в кошелёк команды'}, 'ru');
 
 export class UI {
   constructor(app) {
@@ -1061,9 +1064,12 @@ export class UI {
   }
 
   screen_howto() {
+    const shipHelp = '<b>THE SHIP</b><br>Use the <b>terminal</b> for MOONS, ROUTE, SCAN, BESTIARY and door codes. Pull the <b>lever</b> to land or announce departure; the crew has eight seconds to board. Pull again to cancel the countdown. The ship waits for your command, even after midnight. A recovered <b>Main Server Core</b> powers the next journey or can be sold for quota. At HQ, the empty engine-room socket offers emergency fuel for ▮60; unpaid fuel is deducted from later salvage income.';
+    addTranslations({ [shipHelp]: '<b>GEMİ</b><br><b>Terminalde</b> MOONS, ROUTE, SCAN, BESTIARY ve kapı kodlarını kullan. İnmek veya kalkışı duyurmak için <b>kolu</b> çek; ekibin binmek için sekiz saniyesi vardır. Geri sayımı iptal etmek için tekrar çek. Gemi gece yarısından sonra da komutunu bekler. Bulduğun <b>Ana Sunucu Çekirdeği</b> sonraki yolculuğu besler veya kota için satılır. HQ’da boş motor odası yuvasından ▮60 karşılığında acil yakıt alabilirsin; eksik ücret sonraki hurda gelirinden kesilir.' }, 'tr');
+    addTranslations({ [shipHelp]: '<b>КОРАБЛЬ</b><br><b>Терминал</b> принимает MOONS, ROUTE, SCAN, BESTIARY и коды дверей. Потяни <b>рычаг</b> для посадки или объявления вылета; у экипажа восемь секунд, чтобы подняться на борт. Потяни снова, чтобы отменить отсчёт. Корабль ждёт команды даже после полуночи. Найденное <b>ядро главного сервера</b> обеспечивает следующий рейс или продаётся ради квоты. В HQ пустое гнездо машинного отделения предлагает аварийное топливо за ▮60; остаток удержат из будущих продаж.' }, 'ru');
     const txt = [
       `<b>THE JOB</b><br>You are a contract content janitor for <b>The Algorithm</b>. Fly to the server moons, clear out the abandoned facilities and bring the lost content back to the ship. Sell it at <b>0-Algorithm HQ</b> to meet the <b>engagement quota</b> every 3 days. Miss it and you are deplatformed.`,
-      `<b>THE SHIP</b><br>The <b>terminal</b> takes typed commands (MOONS, ROUTE, STORE, BUY, SCAN, BESTIARY, door codes). Pull the <b>lever</b> to land or take off. The ship leaves at <b>midnight</b>, with or without you.`,
+      shipHelp,
       `<b>CONTROLS</b><br>WASD move · Shift sprint · C crouch · Alt sneak (quiet) · Space jump · E interact / pick up · LMB use / attack / grab big loot · RMB scan · MMB / P ping · G drop · Q throw · F flashlight · 1-4 slots · R reload · V push-to-talk · Z/X emotes · Enter chat · I inventory · K passive tree · hold Backslash spell wheel (or say / type the spell word) · J service record · hold B emote wheel · Tab character · Esc menu`,
       `<b>SURVIVAL</b><br>Every creature has a rule. <i>Scan</i> them and read the BESTIARY. Sound matters: sprinting, horns and <b>your voice</b> attract things. Some exits are not what they seem.`,
       `<b>PROGRESSION</b><br>You earn XP and <b>Followers</b> from scrap, kills, bounties, fishing and minigames. Every level gives a skill point for the passive tree [K]. The Black Market at HQ, run by <b>Phish Dayı</b>, sells soulbound weapons, armor and cosmetics for ◈. The host confirms payment and delivery; weapons need inventory space. Higher-tier moons and later quotas hurt more and pay more.`,
@@ -1456,7 +1462,9 @@ export class UI {
       return `<div class="sum-row sale-row">${type ? iconHTML(type, 'sale-ico') : '<i class="sale-ico none"></i>'}<span class="sale-n">${escapeHtml(x.name)}</span><span>${fmtMoney(x.v)}</span></div>`;
     };
     const lines = d.list.slice(0, 12).map(rowHtml).join('');
-    const box = el('div', { class: 'summary sale', html: `<div class="sum-title">${t('THE ALGORITHM IS PLEASED')}</div>${lines}${d.list.length > 12 ? `<div class="dim">+${d.list.length - 12} ${t('more...')}</div>` : ''}<div class="sum-row q"><span>${t('TOTAL')} (${Math.round(d.rate * 100)}%)</span><span>${fmtMoney(d.total)}</span></div>` });
+    const paid = Math.max(0, Math.min(Number(d.total) || 0, Number(d.fuelPaid) || 0));
+    const fuel = paid ? `<div class="sum-row"><span>${t('Emergency fuel repayment')}</span><span>−${fmtMoney(paid)}</span></div><div class="sum-row q"><span>${t('Deposited to crew wallet')}</span><span>${fmtMoney(Math.max(0, d.total - paid))}</span></div>` : '';
+    const box = el('div', { class: 'summary sale', html: `<div class="sum-title">${t('THE ALGORITHM IS PLEASED')}</div>${lines}${d.list.length > 12 ? `<div class="dim">+${d.list.length - 12} ${t('more...')}</div>` : ''}<div class="sum-row q"><span>${t('TOTAL')} (${Math.round(d.rate * 100)}%)</span><span>${fmtMoney(d.total)}</span></div>${fuel}` });
     document.querySelectorAll('.summary.sale').forEach((x) => x.remove());
     this.root.appendChild(box);
     setTimeout(() => box.classList.add('out'), 6000);

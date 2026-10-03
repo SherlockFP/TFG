@@ -1,0 +1,70 @@
+{
+  "files": [
+    {
+      "sha256": "73E27FED9999D30A34D75CE092495BB44ECA987B4A832825A172CD7339B3349F",
+      "path": "src/game/actions.js"
+    },
+    {
+      "sha256": "F24B88FD3266519782F803B026B95AD52356D0E7CA2349C85C602A3A60CBC576",
+      "path": "src/game/crew38.js"
+    },
+    {
+      "sha256": "65CBA428AA65AE6CA1B63D58ABDB8B341D7213012D29B731A84D24432C27F813",
+      "path": "src/game/host.js"
+    },
+    {
+      "sha256": "D86B0A74D34D0D852A114BA413DF13DC94697BBD64A03DE43B5B9EF3E040630F",
+      "path": "src/game/loredata.js"
+    },
+    {
+      "sha256": "EAF66B18632162892BC7345AF258C24A450D61B8D8819823FD320D04F1E27793",
+      "path": "src/game/objectives.js"
+    },
+    {
+      "sha256": "F0ED5BD7121C70E6ADBE09A2678132E0D7D89AFB3351D372A5208A05D5742917",
+      "path": "src/game/phase_help28.js"
+    },
+    {
+      "sha256": "ECD570ADA356556C0F4FCF614CEA670EE5BD5295FF06DCCEA25DB3A117F09436",
+      "path": "src/game/reactor38.js"
+    },
+    {
+      "sha256": "14B2DFD449D4F73CAF132734EB89E33C27307C4845F432978BC3A5D056563F0E",
+      "path": "src/game/shipfaults.js"
+    },
+    {
+      "sha256": "D16E2A1FCA5EF48179F89003773DCEEA4C3635881720E84601AB97E458C19991",
+      "path": "src/game/voyage.js"
+    },
+    {
+      "sha256": "56CDD48166007B4E032CB0CC7347375122216B79683A50CF2F5CBC402C2C8009",
+      "path": "src/game/cargo13.js"
+    },
+    {
+      "sha256": "19E959C0D9651AA19A1341D8CCCA69DC428B67A6F01207221DA59BBCC1FD80AD",
+      "path": "src/game/extraction39.js"
+    },
+    {
+      "sha256": "0F2CB38AB3A66D7B1509FD10DEB3B75F8AD704CE5F04098575FDB880C8974AEC",
+      "path": "src/game/salvage39.js"
+    },
+    {
+      "sha256": "D3D8AC790CCF15BC44ECE9BD1520E7183372F99DDB2B7C380B480E1266BCD4D6",
+      "path": "src/net/lobby.js"
+    },
+    {
+      "sha256": "774D09351ECAA22849032350411DB62201FDAC7BE8A0AD2DCD9544FAA970516E",
+      "path": "src/ui/ui.js"
+    },
+    {
+      "sha256": "9C383DC546662219023E0183C6F06C92F4F18934485C79F849DC2F912ACB60FD",
+      "path": "test/gauntlet39.html"
+    },
+    {
+      "sha256": "A8631E85372662B6766639FA83FD51CD63EB1C2B63A9A4EE5531C080DEE5664A",
+      "path": "test/gauntlet39_game.html"
+    }
+  ],
+  "at": "2026-10-03T15:41:18.9447114Z",
+  "base": "e1e7365cf81b7549b9e5cd777a24043d8500e2f8"
+}

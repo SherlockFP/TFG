@@ -45,7 +45,8 @@ ok(OG.algoOk({ nowMs: 2000, lastMs: 1000, chatty: true, peak: true }), 'Chatty A
 // ---- module: tagged emit + the TAGGED line + lease
 globalThis.performance ??= { now: () => Date.now() };
 const mods = new Emitter();
-const game = { mods, selfId: 'me', settings: {}, run: { phase: 'moon', fc: { p: { me: [80, 1, 1] } } }, player: { pos: { x: 30, z: 40 }, dead: false, inShip: false, slots: ['a'] }, items: { get: (id) => id === 'a' ? { id: 'a', state: 'held', holder: 'me', type: 'scrap', value: 50, def: { kind: 'scrap' } } : null } };
+const carriedItem = { id: 'a', state: 'held', holder: 'me', type: 'figurine', value: 94, def: { kind: 'scrap' } };
+const game = { mods, selfId: 'me', settings: {}, run: { phase: 'moon', fc: { p: { me: [80, 1, 1] } } }, player: { pos: { x: 30, z: 40 }, dead: false, inShip: false, slots: ['a'] }, items: { get: (id) => id === 'a' ? carriedItem : null } };
 const h1 = (add) => add('Job line', 'main'); h1._src = 'facjobs'; mods.on('objectives', h1);
 mods.on('objectives', (add) => add('mod line', 'sub'));
 const { installOneGoal } = await import('../../src/game/onegoal.js');
@@ -58,6 +59,21 @@ ok(tag && tag.cat === 'escape' && /50 m/.test(tag.text), 'TAGGED line with the d
 ok(api.shown([...out, L('Bring scrap', 'main', { src: 'core' })], 'standard')[0] === tag, 'TAGGED is the goal');
 game.player.indoor = true; const outIn = []; api.emit((tx, kd) => { const o = { text: tx, kind: kd }; outIn.push(o); return o; }, game, 'moon'); game.player.indoor = false;   // [qa2] the facility is offset: no bogus metre count indoors
 ok(outIn.find((l) => /TAGGED/.test(l.text)) && !/\d+ m/.test(outIn.find((l) => /TAGGED/.test(l.text)).text), 'TAGGED indoors carries no distance');
+// Actual module emit reproduces Wave39's earned figurine cue. A fabricated
+// resolver line cannot catch mismatched template variables from carryPreview.
+const { getLang, setLang } = await import('../../src/core/i18n.js');
+const previousLang = getLang(), beforePreview = JSON.stringify({ run: game.run, item: carriedItem });
+ok(JSON.stringify(api.preview()) === JSON.stringify({ v: 94, net: 56 }), 'observed figurine uses the native exact tax preview');
+try {
+  for (const lang of ['en', 'tr', 'ru']) for (const indoor of [false, true]) {
+    setLang(lang); game.player.indoor = indoor;
+    const lines = []; api.emit((text, kind) => { const line = { text, kind }; lines.push(line); return line; }, game, 'moon');
+    const shown = api.shown(lines, 'standard')[0];
+    ok(shown?.cat === 'escape' && shown.text.includes('▮94 → ▮56') && !/[{}]/.test(shown.text), `${lang} ${indoor ? 'indoor' : 'outdoor'} actual tagged goal fills both exact tax values: ${shown?.text}`);
+    ok(indoor ? !/50 [mм]/.test(shown?.text) : /50 [mм]/.test(shown?.text), `${lang} tagged goal retains only the outdoor native distance`);
+  }
+} finally { setLang(previousLang); game.player.indoor = false; }
+ok(JSON.stringify({ run: game.run, item: carriedItem }) === beforePreview, 'tagged goal presentation leaves native value, custody and run state intact');
 ok(api.lease('card', 4, 2) && !api.lease('caption', 6, 1) && api.lease('hub', 4, 3), 'one card at a time for veterans');
 game.settings.chattyAlgo = true; ok(api.lease('caption', 6, 1), 'chatty: cards may stack');
 api.dispose();

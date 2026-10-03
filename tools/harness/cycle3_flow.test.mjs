@@ -17,6 +17,8 @@ import { SHRINE_NUM } from '../../src/game/dice.js';
 import * as CORE from '../../src/game/cycle_core.js';
 import * as P from '../../src/game/cycle_plan.js';
 import * as K from '../../src/game/cycle3_core.js';
+import {nativeCockpit39} from './extraction39_cockpit.mjs';
+const cockpit39=await nativeCockpit39();
 
 // a permissive DOM stub: canvas 2d contexts swallow every call, elements are plain objects, so the mesh / panel builders of cycle3 really run in node
 const ctx2d = () => new Proxy({ measureText: (t) => ({ width: String(t).length * 8 }), createRadialGradient: () => ({ addColorStop() {} }), createLinearGradient: () => ({ addColorStop() {} }), getImageData: (x, y, w, h) => ({ data: new Uint8ClampedArray(Math.max(1, w * h * 4)), width: w, height: h }), createImageData: (w, h) => ({ data: new Uint8ClampedArray(Math.max(1, w * h * 4)), width: w, height: h }) }, { get: (t, k) => (k in t ? t[k] : () => {}), set: () => true });
@@ -62,15 +64,15 @@ class FakeGame {
     this.timers = []; this.log = []; this.saves = 0;
     this.players = [0, 1, 2].map((i) => ({ id: 'p' + i, pos: new THREE.Vector3(i * 0.5, 1, 0), eye: new THREE.Vector3(i * 0.5, 2.6, 0), look: new THREE.Vector3(0, 0, 1), dead: false, inShip: true, indoor: false, crouch: false }));
     this.remotes = new Map([['p1', { hp: 90, name: 'p1' }], ['p2', { hp: 70, name: 'p2' }]]);
-    this.player = { inShip: true, hp: 100 };
+    this.player = cockpit39.player(); // labelled physical cockpit admission; other players remain lifecycle doubles
     this.engine = { scene: { add() {}, remove() {} }, shake() {} };
     this.scene = new THREE.Scene();
-    this.physics = { lineOfSight: () => true, addStaticBox: (...a) => ({ box: a }), removeCollider() {}, colliders: 0 };
+    this.physics = { lineOfSight: () => true, raycast:cockpit39.physics.raycast.bind(cockpit39.physics), addStaticBox: (...a) => ({ box: a }), removeCollider() {}, colliders: 0 };
     this.lights = { emitters: new Set(), add(e) { this.emitters.add(e); return e; }, remove(e) { this.emitters.delete(e); } };
     this.ui = { panelOpen: null, toast() {}, hud: { bigText() {} }, openPanel(el) { this.panelOpen = el; }, closePanel() { this.panelOpen = null; } };
     this.world = { facility: null, outdoor: null, ship: {}, moonId: null };
     this.env = { setSpace() {} };
-    this.ship = { spawns: [new THREE.Vector3(3, 1, 0)], door: { open: false }, points: {} };
+    this.ship = { spawns: [new THREE.Vector3(3, 1, 0)], door: { open: false }, points: cockpit39.ship.points };
     this.items = new FakeItems();
     this.handlers = new Map();
     const self = this, listeners = new Map();
@@ -622,4 +624,5 @@ const freshMoonDay = (g, id = 'hamsi') => { g.run.moon = id; g.run.forecast[id] 
 }
 ok(errs.length === 0, `no exceptions / warnings (${errs.length}) ${errs.slice(0, 6).join(' | ')}`);
 console.log(fails ? `\n${fails} FAILED of ${checks}` : `\nall ${checks} checks passed`);
+cockpit39.dispose();
 process.exit(fails ? 1 : 0);

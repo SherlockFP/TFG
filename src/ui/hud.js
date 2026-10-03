@@ -489,7 +489,8 @@ export class HUD {
     ctx.fillStyle = '#fff'; ctx.fillRect(W / 2 - 1, 0, 2, 4);
     // markers
     const out = game.world.outdoor;
-    const marks = [{ x: 0, z: 0, label: t('SHIP'), col: '#9fd4ff', dist: true }];
+    const entry = game.ship?.points?.doorOpen;
+    const marks = [{ x: entry?.x ?? 0, z: entry?.z ?? 0, label: t(entry ? 'AIRLOCK' : 'SHIP'), col: '#9fd4ff', dist: true }];
     if (out?.mainExit) marks.push({ x: out.mainExit.pos.x, z: out.mainExit.pos.z, label: t('ENTRANCE'), col: '#9fffb0', dist: true });
     for (const f of out?.fireExits || []) marks.push({ x: f.pos.x, z: f.pos.z, label: t('EXIT'), col: 'rgba(160,255,176,0.55)', dist: false, small: true });
     ctx.font = '15px "TFG Credit", VT323, "TFG Cyr VT", monospace';

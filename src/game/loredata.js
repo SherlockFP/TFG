@@ -1,6 +1,10 @@
 // Lore content tables (docs/LORE.md is the bible; this file is the in-game copy). Every player-facing string is an
 // [EN, TR] pair; pick with pickLang(). Data only: no game logic. RU comes from src/i18n/ru_lore.js keyed by the EN text.
-import { getLang, t } from '../core/i18n.js';
+import { getLang, t, addTranslations } from '../core/i18n.js';
+addTranslations({
+  'Night shift. The ship waits for your command. The things outside do not.': 'Ночная смена. Корабль ждёт твоей команды. То, что снаружи, — нет.',
+  'Night is here. Pull the lever when your crew is aboard.': 'Наступила ночь. Потяни рычаг, когда экипаж будет на борту.',
+}, 'ru');
 
 /** [EN, TR] pair -> current language (RU: dictionary lookup by the English text; second arg kept for old callers). */
 export const pickLang = (pair) => {
@@ -256,8 +260,8 @@ export const LINES = {
     ['You made it out. The facility has filed a complaint.', 'Çıkmayı başardınız. Tesis şikâyette bulundu.'],
   ],
   midnight: [
-    ['The ship leaves at midnight. I will not wait. I have never waited for anyone.', 'Gemi gece yarısı kalkıyor. Beklemeyeceğim. Kimseyi beklemedim.'],
-    ['One hour left. This is where the good content happens.', 'Bir saat kaldı. İyi içerik tam burada olur.'],
+    ['Night shift. The ship waits for your command. The things outside do not.', 'Gece vardiyası. Gemi komutunu bekler. Dışarıdakiler beklemez.'],
+    ['Night is here. Pull the lever when your crew is aboard.', 'Gece başladı. Ekibin gemiye bindiğinde kolu çek.'],
     ['Late-night stream detected. Late-night viewers are... different.', 'Gece yayını tespit edildi. Gece izleyicileri... farklıdır.'],
   ],
   greed: [

@@ -5,19 +5,31 @@ import { isSellable } from './items.js';
 import { carriedSalvage29 } from './carried_salvage29.js';
 import { insideShip } from '../world/ship.js';
 import { bountyText, quotaState } from './progression.js';
-import { escapeHtml, fmtClock } from '../core/util.js';
+import { escapeHtml } from '../core/util.js';
 import { greedOn } from './onegoal_core.js';
 import { t, tf, addTranslations } from '../core/i18n.js';
 
 addTranslations({
+  'AIRLOCK': 'HAVA KİLİDİ',
+  'Departure in {n} s — return aboard': 'Kalkışa {n} sn — gemiye dön',
   'Leave the ship through the AIRLOCK': 'HAVA KİLİDİ kapısından gemiden çık',
   'Unload your recovered cargo inside the ship': 'Topladığın yükü geminin içinde yere bırak',
+  'Carrying salvage — return through the ship AIRLOCK': 'Ganimet taşıyorsun — geminin HAVA KİLİDİ kapısından dön',
   'Terminal: MOONS / ROUTE': 'Terminal: MOONS / ROUTE',
+  'Night is dangerous. Return when ready; pull the ship lever to leave.': 'Gece tehlikeli. Hazır olduğunda dön; kalkmak için geminin kolunu çek.',
+  '▮{left} still in here · deep room {m} m · leave when ready': 'İçeride hâlâ ▮{left} var · derin oda {m} m · hazır olduğunda kalk',
+  '▮{left} still in here · leave when ready': 'İçeride hâlâ ▮{left} var · hazır olduğunda kalk',
 });
 addTranslations({
+  'AIRLOCK': 'ШЛЮЗ',
+  'Departure in {n} s — return aboard': 'Вылет через {n} с — вернитесь на борт',
   'Leave the ship through the AIRLOCK': 'Выйди из корабля через ШЛЮЗ',
   'Unload your recovered cargo inside the ship': 'Выгрузи найденный груз внутри корабля',
+  'Carrying salvage — return through the ship AIRLOCK': 'Несёшь добычу — вернись через ШЛЮЗ корабля',
   'Terminal: MOONS / ROUTE': 'Терминал: MOONS / ROUTE',
+  'Night is dangerous. Return when ready; pull the ship lever to leave.': 'Ночью опасно. Вернись, когда будешь готов; для вылета потяни рычаг.',
+  '▮{left} still in here · deep room {m} m · leave when ready': 'Здесь ещё ▮{left} · глубокая комната в {m} м · вылетай, когда готов',
+  '▮{left} still in here · leave when ready': 'Здесь ещё ▮{left} · вылетай, когда готов',
 }, 'ru');
 
 export class Objectives {
@@ -61,7 +73,8 @@ export class Objectives {
           if (nearest && nearest.d > 5) add(tf('Nearby lead: {name} ({d} m) - check it for supplies', { name: nearest.s.name, d: Math.round(nearest.d) }), 'sub').cat = 'other';   // [onegoal] detours never take the goal slot
         }
         const time = run.time || 480;
-        if (time > 23 * 60) add(t('THE SHIP LEAVES AT MIDNIGHT - RUN BACK NOW'), 'warn');
+        if (run.departure38?.seconds > 0) add(tf('Departure in {n} s — return aboard', { n: Math.ceil(run.departure38.seconds) }), 'warn');
+        else if (time > 23 * 60) add(t('Night is dangerous. Return when ready; pull the ship lever to leave.'), 'warn');
         else if (time > 21 * 60) add(t('It is getting late. Head back to the ship soon.'), 'warn');
         const today = g.hostData?.dayStats?.collected ?? this.clientCollected();
         const target = quotaState(run, shipValue - today).perDay;   // [econ9] the cash still needed at today's pace: scrap already aboard from earlier days counts (deadline day pays 100 %)
@@ -70,13 +83,13 @@ export class Objectives {
         if (!moon?.home && !moon?.expedition && !moon?.company && greedOn(today, target, left)) {   // [greed] the day target is met: leave now or push deeper with the clock visible
           const deep = p.indoor ? (g.world.facility?.bigSpots || []).filter((s) => (s.dist || 0) >= 7) : [];
           const dm = deep.length ? Math.round(Math.min(...deep.map((s) => Math.hypot(s.x - p.pos.x, s.z - p.pos.z)))) : 0;
-          add(dm > 5 ? tf('▮{left} still in here · deep room {m} m · leaves {time}', { left, m: dm, time: fmtClock(24 * 60) }) : tf('▮{left} still in here · leaves {time}', { left, time: fmtClock(24 * 60) }), 'main').greed = true;
+          add(dm > 5 ? tf('▮{left} still in here · deep room {m} m · leave when ready', { left, m: dm }) : tf('▮{left} still in here · leave when ready', { left }), 'main').greed = true;
         } else if (target <= 0 && need > 0) add(t('Quota covered by the scrap aboard. More scrap is overtime bonus'), 'main', true, 1);
         else add(tf('Bring scrap to the ship: ▮{a} / ▮{b} today', { a: today, b: target }), 'main', today >= target && target > 0, target ? Math.min(1, today / target) : 1);
         const carrying = carriedSalvage29(g).length;
         const fcp = run.fc?.p?.[g.selfId], pv = g.onegoal?.preview?.();
         if (carrying && !p.inShip && pv && pv.net < pv.v && fcp && (fcp[0] > 0 || fcp[1] || fcp[2])) add(tf(fcp[2] ? '▮{v} → ▮{n} (viewer tax)' : '▮{v} → ▮{n} if tagged', { v: pv.v, n: pv.net }), 'sub').lead = true;   // [greed] on camera: the carry line prices being on air
-        else if (carrying && !p.inShip) add(tf(carrying > 1 ? 'Carrying {n} items - get them to the ship' : 'Carrying {n} item - get it to the ship', { n: carrying }), 'sub').lead = true;   // [onegoal] loot in hand = the goal
+        else if (carrying && !p.inShip) add(p.indoor ? tf(carrying > 1 ? 'Carrying {n} items - get them to the ship' : 'Carrying {n} item - get it to the ship', { n: carrying }) : t('Carrying salvage — return through the ship AIRLOCK'), 'sub').lead = true;   // [onegoal] name the actual outdoor entry, not the hull centre
         if (!p.indoor && g.world.outdoor) {
           const e = g.world.outdoor.mainExit.pos;
           const d = Math.round(Math.hypot(e.x - p.pos.x, e.z - p.pos.z));

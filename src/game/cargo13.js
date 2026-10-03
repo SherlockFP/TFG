@@ -48,7 +48,7 @@ export function installCargo13(game){
  offs.push(game.mods.on('netReady',ready));if(game.net)ready(game.net);offs.push(game.mods.on('registerHandlers',H=>{H('cg13act',request);H('cg13gate',gate);}));
  offs.push(game.mods.on('mapLoaded',build));
  restores.push(wrapMethod(game,'useExit',old=>function(index,toInside){if(state()?.driver===game.selfId){game.net.request('cg13gate',{index,toInside});return;}return old.call(this,index,toInside);}));
- restores.push(wrapMethod(game,'hostBeginTakeoff',old=>function(...args){if(this.isHost)release(true);return old.apply(this,args);}));
+ restores.push(wrapMethod(game,'hostBeginTakeoff',old=>function(...args){if(args[0]==='lever'&&this.run?.departure38)return old.apply(this,args);if(this.isHost)release(true);return old.apply(this,args);}));
  restores.push(wrapMethod(game,'hostOnPlayerLeave',old=>function(id,...args){if(state()?.driver===id)release();return old.call(this,id,...args);}));
  restores.push(wrapMethod(game,'unloadMap',old=>function(...args){if(this.isHost)release(true);cleanup();return old.apply(this,args);}));
  offs.push(game.mods.on('phase',()=>{const s=state();if(!enabled()&&s&&(s.driver||s.ids.length)&&game.isHost)release(true);}));

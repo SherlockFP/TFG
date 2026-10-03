@@ -328,7 +328,9 @@ export function installShipFaults(game, ctx = {}) {
   if (typeof origTakeoff === 'function') {
     game.hostBeginTakeoff = function (reason) {
       const ph = this.run?.phase;
-      if ((ph !== 'moon' && ph !== 'company') || reason === 'alldead' || F.bypass || !enabled()) return origTakeoff.call(this, reason);
+      // A pending crew warning has already passed preflight. Cancel/expiry
+      // belongs to that native countdown and must never roll another fault.
+      if ((ph !== 'moon' && ph !== 'company') || reason === 'alldead' || reason === 'crew' || (reason === 'lever' && this.run?.departure38) || F.bypass || !enabled()) return origTakeoff.call(this, reason);
       if (F.act) {
         const now = game.time || 0;
         if (reason === 'lever' && now - F.remindT > 3) { F.remindT = now; const n = F.list.filter((f) => !f.done).length; if (n) sys(`Takeoff blocked: ${n} fault${n > 1 ? 's' : ''} left.`, 'bad'); }

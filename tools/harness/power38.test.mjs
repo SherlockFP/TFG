@@ -25,10 +25,13 @@ assert.equal(events.filter(e=>e[0]==='power').length,1,'real power broadcast onc
 handlers.get('fuse')(request,'H');assert.equal(events.filter(e=>e[0]==='xp').length,1,'diagnostic replay cannot farm reward');
 console.log('power38 native host fuse authority PASS');
 const scheduled=[],departureEvents=[];
-const departure={run:{phase:'moon'},hostData:{},broadcastRun:()=>{},net:{broadcast:(...a)=>departureEvents.push(a)},hostSetPhase(p){this.run.phase=p;},later:(f,ms)=>scheduled.push({f,ms}),hostFinishTakeoff(){},hostBeginTakeoff:hostMethods.hostBeginTakeoff};
+const departure={isHost:true,run:{phase:'moon'},hostData:{},broadcastRun:()=>{},net:{broadcast:(...a)=>departureEvents.push(a)},hostSetPhase(p){this.run.phase=p;},later:(f,ms)=>scheduled.push({f,ms}),hostFinishTakeoff(){},hostBeginTakeoff:hostMethods.hostBeginTakeoff};
 departure.hostBeginTakeoff('midnight');assert.equal(departure.run.phase,'moon','clock never forces departure');assert.equal(scheduled.length,0);
 departure.hostBeginTakeoff('lever');assert.equal(departure.run.phase,'moon','crew boarding window remains on moon');assert.equal(departure.run.departure38.seconds,8);assert.equal(departureEvents.length,0,'door stays open during boarding countdown');
-departure.hostBeginTakeoff('lever');assert.equal(scheduled.length,1,'repeat lever cannot reset or duplicate countdown');
+departure.hostBeginTakeoff('lever');assert.equal(departure.run.departure38,null,'repeat lever cancels boarding countdown');
+assert.equal(scheduled.length,1,'cancel adds no replacement timer');
+scheduled.shift().f();assert.equal(departure.run.phase,'moon','abandoned timer cannot depart');
+departure.hostBeginTakeoff('lever');assert.equal(departure.run.departure38.seconds,8,'fresh lever starts a new full countdown');
 for(let n=0;n<8;n++){const next=scheduled.shift();assert.equal(next.ms,1000);next.f();}
 assert.equal(departure.run.phase,'takeoff');assert.equal(departureEvents[0][0],'door');assert.equal(scheduled[0].ms,7000,'native flight still seven seconds');
 console.log('power38 explicit crew departure countdown PASS');

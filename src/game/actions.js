@@ -11,6 +11,7 @@ import { FACILITY_Y } from '../world/facility.js';
 import { clamp, damp } from '../core/util.js';
 import { MINIGAMES } from '../minigames/index.js';
 import {fuseReceipt38} from './power38.js';
+import {leverReceipt39} from './extraction39.js';
 import { applyAffixes, applyAffixEffects, affixCooldown, affixDisplayName, affixColor, describeAffix } from './loot.js';
 import { TIERS } from './tiers.js';
 import { plusMul } from './enhance.js';   // [forge]
@@ -208,7 +209,7 @@ export const actionMethods = {
           }
         } else if (hit.distance < reach) {
           const toBag = this.inventory?.pickTargetHint?.(it);
-          return { label: tf('Pick up {name} [E]', { name: affixDisplayName(def.name, it.affix, it) }), sub: [isSellable(def) && it.value ? `▮${it.value}` : '', tierTag(it), ...describeAffix(it.affix, { rarity: true }), toBag ? '→ ' + t('BAG') : ''].filter(Boolean).join(' · '), color: it.affix ? affixColor(it.affix) : r, action: () => this.pickup(it) };
+          return { label: tf('Pick up {name} [E]', { name: affixDisplayName(def.name, it.affix, it) }), sub: [isSellable(def) && it.value ? `▮${it.value}` : '', tierTag(it), ...describeAffix(it.affix, { rarity: true }), toBag ? '→ ' + t('BAG') : ''].filter(Boolean).join(' · '), color: it.affix ? affixColor(it.affix) : r, pickupItem: it, action: () => this.pickup(it) };
         }
       }
     }
@@ -273,9 +274,10 @@ export const actionMethods = {
     const add = (o) => { if (o.pos) out.push(o); };
     if (p.inShip || p.pos.distanceTo(new THREE.Vector3(0, 0, 0)) < 12) {
       add({ pos: sp.terminal, r: 0.8, label: t('Use terminal [E]'), action: () => this.openTerminal() });
+      const leverReceipt=leverReceipt39(this),departing=!!this.run?.departure38;
       add({
-        pos: sp.lever, r: 0.6, label: () => ph === 'orbit' ? (this.run.daysLeft <= 0 && this.run.moon !== 'hq' ? t('Deadline. Route to 0-Algorithm HQ') : tf('Land on {name} [E]', { name: MOONS[this.run.moon]?.name })) : (ph === 'moon' || ph === 'company') ? t('Start the ship / take off [E]') : t('Ship in flight...'),
-        action: () => { if (ph === 'orbit' || ph === 'moon' || ph === 'company') { this.sfx('lever_pull', 0.9); this.animLever(); this.net.request('lever'); } },
+        pos: sp.lever, r: 0.6, label: () => ph === 'orbit' ? (this.run.daysLeft <= 0 && this.run.moon !== 'hq' ? t('Deadline. Route to 0-Algorithm HQ') : tf('Land on {name} [E]', { name: MOONS[this.run.moon]?.name })) : (ph === 'moon' || ph === 'company') ? t(departing?'Cancel departure [E]':'Start the ship / take off [E]') : t('Ship in flight...'),
+        action: () => { if (ph === 'orbit' || ph === 'moon' || ph === 'company') { this.sfx('lever_pull', 0.9); this.animLever(); this.net.request('lever',leverReceipt); } },
       });
       add({ pos: sp.doorOpen, r: 0.5, reach: 2.8, label: () => this.ship.door.label(this.run?.phase), action: () => this.net.request('shipdoor', { open: !this.ship.door.open }) });
       add({ pos: sp.arcade, r: 0.6, label: t('Play FLAPPY PHISH [E]'), action: () => this.startArcade() });
@@ -923,7 +925,7 @@ export const actionMethods = {
       const shown = it.type === 'body' ? 0 : Math.round(it.value * fuzz);
       total += shown;
       const tg = tierTag(it);
-      labels.push({ pos, name: it.type === 'body' ? `${it.label || 'Body'}` : it.def.name, sub: it.type === 'body' ? t('Recover to reduce fines') : tf('Value: ▮{shown}{n}', { shown, n: tg ? ' · ' + tg : '' }), color: it.type === 'body' ? '#ff6b6b' : it.tierColor });
+      labels.push({ itemId: it.id, pos, name: it.type === 'body' ? `${it.label || 'Body'}` : it.def.name, sub: it.type === 'body' ? t('Recover to reduce fines') : tf('Value: ▮{shown}{n}', { shown, n: tg ? ' · ' + tg : '' }), color: it.type === 'body' ? '#ff6b6b' : it.tierColor });
       labels[labels.length - 1].type = it.type;
       if (it.affix) { const l = labels[labels.length - 1]; l.name = affixDisplayName(it.def.name, it.affix, it); l.color = affixColor(it.affix); l.sub += ' · ' + describeAffix(it.affix).slice(0, 2).join(', '); }
       else if (it.plus || it.oc?.length) labels[labels.length - 1].name = affixDisplayName(it.def.name, null, it);   // [forge]

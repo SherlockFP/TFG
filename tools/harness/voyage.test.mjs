@@ -337,7 +337,7 @@ function reachableSet(t, lim, ban) {
     items: { hostSpawn: (ty, pos, o) => { spawned.push([ty, o]); return 'i' + spawned.length; }, get: () => null, all: () => [], inShipItems: () => [] },
     creatures: { host: new Map(), views: new Map(), hostSpawn: () => null },
     applyRunState(d) { Object.assign(this.run, d); }, broadcastRun(k) { calls.broadcastRun.push(k); },
-    hostLever() { calls.lever++; }, hostFinishTakeoff() { this.run.phase = 'orbit'; }, hostBeginTakeoff() { calls.takeoff++; }, hostUpdate() {},
+    hostLever() { calls.lever++; }, hostFinishTakeoff() { this.run.phase = 'orbit'; }, hostBeginTakeoff() { calls.takeoff++; this.run.phase = 'takeoff'; }, hostUpdate() {},
     later: (fn, ms) => { later.push([fn, ms]); return later.length; }, aiPlayers: () => [{ id: 'me', pos: new THREE.Vector3(0, 0, 0), dead: false, inShip: true, zone: 'in' }], aiPlayerById: (id) => (id === 'me' ? { id, pos: new THREE.Vector3(0, 0, 0), dead: false, inShip: true, zone: 'in' } : null),
     env: { setSpace() {} }, planetColorFor: () => 0, ui: { toast() {}, hud: { bigText() {} } }, sfx() {}, deathText: () => 'x', engine: {}, camera: new THREE.PerspectiveCamera(),
     terminal: { hostExecute: () => {}, active: false }, rollLevel: () => 1, shipyard: null, cycle: null, crafting: null,

@@ -6,7 +6,7 @@ const rows = [
   ['Pull the LEVER to land. Buy tools from a field broker, not the ship console.', 'İnmek için KOLU çek. Ekipmanı gemi konsolundan değil, saha tüccarından al.', 'Потяни РЫЧАГ для посадки. Снаряжение продаёт полевой брокер, а не консоль корабля.'],
   ['Follow the path to the facility entrance.', 'Tesis girişine giden yolu takip et.', 'Следуй по тропе ко входу на объект.'],
   ['Scan for salvage and threats, then bring recovered items back to the ship.', 'Ganimet ve tehditleri tara, bulduğun eşyaları gemiye getir.', 'Сканируй добычу и угрозы, затем неси найденное на корабль.'],
-  ['Return before midnight. The ship will leave without you.', 'Gece yarısından önce dön. Gemi seni beklemeden kalkar.', 'Вернись до полуночи. Корабль улетит без тебя.'],
+  ['Night is dangerous. The ship waits until a crew member pulls the lever; then everyone has eight seconds to board.', 'Gece tehlikeli. Ekipten biri kolu çekene kadar gemi bekler; ardından herkesin binmek için sekiz saniyesi vardır.', 'Ночью опасно. Корабль ждёт команды рычагом; после этого у всех восемь секунд, чтобы подняться на борт.'],
   ['Put recovered items on the COUNTER, then ring the BELL to sell.', 'Bulduğun eşyaları TEZGÂHA koy, satmak için ZİLİ çal.', 'Положи добычу на ПРИЛАВОК и позвони в КОЛОКОЛ, чтобы продать её.'],
   ['Visit the field broker for TOOLS. The Black Market has personal gear.', 'EKİPMAN için saha tüccarını ziyaret et. Karaborsada kişisel teçhizat var.', 'За СНАРЯЖЕНИЕМ иди к полевому брокеру. Личное снаряжение есть на чёрном рынке.'],
   ['Board your selected ship at the departure kiosk.', 'Seçili gemine kalkış kioskundan bin.', 'Садись на выбранный корабль через киоск отправления.'],

@@ -43,7 +43,7 @@ export function installOneGoal(game) {
     const values = carriedValues();
     if (!OG.taggedGoalOn(fp[2], values.length)) return;   // [greed] only when the tagged player carries scrap
     const pv = OG.carryPreview(values), d = Math.round(Math.hypot(p.pos.x, p.pos.z));   // [greed] the tagged goal carries the price of staying on air
-    const o = pv.net < pv.v ? add(p.indoor ? tf('TAGGED ▮{v} → ▮{n}: get out to the ship or kill the camera that tagged you', pv) : tf('TAGGED ▮{v} → ▮{n}: get to the ship ({d} m) or kill the camera', { ...pv, d }), 'main')
+    const o = pv.net < pv.v ? add(p.indoor ? tf('TAGGED ▮{v} → ▮{n}: get out to the ship or kill the camera that tagged you', { v: pv.v, n: pv.net }) : tf('TAGGED ▮{v} → ▮{n}: get to the ship ({d} m) or kill the camera', { v: pv.v, n: pv.net, d }), 'main')
       : add(p.indoor ? t('TAGGED: get out to the ship or kill the camera that tagged you') : tf('TAGGED: get to the ship ({d} m) or kill the camera that tagged you', { d }), 'main');   // [qa2] indoors the x/z distance is meaningless (the facility is offset)
     if (o && typeof o === 'object') { o.cat = 'escape'; o.lead = true; }
   }));

@@ -16,6 +16,8 @@ import { installBosses } from '../../src/game/bosses.js';
 import { installCycle } from '../../src/game/cycle.js';
 import * as CORE from '../../src/game/cycle_core.js';
 import * as P from '../../src/game/cycle_plan.js';
+import {nativeCockpit39} from './extraction39_cockpit.mjs';
+const cockpit39=await nativeCockpit39();
 
 setInteriorProbe(() => true);
 const store = {};
@@ -58,12 +60,12 @@ class FakeGame {
     this.timers = []; this.log = []; this.saves = 0;
     this.players = [0, 1, 2].map((i) => ({ id: 'p' + i, pos: new THREE.Vector3(i * 0.5, 1, 0), eye: new THREE.Vector3(i * 0.5, 2.6, 0), look: new THREE.Vector3(0, 0, 1), dead: false, inShip: true, indoor: false, crouch: false }));
     this.remotes = new Map([['p1', { hp: 90, name: 'P1' }], ['p2', { hp: 70, name: 'P2' }]]);
-    this.player = { inShip: true, hp: 100 };
+    this.player = cockpit39.player(); // labelled physical cockpit admission; other players remain lifecycle doubles
     this.engine = { scene: { add() {}, remove() {} }, shake() {} };
-    this.physics = { lineOfSight: () => true };
+    this.physics = { lineOfSight: () => true, raycast:cockpit39.physics.raycast.bind(cockpit39.physics) };
     this.world = { facility: null, outdoor: null, ship: {}, moonId: null };
     this.env = { setSpace() {} };
-    this.ship = { spawns: [new THREE.Vector3(3, 1, 0)], door: { open: false }, points: {} };
+    this.ship = { spawns: [new THREE.Vector3(3, 1, 0)], door: { open: false }, points: cockpit39.ship.points };
     this.items = new FakeItems(this);
     this.handlers = new Map();
     const self = this;
@@ -690,6 +692,7 @@ function metQuota(g) {
 }
 
 console.error = origErr; console.warn = origWarn;
+cockpit39.dispose();
 ok(errs.length === 0, 'no exceptions logged' + (errs.length ? ': ' + errs.slice(0, 4).join(' | ') : ''));
 console.log(`${checks} checks`);
 if (fails) { console.error(`${fails} check(s) failed`); process.exit(1); }

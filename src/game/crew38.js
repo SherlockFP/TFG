@@ -1,9 +1,10 @@
 import {t,tf,addTranslations} from '../core/i18n.js';
 import {insideShip} from '../world/ship.js';
 import {dropPoint} from '../world/shiplayout.js';
-const DEPART='Departure in {n} s — return aboard';
-addTranslations({[DEPART]:'Kalkışa {n} sn — gemiye dön','The ship waits for a crew member to pull the lever.':'Gemi, bir ekip üyesinin kolu çekmesini bekler.','Radio issued. Hold it and press E to switch it on.':'Telsiz verildi. Eline alıp E ile aç.'},'tr');
-addTranslations({[DEPART]:'Вылет через {n} с — вернитесь на борт','The ship waits for a crew member to pull the lever.':'Корабль ждёт, пока член экипажа потянет рычаг.','Radio issued. Hold it and press E to switch it on.':'Рация выдана. Возьмите её и нажмите E, чтобы включить.'},'ru');
+import {departureCrew39} from './extraction39.js';
+const DEPART='Departure in {n} s — {aboard}/{total} aboard · {away} away';
+addTranslations({[DEPART]:'Kalkışa {n} sn — {aboard}/{total} gemide · {away} dışarıda','Cancel departure [E]':'Kalkışı iptal et [E]','The ship waits for a crew member to pull the lever.':'Gemi, bir ekip üyesinin kolu çekmesini bekler.','Radio issued. Hold it and press E to switch it on.':'Telsiz verildi. Eline alıp E ile aç.'},'tr');
+addTranslations({[DEPART]:'Вылет через {n} с — {aboard}/{total} на борту · {away} снаружи','Cancel departure [E]':'Отменить вылет [E]','The ship waits for a crew member to pull the lever.':'Корабль ждёт, пока член экипажа потянет рычаг.','Radio issued. Hold it and press E to switch it on.':'Рация выдана. Возьмите её и нажмите E, чтобы включить.'},'ru');
 export function installCrew38(game){
  const offs=[];let banner=null,disposed=false,bannerDisplay='',bannerText='';
  function issue(onlyId){
@@ -32,7 +33,7 @@ export function installCrew38(game){
   if(!(n>0)){if(banner&&bannerDisplay!=='none'){bannerDisplay='none';banner.style.display='none';}return;}
   if(!banner){banner=document.createElement('div');banner.className='departure38';banner.style.cssText='position:fixed;top:18%;left:50%;transform:translateX(-50%);padding:8px 15px;background:#20272ded;border:1px solid #bda772;color:#e7dbc0;font:18px monospace;text-align:center;pointer-events:none;z-index:65';document.body.appendChild(banner);}
   if(bannerDisplay!==''){bannerDisplay='';banner.style.display='';}
-  const text=tf(DEPART,{n:Math.ceil(n)});if(text!==bannerText){bannerText=text;banner.textContent=text;}
+  const text=tf(DEPART,{n:Math.ceil(n),...departureCrew39(game)});if(text!==bannerText){bannerText=text;banner.textContent=text;}
  }));
  return {issue,dispose(){disposed=true;banner?.remove();offs.forEach(f=>f());}};
 }
