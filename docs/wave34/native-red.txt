@@ -1,0 +1,10 @@
+Wave34 native behavior RED, 2026-10-03. Stub imports successfully.
+Command: bundled Node24.19 tools/harness/earlyhaul34.test.mjs
+Exit 1. Actual hostPopulateMoon / ItemManager / Session / Rapier pair.
+
+AssertionError [ERR_ASSERTION]: first ordinary factory population offers one existing Indexed Glass slot
+0 !== 1
+    at file:///C:/Users/Sher/Desktop/TFG/tools/harness/earlyhaul34.test.mjs:41:9
+actual: 0, expected: 1
+
+An earlier attempt lacked fixture hostData and stopped before behavior; that setup error is not counted as RED evidence.

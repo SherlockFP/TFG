@@ -1,12 +1,12 @@
 # TFG — current project entry
 
-Updated 2026-10-03, Wave33 experimental crew threats. Read [AGENTS.md](AGENTS.md),
+Updated 2026-10-03, Wave34 early salvage haul. Read [AGENTS.md](AGENTS.md),
 [the current Gauntlet procedure](docs/GAUNTLET.md),
-[Wave33 evidence](docs/wave33/README.md), [Wave32 asset intake](docs/wave32/README.md)
+[Wave34 evidence](docs/wave34/README.md), [Wave33 threats](docs/wave33/README.md), [Wave32 asset intake](docs/wave32/README.md)
 and [critique](docs/CRITIQUE.md).
 For "devam", start with [CONTINUE](docs/session/CONTINUE.md).
 
-Workspace `/workspace/TFG`; Node22 activation `/workspace/.tfg-tools/activate.sh`.
+Current Windows workspace `C:/Users/Sher/Desktop/TFG`; bundled Node24.19 path and native commands are in AGENTS. Historical cloud workspace `/workspace/TFG` uses Node22 activation `/workspace/.tfg-tools/activate.sh`.
 The prior Windows/model/session instructions are historical and preserved in
 [this snapshot](docs/history/CLAUDE-pre-wave25.md). Do not apply old branch,
 automatic merge/push or no-test instructions to the current shared checkout.

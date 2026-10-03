@@ -318,6 +318,8 @@ import { installFirstDepth21 } from './firstdepth21.js';
 import { installDescent21Threats } from './descent21_threats.js';
 import { installLiminal26 } from './liminal26.js';
 import { installSalvage27 } from './salvage27.js';
+import { installEarlyHaul34 } from './earlyhaul34.js';
+import { installEarlyHaul34Presentation } from './earlyhaul34_presentation.js';
 import { installRecovery27 } from './recovery27.js';
 import './lab20_moons.js';
 import { installDowned } from './downed.js';   // [import:downed] wave 8: 0 HP = downed, crew revives (docs/wave8/downed.md)
@@ -703,6 +705,8 @@ export class Game extends Emitter {
     this.useModule('descentThreat21', installDescent21Threats);
     this.useModule('liminal26', installLiminal26);
     this.useModule('salvage27', installSalvage27);
+    this.useModule('earlyHaul34', installEarlyHaul34);
+    this.useModule('earlyHaul34Art', installEarlyHaul34Presentation);
     this.useModule('recovery27', installRecovery27);
     this.useModule('firstdepth21', installFirstDepth21);
     this.useModule('deadletter24', installDeadletter24);

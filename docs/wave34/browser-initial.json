@@ -1,0 +1,257 @@
+{
+  "scenario": "setup",
+  "running": false,
+  "initial": {
+    "seed": 1235,
+    "quota": 0,
+    "normalSize": true,
+    "population": "actual hostFinishLanding",
+    "pose": "ship centre initial body setup",
+    "profile": "Extra481",
+    "held": [
+      "hr_chalk",
+      null,
+      null,
+      null,
+      null
+    ],
+    "items": 114,
+    "actors": 3
+  },
+  "phase": "moon",
+  "seed": 1235,
+  "size": 0.8,
+  "theme": "factory",
+  "queue": false,
+  "hidden": false,
+  "receipt": {
+    "id": "ilb",
+    "moon": "hamsi",
+    "seed": 1235,
+    "day": 1
+  },
+  "plan": {
+    "type": "indexedglass27",
+    "p": [
+      -0.25,
+      -299.31875001236796,
+      49.75
+    ],
+    "yaw": 0,
+    "size": [
+      0.7599999904632568,
+      1.2124999752640724,
+      0.36000001430511475
+    ],
+    "approach": [
+      -0.25,
+      -300,
+      51.25
+    ],
+    "path": [
+      [
+        0,
+        -300,
+        60.4
+      ],
+      [
+        0.25,
+        -300,
+        60.25
+      ],
+      [
+        -0.25,
+        -300,
+        60.25
+      ],
+      [
+        -0.25,
+        -300,
+        59.75
+      ],
+      [
+        -0.25,
+        -300,
+        59.25
+      ],
+      [
+        -0.25,
+        -300,
+        58.75
+      ],
+      [
+        -0.25,
+        -300,
+        58.25
+      ],
+      [
+        -0.25,
+        -300,
+        57.75
+      ],
+      [
+        -0.25,
+        -300,
+        57.25
+      ],
+      [
+        -0.25,
+        -300,
+        56.75
+      ],
+      [
+        -0.25,
+        -300,
+        56.25
+      ],
+      [
+        -0.25,
+        -300,
+        55.75
+      ],
+      [
+        -0.25,
+        -300,
+        55.25
+      ],
+      [
+        -0.25,
+        -300,
+        54.75
+      ],
+      [
+        -0.25,
+        -300,
+        54.25
+      ],
+      [
+        -0.25,
+        -300,
+        53.75
+      ],
+      [
+        -0.25,
+        -300,
+        53.25
+      ],
+      [
+        -0.25,
+        -300,
+        52.75
+      ],
+      [
+        -0.25,
+        -300,
+        52.25
+      ],
+      [
+        -0.25,
+        -300,
+        51.75
+      ],
+      [
+        -0.25,
+        -300,
+        51.25
+      ],
+      [
+        -0.25,
+        -300,
+        50.75
+      ],
+      [
+        -0.25,
+        -300,
+        50.25
+      ],
+      [
+        -0.25,
+        -300,
+        49.75
+      ],
+      [
+        -0.25,
+        -300,
+        49.75
+      ]
+    ],
+    "doors": [],
+    "length": 11.291547594742264,
+    "room": -1,
+    "source": "mainEntrance"
+  },
+  "planning": {
+    "candidates": 18,
+    "sites": 1,
+    "nodes": 380,
+    "probes": 2527,
+    "occupiedRejected": 0,
+    "siteRejected": 0,
+    "routeRejected": 0,
+    "losRejected": 0,
+    "ms": 11.100000023841858
+  },
+  "player": {
+    "p": [
+      0,
+      0.018843269348144454,
+      0
+    ],
+    "yaw": 0,
+    "pitch": 0,
+    "hp": 100,
+    "dead": false,
+    "indoor": false,
+    "inShip": true,
+    "input": true,
+    "locked": false,
+    "held": [
+      "hr_chalk",
+      "pipe",
+      "hullpatch",
+      null,
+      null
+    ],
+    "down": []
+  },
+  "glass": {
+    "id": "ilb",
+    "type": "indexedglass27",
+    "state": "world",
+    "p": [
+      -0.2499852031469345,
+      -299.3938293457031,
+      49.75050354003906
+    ],
+    "owner": null,
+    "holder": null,
+    "value": 274,
+    "baseValue": 274,
+    "tier": "common"
+  },
+  "cargo": {
+    "map": "hamsi:1235:1:",
+    "p": [
+      7.7,
+      -1.2455305680632591,
+      7
+    ],
+    "yaw": 0,
+    "driver": null,
+    "ids": []
+  },
+  "target": {
+    "label": "Ship charger: hold a battery item [E]",
+    "sub": ""
+  },
+  "prompt": {
+    "main": "Ship charger: hold a battery item",
+    "sub": ""
+  },
+  "trace": [],
+  "errors": {
+    "total": 0,
+    "last": []
+  },
+  "eventErrors": 0
+}

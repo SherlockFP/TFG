@@ -1,0 +1,10 @@
+ok     1/8 tools\harness\inventory_core.test.mjs (0.1s)
+ok     2/8 tools\harness\cargo13.test.mjs (0.1s)
+ok     3/8 tools\harness\inventory_feedback16.test.mjs (0.1s)
+ok     4/8 tools\harness\net_session.test.mjs (0.2s)
+ok     5/8 tools\harness\cargo20.test.mjs (0.7s)
+ok     6/8 tools\harness\salvage27.test.mjs (0.9s)
+ok     7/8 tools\harness\earlyhaul34.test.mjs (3.1s)
+ok     8/8 tools\harness\recovery27.test.mjs (4.2s)
+
+8/8 passed in 4s (-j 4). slowest: tools\harness\recovery27.test.mjs 4s, tools\harness\earlyhaul34.test.mjs 3s, tools\harness\salvage27.test.mjs 1s, tools\harness\cargo20.test.mjs 1s, tools\harness\net_session.test.mjs 0s

@@ -1,0 +1,17 @@
+placement diagnostics {"candidates":18,"sites":3,"nodes":435,"probes":2879,"occupiedRejected":0,"siteRejected":2,"routeRejected":0,"losRejected":0,"ms":21.273300000000063}
+PASS native paired population replaces exactly one slot preserving economy / IDs / entropy / deep prize
+size1 plan {"pose":[10.25,-299.31875001236796,63.25],"length":13.600564589117216,"candidates":18,"sites":3,"nodes":458,"probes":3072,"occupiedRejected":0,"siteRejected":2,"routeRejected":0,"losRejected":0,"ms":14.551099999999906}
+PASS actual factory size1.0 and Hamsi size.8 use bounded main-entrance plans
+seed smoke {"seed":17,"result":"offered","pose":[-8.25,-299.31875001236796,57.25],"length":14.291547594742264,"candidates":18,"sites":3,"nodes":456,"probes":2981,"occupiedRejected":0,"siteRejected":2,"routeRejected":0,"losRejected":0,"ms":9.848899999999958}
+PASS ordinary Hamsi seed17 bounded admission smoke
+seed smoke {"seed":1,"result":"offered","pose":[-0.25,-299.31875001236796,49.75],"length":11.291547594742264,"candidates":18,"sites":1,"nodes":390,"probes":2585,"occupiedRejected":0,"siteRejected":0,"routeRejected":0,"losRejected":0,"ms":13.108199999999897}
+PASS ordinary Hamsi seed1 bounded admission smoke
+PASS native synchronous gs/sp callbacks cannot replay a removed offer
+PASS real host save and welcome preserve receipt and one native cargo identity
+PASS private same-kind spawn proposal rejects forgery, pocket/holder and stale map
+PASS actual locked entrance branch or static blockage falls back stock, retry only fresh map
+PASS off-scope phase/quota/depth/peer/context and disposed instance preserve stock
+PASS real native door opening and controller traverse the certified pickup route
+PASS real partner native brake travel 0.8924 → 0.1610
+PASS native partner brace rejects active beam owner, occupied hands and real LOS obstruction
+PASS existing trolley custody loads/unloads the offered native ID once; no receipt reset

@@ -558,7 +558,8 @@ export const hostMethods = {
     const bigN = Math.min(fac.bigSpots.length, Math.max(1, Math.round(rng.int(1, 2 + Math.floor(moon.tier / 2)) * BALANCE.lootCountMul)));   // wave 3: -30 %
     const bigSpots = rng.shuffle(fac.bigSpots.slice());
     const bigW = bigTableFor(fac.layout?.theme || moon.interior).map(([id, w]) => ({ id, w }));
-    for (let i = 0; i < bigN; i++) this.items.hostSpawn(rng.weighted(bigW).id, new THREE.Vector3(bigSpots[i].x, bigSpots[i].y + 1, bigSpots[i].z), { valueMul });
+    const earlyHaul = this.earlyHaul34?.populationOffer(bigSpots, bigN);
+    for (let i = 0; i < bigN; i++) this.items.hostSpawn(rng.weighted(bigW).id, new THREE.Vector3(bigSpots[i].x, bigSpots[i].y + 1, bigSpots[i].z), i === 0 && earlyHaul ? { valueMul, earlyHaul34: earlyHaul } : { valueMul });
     // One guaranteed deep-room prize makes the back half of a dungeon worth reaching.
     const deepBig = bigSpots.filter((s) => (s.dist || 0) >= 7);
     if (deepBig.length) {

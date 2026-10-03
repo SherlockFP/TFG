@@ -1,0 +1,16 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><base href="/"><title>TFG Wave34 native Game</title>
+<style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#loading{position:fixed;inset:0;background:#050302;display:grid;place-items:center;z-index:100;color:#ff9a4a;font-family:monospace}#loading.hidden{display:none}</style>
+<div id="game"></div><div id="ui"></div><div id="fps"></div><div id="loading">LOADING TFG OS...</div>
+<script type="module">
+if(!import.meta.env.DEV)throw new Error('Dev-only fixture');
+import {HUB13_BROKER,HUB13_BOARD} from '/src/world/hub13.js';
+import {newDescent} from '/src/game/descent21_state.js';
+import {errLog} from '/src/core/events.js';
+import {CUSTODY} from '/src/game/cargo13_core.js';
+window.fixture34={HUB13_BROKER,HUB13_BOARD,newDescent,errLog,CUSTODY};
+await import('/src/main.js');
+// Test-only mix copy: preserve the normal saved preference and native sound
+// scheduling/voices while preventing this disposable page from making sound.
+window.kefal.audio.settings={...window.kefal.audio.settings,masterVolume:0};
+window.kefal.audio.applyVolumes();
+</script></html>

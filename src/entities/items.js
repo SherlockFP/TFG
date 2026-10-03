@@ -300,6 +300,14 @@ export class ItemManager {
     };
     // spawn straight into the holder's bag / equipment (crafting, reclaim): opts.inv = 'bag' | 'eq' | { k, x, y } | { k:'eq', s }
     if (opts.holder && opts.inv) { const iv = this.game.inventory?.hostPlaceFor?.(opts.holder, def, opts.inv); if (iv) data.iv = iv; }
+    // Internal early-haul replacement follows ALL original rolls, including ID/yaw.
+    // Only an owned same-kind proposal can replace type/pose; economy is immutable here.
+    const offer = opts.earlyHaul34;
+    if (this.game.isHost && def.kind === 'big' && ITEMS[offer?.type]?.kind === 'big' && offer.type === 'indexedglass27' && !opts.holder && !opts.inv
+      && Array.isArray(offer.p) && offer.p.length === 3 && offer.p.every(Number.isFinite) && Number.isFinite(offer.yaw)
+      && this.game.earlyHaul34?.consume(offer, id)) {
+      data.ty = offer.type; data.p = offer.p.slice(); data.q = [0, Math.sin(offer.yaw / 2), 0, Math.cos(offer.yaw / 2)];
+    }
     this.game.net.broadcast('it', { e: 'sp', ...data });
     return id;
   }

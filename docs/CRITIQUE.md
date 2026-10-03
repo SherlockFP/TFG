@@ -1,4 +1,8 @@
-# Current owner direction — Wave33 experimental encounters
+# Current owner direction — Wave34 early salvage decision
+
+The owner asked to make the normal game more interesting. One existing large-loot slot now becomes a fragile Indexed Glass haul on a certified early factory route, at most once per campaign. The original economy rolls and deeper prize stay intact; ordinary small loot remains the quick alternative. Native local/scan cues explain the beam, cart extraction and a friend's brake before carrying. [Wave34](wave34/README.md) owns the current physical/custody tests, first-person evidence and limits. The owner's **1/10** experience baseline remains unchanged; native correctness does not establish enjoyment. Next work should follow a crew's actual choice, confusion and return rather than adding more catalogues.
+
+# Prior owner direction — Wave33 experimental encounters
 
 The latest owner baseline remains **1/10**. Two original threats now add light/noise withdrawal and fixed-lane cargo risk to native co-op systems. They are an explicit unchecked Host Advanced experiment; introductory floors, budgets and once-per-floor admission are protected. [Wave33](wave33/README.md) owns current verification, actual-Game render/synthetic-input evidence and the shared grenade attack repair. Default promotion, blind crew enjoyment, natural encounter discovery, Internet play and hardware profiling remain unearned. Next work should use observed counterplay readability and a normal salvage session rather than more catalogue entries or an invented score.
 

@@ -1,19 +1,20 @@
 # TFG — current agent map
 
-Updated 2026-10-03, Wave33 experimental crew threats. This is the current entry point; historical Windows,
+Updated 2026-10-03, Wave34 early salvage haul. This is the current entry point; historical Windows,
 Claude branch/model, no-test and automatic merge/push instructions are retired.
 Their full prior text is preserved in [the historical snapshot](docs/history/AGENTS-pre-wave25.md).
 Current user/session instructions take precedence. Inspect Git for the publication SHA.
 
 ## Start here
 
-1. Read [current work and evidence](docs/wave33/README.md),
+1. Read [current work and evidence](docs/wave34/README.md),
+   [experimental crew threats](docs/wave33/README.md),
    [asset intake and original plan](docs/wave32/README.md), then
    [Gauntlet procedure](docs/GAUNTLET.md) and [current critique](docs/CRITIQUE.md).
 2. Read [identity/art direction](docs/THEME.md) and the relevant module report.
    [Research](docs/wave25/RESEARCH.md) connects genre design and current agent engineering.
 3. Check `git status`, current branch/SHA and existing user changes before editing.
-   Workspace: `/workspace/TFG`; use `rg`/`rg --files` to find real owners and callers.
+   Current Windows workspace: `C:/Users/Sher/Desktop/TFG`; use `rg`/`rg --files` to find real owners and callers. Prefer the current environment context over historical cloud paths.
 4. For a continuation, consult [CONTINUE](docs/session/CONTINUE.md).
    Wave reports are historical evidence, not today's passing result.
 
@@ -41,14 +42,18 @@ Internal IDs, `kefal.*` saves and `window.KefalAPI` remain stable.
 ## Run and verify
 
 ```bash
-source /workspace/.tfg-tools/activate.sh   # Node22
+source /workspace/.tfg-tools/activate.sh   # cloud Node22 only
 npm run dev -- --port 5174               # first inspect the existing owned server
 npm test -- -j 4 deadletter lab24         # filename-substring filters; adapt to change
 npm run build
 git diff --check
 ```
 
+Current Windows verification uses bundled Node24.19 at `C:/Users/Sher/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe`; pass `tools/harness/run_all.mjs -j 4 <filters>` or `node_modules/vite/bin/vite.js build` directly. Keep the existing owned localhost5174 server; do not confuse its IPv6 Vite listener with the IPv4 lobby listener. PowerShell browser lock is `$env:TEMP/tfg-browser.lock`.
+
 HMR is off; browser checks require fresh pages. Install dependencies only if missing.
+Keep automated game QA in the background and silent, using a disposable test audio
+mix with masterVolume0. Preserve the owner's saved volume for normal play.
 Use focused native checks, then a final full suite for shared lifecycle/host contracts.
 One browser owner holds `/tmp/tfg-browser.lock`; do not share CPU-heavy suites with QA.
 Setup, native integration, guided input, human play and hardware profiling are
@@ -60,7 +65,7 @@ normal range/LOS input, failure capture and exact first-floor acceptance.
 | Path | Owner / responsibility |
 | --- | --- |
 | `src/main.js`, `src/game/game.js` | Boot, input/render clocks, orchestration, map lifecycle. |
-| `src/game/host.js`, `src/game/actions.js` | Authoritative requests and native player actions. |
+| `src/game/host.js`, `src/game/actions.js`, `earlyhaul34*.js` | Authoritative requests, native player actions and bounded early-haul admission/cues. |
 | `src/net/session.js`, `lobby.js`, `transport.js` | Host/peer delivery, protocol and transport. |
 | `src/world/facility.js`, `interiors/`, `nav.js` | Seeded layout, furniture, Rapier geometry and paths. |
 | `src/physics/physics.js`, `src/entities/` | Native bodies, controller, custody and creature simulation. |
