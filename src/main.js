@@ -9,6 +9,7 @@ import { Engine } from './core/engine.js';
 import { Input } from './core/input.js';
 import { AudioManager } from './audio/audio.js';
 import { loadSettings, saveSettings, loadProfile, saveProfile, defaultProfile } from './core/save.js';
+import {sessionProfile41} from './game/endless41_core.js';
 import { setLang, t, tf } from './core/i18n.js';
 import { lobbyCode } from './core/rng.js';
 import { initPhysics, Physics } from './physics/physics.js';
@@ -164,7 +165,7 @@ class App {
     }, 50);
     // dev helpers: ?autohost=local  /  ?autojoin=CODE&net=local
     const qs = new URLSearchParams(location.search);
-    if (qs.has('autohost')) this.hostGame({ strategy: qs.get('autohost') || 'local', isPublic: qs.get('autohost') !== 'local', slot: 3, lobbyName: 'Test crew', maxPlayers: 4, code: qs.get('code') || undefined });
+    if (qs.has('autohost')) this.hostGame({ strategy: qs.get('autohost') || 'local', isPublic: qs.get('autohost') !== 'local', slot: 3, mode:qs.get('mode')==='endless'?'endless':undefined, lobbyName: 'Test crew', maxPlayers: 4, code: qs.get('code') || undefined });
     else if (qs.has('autojoin')) this.joinGame({ code: qs.get('autojoin').toUpperCase(), strategy: qs.get('net') || 'local' });
     else { const j = parseJoin(location.search, this.settings.netStrategy); if (j) this.joinGame(j); }   // [joinplay] ?join=CODE&net=X: the link carries the net mode
   }
@@ -284,7 +285,8 @@ class App {
     const scene = new THREE.Scene();
     this.engine.scene = scene;
     scene.add(this.engine.camera);
-    this.game = new Game({ engine: this.engine, audio: this.audio, settings: this.settings, profile: this.profile, ui: this.ui, input: this.input, mods: this.mods });
+    const sessionProfile=sessionProfile41(this.profile,opts);
+    this.game = new Game({ engine: this.engine, audio: this.audio, settings: this.settings, profile: sessionProfile, ui: this.ui, input: this.input, mods: this.mods });
     this.mods.attach(this.game);
     this.game.shipScreens = new ShipScreens(this.game);
     this.game.on('fatal', (msg) => { alert(msg); this.leaveGame(); });
@@ -298,6 +300,7 @@ class App {
       return false;
     }
     if (!this.game) return false;   // a 'fatal' during startSession already left the game
+    if(!opts.host&&this.game.config.mode!=='endless') {if(!this.profile._noSave)delete sessionProfile._noSave;this.profile=sessionProfile;}
     this.ui.hideLoading();
     this.ui.hideMenu();
     this.ui.hud.show(true);

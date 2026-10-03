@@ -13,6 +13,7 @@ import { attention as dailyAttention } from '../game/daily_core.js';   // [daily
 import { decideMode, isOpen } from '../game/onboard_core.js';   // [joinplay] DAILY / HUB stay hidden until the first quota is met
 import { isArtdir } from './artdir.js';   // [artdir]
 import { drawArtMenu, disposeArtMenu } from './artdir_menu.js';
+import './endless41_text.js';
 
 export const CRT_VS = `
 varying vec2 vUv;
@@ -208,7 +209,7 @@ export class CRTMenu {
   setItems() {
     let open = true;   // [joinplay] veterans and anyone past quota 1 see everything; a fresh profile sees PLAY first and no DAILY / HUB
     try { const p = this.app.profile; if (p) { decideMode(p); open = isOpen('shop', p.unlocks, null); } } catch { open = true; }
-    const items = [{ id: 'play', label: t('PLAY') }];
+    const items = [{ id: 'play', label: t('PLAY') }, { id: 'endless', label: t('ENDLESS') }];
     if (open) items.push({ id: 'daily', label: t('DAILY') });
     items.push({ id: 'profile', label: t('PROFILE') });
     if (open) items.push({ id: 'hub', label: t('HUB') });
@@ -422,6 +423,7 @@ export class CRTMenu {
     if (!it) return;
     this.app.audio?.ui('ui_confirm', 0.6);
     if (it.id === 'play') { this.app.ui.showMenu('browser'); return; }
+    if (it.id === 'endless') { this.app.ui.showMenu('host', { mode: 'endless' }); return; }
     this.app.ui.showMenu(it.id);
   }
   setMode(mode, label) {

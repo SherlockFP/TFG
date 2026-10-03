@@ -84,7 +84,13 @@ export function installScore(game) {
     else if (d.k === 'punish') sting('punish', 1);
     else if (d.k === 'shop') sting('co_shop', 0.8);
   }));
-  offs.push(game.mods.on('tfg:viewers', (d) => { if (!disposed && d?.reason && d.delta > 0) sting('live', 0.85); }));   // a LIVE event pulled viewers in
+  offs.push(game.mods.on('tfg:viewers', (d, g) => {
+    // Field gains often mean surveillance or a casualty. Leave native cues clear.
+    if (disposed || (g && g !== game) || !d?.reason || !(d.delta > 0)) return;
+    const p = game.player, phase = game.run?.phase;
+    if (phase === 'moon' && (!p?.inShip || p.dead || snapshot(0).chase > .12)) return;
+    sting('live', 0.85);
+  }));
   offs.push(game.mods.on('tfg:extraction', (d) => { if (!disposed && d?.phase === 'end') sting(d.success ? 'hype2' : 'punish', 0.9); }));
 
   return {

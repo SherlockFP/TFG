@@ -153,5 +153,28 @@ eq(S.stemsForScene('muzak'), ['muzak'], 'theme pre-render'); eq(S.stemsForScene(
   ok(k.length === 32 && k.every((e) => Math.abs((e.t / S.BEAT) - Math.round(e.t / S.BEAT)) < 1e-9), 'chase kick: 4 on the floor, on the grid');
 }
 
+// Broad-place exploration must leave space for physical warning sounds, without a dance kit.
+const survey = S.stemEvents('survey');
+ok(!survey.some(e => ['kick','snare','hat','bass'].includes(e.voice)), 'safe survey does not carry a steady rhythm section');
+eq(S.pickScene({phase:'moon',surface:true,tension:.3}).scene,'survey','calm open place retains its existing scene');
+ok(S.pickScene({phase:'moon',surface:true,chase:1}).stems.chase>0,'danger still raises native chase layers');
+// Exercise installed event callbacks rather than a source-text assertion.
+const {installScore} = await import('../../src/game/score.js');
+const listeners=new Map(), stings=[];
+const game={run:{phase:'moon',moon:'hamsi'},selfId:'crew',player:{pos:{x:0,y:0,z:0},hp:100},settings:{masterVolume:.42,musicVolume:.31},
+ audio:{score:{sting:(...a)=>stings.push(a),setContext(){},setFlags(){}}},mods:{on(k,f){listeners.set(k,f);return ()=>listeners.delete(k);}}};
+const score=installScore(game),settingsBefore=JSON.stringify(game.settings);
+listeners.get('tfg:viewers')({reason:'onair',delta:300},game);
+eq(stings.length,0,'field viewer event does not play a celebratory jingle');
+game.player.inShip=true;listeners.get('tfg:viewers')({reason:'escape',delta:300},game);
+eq(stings.length,1,'safe aboard success can retain a viewer sting');
+game.director={chaseLevel:()=>1};listeners.get('tfg:viewers')({reason:'onair',delta:300},game);
+eq(stings.length,1,'danger suppresses viewer celebration even when aboard');
+game.director=null;game.player.dead=true;listeners.get('tfg:viewers')({reason:'death',delta:300},game);
+eq(stings.length,1,'a casualty is not celebrated aboard');game.player.dead=false;
+game.player.inShip=false;game.run.phase='orbit';listeners.get('tfg:viewers')({reason:'escape',delta:300},{});
+eq(stings.length,1,'another game event does not play this peer score');
+eq(JSON.stringify(game.settings),settingsBefore,'score never overwrites saved audio settings');
+score.dispose();eq(listeners.size,0,'score event hooks dispose');
 console.log(fails ? `${fails} of ${checks} checks FAILED` : `score: all ${checks} checks passed`);
 process.exit(fails ? 1 : 0);

@@ -65,7 +65,7 @@ export function pickScene(c0) {
   if (c.home) return { scene: 'home', family: null, stems: { home: 1 } };
   if (c.phase === 'company') return { scene: 'muzak', family: null, stems: { muzak: 1 } };
   if (c.phase !== 'moon') return { scene: 'orbit', family: null, stems: { orbit: 1 } };   // orbit, landing, takeoff, fired
-  // Original mellow synth groove in safe broad places. Danger takes the same
+  // Sparse unresolved machinery in broad places. Danger takes the same
   // adaptive chase/boss path; maze rooms retain their existing horror beds.
   if(c.surface&&!c.dead&&!c.boss&&!c.extract&&(c.chase||0)<.12&&(c.locked||0)<.15&&(c.tension||0)<.45)
     return {scene:'survey',family:null,stems:{survey:1}};
@@ -421,17 +421,17 @@ function muzakEvents() {
 
 const CACHE = new Map();
 function surveyEvents(){
- const ev=[],chords=[[48,55,59,64],[45,52,55,60],[41,48,52,57],[43,50,55,62]];
- for(let bar=0;bar<BARS;bar++){
-  const t0=bar*BAR,ch=chords[Math.floor(bar/2)];
-  ev.push({voice:'pad',t:t0,dur:BAR*.9,midi:ch,vel:.15,cut:1600,att:.18,rel:.4});
-  for(let beat=0;beat<4;beat++){
-   ev.push({voice:'bass',t:t0+beat*BEAT,dur:BEAT*.65,midi:[ch[0]-12+(beat===2?7:0)],vel:.23});
-   ev.push({voice:'pluck',t:t0+(beat+.5)*BEAT,dur:BEAT*.8,midi:[ch[1+((bar+beat)%3)]+12],vel:.16,pan:beat%2?.2:-.2});
-   ev.push({voice:'hat',t:t0+beat*BEAT,dur:.05,vel:.035});
-  }
-  ev.push({voice:'kick',t:t0,dur:.2,vel:.13},{voice:'snare',t:t0+2*BEAT,dur:.1,vel:.07});
- }
+ const ev=[];
+ // Low suspended tones and uneven metal/key tails leave walking and creature
+ // warnings audible. Existing loop, voices and cache still own playback.
+ for(const [t,midi] of [[0,[36,43,49]],[6.3,[36,42,43]],[13.7,[35,42,48]]])
+  ev.push({voice:'pad',t,dur:5.5,midi,vel:.13,cut:680,att:1.6,rel:1.2});
+ for(const [t,midi] of [[1.8,61],[8.9,60],[16.6,61]])
+  ev.push({voice:'ep',t,dur:1.7,midi:[midi],vel:.07});
+ for(const [t,midi] of [[4.1,39],[11.3,38],[18.2,39]])
+  ev.push({voice:'clang',t,dur:1.2,midi:[midi],vel:.035});
+ for(const t of [3.2,12.6])
+  ev.push({voice:'swell',t,dur:3.1,f0:180,f1:450,vel:.035});
  return ev;
 }
 /** Sorted event list of a stem (times in [0, LOOP)). Deterministic. Cached. */

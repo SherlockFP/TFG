@@ -1,6 +1,9 @@
 // Game orchestrator: world loading, main loop, networking glue, players, items, creatures.
 // Host-only logic lives in host.js, local player actions in actions.js (mixed into the prototype).
 import * as THREE from 'three';
+import {installAdventure40} from './adventure40.js';
+import {installEndless41} from './endless41.js';
+import {resetEndlessProfile41} from './endless41_core.js';
 import { installFleet13 } from './fleet13.js';
 import { installReactor38 } from './reactor38.js';
 import { installOxygen38 } from './oxygen38.js';
@@ -725,6 +728,8 @@ export class Game extends Emitter {
     this.useModule('firstdepth21', installFirstDepth21);
     this.useModule('density35', installDensity35);
     this.useModule('deadletter24', installDeadletter24);
+    this.useModule('adventure40', installAdventure40);
+    this.useModule('endless41', installEndless41);
 
 
   }
@@ -734,6 +739,7 @@ export class Game extends Emitter {
       this._stats = derivedStats(this.profile);
       this.mods?.emit('stats', this._stats, this);
     }
+    if(this.endless41?.active?.())return this.endless41.stats(this._stats);
     return this.deadletter24?.active?.() ? this.deadletter24.stats?.(this._stats) || this._stats : this._stats;
   }
   refreshStats() { this._stats = null; }
@@ -745,6 +751,7 @@ export class Game extends Emitter {
   // ------------------------------------------------------------------ session
   async startSession(opts) {
     this.opts = opts;
+    this.config.mode=opts.host&&opts.mode==='endless'?'endless':'normal';
     this.config.maxPlayers = opts.maxPlayers || this.config.maxPlayers;
     this.config.creatures32 = opts.host && opts.creatures32 === true;
     this.mods?.emit('configure', this.config, this);
@@ -902,6 +909,7 @@ export class Game extends Emitter {
     const resume = !!d.resume && !!this.run;   // reconnect after a dropped link: resync the world, keep our position and inventory
     if (!resume) this.ui.toast(t('Connected. Welcome aboard.'));
     this.config = { ...this.config, ...(d.config || {}) };
+    if(this.config.mode==='endless') {if(d.run.mode!=='endless'||d.run.endless41?.v!==41)throw new Error('Invalid Endless host snapshot');if(!resume){resetEndlessProfile41(this.profile,{preserveExtensions:true});if(this.profile.crew)this.profile.crew.xp=0;this.rpg?.profileReset?.();}this.refreshStats();}
     for (const p of d.players || []) if (p.id !== this.selfId) { const r = this.ensureRemote(p.id, p); if (p.dead) r.setDead(true); if (p.st) r.applyState(p.st); }
     this.applyRunState(d.run, true);
     this.loadMapFor(d.run, true);
@@ -921,7 +929,7 @@ export class Game extends Emitter {
     this.spawnInShip();
     this.descent21?.placeLateJoin?.();
     this.deadletter24?.placeLateJoin?.();
-    if (d.run.phase === 'moon' || d.run.phase === 'company') this.requestLoadout();
+    if (this.config.mode==='endless'||d.run.phase === 'moon' || d.run.phase === 'company') this.requestLoadout();
     this.tutorialHint(d.run.phase);
     this.emit('joined');
   }
@@ -938,6 +946,7 @@ export class Game extends Emitter {
     this.ui.hud?.setRun(this.run);
     this.descent21?.onState?.(this.run);
     this.deadletter24?.onState?.(this.run);
+    this.endless41?.onState?.(this.run);
   }
 
   onItemEvent(d) {

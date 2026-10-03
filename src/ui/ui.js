@@ -6,6 +6,7 @@
 import { el, escapeHtml, clamp, fmtMoney } from '../core/util.js';
 import { t, setLang, getLang, LANGS, tf, addTranslations } from '../core/i18n.js';
 import { DEADLETTER30 } from '../game/deadletter30_access.js';
+import './endless41_text.js';
 import { tNum } from '../i18n/tnum.js';   // [i18n8] toasts: exact key, then numbers as {}
 import { HUD, randomTip } from './hud.js';
 import { createCenterCards } from './centercards.js';
@@ -508,15 +509,15 @@ export class UI {
       row(t('Difficulty'), diff), diffNote,   // [hardmode]
       row(t(C32_OPTION), archiveThreats), el('div', { class: 'cp-note' }, t(C32_OPTION_NOTE)),
     );
-    const mode = el('select', { 'data-nav': 'host:mode' }, el('option', { value: 'campaign' }, t('Campaign')), el('option', { value: 'quick' }, t('QUICK SHIFT')));
-    mode.value = 'campaign';
+    const mode = el('select', { 'data-nav': 'host:mode' }, el('option', { value: 'campaign' }, t('Campaign')), el('option', { value: 'quick' }, t('QUICK SHIFT')), el('option', { value: 'endless' }, t('ENDLESS')));
+    mode.value = this.menuOpts?.mode === 'endless' ? 'endless' : 'campaign';
     const modeNote = el('div', { class: 'cp-note' });
     form.append(row(t('Game mode'), mode), modeNote, row(t('Lobby name'), name), row(t('Public (listed in lobby browser)'), pub), adv);
     const slots = el('div', { class: 'slots' });
     let chosen = { slot: this.menuOpts?.slot || listRuns().filter((r) => r.data).sort((a, b) => (b.data.savedAt || 0) - (a.data.savedAt || 0))[0]?.slot || 1, data: null };
     const start = () => {
       s.netStrategy = net.value; s.difficulty = diff.value; saveSettings(s);
-      this.app.hostGame({ lobbyName: name.value.trim() || 'Crew', isPublic: pub.checked, password: pw.value.trim(), maxPlayers: +max.value, difficulty: diff.value, strategy: net.value, creatures32: archiveThreats.checked, slot: mode.value === 'campaign' ? chosen.slot : 0, runData: mode.value === 'campaign' ? loadRun(chosen.slot) : null, quick: mode.value === 'quick' });
+      this.app.hostGame({ lobbyName: name.value.trim() || 'Crew', isPublic: pub.checked, password: pw.value.trim(), maxPlayers: +max.value, difficulty: diff.value, strategy: net.value, mode: mode.value, creatures32: archiveThreats.checked, slot: mode.value === 'campaign' ? chosen.slot : 0, runData: mode.value === 'campaign' ? loadRun(chosen.slot) : null, quick: mode.value === 'quick' });
     };
     const renderSlots = () => {
       const focused = document.activeElement?.dataset?.slot;
@@ -552,7 +553,8 @@ export class UI {
     const updateMode = () => {
       slotColumn.classList.toggle('hidden', mode.value !== 'campaign');
       hostGrid.style.gridTemplateColumns = mode.value === 'campaign' ? '' : 'minmax(0, 1fr)';
-      modeNote.hidden = true;
+      modeNote.hidden = mode.value !== 'endless';
+      modeNote.textContent = mode.value === 'endless' ? t('Endless: start aboard the default ship. Recover cargo, survive waves and build your crew. Campaign saves stay separate.') : '';
     };
     mode.addEventListener('change', updateMode); updateMode();
     const f = this.frame(t('HOST GAME'),

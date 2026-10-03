@@ -1,0 +1,15 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><base href="/"><title>Wave41 isolated game</title>
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#000}#loading{position:fixed;inset:0;display:grid;place-items:center;z-index:100;background:#111;color:#ddd}#loading.hidden{display:none}</style></head><body>
+<div id="game"></div><div id="ui"></div><div id="fps"></div><div id="loading"><div class="load-text">LOADING</div></div>
+<script type="module">
+if(!import.meta.env.DEV)throw Error('DEV only');
+const data=new Map();for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k.startsWith('kefal.run.v1.'))data.set(k,localStorage.getItem(k));}
+const prefs=JSON.parse(data.get('kefal.settings.v1')||'{}');data.set('kefal.settings.v1',JSON.stringify({...prefs,lang:new URLSearchParams(location.search).get('lang')||'tr',masterVolume:0,fullscreenPlay:false}));
+Object.defineProperty(window,'localStorage',{value:{getItem:k=>data.get(k)??null,setItem:(k,v)=>data.set(k,String(v)),removeItem:k=>data.delete(k),clear:()=>data.clear(),key:i=>[...data.keys()][i]??null,get length(){return data.size;}}});
+const {defaultProfile}=await import('/src/core/save.js');data.set('kefal.profile.v1',JSON.stringify(defaultProfile()));
+window.qa41errors=[];window.addEventListener('error',e=>window.qa41errors.push({message:e.message,file:e.filename,line:e.lineno,stack:e.error?.stack}));
+window.addEventListener('unhandledrejection',e=>window.qa41errors.push({message:String(e.reason),stack:e.reason?.stack}));
+window.qa41consoleErrors=[];const originalError=console.error;console.error=function(...args){window.qa41consoleErrors.push(args.map(a=>a?.stack||String(a)).join(' '));return originalError.apply(this,args);};
+const {physicalReach21}=await import('/src/world/descent21.js');const {certifiedWalk39}=await import('/test/gauntlet39_nav.js');const {leverReach39,leverReceipt39}=await import('/src/game/extraction39.js');window.qa41={physicalReach21,certifiedWalk39,leverReach39,leverReceipt39};
+await import('/src/main.js');window.kefal.audio.settings={...window.kefal.audio.settings,masterVolume:0};window.kefal.audio.applyVolumes();
+</script></body></html>

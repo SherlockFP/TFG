@@ -84,6 +84,7 @@ export const hostMethods = {
       players: this.net.playerCount(), max: this.config.maxPlayers, phase: this.run.phase, moon: MOONS[this.run.moon]?.short,
       quota: this.run.quota, day: this.run.day, locked: !!this.opts.password, mods: this.mods?.enabledIds() || [],
       diff: this.config.difficulty || undefined,   // [hardmode] shown in the lobby browser
+      mode:this.config.mode==='endless'?'endless':undefined,
       level: this.profile.level, av: liteOf(this.profile),   // [profile] host avatar (258 chars)
     };
     this.emit('announce', info);
@@ -607,10 +608,11 @@ export const hostMethods = {
     for (let i = 0; i < bigN; i++) this.items.hostSpawn(rng.weighted(bigW).id, new THREE.Vector3(bigSpots[i].x, bigSpots[i].y + 1, bigSpots[i].z), i === 0 && earlyHaul ? { valueMul, earlyHaul34: earlyHaul } : { valueMul });
     // One guaranteed deep-room prize makes the back half of a dungeon worth reaching.
     const deepBig = bigSpots.filter((s) => (s.dist || 0) >= 7);
+    let adventurePrize40 = null;
     if (deepBig.length) {
       const s = deepBig[0];
       const prize = rng.pick(['goldbar', 'ring', 'figurine', 'trophy']);
-      this.items.hostSpawn(prize, new THREE.Vector3(s.x + 0.7, s.y + 0.55, s.z - 0.5), { valueMul: valueMul * 1.65 });
+      adventurePrize40 = this.items.hostSpawn(prize, new THREE.Vector3(s.x + 0.7, s.y + 0.55, s.z - 0.5), { valueMul: valueMul * 1.65 });
     }
     // vault loot
     for (const s of fac.vaultSpots) {
@@ -644,6 +646,9 @@ export const hostMethods = {
     this.hostSpawnWave(0.35);
     this.bosses?.hostOnMoonPopulated();   // boss roll; idempotent (the mods 'moonPopulated' event triggers it too)
     this.mods?.emit('moonPopulated', this);
+    // Final native population keeps every roll/ID/value. The encounter checks
+    // its wall recorder and prize access after the depth lift's first update.
+    if (adventurePrize40) this.adventure40?.offer(adventurePrize40);
   },
 
   indoorBudget() {

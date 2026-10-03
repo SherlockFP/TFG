@@ -307,6 +307,7 @@ export function installRpg(game) {
   // ------------------------------------------------------------------ public API
   const api = {
     ...ctl,
+    profileReset(){ensureRpgProfile(p);st.dyn={};st.dynT=0;invalidate();},
     role: () => ctl.role(),
     roleDef: () => ctl.roleDef(),
     setRole(id) {

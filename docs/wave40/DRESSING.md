@@ -1,0 +1,5 @@
+# Wide-place work scenes
+
+Root owns `openplaces40_dressing.js`, the narrow facility build hook and the added native checks in `openplaces36_landmarks.test.mjs`. Two matte wall reliefs per current bay describe failed relay work (courtyard), abandoned shutters/displays (concourse) and undelivered mail/sorting (reception). Existing closed wall segments own collision; relief vertices are inside their inward .14m surface. No extra lights, interactables, colliders, cargo, shared RNG draws or furniture barriers.
+
+Fresh standalone native check passed all three maps after a missing-group RED. Actual vertex raycasts prove every decoration vertex remains in the native solid wall; literal physical/layout/cargo/door/light oracles remain identical. At most three owned matte merged batches, zero emissive surfaces; repeated disposal frees owned geometry/material once. Existing native lift/entrance/cargo clearance and staged/legacy layout checks pass. First-person visual judgment remains root browser acceptance; these checks alone do not establish atmosphere/fun.

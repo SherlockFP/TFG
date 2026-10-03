@@ -14,7 +14,7 @@ export function installDensity35(game){
  const clock=()=>Math.max(0,Number(game.hostData?.moonT)||0);
  function ordinary(){
   const r=game.run,m=MOONS[r?.moon];
-  return !disposed&&game.isHost&&r&&['landing','moon'].includes(r.phase)&&m&&!SPECIAL_MOON.some(k=>m[k])&&!!game.world?.facility&&!game.deadletter24?.active?.()&&!game.missions14?.active?.()&&!game.escape14?.active?.()&&!game.cycle?.inst?.cur;
+  return !disposed&&game.isHost&&r&&['landing','moon'].includes(r.phase)&&m&&!SPECIAL_MOON.some(k=>m[k])&&!!game.world?.facility&&!game.endless41?.active?.()&&!game.deadletter24?.active?.()&&!game.missions14?.active?.()&&!game.escape14?.active?.()&&!game.cycle?.inst?.cur;
  }
  function owned(type,opts){
   if(ENCOUNTER_TYPES.has(type))return true;

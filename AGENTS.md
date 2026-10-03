@@ -24,7 +24,7 @@ Current user/session instructions take precedence. Inspect Git for the publicati
 
 TFG / TOTALLY FUCKED GAME is a browser co-op PSX horror scavenging game: a maintenance
 crew recovers lost content for The Algorithm's Engagement Quota. Its dead-internet
-identity should change crew decisions, routes and consequences. Normal horror is the priority. Dead Letter development is cancelled; new entries
+identity should change crew decisions, routes and consequences. Normal horror remains available; Endless is an explicitly selected co-op extraction/survival roguelike with temporary builds, native cargo credits, robots and a fitted ship. Dead Letter development is cancelled; new entries
 are retired while active legacy sessions retain safe checkpoint return.
 
 The owner writes Turkish, wants autonomous implementation, multi-agent work and

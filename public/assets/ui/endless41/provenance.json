@@ -1,0 +1,55 @@
+{
+  "creator": "ViNk Assets",
+  "source": "https://vinkgames.itch.io/sci-fi-ui-essentials",
+  "license": "CC0",
+  "archiveSha256": "947b3e20dbbb963d3ae58d0445b24555133037ceceb25c9a243e8fd3b2ba2825",
+  "sheetSha256": "c7cc47e5a3682cba0b5513a0e2461d37e740a65bbd9f5d7cd7c75267278e3691",
+  "processing": "Lossless RGBA crops from free light spritesheet; only used UI elements retained.",
+  "assets": [
+    {
+      "file": "frame.png",
+      "crop": [
+        0,
+        0,
+        64,
+        64
+      ]
+    },
+    {
+      "file": "health.png",
+      "crop": [
+        128,
+        0,
+        192,
+        64
+      ]
+    },
+    {
+      "file": "weapon.png",
+      "crop": [
+        384,
+        0,
+        448,
+        64
+      ]
+    },
+    {
+      "file": "armor.png",
+      "crop": [
+        0,
+        64,
+        64,
+        128
+      ]
+    },
+    {
+      "file": "panel.png",
+      "crop": [
+        0,
+        384,
+        248,
+        512
+      ]
+    }
+  ]
+}

@@ -29,6 +29,24 @@ try{
   setLang('en');const scene=new THREE.Scene(),physics=new Physics(),pool=new LightPool(scene),initialLights=lightCount(scene),started=performance.now();
   const L=generateLayout(seed,theme,size,{open35:{version:35,kind}}),fac=buildFacility(L,{physics,lightPool:pool});scene.add(fac.group);physics.world.step();
   const root=fac.group.getObjectByName('openplaces36-landmarks');assert(root?.isGroup,'the actual admitted courtyard must identify its real entrance and four bay purposes');
+  const dressing=fac.group.getObjectByName('openplaces40-dressing');
+  assert(dressing?.isGroup,'wide bays must contain abandoned wall-mounted work scenes rather than signs alone');
+  assert(dressing.userData.panels.length>=4,'each existing service bay has an encountered work scene');
+  const dressingMeshes=[];dressing.traverse(o=>{if(o.isMesh)dressingMeshes.push(o);});
+  assert(dressingMeshes.length<=3,'bounded wall scenes must not create an unbounded mesh per prop');
+  for(const mesh40 of dressingMeshes){
+   assert.equal(mesh40.material.emissive.getHex(),0,'abandoned equipment cannot add disco emission');
+   assert.equal(mesh40.material.userData.brBake,true,'map materials cannot enter the global Backrooms bake cache');
+   const positions40=mesh40.geometry.attributes.position;
+   for(let n40=0;n40<positions40.count;n40++){
+    const p40={x:positions40.getX(n40),y:positions40.getY(n40),z:positions40.getZ(n40)};
+    const panel40=dressing.userData.panels.find(s=>Math.abs((p40.x-s.x)*s.nx+(p40.z-s.z)*s.nz)<.145&&Math.abs((p40.x-s.x)*s.nz-(p40.z-s.z)*s.nx)<1.6);
+    assert(panel40,'every actual scene vertex stays in its bounded wall-mounted footprint');
+    const wall40=physics.raycast(p40,{x:-panel40.nx,y:0,z:-panel40.nz},.2,G.STATIC);
+    assert(wall40&&wall40.distance<.002,'dressing stays inside existing native solid walls, never ghost furniture in haul lanes');
+   }
+  }
+  const dressingDisposed={geometry:0,material:0};for(const mesh40 of dressingMeshes){mesh40.geometry.addEventListener('dispose',()=>dressingDisposed.geometry++);mesh40.material.addEventListener('dispose',()=>dressingDisposed.material++);}
   assert.equal(physical(fac),before[kind],'native collision/nav/doors/cargo/emitter snapshot remains exact after the explicit Wave38 ordinary lamp palette change');
   if(kind!=='reception')assert(fac.emitters.filter(e=>e.group==='facility').every(e=>e.color===0xe6ded0&&!e.flicker),'only ordinary lamps receive the steady industrial palette');
   const meshes=[];root.traverse(o=>{if(o.isMesh)meshes.push(o);});assert(meshes.length>=1&&meshes.length<=2,'five landmarks share at most two actual draw meshes');
@@ -61,6 +79,7 @@ try{
    const br=installBackroomsLevels(game);assert.equal(mesh.material,ownedMat,'actual Backrooms bake retains the map-owned sign material instead of globally caching a replacement');br.dispose();
   }
   fac.dispose(physics);fac.dispose(physics);assert.deepEqual(disposals,{geometry:1,material:1,texture:1});assert.equal(physics.info.size,0);const oldCalls=calls.length;setLang('en');assert.equal(calls.length,oldCalls,'native texture disposal releases the language listener');assert.equal(lightCount(scene),initialLights);
+  assert.deepEqual(dressingDisposed,{geometry:dressingMeshes.length,material:dressingMeshes.length},'each actual scene mesh/material is disposed once with its map');
   const again=buildFacility(generateLayout(seed,theme,size,{open35:{version:35,kind}}),{physics,lightPool:pool}),next=again.group.getObjectByName('openplaces36-signs');assert.notEqual(next.geometry,mesh.geometry);assert.notEqual(next.material,mesh.material);assert.notEqual(next.material.map,atlas);assert.equal(geometryBody(next),geoHash,'rebuilt actual map owns independent deterministic signage');again.dispose(physics);assert.equal(physics.info.size,0);physics.dispose();
   const stagedPhysics=new Physics(),staged=createFacilityBuild30(generateLayout(seed,theme,size,{open35:{version:35,kind}}),{physics:stagedPhysics,lightPool:{add:e=>e,remove(){}}});let result;while(!staged.done){const step=staged.advance(0);if(step.done)result=step.value;}assert.equal(geometryBody(result.group.getObjectByName('openplaces36-signs')),geoHash);assert.equal(physical(result),before[kind]);result.dispose(stagedPhysics);stagedPhysics.dispose();
   console.log('native landmarks36',JSON.stringify({kind,signs:signs.length,draws:meshes.length,triangles:mesh.geometry.index.count/3,atlas:[atlas.image.width,atlas.image.height],textureBytes:atlas.image.width*atlas.image.height*4,elapsedMs:+(performance.now()-started).toFixed(2),disposals}));

@@ -25,6 +25,7 @@ import { decorateHeroes } from './interiors/heroes.js';   // [labyrinths] hero r
 import { planOpenPlace35 } from './interiors/openplaces35_plan.js';
 import { openPlaceStyle35, openPlaceCeiling35, buildOpenPlaceSky35 } from './interiors/openplaces35_art.js';
 import { buildOpenPlaces36Landmarks } from './interiors/openplaces36_landmarks.js';
+import { buildOpenPlaces40Dressing } from './interiors/openplaces40_dressing.js';
 
 // Interior theme registry (ids: factory, mansion, mineshaft, office, backrooms, serverfarm, sewer, hospital).
 export { INTERIORS, INTERIOR_THEMES, INTERIOR_NAMES, getInterior, isInteriorTheme };
@@ -1509,6 +1510,7 @@ function* buildFacilitySteps30(layout, { physics, lightPool: pool }, owned) {
   if (!L.open35 && typeof def.decorate === 'function') themeOut = def.decorate({ ...themeCtx, rng: new RNG((L.seed ^ 0x7de1c0) >>> 0) }) || null;
   if (L.open35) sky35 = buildOpenPlaceSky35(themeCtx);
   buildOpenPlaces36Landmarks({ ...themeCtx, doors: doorsOut });
+  buildOpenPlaces40Dressing(themeCtx);
   yield 'theme-decoration';
   try { addPracticals({ ...themeCtx, def }); } catch (e) { console.warn('practicals', e); }   // [qa] emissive strips + exit signs: rooms read without a torch
   yield 'practicals';

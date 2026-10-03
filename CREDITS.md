@@ -14,15 +14,15 @@ Most packs are CC0 (public domain) — credit is not required but given anyway.
 
 ## Attribution required
 
-- **Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)** by ObsydianX — <https://obsydianx.itch.io/horror-sfx-volume-1> — License: CC-BY 4.0. Used: 34 sounds.  
+- **Horror SFX Volume 1 (Free Pack, Drones 1, Stingers 2)** by ObsydianX — <https://obsydianx.itch.io/horror-sfx-volume-1> — License: CC-BY 4.0. Used: 34 sounds.
   Credit line: _Horror SFX Volume 1 by ObsydianX (CC-BY 4.0)_
-- **Sci-fi SFX (Part 1)** by loadless (Paul Timings) — <https://loadless.itch.io/scifi-sfx-1> — License: Free incl. commercial use with credit to "Paul Timings" + link. Used: 26 sounds.  
+- **Sci-fi SFX (Part 1)** by loadless (Paul Timings) — <https://loadless.itch.io/scifi-sfx-1> — License: Free incl. commercial use with credit to "Paul Timings" + link. Used: 26 sounds.
   Credit line: _Sci-fi SFX by Paul Timings (loadless) - https://loadless.itch.io/scifi-sfx-1_
-- **PSX Industrial Environment Asset Pack** by godgoldfear — <https://godgoldfear.itch.io/psx-industrial-environment-asset-pack> — License: CC-BY 4.0. Used: 53 models.  
+- **PSX Industrial Environment Asset Pack** by godgoldfear — <https://godgoldfear.itch.io/psx-industrial-environment-asset-pack> — License: CC-BY 4.0. Used: 53 models.
   Credit line: _PSX Industrial Environment Asset Pack by godgoldfear (CC-BY 4.0)_
-- **Backrooms Asset Pack** by NaiveGoblin — <https://naivegoblin.itch.io/cc0-backrooms-asset-pack> — License: CC-BY 4.0. Used: 3 textures.  
+- **Backrooms Asset Pack** by NaiveGoblin — <https://naivegoblin.itch.io/cc0-backrooms-asset-pack> — License: CC-BY 4.0. Used: 3 textures.
   Credit line: _Backrooms Asset Pack by NaiveGoblin (CC-BY 4.0)_
-- **Free Water Stream Sounds** by Gregor Quendel — <https://gregor-quendel.itch.io/free-water-stream-sounds> — License: CC-BY 4.0. Used: 2 sounds.  
+- **Free Water Stream Sounds** by Gregor Quendel — <https://gregor-quendel.itch.io/free-water-stream-sounds> — License: CC-BY 4.0. Used: 2 sounds.
   Credit line: _Free Water Stream Sounds by Gregor Quendel (CC-BY 4.0)_
 
 ## CC0 / public domain
@@ -88,6 +88,8 @@ the free models contain no animations. No Valve/L4D character, sound or model
 is included. The new original enemy behaviors are still an implementation plan.
 
 ## Notes
+
+- **Essentials: Sci-fi Shooter UI** by ViNk Assets — <https://vinkgames.itch.io/sci-fi-ui-essentials> — CC0 1.0, creator page verified 2026-10-03. Free PNG pack; cropped monochrome frames/health/weapon/armor icons for Endless. Source archive stays outside Git. Crop rectangles and SHA256 provenance: `public/assets/ui/endless41/provenance.json`.
 
 - Liminal Games asks that the horror SFX pack itself is not re-sold or re-uploaded as a pack (CC0 otherwise).
 - KayKit (Kay Lousberg) asks not to resell unmodified copies of the assets as your own.

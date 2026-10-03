@@ -336,6 +336,7 @@ export function installHost(X) {
     return n;
   }
   function giveChalk(id) {
+    if(g.endless41?.active?.())return;
     if (!id || H.given.has(id) || !ITEMS[CHALK.item]) return;
     const p = aip(id); if (!p) return;
     const has = [...g.items.all()].filter((it) => it.holder === id);

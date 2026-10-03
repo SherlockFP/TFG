@@ -154,7 +154,7 @@ export function installGuide(game) {
   on('itemState', (it) => { if ((it?.type === 'flashlight' || it?.type === 'proflash') && it.on && game.player?.slots?.includes(it.id)) { use('flashlight'); tut('flash'); } });
 
   // ---------------------------------------------------------------- tutorial
-  const separateMode=()=>game.deadletter24?.active?.()===true;
+  const separateMode=()=>game.deadletter24?.active?.()===true||game.endless41?.active?.()===true;
   function tut(ev, data) {
     const g = G();
     if (!g || disposed || separateMode() || !tutRunning(g)) return;

@@ -15,6 +15,7 @@ import { walletRowOf } from './wallet.js';
 import { quotaState } from './progression.js';   // [econ9] one quota source
 import { followerCard } from './followers.js';
 import { isVeteran } from './onboard_core.js';
+import { liveText } from './onegoal_core.js';
 
 const FLASH_S = { standard: 6, minimal: 3 };
 // dock item id -> rule.  f: shown for FLASH_S s after each change of its text (digits ignored, so ticking timers do not re-trigger)
@@ -141,6 +142,7 @@ export function installHudCalm(game) {
     const fc = followerCard(game.profile);
     const keyName = keyCode().replace(/^Key/, '').replace(/^Digit/, '');
     const moon = MOONS[run.moon]?.name || run.moon || '';
+    const live = escapeHtml(liveText(game.algo1?.viewers?.() ?? 0));
     const full = dens() === 'full', vet = isVeteran(game.profile);
     // [lanes] veterans never see the TUTORIAL step or hint lines on the card
     const olist = (game.objectives?.full || []).filter((o) => !(vet && (o.pin || o.kind === 'hint')));
@@ -152,6 +154,7 @@ export function installHudCalm(game) {
       [t('CREDITS'), `▮${run.credits ?? 0}`],   // [algoslot] CREDITS / ROUTE left the top bar
       ...(run.phase === 'orbit' && moon ? [[t('ROUTE'), escapeHtml(moon)]] : []),
       [t('Clock'), txt('.clock-time')],
+      ['LIVE', live],
       [`${txt('.lvl')} ${txt('.rank')}`, walletRowOf(game)],   // [hud6] the Tab card is where the wallet (credits + followers) lives
       ...(fc.next ? [[t('Followers'), `◈ ${fc.followers}`], [t('Next milestone'), escapeHtml(`${fc.next.name ? t(fc.next.name) + ' · ' : ''}${fc.next.at}`)]] : [[t('Followers'), `◈ ${fc.followers}`]]),   // [followers] channel size + the closest unlock
       [t('Weight'), txt('.hud-weight')],
@@ -168,7 +171,7 @@ export function installHudCalm(game) {
         line(escapeHtml(tf('Day {n}', { n: run.day ?? 1 }) + (moon ? ' · ' + moon : '')), `${escapeHtml(t('QUOTA'))} ${quotaState(run).text}`),
         line(t('CREDITS') + ' · ' + t('Followers'), walletRowOf(game)),
         line(t('Next milestone'), fc.next ? escapeHtml(`${fc.next.name ? t(fc.next.name) + ' · ' : ''}${fc.next.at}`) : '-'),
-        line(`${escapeHtml(game.playerName?.(game.selfId) || '')} (${t('you')})${alive.length ? ' +' + alive.length : ''}`, p ? Math.round(p.hp || 0) + '/' + Math.round(p.maxHp || 100) : ''),
+        line(`${escapeHtml(game.playerName?.(game.selfId) || '')} (${t('you')})${alive.length ? ' +' + alive.length : ''}`, `${p ? Math.round(p.hp || 0) + '/' + Math.round(p.maxHp || 100) : ''} · ${live}`),
       ];
       card.innerHTML = `<div class="hc-head"><span>${t('FULL STATUS')}</span><i>${escapeHtml(tf('hold {key} for the full status', { key: keyName }))}</i></div>${lines.join('')}`;
       return;

@@ -6,7 +6,7 @@ import {wrapMethod} from './dailyEvents.js';
 import {firstSurface,admitFirst,roaming,FIRST21} from './firstdepth21_core.js';
 export function installFirstDepth21(game){
  const restores=[];let disposed=false,accepted=0;
- const active=()=>!disposed&&game.isHost&&firstSurface(game.run,MOONS[game.run?.moon],game.world?.facility);
+ const active=()=>!disposed&&game.isHost&&!game.endless41?.active?.()&&firstSurface(game.run,MOONS[game.run?.moon],game.world?.facility);
  const time=()=>Math.max(0,Number(game.hostData?.moonT)||0);
  const shipPoint=new THREE.Vector3();
  const entries=()=>{const points=[game.world?.facility?.mainDoor,...(game.world?.facility?.fireDoors||[]),game.world?.outdoor?.mainExit].filter(Boolean).map(d=>d.spawn||d.pos).filter(Boolean);if(game.ship?.group?.getWorldPosition)points.push(game.ship.group.getWorldPosition(shipPoint));return points;};

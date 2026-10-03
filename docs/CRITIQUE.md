@@ -1,3 +1,9 @@
+# Current direction — Wave41 extraction/survival and Wave40 atmosphere
+
+The owner's latest identity is a separately selected 3D survival roguelike: cooperative physical salvage, escalating exterior pressure, temporary builds and a working upgradeable ship. Native kill XP makes combat progress; actual extracted cargo pays robots/rooms/repair through the existing wallet. Grace, warning, low starting counts and free defensive pulse protect an unprepared first landing. Normal horror still has optional abandoned-crew discovery, quieter LIVE framing and sparse industrial ambience. See [Wave41](wave41/README.md) and [Wave40](wave40/README.md).
+
+These mechanisms are a design hypothesis, not an earned fun score. The owner's experience baseline remains1/10. Next critique must observe whether an unguided crew understands the console/lever and first cargo investment, recognizes pulse/robot limits, chooses extraction before ship loss, and wants another landing. Station discoverability, exterior route conservatism and long-run balance need human play. Native counts cannot establish retention.
+
 # Current owner direction — Wave39 decisions and recoverable shifts
 
 [Wave39](wave39/README.md) applies primary-source design hypotheses through reversible extraction, explicit fuel-versus-sale choices, a recoverable next journey and a bounded optional valuable branch. The AIRLOCK compass targets the real entry; an observed TAGGED tax placeholder is repaired. Failed earned-return operator routes remain beside fresh replays, with source-assisted native input distinguished from human play. Owner baseline remains1/10. The useful next questions are whether a blind crew understands its next action, deliberately chooses a detour, can explain its failure and voluntarily tries another shift. Feature count and native passes do not answer those questions. Final PLAYTEST/REVIEW owns the acceptance boundary. Current scope does not request another shutdown.

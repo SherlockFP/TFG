@@ -567,7 +567,7 @@ export class CreatureManager {
     if (ticket === false) return null;
     let admitted = null;
     try {
-    const mode = this.game.deadletter24;
+    const mode = this.game.endless41?.active?.() ? this.game.endless41 : this.game.deadletter24;
     const modeActive = !!mode?.active?.();
     if (modeActive) {
       const admitted = mode.spawnOptions?.(type, pos, opts);
@@ -584,10 +584,10 @@ export class CreatureManager {
     }
     if (this.game.forge && !modeActive) opts = this.game.forge.creatureOpts(type, opts);   // [forge] tier + extra affixes
     if (opts.affix === undefined) opts = { ...opts, affix: rollAffix(type, opts.level || 1, !!opts.elite) };
-    if (this.game.descentThreat21?.allowSpawn?.(type, opts) === false) return null;
+    if (!modeActive && this.game.descentThreat21?.allowSpawn?.(type, opts) === false) return null;
     const c = new HostCreature(this, id, type, pos, opts);
     if (modeActive) mode.afterSpawn?.(c, opts);
-    this.game.descentThreat21?.limit?.(c, opts);   // bounded deep-floor stats before native replication
+    if (!modeActive) this.game.descentThreat21?.limit?.(c, opts);   // bounded deep-floor stats before native replication
     c.fakeLv = opts.fakeLv; c.fakeTitle = opts.fakeTitle || '';   // disguise tag data, re-sent to late joiners by serializeFor
     this.host.set(id, c);
     admitted = c; // publish reservation before synchronous Session callbacks can reenter
@@ -596,6 +596,7 @@ export class CreatureManager {
       mh: c.maxHp, hp: c.hp, code: c.code, seed: c.seed, nm: c.name, suit: c.suit, up: c.up, fakeLv: opts.fakeLv, ft: opts.fakeTitle || undefined,
       vr: c.variant || undefined, af: c.affix || undefined, tr: c.tier || undefined, fa: c.fgAff || undefined,   // [forge]
       bo: bossOwnerFor(c, this), // bounded encounter ownership; never replicate general AI data
+      e41: this.game.endless41?.ownsCreature?.(c) ? c.data.e41 : undefined,
     });
     return c;
     } finally { density?.finish(ticket, admitted); }
@@ -607,7 +608,7 @@ export class CreatureManager {
   serializeFor() {
     const out = [];
     for (const c of this.host.values()) {
-      out.push({ e: 'sp', id: c.id, ty: c.type, p: [c.pos.x, c.pos.y, c.pos.z], yaw: c.yaw, st: c.state, lv: c.level, el: c.elite, mh: c.maxHp, hp: c.hp, code: c.code, seed: c.seed, nm: c.name, suit: c.suit, up: c.up, fakeLv: c.fakeLv, ft: c.fakeTitle || undefined, vr: c.variant || undefined, af: c.affix || undefined, tr: c.tier || undefined, fa: c.fgAff || undefined, bo: bossOwnerFor(c, this) });   // [forge]
+      out.push({ e: 'sp', id: c.id, ty: c.type, p: [c.pos.x, c.pos.y, c.pos.z], yaw: c.yaw, st: c.state, lv: c.level, el: c.elite, mh: c.maxHp, hp: c.hp, code: c.code, seed: c.seed, nm: c.name, suit: c.suit, up: c.up, fakeLv: c.fakeLv, ft: c.fakeTitle || undefined, vr: c.variant || undefined, af: c.affix || undefined, tr: c.tier || undefined, fa: c.fgAff || undefined, bo: bossOwnerFor(c, this), e41: this.game.endless41?.ownsCreature?.(c) ? c.data.e41 : undefined });   // [forge]
     }
     return out;
   }
@@ -660,7 +661,7 @@ export class CreatureManager {
 
   kill(c, by, opts = {}) {
     if (c.dead) return;
-    const mode = this.game.deadletter24;
+    const mode = this.game.endless41?.active?.() ? this.game.endless41 : this.game.deadletter24;
     const modeOwned = !!mode?.ownsCreature?.(c);
     const modeReward = modeOwned && !opts.silent;
     if (modeOwned) opts = { ...opts, silent: true };
@@ -744,6 +745,7 @@ export class CreatureManager {
   balanceKind(c) { return c.def.boss ? 'boss' : c.def.hazard ? 'hazard' : 'creature'; }
   detectMul(c) { const B = this.game.balance; return B ? B.scale(this.balanceKind(c)).detect : 1; }
   speedMul(c, speed) {
+    if (this.game.endless41?.ownsCreature?.(c)) return Math.min(c.def.run, speed);
     const B = this.game.balance;
     if (!B) return speed;
     const kind = this.balanceKind(c);
@@ -818,7 +820,7 @@ export class CreatureManager {
     if (!c.path || c.pathIdx >= c.path.length) return true;
     speed = this.speedMul(c, speed);
     // wave 5 (chase_tuning.js): sustained speed < player sprint, burst -> fatigue -> recovery, wide corners, hesitation at shut doors
-    const cfg = chaseCfg(c.def, c.type), asked = speed;
+    const cfg = this.game.endless41?.ownsCreature?.(c) ? null : chaseCfg(c.def, c.type), asked = speed;
     if (cfg) { speed = chaseSpeed(c._ch || (c._ch = newChase()), speed, dt, cfg, this.game.time || 0); [turnRate, facingSlow] = chaseTurn(cfg, asked, turnRate, 0.3); }
     if (c.hesT > 0) { c.hesT -= dt; return false; }              // standing at a door that was shut in its face
     const wp = c.path[c.pathIdx];
@@ -835,6 +837,11 @@ export class CreatureManager {
     return false;
   }
   placeAt(c, x, z) {
+    if (this.game.endless41?.ownsCreature?.(c)) {
+      const ground = this.game.endless41.canMove?.(c, x, z);
+      if (ground) c.pos.set(x, ground.y, z);
+      return;
+    }
     c.pos.x = x; c.pos.z = z;
     if (c.zone === 'out' || (c.zone === 'any' && c.pos.y > -200)) {
       const terr = this.game.world.terrain;
@@ -907,6 +914,7 @@ export class CreatureManager {
         if (c.stunT <= 0 && c.state === 'stunned') c.setState('idle');
         continue;
       }
+      if (this.game.endless41?.ownsCreature?.(c) && this.game.endless41.creatureTick?.(c, dt, this)) continue;
       const beh = BEHAVIORS[c.type] || CREATURES[c.type]?.behavior || BEHAVIORS.scuttler;
       try { beh(c, dt, this); } catch (e) { console.error('AI', c.type, e); }
     }
