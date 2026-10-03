@@ -65,6 +65,28 @@ Most packs are CC0 (public domain) — credit is not required but given anyway.
 - **KayKit : Halloween Bits (Free)** by Kay Lousberg — <https://kaylousberg.itch.io/halloween-bits> — License: CC0. Used: 25 models.
 - **Low-res Backrooms and Poolrooms textures** by GibbonGL — <https://gibbongl.itch.io/backrooms-low-res-textures> — License: CC0. Used: 8 textures.
 
+## Wave32 curated library (not yet placed in the game)
+
+The separate catalog `public/assets/ext/wave32-library.json` records source
+members, licenses, source/output SHA256 and processing. Raw archives stay in the
+local asset library outside Git. This selection adds no automatic boot preload.
+
+- **FoxTex Re-Named** by Foxhead — <https://foxh3ad.itch.io/foxtexcom> — CC0 1.0.
+  Curated: 39 metal/concrete/wood textures, nearest resized to at most 128 px,
+  256-color indexed PNG without dithering; alpha retained where present.
+- **PSX Electronics Asset Pack [FREE]** by Animimo Studios —
+  <https://animimostudios.itch.io/psx-electronics-asset-pack-free> — CC0 1.0.
+  Curated: FM radio, vintage radio, single VHS and VHS stack; processed GLB.
+- **Free Office PSX Asset Pack DEMO** by ALEX —
+  <https://apfelgarten.itch.io/office-psx-asset-pack> — CC0 1.0.
+  Curated: two filing cabinets; processed GLB.
+
+**LOWPO Horror Free** by Standout 7 —
+<https://standout7.itch.io/horror-character-pack> — CC0 1.0. Downloaded to the
+local source library as a rigged character reference, not bundled or active;
+the free models contain no animations. No Valve/L4D character, sound or model
+is included. The new original enemy behaviors are still an implementation plan.
+
 ## Notes
 
 - Liminal Games asks that the horror SFX pack itself is not re-sold or re-uploaded as a pack (CC0 otherwise).
