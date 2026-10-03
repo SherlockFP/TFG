@@ -1,3 +1,7 @@
+# Current owner direction — Wave35 wide places
+
+Three bounded open plans, cloudy roofs and fewer ordinary encounters now have native/rendered evidence in [Wave35](wave35/README.md). Old saves retain geometry. Human enjoyment is not inferred from tests. Observed next problem: briefing/HUD still describe the replaced maze/greenhouse, and the broad spaces need useful physical landmarks. The owner authorized one further round and PC shutdown after completed saving/publication.
+
 # Current owner direction — Wave34 early salvage decision
 
 The owner asked to make the normal game more interesting. One existing large-loot slot now becomes a fragile Indexed Glass haul on a certified early factory route, at most once per campaign. The original economy rolls and deeper prize stay intact; ordinary small loot remains the quick alternative. Native local/scan cues explain the beam, cart extraction and a friend's brake before carrying. [Wave34](wave34/README.md) owns the current physical/custody tests, first-person evidence and limits. The owner's **1/10** experience baseline remains unchanged; native correctness does not establish enjoyment. Next work should follow a crew's actual choice, confusion and return rather than adding more catalogues.

@@ -362,7 +362,7 @@ export function installMirror(game) {
     if (!pos) return null;
     let c = null;
     if (type === 'zombot') c = spawnZombot(M, pos, { zone: ap.zone, level, state: 'run', data: { mirror: 1, wave: 90000 } });
-    else c = M.hostSpawn(type, pos, { level, elite, zone: ghostish ? 'any' : ap.zone, state: 'run' });
+    else c = M.hostSpawn(type, pos, { level, elite, zone: ghostish ? 'any' : ap.zone, state: 'run', data: { mirror: 1 } });
     if (c) { c.data.mirror = 1; S.mobs.set(c.id, game.time); }
     return c;
   }

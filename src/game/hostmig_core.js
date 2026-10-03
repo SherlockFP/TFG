@@ -49,7 +49,8 @@ export function nextOrder(prevOrder, newHost, oldHost, ids) {
 }
 
 // HostCreature spawn options rebuilt from a client CreatureView (view.spawnData is the original 'sp' event).
-// Secondary AI state (nest camps, boss phases, `data`) is NOT replicated to clients and comes back as defaults.
+// Secondary AI state (nest camps, boss phases, `data`) comes back as defaults,
+// except the bounded native boss-owner identity carried by the spawn receipt.
 export function creatureOptsFromView(v, facilityY = -300) {
   const sd = v.spawnData || {};
   const p = v.target || v.pos;
@@ -60,6 +61,7 @@ export function creatureOptsFromView(v, facilityY = -300) {
     tier: v.tier ?? sd.tr ?? null, fa: v.fgAff ?? sd.fa ?? undefined, yaw: v.targetYaw ?? v.yaw, state: v.state === 'dead' ? 'idle' : v.state,
     zone, extra: typeof v.extra === 'number' ? v.extra : 0, code: v.code || sd.code || null, seed: sd.seed, name: v.name || null, suit: sd.suit || null,
     up: !!sd.up, fakeLv: sd.fakeLv, fakeTitle: sd.ft || '',
+    ...(typeof sd.bo === 'string' && sd.bo.length <= 96 ? { data: { owner: sd.bo } } : {}),
   };
 }
 

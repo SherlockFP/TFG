@@ -11,6 +11,7 @@ import { t,addTranslations,getLang,tf } from '../core/i18n.js';
 import { floorSpec,savedFloorSpec } from './descent21_core.js';
 import { descentRuleText,descentDestinationText } from './descent21_text.js';
 import { descentToken,newDescent,inCabin,discovered,stageRequest,chooseSafeFloor } from './descent21_state.js';
+import {surfaceOptions35} from './openplaces35.js';
 HOST_ONLY.add('ds21floor');
 const TEXT={call:'Call depth lift [E]',descend:'Descend together [E]',back:'Return to surface together [E]',explore:'Explore rooms to authorize the lift.',crew:'All living crew must board; recover downed crew first.',choice:'3s transit. Cabin cargo travels. Deep clock held; abandoned floors seal. Surface clock resumes on return.',busy:'Depth lift travelling. Keep the whole crew aboard.',blocked:'Finish the active pursuit or mission first.',unsafe:'No safe lift on that floor. Transit cancelled.',limit:'Too much loose cargo to preserve safely. Collect it before transit.'};
 addTranslations({[TEXT.call]:'Derinlik asansörünü çağır [E]',[TEXT.descend]:'Birlikte aşağı in [E]',[TEXT.back]:'Birlikte yüzeye dön [E]',[TEXT.explore]:'Asansör izni için odaları keşfet.',[TEXT.crew]:'Yaşayan tüm ekip binsin; önce düşen arkadaşını kaldır.',[TEXT.choice]:'3 sn yolculuk. Kabindeki yük taşınır. Terk edilen derin katlar kapanır; yüzey saati dönüşte sürer.',[TEXT.busy]:'Asansör hareket ediyor. Tüm ekip kabinde kalsın.',[TEXT.blocked]:'Önce aktif takibi veya görevi bitir.',[TEXT.unsafe]:'O katta güvenli asansör yok. Yolculuk iptal edildi.',[TEXT.limit]:'Yerdeki yük güvenli kayıt sınırını aşıyor. Önce yükü topla.'},'tr');
@@ -75,7 +76,7 @@ export function installDescent21(game){
   for(const [id,v]of [...(game.creatures?.views?.entries?.()||[])])if(v.zone==='in'||v.pos?.y<FACILITY_Y+40)game.creatures.onEvent({e:'rm',id});
   if(game.creatures?.noises)game.creatures.noises=game.creatures.noises.filter(n=>n.pos.y>=FACILITY_Y+40);
  }
- function floorLayout(run,depth,choice){const moon=MOONS[run.moon],gen=depth===0?run.descent21?.surface?.gen:null,s=depth>0?(run.descent21?.depth===depth?spec(run):floorSpec(moon,run.seed,depth)):gen,c=choice||s;return generateLayout(c?.seed??run.seed,c?.theme??moon.interior,c?.size??moon.size,depth>0?undefined:gen?.lopts||gen?.layoutOpts||moon.layoutOpts||game.facjobs?.layoutOpts?.(moon,run));}
+ function floorLayout(run,depth,choice){const moon=MOONS[run.moon],gen=depth===0?run.descent21?.surface?.gen:null,s=depth>0?(run.descent21?.depth===depth?spec(run):floorSpec(moon,run.seed,depth,{routeVersion:run.descent21?.routeVersion})):gen,c=choice||s;return generateLayout(c?.seed??run.seed,c?.theme??moon.interior,c?.size??moon.size,depth>0?c?.layoutOpts:gen?gen.lopts||gen.layoutOpts:surfaceOptions35(run,moon,moon.layoutOpts||game.facjobs?.layoutOpts?.(moon,run)));}
  function preflight(depth,choice){
   const physics=new Physics();let preview=null,lobby=null;
   try{preview=buildFacility(floorLayout(game.run,depth,choice),{physics,lightPool:{add:e=>e,remove(){}}});physics.world.step();lobby=buildDescent21({facility:preview,physics,floor:depth});return lobby?.plan||null;}
@@ -83,7 +84,7 @@ export function installDescent21(game){
   finally{lobby?.dispose();preview?.dispose(physics);physics.world.free();}
  }
  function chooseFloor(depth){
-  return chooseSafeFloor(MOONS[game.run.moon],game.run.seed,depth,preflight);
+  return chooseSafeFloor(MOONS[game.run.moon],game.run.seed,depth,preflight,{routeVersion:state()?.routeVersion===35?35:26});
  }
  function rebuild(depth,verifiedPlan){
   emit('facilityWillChange',game.world,game,depth);lift?.dispose();lift=null;
@@ -92,7 +93,7 @@ export function installDescent21(game){
   game.world.facility=next;game.world.descent21Depth=depth;fac=null;key='';game.scene?.add?.(next.group);game.env&&(game.env.interiorFog=next.atmosphere||null);
   fac=next;key=descentToken(game.run);lastLiftAttempt=game.time;liftAttempts=1;lift=buildDescent21({facility:next,physics:game.physics,floor:depth,verifiedPlan});
   if(depth===0&&state()?.surface?.darkcollapse20)game.run.darkcollapse20=structuredClone(state().surface.darkcollapse20);
-  next.descent21Generation=depth===0?state()?.surface?.gen:{seed:next.layout.seed,theme:next.layout.theme,size:next.layout.size};
+  next.descent21Generation=depth===0?state()?.surface?.gen:{seed:next.layout.seed,theme:next.layout.theme,size:next.layout.size,layoutOpts:spec(game.run)?.layoutOpts};
   emit('facilityChanged',game.world,game,depth);return next;
  }
  function onState(){
@@ -128,7 +129,7 @@ export function installDescent21(game){
   const surface=st.depth===0?{gen:structuredClone(fac.descent21Generation||{seed:fac.layout.seed,theme:fac.layout.theme,size:fac.layout.size}),items:game.items.serialize(it=>indoor(it)&&!cargo.some(c=>c.id===it.id)),doors:fac.doors.map(d=>({id:d.id,open:d.open,locked:d.jam?false:d.locked,silent:true})),darkcollapse20:game.run.darkcollapse20?structuredClone(game.run.darkcollapse20):undefined,budget:{powerUsed:game.hostData?.powerUsed||0,powerBoost:game.hostData?.powerBoost||0,spawnT:game.hostData?.spawnT||20}}:st.surface;
   if(cargo.length>64||(surface?.items?.length||0)>256){st.liftStage='ready';st.rev++;publish();warn(TEXT.limit);return false;}
   const next=chooseFloor(st.target);if(!next){st.liftStage='ready';st.rev++;publish();warn(TEXT.unsafe);return false;}const verifiedPlan=next.plan;
-  const oldDepth=st.depth;st.surface=surface;if(oldDepth===0)st.surfaceVisited=[...st.visited];st.depth=st.target;st.currentChoice=next.choice;st.routeVersion=26;st.reached=Math.max(st.reached,st.depth);st.visited=st.depth===0?[...st.surfaceVisited]:[];st.liftStage='idle';st.stageTime=game.time;st.stageElapsed=0;st.rev++;st.nonce++;delete st.target;
+  const oldDepth=st.depth;st.surface=surface;if(oldDepth===0)st.surfaceVisited=[...st.visited];st.depth=st.target;st.currentChoice=next.choice;st.routeVersion=st.routeVersion===35?35:26;st.reached=Math.max(st.reached,st.depth);st.visited=st.depth===0?[...st.surfaceVisited]:[];st.liftStage='idle';st.stageTime=game.time;st.stageElapsed=0;st.rev++;st.nonce++;delete st.target;
   const packet={token:st.token,state:structuredClone(st),cargo,crew:crew().map(p=>p.id),plan:verifiedPlan,origin:{...lift.plan.spawn,yaw:lift.plan.yaw}};
   game.net?.broadcast?.('ds21floor',packet,false);applyFloor(packet,game.selfId);
   if(game.hostData){Object.assign(game.hostData,st.depth>0?{powerUsed:0,powerBoost:0,spawnT:20}:st.surface?.budget||{powerUsed:0,powerBoost:0,spawnT:20});game.hostData.exitField=null;}

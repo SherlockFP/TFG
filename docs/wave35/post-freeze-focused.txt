@@ -1,0 +1,7 @@
+ok     1/5 tools\harness\density35.test.mjs (0.2s)
+ok     2/5 tools\harness\openplaces35_art.test.mjs (0.9s)
+ok     3/5 tools\harness\openplaces35_world.test.mjs (2.0s)
+ok     4/5 tools\harness\openplaces35_lifecycle.test.mjs (3.0s)
+ok     5/5 tools\harness\hostmig.test.mjs (7.6s)
+
+5/5 passed in 8s (-j 4). slowest: tools\harness\hostmig.test.mjs 8s, tools\harness\openplaces35_lifecycle.test.mjs 3s, tools\harness\openplaces35_world.test.mjs 2s, tools\harness\openplaces35_art.test.mjs 1s, tools\harness\density35.test.mjs 0s

@@ -1,0 +1,9 @@
+ok     1/7 tools\harness\firstdepth21.test.mjs (0.1s)
+ok     2/7 tools\harness\density35.test.mjs (0.2s)
+ok     3/7 tools\harness\crdirector.test.mjs (0.4s)
+ok     4/7 tools\harness\openplaces35_art.test.mjs (0.9s)
+ok     5/7 tools\harness\openplaces35_world.test.mjs (2.1s)
+ok     6/7 tools\harness\openplaces35_lifecycle.test.mjs (2.9s)
+ok     7/7 tools\harness\hostmig.test.mjs (7.6s)
+
+7/7 passed in 8s (-j 4). slowest: tools\harness\hostmig.test.mjs 8s, tools\harness\openplaces35_lifecycle.test.mjs 3s, tools\harness\openplaces35_world.test.mjs 2s, tools\harness\openplaces35_art.test.mjs 1s, tools\harness\crdirector.test.mjs 0s

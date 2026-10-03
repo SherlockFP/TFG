@@ -7,14 +7,14 @@ export const MOONS = {
   },
   hamsi: {
     id: 'hamsi', name: '56K-Dialup', short: 'Dialup', tier: 1, cost: 0, biome: 'hills', interior: 'factory', interiorName: 'Abandoned Web Host', size: 0.8,
-    desc: 'Rolling hills of the early web. A small abandoned web host. Good for new janitors.',
+    desc: 'Rolling hills of the early web. A broad service courtyard under grey clouds, with covered return lanes and archive bays. Quiet arrival; fragile cargo is the longer haul.',
     weather: ['clear', 'clear', 'rainy', 'foggy'], scrapCount: [10, 14], scrapMul: 1.0, power: 3, outdoorPower: 2,
     creatures: { scuttler: 30, yoinker: 22, crawler: 10, lurker: 6, mannequin: 4, sludge: 8, spider: 10, leech: 12, mimic: 3, turret: 6, mine: 10 },
     outdoor: { hound: 5, mimic: 2 },
   },
   lufer: {
     id: 'lufer', name: '12-Forum', short: 'Forum', tier: 1, cost: 0, biome: 'swamp', interior: 'greenhouse', size: 1.0,   // [labyrinths] was factory
-    desc: 'A swampy old message board. Frequent rain. Ponds full of phish. An overgrown hydroponics greenhouse hides the good scrap: cut the vines.',
+    desc: 'A swampy old message board. Frequent rain and ponds full of phish. An empty shopping concourse opens beneath a cloudy glass roof; search the side bays and keep a return route.',
     weather: ['rainy', 'rainy', 'foggy', 'clear', 'stormy'], scrapCount: [12, 16], scrapMul: 1.05, power: 4, outdoorPower: 3, ponds: 3,
     creatures: { scuttler: 24, yoinker: 18, crawler: 14, lurker: 10, mannequin: 6, sludge: 14, spider: 12, leech: 14, jester: 3, screamer: 5, mimic: 4, turret: 6, mine: 10 },
     outdoor: { hound: 6, giant: 3, mimic: 3 },

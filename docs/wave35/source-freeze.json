@@ -1,0 +1,91 @@
+{
+  "base": "4f289093ab5defd4b7a7cb6a01d41e9a64484288",
+  "protocol": "0.12.7",
+  "utc": "2026-10-03T04:56:18.0164700Z",
+  "files": [
+    {
+      "path": "src/entities/creatures.js",
+      "sha256": "1a748c88428d50c638ecb48f6ecc43073f2af43c54bc524686005f7bc37de910"
+    },
+    {
+      "path": "src/game/bosses.js",
+      "sha256": "de8280e740ec510fd494d4545e4f00b67b7976f23dc708ac6f10f7a1eb7d71ef"
+    },
+    {
+      "path": "src/game/brlevels.js",
+      "sha256": "37bbe182abf2dfe62fe9ea5864b764bbd81cd9a2e8ebc38e4c9e7c067f55b1e4"
+    },
+    {
+      "path": "src/game/crdirector.js",
+      "sha256": "9b2ed76c3421f357e6e46d23c9f845b095b378f051176ed77f52de96bd40922a"
+    },
+    {
+      "path": "src/game/cycle_bosses.js",
+      "sha256": "05a63515e254abfb47d2596c6405c988a7b551b20ffc9b19799bfcc4da9c0ef4"
+    },
+    {
+      "path": "src/game/density35.js",
+      "sha256": "b1c1314fc6e68baf981ac1bed9d7529b019df84358885d02591f40f3e9d13eda"
+    },
+    {
+      "path": "src/game/descent21_core.js",
+      "sha256": "79c5d531308852597d83a1c41898648373dd7283d47117ed18565f228ae2db85"
+    },
+    {
+      "path": "src/game/descent21_state.js",
+      "sha256": "cbc74109d39b3cbb3868a19617cb243fc7321281a252e51041660b5833dc6bee"
+    },
+    {
+      "path": "src/game/descent21.js",
+      "sha256": "805f2ef32df5be575daac52658fce00420f8bfc5326dbddb56919c87ed776f74"
+    },
+    {
+      "path": "src/game/game.js",
+      "sha256": "e4419c5485f403d73c7fdba497cc24760d24af43ba20a1fa05f8e2b05b2b5ed2"
+    },
+    {
+      "path": "src/game/host.js",
+      "sha256": "2e966a813c326aed1bf9e7e7269d184f41011abd5dc248f9cc6112604ddfc0e8"
+    },
+    {
+      "path": "src/game/hostmig_core.js",
+      "sha256": "0d98955445fc11a9e745f2ee2a3f8c0b3693dacba34bc07ce10a0f778ffcdd39"
+    },
+    {
+      "path": "src/game/mirror.js",
+      "sha256": "caa802fddd0b4c6f8fbbae6c0e0ad4581749dc4b2336424b2d8b1d510f484edd"
+    },
+    {
+      "path": "src/game/moons.js",
+      "sha256": "029c25a78e84b5b504a7f8df1379ae041df1a3016ccdca9fc4ceb00cddbe1ce2"
+    },
+    {
+      "path": "src/game/openplaces35.js",
+      "sha256": "b9e99f1f17bcf9cd27ab9851e08e6568b660281384569ae6d4e7e199745b5dc3"
+    },
+    {
+      "path": "src/net/lobby.js",
+      "sha256": "81de36bc342d2d38fdb60122ce2ca4374f321b977bbbe4d60f6231a1612d0e9a"
+    },
+    {
+      "path": "src/world/facility.js",
+      "sha256": "38902ab7fbad0e29c43e69a37a8a6c7cc1d7fb2b00ed16486b4e16e3d0175bb1"
+    },
+    {
+      "path": "src/world/interiors/openplaces35_art.js",
+      "sha256": "7cbb59ea8897d03716a5b17df61cd940a69c484426a2a5e67080e5efe9319ea7"
+    },
+    {
+      "path": "src/world/interiors/openplaces35_plan.js",
+      "sha256": "d292c4249cc9a6d45585d71508f3d43345d5c9cdc5c1ffd150a7774cfcb99c34"
+    },
+    {
+      "path": "test/openplaces35_game.html",
+      "sha256": "2e8333b1ac6eec5769da1af738fc21a9ff42f31e8cfc177a853175536a373c68"
+    },
+    {
+      "path": "test/openplaces35.html",
+      "sha256": "f7552907ddb39caeee05eabaf81345073acd0791280de570aedbf543c0df924a"
+    }
+  ]
+}

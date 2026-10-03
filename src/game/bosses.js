@@ -218,7 +218,7 @@ function summonMinions(c, M) {
       if (!w) continue;
       x = w.x; z = w.z;
     }
-    const m = M.hostSpawn('scuttler', new THREE.Vector3(x, y, z), { level: Math.max(1, c.level - 1), zone: 'in', state: 'idle' });
+    const m = M.hostSpawn('scuttler', new THREE.Vector3(x, y, z), { level: Math.max(1, c.level - 1), zone: 'in', state: 'idle', data: { owner: c.id } });
     if (!m) continue;
     spawned++;
     d.minions.push(m.id);

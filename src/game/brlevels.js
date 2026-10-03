@@ -408,14 +408,19 @@ export function installBackroomsLevels(game) {
     const look = LOOK[id] || LOOK.l0;
     const dk = Math.max(0, Math.min(1, (0.45 - lightHere) / 0.45)) * (id === 'run' || id === 'l2' ? 0.4 : 1);
     const power = S.bakeV;
-    _c1.set(look.fog).lerp(_c2.set(DARK_LOOK.fog), Math.max(dk, 1 - power));
-    const wantD = look.dens + (DARK_LOOK.dens - look.dens) * Math.max(dk, 1 - power);
+    // Admitted public reception sightlines use this actual facility's haze. Native
+    // dim cells, room breakers and power collapse still blend toward DARK_LOOK.
+    const O = S.L.open35;
+    const broad = O?.version === 35 && O.kind === 'reception' && Array.isArray(O.publicRooms) && O.publicRooms.includes(S.L.roomOf[cell]) ? S.fac.atmosphere : null;
+    const density = broad?.density ?? look.dens, ambient = broad?.ambient ?? look.amb;
+    _c1.set(broad?.fog ?? look.fog).lerp(_c2.set(DARK_LOOK.fog), Math.max(dk, 1 - power));
+    const wantD = density + (DARK_LOOK.dens - density) * Math.max(dk, 1 - power);
     const k = Math.min(1, dt * 1.2);
     S.fogC.lerp(_c1, k); S.fogD += (wantD - S.fogD) * k;
     S.fog.fog = S.fogC.getHex(); S.fog.density = S.fogD;
-    const wantA = (look.amb + (DARK_LOOK.amb - look.amb) * dk) * power + 0.012 * (1 - power);
+    const wantA = (ambient + (DARK_LOOK.amb - ambient) * dk) * power + 0.012 * (1 - power);
     S.amb += (wantA - S.amb) * Math.min(1, dt * 0.9);
-    _c1.set(look.ambC);
+    _c1.set(broad ? 0xd9d5c6 : look.ambC);
     S.ambC.lerp(_c1, k);
     game.lights.ambient.intensity = S.amb;
     game.lights.ambient.color.copy(S.ambC);

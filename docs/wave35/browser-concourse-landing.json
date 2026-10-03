@@ -1,0 +1,115 @@
+{
+  "place": "concourse",
+  "running": false,
+  "initial": {
+    "population": "actual native lever and hostFinishLanding",
+    "seed": "temporary weekly fixture1235",
+    "pose": "initial ship centre",
+    "checkpoint": "fresh surface",
+    "profile": "Extra481"
+  },
+  "inShip": true,
+  "docked": false,
+  "phase": "moon",
+  "moon": "lufer",
+  "seed": 1235,
+  "size": 1,
+  "theme": "greenhouse",
+  "receipt": {
+    "version": 35,
+    "token": "lufer:1235:1",
+    "kind": "concourse"
+  },
+  "depth": 0,
+  "open35": {
+    "version": 35,
+    "kind": "concourse",
+    "publicRooms": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "skyRooms": [
+      5
+    ],
+    "bayRooms": [
+      7,
+      8,
+      9,
+      10
+    ],
+    "height": 7.2,
+    "viewFar": 96
+  },
+  "queue": 0,
+  "hidden": false,
+  "audio": {
+    "testMaster": 0,
+    "gain": 0,
+    "normalPreference": 0.8
+  },
+  "cameraFar": 420,
+  "atmosphere": {
+    "fog": 7435631,
+    "density": 0.016,
+    "hemi": 0.22,
+    "ambient": 0.18
+  },
+  "sky": {
+    "parent": true,
+    "vertices": 153,
+    "texture": 128,
+    "visible": true
+  },
+  "player": {
+    "p": [
+      1.4877942078328488e-7,
+      0.018843269348144454,
+      1.4877942078328488e-7
+    ],
+    "yaw": 0,
+    "pitch": 0,
+    "hp": 100,
+    "dead": false,
+    "indoor": false,
+    "input": true,
+    "locked": false
+  },
+  "population": {
+    "clock": 47.53736252967158,
+    "actors": [
+      {
+        "id": "c1",
+        "type": "sw_nest",
+        "dead": false,
+        "zone": "in"
+      }
+    ],
+    "density": {
+      "v": 35,
+      "token": "lufer:1235:1",
+      "depth": 0,
+      "arrival": 0,
+      "last": null
+    }
+  },
+  "nativeLift": 7,
+  "prompt": {
+    "main": "Ship charger: hold a battery item",
+    "sub": ""
+  },
+  "trace": [
+    {
+      "e": "initial-admission-setup",
+      "place": "concourse"
+    }
+  ],
+  "errors": {
+    "total": 0,
+    "last": []
+  },
+  "eventErrors": 0
+}

@@ -1,0 +1,5 @@
+PASS native host/self/peer phase receipt precedes synchronous build
+PASS legacy receipt identity and actual descent state/safety retries/checkpoint options
+PASS current occupied indoor facility bounds camera range; stale/outdoor/unloaded legacy scope
+PASS actual Game queued build and certified Descent peer preflight/live/surface return old26
+PASS actual Game queued build and certified Descent peer preflight/live/surface return new35

@@ -1,13 +1,14 @@
 # TFG — current agent map
 
-Updated 2026-10-03, Wave34 early salvage haul. This is the current entry point; historical Windows,
+Updated 2026-10-03, Wave35 wide places and quieter encounters. This is the current entry point; historical Windows,
 Claude branch/model, no-test and automatic merge/push instructions are retired.
 Their full prior text is preserved in [the historical snapshot](docs/history/AGENTS-pre-wave25.md).
 Current user/session instructions take precedence. Inspect Git for the publication SHA.
 
 ## Start here
 
-1. Read [current work and evidence](docs/wave34/README.md),
+1. Read [current work and evidence](docs/wave35/README.md),
+   [early salvage haul](docs/wave34/README.md),
    [experimental crew threats](docs/wave33/README.md),
    [asset intake and original plan](docs/wave32/README.md), then
    [Gauntlet procedure](docs/GAUNTLET.md) and [current critique](docs/CRITIQUE.md).

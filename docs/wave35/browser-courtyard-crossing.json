@@ -1,0 +1,158 @@
+{
+  "place": "courtyard",
+  "running": true,
+  "initial": {
+    "population": "actual native lever and hostFinishLanding",
+    "seed": "temporary weekly fixture1235",
+    "pose": "initial ship centre",
+    "checkpoint": "fresh surface",
+    "profile": "Extra481"
+  },
+  "inShip": false,
+  "docked": false,
+  "phase": "moon",
+  "moon": "hamsi",
+  "seed": 1235,
+  "size": 0.8,
+  "theme": "factory",
+  "receipt": {
+    "version": 35,
+    "token": "hamsi:1235:1",
+    "kind": "courtyard"
+  },
+  "depth": 0,
+  "open35": {
+    "version": 35,
+    "kind": "courtyard",
+    "publicRooms": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "skyRooms": [
+      5
+    ],
+    "bayRooms": [
+      7,
+      8,
+      9,
+      10
+    ],
+    "height": 7.2,
+    "viewFar": 96
+  },
+  "queue": 0,
+  "hidden": false,
+  "audio": {
+    "testMaster": 0,
+    "gain": 0,
+    "normalPreference": 0.8
+  },
+  "cameraFar": 96,
+  "atmosphere": {
+    "fog": 7435631,
+    "density": 0.016,
+    "hemi": 0.22,
+    "ambient": 0.18
+  },
+  "sky": {
+    "parent": true,
+    "vertices": 153,
+    "texture": 128,
+    "visible": true
+  },
+  "player": {
+    "p": [
+      -1.9919070798932808,
+      -299.9800025909575,
+      6.448506359010935
+    ],
+    "yaw": 0.00040291060924853295,
+    "pitch": 0,
+    "hp": 100,
+    "dead": false,
+    "indoor": true,
+    "input": true,
+    "locked": false
+  },
+  "population": {
+    "clock": 53.95604021934927,
+    "actors": [
+      {
+        "id": "c1",
+        "type": "sw_nest",
+        "dead": false,
+        "zone": "in"
+      }
+    ],
+    "density": {
+      "v": 35,
+      "token": "hamsi:1235:1",
+      "depth": 0,
+      "arrival": 0,
+      "last": null
+    },
+    "glass": "ilk"
+  },
+  "nativeLift": 7,
+  "prompt": {
+    "main": "",
+    "sub": ""
+  },
+  "trace": [
+    {
+      "e": "initial-admission-setup",
+      "place": "courtyard"
+    },
+    {
+      "e": "initial-entrance-body-setup",
+      "p": [
+        0,
+        -299.9,
+        60.4
+      ]
+    },
+    {
+      "e": "native-controller-walk",
+      "from": [
+        0,
+        -299.98000170758985,
+        60.400001525878906
+      ],
+      "to": [
+        -1.9673255194211379,
+        -299.98005225426675,
+        34.43427998945117
+      ],
+      "metres": 26.040143329275814,
+      "t": 64.52212831030458
+    },
+    {
+      "e": "native-controller-walk",
+      "from": [
+        -1.9673255194211379,
+        -299.98005225426675,
+        34.43427998945117
+      ],
+      "to": [
+        -1.9919070798932808,
+        -299.9800025909575,
+        6.448506359010935
+      ],
+      "metres": 27.98578442620156,
+      "t": 70.42802571234718
+    },
+    {
+      "e": "complete",
+      "name": "native-public-crossing"
+    }
+  ],
+  "errors": {
+    "total": 0,
+    "last": []
+  },
+  "eventErrors": 0
+}

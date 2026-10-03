@@ -464,6 +464,11 @@ class HostCreature {
 const WANDER_TIME = [4, 9];
 const NO_HUNT = new Set(['yoinker', 'leech', 'spider', 'sludge', 'mimicdoor', 'web', 'stalker', 'ticketswarm', 'editor']);   // guard a nest / lair, or have their own hunting rules
 
+function bossOwnerFor(c, manager) {
+  const id = c.data?.owner, owner = manager.host.get(id);
+  return typeof id === 'string' && id.length <= 96 && owner?.def?.boss && !owner.dead ? id : undefined;
+}
+
 export class CreatureManager {
   constructor(game) {
     this.game = game;
@@ -558,6 +563,10 @@ export class CreatureManager {
   hostSpawn(type, pos, opts = {}) {
     const def = CREATURES[type];
     if (!def) return null;
+    const density = this.game.density35, ticket = density?.reserve(type, pos, opts);
+    if (ticket === false) return null;
+    let admitted = null;
+    try {
     const mode = this.game.deadletter24;
     const modeActive = !!mode?.active?.();
     if (modeActive) {
@@ -581,12 +590,15 @@ export class CreatureManager {
     this.game.descentThreat21?.limit?.(c, opts);   // bounded deep-floor stats before native replication
     c.fakeLv = opts.fakeLv; c.fakeTitle = opts.fakeTitle || '';   // disguise tag data, re-sent to late joiners by serializeFor
     this.host.set(id, c);
+    admitted = c; // publish reservation before synchronous Session callbacks can reenter
     this.game.net.broadcast('cev', {
       e: 'sp', id, ty: type, p: [pos.x, pos.y, pos.z], yaw: c.yaw, st: c.state, lv: c.level, el: c.elite,
       mh: c.maxHp, hp: c.hp, code: c.code, seed: c.seed, nm: c.name, suit: c.suit, up: c.up, fakeLv: opts.fakeLv, ft: opts.fakeTitle || undefined,
       vr: c.variant || undefined, af: c.affix || undefined, tr: c.tier || undefined, fa: c.fgAff || undefined,   // [forge]
+      bo: bossOwnerFor(c, this), // bounded encounter ownership; never replicate general AI data
     });
     return c;
+    } finally { density?.finish(ticket, admitted); }
   }
   hostRemove(id) {
     this.host.delete(id);
@@ -595,7 +607,7 @@ export class CreatureManager {
   serializeFor() {
     const out = [];
     for (const c of this.host.values()) {
-      out.push({ e: 'sp', id: c.id, ty: c.type, p: [c.pos.x, c.pos.y, c.pos.z], yaw: c.yaw, st: c.state, lv: c.level, el: c.elite, mh: c.maxHp, hp: c.hp, code: c.code, seed: c.seed, nm: c.name, suit: c.suit, up: c.up, fakeLv: c.fakeLv, ft: c.fakeTitle || undefined, vr: c.variant || undefined, af: c.affix || undefined, tr: c.tier || undefined, fa: c.fgAff || undefined });   // [forge]
+      out.push({ e: 'sp', id: c.id, ty: c.type, p: [c.pos.x, c.pos.y, c.pos.z], yaw: c.yaw, st: c.state, lv: c.level, el: c.elite, mh: c.maxHp, hp: c.hp, code: c.code, seed: c.seed, nm: c.name, suit: c.suit, up: c.up, fakeLv: c.fakeLv, ft: c.fakeTitle || undefined, vr: c.variant || undefined, af: c.affix || undefined, tr: c.tier || undefined, fa: c.fgAff || undefined, bo: bossOwnerFor(c, this) });   // [forge]
     }
     return out;
   }

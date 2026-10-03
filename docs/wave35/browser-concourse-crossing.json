@@ -1,0 +1,157 @@
+{
+  "place": "concourse",
+  "running": false,
+  "initial": {
+    "population": "actual native lever and hostFinishLanding",
+    "seed": "temporary weekly fixture1235",
+    "pose": "initial ship centre",
+    "checkpoint": "fresh surface",
+    "profile": "Extra481"
+  },
+  "inShip": false,
+  "docked": false,
+  "phase": "moon",
+  "moon": "lufer",
+  "seed": 1235,
+  "size": 1,
+  "theme": "greenhouse",
+  "receipt": {
+    "version": 35,
+    "token": "lufer:1235:1",
+    "kind": "concourse"
+  },
+  "depth": 0,
+  "open35": {
+    "version": 35,
+    "kind": "concourse",
+    "publicRooms": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "skyRooms": [
+      5
+    ],
+    "bayRooms": [
+      7,
+      8,
+      9,
+      10
+    ],
+    "height": 7.2,
+    "viewFar": 96
+  },
+  "queue": 0,
+  "hidden": false,
+  "audio": {
+    "testMaster": 0,
+    "gain": 0,
+    "normalPreference": 0.8
+  },
+  "cameraFar": 96,
+  "atmosphere": {
+    "fog": 7435631,
+    "density": 0.016,
+    "hemi": 0.22,
+    "ambient": 0.18
+  },
+  "sky": {
+    "parent": true,
+    "vertices": 153,
+    "texture": 128,
+    "visible": true
+  },
+  "player": {
+    "p": [
+      0.0166228786110878,
+      -299.98000059807,
+      8.27195930480957
+    ],
+    "yaw": 0.0005521391129805486,
+    "pitch": 0,
+    "hp": 100,
+    "dead": false,
+    "indoor": true,
+    "input": true,
+    "locked": false
+  },
+  "population": {
+    "clock": 87.4029535767854,
+    "actors": [
+      {
+        "id": "c1",
+        "type": "sw_nest",
+        "dead": false,
+        "zone": "in"
+      }
+    ],
+    "density": {
+      "v": 35,
+      "token": "lufer:1235:1",
+      "depth": 0,
+      "arrival": 0,
+      "last": null
+    }
+  },
+  "nativeLift": 7,
+  "prompt": {
+    "main": "",
+    "sub": ""
+  },
+  "trace": [
+    {
+      "e": "initial-admission-setup",
+      "place": "concourse"
+    },
+    {
+      "e": "initial-entrance-body-setup",
+      "p": [
+        2,
+        -299.9,
+        66.4
+      ]
+    },
+    {
+      "e": "native-controller-walk",
+      "from": [
+        2,
+        -299.9800170898437,
+        66.4000015258789
+      ],
+      "to": [
+        0.03943016869015992,
+        -299.9800011508481,
+        40.446861665695906
+      ],
+      "metres": 26.027087863722212,
+      "t": 102.0574772312315
+    },
+    {
+      "e": "native-controller-walk",
+      "from": [
+        0.03943016869015992,
+        -299.9800011508481,
+        40.446861665695906
+      ],
+      "to": [
+        0.016719090896913258,
+        -299.98140932834065,
+        8.446742873638868
+      ],
+      "metres": 32.00012688227627,
+      "t": 108.81105363775941
+    },
+    {
+      "e": "complete",
+      "name": "native-public-crossing"
+    }
+  ],
+  "errors": {
+    "total": 0,
+    "last": []
+  },
+  "eventErrors": 0
+}

@@ -1,0 +1,9 @@
+# Wave35 combined review
+
+Map and density implementers cross-reviewed other owners; the art implementer independently reviewed/reran density. Root inspected combined source and ran focused/native/build/browser verification. No concrete remaining P1/P2 blocker was reported for bounded open-place admission/travel, owned sky/roof, scoped camera or ordinary density.
+
+One real review finding was repaired: newly tagged boss minions lost their owner on host promotion and then filled the ordinary cap. A bounded validated live-boss `bo` spawn/serialize marker now survives real native HostMig promotion. No general transient AI-state replication was added. Existing Horde/squad/mirror transient owner degradation remains: restored members survive, but ownerless actors conservatively occupy the ordinary cap afterward. The outer deep queue mapping was source-reviewed; focused tests install the real director separately, not the entire outer deep wrapper stack.
+
+Native evidence proves long standing LOS, enclosed roof/perimeter, actual controller hall/lift approach, four native cabin footprints, registered glass dimensions, legacy goldens, staged equality/cancel, real Session phase ordering and actual Game/Descent preflight/rebuild/return. Browser earns rendered clouds/current view range and measured public walking under labelled setup. It does not earn natural ship→facility discovery, complete new-map cargo extraction/sale, Internet/election, blind crew fun or representative hardware performance.
+
+Full270/272/125s has the two already-recorded baseline failures, not new passing claims. Final focused5/5 and production build2.93s pass. PLAYTEST owns comment/fixture freeze differences, raw stops and unexplained console provenance. No numeric fun uplift is assigned; the owner's1/10 assessment remains the experience baseline. Root owns already-authorized main publication and verifies the exact remote SHA.

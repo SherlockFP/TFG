@@ -149,7 +149,7 @@ const abSummon = (o = {}) => ({
     for (let k = 0; k < n; k++) {
       const a = Math.random() * TAU, p = walkNear(M, c, c.pos.x + Math.cos(a) * 2.6, c.pos.z + Math.sin(a) * 2.6, 3);
       if (!p) continue;
-      const m = M.hostSpawn('scuttler', new THREE.Vector3(p.x, yOf(M, c), p.z), { level: Math.max(1, (c.level || 1)), zone: 'in', state: 'idle' });
+      const m = M.hostSpawn('scuttler', new THREE.Vector3(p.x, yOf(M, c), p.z), { level: Math.max(1, (c.level || 1)), zone: 'in', state: 'idle', data: { owner: c.id } });
       if (m) { c.data.minions.push(m.id); const tid = c.data.tid; if (tid) { m.target = tid; m.setState('run'); } }
     }
     snd(M.game, 'vent_crawl', c, 1);
@@ -247,7 +247,7 @@ const KITS = {
         run: (c, M) => { aoe(M, c, c.pos.x, c.pos.z, 10.5, c.dmg * 0.2, 3.2); say(M.game, 'THROTTLED - everyone in the room is slowed!', {}, 'warn'); } },
       { id: 'reroute', cd: 21, windup: 1.2, recover: 0.5, ok: (c, M) => auxInfo(M, c).alive > 0 && c.data.minions.filter((id) => { const m = M.host.get(id); return m && !m.dead; }).length < 6,
         tele: (c, M) => ring(M.game, c.pos.x, c.pos.y, c.pos.z, 3, 1.2, 0x5aa8ff),
-        run: (c, M) => { const n = Math.min(4, 1 + auxInfo(M, c).alive); for (let k = 0; k < n; k++) { const a = Math.random() * TAU, p = walkNear(M, c, c.pos.x + Math.cos(a) * 3.2, c.pos.z + Math.sin(a) * 3.2, 3); if (!p) continue; const m = M.hostSpawn('scuttler', new THREE.Vector3(p.x, yOf(M, c), p.z), { level: 1 + (c.data.sector | 0), zone: 'in', state: 'idle' }); if (m) { c.data.minions.push(m.id); if (c.data.tid) { m.target = c.data.tid; m.setState('run'); } } } } },
+        run: (c, M) => { const n = Math.min(4, 1 + auxInfo(M, c).alive); for (let k = 0; k < n; k++) { const a = Math.random() * TAU, p = walkNear(M, c, c.pos.x + Math.cos(a) * 3.2, c.pos.z + Math.sin(a) * 3.2, 3); if (!p) continue; const m = M.hostSpawn('scuttler', new THREE.Vector3(p.x, yOf(M, c), p.z), { level: 1 + (c.data.sector | 0), zone: 'in', state: 'idle', data: { owner: c.id } }); if (m) { c.data.minions.push(m.id); if (c.data.tid) { m.target = c.data.tid; m.setState('run'); } } } } },
     ],
   },
   middlemanager: {

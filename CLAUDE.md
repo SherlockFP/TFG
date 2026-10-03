@@ -1,8 +1,8 @@
 # TFG — current project entry
 
-Updated 2026-10-03, Wave34 early salvage haul. Read [AGENTS.md](AGENTS.md),
+Updated 2026-10-03, Wave35 wide places and quieter encounters. Read [AGENTS.md](AGENTS.md),
 [the current Gauntlet procedure](docs/GAUNTLET.md),
-[Wave34 evidence](docs/wave34/README.md), [Wave33 threats](docs/wave33/README.md), [Wave32 asset intake](docs/wave32/README.md)
+[Wave35 evidence](docs/wave35/README.md), [Wave34 haul](docs/wave34/README.md), [Wave33 threats](docs/wave33/README.md), [Wave32 asset intake](docs/wave32/README.md)
 and [critique](docs/CRITIQUE.md).
 For "devam", start with [CONTINUE](docs/session/CONTINUE.md).
 

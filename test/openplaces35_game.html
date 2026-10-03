@@ -1,0 +1,15 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><base href="/"><title>TFG35 native Game</title>
+<style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#loading{position:fixed;inset:0;background:#050302;display:grid;place-items:center;z-index:100;color:#d8c59c;font-family:monospace}#loading.hidden{display:none}</style>
+<div id="game"></div><div id="ui"></div><div id="fps"></div><div id="loading">LOADING TFG OS...</div>
+<script type="module">
+if(!import.meta.env.DEV)throw Error('Dev-only fixture');
+import {HUB13_BROKER,HUB13_BOARD} from '/src/world/hub13.js';
+import {newDescent} from '/src/game/descent21_state.js';
+import {floorSpec} from '/src/game/descent21_core.js';
+import {errLog} from '/src/core/events.js';
+window.fixture35={HUB13_BROKER,HUB13_BOARD,newDescent,floorSpec,errLog};
+await import('/src/main.js');
+// Disposable silent mix, including startup. Keep the actual saved play setting.
+window.kefal.audio.settings={...window.kefal.audio.settings,masterVolume:0};
+window.kefal.audio.applyVolumes();
+</script></html>

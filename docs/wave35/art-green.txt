@@ -1,0 +1,7 @@
+PASS copied sparse style and three translated place names; legacy definitions remain exact
+PASS actual glazed roof, cloud view ray, native roof cap and fixed light count
+PASS once-only native unload disposal and independent deterministic rebuild resources
+PASS native concourse and reception roofs expose their own clouds with enclosed collision
+PASS real Backrooms updates keep admitted haze while legacy and power/breaker darkness remain native
+openplaces35_art: 6 PASS groups; native lifecycle and geometry only, no rendered QA
+{"skyDraws":1,"skyTriangles":240,"skyVertices":153,"cloudTextureBytes":65536,"sceneLightCount":17,"ownedDisposals":{"geo":1,"mat":1,"tex":1}}

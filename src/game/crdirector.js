@@ -153,8 +153,10 @@ export function installCrdirector(game) {
           const before = new Set(game.creatures.host.keys());
           const r = orig.call(this, type); claim(before); return r;
         }
-        K.enqueue(S.q, { zone: 'in', type, cost: costFor(type), tries: 0 }, S.now); S.stats.queued++;
-        return true;
+        const density = game.density35?.controls(type);
+        if (density && !game.density35.canRequest(type)) return false;
+        K.enqueue(S.q, { zone: 'in', type, cost: costFor(type), tries: 0, density, power: CREATURES[type]?.power || 0 }, S.now); S.stats.queued++;
+        return !density; // density35: queued intent has not admitted a native body or spent power
       } catch (e) { console.warn('[crdirector] queue', e); return orig.call(this, type); }
     });
     wrap(g, 'hostSpawnOutdoor', (orig) => function (...a) {
@@ -181,10 +183,15 @@ export function installCrdirector(game) {
     let ok = false;
     try {
       S.bypass = true;
-      if (e.zone === 'in') { if (canSpawnMore(e.type, game.creatures.host)) ok = !!S.orig.indoor?.(e.type); }
+      if (e.zone === 'in') {
+        const room = !e.density || (game.hostData.powerUsed || 0) + e.power <= (game.indoorBudget?.() || 0) + .5;
+        if (room && canSpawnMore(e.type, game.creatures.host)) ok = !!S.orig.indoor?.(e.type);
+        if (ok && e.density) game.hostData.powerUsed += e.power;
+      }
       else { S.orig.outdoor?.(); ok = true; }
     } catch (err) { console.warn('[crdirector] release', err); } finally { S.bypass = false; }
-    return claim(before) > 0 && ok;
+    const kept = claim(before);
+    return (e.density || kept > 0) && ok; // synchronous removal does not erase successful native admission
   }
   function release(act, crew) {
     if (!S.q.length) return;

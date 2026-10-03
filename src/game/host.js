@@ -15,6 +15,7 @@ import { hostPopulateOutposts } from '../world/outposts.js';
 import { rollWeaponAffixes, lootLevelFor, affixDisplayName } from './loot.js';
 import { dailyEventFor } from './dailyEvents.js';
 import { liteOf } from '../ui/avatarpic.js';   // [profile]
+import { admitOpenPlaces35 } from './openplaces35.js';
 
 const EARLY_SAFE_T = 90;   // s after landing with no creature spawns near the facility doors
 const EARLY_SAFE_D = 25;   // m of walking distance
@@ -334,7 +335,9 @@ export const hostMethods = {
       this.hostData.pressureStage = 0;   // haul pressure is per day
       this.hostData.moonT = 0;
       this.hostData.fuseDone = new Set();   // fuse-box XP is once per player per DAY (new facility), not per session
-      this.hostSetPhase('landing', { dailyEvent: run.dailyEvent });
+      // Weekly selection may change seed. Phase carries admission before every
+      // synchronous Game.onPhase build, including peers that have no later gs.
+      this.hostSetPhase('landing', { dailyEvent: run.dailyEvent, openPlaces35: admitOpenPlaces35(run, MOONS[run.moon]) });
       this.later(() => this.hostFinishLanding(), 9000);
     } else if (run.phase === 'moon' || run.phase === 'company') {
       this.hostBeginTakeoff('lever');
@@ -678,8 +681,7 @@ export const hostMethods = {
       const ceil = fac.ceilingSpots || [];
       const s = pickFrom(ceil.filter(ok)) || (early ? null : pickFrom(ceil));
       if (!s) return false;
-      this.creatures.hostSpawn('leech', new THREE.Vector3(s.x, s.y, s.z), { state: 'ceiling', level, elite, up: true });
-      return true;
+      return !!this.creatures.hostSpawn('leech', new THREE.Vector3(s.x, s.y, s.z), { state: 'ceiling', level, elite, up: true });
     }
     const vents = (fac.ventSpots || []).filter(ok);
     const s = vents.length ? pickFrom(vents) : pickFrom((fac.scrapSpots || []).filter((q) => !q.elevated && ok(q)));   // never spawn creatures on catwalks
@@ -691,11 +693,11 @@ export const hostMethods = {
     if (type === 'jester') opts.state = 'box';
     if (type === 'scuttler') {
       const n = 2 + Math.floor(Math.random() * 3);
-      for (let k = 0; k < n; k++) this.creatures.hostSpawn('scuttler', pos.clone().add(new THREE.Vector3((Math.random() - 0.5) * 2, 0, (Math.random() - 0.5) * 2)), { level: Math.max(1, level - 1), elite: elite && k === 0, zone: 'in' });
-      return true;
+      let admitted = false;
+      for (let k = 0; k < n; k++) if (this.creatures.hostSpawn('scuttler', pos.clone().add(new THREE.Vector3((Math.random() - 0.5) * 2, 0, (Math.random() - 0.5) * 2)), { level: Math.max(1, level - 1), elite: elite && k === 0, zone: 'in' })) admitted = true;
+      return admitted;
     }
-    this.creatures.hostSpawn(type, pos, opts);
-    return true;
+    return !!this.creatures.hostSpawn(type, pos, opts);
   },
 
   mimicDisguise() {
@@ -721,6 +723,8 @@ export const hostMethods = {
     for (const [k, w] of entries) { r -= w; if (r <= 0) { id = k; break; } }
     const def = CREATURES[id];
     this.hostData.outPowerUsed += def.power;
+    let admitted = false;
+    try {
     // Outdoor encounters should pull crews toward points of interest instead of
     // spawning as distant background noise. Prefer a ring around the active
     // outpost network, while keeping the spawn out of immediate view.
@@ -737,7 +741,7 @@ export const hostMethods = {
       x = ax + Math.cos(a) * d; z = az + Math.sin(a) * d;
       if (!early) break;
       if (Math.hypot(x, z) > 45 && (!ent || Math.hypot(x - ent.x, z - ent.z) > 35)) break;
-      if (tries === 7) { this.hostData.outPowerUsed -= def.power; return; }   // no fair spot yet: try again next timer
+      if (tries === 7) return;   // no fair spot yet: finally refunds this attempt
     }
     const y = this.world.terrain?.heightAt(x, z) ?? 0;
     const opts = { level: this.rollLevel(), elite: this.rollElite(), zone: 'out' };
@@ -745,10 +749,11 @@ export const hostMethods = {
     if (id === 'sandkefal') opts.state = 'hidden';
     if (id === 'hound') {
       const n = 1 + Math.floor(Math.random() * 2);
-      for (let k = 0; k < n; k++) this.creatures.hostSpawn('hound', new THREE.Vector3(x + k * 2, y, z + k), { ...opts });
+      for (let k = 0; k < n; k++) if (this.creatures.hostSpawn('hound', new THREE.Vector3(x + k * 2, y, z + k), { ...opts })) admitted = true;
       return;
     }
-    this.creatures.hostSpawn(id, new THREE.Vector3(x, y, z), opts);
+    admitted = !!this.creatures.hostSpawn(id, new THREE.Vector3(x, y, z), opts);
+    } finally { if (!admitted) this.hostData.outPowerUsed -= def.power; }
   },
 
   // ------------------------------------------------------------------ tick

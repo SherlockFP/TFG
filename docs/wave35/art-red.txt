@@ -1,0 +1,15 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: an admitted facility must own a cloudy skylight mesh through its native map lifecycle
+    at file:///C:/Users/Sher/Desktop/TFG/tools/harness/openplaces35_art.test.mjs:24:8 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: undefined,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

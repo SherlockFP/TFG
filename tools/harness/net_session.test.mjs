@@ -26,13 +26,13 @@ async function mk(isHost) {
 const hello = (extra = {}) => ({ t: 'hello', d: { ver: GAME_VERSION, name: 'A', pid: 'pidA', ...extra } });
 const log = (s, evs) => { const out = []; for (const e of evs) s.on(e, (...a) => out.push([e, ...a])); return out; };
 
-// The last published client lacks the new native early-haul admission/presentation.
+// The last published client lacks open-place generation and density admission.
 {
   const h = await mk(true);
   try {
-    h.transport.join_('OLD'); h.receive(hello({ ver: '0.12.5' }), 'OLD');
+    h.transport.join_('OLD'); h.receive(hello({ ver: '0.12.6' }), 'OLD');
     assert.ok(h.transport.sent.some(({ m, to }) => to === 'OLD' && m.t === 'reject' && m.d.reason.startsWith('Version mismatch')));
-    assert.ok(!h.players.has('OLD'), 'old haul client is rejected before snapshot admission');
+    assert.ok(!h.players.has('OLD'), 'old layout client is rejected before snapshot admission');
     h.transport.join_('CURRENT'); h.receive(hello({ pid: 'current' }), 'CURRENT');
     assert.ok(h.players.has('CURRENT'), 'current protocol still admits the crew');
   } finally { h.leave(); }

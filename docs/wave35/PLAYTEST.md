@@ -1,0 +1,25 @@
+# Wave35 actual Game acceptance
+
+2026-10-03, Windows Node24.19, protocol0.12.7. Root uses the existing owned localhost5174 Vite, one browser lock, fresh background IAB tabs and DEV-only `test/openplaces35*.html`. Full CPU-heavy verification finished before these browser scenarios. One actual App RAF drives all physics/simulation; parent RAF waits observe it. Bound synthetic keys and Input mouse buffers feed native controller/look. This is NATIVE_INTEGRATION / VISUAL_REPLAY, not trusted pointer lock, human discovery or hardware evidence.
+
+## Setup and stops
+
+The retained disposable Extra481 profile, initial campaign/day1/quota0, initial ship body pose and temporary weekly seed1235 are setup. The actual installed hostLever and its phase delivery build/populate each ordinary map; no spawn/HP/power/collision outcome is supplied to make movement pass. The reception case separately selects an initial depth3 checkpoint and calls native Descent21 peer-state preflight/rebuild; it does not earn travel or populate a saved loot checkpoint. Each physical walk starts from a separately labelled entrance body pose. Full outdoor entry, blind discovery and ship delivery are outside this evidence.
+
+All test pages open with a disposable AudioManager settings copy/masterVolume0/native gain0. Normal saved play preference remains.8. The actual sound scheduling/hooks remain active. Each named movement scenario has a three-minute deadline, invalid/dead/hidden-input stops and finally releases every held movement key. App/event error counters are reported separately from browser console capture.
+
+The initial test fixture called the lever in the same event as its setup body placement, before native aboard state refreshed; it remained orbit with no admitted map. `browser-initial-setup-stop.json`/logs preserve that result. The fixture now waits for the actual aboard flag through the App clock; no host guard or player result is overwritten. An early concourse selector wait also stopped before the normal landing finished; the next observation confirmed completed native landing. It is an automation observation limit, not a failed Game phase. Fresh scenario results own acceptance.
+
+## Results
+
+- Courtyard: actual native phase carries version35/courtyard for Hamsi1235,size.8,factory. Actual population includes the early glass and one native nest; no ordinary roamer in the recorded initial grace. From entrance setup, native walking measured26.040m then27.986m to the central public space, HP100. Actual indoor cameraFar96 and facility-owned sky153vertices/128px texture are confirmed. Horizontal and upward cloud frames are `courtyard.jpg`/`courtyard-clouds.jpg`.
+- Concourse: actual phase admits Lufer1235,size1,greenhouse with concourse options. Native walking measured26.027m then32.000m, HP100, cameraFar96, same bounded owned cloud. Native nest remains; no ordinary roamer in the recorded grace. See `concourse.jpg`/`concourse-clouds.jpg` and corresponding JSON.
+- Reception: the labelled initial depth3 checkpoint rebuilds the actual native Backrooms floor3009280683,size.89,reception. Native walking measured26.027m then27.998m, HP100 and cameraFar96; rendered clouds retain the existing Backrooms postprocess tint. The later observation at native clock182.1s has one living lm_keeper, last successful admission160.26s. This setup has no restored loose cargo and does not count as earned descent, full deep population or a surface-return expedition.
+
+The unlocked fixture retains the native “Click to resume” overlay. FPS labels in screenshots are not matched hardware profiling. All three browser captures include the existing MutationObserver parameter-not-Node TypeError; App/event counters are0. Its provenance remains unestablished, so this is not a clean-console or resolved-production-error claim. Raw logs remain alongside the screenshots.
+
+Actual briefing still labels the concourse as Greenhouse/Classic and describes vines; Backrooms public HUD still describes the old mono-yellow lobby. These are observed presentation targets for the separately requested next round. The new physical plans and native contract checks do not establish improved blind-human fun; owner baseline remains1/10.
+
+## Verification and freezes
+
+Full native run270/272 in125s retains the two historical Windows carry2 forced-exit abort and outdoor30 frozen-oracle mismatch. Build2.93s succeeds with existing dynamic-import warnings. The initial full-run freeze is `source-freeze-initial.json`; a later hostmig_core header comment documented its already-tested boss-owner exception, with no behavior change. Exact final migration/density/world/art/lifecycle focused5/5 passed in8s. Final browser setup-only revision waits for native aboard state and exposes diagnostics; `source-freeze-browser-setup-stop.json` records the prior DEV fixture, `source-freeze.json` the final source/fixture. No second full run at the final comment/fixture state is claimed. Production behavior was unchanged during browser QA.

@@ -21,6 +21,8 @@ import { carveMaze } from './mazegen.js';
 import { planArch } from './facility_arch.js';   // [facjobs] atrium / ring layout archetypes
 import { planLabArch } from './interiors/lab_themes.js';   // [labyrinths] metro layout plan
 import { decorateHeroes } from './interiors/heroes.js';   // [labyrinths] hero rooms for the older themes
+import { planOpenPlace35 } from './interiors/openplaces35_plan.js';
+import { openPlaceStyle35, openPlaceCeiling35, buildOpenPlaceSky35 } from './interiors/openplaces35_art.js';
 
 // Interior theme registry (ids: factory, mansion, mineshaft, office, backrooms, serverfarm, sewer, hospital).
 export { INTERIORS, INTERIOR_THEMES, INTERIOR_NAMES, getInterior, isInteriorTheme };
@@ -55,6 +57,8 @@ export const MAX_FACILITY_SIZE = 2.6;
 export function generateLayout(seed, theme = 'factory', size = 1, opts = null) {
   if (!isInteriorTheme(theme)) theme = 'factory';
   size = Math.min(MAX_FACILITY_SIZE, Math.max(0.5, Number(size) || 1));
+  const authored35 = planOpenPlace35(seed, theme, size, opts, { cell: CELL, y: FACILITY_Y });
+  if (authored35) return authored35;
   const R = layoutRules(theme);
   const O = opts && typeof opts === 'object' ? { ...opts } : {};
   if (O.plan === 'wings' && R.plan === 'rooms') R.plan = 'wings';
@@ -846,8 +850,9 @@ function* buildFacilitySteps30(layout, { physics, lightPool: pool }, owned) {
   } });
   const L = layout;
   const rng = new RNG((L.seed ^ 0x77b1) >>> 0);
-  const theme = THEMES[L.theme] || THEMES.factory;
-  const def = getInterior(L.theme);
+  const baseTheme = THEMES[L.theme] || THEMES.factory, baseDef = getInterior(L.theme);
+  const def = openPlaceStyle35(L.open35 ? { ...baseDef, style: baseDef.style || baseTheme } : baseDef, L);
+  const theme = L.open35 ? def.style : baseTheme;
   const legacy = !def.style;                       // factory / mansion / mineshaft keep their original dressing
   const corridorH = L.corridorH || CORRIDOR_H;
   const C = L.cell, Y = L.y, W = L.w, H = L.h;
@@ -868,7 +873,7 @@ function* buildFacilitySteps30(layout, { physics, lightPool: pool }, owned) {
   const decals = [];
   const wallSpots = [];
   const ceilingSpots = [];
-  let setPieces = null, themeOut = null, heroOut = null, sys = null, m2 = null, variety = null, disposed = false;
+  let setPieces = null, themeOut = null, heroOut = null, sys = null, m2 = null, variety = null, sky35 = null, disposed = false;
   const dispose = physicsRef => {
     if (disposed) return;
     disposed = true;
@@ -890,7 +895,8 @@ function* buildFacilitySteps30(layout, { physics, lightPool: pool }, owned) {
   const roomStyle = (i) => {
     const r = L.roomOf[i];
     if (r < 0) return theme.corridor;
-    return theme.rooms[L.rooms[r].type] || theme.rooms.office || Object.values(theme.rooms)[0] || theme.corridor;
+    const st = theme.rooms[L.rooms[r].type] || theme.rooms.office || Object.values(theme.rooms)[0] || theme.corridor;
+    return def.roomStyle35 ? def.roomStyle35(L.rooms[r], st) : st;
   };
   const addBox = (cx, cy, cz, sx, sy, sz, member = G.STATIC, data, rot = 0) => {
     const c = physics.addStaticBox(cx, cy, cz, sx / 2, sy / 2, sz / 2, rot, member, data);
@@ -906,7 +912,7 @@ function* buildFacilitySteps30(layout, { physics, lightPool: pool }, owned) {
     const h = L.heightOf[i];
     const shade = 0.85 + ((x * 7 + z * 13) % 5) * 0.035;
     if (!pit || !pit.cells.has(i)) gb.hrect('f:' + st.floor, wx(x), wz(z), wx(x + 1), wz(z + 1), Y, true, 0.5, [shade, shade, shade]);   // [labyrinths] no floor over the well
-    gb.hrect('c:' + st.ceil, wx(x), wz(z), wx(x + 1), wz(z + 1), Y + h, false, 0.5);
+    if (openPlaceCeiling35(L, i)) gb.hrect('c:' + st.ceil, wx(x), wz(z), wx(x + 1), wz(z + 1), Y + h, false, 0.5);
     addBox(wx(x) + C / 2, Y + h + 0.25, wz(z) + C / 2, C, 0.5, C);
     if (L.cells[i] === 2 && theme.corridor.carpet) {
       gb.hrect('f:' + theme.corridor.carpet, wx(x) + 0.9, wz(z) + 0.9, wx(x + 1) - 0.9, wz(z + 1) - 0.9, Y + 0.01, true, 0.5);
@@ -1075,6 +1081,7 @@ function* buildFacilitySteps30(layout, { physics, lightPool: pool }, owned) {
   // rooms
   for (const r of L.rooms) {
     let st = theme.rooms[r.type] || theme.rooms.office;
+    if (def.roomStyle35) st = def.roomStyle35(r, st);
     if (r.maze) st = { ...st, rows: null, grid: null, center: null, clutter: [], webs: false, wall_: [], reactor: false };   // labyrinth: nothing may block a maze corridor
     const x0 = wx(r.x), z0 = wz(r.z), x1 = wx(r.x + r.w), z1 = wz(r.z + r.h);
     const rcx = (x0 + x1) / 2, rcz = (z0 + z1) / 2;
@@ -1255,7 +1262,7 @@ function* buildFacilitySteps30(layout, { physics, lightPool: pool }, owned) {
     }
     yield 'room-clutter';
     // posters / decals
-    const nPost = st.posters || (rng.chance(0.5) ? 1 : 0);
+    const nPost = L.open35 ? (st.posters ?? 0) : st.posters || (rng.chance(0.5) ? 1 : 0);
     for (let k = 0; k < nPost && wallSlots.length; k++) {
       const s = wallSlots[(wallCount + k) % wallSlots.length];
       decals.push({ s, tex: def.posters ? rng.pick(def.posters) : L.theme === 'mansion' ? rng.pick(['poster_missing', 'poster_fish', 'graffiti', 'poster_lost', 'poster_grave']) : rng.pick(['poster_work', 'poster_safety', 'poster_like', 'poster_fish', 'poster_missing', 'sign_danger', 'graffiti', 'blood_splat', 'poster_hr', 'poster_wash', 'poster_delete', 'poster_noref']), y: 1.6, size: 1.1 });
@@ -1497,11 +1504,12 @@ function* buildFacilitySteps30(layout, { physics, lightPool: pool }, owned) {
     layout: L, group, lightPool, addBox, placeProp, propBoxes, nav, Y, CELL: C, levelMaterial, GeoBuilder, emitters,
     zones: setPieces.zones, scrapSpots, darkCells, setPieces,
   };
-  if (typeof def.decorate === 'function') themeOut = def.decorate({ ...themeCtx, rng: new RNG((L.seed ^ 0x7de1c0) >>> 0) }) || null;
+  if (!L.open35 && typeof def.decorate === 'function') themeOut = def.decorate({ ...themeCtx, rng: new RNG((L.seed ^ 0x7de1c0) >>> 0) }) || null;
+  if (L.open35) sky35 = buildOpenPlaceSky35(themeCtx);
   yield 'theme-decoration';
   try { addPracticals({ ...themeCtx, def }); } catch (e) { console.warn('practicals', e); }   // [qa] emissive strips + exit signs: rooms read without a torch
   yield 'practicals';
-  try { heroOut = decorateHeroes({ ...themeCtx, rng: new RNG((L.seed ^ 0x4e70c1) >>> 0), theme }); } catch (e) { console.warn('hero rooms', e); }   // [labyrinths]
+  try { if (!L.open35) heroOut = decorateHeroes({ ...themeCtx, rng: new RNG((L.seed ^ 0x4e70c1) >>> 0), theme }); } catch (e) { console.warn('hero rooms', e); }   // [labyrinths]
   yield 'hero-decoration';
   // gameplay set pieces shared by every theme: laser grids, breaker rooms, cave-ins, vent shortcuts, sludge
   const hazards = buildHazards({ ...themeCtx, rng: new RNG((L.seed ^ 0x4a2a7d) >>> 0), interior: def });
@@ -1547,7 +1555,7 @@ function* buildFacilitySteps30(layout, { physics, lightPool: pool }, owned) {
     setPieces, zones: setPieces.zones, landmarkSpots, hazards,
     sys, chestSpots, m2, variety, lab: themeOut?.lab || null, heroes: heroOut || null,   // [labyrinths]   // [stealth] fac.variety = hatches / rewards / shortcut latch (src/game/stealth.js); [maps2] fac.m2 = story-room notes / light switches / windows (src/game/maps2.js)
     // facility systems runtime data + chest spots (dead-end / treasure / vault rooms) for the world module
-    interior: def.id, interiorName: def.name, atmosphere: def.atmosphere || null,
+    interior: def.id, interiorName: def.name, atmosphere: def.atmosphere || null, viewFar: def.viewFar || null, open35: sky35,
     dispose,
     // which room/zone is a world position in
     cellAt(x, z) {

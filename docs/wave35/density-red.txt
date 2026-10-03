@@ -1,0 +1,214 @@
+FAIL first landing quiet then one shared living roamer no ordinary spawn during first landing grace
+FAIL later grace and cooldown cover metadata and scripted requests The expression evaluated to a falsy value:
+
+  assert.ok(spawn('crawler',{data:{closet:'native'},scripted:true})===null)
+
+FAIL quota 0 sleeping and remote bodies fill shared cap The expression evaluated to a falsy value:
+
+  assert.ok(spawn()===null)
+
+FAIL quota 1 sleeping and remote bodies fill shared cap The expression evaluated to a falsy value:
+
+  assert.ok(spawn()===null)
+
+FAIL quota 2 sleeping and remote bodies fill shared cap The expression evaluated to a falsy value:
+
+  assert.ok(spawn()===null)
+
+FAIL quota 3 sleeping and remote bodies fill shared cap The expression evaluated to a falsy value:
+
+  assert.ok(spawn()===null)
+
+FAIL quota 4 sleeping and remote bodies fill shared cap The expression evaluated to a falsy value:
+
+  assert.ok(spawn()===null)
+
+FAIL quota 9 sleeping and remote bodies fill shared cap The expression evaluated to a falsy value:
+
+  assert.ok(spawn()===null)
+
+FAIL recursive Session delivery cannot over-admit and removed success consumes cooldown The expression evaluated to a falsy value:
+
+  assert.ok(recursive===null)
+
+PASS native decline and constructor throw release pending admission
+FAIL native pack and leech helpers report full refusal and accepted partial pack Expected values to be strictly equal:
+
+true !== false
+
+FAIL native outdoor rejected attempt refunds power; admitted pack retains original cost Expected values to be strictly equal:
+
+2 !== 0
+
+FAIL native view migration restores over cap without treating fresh id as restored The expression evaluated to a falsy value:
+
+  assert.ok(spawn('crawler',{id:'fresh-id'})===null)
+
+FAIL facility arrival grace and lower native depth cap The expression evaluated to a falsy value:
+
+  assert.ok(spawn()===null)
+
+FAIL dispose and new landing retain existing actors and clear obsolete pacing The expression evaluated to a falsy value:
+
+  assert.ok(spawn()===null)
+
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: 14 failed groups: first landing quiet then one shared living roamer; later grace and cooldown cover metadata and scripted requests; quota 0 sleeping and remote bodies fill shared cap; quota 1 sleeping and remote bodies fill shared cap; quota 2 sleeping and remote bodies fill shared cap; quota 3 sleeping and remote bodies fill shared cap; quota 4 sleeping and remote bodies fill shared cap; quota 9 sleeping and remote bodies fill shared cap; recursive Session delivery cannot over-admit and removed success consumes cooldown; native pack and leech helpers report full refusal and accepted partial pack; native outdoor rejected attempt refunds power; admitted pack retains original cost; native view migration restores over cap without treating fresh id as restored; facility arrival grace and lower native depth cap; dispose and new landing retain existing actors and clear obsolete pacing
+
+14 !== 0
+
+    at file:///C:/Users/Sher/Desktop/TFG/tools/harness/density35.test.mjs:74:8
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 14,
+  expected: 0,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0
+PASS first landing quiet then one shared living roamer
+PASS later grace and cooldown cover metadata and scripted requests
+PASS quota 0 sleeping and remote bodies fill shared cap
+PASS quota 1 sleeping and remote bodies fill shared cap
+PASS quota 2 sleeping and remote bodies fill shared cap
+PASS quota 3 sleeping and remote bodies fill shared cap
+PASS quota 4 sleeping and remote bodies fill shared cap
+PASS quota 9 sleeping and remote bodies fill shared cap
+PASS recursive Session delivery cannot over-admit and removed success consumes cooldown
+PASS native decline and constructor throw release pending admission
+PASS native pack and leech helpers report full refusal and accepted partial pack
+PASS native outdoor rejected attempt refunds power; admitted pack retains original cost
+PASS native view migration restores over cap without treating fresh id as restored
+PASS facility arrival grace and lower native depth cap
+PASS dispose and new landing retain existing actors and clear obsolete pacing
+PASS real native host migration promotes peer and preserves over-cap views
+PASS only a real living boss owner exempts minions, unrelated metadata stays bounded
+PASS harmless native web and damaging hazard retain native owners
+PASS disposed module and authored active mode bypass only their own admission
+PASS native wave charged once for accepted partial pack and zero for full denial
+PASS native outdoor construction failure refunds power and releases admission
+PASS receipt replicated through real Session preserves cooldown after native removal
+PASS deep receipt survives same-floor rebuild and later floor starts a fresh grace
+FAIL actual creature director cannot charge queued denials or rush landing grace queued requests are not admitted bodies
+
+9.5 !== 0
+
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: 1 failed groups: actual creature director cannot charge queued denials or rush landing grace
+
+1 !== 0
+
+    at file:///C:/Users/Sher/Desktop/TFG/tools/harness/density35.test.mjs:131:8 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 1,
+  expected: 0,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0
+PASS first landing quiet then one shared living roamer
+PASS later grace and cooldown cover metadata and scripted requests
+PASS quota 0 sleeping and remote bodies fill shared cap
+PASS quota 1 sleeping and remote bodies fill shared cap
+PASS quota 2 sleeping and remote bodies fill shared cap
+PASS quota 3 sleeping and remote bodies fill shared cap
+PASS quota 4 sleeping and remote bodies fill shared cap
+PASS quota 9 sleeping and remote bodies fill shared cap
+PASS recursive Session delivery cannot over-admit and removed success consumes cooldown
+PASS native decline and constructor throw release pending admission
+PASS native pack and leech helpers report full refusal and accepted partial pack
+PASS native outdoor rejected attempt refunds power; admitted pack retains original cost
+PASS native view migration restores over cap without treating fresh id as restored
+PASS facility arrival grace and lower native depth cap
+PASS dispose and new landing retain existing actors and clear obsolete pacing
+PASS real native host migration promotes peer and preserves over-cap views
+PASS only a real living boss owner exempts minions, unrelated metadata stays bounded
+PASS harmless native web and damaging hazard retain native owners
+PASS disposed module and authored active mode bypass only their own admission
+PASS native wave charged once for accepted partial pack and zero for full denial
+PASS native outdoor construction failure refunds power and releases admission
+PASS receipt replicated through real Session preserves cooldown after native removal
+PASS deep receipt survives same-floor rebuild and later floor starts a fresh grace
+PASS actual creature director cannot charge queued denials or rush landing grace
+FAIL degraded migration clock rollback cannot strand fresh spawns for an old landing duration degraded snapshot retains one cooldown, not the old absolute clock
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: 1 failed groups: degraded migration clock rollback cannot strand fresh spawns for an old landing duration
+
+1 !== 0
+
+    at file:///C:/Users/Sher/Desktop/TFG/tools/harness/density35.test.mjs:135:8 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 1,
+  expected: 0,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0
+PASS first landing quiet then one shared living roamer
+PASS later grace and cooldown cover metadata and scripted requests
+PASS quota 0 sleeping and remote bodies fill shared cap
+PASS quota 1 sleeping and remote bodies fill shared cap
+PASS quota 2 sleeping and remote bodies fill shared cap
+PASS quota 3 sleeping and remote bodies fill shared cap
+PASS quota 4 sleeping and remote bodies fill shared cap
+PASS quota 9 sleeping and remote bodies fill shared cap
+PASS recursive Session delivery cannot over-admit and removed success consumes cooldown
+PASS native decline and constructor throw release pending admission
+PASS native pack and leech helpers report full refusal and accepted partial pack
+PASS native outdoor rejected attempt refunds power; admitted pack retains original cost
+PASS native view migration restores over cap without treating fresh id as restored
+PASS facility arrival grace and lower native depth cap
+PASS dispose and new landing retain existing actors and clear obsolete pacing
+PASS real native host migration promotes peer and preserves over-cap views
+PASS only a real living boss owner exempts minions, unrelated metadata stays bounded
+PASS harmless native web and damaging hazard retain native owners
+PASS disposed module and authored active mode bypass only their own admission
+PASS native wave charged once for accepted partial pack and zero for full denial
+PASS native outdoor construction failure refunds power and releases admission
+PASS receipt replicated through real Session preserves cooldown after native removal
+PASS deep receipt survives same-floor rebuild and later floor starts a fresh grace
+PASS actual creature director cannot charge queued denials or rush landing grace
+PASS degraded migration clock rollback cannot strand fresh spawns for an old landing duration
+FAIL known native squad and active mirror owner exempt only explicit encounter members The expression evaluated to a falsy value:
+
+  assert(spawn('hs_enforcer',{data:{squad,faction:1}}))
+
+FAIL boss owner marker survives actual native promotion without filling ordinary cap Expected values to be strictly equal:
+
+undefined !== 'c1'
+
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: 2 failed groups: known native squad and active mirror owner exempt only explicit encounter members; boss owner marker survives actual native promotion without filling ordinary cap
+
+2 !== 0
+
+    at file:///C:/Users/Sher/Desktop/TFG/tools/harness/density35.test.mjs:156:8 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 2,
+  expected: 0,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

@@ -1,0 +1,28 @@
+PASS first landing quiet then one shared living roamer
+PASS later grace and cooldown cover metadata and scripted requests
+PASS quota 0 sleeping and remote bodies fill shared cap
+PASS quota 1 sleeping and remote bodies fill shared cap
+PASS quota 2 sleeping and remote bodies fill shared cap
+PASS quota 3 sleeping and remote bodies fill shared cap
+PASS quota 4 sleeping and remote bodies fill shared cap
+PASS quota 9 sleeping and remote bodies fill shared cap
+PASS recursive Session delivery cannot over-admit and removed success consumes cooldown
+PASS native decline and constructor throw release pending admission
+PASS native pack and leech helpers report full refusal and accepted partial pack
+PASS native outdoor rejected attempt refunds power; admitted pack retains original cost
+PASS native view migration restores over cap without treating fresh id as restored
+PASS facility arrival grace and lower native depth cap
+PASS dispose and new landing retain existing actors and clear obsolete pacing
+PASS real native host migration promotes peer and preserves over-cap views
+PASS only a real living boss owner exempts minions, unrelated metadata stays bounded
+PASS harmless native web and damaging hazard retain native owners
+PASS disposed module and authored active mode bypass only their own admission
+PASS native wave charged once for accepted partial pack and zero for full denial
+PASS native outdoor construction failure refunds power and releases admission
+PASS receipt replicated through real Session preserves cooldown after native removal
+PASS deep receipt survives same-floor rebuild and later floor starts a fresh grace
+PASS actual creature director cannot charge queued denials or rush landing grace
+PASS degraded migration clock rollback cannot strand fresh spawns for an old landing duration
+PASS known native squad and active mirror owner exempt only explicit encounter members
+PASS boss owner marker survives actual native promotion without filling ordinary cap
+density35: all native admission groups passed

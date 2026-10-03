@@ -1,0 +1,69 @@
+local phase AssertionError [ERR_ASSERTION]: receipt must reach the actual build callback after weekly seed selection
++ actual - expected
+
++ undefined
+- {
+-   kind: 'courtyard',
+-   token: 'hamsi:1235:1',
+-   version: 35
+- }
+
+    at Object.loadMapFor (file:///C:/Users/Sher/Desktop/TFG/tools/harness/openplaces35_lifecycle.test.mjs:19:10)
+    at Object.onPhase (file:///C:/Users/Sher/Desktop/TFG/src/game/game.js:944:12)
+    at file:///C:/Users/Sher/Desktop/TFG/tools/harness/openplaces35_lifecycle.test.mjs:23:47
+    at Session.receiveLocal (file:///C:/Users/Sher/Desktop/TFG/src/net/session.js:474:20)
+    at Session.broadcast (file:///C:/Users/Sher/Desktop/TFG/src/net/session.js:327:27)
+    at Object.hostSetPhase (file:///C:/Users/Sher/Desktop/TFG/src/game/host.js:310:14)
+    at Object.hostLever (file:///C:/Users/Sher/Desktop/TFG/src/game/host.js:337:12)
+    at file:///C:/Users/Sher/Desktop/TFG/tools/harness/openplaces35_lifecycle.test.mjs:26:25 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: undefined,
+  expected: [Object],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+msg phase AssertionError [ERR_ASSERTION]: receipt must reach the actual build callback after weekly seed selection
++ actual - expected
+
++ undefined
+- {
+-   kind: 'courtyard',
+-   token: 'hamsi:1235:1',
+-   version: 35
+- }
+
+    at Object.loadMapFor (file:///C:/Users/Sher/Desktop/TFG/tools/harness/openplaces35_lifecycle.test.mjs:19:10)
+    at Object.onPhase (file:///C:/Users/Sher/Desktop/TFG/src/game/game.js:944:12)
+    at file:///C:/Users/Sher/Desktop/TFG/tools/harness/openplaces35_lifecycle.test.mjs:23:107
+    at Session.receive (file:///C:/Users/Sher/Desktop/TFG/src/net/session.js:305:20)
+    at hostNet.transport.send (file:///C:/Users/Sher/Desktop/TFG/tools/harness/openplaces35_lifecycle.test.mjs:24:58)
+    at put (file:///C:/Users/Sher/Desktop/TFG/src/net/session.js:409:10)
+    at flushCur (file:///C:/Users/Sher/Desktop/TFG/src/net/session.js:461:79)
+    at Session.flush (file:///C:/Users/Sher/Desktop/TFG/src/net/session.js:469:7)
+    at file:///C:/Users/Sher/Desktop/TFG/tools/harness/openplaces35_lifecycle.test.mjs:26:48 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: undefined,
+  expected: [Object],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: both actual Session phase callbacks enter the map build
+
+0 !== 2
+
+    at file:///C:/Users/Sher/Desktop/TFG/tools/harness/openplaces35_lifecycle.test.mjs:27:10 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 0,
+  expected: 2,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

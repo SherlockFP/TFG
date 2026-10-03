@@ -315,6 +315,8 @@ import { installDarkCollapse20 } from './darkcollapse20.js';
 import { installCargo20 } from './cargo20.js';
 import { installDescent21 } from './descent21.js';
 import { installFirstDepth21 } from './firstdepth21.js';
+import { installDensity35 } from './density35.js';
+import { surfaceOptions35,interiorViewFar35 } from './openplaces35.js';
 import { installDescent21Threats } from './descent21_threats.js';
 import { installLiminal26 } from './liminal26.js';
 import { installSalvage27 } from './salvage27.js';
@@ -709,6 +711,7 @@ export class Game extends Emitter {
     this.useModule('earlyHaul34Art', installEarlyHaul34Presentation);
     this.useModule('recovery27', installRecovery27);
     this.useModule('firstdepth21', installFirstDepth21);
+    this.useModule('density35', installDensity35);
     this.useModule('deadletter24', installDeadletter24);
 
 
@@ -1037,7 +1040,7 @@ export class Game extends Emitter {
       });
       let layout = null;
       const depthSpec = this.descent21?.spec?.(run);
-      const size = depthSpec?.size ?? moon.size, lopts = moon.layoutOpts || this.facjobs?.layoutOpts?.(moon, run) || undefined;   // read now: worlds3 patches moon.size around this call
+      const size = depthSpec?.size ?? moon.size, lopts = surfaceOptions35(run, moon, moon.layoutOpts || this.facjobs?.layoutOpts?.(moon, run) || undefined);   // read now: worlds3 patches moon.size around this call
       step('layout', () => { layout = generateLayout(depthSpec?.seed ?? run.seed, depthSpec?.theme ?? moon.interior, size, depthSpec ? depthSpec.layoutOpts : lopts); });   // [cycle] Sector Core / Raid / Keystone moons carry layoutOpts
       step('facility', () => {
         const publish = fac => {
@@ -1415,7 +1418,7 @@ export class Game extends Emitter {
     if (zonePrevIndoor !== p.indoor || zonePrevShip !== p.inShip) this.updateAmbience();
     updateThemeOneShots(this, dt);
     // indoors the black fog hides everything past ~40 m: cull it with the far plane
-    const far = (p.dead ? this.env.indoor : p.indoor) ? 46 : QUALITY.far;   // [perf2]
+    const far = interiorViewFar35(this.world.facility, p, p.dead ? this.env.indoor : p.indoor, QUALITY.far);   // current native facility owns its view range
     if (this.camera.far !== far) { this.camera.far = far; this.camera.updateProjectionMatrix(); }
     { const w = this.world; (this._cull ||= makeDistCull()).update(dt, [w.outdoor?.group, w.facility?.group], this.camera.position, (p.dead ? this.env.indoor : p.indoor) ? 0 : QUALITY.propFar); }   // [perf2] outdoors only (indoor fog + 46 m far plane already cull)
 
