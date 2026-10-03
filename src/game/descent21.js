@@ -26,7 +26,7 @@ export function installDescent21(game){
  const state=()=>game.run?.descent21?.token===descentToken(game.run)?game.run.descent21:null;
  const eligible=run=>{const moon=MOONS[run?.moon];return !!moon&&!['company','home','customMap','expedition','goal','instance','core','raid','voyage','ghost'].some(k=>!!moon[k]);};
  const active=()=>!disposed&&!game.destroyed&&eligible(game.run)&&game.run?.phase==='moon'&&game.world?.moonId===game.run.moon&&game.world?.seed===game.run.seed&&!!game.world.facility;
- const spec=run=>{if(!eligible(run)||run?.descent21?.token!==descentToken(run))return null;const st=run.descent21;if(st.depth===0){const gen=st.surface?.gen;return gen?{depth:0,seed:gen.seed,theme:gen.theme,size:gen.size,layoutOpts:gen.lopts||gen.layoutOpts}:null;}return savedFloorSpec(MOONS[run.moon],run.seed,st);};
+ const spec=run=>{if(!eligible(run)||run?.descent21?.token!==descentToken(run))return null;const st=run.descent21;if(st.depth===0){const gen=st.surface?.gen;return gen?{depth:0,seed:gen.seed,theme:gen.theme,size:gen.size,layoutOpts:gen.lopts||gen.layoutOpts}:null;}return savedFloorSpec(MOONS[run.moon],run.seed,st,{creatures32:game.config?.creatures32===true});};
  const publish=()=>game.broadcastRun?.(['descent21']);
  const emit=(name,...args)=>game.mods?.emit?.(name,...args);
  const warn=text=>game.ui?.toast?.(t(text),'warn');

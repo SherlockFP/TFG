@@ -1,0 +1,2 @@
+FAIL the enabled native pool actually draws archive encounters
+threatmerge: 1 FAILED of 833

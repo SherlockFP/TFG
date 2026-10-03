@@ -1,8 +1,8 @@
 # TFG — current project entry
 
-Updated 2026-10-03, Wave32 assets/plan; runtime baseline Wave31. Read [AGENTS.md](AGENTS.md),
+Updated 2026-10-03, Wave33 experimental crew threats. Read [AGENTS.md](AGENTS.md),
 [the current Gauntlet procedure](docs/GAUNTLET.md),
-[Wave32 assets/plan](docs/wave32/README.md), [Wave31 runtime evidence](docs/wave31/README.md)
+[Wave33 evidence](docs/wave33/README.md), [Wave32 asset intake](docs/wave32/README.md)
 and [critique](docs/CRITIQUE.md).
 For "devam", start with [CONTINUE](docs/session/CONTINUE.md).
 

@@ -1,0 +1,104 @@
+{
+  "initial": {
+    "seed": 1235,
+    "theme": "factory",
+    "quota": 2,
+    "depth": 0,
+    "hp": 100,
+    "gear": [
+      "ib0",
+      "icv"
+    ]
+  },
+  "phase": "moon",
+  "seed": 1235,
+  "theme": "factory",
+  "queue": false,
+  "player": {
+    "pos": [
+      39.5,
+      -299.980001561364,
+      -24.5
+    ],
+    "hp": 82,
+    "dead": false,
+    "frozen": false,
+    "stun": 0,
+    "downed": false,
+    "noise": 0,
+    "flash": true,
+    "held": [
+      "flashlight",
+      "taser",
+      "copper",
+      null,
+      null
+    ],
+    "input": true,
+    "locked": false,
+    "keys": {
+      "back": "KeyS",
+      "right": "KeyD"
+    },
+    "down": []
+  },
+  "actor": {
+    "id": "c4",
+    "state": "rest",
+    "pos": [
+      39.5,
+      -300,
+      -25.340016512442027
+    ],
+    "yaw": 0,
+    "target": null
+  },
+  "trace": [
+    {
+      "t": 165.36271002474237,
+      "e": "guided-warning",
+      "state": "windup",
+      "hp": 100,
+      "yaw": 0
+    },
+    {
+      "t": 165.37967553554435,
+      "e": "state",
+      "prev": "idle",
+      "state": "windup"
+    },
+    {
+      "t": 165.84482573773022,
+      "e": "warning-frame-replay",
+      "state": "windup"
+    },
+    {
+      "t": 166.8250067115899,
+      "e": "state",
+      "prev": "windup",
+      "state": "charge"
+    },
+    {
+      "t": 167.56176603314532,
+      "e": "hurt",
+      "dmg": 18,
+      "cause": "c32_ram",
+      "from": "c4",
+      "p": [
+        39.5,
+        -300,
+        -25.340016512442027
+      ],
+      "hp": 82
+    },
+    {
+      "t": 167.56176603314532,
+      "e": "guided-complete",
+      "kind": "hit"
+    }
+  ],
+  "errors": {
+    "total": 0,
+    "last": []
+  }
+}

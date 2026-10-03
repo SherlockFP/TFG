@@ -1,0 +1,86 @@
+{
+  "error": "once-only native hit positive control failed",
+  "initial": {
+    "seed": 1235,
+    "theme": "factory",
+    "quota": 2,
+    "depth": 0,
+    "hp": 100,
+    "gear": [
+      "ibr",
+      "ics"
+    ]
+  },
+  "phase": "moon",
+  "seed": 1235,
+  "theme": "factory",
+  "queue": false,
+  "player": {
+    "pos": [
+      39.5,
+      -299.980001561364,
+      -24.5
+    ],
+    "hp": 100,
+    "dead": false,
+    "frozen": false,
+    "stun": 0,
+    "downed": false,
+    "noise": 0,
+    "flash": false,
+    "held": [
+      "flashlight",
+      "taser",
+      "copper",
+      null
+    ],
+    "input": true,
+    "locked": false,
+    "keys": {
+      "back": "KeyS",
+      "right": "KeyD"
+    },
+    "down": []
+  },
+  "actor": {
+    "id": "c3",
+    "state": "rest",
+    "pos": [
+      39.5,
+      -300,
+      -25.339995928345765
+    ],
+    "yaw": 0,
+    "target": null
+  },
+  "trace": [
+    {
+      "t": 120.32570400167378,
+      "e": "guided-warning",
+      "state": "windup",
+      "hp": 100,
+      "yaw": 0
+    },
+    {
+      "t": 120.39178214594398,
+      "e": "state",
+      "prev": "idle",
+      "state": "windup"
+    },
+    {
+      "t": 120.80819487763893,
+      "e": "warning-frame-replay",
+      "state": "windup"
+    },
+    {
+      "t": 121.76204634613346,
+      "e": "state",
+      "prev": "windup",
+      "state": "charge"
+    }
+  ],
+  "errors": {
+    "total": 0,
+    "last": []
+  }
+}

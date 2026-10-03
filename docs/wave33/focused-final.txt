@@ -1,0 +1,8 @@
+ok     1/6 tools\harness\balance_rules.test.mjs (0.2s)
+ok     2/6 tools\harness\creatures32_model.test.mjs (0.3s)
+ok     3/6 tools\harness\grenades.test.mjs (0.1s)
+ok     4/6 tools\harness\net_session.test.mjs (0.2s)
+ok     5/6 tools\harness\creatures20.test.mjs (1.0s)
+ok     6/6 tools\harness\creatures32.test.mjs (11.2s)
+
+6/6 passed in 11s (-j 4). slowest: tools\harness\creatures32.test.mjs 11s, tools\harness\creatures20.test.mjs 1s, tools\harness\creatures32_model.test.mjs 0s, tools\harness\net_session.test.mjs 0s, tools\harness\balance_rules.test.mjs 0s

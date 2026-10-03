@@ -1,0 +1,53 @@
+Wave33 actual grenade/balance attack integration RED record
+Date: 2026-10-03
+Command: C:/Users/Sher/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe tools/harness/creatures32.test.mjs
+
+First RED, unmodified production grenade attack wrapper. Exit 1.
+
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: completed authored warning immediately delivers one native hurt
+
+0 !== 1
+
+    at file:///C:/Users/Sher/Desktop/TFG/tools/harness/creatures32.test.mjs:35:10
+    at check (file:///C:/Users/Sher/Desktop/TFG/tools/harness/creatures32.test.mjs:13:75)
+    at async file:///C:/Users/Sher/Desktop/TFG/tools/harness/creatures32.test.mjs:31:45 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 0,
+  expected: 1,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0
+
+Second RED, fifth argument forwarded but blackout bonus still re-applied on replay. Exit 1.
+The actual grenade API detonates a real blackout ball before the native lurker attack.
+
+PASS c32_dormant authored warning hits once through real grenades / balance / Session
+PASS c32_ram authored warning hits once through real grenades / balance / Session
+PASS ordinary delayed attack through real grenades / balance
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: blackout applies exactly once
+
+31 !== 25
+
+    at file:///C:/Users/Sher/Desktop/TFG/tools/harness/creatures32.test.mjs:45:90
+    at check (file:///C:/Users/Sher/Desktop/TFG/tools/harness/creatures32.test.mjs:13:75)
+    at async file:///C:/Users/Sher/Desktop/TFG/tools/harness/creatures32.test.mjs:39:36 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 31,
+  expected: 25,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

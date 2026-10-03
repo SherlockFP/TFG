@@ -1,14 +1,14 @@
 # TFG — current agent map
 
-Updated 2026-10-03, Wave32 asset intake/plan (runtime baseline Wave31). This is the current entry point; historical Windows,
+Updated 2026-10-03, Wave33 experimental crew threats. This is the current entry point; historical Windows,
 Claude branch/model, no-test and automatic merge/push instructions are retired.
 Their full prior text is preserved in [the historical snapshot](docs/history/AGENTS-pre-wave25.md).
 Current user/session instructions take precedence. Inspect Git for the publication SHA.
 
 ## Start here
 
-1. Read [current assets and creature plan](docs/wave32/README.md),
-   [runtime work and evidence](docs/wave31/README.md), then
+1. Read [current work and evidence](docs/wave33/README.md),
+   [asset intake and original plan](docs/wave32/README.md), then
    [Gauntlet procedure](docs/GAUNTLET.md) and [current critique](docs/CRITIQUE.md).
 2. Read [identity/art direction](docs/THEME.md) and the relevant module report.
    [Research](docs/wave25/RESEARCH.md) connects genre design and current agent engineering.
@@ -64,6 +64,7 @@ normal range/LOS input, failure capture and exact first-floor acceptance.
 | `src/net/session.js`, `lobby.js`, `transport.js` | Host/peer delivery, protocol and transport. |
 | `src/world/facility.js`, `interiors/`, `nav.js` | Seeded layout, furniture, Rapier geometry and paths. |
 | `src/physics/physics.js`, `src/entities/` | Native bodies, controller, custody and creature simulation. |
+| `src/game/creatures32*.js`, `src/models/creatures32.js` | Experimental archive threats; default off, native warnings/sweeps/receipts and bounded PSX presentation. |
 | `src/game/deadletter24*.js` | Optional temporary combat, cards, checkpoint and owned actors. |
 | `src/game/descent21*.js`, `brlevels.js`, `liminal26.js` | Normal certified depth travel, Backrooms lifecycle and bounded stale-sound receipts. |
 | `src/ui/`, `src/models/`, `src/audio/` | Presentation, faceted models and audio; follow actual callers. |

@@ -1,0 +1,91 @@
+<!doctype html><meta charset="utf-8"><title>TFG Wave33 native encounter fixture</title>
+<style>body{margin:0;background:#181818;color:#ddd;font:12px monospace}header{padding:7px}button{margin:3px}iframe{width:100%;height:calc(100vh - 170px);border:0}pre{margin:3px;max-height:90px;overflow:auto;white-space:pre-wrap}#warning{position:fixed;right:8px;bottom:8px;width:320px;border:1px solid #c89c49;pointer-events:none}#warning.hidden{display:none}</style>
+<header>DEV FIXTURE — seed1235 factory1.3, quota2, gear and start poses are setup. Synthetic repeat keys avoid iframe pointer capture; single real App RAF. No real mouse/human difficulty/FPS claim.
+<div><button id="setup">Prepare native factory</button><button id="dormant">Place Silent Worker</button><button id="ram">Place Lane Breaker</button><button id="withdraw">F wake / F off / S withdraw</button><button id="dodge">Hold cargo / D dodge</button><button id="hit">Hold cargo / stay on lane</button><button id="inspect">Read native result</button></div>
+<pre id="result">Booting disposable local room. No microphone or Internet test.</pre></header>
+<iframe id="game"></iframe>
+<img id="warning" class="hidden" alt="Actual warning frame replay captured from native renderer">
+<img id="idle" hidden alt="Actual same-camera idle frame from native renderer">
+<script type="module">
+if(!import.meta.env.DEV)throw new Error('Dev-only fixture');
+const frame=document.querySelector('#game'),out=document.querySelector('#result');
+frame.src='/test/creatures32_game.html?autohost=local&code=W33QA'+crypto.randomUUID().slice(0,6);
+const current=()=>frame.contentWindow.kefal?.game;
+let cleanup,initial,trace=[],gear=[],off=[],running=false;
+const write=value=>{out.textContent=JSON.stringify(value,null,2);};
+const actionOf={KeyF:'flashlight',KeyS:'back',KeyD:'right'};
+const key=(code,down)=>{const win=frame.contentWindow,bind=current().input.key(actionOf[code]);win.dispatchEvent(new win.KeyboardEvent(down?'keydown':'keyup',{code:bind,key:bind,bubbles:true,cancelable:true,repeat:down}));};
+const release=()=>{for(const code of ['KeyF','KeyS','KeyD'])if(current())key(code,false);};
+const warning=async()=>{const g=current(),start=g.time;await wait(()=>g.time-start>=.5);};
+const wait=async predicate=>{const end=performance.now()+16000;while(!predicate()){const g=current();if(running&&(g?.player.dead||g?.downed.isDowned(g.selfId)||!creature()||creature().dead))throw new Error('guided input stopped: invalid operator/actor');if(performance.now()>end)throw new Error('fixture observation deadline');await new Promise(requestAnimationFrame);}};
+const creature=()=>current()?.creatures.host.get(cleanup?.creatureId);
+const read=()=>{const g=current(),c=creature();return {initial,phase:g?.run.phase,seed:g?.world.facility?.layout.seed,theme:g?.world.facility?.layout.theme,queue:!!(g?.landQ?.pending||g?.landQ?.running),player:g&&{pos:g.player.pos.toArray(),hp:g.player.hp,dead:g.player.dead,frozen:g.player.frozen,stun:g.player.stunT,downed:g.downed?.isDowned(g.selfId),noise:g.player.noise,flash:g.flashlightOn(),held:g.player.slots.map(id=>g.items.get(id)?.type),input:g.input.enabled,locked:g.input.locked,keys:{back:g.input.key('back'),right:g.input.key('right')},down:[...g.input.down]},actor:c&&{id:c.id,state:c.state,pos:c.pos.toArray(),yaw:c.yaw,target:c.target},trace,errors:g?.perfInfo?.().errors};};
+document.querySelector('#inspect').onclick=()=>write(read());
+document.querySelector('#setup').onclick=async()=>{try{
+ if(running)throw new Error('guided input still running');
+ const g=current();if(!g?.net?.connected)throw new Error('Host not ready');
+ const {HUB13_BROKER,HUB13_BOARD,newDescent}=frame.contentWindow.fixture32;
+ g.ui.closePanel(true);g.terminal.close();g.input.unlock();
+ if(g.fleet13.docked()){
+  g.player.teleport(new frame.contentWindow.THREE.Vector3(...HUB13_BROKER),0);g.fleet13.request('buy','courier');
+  g.player.teleport(new frame.contentWindow.THREE.Vector3(...HUB13_BOARD),0);g.fleet13.request('board');
+ }
+ Object.assign(g.run,{moon:'hamsi',seed:1235,quotaIndex:2,time:480,weather:'clear',dailyEvent:null});
+ g.run.descent21=newDescent(g.run);g.run.descent21.surface={gen:{seed:1235,theme:'factory',size:1.3}};
+ g.hostSetPhase('landing');g.hostSetPhase('moon');
+ await wait(()=>g.world.facility&&!g.landQ?.pending&&!g.landQ?.running);
+ for(const id of [...g.creatures.host.keys()])g.creatures.hostRemove(id);
+ for(const it of g.items.all())if(it.holder===g.selfId)g.net.broadcast('it',{e:'rm',id:it.id});
+ for(const type of ['flashlight','taser'])gear.push(g.items.hostSpawn(type,g.player.pos.clone(),{holder:g.selfId,tier:null}));
+ g.hostData.spawnT=120;
+ initial={seed:g.world.facility.layout.seed,theme:g.world.facility.layout.theme,quota:g.run.quotaIndex,depth:g.run.descent21.depth,hp:g.player.hp,gear};write(read());
+}catch(e){write({error:e.message});}};
+function place(type){try{
+ if(running)throw new Error('guided input still running');release();for(const fn of off)fn();off=[];cleanup?.();
+ const g=current();g.ui.closePanel(true);g.terminal.close();g.input.unlock();
+ for(const it of g.items.all())if(it.holder===g.selfId&&it.type!=='flashlight'&&it.type!=='taser')g.net.broadcast('it',{e:'rm',id:it.id});
+ for(const it of g.items.all())if(it.holder===g.selfId&&it.on)g.toggleItem(it);
+ cleanup=frame.contentWindow.fixture32.prepareBrowserArena32(g,type);trace=[];
+ document.querySelector('#warning').classList.add('hidden');
+ if(!creature())throw new Error('native actor publication failed');
+ const oldState=g.onCreatureState,oldHurt=g.onHurt,oldRender=g.engine.render;let captured=false,idleCaptured=false;
+ g.onCreatureState=function(v,prev,st){const result=oldState.call(this,v,prev,st);if(v.id===cleanup.creatureId)trace.push({t:g.time,e:'state',prev,state:st});return result;};
+ g.onHurt=function(d){const result=oldHurt.call(this,d);trace.push({t:g.time,e:'hurt',...d,hp:g.player.hp});return result;};
+ let inputSamples=0;off.push(g.mods.on('update',()=>{if(running&&inputSamples<3&&(g.input.isDown('back')||g.input.isDown('right'))){inputSamples++;trace.push({t:g.time,e:'held-native-input',back:g.input.isDown('back'),right:g.input.isDown('right'),vel:g.player.vel.toArray(),movement:g.player.ctrl.computedMovement()});}}));
+ g.engine.render=function(...args){const result=oldRender.apply(this,args),c=creature();if(!idleCaptured&&c?.state==='idle'&&c.t>=.2&&(c.type==='c32_ram'||g.flashlightOn())){idleCaptured=true;document.querySelector('#idle').src=this.canvas.toDataURL('image/png');}if(!captured&&c&&['wake','windup'].includes(c.state)&&c.t>=.48){captured=true;const img=document.querySelector('#warning');img.src=this.canvas.toDataURL('image/png');img.classList.remove('hidden');trace.push({t:g.time,e:'warning-frame-replay',state:c.state});}return result;};
+ off.push(()=>{g.onCreatureState=oldState;g.onHurt=oldHurt;g.engine.render=oldRender;});
+ write(read());
+}catch(e){write({error:e.message});}}
+document.querySelector('#dormant').onclick=()=>place('c32_dormant');
+document.querySelector('#ram').onclick=()=>place('c32_ram');
+async function guided(kind){if(running)return;running=true;try{
+ const g=current(),c=creature();if(!c||g.player.dead||g.downed.isDowned(g.selfId))throw new Error('invalid live operator/actor');
+ if(kind==='withdraw'){
+  if(c.type!=='c32_dormant')throw new Error('place Silent Worker first');key('KeyF',true);await wait(()=>g.flashlightOn());key('KeyF',false);
+  await wait(()=>c.state==='wake');trace.push({t:g.time,e:'guided-warning',state:c.state,hp:g.player.hp});
+  await warning();
+  key('KeyF',true);await wait(()=>!g.flashlightOn());key('KeyF',false);key('KeyS',true);
+  const start=g.time,pos=g.player.pos.clone();await wait(()=>g.time-start>=.65);key('KeyS',false);await wait(()=>c.state==='rest');
+  if(g.player.pos.distanceTo(pos)<.7||trace.some(e=>e.e==='hurt'))throw new Error('native retreat/zero-hurt acceptance failed');
+  trace.push({t:g.time,e:'retreat-distance',metres:g.player.pos.distanceTo(pos)});
+ }else{
+  if(c.type!=='c32_ram')throw new Error('place Lane Breaker first');
+  if(kind==='hit'){key('KeyF',true);await wait(()=>g.flashlightOn());key('KeyF',false);}
+  g.items.hostSpawn('copper',g.player.pos.clone(),{holder:g.selfId,tier:null,value:10});
+  await wait(()=>c.state==='windup');trace.push({t:g.time,e:'guided-warning',state:c.state,hp:g.player.hp,yaw:c.yaw});
+  await warning();
+  const yaw=c.yaw,pos=c.pos.clone(),playerStart=g.player.pos.clone();
+  if(kind==='dodge'){key('KeyD',true);const start=g.time;await wait(()=>g.time-start>=.65);key('KeyD',false);}
+  await wait(()=>c.state==='rest');
+  const hits=trace.filter(e=>e.e==='hurt'),charge=trace.find(e=>e.e==='state'&&e.state==='charge');
+  if(!charge||Math.abs(c.yaw-yaw)>1e-5||c.pos.distanceTo(pos)<1)throw new Error('actual charge/locked yaw/movement acceptance failed');
+  if(kind==='dodge'&&(hits.length||g.player.pos.distanceTo(playerStart)<.7))throw new Error('actual dodge/zero-hurt acceptance failed');
+  if(kind==='hit'&&(hits.length!==1||hits[0].dmg<=0||hits[0].dmg>35))throw new Error('once-only native hit positive control failed');
+ }
+ trace.push({t:current().time,e:'guided-complete',kind});write(read());
+}catch(e){write({error:e.message,...read()});}finally{release();running=false;}}
+document.querySelector('#withdraw').onclick=()=>guided('withdraw');
+document.querySelector('#dodge').onclick=()=>guided('dodge');
+document.querySelector('#hit').onclick=()=>guided('hit');
+window.addEventListener('pagehide',()=>{release();for(const fn of off)fn();cleanup?.();});
+</script>

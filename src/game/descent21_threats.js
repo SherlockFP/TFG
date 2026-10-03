@@ -6,12 +6,13 @@ import {NEW_IDS,poolFor,poolMul} from './threatpool.js';
 import {RNG,hashString} from '../core/rng.js';
 const AMBIENT=new Set(['scuttler','yoinker','crawler','spider','listener']);
 const FAMILY=new Set(['c20_pixel','c20_brute']);
+const C32_FAMILY=new Set(['c32_dormant','c32_ram']);
 const BR=new Set(['br_smiler','br_hound','br_partygoer','br_moth']);
 const ARRIVAL_QUIET=25;
 export function installDescent21Threats(game){
  let serial=0,lastKey='',disposed=false,waveCeiling=null,arrivalFac=null,arrivalAt=0;const nativeBudget=game.indoorBudget?.bind(game);const restores=[];
  const spec=()=>{const d=game.run?.descent21,F=game.world?.facility;if(disposed||game.run?.phase!=='moon'||!F||!d||d.token!==descentToken(game.run)||!(d.depth>0))return null;
-  const planned=game.descent21?.spec?.(game.run)||savedFloorSpec(MOONS[d.moon||game.run.moon]||{},d.baseSeed??d.seed??game.run.seed,d);
+  const planned=game.descent21?.spec?.(game.run)||savedFloorSpec(MOONS[d.moon||game.run.moon]||{},d.baseSeed??d.seed??game.run.seed,d,{creatures32:game.config?.creatures32===true});
   const theme=F.layout?.theme||d.currentChoice?.theme||planned.theme,liminal=LIMINAL26_THEMES.includes(theme);
   return {...planned,theme,seed:F.layout?.seed??d.currentChoice?.seed??planned.seed,liminal};
  };
@@ -23,6 +24,7 @@ export function installDescent21Threats(game){
   const living=live();if(living.length>=s.threat.maxAlive||!canSpawnMore(type,game.creatures?.host))return false;
   if(s.theme==='backrooms'&&s.depth<11&&BR.has(type)&&living.some(c=>BR.has(c.type)))return false;
   if(FAMILY.has(type)&&living.some(c=>FAMILY.has(c.type)))return false;
+  if(C32_FAMILY.has(type)&&living.some(c=>C32_FAMILY.has(c.type)))return false;
   if(NEW_IDS.has(type)&&living.filter(c=>NEW_IDS.has(c.type)).length>=s.threat.newRuleSlots)return false;
   const budget=Math.max(0,Number(nativeBudget?.()??MOONS[game.run.moon]?.power??4))*s.threat.powerMul;
   return living.reduce((sum,c)=>sum+(c.def?.power||0),0)+(def.power||0)<=budget+.001;
@@ -38,9 +40,9 @@ export function installDescent21Threats(game){
  const limited=c=>!disposed&&!!c?.data?.descent21&&c.zone==='in'&&!c.def.boss&&!c.def.hazard;
  function residents(s=spec()){if(!s)return[];
   const ids=s.theme==='backrooms'?['yoinker','br_smiler','br_hound',...(s.depth>=11?['br_partygoer','br_moth']:[])]:s.theme==='nullreception'?['yoinker','crawler','listener']:[...AMBIENT].filter(id=>id!=='scuttler').concat(s.threat.newIds);
-  return ids.filter(id=>CREATURES[id]&&!CREATURES[id].noSpawn);
+  return ids.map(id=>C32_FAMILY.has(id)?game.creatures32?.choice?.():id).filter(id=>id&&CREATURES[id]&&!CREATURES[id].noSpawn);
  }
- function weights(s=spec()){if(!s)return[];const pool=poolFor(game.run,MOONS[game.run.moon]);return residents(s).map(id=>{let base=NEW_IDS.has(id)?.12:1;if(s.rule==='listening'&&id==='listener')base*=3;if(s.rule==='inspection'&&id==='c20_pixel')base*=3;if(s.rule==='heavy'&&id==='c20_brute')base*=3;return{id,w:base*poolMul(id,pool)};});}
+ function weights(s=spec()){if(!s)return[];const pool=poolFor(game.run,MOONS[game.run.moon],{creatures32:game.config?.creatures32===true});return residents(s).map(id=>{let base=NEW_IDS.has(id)?.12:1;if(s.rule==='listening'&&id==='listener')base*=3;if(s.rule==='inspection'&&id==='c20_pixel')base*=3;if(s.rule==='heavy'&&id==='c20_brute')base*=3;return{id,w:base*poolMul(id,pool)};});}
  function wrap(obj,key,make){if(typeof obj?.[key]!=='function')return;const previous=obj[key],next=make(previous);obj[key]=next;restores.push(()=>{if(obj[key]===next)obj[key]=previous;});}
  wrap(game,'indoorBudget',old=>function(){const base=old.call(this),s=spec();return s?base*s.threat.powerMul:base;});
  wrap(game.creatures,'speedMul',old=>function(c,speed){const value=old.call(this,c,speed);return limited(c)?Math.min(6.8,value):value;});

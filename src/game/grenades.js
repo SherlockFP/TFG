@@ -724,9 +724,9 @@ export function installGrenades(game) {
     if (hostDark.length && C.DARK_LOVERS.has(c.type) && C.inZone({ x: c.pos.x, y: c.pos.y + 1, z: c.pos.z }, hostDark)) speed *= C.DARK_BONUS.speed;
     return speed;
   });
-  wrap(g.creatures, 'attack', (orig) => function (c, p, dmg, cause) {
-    if (hostDark.length && C.DARK_LOVERS.has(c.type) && dmg < 999 && C.inZone({ x: c.pos.x, y: c.pos.y + 1, z: c.pos.z }, hostDark)) dmg = Math.round(dmg * C.DARK_BONUS.dmg);
-    return orig(c, p, dmg, cause);
+  wrap(g.creatures, 'attack', (orig) => function (c, p, dmg, cause, _late) {
+    if (!_late && hostDark.length && C.DARK_LOVERS.has(c.type) && dmg < 999 && C.inZone({ x: c.pos.x, y: c.pos.y + 1, z: c.pos.z }, hostDark)) dmg = Math.round(dmg * C.DARK_BONUS.dmg);
+    return orig(c, p, dmg, cause, _late);
   });
 
   // ---------------------------------------------------------------- host: rare drops (chest / boss / tiered creature / world)

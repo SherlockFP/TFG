@@ -61,5 +61,21 @@ c = mk(); p = pl(); M.attack(c, p, 40, 'crawler'); p.pos.x = 5; timers.shift()[0
 c = mk(); p = pl(); M.attack(c, p, 40, 'crawler'); c.stunT = 1; timers.shift()[0](); ok(hits.length === 1, 'a stunned creature does not swing');
 game.balRules.dispose();
 
+// C32's safety limit belongs after the native host's sector/difficulty scaling.
+const { hostMethods } = await import('../../src/game/host.js');
+const delivered = [];
+const capGame = {
+  creatures: { host: new Map([
+    ['quiet', { type: 'c32_dormant' }], ['ram', { type: 'c32_ram' }], ['base', { type: 'crawler' }],
+  ]) },
+  balance: { hitDamage: () => 80 },
+  net: { sendTo: (id, kind, row) => delivered.push({ id, kind, row }) },
+};
+for (const source of ['quiet', 'ram', 'base']) hostMethods.hostHurtPlayer.call(capGame, 'crew', 22, 'creature', source);
+hostMethods.hostHurtPlayer.call(capGame, 'crew', 999, 'left');
+ok(delivered[0].row.dmg === 35 && delivered[1].row.dmg === 35, 'both original C32 threats cap after upstream damage scaling');
+ok(delivered[2].row.dmg === 80 && delivered[3].row.dmg === 999, 'other creature and environment damage retain native contracts');
+ok(delivered.every(x => x.id === 'crew' && x.kind === 'hurt'), 'cap retains the real host hurt delivery path');
+
 console.log(fails ? `${fails} FAILED of ${checks}` : `balance_rules: all ${checks} checks passed`);
 process.exit(fails ? 1 : 0);

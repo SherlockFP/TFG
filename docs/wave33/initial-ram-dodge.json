@@ -1,0 +1,138 @@
+{
+  "initial": {
+    "seed": 1235,
+    "theme": "factory",
+    "quota": 2,
+    "depth": 0,
+    "hp": 100,
+    "gear": [
+      "ibr",
+      "ics"
+    ]
+  },
+  "phase": "moon",
+  "seed": 1235,
+  "theme": "factory",
+  "queue": false,
+  "player": {
+    "pos": [
+      41.97990036010742,
+      -299.98000107415135,
+      -24.498218536376953
+    ],
+    "hp": 100,
+    "dead": false,
+    "frozen": false,
+    "stun": 0,
+    "downed": false,
+    "noise": 0,
+    "flash": false,
+    "held": [
+      "flashlight",
+      "taser",
+      "copper",
+      null
+    ],
+    "input": true,
+    "locked": false,
+    "keys": {
+      "back": "KeyS",
+      "right": "KeyD"
+    },
+    "down": []
+  },
+  "actor": {
+    "id": "c2",
+    "state": "rest",
+    "pos": [
+      39.5,
+      -300,
+      -22.507999999999992
+    ],
+    "yaw": 0,
+    "target": null
+  },
+  "trace": [
+    {
+      "t": 67.17472964083726,
+      "e": "guided-warning",
+      "state": "windup",
+      "hp": 100,
+      "yaw": 0
+    },
+    {
+      "t": 67.18960760955693,
+      "e": "state",
+      "prev": "idle",
+      "state": "windup"
+    },
+    {
+      "t": 67.65519660652603,
+      "e": "warning-frame-replay",
+      "state": "windup"
+    },
+    {
+      "t": 67.68022952106745,
+      "e": "held-native-input",
+      "back": false,
+      "right": true,
+      "vel": [
+        0.45926747384262656,
+        -1,
+        0
+      ],
+      "movement": {
+        "x": 0.0022174532059580088,
+        "y": 0.00037548053660430014,
+        "z": -0.00004998834992875345
+      }
+    },
+    {
+      "t": 67.68449547878821,
+      "e": "held-native-input",
+      "back": false,
+      "right": true,
+      "vel": [
+        0.8211760374005208,
+        -1,
+        0
+      ],
+      "movement": {
+        "x": 0.003503102343529463,
+        "y": -0.0003796815872192383,
+        "z": 0
+      }
+    },
+    {
+      "t": 67.68919164919274,
+      "e": "held-native-input",
+      "back": false,
+      "right": true,
+      "vel": [
+        1.1854532763955752,
+        -1,
+        0
+      ],
+      "movement": {
+        "x": 0.0055670905858278275,
+        "y": -0.000016220164980040863,
+        "z": 0
+      }
+    },
+    {
+      "t": 68.64185002570527,
+      "e": "state",
+      "prev": "windup",
+      "state": "charge"
+    },
+    {
+      "t": 69.80747500599847,
+      "e": "guided-complete",
+      "kind": "dodge"
+    }
+  ],
+  "errors": {
+    "total": 0,
+    "last": []
+  }
+}

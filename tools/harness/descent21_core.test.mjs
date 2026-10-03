@@ -44,4 +44,15 @@ for(const depth of [3,7]){
  assert.notEqual(attempts[0].seed,attempts[1].seed);
  let probes=0;assert.equal(chooseSafeFloor(MOONS.hamsi,17,depth,()=>{probes++;return null;}),null);assert.equal(probes,3,'unsafe liminal transit cancels after bounded retries');
 }
+// Optional archive encounters consume an existing rule slot and preserve old floors.
+for (const depth of [0,1,2,4,8]) {
+ const plain=floorSpec(MOONS.hamsi,1235,depth,{choice:{theme:'factory'}});
+ const enabled=floorSpec(MOONS.hamsi,1235,depth,{choice:{theme:'factory'},creatures32:true});
+ assert.deepEqual(plain,floorSpec(MOONS.hamsi,1235,depth,{choice:{theme:'factory'},creatures32:false}));
+ assert.equal(enabled.seed,plain.seed);assert.equal(enabled.size,plain.size);
+ const family=enabled.threat.newIds.filter(id=>id.startsWith('c32_'));
+ assert.equal(family.length,depth>=3?1:0,'one opt-in family candidate only after introductory depths');
+ assert(enabled.threat.newIds.length<=enabled.threat.newRuleSlots,'existing slot budget is not increased');
+}
+assert(!floorSpec(MOONS.hamsi,1235,7,{creatures32:true}).threat.newIds.some(id=>id.startsWith('c32_')),'liminal floors do not admit the family');
 console.log('descent21 core: deterministic650+deep floors, native damage/sprint caps, themes, discovery and translations pass');

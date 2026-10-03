@@ -15,9 +15,9 @@ export const READ = { bob: 0.035, lean: 0.06, windBack: 0.3, strike: 0.34, strik
 export const STRIKE_STATES = new Set(['attack', 'lunge', 'stab', 'snip', 'slam', 'stomp', 'shove', 'kick', 'scratch', 'hug', 'charge', 'bite']);
 export const HOLD_STATES = new Set(['windup', 'winding', 'aim', 'draw']);
 /** no pose layer: fixtures, ceiling / buried / swarm bodies that own their transform */
-export const NO_POSE = new Set(['turret', 'mine', 'web', 'mimicdoor', 'sandkefal', 'leech', 'hoardnest', 'janitorbin', 'zombot', 'skel_swarm', 'ticketswarm', 'spambomb', 'dunemaw']);
+export const NO_POSE = new Set(['turret', 'mine', 'web', 'mimicdoor', 'sandkefal', 'leech', 'hoardnest', 'janitorbin', 'zombot', 'skel_swarm', 'ticketswarm', 'spambomb', 'dunemaw', 'c32_dormant', 'c32_ram']);
 /** no added tell: the disguise IS the threat (the tell is behavioural) or the body is a fixture / instanced swarm */
-export const NO_TELL = new Set(['mimic', 'mr_copy', 'lm_lootmimic', 'lm_masked', 'mimicdoor', 'web', 'mine', 'turret', 'hoardnest', 'janitorbin', 'zombot']);
+export const NO_TELL = new Set(['mimic', 'mr_copy', 'lm_lootmimic', 'lm_masked', 'mimicdoor', 'web', 'mine', 'turret', 'hoardnest', 'janitorbin', 'zombot', 'c32_dormant', 'c32_ram']);
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const lerp = (a, b, t) => a + (b - a) * t;

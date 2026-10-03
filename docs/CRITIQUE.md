@@ -1,4 +1,8 @@
-# Current owner direction — Wave31 critical repairs
+# Current owner direction — Wave33 experimental encounters
+
+The latest owner baseline remains **1/10**. Two original threats now add light/noise withdrawal and fixed-lane cargo risk to native co-op systems. They are an explicit unchecked Host Advanced experiment; introductory floors, budgets and once-per-floor admission are protected. [Wave33](wave33/README.md) owns current verification, actual-Game render/synthetic-input evidence and the shared grenade attack repair. Default promotion, blind crew enjoyment, natural encounter discovery, Internet play and hardware profiling remain unearned. Next work should use observed counterplay readability and a normal salvage session rather than more catalogue entries or an invented score.
+
+# Prior owner direction — Wave31 critical repairs
 
 The latest owner assessment is **1/10** (2026-10-03). Dead Letter development is
 cancelled; all new entrances are retired. Normal-game commerce and input are

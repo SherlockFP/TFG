@@ -2,7 +2,7 @@
 // joins a shared discovery room; hosts announce their lobby info periodically.
 import { makeTransport } from './transport.js';
 
-export const GAME_VERSION = '0.12.4';   // host-confirmed market receipts and required commerce order IDs; all peers reload
+export const GAME_VERSION = '0.12.5';   // original archive threat IDs, states and models; all peers reload
 const DISCOVERY_ROOM = 'kefal-lobbies-v1';
 
 export class LobbyDirectory {

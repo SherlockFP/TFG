@@ -23,9 +23,10 @@ import {
   clamp, lerp, smooth, damp, ramp, keys, rng, TAU, PI,
 } from './modelkit.js';
 import { createAvatar } from './avatar.js';
+import { createCreature32 } from './creatures32.js';
 
 export const CREATURE_MODEL_IDS = ['scuttler', 'yoinker', 'crawler', 'lurker', 'mannequin', 'sludge', 'jester', 'spider', 'leech', 'screamer', 'mimic', 'hound', 'giant', 'sandkefal', 'turret', 'mine', 'kefaldayi', 'company',
-  'moderator', 'support', 'ticketswarm', 'editor', 'tamagotchi', 'stalker', 'clickbait', 'replyguy'];
+  'moderator', 'support', 'ticketswarm', 'editor', 'tamagotchi', 'stalker', 'clickbait', 'replyguy', 'c32_dormant', 'c32_ram'];
 
 const ELITE_EYE = new THREE.Color('#ff2414');
 
@@ -2270,6 +2271,7 @@ const BUILDERS = {
  *     update(dt, { state, speed, t, time, progress }), setElite(bool), setHitFlash(v), dispose() }
  */
 export function createCreatureModel(id, opts = {}) {
+  if (id === 'c32_dormant' || id === 'c32_ram') return createCreature32(id);
   const build = BUILDERS[id];
   if (!build) throw new Error('Unknown creature model: ' + id);
   const ctx = new Ctx(id, opts);

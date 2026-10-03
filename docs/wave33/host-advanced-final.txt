@@ -1,0 +1,71 @@
+Browser tab: 10, Title: "TFG", URL: "http://localhost:5174/?wave33=hostcheck".
+0 AXWebArea TFG, URL: localhost:5174/?wave33=hostcheck
+	1 image game-canvas
+	2 container ui
+		3 container
+			4 text HOST GAME
+			5 text FORM TFG-11-G
+			6 text APPROVED
+			7 text Game mode
+			8 pop up button (collapsed, settable) Value: Campaign, Secondary Actions: Expand
+				9 menu
+					10 (selected) Campaign
+					11 QUICK SHIFT
+			12 text Lobby name
+			13 text field (settable) Extra481's crew
+			14 text Public (listed in lobby browser)
+			15 checkbox (settable, integer) 1
+			39 container
+				40 button (expanded) ADVANCED, Secondary Actions: Collapse
+					41 text ADVANCED
+				42 text Password (optional)
+				43 text field (settable)
+				44 text Max players
+				45 pop up button (collapsed, settable) Value: 4, Secondary Actions: Expand
+					46 menu
+						47 2
+						48 3
+						49 (selected) 4
+						50 5
+						51 6
+						52 7
+						53 8
+				54 text Network
+				55 pop up button (collapsed, settable) Value: Online P2P (Nostr relays), Secondary Actions: Expand
+					56 menu
+						57 (selected) Online P2P (Nostr relays)
+						58 Online P2P (MQTT brokers)
+						59 Online P2P (BitTorrent trackers)
+						60 Local (same PC, multiple tabs)
+				61 text Difficulty
+				62 pop up button (collapsed, settable) Value: Standard, Secondary Actions: Expand
+					63 menu
+						64 Casual
+						65 (selected) Standard
+						66 Hard
+				67 text From quota 3: loot worth 20% less, heavier hauls, the ship door warns before it locks, creatures close doors, food spoils. Archive threats (experimental)
+				68 checkbox (settable, integer) 0
+				69 text After two quotas, industrial depth 3 and beyond may contain a quiet worker or a charging carrier.
+			18 text SAVE SLOT
+			19 container
+				20 text SLOT 1
+				21 text NEW RUN
+				22 text — — —
+			23 container
+				24 text SLOT 2
+				25 text NEW RUN
+				26 text — — —
+			27 container
+				70 text ▶
+				29 text SLOT 3
+				30 text DAY 1
+				31 text Quota #1 · ▮0/▮330
+				32 text Credits ▮60
+				33 text Extra481
+				34 button ✖, Help: Delete
+			35 button BACK
+				36 text BACK
+			37 button START ▶
+			38 text ↑↓  SELECT ENTER  CONFIRM ESC  BACK
+
+The focused UI element is 40 button (expanded) ADVANCED, Secondary Actions: Collapse

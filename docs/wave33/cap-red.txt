@@ -1,0 +1,2 @@
+FAIL both original C32 threats cap after upstream damage scaling
+1 FAILED of 26

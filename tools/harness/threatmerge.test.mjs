@@ -27,6 +27,18 @@ chk(z0 === 0 && z3 > 0, 'zombies only in pools from quota 3');
 chk(P.themeOf(MOONS.palamut) === 'sandkefal' || P.themeOf(MOONS.palamut) === null || typeof P.themeOf(MOONS.palamut) === 'string', 'theme creature derives from the moon table');
 
 // blocks: non-pool headline is vetoed (Hard lets it through), everything else untouched; table weight is cut
+let archiveDraws=0;
+for(let seed=0;seed<200;seed++) {
+ const r={seed,quotaIndex:2},plain=P.poolFor(r,m1),enabled=P.poolFor(r,m1,{creatures32:true});
+ chk(!plain.ids.some(id=>id.startsWith('c32_')),'disabled archive family is absent from the normal seeded pool');
+ chk(JSON.stringify(plain)===JSON.stringify(P.poolFor(r,m1,{creatures32:false})),'explicit opt-out preserves the default pool');
+ const family=enabled.ids.filter(id=>id.startsWith('c32_'));
+ chk(family.length<=1,'opt-in pool shares one archive family');archiveDraws+=family.length;
+ chk(!P.poolFor({...r,quotaIndex:0},m1,{creatures32:true}).ids.some(id=>id.startsWith('c32_')),'opt-in retains early-quota protection');
+}
+chk(archiveDraws>0,'the enabled native pool actually draws archive encounters');
+
+// blocks: non-pool headline is vetoed (Hard lets it through), everything else untouched; table weight is cut
 const out = P.HEADLINE.map((h) => h.id).find((id) => !a.ids.includes(id));
 chk(P.poolBlocks(out, a, false) && !P.poolBlocks(out, a, true) && !P.poolBlocks(a.ids[0], a, false) && !P.poolBlocks('scuttler', a, false) && !P.poolBlocks(out, null, false), 'poolBlocks');
 chk(P.poolMul(out, a, false) < 1 && P.poolMul(out, a, true) > P.poolMul(out, a, false) && P.poolMul('scuttler', a, false) === 1, 'poolMul');

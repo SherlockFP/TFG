@@ -37,6 +37,7 @@ export function installFirstSight(game) {
     r.fsSeen = [...seenList(), type].slice(-24);   // new array: the run diff sync sees it (co-op, host migration, save)
   }
   function defOk(id) {
+    if (id === 'c32_dormant' || id === 'c32_ram') return false;
     const d = CREATURES[id];
     if (!d || d.hazard || d.boss) return false;
     let n = 0; for (const c of game.creatures.host.values()) if (c.type === id && !c.dead) n++;

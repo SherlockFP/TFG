@@ -8,7 +8,7 @@ const clamp=(n,a,b)=>Math.min(b,Math.max(a,n));
 export function descentDepth(value){const n=Number(value);return Number.isFinite(n)?clamp(Math.floor(n),0,DESCENT21_LIMITS.maxDepth):0;}
 // A small generated map must never require nonexistent rooms. Empty facilities cannot discover a lift.
 export function discoveryThreshold(availableOrdinaryRooms){const n=Number(availableOrdinaryRooms);return Number.isFinite(n)?clamp(Math.floor(n),0,15):0;}
-export function floorSpec(moon={},baseSeed=1,depth=0,{choice=null,legacy=false}={}){
+export function floorSpec(moon={},baseSeed=1,depth=0,{choice=null,legacy=false,creatures32=false}={}){
  const d=descentDepth(depth),progress=Math.log2(d+1),generatedSeed=hashString(`descent21:${String(moon.id||'facility')}:${String(baseSeed)}:${d}`),seed=choice?.seed??generatedSeed,rng=new RNG(generatedSeed);
  const baseTheme=(legacy?ORDINARY_THEMES:DESCENT21_THEMES).includes(moon.interior)?moon.interior:'factory';
  const available=ORDINARY_THEMES.slice(0,Math.min(ORDINARY_THEMES.length,3+Math.floor(d/2)));
@@ -24,6 +24,8 @@ export function floorSpec(moon={},baseSeed=1,depth=0,{choice=null,legacy=false}=
  const drawnRule=rules[rng.int(0,rules.length-1)],rule=liminal?(theme==='backrooms'?'liminal':'receipt'):drawnRule;
  const low=clamp(Math.floor(Number(moon.scrapCount?.[0])||10),6,18),high=clamp(Math.floor(Number(moon.scrapCount?.[1])||14),low,20),bonus=Math.floor(progress*1.5);
  const newIds=liminal?[]:d<3?[]:d<6?['c20_pixel']:rule==='heavy'?['c20_brute']:rule==='inspection'?['c13_checksum','c20_pixel']:['c20_pixel','c13_printer'];
+ // The optional family replaces one existing rule slot; old floors keep their exact plan.
+ if(creatures32&&d>=3&&!liminal&&['factory','office'].includes(theme))newIds[newIds.length-1]=rng.next()<.5?'c32_dormant':'c32_ram';
  return {depth:d,floorNumber:d+1,seed,theme,tier,rule,liminal,
   size:choice?.size??+clamp((Number(moon.size)||1)+progress*.045,.75,1.35).toFixed(3),discoveryRooms:15,
   loot:{countMin:Math.min(24,low+bonus),countMax:Math.min(24,high+bonus),valueMul:+Math.min(1.8,1+progress*.08).toFixed(3)},
@@ -34,4 +36,4 @@ export function floorSpec(moon={},baseSeed=1,depth=0,{choice=null,legacy=false}=
 }
 // Older in-flight runs keep the certified map and ordinary rule they started
 // with. New routing starts at their next accepted native transition.
-export function savedFloorSpec(moon,baseSeed,state){return floorSpec(moon,baseSeed,state?.depth,{choice:state?.currentChoice,legacy:state?.routeVersion!==26});}
+export function savedFloorSpec(moon,baseSeed,state,{creatures32=false}={}){return floorSpec(moon,baseSeed,state?.depth,{choice:state?.currentChoice,legacy:state?.routeVersion!==26,creatures32});}

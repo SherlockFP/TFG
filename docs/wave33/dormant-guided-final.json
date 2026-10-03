@@ -1,0 +1,143 @@
+{
+  "initial": {
+    "seed": 1235,
+    "theme": "factory",
+    "quota": 2,
+    "depth": 0,
+    "hp": 100,
+    "gear": [
+      "ib0",
+      "icv"
+    ]
+  },
+  "phase": "moon",
+  "seed": 1235,
+  "theme": "factory",
+  "queue": false,
+  "player": {
+    "pos": [
+      39.504981994628906,
+      -299.9800008323276,
+      -21.51117737777531
+    ],
+    "hp": 100,
+    "dead": false,
+    "frozen": false,
+    "stun": 0,
+    "downed": false,
+    "noise": 0.345,
+    "flash": false,
+    "held": [
+      "flashlight",
+      "taser",
+      "hullpatch",
+      null,
+      null
+    ],
+    "input": true,
+    "locked": false,
+    "keys": {
+      "back": "KeyS",
+      "right": "KeyD"
+    },
+    "down": []
+  },
+  "actor": {
+    "id": "c1",
+    "state": "rest",
+    "pos": [
+      39.5,
+      -300,
+      -27.5
+    ],
+    "yaw": 0,
+    "target": null
+  },
+  "trace": [
+    {
+      "t": 45.940759824128506,
+      "e": "guided-warning",
+      "state": "wake",
+      "hp": 100
+    },
+    {
+      "t": 45.9494258699326,
+      "e": "state",
+      "prev": "idle",
+      "state": "wake"
+    },
+    {
+      "t": 46.42155641920518,
+      "e": "warning-frame-replay",
+      "state": "wake"
+    },
+    {
+      "t": 46.454887201520165,
+      "e": "held-native-input",
+      "back": true,
+      "right": false,
+      "vel": [
+        0,
+        -1,
+        0.7417137769112624
+      ],
+      "movement": {
+        "x": 0,
+        "y": -0.000015505724149988964,
+        "z": 0.006030371878296137
+      }
+    },
+    {
+      "t": 46.463098427010955,
+      "e": "state",
+      "prev": "wake",
+      "state": "rest"
+    },
+    {
+      "t": 46.463098427010955,
+      "e": "held-native-input",
+      "back": true,
+      "right": false,
+      "vel": [
+        0,
+        -1,
+        1.3778874566252126
+      ],
+      "movement": {
+        "x": 0,
+        "y": 0,
+        "z": 0.011314144358038902
+      }
+    },
+    {
+      "t": 46.47133628485451,
+      "e": "held-native-input",
+      "back": true,
+      "right": false,
+      "vel": [
+        0,
+        -1,
+        1.9193241941071246
+      ],
+      "movement": {
+        "x": 0,
+        "y": 0,
+        "z": 0.015811119228601456
+      }
+    },
+    {
+      "t": 47.10093379249891,
+      "e": "retreat-distance",
+      "metres": 2.988826774403809
+    },
+    {
+      "t": 47.10093379249891,
+      "e": "guided-complete",
+      "kind": "withdraw"
+    }
+  ],
+  "errors": {
+    "total": 0,
+    "last": []
+  }
+}

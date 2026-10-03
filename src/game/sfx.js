@@ -195,7 +195,7 @@ export function installSfx(game) {
   function onState(view, prev, stt) {
     try {
       // These machines own their precise wind-up cues; a generic robot voice would mask counterplay.
-      if (view.type === 'c13_printer' || view.type === 'c13_checksum' || view.type === 'e14_warden') return false;
+      if (view.type === 'c13_printer' || view.type === 'c13_checksum' || view.type === 'e14_warden' || view.type === 'c32_dormant' || view.type === 'c32_ram') return false;
       const ev = stateEvent(stt);
       if (!ev || disposed || !audio?.ctx) return false;
       const s = state(view);
@@ -223,6 +223,7 @@ export function installSfx(game) {
     const L = listener();
     for (const view of M.views.values()) {
       if (!view.root || view.state === 'dead') continue;
+      if (view.type === 'c32_dormant' || view.type === 'c32_ram') continue;
       const s = state(view);
       const p = view.pos;
       // -- footsteps: distance travelled (the view position is smoothed, so this is the real on-screen stride)

@@ -26,6 +26,18 @@ async function mk(isHost) {
 const hello = (extra = {}) => ({ t: 'hello', d: { ver: GAME_VERSION, name: 'A', pid: 'pidA', ...extra } });
 const log = (s, evs) => { const out = []; for (const e of evs) s.on(e, (...a) => out.push([e, ...a])); return out; };
 
+// New creature states/models cannot be delivered to the last published client.
+{
+  const h = await mk(true);
+  try {
+    h.transport.join_('OLD'); h.receive(hello({ ver: '0.12.4' }), 'OLD');
+    assert.ok(h.transport.sent.some(({ m, to }) => to === 'OLD' && m.t === 'reject' && m.d.reason.startsWith('Version mismatch')));
+    assert.ok(!h.players.has('OLD'), 'old creature client is rejected before snapshot admission');
+    h.transport.join_('CURRENT'); h.receive(hello({ pid: 'current' }), 'CURRENT');
+    assert.ok(h.players.has('CURRENT'), 'current protocol still admits the crew');
+  } finally { h.leave(); }
+}
+
 // 1. host: join -> lost -> resume keeps the player, no peerLeave
 {
   const h = await mk(true);

@@ -1,0 +1,12 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><base href="/"><title>TFG native Wave33 fixture</title>
+<style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#loading{position:fixed;inset:0;background:#050302;display:flex;align-items:center;justify-content:center;z-index:100;color:#ff9a4a;font-family:monospace}#loading.hidden{display:none}</style>
+<div id="game"></div><div id="ui"></div><div id="fps"></div><div id="loading">LOADING TFG OS...</div>
+<script type="module">
+if(!import.meta.env.DEV)throw new Error('Dev-only fixture');
+import {HUB13_BROKER,HUB13_BOARD} from '/src/world/hub13.js';
+import {newDescent} from '/src/game/descent21_state.js';
+import {prepareBrowserArena32} from '/tools/harness/creatures32_arena.mjs';
+import {errLog} from '/src/core/events.js';
+window.fixture32={HUB13_BROKER,HUB13_BOARD,newDescent,prepareBrowserArena32,errLog};
+await import('/src/main.js');
+</script></html>

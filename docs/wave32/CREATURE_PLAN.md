@@ -1,5 +1,7 @@
 # İki özgün ekip tehdidi — Implementation Plan
 
+> 2026-10-03 devamı: kullanıcı artık uygulamayı istedi. Native davranışlar ve özgün modeller Wave33'te uygulandı; güncel sonuç ve açık kabul sınırları [Wave33](../wave33/README.md) tarafından tutulur. Aşağıdaki başlangıç kapsamı ve checklist tarihsel plan olarak korunur.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Sessiz İşçi ve Hat Kırıcı ile okunabilir tehlike, isteğe bağlı cargo riski ve gerçek ekip kurtarma anı üretmek; ilk teslimi tek rehberli karşılaşma alanında kanıtlamak.

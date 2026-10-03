@@ -309,6 +309,8 @@ import { installFeedcams2 } from './feedcams2.js';   // [import:feedcams2] wave 
 import { installBroadcast18 } from './broadcast18.js';
 import { installReplay19 } from './replay19.js';
 import { installCreatures20 } from './creatures20.js';
+import { installCreatures32 } from './creatures32.js';
+import { installCreature32Presentation } from './creatures32_presentation.js';
 import { installDarkCollapse20 } from './darkcollapse20.js';
 import { installCargo20 } from './cargo20.js';
 import { installDescent21 } from './descent21.js';
@@ -373,7 +375,7 @@ export class Game extends Emitter {
     this.remotes = new Map();
     this.world = { ship: null, facility: null, outdoor: null, company: null, terrain: null, moonId: null, seed: 0 };
     this.run = null;          // replicated run state
-    this.config = { maxPlayers: 4, inventorySlots: 4, quotaMul: 1, dangerMul: 1, dayLengthSec: 720, bigHeads: false, freeTravel: true };
+    this.config = { maxPlayers: 4, inventorySlots: 4, quotaMul: 1, dangerMul: 1, dayLengthSec: 720, bigHeads: false, freeTravel: true, creatures32: false };
     this.infiniteSprint = false;
     this.mapT = 1;            // landing/takeoff animation progress
     this.stateTimer = 0;
@@ -676,6 +678,9 @@ export class Game extends Emitter {
     this.useModule('casino13', installCasino13);
     this.useModule('threats13', installThreats13);
     this.useModule('creatures20', installCreatures20);
+    // Descent's later wrapper routes its resident picks through this seeded admission.
+    this.useModule('creatures32', installCreatures32);
+    this.useModule('creatures32Art', installCreature32Presentation);
     this.useModule('districts13', installDistricts13);
 
     this.useModule('onboard', installOnboard);   // [slot:onboard] wave 5: Hiring Day + staged unlocks (installed last: wraps hostLever / terminalCommand / objectives.compute)
@@ -722,6 +727,7 @@ export class Game extends Emitter {
   async startSession(opts) {
     this.opts = opts;
     this.config.maxPlayers = opts.maxPlayers || this.config.maxPlayers;
+    this.config.creatures32 = opts.host && opts.creatures32 === true;
     this.mods?.emit('configure', this.config, this);
     this.net = new Session({
       strategy: opts.strategy, isHost: opts.host, code: opts.code, password: opts.password,

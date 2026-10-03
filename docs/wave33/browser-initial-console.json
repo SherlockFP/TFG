@@ -1,0 +1,14 @@
+[
+  {
+    "level": "warn",
+    "message": "ext manifest missing SyntaxError: Unexpected token '<', \"<!doctype \"... is not valid JSON",
+    "timestamp": "2026-10-03T01:46:37.585Z",
+    "url": "http://localhost:5174/@vite/client"
+  },
+  {
+    "level": "warn",
+    "message": "no mods index SyntaxError: Unexpected token '<', \"<!doctype \"... is not valid JSON",
+    "timestamp": "2026-10-03T01:46:37.755Z",
+    "url": "http://localhost:5174/@vite/client"
+  }
+]

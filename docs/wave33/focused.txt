@@ -1,0 +1,15 @@
+ok     1/13 tools\harness\balance_rules.test.mjs (0.2s)
+ok     2/13 tools\harness\creatures32_model.test.mjs (0.3s)
+ok     3/13 tools\harness\creatures20.test.mjs (1.1s)
+ok     4/13 tools\harness\descent21_boundaries.test.mjs (0.9s)
+ok     5/13 tools\harness\descent21_core.test.mjs (0.1s)
+ok     6/13 tools\harness\descent21_focus.test.mjs (0.3s)
+ok     7/13 tools\harness\descent21_threats.test.mjs (1.1s)
+ok     8/13 tools\harness\firstdepth21.test.mjs (0.2s)
+ok     9/13 tools\harness\net_session.test.mjs (0.2s)
+ok    10/13 tools\harness\threatmerge.test.mjs (0.1s)
+ok    11/13 tools\harness\descent21_lifecycle.test.mjs (10.1s)
+ok    12/13 tools\harness\creatures32.test.mjs (13.2s)
+ok    13/13 tools\harness\descent21.test.mjs (23.5s)
+
+13/13 passed in 24s (-j 4). slowest: tools\harness\descent21.test.mjs 23s, tools\harness\creatures32.test.mjs 13s, tools\harness\descent21_lifecycle.test.mjs 10s, tools\harness\creatures20.test.mjs 1s, tools\harness\descent21_threats.test.mjs 1s

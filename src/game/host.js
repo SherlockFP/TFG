@@ -855,8 +855,10 @@ export const hostMethods = {
     if (!id) return;
     // Sector scale + early-game hit cap for EVERY creature / trap hit, whichever behaviour (built in or a module's) made
     // it: the source is a host creature id. Players, lightning, 'left behind' and the like are never scaled.
+    const source = fromId ? this.creatures?.host?.get(fromId) : null;
     if (this.deadletter24?.active?.()) dmg = this.deadletter24.playerDamage?.(id, dmg) ?? dmg;
-    else if (fromId && this.balance) { const src = this.creatures?.host?.get(fromId); if (src) dmg = this.balance.hitDamage(dmg, src); }
+    else if (source && this.balance) dmg = this.balance.hitDamage(dmg, source);
+    if (source?.type === 'c32_dormant' || source?.type === 'c32_ram') dmg = Math.min(dmg, 35);
     const p = fromPos ? [fromPos.x, fromPos.y, fromPos.z] : null;
     this.net.sendTo(id, 'hurt', { dmg, cause, from: fromId, p });
   },

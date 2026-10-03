@@ -23,6 +23,7 @@ import { MOONS } from '../game/moons.js';
 import { SUIT_COLORS, HATS } from '../models/avatar.js';
 import { CREATURES } from '../game/creatures.js';
 import { GAME_VERSION } from '../net/lobby.js';
+import { C32_OPTION, C32_OPTION_NOTE } from './creatures32_text.js';
 import { MODES as DIFF_MODES, DEFAULT_MODE as DIFF_DEFAULT, LABEL as DIFF_LABEL, SUMMARY as DIFF_SUMMARY } from '../game/difficulty.js';
 import { renderAchievementsPanel } from '../game/achievements.js';
 import { createServiceRecord } from './panels/record.js';
@@ -494,6 +495,7 @@ export class UI {
     const pw = el('input', { type: 'text', maxlength: 24, placeholder: '—' });
     const max = el('select', {}, ...Array.from({ length: maxAllowed - 1 }, (_, i) => el('option', { value: i + 2, selected: i + 2 === Math.min(4, maxAllowed) }, String(i + 2))));
     const net = this.netSelect();
+    const archiveThreats = el('input', { type: 'checkbox', checked: false });
     const diff = el('select', {}, ...DIFF_MODES.map((m) => el('option', { value: m, selected: m === (s.difficulty || DIFF_DEFAULT) }, t(DIFF_LABEL[m]))));   // [hardmode] lobby difficulty (difficulty.js)
     const diffNote = el('div', { class: 'cp-note', style: 'opacity:.7;font-size:12px;margin:-2px 0 6px' }, t(DIFF_SUMMARY[diff.value]));
     diff.addEventListener('change', () => { diffNote.textContent = t(DIFF_SUMMARY[diff.value]); });
@@ -501,6 +503,7 @@ export class UI {
       row(t('Password (optional)'), pw),
       row(t('Max players'), max), row(t('Network'), net),
       row(t('Difficulty'), diff), diffNote,   // [hardmode]
+      row(t(C32_OPTION), archiveThreats), el('div', { class: 'cp-note' }, t(C32_OPTION_NOTE)),
     );
     const mode = el('select', { 'data-nav': 'host:mode' }, el('option', { value: 'campaign' }, t('Campaign')), el('option', { value: 'quick' }, t('QUICK SHIFT')));
     mode.value = 'campaign';
@@ -510,7 +513,7 @@ export class UI {
     let chosen = { slot: this.menuOpts?.slot || listRuns().filter((r) => r.data).sort((a, b) => (b.data.savedAt || 0) - (a.data.savedAt || 0))[0]?.slot || 1, data: null };
     const start = () => {
       s.netStrategy = net.value; s.difficulty = diff.value; saveSettings(s);
-      this.app.hostGame({ lobbyName: name.value.trim() || 'Crew', isPublic: pub.checked, password: pw.value.trim(), maxPlayers: +max.value, difficulty: diff.value, strategy: net.value, slot: mode.value === 'campaign' ? chosen.slot : 0, runData: mode.value === 'campaign' ? loadRun(chosen.slot) : null, quick: mode.value === 'quick' });
+      this.app.hostGame({ lobbyName: name.value.trim() || 'Crew', isPublic: pub.checked, password: pw.value.trim(), maxPlayers: +max.value, difficulty: diff.value, strategy: net.value, creatures32: archiveThreats.checked, slot: mode.value === 'campaign' ? chosen.slot : 0, runData: mode.value === 'campaign' ? loadRun(chosen.slot) : null, quick: mode.value === 'quick' });
     };
     const renderSlots = () => {
       const focused = document.activeElement?.dataset?.slot;

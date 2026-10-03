@@ -1,0 +1,142 @@
+{
+  "initial": {
+    "seed": 1235,
+    "theme": "factory",
+    "quota": 2,
+    "depth": 0,
+    "hp": 100,
+    "gear": [
+      "ibr",
+      "ics"
+    ]
+  },
+  "phase": "moon",
+  "seed": 1235,
+  "theme": "factory",
+  "queue": false,
+  "player": {
+    "pos": [
+      39.501026355603244,
+      -299.97719999295657,
+      -21.503193451091647
+    ],
+    "hp": 100,
+    "dead": false,
+    "frozen": false,
+    "stun": 0,
+    "downed": false,
+    "noise": 0.345,
+    "flash": false,
+    "held": [
+      "flashlight",
+      "taser",
+      "hullpatch",
+      null
+    ],
+    "input": true,
+    "locked": false,
+    "keys": {
+      "back": "KeyS",
+      "right": "KeyD"
+    },
+    "down": []
+  },
+  "actor": {
+    "id": "c1",
+    "state": "rest",
+    "pos": [
+      39.5,
+      -300,
+      -27.5
+    ],
+    "yaw": 0,
+    "target": null
+  },
+  "trace": [
+    {
+      "t": 34.32005903309739,
+      "e": "guided-warning",
+      "state": "wake",
+      "hp": 100
+    },
+    {
+      "t": 34.39891086325729,
+      "e": "state",
+      "prev": "idle",
+      "state": "wake"
+    },
+    {
+      "t": 34.80331108217108,
+      "e": "warning-frame-replay",
+      "state": "wake"
+    },
+    {
+      "t": 34.83813861413353,
+      "e": "held-native-input",
+      "back": true,
+      "right": false,
+      "vel": [
+        0,
+        -1,
+        0.46817950236102157
+      ],
+      "movement": {
+        "x": 0,
+        "y": -0.000016536700059077702,
+        "z": 0.0023296810686588287
+      }
+    },
+    {
+      "t": 34.854838614133534,
+      "e": "held-native-input",
+      "back": true,
+      "right": false,
+      "vel": [
+        0,
+        -1,
+        1.7385912797272842
+      ],
+      "movement": {
+        "x": 0,
+        "y": 0,
+        "z": 0.02903447486460209
+      }
+    },
+    {
+      "t": 34.86000184393448,
+      "e": "held-native-input",
+      "back": true,
+      "right": false,
+      "vel": [
+        0,
+        -1,
+        2.052913324533646
+      ],
+      "movement": {
+        "x": 0,
+        "y": 0,
+        "z": 0.010599663481116295
+      }
+    },
+    {
+      "t": 34.91481008956231,
+      "e": "state",
+      "prev": "wake",
+      "state": "rest"
+    },
+    {
+      "t": 35.486526536647794,
+      "e": "retreat-distance",
+      "metres": 2.9968080341876018
+    },
+    {
+      "t": 35.486526536647794,
+      "e": "guided-complete",
+      "kind": "withdraw"
+    }
+  ],
+  "errors": {
+    "total": 0,
+    "last": []
+  }
+}
