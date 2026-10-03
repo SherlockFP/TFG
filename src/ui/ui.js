@@ -45,7 +45,8 @@ import { soundPackSection } from './soundpack_ui.js';   // [sfx] Settings > Audi
 import { hudDensitySelect } from './hudcalm_ui.js';   // [hudcalm] Settings > HUD > density
 import { syncArtdir } from './artdir.js';   // [artdir] html.tfg-artdir / ad-calm from settings
 import { followerCard } from '../game/followers.js';
-import { cloutOpenOf, unlockAt, claimable } from '../game/wallet.js';   // [trim] follower unlocks show after the store unlock; [followers] nothing is spent
+import { cloutOpenOf } from '../game/wallet.js';
+import { marketFailure31 } from '../game/market31.js';
 
 // [profile] tiny avatar icon (16x16 thumbnail) for chat / lists
 const avIcon = (av, px = 16) => { const c = avatarCanvas(av, px, { thumb: true }); c.style.marginRight = '4px'; return c; };
@@ -501,15 +502,15 @@ export class UI {
       row(t('Max players'), max), row(t('Network'), net),
       row(t('Difficulty'), diff), diffNote,   // [hardmode]
     );
-    const mode = el('select', { 'data-nav': 'host:mode' }, el('option', { value: 'campaign' }, t('Campaign')), el('option', { value: 'quick' }, t('QUICK SHIFT')), el('option', { value: 'deadletter' }, DEADLETTER30.title));
-    mode.value = this.menuOpts?.mode === 'deadletter' ? 'deadletter' : 'campaign';
+    const mode = el('select', { 'data-nav': 'host:mode' }, el('option', { value: 'campaign' }, t('Campaign')), el('option', { value: 'quick' }, t('QUICK SHIFT')));
+    mode.value = 'campaign';
     const modeNote = el('div', { class: 'cp-note' });
     form.append(row(t('Game mode'), mode), modeNote, row(t('Lobby name'), name), row(t('Public (listed in lobby browser)'), pub), adv);
     const slots = el('div', { class: 'slots' });
     let chosen = { slot: this.menuOpts?.slot || listRuns().filter((r) => r.data).sort((a, b) => (b.data.savedAt || 0) - (a.data.savedAt || 0))[0]?.slot || 1, data: null };
     const start = () => {
       s.netStrategy = net.value; s.difficulty = diff.value; saveSettings(s);
-      this.app.hostGame({ lobbyName: name.value.trim() || 'Crew', isPublic: pub.checked, password: pw.value.trim(), maxPlayers: +max.value, difficulty: diff.value, strategy: net.value, slot: mode.value === 'campaign' ? chosen.slot : 0, runData: mode.value === 'campaign' ? loadRun(chosen.slot) : null, quick: mode.value === 'quick', deadletter: mode.value === 'deadletter' });
+      this.app.hostGame({ lobbyName: name.value.trim() || 'Crew', isPublic: pub.checked, password: pw.value.trim(), maxPlayers: +max.value, difficulty: diff.value, strategy: net.value, slot: mode.value === 'campaign' ? chosen.slot : 0, runData: mode.value === 'campaign' ? loadRun(chosen.slot) : null, quick: mode.value === 'quick' });
     };
     const renderSlots = () => {
       const focused = document.activeElement?.dataset?.slot;
@@ -545,8 +546,7 @@ export class UI {
     const updateMode = () => {
       slotColumn.classList.toggle('hidden', mode.value !== 'campaign');
       hostGrid.style.gridTemplateColumns = mode.value === 'campaign' ? '' : 'minmax(0, 1fr)';
-      modeNote.hidden = mode.value !== 'deadletter';
-      modeNote.textContent = mode.value === 'deadletter' ? `${t(DEADLETTER30.description)} ${t(DEADLETTER30.fresh)}` : '';
+      modeNote.hidden = true;
     };
     mode.addEventListener('change', updateMode); updateMode();
     const f = this.frame(t('HOST GAME'),
@@ -1063,7 +1063,7 @@ export class UI {
       `<b>THE SHIP</b><br>The <b>terminal</b> takes typed commands (MOONS, ROUTE, STORE, BUY, SCAN, BESTIARY, door codes). Pull the <b>lever</b> to land or take off. The ship leaves at <b>midnight</b>, with or without you.`,
       `<b>CONTROLS</b><br>WASD move · Shift sprint · C crouch · Alt sneak (quiet) · Space jump · E interact / pick up · LMB use / attack / grab big loot · RMB scan · MMB / P ping · G drop · Q throw · F flashlight · 1-4 slots · R reload · V push-to-talk · Z/X emotes · Enter chat · I inventory · K passive tree · hold Backslash spell wheel (or say / type the spell word) · J service record · hold B emote wheel · Tab character · Esc menu`,
       `<b>SURVIVAL</b><br>Every creature has a rule. <i>Scan</i> them and read the BESTIARY. Sound matters: sprinting, horns and <b>your voice</b> attract things. Some exits are not what they seem.`,
-      `<b>PROGRESSION</b><br>You earn XP and <b>Followers</b> from scrap, kills, bounties, fishing and minigames. Every level gives a skill point for the passive tree [K]. The Black Market at HQ, run by <b>Phish Dayı</b>, unlocks soulbound weapons, armor and cosmetics as your Followers grow (they are never spent). Higher-tier moons and later quotas hurt more and pay more.`,
+      `<b>PROGRESSION</b><br>You earn XP and <b>Followers</b> from scrap, kills, bounties, fishing and minigames. Every level gives a skill point for the passive tree [K]. The Black Market at HQ, run by <b>Phish Dayı</b>, sells soulbound weapons, armor and cosmetics for ◈. The host confirms payment and delivery; weapons need inventory space. Higher-tier moons and later quotas hurt more and pay more.`,
       `<b>MINIGAMES</b><br>Crack vault keypads, rewire fuse boxes, pick locks, fish at ponds and the HQ dock, play FLAPPY PHISH on the ship's arcade, and gamble table chips at the GACHA MACHINE.`,
       `<b>MULTIPLAYER</b><br>Host a lobby (public or private with password) and friends can find it in the lobby browser or join with the 6-letter code. Everything is peer-to-peer; the host runs the world.`,
     ].map((p) => t(p)).join('<br><br>');
@@ -1128,15 +1128,10 @@ export class UI {
         el('span', { class: 'dim' }, `${g?.isHost ? t('You are the host') : t('Connected')} · ${t('Players')} ${1 + (g?.remotes.size || 0)}`)),
       el('div', { class: 'menu-list' },
         this.button(t('Resume'), () => this.closePanel(), 'big'),
-        ...(g?.deadletter24 ? (() => {
-          const status = g.deadletter24.menuStatus();
-          const enter = this.button(t(DEADLETTER30.start), () => {
-            if (this.app.game !== g || !g.deadletter24.menuStatus().enabled) { this.toast(t(g.deadletter24.menuStatus().reason), 'warn'); return; }
-            this.closePanel(); g.deadletter24.enterFromMenu();
-          }, 'primary');
-          enter.disabled = !status.enabled;
-          return [enter, el('div', { class: 'cp-note' }, t(status.reason || DEADLETTER30.description))];
-        })() : []),
+        ...(g?.isHost && g.deadletter24?.active?.() ? [this.button(t(DEADLETTER30.return), () => {
+          if (this.app.game !== g || !g.deadletter24.active()) return;
+          this.closePanel(); g.deadletter24.exitFromMenu();
+        }, 'primary')] : []),
         this.button(t('Copy join link'), () => { copyJoinLink(this, g); }, 'primary'),   // [joinplay] ?join=CODE&net=X
         this.button(t('Copy invite code'), () => { navigator.clipboard?.writeText(code); this.toast(`${t('Copied')}: ${code}`); }),
         this.button(t('CHARACTER'), () => this.openPanel(this.characterPanel(true))),
@@ -1167,11 +1162,13 @@ export class UI {
     const p = game.profile;
     let tab = this.marketTab || 'Weapons';
     const wrap = this.panel('wide market');
+    let notice = '', noticeKind = 'dim';
     const render = () => {
       wrap.innerHTML = '';
-      wrap.appendChild(this.panelHead(`${t('Black Market')} - Phish Dayı`, tf('◈ {coins} · Lv.{level}', { coins: p.coins, level: p.level })));
+      wrap.appendChild(this.panelHead(`${t('Black Market')} - Phish Dayı`, tf('Money: ◈ {coins}', { coins: p.coins }) + ` · Lv.${p.level}`));
       const body = el('div', { class: 'cp-body' });
       body.appendChild(el('div', { class: 'dim' }, tf('"Ooo, hoş geldin evlat! Good stuff, fair prices... mostly." · You have ◈ {coins} · Lv.{level}', { coins: p.coins, level: p.level })));
+      if (notice) body.appendChild(el('div', { class: noticeKind, role: 'status' }, notice));
       body.appendChild(el('div', { class: 'tabs' }, ...['Weapons', 'Armor', 'Perks', 'Cosmetics'].map((n) => this.button(t(n), () => { tab = n; this.marketTab = n; render(); }, tab === n ? 'tab sel' : 'tab'))));
       const grid = el('div', { class: 'shop-grid' });
       const card = (name, rarity, desc, price, minLevel, owned, equipped, onBuy, onEquip, iconType) => {
@@ -1182,26 +1179,34 @@ export class UI {
             el('div', {}, el('div', { class: 'sc-name', style: { color: r.color } }, name), el('div', { class: 'sc-rar' }, r.name + (minLevel > 1 ? tf(' · Lv.{minLevel}+', { minLevel }) : '')))),
           el('div', { class: 'sc-desc' }, desc),
           owned ? (onEquip ? this.button(equipped ? t('Equipped') : t('Equip'), onEquip, equipped ? 'small disabled' : 'small') : el('div', { class: 'dim' }, t('Owned')))
-            : this.button(claimable(p.coins, price) ? t('Claim') : tf('Unlocks at {n} followers', { n: unlockAt(price) }), onBuy, 'small' + (locked || !claimable(p.coins, price) ? ' disabled' : ' primary')),   // [followers] milestone
+            : this.button(tf('Buy · ◈ {price}', { price }), onBuy, 'small' + (locked || p.coins < price ? ' disabled' : ' primary')),
         );
       };
-      const buy = (price, fn) => () => {
-        if (!game.progress.canClaim(price)) { this.sfx('ui_error'); return; }
-        fn(); saveProfile(p); game.audio.ui('ui_buy', 0.7); render();
+      const buy = (id) => async () => {
+        if (game.market31?.pending(id)) return;
+        notice = t('Waiting for host approval…'); noticeKind = 'dim'; render();
+        const result = await (game.market31?.buy(id) || Promise.resolve({ ok: false, reason: 'disconnected' }));
+        if (result.ok) {
+          notice = t(result.kind === 'weapons' ? 'Bought and delivered.' : result.kind === 'cosmetics' ? 'Bought. Select it in Character to wear it.' : 'Owned and equipped.');
+          noticeKind = 'good'; game.audio.ui('ui_buy', 0.7);
+        } else {
+          notice = marketFailure31(result.reason); noticeKind = 'bad'; this.sfx('ui_error');
+        }
+        if (this.panelOpen === wrap) render();
       };
       if (tab === 'Weapons') {
         for (const w of MARKET.weapons) {
           const d = ITEMS[w.id];
           if (!d) continue;
           grid.appendChild(card(d.name, d.rarity, [tf('DMG {dmg}', { dmg: d.dmg }), t(d.ranged ? 'Ranged' : 'Melee'), tf('reach {reach}m', { reach: d.reach }), d.stun ? t('stuns') : null, d.hands === 2 ? t('two-handed') : null].filter(Boolean).join(' · '), w.coin, w.minLevel, p.owned.includes(w.id), p.loadout.weapon === w.id,
-            buy(w.coin, () => { p.owned.push(w.id); p.loadout.weapon = w.id; }), () => { p.loadout.weapon = w.id; saveProfile(p); render(); }, w.id));
+            buy(w.id), () => { p.loadout.weapon = w.id; saveProfile(p); game.requestLoadout(); render(); }, w.id));
         }
       } else if (tab === 'Armor' || tab === 'Perks') {
         const list = tab === 'Armor' ? MARKET.armor : MARKET.perks;
         for (const a of list) {
           const desc = a.desc || [t(a.slot.toUpperCase()), tf('{n}% damage reduction', { n: Math.round((a.armor || 0) * 100) }), a.hp ? tf('+{n} HP', { n: a.hp }) : null, a.speed ? tf('+{n}% speed', { n: a.speed * 100 }) : null].filter(Boolean).join(' · ');
           grid.appendChild(card(a.name, a.rarity, desc, a.coin, a.minLevel, p.owned.includes(a.id), p.loadout[a.slot] === a.id,
-            buy(a.coin, () => { p.owned.push(a.id); p.loadout[a.slot] = a.id; game.refreshStats(); }), () => { p.loadout[a.slot] = a.id; saveProfile(p); game.refreshStats(); render(); }, ITEMS[a.id] ? a.id : null));
+            buy(a.id), () => { p.loadout[a.slot] = a.id; saveProfile(p); game.refreshStats(); render(); }, ITEMS[a.id] ? a.id : null));
         }
       } else {
         for (const c of MARKET.cosmetics) {
@@ -1211,7 +1216,7 @@ export class UI {
           if (!meta) continue;
           const nm = (kind === 'suit' ? t('Suit') : t('Hat')) + ': ' + (meta.name || id);
           grid.appendChild(card(nm, c.coin > 1000 ? 'legendary' : c.coin > 300 ? 'epic' : c.coin > 120 ? 'rare' : 'uncommon', kind === 'suit' ? t('A fresh coverall.') : t('Headwear. Fashion is survival.'), c.coin, c.minLevel, owned, false,
-            buy(c.coin, () => { if (kind === 'suit') p.cosmetics.suits.push(id); else p.cosmetics.hats.push(id); }), null));
+            buy(c.id), null));
         }
       }
       body.appendChild(grid);

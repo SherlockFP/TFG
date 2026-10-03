@@ -283,7 +283,7 @@ export function installShop(game) {
     const st = new Map(stockFor(run, lore(), g.hubgate?.shopLock, followersOf(g)).map((e) => [e.id, e]));   // [hubgate] the host enforces the lock too (the client store only greys the card)
     const plan = [];
     let total = 0;
-    const taken = new Map();
+    const taken = new Map(), traded = new Set();
     let trapTaken = 0;
     for (const raw of cmd.lines) {
       const e = st.get(String(raw?.id));
@@ -296,8 +296,8 @@ export function installShop(game) {
       let unit = e.price, trade = null;
       if (isTrapItem(e.def)) { unit = trapUnitPrice(e.priceBase, trapsBoughtToday(run) + trapTaken, n); trapTaken += n; }   // [hardmode] rising kit price within one order too
       if (raw.trade && e.def?.upgradeFrom && e.def.upgradePrice > 0) {
-        trade = [...g.items.all()].find((it) => it.type === e.def.upgradeFrom && it.holder === from && !it.affix);
-        if (trade) { unit = e.def.upgradePrice; n = 1; }
+        trade = [...g.items.all()].find((it) => it.type === e.def.upgradeFrom && it.holder === from && !it.affix && !traded.has(it.id));
+        if (trade) { traded.add(trade.id); unit = e.def.upgradePrice; n = 1; }
       }
       taken.set(e.id, (taken.get(e.id) || 0) + n);
       total += unit * n;

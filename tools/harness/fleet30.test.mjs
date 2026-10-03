@@ -33,7 +33,7 @@ setLang('en');const fleet=installFleet13(game);game.mods.emit('registerHandlers'
 const card=id=>find(ui.panelOpen,n=>n.attrs['data-vessel']===id);
 const preview=id=>find(card(id),n=>n.classList.contains('fleet13-preview'));
 const buy=id=>find(card(id),n=>n.tagName==='BUTTON');
-fleet.open();assert.equal(unlocks,1);assert.match(game.objectives.compute()[0].text,/^Dead Letter Run · Claim a free ship/);
+fleet.open();assert.equal(unlocks,1);assert.match(game.objectives.compute()[0].text,/^Claim a free ship/);
 assert.equal(Object.keys(FLEET13).length,4);for(const [id,d]of Object.entries(FLEET13)){
  assert.equal(preview(id).innerHTML,fleetPreview13(fleetLayout(id),d.name));assert.match(preview(id).innerHTML,/role="img"/);
  assert.equal(buy(id).disabled,id!=='courier','native crew credits restrict purchases');
@@ -41,7 +41,7 @@ assert.equal(Object.keys(FLEET13).length,4);for(const [id,d]of Object.entries(FL
 assert.equal(new Set(Object.keys(FLEET13).map(id=>preview(id).innerHTML)).size,4,'different fitted hulls have different visual geometry');
 const oldPanel=ui.panelOpen,oldPreview=preview('courier');buy('hauler').click();assert.equal(requests.length,0);buy('courier').click();
 assert.equal(game.run.fleet13.selected,'courier');assert.equal(game.run.credits,60);assert.equal(ui.panelOpen,null);assert.equal(oldPanel.isConnected,false);assert.equal(oldPreview.isConnected,false);assert.equal(locks,1);
-fleet.open();assert.equal(card('courier').attrs['aria-current'],'true');assert.equal(buy('courier').disabled,true);assert.match(game.objectives.compute()[0].text,/^Dead Letter Run · Board Packet Courier/);
+fleet.open();assert.equal(card('courier').attrs['aria-current'],'true');assert.equal(buy('courier').disabled,true);assert.match(game.objectives.compute()[0].text,/^Board Packet Courier/);
 game.run.fleet13.owned.courier.m={N1:{id:'lab',t:2}};game.run.fleet13.owned.courier.paint.c1='red';fleet.open();
 assert.match(preview('courier').innerHTML,/data-part="N1:lab"/);assert.match(preview('courier').innerHTML,/#b02a22/,'saved fitted layout and paint override brochure preset');
 let handoffs=0;ui.onPanelClose=()=>{handoffs++;return true;};const beforeLocks=locks;fleet.open();assert.equal(handoffs,1,'native panel replacement honors one close callback');assert.equal(locks,beforeLocks);

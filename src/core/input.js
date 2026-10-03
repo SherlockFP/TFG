@@ -25,12 +25,13 @@ export class Input {
     window.addEventListener('keydown', (e) => {
       if (e.isTrusted !== false) this.usingPad = false;   // [a11y] a real key: prompts show key names again
       if (e.code === 'Escape' && e.repeat) return;
-      if (this.locked && !this.isTyping() && (e.ctrlKey || e.metaKey)) e.preventDefault();
+      // Browser shortcuts keep their native action and do not become gameplay input.
+      if (e.ctrlKey || e.metaKey || e.code === 'ControlLeft' || e.code === 'ControlRight') return;
       if (this.onKeyAny && this.onKeyAny(e) === true) return;
       if (this.isTyping()) return;
       if (!this.down.has(e.code)) this.pressedSet.add(e.code);
       this.down.add(e.code);
-      if (this.locked && ['Space', 'Tab', 'ArrowUp', 'ArrowDown', 'ControlLeft', 'KeyF', 'KeyS', 'KeyD', 'KeyW'].includes(e.code)) e.preventDefault();
+      if (this.locked && ['Space', 'Tab', 'ArrowUp', 'ArrowDown', 'KeyF', 'KeyS', 'KeyD', 'KeyW'].includes(e.code)) e.preventDefault();
       if (this.locked && e.code === 'Tab') e.preventDefault();
     });
     window.addEventListener('keyup', (e) => {
@@ -79,7 +80,7 @@ export class Input {
       const p = this.canvas.requestPointerLock({ unadjustedMovement: true });
       if (p && p.catch) p.catch(() => { if (!current()) return; try { const q = this.canvas.requestPointerLock(); if (q && q.catch) q.catch(() => { if (current()) this.onLockFail?.(); }); } catch { this.onLockFail?.(); } });
     } catch { try { this.canvas.requestPointerLock(); } catch { this.onLockFail?.(); } }   // [ux]
-    // [ctrlw] then fullscreen (Settings: fullscreenPlay, default on): lets Keyboard Lock catch Ctrl+W instead of closing the tab
+    // Enter fullscreen once; resuming after browser Escape keeps the chosen view.
     if (!this.fullscreenAttempted && this.settings.fullscreenPlay !== false && !document.fullscreenElement && document.documentElement.requestFullscreen) {
       this.fullscreenAttempted = true; // Esc may exit browser fullscreen; resuming must not force it back.
       try { document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(() => {}); } catch { /* not allowed */ }

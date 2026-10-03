@@ -22,14 +22,8 @@ export function installEscape27(app, target = window) {
     if (ui.cancelRebind) { consume(app, e); ui.cancelRebind(); return; }
     if (ui.chatOpen) { consume(app, e); ui.closeChat(); return; }
     if (ui.panelOpen) {
-      // Browser Escape can unlock first and open pause before delivering keydown.
-      // Only that automatically opened pause owns the first gesture; other panels
-      // close even when a form or skill-tree search currently has text focus.
-      const automatic = ui.panelOpen.classList?.contains('pause') &&
-        app.pauseFromUnlockAt && performance.now() - app.pauseFromUnlockAt <= 250;
-      app.pauseFromUnlockAt = 0;
       consume(app, e);
-      if (!automatic) ui.closePanel();
+      ui.closePanel();
       return;
     }
     if (!g) {
@@ -63,7 +57,7 @@ export function installEscape27(app, target = window) {
   const fallback = (e) => {
     if ((e.code !== 'Escape' && e.key !== 'Escape') || e.defaultPrevented || e.repeat || e.isComposing) return;
     if (!app.game || app.input.isTyping() || hasEscapeLayer27(app) || app.ui.fullscreenOpen?.()) return;
-    consume(app, e); app.pauseFromUnlockAt = 0; app.ui.openPause();
+    consume(app, e); app.ui.openPause();
   };
   target.addEventListener('keydown', capture, true);
   target.addEventListener('keydown', fallback);

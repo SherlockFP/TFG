@@ -1,0 +1,42 @@
+<!doctype html><meta charset="utf-8"><title>TFG Wave31 QA fixture</title>
+<style>body{margin:0;background:#181818;color:#ddd;font:14px monospace}header{padding:8px}button{margin:4px}iframe{width:100%;height:calc(100vh - 110px);border:0}pre{margin:4px;white-space:pre-wrap}</style>
+<header>DEV FIXTURE — Company pose, level 50 and ◈3000 are setup, not earned gameplay.
+<button id="setup">Prepare Company fixture</button><button id="market">Open real market UI</button>
+<button id="inspect">Read native result</button><pre id="result">Booting local host. No Internet or microphone test.</pre></header>
+<iframe id="game"></iframe>
+<script type="module">
+if(!import.meta.env.DEV)throw new Error('Dev-only fixture');
+import {HUB13_BROKER,HUB13_BOARD} from '/src/world/hub13.js';
+const frame=document.querySelector('#game'),out=document.querySelector('#result');
+frame.src='/?autohost=local&code=W31QA'+crypto.randomUUID().slice(0,6);
+const current=()=>frame.contentWindow.kefal?.game;
+let initial;
+document.querySelector('#setup').onclick=async()=>{
+ const g=current();if(!g?.net?.connected){out.textContent='Host not ready';return;}
+ g.ui.closePanel(true);g.terminal.close();g.input.unlock();
+ if(g.fleet13.docked()){
+   g.player.teleport(new frame.contentWindow.THREE.Vector3(...HUB13_BROKER),0);
+   g.fleet13.request('buy','courier');
+   g.player.teleport(new frame.contentWindow.THREE.Vector3(...HUB13_BOARD),0);
+   g.fleet13.request('board');
+ }
+ g.profile.coins=3000;g.profile.level=50;g.profile.owned=['bat'];
+ g.hostSetPhase('landing',{moon:'hq'});
+ g.hostSetPhase('company');
+ const deadline=performance.now()+15000;
+ while((!g.world.company||g.landQ?.pending||g.landQ?.running)&&performance.now()<deadline)await new Promise(requestAnimationFrame);
+ if(!g.world.company){out.textContent='Company build did not finish';return;}
+ const counter=g.world.company.interactables.find(i=>i.type==='market');
+ for(const item of g.items.all())if(item.holder===g.selfId)g.net.broadcast('it',{e:'rm',id:item.id});
+ g.player.teleport(counter.pos.clone().add(new frame.contentWindow.THREE.Vector3(0,0,2)),0);
+ initial={coins:g.profile.coins,items:g.items.serialize().map(i=>i.id)};
+ out.textContent='SETUP ONLY: '+JSON.stringify(initial);
+};
+document.querySelector('#market').onclick=()=>{const g=current();g?.ui.openMarket(g);};
+document.querySelector('#inspect').onclick=()=>{
+ const g=current();if(!g)return;out.textContent=JSON.stringify({initial,phase:g.run.phase,
+ coins:g.profile.coins,owned:g.profile.owned,loadout:g.profile.loadout,
+ held:g.items.serialize().filter(i=>i.h===g.selfId),panel:!!g.ui.panelOpen,
+ crouch:g.settings.keys.crouch,locked:g.input.locked,version:g.net.helloData?.ver},null,2);
+};
+</script>

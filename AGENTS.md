@@ -1,13 +1,13 @@
 # TFG — current agent map
 
-Updated 2026-10-01, Wave30. This is the current entry point; historical Windows,
+Updated 2026-10-03, Wave31. This is the current entry point; historical Windows,
 Claude branch/model, no-test and automatic merge/push instructions are retired.
 Their full prior text is preserved in [the historical snapshot](docs/history/AGENTS-pre-wave25.md).
 Current user/session instructions take precedence. Inspect Git for the publication SHA.
 
 ## Start here
 
-1. Read [current work and evidence](docs/wave30/README.md), then
+1. Read [current work and evidence](docs/wave31/README.md), then
    [Gauntlet procedure](docs/GAUNTLET.md) and [current critique](docs/CRITIQUE.md).
 2. Read [identity/art direction](docs/THEME.md) and the relevant module report.
    [Research](docs/wave25/RESEARCH.md) connects genre design and current agent engineering.
@@ -20,8 +20,8 @@ Current user/session instructions take precedence. Inspect Git for the publicati
 
 TFG / TOTALLY FUCKED GAME is a browser co-op PSX horror scavenging game: a maintenance
 crew recovers lost content for The Algorithm's Engagement Quota. Its dead-internet
-identity should change crew decisions, routes and consequences. Normal horror and
-the optional Dead Letter card-combat expedition have separate experience goals.
+identity should change crew decisions, routes and consequences. Normal horror is the priority. Dead Letter development is cancelled; new entries
+are retired while active legacy sessions retain safe checkpoint return.
 
 The owner writes Turkish, wants autonomous implementation, multi-agent work and
 main commit/push in this session. Root handles combined Git after verification.
@@ -29,7 +29,7 @@ Continue already-authorized work without redundant confirmation. Reassess scope
 when future user instructions change it; do not infer authority for unrelated actions.
 Prefer a few observed quality improvements over another mandatory meter/catalogue.
 Give concise progress updates and keep scores/evidence honest.
-The owner's current experience baseline is **5/10**. Historical source-review
+The owner's current experience baseline is **1/10**. Historical source-review
 scores do not override it; native test counts alone do not raise the fun rating.
 
 Art: faceted, matte PSX industrial workers/CRT/archive props. Dirty ivory, charcoal,

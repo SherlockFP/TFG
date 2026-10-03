@@ -44,7 +44,7 @@ export function defaultSettings() {
     micEnabled: true,
     micConsent: 'ask',      // 'ask' | 'yes' | 'no'  (never grab the mic without asking)
     voiceMode: 'ptt',       // 'open' | 'ptt'  (hold V to talk, like R.E.P.O.)
-    settingsVersion: 4,
+    settingsVersion: 5,
     micGain: 1.0,
     micDevice: '',
     outputDevice: '',       // AudioContext.setSinkId target ('' = system default)
@@ -52,7 +52,7 @@ export function defaultSettings() {
     dither: true,
     outlines: true,
     headBob: true,
-    fullscreenPlay: true,   // [ctrlw] go fullscreen when the game captures the mouse (Keyboard Lock then catches Ctrl+W)
+    fullscreenPlay: true,   // enter fullscreen once when the game captures the mouse
     confirmLeave: true,     // [ctrlw] ask before closing the tab while in a game
     reduceMotion: false,    // scales camera shake/bob/punch + screen warp down, disables the sprint FOV kick
     showFps: false,
@@ -90,6 +90,27 @@ export function loadSettings() {
       if (oldWheel) out.keys.magicWheel = 'Backslash';
     }
     out.settingsVersion = 4;
+  }
+  // v5: v4 conflict saves can still have Ctrl crouch. Move it to C and keep
+  // displaced actions usable without moving an unrelated custom binding.
+  const isCtrl = code => code === 'ControlLeft' || code === 'ControlRight';
+  if ((s.settingsVersion || 1) < 5 || Object.values(out.keys).some(isCtrl)) {
+    const moveToFree = action => {
+      const candidates = [DEFAULT_KEYS[action], 'Backslash', 'BracketLeft', 'BracketRight',
+        'Semicolon', 'Quote', 'Minus', 'Equal', ...Object.values(DEFAULT_KEYS)];
+      const occupied = new Set(Object.values(out.keys));
+      const free = candidates.find(code => code && !isCtrl(code) && !occupied.has(code));
+      if (free) out.keys[action] = free;
+    };
+    if (out.keys.crouch === 'ControlLeft' || out.keys.crouch === 'ControlRight') {
+      out.keys.crouch = 'KeyC';
+      for (const action of Object.keys(out.keys)) {
+        if (action === 'crouch' || out.keys[action] !== 'KeyC') continue;
+        moveToFree(action);
+      }
+    }
+    for (const action of Object.keys(out.keys)) if (isCtrl(out.keys[action])) moveToFree(action);
+    out.settingsVersion = 5;
   }
   // [a11y] range checks (a hand-edited / old save must not give a 5 degree or 300 degree FOV)
   out.fov = clampFov(out.fov);

@@ -266,7 +266,7 @@ export class Terminal {
         const it = fuzzyFind(pool, q, (d) => d.name + ' ' + (d.$name || '') + ' ' + d.id);
         if (it && (!up || it.name.toLowerCase().startsWith(q))) {
           const cost = it.price * n;
-          this.pending = { op: 'buy', item: it.id, n };
+          this.pending = { op: 'buy', item: it.id, n, orderId: crypto.randomUUID() };
           this.print(`${tf('Order {n}x {name} for ▮{cost}? Credits: ▮{c}', { n, name: it.name, cost, c: run.credits })}\n${t('Type CONFIRM or DENY.')}`);
           return;
         }
@@ -457,7 +457,7 @@ export class Terminal {
       }
       case 'cart': { if (g.shop?.hostCart) g.shop.hostCart(cmd, from, reply); else reply('The store is offline.', true); return; }
       case 'buy': {
-        if (g.shop?.hostCart) { g.shop.hostCart({ lines: [{ id: cmd.item, n: cmd.n }] }, from, reply); return; }   // same deal prices / stock / delivery as the store screen
+        if (g.shop?.hostCart) { g.shop.hostCart({ orderId: cmd.orderId, lines: [{ id: cmd.item, n: cmd.n }] }, from, reply); return; }   // keep the confirmation nonce through the native cart
         const d = itemDef(cmd.item);
         const n = Math.max(1, Math.min(10, cmd.n | 0));
         if (!STORE_ITEMS.includes(cmd.item)) { reply('Not sold here.', true); return; }

@@ -122,12 +122,11 @@ ui.fullscreenOpen = () => true; key(); assert.equal(pauses, 0); ui.fullscreenOpe
 key(); assert.equal(pauses, 1); assert.ok(ui.panelOpen);
 key({ repeat: true }); assert.ok(ui.panelOpen); assert.equal(pauses, 1);
 key(); assert.equal(ui.panelOpen, null); assert.equal(pauses, 1);
-// Browser pointer-unlock-first: keep its newly opened pause for this gesture only.
-ui.openPause(); app.pauseFromUnlockAt = performance.now(); key(); assert.ok(ui.panelOpen);
-key(); assert.equal(ui.panelOpen, null);
+// An already open pause always closes on the first explicit Escape gesture.
+ui.openPause(); app.pauseFromUnlockAt = performance.now(); key(); assert.equal(ui.panelOpen, null);
 ui.currentScreen = 'settings'; ui.menuEl = new Node(); app.game = null;
 let backs = 0; ui.backOf = () => ({ click() { backs++; } }); doc.activeElement = { tagName: 'INPUT' };
 key(); assert.equal(backs, 1); assert.equal(pauses, 2);
 uninstall();
 assert.ok(locks > 0);
-console.log('escape27: captured foremost menus/text/rebind/chat/native close handoff, wheel/build cancellation, native pending/cancel minigames, popup priority, IME, pause repeat and browser unlock passed');
+console.log('escape27: captured foremost menus/text/rebind/chat/native close handoff, wheel/build cancellation, native pending/cancel minigames, popup priority, IME, pause repeat and first-gesture pause close passed');

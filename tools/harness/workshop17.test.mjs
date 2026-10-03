@@ -43,6 +43,6 @@ const brokerMods=new Emitter(),brokerHandlers=new Map(),actor={pos:new THREE.Vec
 const brokerGame={mods:brokerMods,run:brokerRun,selfId:'crew',isHost:true,time:0,aiPlayerById:()=>actor,net:{on_(){},request(){},sendTo(){}},shop:{open(){},hostCart(){}},ui:{},broadcastRun(){},hostSave(){}};
 const broker=installIndustry13(brokerGame);brokerMods.emit('mapLoaded',{company:{group:new THREE.Group(),groundY:-1.25}});brokerMods.emit('registerHandlers',(k,f)=>brokerHandlers.set(k,f),brokerGame);
 assert.equal(broker.near('crew'),true,'public route test has a legitimately nearby broker');
-brokerHandlers.get('i13req')({op:'produce',product:'cells'},'crew');completeIndustryShift(brokerRun,'hamsi',1);const publicJob=industryOf(brokerRun).jobs[0];
+brokerHandlers.get('i13req')({op:'produce',product:'cells',orderId:'public-batch'},'crew');completeIndustryShift(brokerRun,'hamsi',1);const publicJob=industryOf(brokerRun).jobs[0];
 brokerHandlers.get('i13req')({op:'calibrate',id:publicJob.id},'crew');brokerHandlers.get('i13req')({op:'pack',id:publicJob.id},'crew');assert.equal(publicJob.tuned,false,'actual public i13req cannot bypass challenge');assert.equal(industryOf(brokerRun).goods.cells,undefined);broker.dispose();
 console.log('workshop17 actual public industry route rejects direct calibration/collection bypass');

@@ -1,3 +1,14 @@
+# Current owner direction — Wave31 critical repairs
+
+The latest owner assessment is **1/10** (2026-10-03). Dead Letter development is
+cancelled; all new entrances are retired. Normal-game commerce and input are
+being repaired in this wave. Read [Wave31](wave31/README.md), its native evidence,
+[PLAYTEST](wave31/PLAYTEST.md) and independent [REVIEW](wave31/REVIEW.md).
+Earlier scores below remain historical; this work does not establish improved
+human enjoyment, atmosphere, Internet voice/P2P reliability or hardware frame times.
+Next: measure first/repeat hub → moon → facility transitions before choosing a
+performance change, then complete one art target under actual first-person light.
+
 # Current experience — Wave30 access and loading improvements
 
 The owner's baseline remains **5/10**. This round addresses failed mode discovery,

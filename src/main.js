@@ -97,14 +97,10 @@ class App {
     addTranslations({ 'Fullscreen when playing': 'Полный экран в игре', 'Use fullscreen for an immersive view': 'Полный экран для погружения', 'Ask before leaving the page': 'Спрашивать перед уходом со страницы' }, 'ru');
     addTranslations({ 'Loading models {d}/{n}': 'Modeller yükleniyor {d}/{n}' }, 'tr');   // [fastmenu]
     addTranslations({ 'Loading models {d}/{n}': 'Загрузка моделей {d}/{n}' }, 'ru');
-    // [ctrlw] Ctrl+W (crouch + forward) closes the tab and browsers don't let a page cancel it. 1) ask before leaving while in a game;
-    // 2) in fullscreen, Keyboard Lock (Chromium) lets the game receive Ctrl+W / Ctrl+T etc. instead of the browser.
+    // Protect the active session when the browser leaves the page.
     window.addEventListener('beforeunload', (e) => {
       if (!this.game || this.game.destroyed || this.settings?.confirmLeave === false) return;
       e.preventDefault(); e.returnValue = '';
-    });
-    document.addEventListener('fullscreenchange', () => {
-      try { if (document.fullscreenElement) navigator.keyboard?.lock?.(['KeyW', 'KeyT', 'KeyN', 'KeyR', 'KeyQ']).catch?.(() => {}); else navigator.keyboard?.unlock?.(); } catch { /* unsupported */ }
     });
     this.menu = null;
     this.lobbyDir = null;
@@ -191,14 +187,10 @@ class App {
 
   bindKeys() {
     const input = this.input;
-    input.onLockChange = (locked, intentional) => {
+    input.onLockChange = (locked) => {
       const g = this.game;
       if (!g) return;
-      this.ui.clickHint.classList.toggle('hidden', locked || hasEscapeLayer27(this));
-      if (!locked && !intentional && !hasEscapeLayer27(this) && !this.ui.fullscreenOpen?.()) {
-        this.pauseFromUnlockAt = performance.now();
-        this.ui.openPause();
-      }
+      this.ui.clickHint.classList.toggle('hidden', locked || hasEscapeLayer27(this) || this.ui.fullscreenOpen?.());
     };
     this.engine.canvas.addEventListener('click', () => {
       if (this.game && !hasEscapeLayer27(this) && !this.ui.fullscreenOpen?.()) input.lock();
@@ -210,12 +202,12 @@ class App {
     const showHint = () => { if (idle() && !input.locked) this.ui.clickHint.classList.remove('hidden'); };
     input.onLockFail = () => setTimeout(showHint, 60);
     document.addEventListener('mousedown', (e) => { if (idle() && !input.locked && !e.target.closest?.('button,input,select,textarea,a')) input.lock(); }, true);
-    window.addEventListener('keydown', (e) => { if (e.code !== 'Escape' && idle() && !input.locked && !e.repeat) input.lock(); }, true);
+    window.addEventListener('keydown', (e) => { if (e.code !== 'Escape' && !e.ctrlKey && !e.metaKey && idle() && !input.locked && !e.repeat) input.lock(); }, true);
     setInterval(() => { if (this.game && idle() && !input.locked && document.hasFocus?.() !== false) this.ui.clickHint.classList.remove('hidden'); else if (input.locked) this.ui.clickHint.classList.add('hidden'); }, 400);
     installEscape27(this);
     window.addEventListener('keydown', (e) => {
       const g = this.game;
-      if (!g || input.isTyping() || e.repeat) return;
+      if (!g || input.isTyping() || e.repeat || e.ctrlKey || e.metaKey) return;
       const k = this.settings.keys;
       // The bound menu action is hold-for-status. HUDcalm owns it in play;
       // Tab still moves focus in forms, and a remapped panel-close is one gesture.

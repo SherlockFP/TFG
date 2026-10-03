@@ -9,10 +9,13 @@ import './industry13_text.js';
 import { createTrading15 } from './trading15.js';
 import { installWorkshop14 } from './workshop14.js';
 HOST_ONLY.add('i13reply');
+const ORDER_HISTORY_LIMIT = 4096;
+const validOrderId = id => typeof id === 'string' && /^[A-Za-z0-9:_-]{1,64}$/.test(id);
 export function installIndustry13(game) {
   const offs = [], undo = [];
+  const inFlightOrders = new Set();
   let vendor = null, avatar = null, anchor = null, panel = null, live = true, pending = false, wait = null;
-  let lastMessage = '', lastPanelKey = '', ticks = 0;
+  let lastMessage = '', lastPanelKey = '', ticks = 0, pendingOrder = null;
   const near = id => {
     const p = game.aiPlayerById?.(id);
     return !!anchor && !!p && !p.dead && !p.downed && !p.inShip && p.pos.distanceTo(anchor) <= 4.5 && (game.run?.phase === 'company' || game.run?.phase === 'moon' || game.fleet13?.docked?.());
@@ -68,8 +71,9 @@ export function installIndustry13(game) {
   const clearVendor=()=>{vendor?.userData.i13OffLang?.();removeVendor();};
   function send(op, extra={}) {
     if(pending)return;pending=true;clearTimeout(wait);
-    game.net.request('i13req',{op,...extra});
-    wait=setTimeout(()=>{pending=false;if(panel && game.ui.panelOpen===panel) render();},3000);
+    pendingOrder=`${orderEpoch}:${++orderSerial}`;
+    wait=setTimeout(()=>{pending=false;pendingOrder=null;if(panel && game.ui.panelOpen===panel) render();},3000);
+    game.net.request('i13req',{op,...extra,orderId:pendingOrder});
     render();
   }
   function render() {
@@ -106,19 +110,39 @@ export function installIndustry13(game) {
       const m=MOONS[d.target];
       if(!m || m.company || m.home || m.stale || (m.tier||1)>Math.max(1,(game.run.quotaIndex||0)+1))return;
     }
+    if(!validOrderId(d.orderId)){game.net.sendTo(from,'i13reply',{ok:false,key:'Invalid order ID. Reopen the broker and try again.'});return;}
+    const ledger=industryOf(game.run),key=`${from}:i13|${d.orderId}`;
+    if((ledger.orders15||[]).includes(key)){game.net.sendTo(from,'i13reply',{ok:false,key:'That order was already processed.',orderId:d.orderId});return;}
+    if((ledger.orders15||[]).length+inFlightOrders.size>=ORDER_HISTORY_LIMIT){game.net.sendTo(from,'i13reply',{ok:false,key:'Order history is full. Start a new run before ordering more.',orderId:d.orderId});return;}
     const result=transactIndustry(game.run,d.op==='produce'?{...d,physical:true}:d);
+    if(result.ok)ledger.orders15=[...(ledger.orders15||[]),key];
     game.broadcastRun(['credits','industry13']);game.hostSave?.();
-    game.net.sendTo(from,'i13reply',result);
+    game.net.sendTo(from,'i13reply',{...result,orderId:d.orderId});
   }
   offs.push(game.mods.on('mapLoaded',world=>{clearVendor();buildVendor(world);}));
   offs.push(game.mods.on('interactables',(out,g)=>{if(g===game && anchor)out.push({pos:anchor,r:.55,reach:3.8,label:t('Talk to the field broker [E]'),action:open});}));
   offs.push(game.mods.on('registerHandlers',(H,g)=>{if(g===game)H('i13req',hostRequest);}));
-  const netReady=net=>net.on_('i13reply',d=>{clearTimeout(wait);pending=false;lastMessage=t(d.key||'');render();});
+  const netReady=net=>net.on_('i13reply',d=>{if(!pendingOrder||d?.orderId!==pendingOrder)return;clearTimeout(wait);pending=false;pendingOrder=null;lastMessage=t(d.key||'');render();});
   offs.push(game.mods.on('netReady',netReady));if(game.net)netReady(game.net);
   wrap(game,'unloadMap',previous=>function(...args){clearVendor();return previous.apply(this,args);});
   // Block all terminal/cart purchases away from a living physical trader, including direct requests.
   wrap(game.shop,'buy',previous=>function(lines){if(buyPending)return;buyPending=true;clearTimeout(buyTimer);buyTimer=setTimeout(()=>{buyPending=false;},5000);game.net.request('term',{cmd:{op:'cart',lines,orderId:`${orderEpoch}:${++orderSerial}`}});});
-  wrap(game.shop,'hostCart',previous=>function(cmd,from,reply){if(!near(from)){const key='Approach the broker before ordering.';reply(key,true);notify(from,key);game.net.sendTo(from,'fx',{k:'sh',t:'shopres',ok:false,msg:t(key)});return;}const key=typeof cmd?.orderId==='string'&&cmd.orderId.length<=64?from+':'+cmd.orderId:null;if(key&&(industryOf(game.run).orders15||[]).includes(key)){reply(t('That order was already processed.'),true);notify(from,'That order was already processed.');game.net.sendTo(from,'fx',{k:'sh',t:'shopres',ok:false,msg:t('That order was already processed.')});return;}const finish=(msg,err)=>{if(!err&&key){const ledger=industryOf(game.run);ledger.orders15=[...(ledger.orders15||[]),key].slice(-64);game.broadcastRun(['industry13']);game.hostSave?.();}reply(msg,err);};return previous.call(this,cmd,from,finish);});
+  wrap(game.shop,'hostCart',previous=>function(cmd,from,reply){
+    const fail=message=>{reply(t(message),true);notify(from,message);game.net.sendTo(from,'fx',{k:'sh',t:'shopres',ok:false,msg:t(message)});};
+    if(!near(from))return fail('Approach the broker before ordering.');
+    if(!validOrderId(cmd?.orderId))return fail('Invalid order ID. Reopen the broker and try again.');
+    const key=from+':'+cmd.orderId,ledger=industryOf(game.run);
+    if(inFlightOrders.has(key)||(ledger.orders15||[]).includes(key))return fail('That order was already processed.');
+    if((ledger.orders15||[]).length+inFlightOrders.size>=ORDER_HISTORY_LIMIT)return fail('Order history is full. Start a new run before ordering more.');
+    inFlightOrders.add(key);
+    const finish=(msg,err)=>{
+      if(!err&&!(ledger.orders15||[]).includes(key)){
+        ledger.orders15=[...(ledger.orders15||[]),key];inFlightOrders.delete(key);game.broadcastRun(['industry13']);game.hostSave?.();
+      }
+      reply(msg,err);
+    };
+    try{return previous.call(this,cmd,from,finish);}finally{inFlightOrders.delete(key);}
+  });
   wrap(game.shop,'open',previous=>function(...args){if(!near(game.selfId)){game.ui.toast(t('Meet a field broker to buy supplies. The ship terminal is now a route console.'),'info');return;}return previous.apply(this,args);});
   wrap(game.terminal,'hostExecute',previous=>function(cmd,from){if(['buy','cart','upgrade','van'].includes(cmd?.op)&&!near(from)){notify(from,'Approach the broker before ordering.');return;}return previous.call(this,cmd,from);});
   offs.push(game.mods.on('fx',d=>{if(d?.k==='sh'&&d.t==='shopres'){buyPending=false;clearTimeout(buyTimer);}}));

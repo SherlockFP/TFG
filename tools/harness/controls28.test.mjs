@@ -29,7 +29,7 @@ const canvas=new Node();canvas.requestPointerLock=()=>Promise.resolve();
 const input=new Input(canvas,settings);input.locked=true;
 let locks=0;input.lock=()=>{locks++;input.locked=true;};input.unlock=()=>{input.locked=false;};
 let opened=0,closed=0;
-const ui={panelOpen:null,chatOpen:false,marketOpen:false,dialogEl:null,overlay:new Node(),clickHint:new Node(),hud:{el:new Node()},blocksInput:UI.prototype.blocksInput,fullscreenOpen:()=>false,openTab(){opened++;this.panelOpen=new Node();},closePanel(){closed++;return UI.prototype.closePanel.call(this);},openPanel:UI.prototype.openPanel,onNavKey:UI.prototype.onNavKey,navScope(){return this.panelOpen;},openChat(){this.chatOpen=true;}};
+const ui={panelOpen:null,chatOpen:false,marketOpen:false,dialogEl:null,overlay:new Node(),clickHint:new Node(),hud:{el:new Node()},blocksInput:UI.prototype.blocksInput,fullscreenOpen:()=>false,openTab(){opened++;this.panelOpen=new Node();},openPause(){opened++;this.panelOpen=new Node();this.panelOpen.classList.add('pause');},closePanel(){closed++;return UI.prototype.closePanel.call(this);},openPanel:UI.prototype.openPanel,onNavKey:UI.prototype.onNavKey,navScope(){return this.panelOpen;},openChat(){this.chatOpen=true;}};
 const game={run:{phase:'orbit',day:1,moon:'__relay13',credits:120,daysLeft:3,quota:150},profile:defaultProfile(),settings,input,ui,mods:new Emitter(),terminal:{active:false},player:{hp:100,maxHp:100},objectives:{full:[{kind:'main',text:'Claim a free ship'}]},remotes:new Map(),selfId:'host',playerName:()=> 'Janitor'};
 const app={settings,input,ui,game,engine:{canvas}};ui.app=app;
 const src=await fs.readFile(new URL('../../src/main.js',import.meta.url),'utf8');
@@ -40,6 +40,30 @@ bindKeys.call(app);
 game.hudcalm=installHudCalm(game);
 const card=doc.body.children.find(n=>n.className==='hc-tab');assert.ok(card);
 function key(type,code,props={}){const e=new Event(type,{cancelable:true});Object.assign(e,{code,key:code==='Tab'?'Tab':code.replace(/^Key/,''),...props});win.dispatchEvent(e);return e;}
+// Browser focus/fullscreen loss must only offer recapture, never create a menu.
+input.locked=false;input.onLockChange(false,false);
+assert.equal(ui.panelOpen,null,'involuntary pointer unlock does not open pause');
+assert.equal(opened,0);assert.equal(ui.clickHint.classList.contains('hidden'),false);
+const beforeShortcutLocks=locks;
+key('keydown','KeyW',{ctrlKey:true});assert.equal(locks,beforeShortcutLocks,'browser shortcut cannot recapture pointer');
+key('keydown','KeyT',{ctrlKey:true});assert.equal(ui.chatOpen,false,'browser shortcut cannot open chat');
+key('keyup','KeyW');key('keyup','KeyT');
+// Browser unlock precedes Escape: the explicit key owns pause, once.
+key('keydown','Escape');assert.equal(opened,1);assert.ok(ui.panelOpen);
+key('keydown','Escape',{repeat:true});assert.ok(ui.panelOpen);assert.equal(opened,1);
+key('keyup','Escape');key('keydown','Escape');assert.equal(ui.panelOpen,null);
+key('keyup','Escape');opened=0;
+// An existing panel closes even when unlock/relock notifications interleave.
+ui.openPanel(new Node());input.onLockChange(false,false);
+key('keydown','Escape');assert.equal(ui.panelOpen,null);assert.equal(opened,0);
+input.locked=false;input.onLockChange(false,false);assert.equal(ui.panelOpen,null);
+key('keyup','Escape');input.locked=true;input.onLockChange(true,false);
+for(const modifier of ['ctrlKey','metaKey']){
+ const shortcut=key('keydown','Tab',{[modifier]:true});
+ assert.equal(shortcut.defaultPrevented,false,'native status shortcut keeps browser action');
+ assert.equal(card.classList.contains('on'),false,'native status shortcut does not show status');
+ key('keyup','Tab');
+}
 // Input prevents browser Tab focus in locked play; HUDcalm must still see it.
 let e=key('keydown','Tab');
 assert.equal(e.defaultPrevented,true);assert.equal(card.classList.contains('on'),true);
@@ -88,7 +112,7 @@ ui.closePanel();key('keyup','Tab');key('keydown','Tab');assert.equal(card.classL
 game.hudcalm.dispose();assert.equal(card.isConnected,false);assert.equal(doc.documentElement.classList.contains('hc-tab-on'),false,'teardown clears root status presentation');
 key('keyup','Tab');key('keydown','Tab');assert.equal(doc.documentElement.classList.contains('hc-tab-on'),false,'disposed listener cannot return');
 assert.equal(opened,0);assert.ok(locks>0);
-console.log('controls28: actual Input/App/UI/HUDcalm locked Tab + remap, native panel close, form Tab, typing/composition, release/blur and teardown pass');
+console.log('controls28: actual Input/App/UI/HUDcalm unlock without menus, explicit Esc close/pause, native shortcuts, locked Tab + remap, native panel close, form Tab, typing/composition, release/blur and teardown pass');
 
 // Actual Fleet/WorldMarker lifecycle. Coordinates/range are supplied here;
 // physical native E/LOS access is a separate encounters-agent regression.

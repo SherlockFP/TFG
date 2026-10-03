@@ -245,6 +245,7 @@ import { installCoop12 } from './coop12.js';
 import { installCompany13 } from './company13.js';
 import { installCasino13 } from './casino13.js';
 import { installDeadletter24 } from './deadletter24.js';
+import { installMarket31 } from './market31.js';
 import { registerLab24Moons } from './lab24_moons.js';
 
 registerLab24Moons();
@@ -819,6 +820,7 @@ export class Game extends Emitter {
     net.on_('gs', (d) => this.applyRunState(d));
     net.on_('phase', (d) => this.onPhase(d));
     net.on_('it', (d) => this.onItemEvent(d));
+    installMarket31(this, net);
     net.on_('itst', (d, from) => { if (from !== this.selfId) this.items.onState(d); });
     net.on_('is', (d, from) => { if (from !== this.selfId) this.items.applySnapshot(d); });
     net.on_('cev', (d) => this.creatures.onEvent(d));
@@ -1637,6 +1639,7 @@ export class Game extends Emitter {
   }
 
   destroy() {
+    this.market31?.dispose?.(); this.market31 = null;
     clearTimeout(this.joinTimeout); clearTimeout(this._pwErrTimer);
     this.netstats?.dispose(); this.netstats = null;
     for (const n of (this.wave1 || []).reverse()) { try { this[n]?.dispose?.(); } catch (e) { console.warn('dispose', n, e); } this[n] = null; }

@@ -116,7 +116,7 @@ export const KEY_GROUPS = [
   ['Social', ['ptt', 'chat', 'radio', 'emote1', 'emote2', 'emoteWheel']],
 ];
 /** keys the game cannot let you take: browser / engine keys */
-export const RESERVED_KEYS = ['Escape', 'F5', 'F11', 'F12', 'MetaLeft', 'MetaRight', 'ContextMenu'];
+export const RESERVED_KEYS = ['Escape', 'F5', 'F11', 'F12', 'ControlLeft', 'ControlRight', 'MetaLeft', 'MetaRight', 'ContextMenu'];
 /** keys other, NON-rebindable features listen to (a warning, not a refusal) */
 export const HARDCODED_KEYS = {
   KeyH: 'Homeworld build / cruiser horn', KeyT: 'Homeworld build (pieces)', KeyM: 'Trade decline / homeworld move', KeyO: 'Pet mode',

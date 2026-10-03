@@ -13,9 +13,13 @@ export const DEADLETTER30 = {
   cargo: 'Too many items to preserve (maximum 128). Sell cargo or start a fresh Dead Letter session.',
   active: 'Dead Letter Run is already active.',
   unavailable: 'This session is no longer available.',
+  retired: 'Dead Letter Run has been retired. Continue the normal expedition.',
+  return: 'Return to campaign',
 };
 
 const translations = {
+  [DEADLETTER30.retired]: ['Dead Letter Run kapatıldı. Normal sefere devam et.', 'Dead Letter Run закрыт. Продолжайте обычную экспедицию.'],
+  [DEADLETTER30.return]: ['Ana oyuna dön', 'Вернуться в кампанию'],
   [DEADLETTER30.start]: ['Dead Letter Run başlat', 'Начать Dead Letter Run'],
   [DEADLETTER30.description]: ['Kart savaşı: dalgalar, bosslar ve her seviyede üç geliştirme seçeneği.', 'Карточный бой: волны, боссы и три улучшения на каждом уровне.'],
   [DEADLETTER30.fresh]: ['Gemi seçip bin. Kart seferi otomatik başlar; kayıtlı oyunların kendi yuvalarında kalır.', 'Выбери корабль и поднимись на борт. Карточный поход начнётся автоматически; сохранённые кампании останутся в своих слотах.'],
@@ -35,16 +39,6 @@ for (const [index, lang] of [[0, 'tr'], [1, 'ru']]) {
 // The same admission is checked when the menu is drawn and again by the native
 // host start. No cached DOM state can authorize a departed/loading context.
 export function deadletter30Admission(game) {
-  let reason = '';
-  if (game?.destroyed) reason = DEADLETTER30.unavailable;
-  else if (!game?.isHost) reason = DEADLETTER30.host;
-  else if (game.run?.phase === 'deadletter') reason = DEADLETTER30.active;
-  else if (game.landQ?.pending || game.landQ?.running || game.landQ?.flushing) reason = DEADLETTER30.loading;
-  else if (game.run?.fleet13?.docked || !game.ship) reason = DEADLETTER30.dock;
-  else if (!['orbit', 'company', 'hub'].includes(game.run?.phase)) reason = DEADLETTER30.phase;
-  else if (!game.player || game.player.dead || game.player.downed ||
-    [...(game.remotes?.values?.() || [])].some(p => p.dead || p.downed || game.downed?.isDowned?.(p.id)) ||
-    (game.aiPlayers?.() || [game.player]).some(p => p.dead || p.downed || game.downed?.isDowned?.(p.id))) reason = DEADLETTER30.crew;
-  else if ((game.items?.serialize?.() || []).length > 128) reason = DEADLETTER30.cargo;
-  return { enabled: !reason, reason };
+  // Keep the legacy loader and checkpoint exit; every new start is retired.
+  return { enabled: false, reason: DEADLETTER30.retired };
 }

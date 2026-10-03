@@ -104,7 +104,7 @@ export function installFleet13(game) {
   panel.classList.add('fleet13');
   const selected=f.selected ? t(FLEET13[f.selected].name) : t('No vessel selected');
   const body=el('div',{class:'cp-body'},
-   el('p',{},(game.opts?.deadletter?'Dead Letter Run · ':'')+tf('Selected vessel: {name}',{name:selected})),
+   el('p',{},tf('Selected vessel: {name}',{name:selected})),
    el('p',{class:'dim'},t('Ship rooms and upgrades are saved per vessel.')));
   if(!game.isHost)body.append(el('p',{},t('Only the host can purchase and dispatch the crew.')));
   const cards=el('div',{style:'display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:12px'});
@@ -149,7 +149,7 @@ export function installFleet13(game) {
   const selected=game.run.fleet13.selected, target=selected?HUB13_BOARD:HUB13_BROKER;
   const distance=Math.round(Math.hypot(game.player.pos.x-target[0],game.player.pos.z-target[2]));
   const text=game.isHost ? tf(selected?'Board {name} at the departure kiosk ({n} m)':'Claim a free ship at the fleet office ({n} m)',{name:selected?t(FLEET13[selected].name):'',n:distance}) : t(selected?'Waiting for the host to dispatch the selected vessel.':'Waiting for the host to choose a vessel.');
-  return [{text:(game.opts?.deadletter?'Dead Letter Run · ':'')+text,kind:'main',first:true,done:false}];
+  return [{text:text,kind:'main',first:true,done:false}];
  });
  offs.push(game.mods.on('update',(dt,g)=>{
   if(g!==game)return;

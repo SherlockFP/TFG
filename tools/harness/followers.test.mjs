@@ -26,7 +26,8 @@ ok(nextMilestone(1e9) === null, 'past the ladder: null');
 ok(followersOf({ profile: { coins: 77.9 } }) === 77 && CURRENCIES.clout.name === 'Followers' && CURRENCIES.clout.spendable === false, 'wallet: followers, not spendable');
 ok(followerCard({ coins: 10, owned: [] }).next.at === 50 && followerUnlocks({ owned: ['shovel'] }).every((u) => u.name !== 'Lead Pipe' && u.at > 0), 'card + unlock list');
 
-// 3. NO SPEND PATH: claiming / adopting never subtracts
+// 3. Milestone claims/adoptions never subtract. Wave31's explicitly requested
+// host-confirmed market is the sole exception; market31.test covers its payment.
 const q = { level: 30, coins: 1e6, cosm5: null, cosmetics: { suits: [], hats: [] }, stats: {}, emotes: [] };
 const day = 20123, o = offersFor(q, day).offers[0];
 const r = buyOffer(q, o.key, { day });
@@ -38,10 +39,11 @@ ok(buyPet({ state: st, profile: prof }, 'cat').ok && prof.coins === 5000, 'pet a
 ok(buySkin({ state: st, profile: prof }, 'h', 'party').ok !== undefined && prof.coins === 5000, 'pet skin leaves followers untouched');
 const walk = (d, out = []) => { for (const f of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, f.name); if (f.isDirectory()) walk(p, out); else if (/\.(js|mjs)$/.test(f.name)) out.push(p); } return out; };
 const src = walk(fileURLToPath(new URL('../../src/', import.meta.url))).concat(walk(fileURLToPath(new URL('../../public/mods/', import.meta.url))));
+const paidMarket = fileURLToPath(new URL('../../src/game/market31.js', import.meta.url));
 for (const f of src) {
   const s = fs.readFileSync(f, 'utf8').replace(/\/\/.*$/gm, '');
   ok(!/spendCoins/.test(s), 'no spendCoins anywhere: ' + path.basename(f));
-  ok(!/\.coins\s*-=|\.coins\s*=\s*[\w.]*coins\s*-/.test(s), 'no coins decrement: ' + path.basename(f));
+  if (f !== paidMarket) ok(!/\.coins\s*-=|\.coins\s*=\s*[\w.]*coins\s*-/.test(s), 'no coins decrement outside approved market: ' + path.basename(f));
 }
 
 // 4. EN / TR / RU strings of the milestone UI

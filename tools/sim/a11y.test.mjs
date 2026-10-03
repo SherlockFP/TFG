@@ -51,6 +51,10 @@ const cf = A.findConflicts(clash); ok(cf.length === 1 && cf[0].code === 'KeyE' &
 let r = A.bindKey(A.DEFAULT_KEYS, 'jump', 'KeyE');
 ok(r.ok && r.swapped === 'interact' && r.keys.jump === 'KeyE' && r.keys.interact === 'Space' && A.findConflicts(r.keys).length === 0, 'rebind swaps, no new conflict');
 r = A.bindKey(A.DEFAULT_KEYS, 'jump', 'Escape'); ok(!r.ok && r.reason === 'reserved', 'Escape refused');
+for (const code of ['ControlLeft','ControlRight']) {
+  r = A.bindKey(A.DEFAULT_KEYS, 'crouch', code);
+  ok(!r.ok && r.reason === 'reserved', `${code} cannot create an unusable crouch binding`);
+}
 r = A.bindKey(A.DEFAULT_KEYS, 'nope', 'KeyJ'); ok(!r.ok && r.reason === 'unknown', 'unknown action refused');
 r = A.bindKey(A.DEFAULT_KEYS, 'jump', 'KeyH'); ok(r.ok && /Homeworld/.test(r.note || ''), 'hard-coded key warns');
 r = A.bindKey(A.DEFAULT_KEYS, 'jump', 'Space'); ok(r.ok && !r.swapped, 'same key is a no-op');

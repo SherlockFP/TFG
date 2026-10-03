@@ -1,0 +1,57 @@
+Wave31 read-only published-baseline failure reproduction
+Date: 2026-10-03T00:31:24.834Z
+Published SHA: 2e50c8b588343769fbc9e10cfada24be62bba189
+Baseline: isolated git archive origin/main src + original test/fixture + package.json; shared unchanged node_modules junction
+Archive command: git archive --format=zip --output=<baseline>/baseline.zip origin/main src tools/harness/outdoor30_staged.test.mjs tools/harness/ship2_env.mjs package.json
+carry2 source command: git show origin/main:tools/harness/carry2.test.mjs
+Baseline directory: C:/Users/Sher/AppData/Local/Temp/tfg-outdoor31-Jm8Ts2
+Runtime: C:\Users\Sher\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe
+Runtime version: v24.19.0
+Platform: win32 x64
+Three: 0.186.1
+Rapier: 0.21.0
+No application source or test oracle was changed.
+
+COMMAND: & "C:\\Users\\Sher\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe" "C:\\Users\\Sher\\AppData\\Local\\Temp\\tfg-outdoor31-Jm8Ts2\\tools\\harness\\outdoor30_staged.test.mjs"
+CWD: C:/Users/Sher/AppData/Local/Temp/tfg-outdoor31-Jm8Ts2
+EXIT: 1
+SIGNAL: null
+STDOUT:
+
+STDERR:
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: hamsi geometry, material, native collider, height, spawn and placement frozen-HEAD oracle
++ actual - expected
+
++ '0f331a010288465cba6a29c33d1d6379ef1422100744baca4e38922530d93d19'
+- '6a935019a6fde094e627bbc03cd832cae8e919735c4bcaabf27d1662eb3a2359'
+
+    at file:///C:/Users/Sher/AppData/Local/Temp/tfg-outdoor31-Jm8Ts2/tools/harness/outdoor30_staged.test.mjs:62:10 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: '0f331a010288465cba6a29c33d1d6379ef1422100744baca4e38922530d93d19',
+  expected: '6a935019a6fde094e627bbc03cd832cae8e919735c4bcaabf27d1662eb3a2359',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0
+
+
+COMMAND: & "C:\\Users\\Sher\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe" "C:\\Users\\Sher\\AppData\\Local\\Temp\\tfg-outdoor31-Jm8Ts2\\tools\\harness\\carry2.test.mjs"
+CWD: C:/Users/Sher/AppData/Local/Temp/tfg-outdoor31-Jm8Ts2
+EXIT: 3221226505
+SIGNAL: null
+STDOUT:
+carry2: ok
+
+STDERR:
+Assertion failed: !(handle->flags & UV_HANDLE_CLOSING), file src\win\async.c, line 94
+
+
+Result: both failures reproduce on published 2e50c8b with the final suite runtime and current unchanged dependencies; these are pre-existing baseline/environment failures, not Wave31 source regressions.
+Additional reviewer probes: baseline outdoor hash identical under Node24.14.0 and Node26.7.0; baseline and current carry2 both abort after ok under Node24.14.0 (Windows libuv async.c line76, exit3221226505).
+Limit: no Linux/Internet/hardware comparison; the precise platform-versus-dependency source of the historical golden mismatch was not established.

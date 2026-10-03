@@ -8,6 +8,7 @@ import {initPhysics,Physics,G,groups,RAPIER} from '../../src/physics/physics.js'
 import {CreatureManager} from '../../src/entities/creatures.js';
 import {ItemManager} from '../../src/entities/items.js';
 import {installDeadletter24,DL24_GEAR} from '../../src/game/deadletter24.js';
+import {newProgress} from '../../src/game/deadletter24_core.js';
 import {createDeadletter24Projectiles,DL24_TYPES} from '../../src/game/deadletter24_combat.js';
 import {CREATURES} from '../../src/game/creatures.js';
 import {generateLayout,buildFacility} from '../../src/world/facility.js';
@@ -36,6 +37,19 @@ const game={isHost:true,selfId:'host',time:0,scene,engine:{scene,camera:new THRE
 game.loadMapFor=function(run){return this.deadletter24?.loadMapFor(run);};game.applyRunState=function(d){Object.assign(this.run,d);this.deadletter24?.onState(this.run);};let reentrantStates=0;net.on_('gs',d=>{reentrantStates++;game.applyRunState(d);});game.broadcastRun=hostMethods.broadcastRun;game.run.cargo13={map:'native-company',p:[8,0,7],yaw:0,ids:[],driver:null};game.profile={};game.progress={save(){}};
 game.items=new ItemManager(game);game.creatures=new CreatureManager(game);game.deadletter24=installDeadletter24(game);for(const fn of mods._h.get('objectives')||[])fn._src='deadletter24';game.onegoal=installOneGoal(game);const nativeObjectives=Object.create(Objectives.prototype);nativeObjectives.game=game;const nativeCargo=installCargo13(game),nativeFleet=installFleet13(game);mods.emit('registerHandlers',(k,fn)=>handlers.set(k,fn),game);
 try{
+ // Saved-session fixture: retirement blocks new admission, but must retain the
+ // native map/cargo/exit/migration lifecycle for sessions already in progress.
+ function resumeSavedSession(){
+  const backup={run:structuredClone(game.run),items:game.items.serialize(),players:{}};
+  for(const p of game.aiPlayers())backup.players[p.id]={p:p.pos.toArray(),yaw:p.id==='host'?player.yaw:0,hp:p.id==='host'?player.hp:game.remotes?.get(p.id)?.hp||100,dead:false};
+  const token=`legacy-fixture:${game.time}`;
+  const players={host:newProgress({seed:101,floor:0}),peer:newProgress({seed:102,floor:0})};
+  game.hostSetPhase('deadletter',{moon:'deadletter24',deadletter24:{version:1,token,seed:123,floor:0,floorRev:1,stage:'intro',elapsed:0,wave:0,spawned:0,kills:0,rareDrops:0,players,backup}});
+  game.deadletter24.onState();return game.deadletter24.active();
+ }
+ assert.equal(game.deadletter24.start(),false,'retired mode rejects direct start even with an eligible host');
+ assert.equal(game.deadletter24.requestStart(),false,'retired mode rejects stale ship/start callbacks');
+ assert.equal(game.deadletter24.enterFromMenu(),false,'retired mode rejects stale pause callbacks');
  const mainId=game.items.hostSpawn('copper',new THREE.Vector3(0,1,0),{value:42,holder:'host',bag:[{ty:'bolt',v:9}],battery:23});const before=game.items.serialize(),nativeRun=structuredClone(game.run);
  const admissionQueue=new LandingQueue();game.landQ=admissionQueue;admissionQueue.add('pending-map-fixture',()=>{});
  assert.equal(game.deadletter24.menuStatus().enabled,false);assert.equal(game.deadletter24.enterFromMenu(),false,'native menu entry cannot race a pending map build');admissionQueue.clear();
@@ -44,7 +58,7 @@ try{
  game.isHost=false;assert.equal(game.deadletter24.enterFromMenu(),false,'peer cannot start from menu');game.isHost=true;
  const dockState=game.run.fleet13;game.run.fleet13={docked:true};assert.equal(game.deadletter24.start(),false,'fresh dock must finish actual boarding first');game.run.fleet13=dockState;
  assert.deepEqual(game.items.serialize(),before,'all rejected entries preserve actual item custody');assert.equal(mainSaves,0,'rejected menu entries never save or replace campaign state');
- assert(game.deadletter24.enterFromMenu());assert(reentrantStates>0,'real cargo unload synchronously enters native gs/fleet applyRunState');assert.equal(scene.children.filter(o=>o===game.world.facility.group).length,1,'one actual facility despite reentrant delivery');assert.equal(game.run.phase,'deadletter');assert(game.world.facility.lab.arena);assert.equal(game.run.credits,777);assert.equal(game.run.casino13.chips,88);assert.equal(game.items.get(mainId),undefined);assert(game.items.all().some(it=>it.type===DL24_GEAR));assert.equal(mainSaves,1);
+ assert(resumeSavedSession());assert(reentrantStates>0,'real cargo unload synchronously enters native gs/fleet applyRunState');assert.equal(scene.children.filter(o=>o===game.world.facility.group).length,1,'one actual facility despite reentrant delivery');assert.equal(game.run.phase,'deadletter');assert(game.world.facility.lab.arena);assert.equal(game.run.credits,777);assert.equal(game.run.casino13.chips,88);assert.equal(game.items.get(mainId),undefined);assert(game.items.all().some(it=>it.type===DL24_GEAR));assert.equal(mainSaves,0,'saved session loading does not create a new campaign save');
  const producedIntro=nativeObjectives.compute();for(const density of ['standard','full']){const displayed=game.onegoal.shown(producedIntro,density);assert.equal(displayed.length,2,'actual mode producer survives native OneGoal two-row display');assert(displayed.some(row=>/LMB/.test(row.text)&&/R:/.test(row.text)),'native display retains real combat controls');}assert.equal(game.onegoal.shown(producedIntro,'minimal').length,1);
  const objectiveRows=[];mods.emit('objectives',(line,role)=>objectiveRows.push([line,role]),game,'deadletter');assert.equal(objectiveRows.length,2,'mode owns two readable objective rows');assert(game.deadletter24.presentationQuiet(),'real entry is a quiet introductory presentation');me.downed=true;const rescueRows=[];mods.emit('objectives',(line,role)=>rescueRows.push([line,role]),game,'deadletter');assert.equal(rescueRows[1][1],'warn');assert(/recover|revive/i.test(rescueRows[1][0]),'rescue tells crew to recover instead of meet at cabinet');assert(!game.deadletter24.presentationQuiet());const displayedRescue=game.onegoal.shown(nativeObjectives.compute(),'standard');assert.equal(displayedRescue[0].kind,'warn');assert(/Recover/.test(displayedRescue[0].text));assert.equal(displayedRescue.length,2);me.downed=false;
  const st=game.deadletter24.state(),a=game.deadletter24.statsProgress().anchor;player.teleport(new THREE.Vector3().fromArray(a).setY(-299.98),0);peer.pos.copy(me.pos).add(new THREE.Vector3(1,0,0));peer.eye.copy(peer.pos).y+=1.62;peer.zone='in';
@@ -108,10 +122,10 @@ try{
  pg.deadletter24.dispose();pg.items.clearAll();pg.world.company.dispose(peerPhysics);peerPhysics.world.free();
  // Wipe restores only through host tick; a death callback cannot restore and then
  // have the native death tail destroy that restored state.
- me.dead=false;peer.dead=false;assert(game.deadletter24.start());me.downed=true;peer.downed=true;tick(250);assert.equal(game.run.phase,'orbit');assert.deepEqual(game.items.serialize(),before);me.downed=false;peer.downed=false;
+ me.dead=false;peer.dead=false;assert(resumeSavedSession());me.downed=true;peer.downed=true;tick(250);assert.equal(game.run.phase,'orbit');assert.deepEqual(game.items.serialize(),before);me.downed=false;peer.downed=false;
 
  // Drive the real native host-migration installer, not an invented mode event.
- assert(game.deadletter24.start());const originalNetOn=net.on;net.on=()=>()=>{};net.relayTypes=new Set();net.players=new Map([['peer',{id:'peer',name:'Departed'}],['host',{id:'host',name:'Successor'}]]);net.isHost=false;net.hostId='peer';net.hostEpoch=0;net.connected=true;net.lost=new Set();net.transport={peers:new Set(['peer'])};net.migrateTo=(id,epoch)=>{net.isHost=true;net.hostId=id;net.hostEpoch=epoch;game.isHost=true;return net.players.get('peer');};
+ assert(resumeSavedSession());const originalNetOn=net.on;net.on=()=>()=>{};net.relayTypes=new Set();net.players=new Map([['peer',{id:'peer',name:'Departed'}],['host',{id:'host',name:'Successor'}]]);net.isHost=false;net.hostId='peer';net.hostEpoch=0;net.connected=true;net.lost=new Set();net.transport={peers:new Set(['peer'])};net.migrateTo=(id,epoch)=>{net.isHost=true;net.hostId=id;net.hostEpoch=epoch;game.isHost=true;return net.players.get('peer');};
  game.isHost=false;game.freshDayStats=()=>({collected:0,kills:0,deaths:[],per:{}});game.registerHandlers=()=>mods.emit('registerHandlers',(k,fn)=>handlers.set(k,fn),game);game.hostOnPlayerLeave=()=>{};game.opts={};game.config={};game.voice={removePeer(){}};
  const hm=installHostMig(game);hm.becomeHost();assert.equal(game.run.phase,'orbit','actual HMX takeover safely ends mode');assert.deepEqual(game.run,nativeRun);assert.equal(game.items.get(mainId).holder,'host');assert.equal(player.hp,83);hm.dispose();net.on=originalNetOn;
  // Fresh installed mode with an actual native checkpoint tests Host-form launch intent.
@@ -120,8 +134,8 @@ try{
  game.terminal={active:true};mods.emit('update',1/60,game);assert.equal(game.run.phase,'orbit','automatic mode waits for an open terminal');game.terminal.active=false;
  game.minigame={};mods.emit('update',1/60,game);assert.equal(game.run.phase,'orbit','automatic mode waits for a native minigame');game.minigame=null;
  game.ui.blocksInput=()=>true;mods.emit('update',1/60,game);assert.equal(game.run.phase,'orbit','automatic mode waits for owned modal input');game.ui.blocksInput=()=>false;
- mods.emit('update',1/60,game);assert.equal(game.run.phase,'deadletter','eligible boarded title session actually starts native expedition');const freshAnchor=game.deadletter24.statsProgress().anchor;player.teleport(new THREE.Vector3().fromArray(freshAnchor).setY(-299.98),0);
- assert(game.deadletter24.request('exit'));assert.equal(game.run.phase,'orbit');player.inShip=true;mods.emit('update',1/60,game);assert.equal(game.run.phase,'orbit','automatic launch is consumed exactly once across actual exit');assert.deepEqual(game.items.serialize(),before,'automatic mode returns exact campaign/native fixture cargo');
+ mods.emit('update',1/60,game);assert.equal(game.run.phase,'orbit','retired title intent cannot auto-launch');assert(resumeSavedSession());const freshAnchor=game.deadletter24.statsProgress().anchor;player.teleport(new THREE.Vector3().fromArray(freshAnchor).setY(-299.98),0);
+ assert(game.deadletter24.exitFromMenu());assert.equal(game.run.phase,'orbit');player.inShip=true;mods.emit('update',1/60,game);assert.equal(game.run.phase,'orbit','automatic launch is consumed exactly once across actual exit');assert.deepEqual(game.items.serialize(),before,'automatic mode returns exact campaign/native fixture cargo');
  game.opts={};delete player.inShip;delete game.ui.blocksInput;delete game.terminal;game.minigame=null;
  // Captured browser poses, labelled seed17 reconstruction (not the unretained browser RNG seed).
  const slidePhysics=new Physics(),slideScene=new THREE.Scene(),slideFac=buildFacility(generateLayout(17,'deadletter24',.8),{physics:slidePhysics,lightPool:game.lights});slideScene.add(slideFac.group);

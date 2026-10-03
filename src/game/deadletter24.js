@@ -2,7 +2,7 @@
 // never sold/copied into this mode. All progression below is temporary host state.
 import * as THREE from 'three';
 import {generateLayout,buildFacility,FACILITY_Y} from '../world/facility.js';
-import {deadletter24Cabinet,deadletter24RareCase,deadletter25Entry} from './deadletter24_view.js';
+import {deadletter24Cabinet,deadletter24RareCase} from './deadletter24_view.js';
 import {getBasicMaterial} from '../render/textures.js';
 import {MOONS} from './moons.js';
 import {registerItem} from './items.js';
@@ -76,7 +76,7 @@ export function installDeadletter24(game){
  function stats(base){if(!active())return base;const e=effects(state().players?.[game.selfId]?.build);if(!statsCopy||statsCopy._source!==base)statsCopy={...base,_source:base,maxHp:100+e.health,maxStamina:100,speedMul:e.speed,armor:0};return statsCopy;}
  function playerDamage(id,dmg){return Math.max(1,Math.round(Math.min(40,Math.max(0,dmg))*(1-effects(state()?.players?.[id]?.build).reduction)));}
  function reachable(from,pos,range=2.8){const p=game.aiPlayerById?.(from);if(!p||p.dead||down(p)||!pos||p.pos.distanceTo(pos)>range)return false;return !game.physics?.raycast?.(p.eye||p.pos,pos.clone().sub(p.eye||p.pos).normalize(),Math.max(0,pos.distanceTo(p.eye||p.pos)-.15),G.STATIC|G.DOOR);}
- function syncEntry(){const show=!active()&&['orbit','company','hub'].includes(game.run?.phase)&&!!game.ship;if(!show||entryShip!==game.ship){entryVisual?.dispose();entryVisual=null;entryShip=null;}if(show&&!entryVisual){entryShip=game.ship;entryVisual=deadletter25Entry(game,entryPoint());}}
+ function syncEntry(){entryVisual?.dispose();entryVisual=null;entryShip=null;}
  function entryPoint(){return game.ship?.points?.terminal?.clone().add(new THREE.Vector3(.7,.6,0))||game.ship?.spawns?.[0]?.clone().add(new THREE.Vector3(.8,1.1,0))||new THREE.Vector3(1,1.1,0);}
  function snapshot(){const ps={};for(const p of game.aiPlayers?.()||[])ps[p.id]={p:p.pos.toArray(),yaw:p.id===game.selfId?game.player.yaw:game.remotes?.get(p.id)?.yaw||0,hp:p.id===game.selfId?game.player.hp:game.remotes?.get(p.id)?.hp||100,dead:p.dead};
   return {run:copy(game.run),items:copy(game.items?.serialize?.()||[]),players:ps};}
@@ -140,7 +140,7 @@ export function installDeadletter24(game){
  on('netReady',(net,g)=>{if(g===game)bind(net);});if(game.net)bind(game.net);
  on('hostMigrated',(g,info)=>{if(g===game&&info?.self&&game.isHost&&active())end('migration');});
  on('registerHandlers',(H,g)=>{if(g===game)H('dl24req',hostReq);});
- on('interactables',(out,g)=>{if(g!==game)return;if(!active()){syncEntry();if(['orbit','company','hub'].includes(game.run?.phase)&&game.isHost)out.push({pos:entryPoint(),r:.55,reach:2.7,label:t(TEXT.start),sub:t(TEXT.sub),action:()=>request('start')});return;}
+ on('interactables',(out,g)=>{if(g!==game)return;if(!active()){syncEntry();return;}
   const a=anchor();if(!a)return;if(state().players?.[game.selfId]?.offer&&combatPaused())out.unshift({pos:a,r:.5,reach:2.8,label:t(TEXT.draft),action:()=>{const pr=state().players[game.selfId];draft?.openDraft({offer:pr.offer,build:pr.build,onChoose:c=>request('choose',c)});}});
   if(state().stage==='cleared')out.push({pos:a.clone().add(new THREE.Vector3(1,0,0)),r:.45,reach:2.8,label:t(TEXT.next),action:()=>request('next')});
   if(game.isHost)out.push({pos:a.clone().add(new THREE.Vector3(-1,0,0)),r:.45,reach:2.8,label:t(TEXT.exit),action:()=>request('exit')});
@@ -148,14 +148,12 @@ export function installDeadletter24(game){
  });
  on('objectives',(add,g,phase)=>{if(g!==game||phase!=='deadletter')return;const st=state();if(!st)return;const rescue=living().some(down);add(`Dead Letter / ${st.floor+1} / ${t(st.stage==='intro'?TEXT.introStage:st.stage==='wave'?TEXT.waveStage:st.stage==='boss-intro'?TEXT.bossIntroStage:st.stage==='boss'?TEXT.bossStage:TEXT.clearedStage)}`,'main');add(rescue?t(RESCUE):combatPaused()?`${t(TEXT.paused)} ${t(TEXT.auto)}`:st.stage==='cleared'?t(TEXT.clear):t(TEXT.ready),rescue?'warn':'sub');});
  on('update',(dt,g)=>{if(g!==game)return;syncEntry();if(!active()){
-  // Host-form expeditions start only after real fleet boarding, in a temporary slot.
-  if(game.opts?.deadletter&&!menuLaunchConsumed&&game.player?.inShip&&!game.ui?.blocksInput?.()&&!game.terminal?.active&&!game.minigame&&deadletter30Admission(game).enabled){start();}
   return;
  }readyFrames++;if(!combatPaused())projectiles.update(dt);onState();});
  offs.push(()=>{entryVisual?.dispose();entryVisual=null;entryShip=null;});
  const oldSpeed=game.creatures?.speedMul;if(oldSpeed){const wrapped=function(c,speed){return ownsCreature(c)?Math.min(3.6,Math.max(0,speed)):oldSpeed.call(this,c,speed);};game.creatures.speedMul=wrapped;offs.push(()=>{if(game.creatures.speedMul===wrapped)game.creatures.speedMul=oldSpeed;});}
  const oldSpawn=game.items?.hostSpawn;if(oldSpawn){const wrapped=function(type,pos,opts){if(active()&&type!==DL24_GEAR)return null;return oldSpawn.call(this,type,pos,opts);};game.items.hostSpawn=wrapped;offs.push(()=>{if(game.items.hostSpawn===wrapped)game.items.hostSpawn=oldSpawn;});}
- return{active,state,start,entryPoint,menuStatus:()=>deadletter30Admission(game),enterFromMenu(){const status=deadletter30Admission(game);if(!status.enabled){warn(status.reason);return false;}return start();},presentationQuiet:()=>active()&&state().stage==='intro'&&state().elapsed<4&&!living().some(down),acceptItemEvent(d){if(d?.e==='sp'){if(active())return d.ty===DL24_GEAR&&d.lb===`${state().token}:${state().floorRev}`;return d.ty!==DL24_GEAR;}if(active()&&mainCheckpoint?.items?.some(it=>it.id===d?.id))return false;return true;},requestStart:()=>request('start'),request,hostReq,loadMapFor,onState,onPhase,placeLateJoin,hostTick,combatPaused,ownsCreature,spawnOptions,afterSpawn,onKill,attack,special,stats,playerDamage,
+ return{active,state,start,entryPoint,exitFromMenu:()=>end(),menuStatus:()=>deadletter30Admission(game),enterFromMenu(){const status=deadletter30Admission(game);if(!status.enabled){warn(status.reason);return false;}return start();},presentationQuiet:()=>active()&&state().stage==='intro'&&state().elapsed<4&&!living().some(down),acceptItemEvent(d){if(d?.e==='sp'){if(active())return d.ty===DL24_GEAR&&d.lb===`${state().token}:${state().floorRev}`;return d.ty!==DL24_GEAR;}if(active()&&mainCheckpoint?.items?.some(it=>it.id===d?.id))return false;return true;},requestStart:()=>request('start'),request,hostReq,loadMapFor,onState,onPhase,placeLateJoin,hostTick,combatPaused,ownsCreature,spawnOptions,afterSpawn,onKill,attack,special,stats,playerDamage,
   statsProgress:()=>{const st=state();return st?{floor:st.floor+1,stage:st.stage,kills:st.kills,players:st.players,projectiles:projectiles.count(),paused:combatPaused(),anchor:anchor()?.toArray(),start:anchor()?.clone().setY(FACILITY_Y+.02).add(new THREE.Vector3(0,0,2.4)).toArray(),spawnSpots:fac?.lab?.spawnSpots}:null;},
   dispose(){if(disposed)return;disposed=true;pendingThrow=null;draft?.dispose();projectiles.clear();removeMap();for(const off of offs.splice(0))off?.();bound?.off?.('msg:dl24fx',onFx);bound?.off?.('msg:dl24end',onEnd);seqs.clear();shots.clear();if(registry?.get(DL24_GEAR)===gearFactory){if(previousGear)registry.set(DL24_GEAR,previousGear);else registry.delete(DL24_GEAR);}actorRegistryDispose?.();}};
 }

@@ -1,0 +1,10 @@
+{
+  "date": "2026-10-03",
+  "baseline": "2e50c8b588343769fbc9e10cfada24be62bba189",
+  "protocol": "0.12.4",
+  "node": "24.19.0",
+  "devPort": 5174,
+  "sourceFiles": 903,
+  "sha256": "0fc7d7db30161bcd9c25f8ae9da19973c4c1f694346d942d99b1adb5599da710",
+  "browser": "Codex in-app browser; guided input and disclosed Company fixture; no hardware rating"
+}

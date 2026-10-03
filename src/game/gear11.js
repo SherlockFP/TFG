@@ -589,7 +589,7 @@ export function installGear11(game) {
     camRef.batB.style.width = Math.max(0, Math.min(100, (b / cap) * 100)) + '%';
     camRef.bat.classList.toggle('low', b < 8);
     setText(camRef.info, tf('LINK {q}%', { q: Math.round(P.link * 100) }) + '\n' + tf('BODY {m} m', { m: Math.round(dist) }) + '\n' + (P.scanCd > 0 ? tf('SCAN {s} s', { s: Math.ceil(P.scanCd) }) : t('SCAN READY')));
-    setText(camRef.keys, t('WASD fly / Space up / Ctrl down') + '\n' + t('LMB scan / E recall'));
+    setText(camRef.keys, t('WASD fly / Space up / C down') + '\n' + t('LMB scan / E recall'));
     camRef.noise.style.opacity = String(Math.max(0, (1 - P.link) * 0.7) + (g.settings?.reduceMotion ? 0 : (P.link < 0.3 ? Math.random() * 0.12 : 0)));
     camRef.warn.style.display = P.hostile ? 'block' : 'none';
     setText(camRef.warn, t('HOSTILE NEAR YOUR BODY'));

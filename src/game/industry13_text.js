@@ -11,6 +11,8 @@ const rows = [
 ['Dreamdust is fictional contraband. Higher margins, customs may seize a batch.','Rüyatozu kurgu bir kaçak üründür. Kârı yüksek; gümrük partiye el koyabilir.','Пыль снов — вымышленная контрабанда. Доход выше, но таможня может изъять партию.'],
 ['Meet a field broker to buy supplies. The ship terminal is now a route console.','Malzeme almak için saha tüccarını bul. Gemi terminali artık rota konsolu.','Припасы продаёт полевой брокер. Терминал корабля теперь управляет маршрутом.'],
 ['Approach the broker before ordering.','Sipariş vermeden önce tüccara yaklaş.','Подойдите к брокеру перед заказом.'],
+['Invalid order ID. Reopen the broker and try again.','Sipariş kimliği geçersiz. Tüccarı yeniden açıp tekrar dene.','Неверный номер заказа. Открой брокера снова и повтори попытку.'],
+['Order history is full. Start a new run before ordering more.','Sipariş geçmişi dolu. Yeni sipariş için yeni bir oyun başlat.','История заказов заполнена. Начни новую игру перед следующим заказом.'],
 ['Invalid ledger.','Geçersiz hesap.','Неверный счёт.'],['Not enough credits or production bays are full.','Kredi yetersiz veya üretim bölmeleri dolu.','Недостаточно кредитов или мастерская занята.'],
 ['Batch commissioned. Complete field shifts, then collect at a broker.','Üretim başladı. Saha seferlerini tamamla, sonra tüccara dön.','Партия заказана. Завершите вылазки и вернитесь к брокеру.'],
 ['No finished batch to sell.','Satılacak hazır parti yok.','Нет готовой партии.'],['Broker budget spent. Return after another field shift.','Tüccarın bütçesi bitti. Yeni seferden sonra dön.','Бюджет брокера исчерпан. Вернитесь после вылазки.'],
